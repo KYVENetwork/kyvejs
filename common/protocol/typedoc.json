@@ -4,7 +4,7 @@
   "out": "docs",
   "excludeExternals": false,
   "theme": "default",
-  "name": "@kyvejs/sdk",
+  "name": "@kyvejs/protocol",
   "excludePrivate": true,
   "excludeProtected": true,
   "hideGenerator": true
