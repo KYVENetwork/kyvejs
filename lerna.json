@@ -1,0 +1,17 @@
+{
+  "version": "independent",
+  "npmClient": "yarn",
+  "useWorkspaces": true,
+  "useNx": true,
+  "command": {
+    "version": {
+      "conventionalCommits": true,
+      "allowBranch": "main",
+      "exact": true,
+      "message": "chore: released new version"
+    },
+    "clean": {
+      "yes": true
+    }
+  }
+}

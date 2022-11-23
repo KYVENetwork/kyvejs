@@ -1,0 +1,30 @@
+{
+  "name": "root",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KYVENetwork/kyvejs.git"
+  },
+  "workspaces": [
+    "common/*",
+    "integrations/*"
+  ],
+  "devDependencies": {
+    "lerna": "^5.2.0",
+    "nx": "^14.4.3",
+    "prettier": "^2.3.0",
+    "rimraf": "^3.0.2"
+  },
+  "scripts": {
+    "setup": "lerna clean && lerna  bootstrap --ignore-scripts  && lerna run build",
+    "graph": "yarn nx graph",
+    "build": "lerna run build",
+    "pub": "lerna run build && lerna publish",
+    "build:changed": "lerna run --since origin/master --include-dependents build",
+    "test": "lerna run test",
+    "test:unit": "lerna run test:unit",
+    "fmt": "prettier --write .",
+    "clean": "lerna run --parallel clean"
+  },
+  "version": "0.0.0"
+}
