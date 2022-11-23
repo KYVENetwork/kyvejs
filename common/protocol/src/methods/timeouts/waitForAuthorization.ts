@@ -1,4 +1,4 @@
-import { Node } from "../..";
+import { ProtocolNode } from "../..";
 import {
   callWithBackoffStrategy,
   REFRESH_TIME,
@@ -13,10 +13,10 @@ import {
  * After authorization the node can continue running.
  *
  * @method waitForAuthorization
- * @param {Node} this
+ * @param {ProtocolNode} this
  * @return {Promise<void>}
  */
-export async function waitForAuthorization(this: Node): Promise<void> {
+export async function waitForAuthorization(this: ProtocolNode): Promise<void> {
   try {
     // call canValidate query to check if valaccount
     // was already authorized to run

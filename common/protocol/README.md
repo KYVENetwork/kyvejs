@@ -1,11 +1,3 @@
-<p align="center">
-  <a href="https://kyve.network">
-    <img src="https://user-images.githubusercontent.com/62398724/137493477-63868209-a19b-4efa-9413-f06d41197d6d.png" style="border-radius: 50%" height="96">
-  </a>
-  <h3 align="center"><code>@kyve/core</code></h3>
-  <p align="center">🚀 The base KYVE node implementation.</p>
-</p>
-
 # Architecture Overview
 
 The KYVE protocol node is in general responsible for collecting data from various sources and submitting them

@@ -1,4 +1,4 @@
-import { Node } from "../..";
+import { ProtocolNode } from "../..";
 import BigNumber from "bignumber.js";
 import { callWithBackoffStrategy, standardizeJSON, VOTE } from "../../utils";
 import { DataItem } from "../../types";
@@ -10,12 +10,12 @@ import { DataItem } from "../../types";
  * with abstain and continues to try to load the bundle
  *
  * @method saveLoadValidationBundle
- * @param {Node} this
+ * @param {ProtocolNode} this
  * @param {number} updatedAt
  * @return {Promise<DataItem[] | null>}
  */
 export async function saveLoadValidationBundle(
-  this: Node,
+  this: ProtocolNode,
   updatedAt: number
 ): Promise<DataItem[] | null> {
   return await callWithBackoffStrategy(

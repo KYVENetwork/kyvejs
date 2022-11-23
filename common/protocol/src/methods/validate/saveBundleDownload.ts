@@ -1,4 +1,4 @@
-import { Node } from "../..";
+import { ProtocolNode } from "../..";
 import { callWithBackoffStrategy, standardizeJSON, VOTE } from "../../utils";
 import BigNumber from "bignumber.js";
 
@@ -14,12 +14,12 @@ import BigNumber from "bignumber.js";
  * the bundle.
  *
  * @method saveBundleDownload
- * @param {Node} this
+ * @param {ProtocolNode} this
  * @param {number} updatedAt
  * @return {Promise<Buffer | null>}
  */
 export async function saveBundleDownload(
-  this: Node,
+  this: ProtocolNode,
   updatedAt: number
 ): Promise<Buffer | null> {
   return await callWithBackoffStrategy(

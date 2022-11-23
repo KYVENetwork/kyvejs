@@ -1,4 +1,4 @@
-import { Node } from "../..";
+import { ProtocolNode } from "../..";
 import { IDLE_TIME, sleep } from "../../utils";
 
 /**
@@ -14,10 +14,10 @@ import { IDLE_TIME, sleep } from "../../utils";
  * stay in sync with the network.
  *
  * @method runNode
- * @param {Node} this
+ * @param {ProtocolNode} this
  * @return {Promise<void>}
  */
-export async function runNode(this: Node): Promise<void> {
+export async function runNode(this: ProtocolNode): Promise<void> {
   // run rounds indefinitely, continueRound returns always
   // true and is only used by unit tests to control the termination of
   // rounds by mocking it

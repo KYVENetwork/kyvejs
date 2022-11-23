@@ -1,7 +1,7 @@
 import {
   callWithBackoffStrategy,
   DataItem,
-  Node,
+  ProtocolNode,
   standardizeJSON,
 } from "../..";
 
@@ -9,13 +9,13 @@ import {
  * saveGetTransformDataItem gets the data item with a backoff strategy
  *
  * @method saveGetTransformDataItem
- * @param {Node} this
+ * @param {ProtocolNode} this
  * @param {string} source
  * @param {string} key
  * @return {Promise<DataItem | null>}
  */
 export async function saveGetTransformDataItem(
-  this: Node,
+  this: ProtocolNode,
   source: string,
   key: string
 ): Promise<DataItem | null> {

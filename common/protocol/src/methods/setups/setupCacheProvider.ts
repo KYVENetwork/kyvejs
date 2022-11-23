@@ -1,4 +1,4 @@
-import { Node, standardizeJSON } from "../..";
+import { ProtocolNode, standardizeJSON } from "../..";
 import path from "path";
 import * as cacheProvider from "../../reactors/cacheProvider";
 
@@ -6,10 +6,10 @@ import * as cacheProvider from "../../reactors/cacheProvider";
  * setupCacheProvider creates the cache provider for the node
  *
  * @method setupCacheProvider
- * @param {Node} this
+ * @param {ProtocolNode} this
  * @return {Promise<void>}
  */
-export async function setupCacheProvider(this: Node): Promise<void> {
+export async function setupCacheProvider(this: ProtocolNode): Promise<void> {
   try {
     // define cache path where the cached data is saved
     // depending on work dir "home"

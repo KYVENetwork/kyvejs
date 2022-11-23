@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Node } from "../..";
+import { ProtocolNode } from "../..";
 import { standardizeJSON } from "../../utils";
 
 /**
@@ -7,10 +7,10 @@ import { standardizeJSON } from "../../utils";
  * and parses it into a json config
  *
  * @method syncPoolConfig
- * @param {Node} this
+ * @param {ProtocolNode} this
  * @return {Promise<void>}
  */
-export async function syncPoolConfig(this: Node): Promise<void> {
+export async function syncPoolConfig(this: ProtocolNode): Promise<void> {
   try {
     this.logger.debug(this.pool.data!.config);
 

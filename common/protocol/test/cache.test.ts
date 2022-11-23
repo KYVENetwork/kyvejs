@@ -1,5 +1,10 @@
 import { Logger } from "tslog";
-import { DataItem, ICompression, IStorageProvider, Node } from "../src/index";
+import {
+  DataItem,
+  ICompression,
+  IStorageProvider,
+  ProtocolNode,
+} from "../src/index";
 import { runCache } from "../src/methods/main/runCache";
 import { genesis_pool } from "./mocks/constants";
 import { client } from "./mocks/client.mock";
@@ -28,7 +33,7 @@ TEST CASES - cache tests
 */
 
 describe("cache tests", () => {
-  let core: Node;
+  let core: ProtocolNode;
 
   let processExit: jest.Mock<never, never>;
   let setTimeoutMock: jest.Mock;
@@ -37,7 +42,7 @@ describe("cache tests", () => {
   let compression: ICompression;
 
   beforeEach(() => {
-    core = new Node(new TestRuntime());
+    core = new ProtocolNode(new TestRuntime());
 
     core["cacheProvider"] = new TestCacheProvider();
 
@@ -212,7 +217,11 @@ describe("cache tests", () => {
         key: n.toString(),
         value: `${n}-value`,
       };
-      expect(runtime.transformDataItem).toHaveBeenNthCalledWith(n + 1, item);
+      expect(runtime.transformDataItem).toHaveBeenNthCalledWith(
+        n + 1,
+        expect.any(ProtocolNode),
+        item
+      );
     }
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(0);
@@ -379,7 +388,11 @@ describe("cache tests", () => {
         key: (n + parseInt(genesis_pool.data.max_bundle_size)).toString(),
         value: `${n + parseInt(genesis_pool.data.max_bundle_size)}-value`,
       };
-      expect(runtime.transformDataItem).toHaveBeenNthCalledWith(n + 1, item);
+      expect(runtime.transformDataItem).toHaveBeenNthCalledWith(
+        n + 1,
+        expect.any(ProtocolNode),
+        item
+      );
     }
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(0);
@@ -555,7 +568,11 @@ describe("cache tests", () => {
         key: (n + parseInt(genesis_pool.data.max_bundle_size) + 3).toString(),
         value: `${n + parseInt(genesis_pool.data.max_bundle_size) + 3}-value`,
       };
-      expect(runtime.transformDataItem).toHaveBeenNthCalledWith(n + 1, item);
+      expect(runtime.transformDataItem).toHaveBeenNthCalledWith(
+        n + 1,
+        expect.any(ProtocolNode),
+        item
+      );
     }
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(0);
@@ -723,7 +740,11 @@ describe("cache tests", () => {
         key: (n + parseInt(genesis_pool.data.max_bundle_size)).toString(),
         value: `${n + parseInt(genesis_pool.data.max_bundle_size)}-value`,
       };
-      expect(runtime.transformDataItem).toHaveBeenNthCalledWith(n + 1, item);
+      expect(runtime.transformDataItem).toHaveBeenNthCalledWith(
+        n + 1,
+        expect.any(ProtocolNode),
+        item
+      );
     }
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(0);
@@ -757,14 +778,15 @@ describe("cache tests", () => {
     // ARRANGE
     core["runtime"].getDataItem = jest
       .fn()
-      .mockImplementationOnce((core: Node, source: string, key: string) =>
-        Promise.resolve({
-          key,
-          value: `${key}-value`,
-        })
+      .mockImplementationOnce(
+        (core: ProtocolNode, source: string, key: string) =>
+          Promise.resolve({
+            key,
+            value: `${key}-value`,
+          })
       )
       .mockRejectedValueOnce(new Error("network error"))
-      .mockImplementation((core: Node, source: string, key: string) =>
+      .mockImplementation((core: ProtocolNode, source: string, key: string) =>
         Promise.resolve({
           key,
           value: `${key}-value`,
@@ -862,19 +884,19 @@ describe("cache tests", () => {
 
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       1,
-      expect.any(Node),
+      expect.any(ProtocolNode),
       core.poolConfig.sources[0],
       "0"
     );
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       2,
-      expect.any(Node),
+      expect.any(ProtocolNode),
       core.poolConfig.sources[0],
       "1"
     );
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       3,
-      expect.any(Node),
+      expect.any(ProtocolNode),
       core.poolConfig.sources[0],
       "1"
     );
@@ -886,7 +908,11 @@ describe("cache tests", () => {
         key: n.toString(),
         value: `${n}-value`,
       };
-      expect(runtime.transformDataItem).toHaveBeenNthCalledWith(n + 1, item);
+      expect(runtime.transformDataItem).toHaveBeenNthCalledWith(
+        n + 1,
+        expect.any(ProtocolNode),
+        item
+      );
     }
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(0);
@@ -916,21 +942,23 @@ describe("cache tests", () => {
     // ARRANGE
     core["runtime"].getDataItem = jest
       .fn()
-      .mockImplementationOnce((core: Node, source: string, key: string) =>
-        Promise.resolve({
-          key,
-          value: `${key}-value`,
-        })
+      .mockImplementationOnce(
+        (core: ProtocolNode, source: string, key: string) =>
+          Promise.resolve({
+            key,
+            value: `${key}-value`,
+          })
       )
       .mockRejectedValueOnce(new Error("network error"))
-      .mockImplementationOnce((core: Node, source: string, key: string) =>
-        Promise.resolve({
-          key,
-          value: `${key}-value`,
-        })
+      .mockImplementationOnce(
+        (core: ProtocolNode, source: string, key: string) =>
+          Promise.resolve({
+            key,
+            value: `${key}-value`,
+          })
       )
       .mockRejectedValueOnce(new Error("network error"))
-      .mockImplementation((core: Node, source: string, key: string) =>
+      .mockImplementation((core: ProtocolNode, source: string, key: string) =>
         Promise.resolve({
           key,
           value: `${key}-value`,
@@ -1130,7 +1158,11 @@ describe("cache tests", () => {
         key: (n + parseInt(genesis_pool.data.max_bundle_size) + 3).toString(),
         value: `${n + parseInt(genesis_pool.data.max_bundle_size) + 3}-value`,
       };
-      expect(runtime.transformDataItem).toHaveBeenNthCalledWith(n + 1, item);
+      expect(runtime.transformDataItem).toHaveBeenNthCalledWith(
+        n + 1,
+        expect.any(ProtocolNode),
+        item
+      );
     }
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(0);
@@ -1164,20 +1196,20 @@ describe("cache tests", () => {
     // ARRANGE
     core["runtime"].transformDataItem = jest
       .fn()
-      .mockImplementationOnce((item: DataItem) =>
+      .mockImplementationOnce((core: ProtocolNode, item: DataItem) =>
         Promise.resolve({
           key: item.key,
           value: `${item.value}-transform`,
         })
       )
-      .mockImplementationOnce((item: DataItem) =>
+      .mockImplementationOnce((core: ProtocolNode, item: DataItem) =>
         Promise.resolve({
           key: item.key,
           value: `${item.value}-transform`,
         })
       )
       .mockRejectedValueOnce(new Error())
-      .mockImplementation((item: DataItem) =>
+      .mockImplementation((core: ProtocolNode, item: DataItem) =>
         Promise.resolve({
           key: item.key,
           value: `${item.value}-transform`,
@@ -1288,7 +1320,7 @@ describe("cache tests", () => {
     for (let n = 0; n < 5; n++) {
       expect(runtime.getDataItem).toHaveBeenNthCalledWith(
         n + 1,
-        expect.any(Node),
+        expect.any(ProtocolNode),
         core.poolConfig.sources[0],
         n.toString()
       );
@@ -1301,7 +1333,11 @@ describe("cache tests", () => {
         key: n.toString(),
         value: `${n}-value`,
       };
-      expect(runtime.transformDataItem).toHaveBeenNthCalledWith(n + 1, item);
+      expect(runtime.transformDataItem).toHaveBeenNthCalledWith(
+        n + 1,
+        expect.any(ProtocolNode),
+        item
+      );
     }
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(0);
@@ -1554,10 +1590,14 @@ describe("cache tests", () => {
 
     expect(runtime.transformDataItem).toHaveBeenCalledTimes(1);
 
-    expect(runtime.transformDataItem).toHaveBeenNthCalledWith(1, {
-      key: "100",
-      value: `100-value`,
-    });
+    expect(runtime.transformDataItem).toHaveBeenNthCalledWith(
+      1,
+      expect.any(ProtocolNode),
+      {
+        key: "100",
+        value: `100-value`,
+      }
+    );
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(0);
 

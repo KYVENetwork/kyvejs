@@ -1,4 +1,4 @@
-import { Node } from "../..";
+import { ProtocolNode } from "../..";
 import { callWithBackoffStrategy, sleep, standardizeJSON } from "../../utils";
 
 /**
@@ -7,12 +7,12 @@ import { callWithBackoffStrategy, sleep, standardizeJSON } from "../../utils";
  * It runs indefinitely until the query returns a valid response
  *
  * @method canPropose
- * @param {Node} this
+ * @param {ProtocolNode} this
  * @param {number} updatedAt the last update time of the current bundle proposal
  * @return {Promise<boolean>}
  */
 export async function canPropose(
-  this: Node,
+  this: ProtocolNode,
   updatedAt: number
 ): Promise<boolean> {
   try {
@@ -29,7 +29,7 @@ export async function canPropose(
         if (this.pool.bundle_proposal!.next_uploader !== this.staker) {
           return {
             possible: false,
-            reason: "Node is not next uploader of this bundle proposal",
+            reason: "ProtocolNode is not next uploader of this bundle proposal",
           };
         }
 

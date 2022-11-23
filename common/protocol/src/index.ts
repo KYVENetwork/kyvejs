@@ -51,10 +51,10 @@ import os from "os";
 /**
  * Main class of KYVE protocol nodes representing a node.
  *
- * @class Node
+ * @class ProtocolNode
  * @constructor
  */
-export class Node {
+export class ProtocolNode {
   // reactor attributes
   protected runtime!: IRuntime;
   protected cacheProvider!: ICacheProvider;
@@ -174,7 +174,7 @@ export class Node {
       .action(() => {
         console.log(`${this.runtime.name} version: ${this.runtime.version}`);
         console.log(`@kyve/core version: ${this.coreVersion}`);
-        console.log(`Node version: ${process.version}`);
+        console.log(`ProtocolNode version: ${process.version}`);
         console.log();
         console.log(`Platform: ${os.platform()}`);
         console.log(`Arch: ${os.arch()}`);
@@ -269,7 +269,7 @@ export class Node {
     await this.setupValidator();
     await this.setupCacheProvider();
 
-    // start the node process. Node and cache should run at the same time.
+    // start the node process. ProtocolNode and cache should run at the same time.
     // Thats why, although they are async they are called synchronously
     try {
       await this.syncPoolState();

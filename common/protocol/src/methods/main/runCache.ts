@@ -1,4 +1,4 @@
-import { DataItem, Node } from "../..";
+import { DataItem, ProtocolNode } from "../..";
 import { generateIndexPairs, sleep, standardizeJSON } from "../../utils";
 import seedrandom from "seedrandom";
 
@@ -24,10 +24,10 @@ import seedrandom from "seedrandom";
  * following round.
  *
  * @method runCache
- * @param {Node} this
+ * @param {ProtocolNode} this
  * @return {Promise<void>}
  */
-export async function runCache(this: Node): Promise<void> {
+export async function runCache(this: ProtocolNode): Promise<void> {
   // run rounds indefinitely, continueRound returns always
   // true and is only used by unit tests to control the termination of
   // rounds by mocking it

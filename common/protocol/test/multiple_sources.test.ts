@@ -4,7 +4,7 @@ import {
   generateIndexPairs,
   ICompression,
   IStorageProvider,
-  Node,
+  ProtocolNode,
   sha256,
 } from "../src/index";
 import { runCache } from "../src/methods/main/runCache";
@@ -34,7 +34,7 @@ TEST CASES - multiple sources tests
 */
 
 describe("multiple sources tests", () => {
-  let core: Node;
+  let core: ProtocolNode;
 
   let processExit: jest.Mock<never, never>;
   let setTimeoutMock: jest.Mock;
@@ -43,7 +43,7 @@ describe("multiple sources tests", () => {
   let compression: ICompression;
 
   beforeEach(() => {
-    core = new Node(new TestRuntime());
+    core = new ProtocolNode(new TestRuntime());
 
     core["cacheProvider"] = new TestCacheProvider();
 
@@ -211,7 +211,7 @@ describe("multiple sources tests", () => {
       for (let s = 0; s < core.poolConfig.sources.length; s++) {
         expect(runtime.getDataItem).toHaveBeenNthCalledWith(
           n,
-          expect.any(Node),
+          expect.any(ProtocolNode),
           core.poolConfig.sources[s],
           b.toString()
         );
@@ -233,7 +233,11 @@ describe("multiple sources tests", () => {
           key: b.toString(),
           value: `${b}-value`,
         };
-        expect(runtime.transformDataItem).toHaveBeenNthCalledWith(n, item);
+        expect(runtime.transformDataItem).toHaveBeenNthCalledWith(
+          n,
+          expect.any(ProtocolNode),
+          item
+        );
 
         n++;
       }
@@ -255,7 +259,7 @@ describe("multiple sources tests", () => {
         };
         expect(runtime.validateDataItem).toHaveBeenNthCalledWith(
           n,
-          expect.any(Node),
+          expect.any(ProtocolNode),
           item,
           item
         );
@@ -414,7 +418,7 @@ describe("multiple sources tests", () => {
       for (let s = 0; s < core.poolConfig.sources.length; s++) {
         expect(runtime.getDataItem).toHaveBeenNthCalledWith(
           n,
-          expect.any(Node),
+          expect.any(ProtocolNode),
           core.poolConfig.sources[s],
           (b + parseInt(genesis_pool.data.max_bundle_size)).toString()
         );
@@ -436,7 +440,11 @@ describe("multiple sources tests", () => {
           key: (b + parseInt(genesis_pool.data.max_bundle_size)).toString(),
           value: `${b + parseInt(genesis_pool.data.max_bundle_size)}-value`,
         };
-        expect(runtime.transformDataItem).toHaveBeenNthCalledWith(n, item);
+        expect(runtime.transformDataItem).toHaveBeenNthCalledWith(
+          n,
+          expect.any(ProtocolNode),
+          item
+        );
 
         n++;
       }
@@ -460,7 +468,7 @@ describe("multiple sources tests", () => {
         };
         expect(runtime.validateDataItem).toHaveBeenNthCalledWith(
           n,
-          expect.any(Node),
+          expect.any(ProtocolNode),
           item,
           item
         );
@@ -628,7 +636,7 @@ describe("multiple sources tests", () => {
       for (let s = 0; s < core.poolConfig.sources.length; s++) {
         expect(runtime.getDataItem).toHaveBeenNthCalledWith(
           n,
-          expect.any(Node),
+          expect.any(ProtocolNode),
           core.poolConfig.sources[s],
           (b + parseInt(genesis_pool.data.max_bundle_size) + 3).toString()
         );
@@ -650,7 +658,11 @@ describe("multiple sources tests", () => {
           key: (b + parseInt(genesis_pool.data.max_bundle_size) + 3).toString(),
           value: `${b + parseInt(genesis_pool.data.max_bundle_size) + 3}-value`,
         };
-        expect(runtime.transformDataItem).toHaveBeenNthCalledWith(n, item);
+        expect(runtime.transformDataItem).toHaveBeenNthCalledWith(
+          n,
+          expect.any(ProtocolNode),
+          item
+        );
 
         n++;
       }
@@ -674,7 +686,7 @@ describe("multiple sources tests", () => {
         };
         expect(runtime.validateDataItem).toHaveBeenNthCalledWith(
           n,
-          expect.any(Node),
+          expect.any(ProtocolNode),
           item,
           item
         );
@@ -834,7 +846,7 @@ describe("multiple sources tests", () => {
       for (let s = 0; s < core.poolConfig.sources.length; s++) {
         expect(runtime.getDataItem).toHaveBeenNthCalledWith(
           n,
-          expect.any(Node),
+          expect.any(ProtocolNode),
           core.poolConfig.sources[s],
           (b + parseInt(genesis_pool.data.max_bundle_size)).toString()
         );
@@ -856,7 +868,11 @@ describe("multiple sources tests", () => {
           key: (b + parseInt(genesis_pool.data.max_bundle_size)).toString(),
           value: `${b + parseInt(genesis_pool.data.max_bundle_size)}-value`,
         };
-        expect(runtime.transformDataItem).toHaveBeenNthCalledWith(n, item);
+        expect(runtime.transformDataItem).toHaveBeenNthCalledWith(
+          n,
+          expect.any(ProtocolNode),
+          item
+        );
 
         n++;
       }
@@ -880,7 +896,7 @@ describe("multiple sources tests", () => {
         };
         expect(runtime.validateDataItem).toHaveBeenNthCalledWith(
           n,
-          expect.any(Node),
+          expect.any(ProtocolNode),
           item,
           item
         );
@@ -917,32 +933,36 @@ describe("multiple sources tests", () => {
     // ARRANGE
     core["runtime"].getDataItem = jest
       .fn()
-      .mockImplementationOnce((core: Node, source: string, key: string) =>
-        Promise.resolve({
-          key,
-          value: `${key}-value`,
-        })
+      .mockImplementationOnce(
+        (core: ProtocolNode, source: string, key: string) =>
+          Promise.resolve({
+            key,
+            value: `${key}-value`,
+          })
       )
-      .mockImplementationOnce((core: Node, source: string, key: string) =>
-        Promise.resolve({
-          key,
-          value: `${key}-value`,
-        })
+      .mockImplementationOnce(
+        (core: ProtocolNode, source: string, key: string) =>
+          Promise.resolve({
+            key,
+            value: `${key}-value`,
+          })
       )
-      .mockImplementationOnce((core: Node, source: string, key: string) =>
-        Promise.resolve({
-          key,
-          value: `${key}-value`,
-        })
+      .mockImplementationOnce(
+        (core: ProtocolNode, source: string, key: string) =>
+          Promise.resolve({
+            key,
+            value: `${key}-value`,
+          })
       )
-      .mockImplementationOnce((core: Node, source: string, key: string) =>
-        Promise.resolve({
-          key,
-          value: `${key}-value`,
-        })
+      .mockImplementationOnce(
+        (core: ProtocolNode, source: string, key: string) =>
+          Promise.resolve({
+            key,
+            value: `${key}-value`,
+          })
       )
       .mockRejectedValueOnce(new Error("network error"))
-      .mockImplementation((core: Node, source: string, key: string) =>
+      .mockImplementation((core: ProtocolNode, source: string, key: string) =>
         Promise.resolve({
           key,
           value: `${key}-value`,
@@ -1042,43 +1062,43 @@ describe("multiple sources tests", () => {
 
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       1,
-      expect.any(Node),
+      expect.any(ProtocolNode),
       core.poolConfig.sources[0],
       "0"
     );
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       2,
-      expect.any(Node),
+      expect.any(ProtocolNode),
       core.poolConfig.sources[1],
       "0"
     );
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       3,
-      expect.any(Node),
+      expect.any(ProtocolNode),
       core.poolConfig.sources[2],
       "0"
     );
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       4,
-      expect.any(Node),
+      expect.any(ProtocolNode),
       core.poolConfig.sources[0],
       "1"
     );
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       5,
-      expect.any(Node),
+      expect.any(ProtocolNode),
       core.poolConfig.sources[1],
       "1"
     );
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       5,
-      expect.any(Node),
+      expect.any(ProtocolNode),
       core.poolConfig.sources[1],
       "1"
     );
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       6,
-      expect.any(Node),
+      expect.any(ProtocolNode),
       core.poolConfig.sources[2],
       "1"
     );
@@ -1093,7 +1113,11 @@ describe("multiple sources tests", () => {
           key: b.toString(),
           value: `${b}-value`,
         };
-        expect(runtime.transformDataItem).toHaveBeenNthCalledWith(n, item);
+        expect(runtime.transformDataItem).toHaveBeenNthCalledWith(
+          n,
+          expect.any(ProtocolNode),
+          item
+        );
 
         n++;
       }
@@ -1114,7 +1138,7 @@ describe("multiple sources tests", () => {
         };
         expect(runtime.validateDataItem).toHaveBeenNthCalledWith(
           n,
-          expect.any(Node),
+          expect.any(ProtocolNode),
           item,
           item
         );
@@ -1147,33 +1171,37 @@ describe("multiple sources tests", () => {
     // ARRANGE
     core["runtime"].getDataItem = jest
       .fn()
-      .mockImplementationOnce((core: Node, source: string, key: string) =>
-        Promise.resolve({
-          key,
-          value: `${key}-value`,
-        })
+      .mockImplementationOnce(
+        (core: ProtocolNode, source: string, key: string) =>
+          Promise.resolve({
+            key,
+            value: `${key}-value`,
+          })
       )
-      .mockImplementationOnce((core: Node, source: string, key: string) =>
-        Promise.resolve({
-          key,
-          value: `${key}-value`,
-        })
+      .mockImplementationOnce(
+        (core: ProtocolNode, source: string, key: string) =>
+          Promise.resolve({
+            key,
+            value: `${key}-value`,
+          })
       )
-      .mockImplementationOnce((core: Node, source: string, key: string) =>
-        Promise.resolve({
-          key,
-          value: `${key}-value`,
-        })
-      )
-      .mockRejectedValueOnce(new Error("network error"))
-      .mockImplementationOnce((core: Node, source: string, key: string) =>
-        Promise.resolve({
-          key,
-          value: `${key}-value`,
-        })
+      .mockImplementationOnce(
+        (core: ProtocolNode, source: string, key: string) =>
+          Promise.resolve({
+            key,
+            value: `${key}-value`,
+          })
       )
       .mockRejectedValueOnce(new Error("network error"))
-      .mockImplementation((core: Node, source: string, key: string) =>
+      .mockImplementationOnce(
+        (core: ProtocolNode, source: string, key: string) =>
+          Promise.resolve({
+            key,
+            value: `${key}-value`,
+          })
+      )
+      .mockRejectedValueOnce(new Error("network error"))
+      .mockImplementation((core: ProtocolNode, source: string, key: string) =>
         Promise.resolve({
           key,
           value: `${key}-value`,
@@ -1304,50 +1332,50 @@ describe("multiple sources tests", () => {
 
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       1,
-      expect.any(Node),
+      expect.any(ProtocolNode),
       core.poolConfig.sources[0],
       "103"
     );
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       2,
-      expect.any(Node),
+      expect.any(ProtocolNode),
       core.poolConfig.sources[1],
       "103"
     );
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       3,
-      expect.any(Node),
+      expect.any(ProtocolNode),
       core.poolConfig.sources[2],
       "103"
     );
 
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       4,
-      expect.any(Node),
+      expect.any(ProtocolNode),
       core.poolConfig.sources[0],
       "104"
     );
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       5,
-      expect.any(Node),
+      expect.any(ProtocolNode),
       core.poolConfig.sources[1],
       "104"
     );
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       6,
-      expect.any(Node),
+      expect.any(ProtocolNode),
       core.poolConfig.sources[2],
       "104"
     );
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       7,
-      expect.any(Node),
+      expect.any(ProtocolNode),
       core.poolConfig.sources[0],
       "104"
     );
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       8,
-      expect.any(Node),
+      expect.any(ProtocolNode),
       core.poolConfig.sources[2],
       "104"
     );
@@ -1367,7 +1395,11 @@ describe("multiple sources tests", () => {
           key: (b + parseInt(genesis_pool.data.max_bundle_size) + 3).toString(),
           value: `${b + parseInt(genesis_pool.data.max_bundle_size) + 3}-value`,
         };
-        expect(runtime.transformDataItem).toHaveBeenNthCalledWith(n, item);
+        expect(runtime.transformDataItem).toHaveBeenNthCalledWith(
+          n,
+          expect.any(ProtocolNode),
+          item
+        );
 
         n++;
       }
@@ -1391,7 +1423,7 @@ describe("multiple sources tests", () => {
         };
         expect(runtime.validateDataItem).toHaveBeenNthCalledWith(
           n,
-          expect.any(Node),
+          expect.any(ProtocolNode),
           item,
           item
         );
@@ -1428,37 +1460,42 @@ describe("multiple sources tests", () => {
     // ARRANGE
     core["runtime"].getDataItem = jest
       .fn()
-      .mockImplementationOnce((core: Node, source: string, key: string) =>
-        Promise.resolve({
-          key,
-          value: `${key}-value`,
-        })
+      .mockImplementationOnce(
+        (core: ProtocolNode, source: string, key: string) =>
+          Promise.resolve({
+            key,
+            value: `${key}-value`,
+          })
       )
-      .mockImplementationOnce((core: Node, source: string, key: string) =>
-        Promise.resolve({
-          key,
-          value: `${key}-value`,
-        })
+      .mockImplementationOnce(
+        (core: ProtocolNode, source: string, key: string) =>
+          Promise.resolve({
+            key,
+            value: `${key}-value`,
+          })
       )
-      .mockImplementationOnce((core: Node, source: string, key: string) =>
-        Promise.resolve({
-          key,
-          value: `${key}-value`,
-        })
+      .mockImplementationOnce(
+        (core: ProtocolNode, source: string, key: string) =>
+          Promise.resolve({
+            key,
+            value: `${key}-value`,
+          })
       )
-      .mockImplementationOnce((core: Node, source: string, key: string) =>
-        Promise.resolve({
-          key,
-          value: `${key}-value`,
-        })
+      .mockImplementationOnce(
+        (core: ProtocolNode, source: string, key: string) =>
+          Promise.resolve({
+            key,
+            value: `${key}-value`,
+          })
       )
-      .mockImplementationOnce((core: Node, source: string, key: string) =>
-        Promise.resolve({
-          key,
-          value: `${key}-value-invalid`,
-        })
+      .mockImplementationOnce(
+        (core: ProtocolNode, source: string, key: string) =>
+          Promise.resolve({
+            key,
+            value: `${key}-value-invalid`,
+          })
       )
-      .mockImplementation((core: Node, source: string, key: string) =>
+      .mockImplementation((core: ProtocolNode, source: string, key: string) =>
         Promise.resolve({
           key,
           value: `${key}-value`,
@@ -1562,7 +1599,7 @@ describe("multiple sources tests", () => {
       for (let s = 0; s < core.poolConfig.sources.length; s++) {
         expect(runtime.getDataItem).toHaveBeenNthCalledWith(
           n,
-          expect.any(Node),
+          expect.any(ProtocolNode),
           core.poolConfig.sources[s],
           b.toString()
         );
@@ -1593,7 +1630,11 @@ describe("multiple sources tests", () => {
           };
         }
 
-        expect(runtime.transformDataItem).toHaveBeenNthCalledWith(n, item);
+        expect(runtime.transformDataItem).toHaveBeenNthCalledWith(
+          n,
+          expect.any(ProtocolNode),
+          item
+        );
         n++;
       }
     }
@@ -1605,7 +1646,7 @@ describe("multiple sources tests", () => {
 
     expect(runtime.validateDataItem).toHaveBeenNthCalledWith(
       1,
-      expect.any(Node),
+      expect.any(ProtocolNode),
       {
         key: `0`,
         value: `0-value-transform`,
@@ -1617,7 +1658,7 @@ describe("multiple sources tests", () => {
     );
     expect(runtime.validateDataItem).toHaveBeenNthCalledWith(
       2,
-      expect.any(Node),
+      expect.any(ProtocolNode),
       {
         key: `0`,
         value: `0-value-transform`,
@@ -1629,7 +1670,7 @@ describe("multiple sources tests", () => {
     );
     expect(runtime.validateDataItem).toHaveBeenNthCalledWith(
       3,
-      expect.any(Node),
+      expect.any(ProtocolNode),
       {
         key: `0`,
         value: `0-value-transform`,
@@ -1641,7 +1682,7 @@ describe("multiple sources tests", () => {
     );
     expect(runtime.validateDataItem).toHaveBeenNthCalledWith(
       4,
-      expect.any(Node),
+      expect.any(ProtocolNode),
       {
         key: `1`,
         value: `1-value-transform`,
@@ -1679,7 +1720,7 @@ describe("multiple sources tests", () => {
       .fn()
       .mockImplementationOnce(
         async (
-          core: Node,
+          core: ProtocolNode,
           proposedDataItem: DataItem,
           validationDataItem: DataItem
         ) => {
@@ -1696,7 +1737,7 @@ describe("multiple sources tests", () => {
       .mockRejectedValueOnce(new Error())
       .mockImplementation(
         async (
-          core: Node,
+          core: ProtocolNode,
           proposedDataItem: DataItem,
           validationDataItem: DataItem
         ) => {
@@ -1793,7 +1834,7 @@ describe("multiple sources tests", () => {
     for (let s = 0; s < core.poolConfig.sources.length; s++) {
       expect(runtime.getDataItem).toHaveBeenNthCalledWith(
         n,
-        expect.any(Node),
+        expect.any(ProtocolNode),
         core.poolConfig.sources[s],
         "0"
       );
@@ -1808,10 +1849,14 @@ describe("multiple sources tests", () => {
     n = 1;
 
     for (let s = 0; s < core.poolConfig.sources.length; s++) {
-      expect(runtime.transformDataItem).toHaveBeenNthCalledWith(n, {
-        key: "0",
-        value: "0-value",
-      });
+      expect(runtime.transformDataItem).toHaveBeenNthCalledWith(
+        n,
+        expect.any(ProtocolNode),
+        {
+          key: "0",
+          value: "0-value",
+        }
+      );
       n++;
     }
 
@@ -1821,7 +1866,7 @@ describe("multiple sources tests", () => {
 
     expect(runtime.validateDataItem).toHaveBeenNthCalledWith(
       1,
-      expect.any(Node),
+      expect.any(ProtocolNode),
       {
         key: `0`,
         value: `0-value-transform`,
@@ -1833,7 +1878,7 @@ describe("multiple sources tests", () => {
     );
     expect(runtime.validateDataItem).toHaveBeenNthCalledWith(
       2,
-      expect.any(Node),
+      expect.any(ProtocolNode),
       {
         key: `0`,
         value: `0-value-transform`,

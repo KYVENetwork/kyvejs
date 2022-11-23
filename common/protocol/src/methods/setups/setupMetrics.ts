@@ -1,4 +1,4 @@
-import { IMetrics, Node, standardizeJSON } from "../..";
+import { IMetrics, ProtocolNode, standardizeJSON } from "../..";
 import http from "http";
 import url from "url";
 import prom_client, { register } from "prom-client";
@@ -8,10 +8,10 @@ import prom_client, { register } from "prom-client";
  * metrics server
  *
  * @method setupMetrics
- * @param {Node} this
+ * @param {ProtocolNode} this
  * @return {Promise<void>}
  */
-export function setupMetrics(this: Node): void {
+export function setupMetrics(this: ProtocolNode): void {
   try {
     // init metric parameters
     this.m = {} as IMetrics;

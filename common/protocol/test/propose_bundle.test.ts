@@ -1,5 +1,10 @@
 import { Logger } from "tslog";
-import { ICompression, IStorageProvider, Node, sha256 } from "../src/index";
+import {
+  ICompression,
+  IStorageProvider,
+  ProtocolNode,
+  sha256,
+} from "../src/index";
 import { runNode } from "../src/methods/main/runNode";
 import { genesis_pool } from "./mocks/constants";
 import { client } from "./mocks/client.mock";
@@ -29,7 +34,7 @@ TEST CASES - propose bundle tests
 */
 
 describe("propose bundle tests", () => {
-  let core: Node;
+  let core: ProtocolNode;
 
   let processExit: jest.Mock<never, never>;
   let setTimeoutMock: jest.Mock;
@@ -38,7 +43,7 @@ describe("propose bundle tests", () => {
   let compression: ICompression;
 
   beforeEach(() => {
-    core = new Node(new TestRuntime());
+    core = new ProtocolNode(new TestRuntime());
 
     core["cacheProvider"] = new TestCacheProvider();
 
@@ -247,7 +252,10 @@ describe("propose bundle tests", () => {
     // =========================
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(bundle);
+    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
+      expect.any(ProtocolNode),
+      bundle
+    );
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(0);
 
@@ -530,7 +538,10 @@ describe("propose bundle tests", () => {
     // =========================
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(bundle);
+    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
+      expect.any(ProtocolNode),
+      bundle
+    );
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(0);
 
@@ -680,7 +691,10 @@ describe("propose bundle tests", () => {
     // =========================
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(bundle);
+    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
+      expect.any(ProtocolNode),
+      bundle
+    );
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(0);
 
@@ -830,7 +844,10 @@ describe("propose bundle tests", () => {
     // =========================
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(bundle);
+    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
+      expect.any(ProtocolNode),
+      bundle
+    );
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(0);
 
@@ -989,7 +1006,10 @@ describe("propose bundle tests", () => {
     // =========================
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(bundle);
+    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
+      expect.any(ProtocolNode),
+      bundle
+    );
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(0);
 
@@ -1282,7 +1302,10 @@ describe("propose bundle tests", () => {
     // =========================
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(bundle);
+    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
+      expect.any(ProtocolNode),
+      bundle
+    );
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(0);
 
@@ -1427,7 +1450,10 @@ describe("propose bundle tests", () => {
     // =========================
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(bundle);
+    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
+      expect.any(ProtocolNode),
+      bundle
+    );
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(0);
 
@@ -1573,7 +1599,10 @@ describe("propose bundle tests", () => {
     // =========================
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(bundle);
+    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
+      expect.any(ProtocolNode),
+      bundle
+    );
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(0);
 

@@ -1,5 +1,5 @@
 import { Logger } from "tslog";
-import { ICompression, IStorageProvider, Node } from "../src/index";
+import { ICompression, IStorageProvider, ProtocolNode } from "../src/index";
 import { runNode } from "../src/methods/main/runNode";
 import { genesis_pool } from "./mocks/constants";
 import { client } from "./mocks/client.mock";
@@ -26,7 +26,7 @@ TEST CASES - no storage tests
 */
 
 describe("no storage tests", () => {
-  let core: Node;
+  let core: ProtocolNode;
 
   let processExit: jest.Mock<never, never>;
   let setTimeoutMock: jest.Mock;
@@ -35,7 +35,7 @@ describe("no storage tests", () => {
   let compression: ICompression;
 
   beforeEach(() => {
-    core = new Node(new TestRuntime());
+    core = new ProtocolNode(new TestRuntime());
 
     core["cacheProvider"] = new TestCacheProvider();
 
@@ -244,7 +244,10 @@ describe("no storage tests", () => {
     // =========================
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(bundle);
+    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
+      expect.any(ProtocolNode),
+      bundle
+    );
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(0);
 
@@ -509,7 +512,10 @@ describe("no storage tests", () => {
     // =============================
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(bundle);
+    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
+      expect.any(ProtocolNode),
+      bundle
+    );
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(0);
 

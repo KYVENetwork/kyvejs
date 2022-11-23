@@ -1,4 +1,4 @@
-import { Node } from "../..";
+import { ProtocolNode } from "../..";
 
 /**
  * continueRound is only used for test purposes to allow easier unit testing.
@@ -6,9 +6,9 @@ import { Node } from "../..";
  * of proposal rounds.
  *
  * @method continueRound
- * @param {Node} this
+ * @param {ProtocolNode} this
  * @return {boolean}
  */
-export function continueRound(this: Node): boolean {
+export function continueRound(this: ProtocolNode): boolean {
   return true;
 }

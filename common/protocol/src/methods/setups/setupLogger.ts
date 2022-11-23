@@ -1,4 +1,4 @@
-import { Node, standardizeJSON } from "../..";
+import { ProtocolNode, standardizeJSON } from "../..";
 import { appendFileSync, existsSync, mkdirSync } from "fs";
 import { ILogObject, Logger } from "tslog";
 import path from "path";
@@ -8,10 +8,10 @@ import path from "path";
  * where logs are saved for debugging.
  *
  * @method setupLogger
- * @param {Node} this
+ * @param {ProtocolNode} this
  * @return {void}
  */
-export function setupLogger(this: Node): void {
+export function setupLogger(this: ProtocolNode): void {
   try {
     // if "logs" folder under target path does not exist create it
     if (!existsSync(path.join(this.home, "logs"))) {

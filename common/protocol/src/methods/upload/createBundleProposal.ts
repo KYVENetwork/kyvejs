@@ -1,4 +1,4 @@
-import { Node } from "../..";
+import { ProtocolNode } from "../..";
 import { bundleToBytes, sha256, standardizeJSON } from "../../utils";
 import { BundleTag, DataItem } from "../../types";
 
@@ -13,10 +13,10 @@ import { BundleTag, DataItem } from "../../types";
  * to prevent slashes.
  *
  * @method createBundleProposal
- * @param {Node} this
+ * @param {ProtocolNode} this
  * @return {Promise<void>}
  */
-export async function createBundleProposal(this: Node): Promise<void> {
+export async function createBundleProposal(this: ProtocolNode): Promise<void> {
   try {
     this.logger.info(
       `Creating a new bundle proposal for the next bundle proposal round`

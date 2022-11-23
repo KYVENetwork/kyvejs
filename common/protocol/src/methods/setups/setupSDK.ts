@@ -1,4 +1,4 @@
-import { Node, standardizeJSON } from "../..";
+import { ProtocolNode, standardizeJSON } from "../..";
 import KyveSDK from "@kyvejs/sdk";
 import { KYVE_NETWORK } from "@kyvejs/sdk/dist/constants";
 
@@ -7,10 +7,10 @@ import { KYVE_NETWORK } from "@kyvejs/sdk/dist/constants";
  * and the lcd client which is used for queries
  *
  * @method setupSDK
- * @param {Node} this
+ * @param {ProtocolNode} this
  * @return {Promise<void>}
  */
-export async function setupSDK(this: Node): Promise<void> {
+export async function setupSDK(this: ProtocolNode): Promise<void> {
   try {
     this.logger.debug(`Initializing KyveSDK with network ${this.network}`);
 

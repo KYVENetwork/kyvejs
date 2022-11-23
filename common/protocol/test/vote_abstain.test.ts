@@ -3,7 +3,7 @@ import {
   bundleToBytes,
   ICompression,
   IStorageProvider,
-  Node,
+  ProtocolNode,
   sha256,
   standardizeJSON,
 } from "../src/index";
@@ -41,7 +41,7 @@ TEST CASES - vote abstain tests
 */
 
 describe("vote abstain tests", () => {
-  let core: Node;
+  let core: ProtocolNode;
 
   let processExit: jest.Mock<never, never>;
   let setTimeoutMock: jest.Mock;
@@ -50,7 +50,7 @@ describe("vote abstain tests", () => {
   let compression: ICompression;
 
   beforeEach(() => {
-    core = new Node(new TestRuntime());
+    core = new ProtocolNode(new TestRuntime());
 
     core["cacheProvider"] = new TestCacheProvider();
 
@@ -237,14 +237,17 @@ describe("vote abstain tests", () => {
     // =============================
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(bundle);
+    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
+      expect.any(ProtocolNode),
+      bundle
+    );
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(bundle.length);
 
     for (let i = 0; i < bundle.length; i++) {
       expect(runtime.validateDataItem).toHaveBeenNthCalledWith(
         i + 1,
-        expect.any(Node),
+        expect.any(ProtocolNode),
         standardizeJSON(bundle[i]),
         standardizeJSON(bundle[i])
       );
@@ -392,14 +395,17 @@ describe("vote abstain tests", () => {
     // =============================
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(bundle);
+    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
+      expect.any(ProtocolNode),
+      bundle
+    );
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(bundle.length);
 
     for (let i = 0; i < bundle.length; i++) {
       expect(runtime.validateDataItem).toHaveBeenNthCalledWith(
         i + 1,
-        expect.any(Node),
+        expect.any(ProtocolNode),
         standardizeJSON(bundle[i]),
         standardizeJSON(bundle[i])
       );
@@ -549,14 +555,17 @@ describe("vote abstain tests", () => {
     // =============================
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(bundle);
+    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
+      expect.any(ProtocolNode),
+      bundle
+    );
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(bundle.length);
 
     for (let i = 0; i < bundle.length; i++) {
       expect(runtime.validateDataItem).toHaveBeenNthCalledWith(
         i + 1,
-        expect.any(Node),
+        expect.any(ProtocolNode),
         standardizeJSON(bundle[i]),
         standardizeJSON(bundle[i])
       );
@@ -710,14 +719,17 @@ describe("vote abstain tests", () => {
     // =============================
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(bundle);
+    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
+      expect.any(ProtocolNode),
+      bundle
+    );
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(bundle.length);
 
     for (let i = 0; i < bundle.length; i++) {
       expect(runtime.validateDataItem).toHaveBeenNthCalledWith(
         i + 1,
-        expect.any(Node),
+        expect.any(ProtocolNode),
         standardizeJSON(bundle[i]),
         standardizeJSON(bundle[i])
       );
@@ -879,14 +891,17 @@ describe("vote abstain tests", () => {
     // =============================
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(bundle);
+    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
+      expect.any(ProtocolNode),
+      bundle
+    );
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(bundle.length);
 
     for (let i = 0; i < bundle.length; i++) {
       expect(runtime.validateDataItem).toHaveBeenNthCalledWith(
         i + 1,
-        expect.any(Node),
+        expect.any(ProtocolNode),
         standardizeJSON(bundle[i]),
         standardizeJSON(bundle[i])
       );
@@ -1043,14 +1058,17 @@ describe("vote abstain tests", () => {
     // =============================
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(bundle);
+    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
+      expect.any(ProtocolNode),
+      bundle
+    );
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(bundle.length);
 
     for (let i = 0; i < bundle.length; i++) {
       expect(runtime.validateDataItem).toHaveBeenNthCalledWith(
         i + 1,
-        expect.any(Node),
+        expect.any(ProtocolNode),
         standardizeJSON(bundle[i]),
         standardizeJSON(bundle[i])
       );
@@ -1187,14 +1205,17 @@ describe("vote abstain tests", () => {
     // =============================
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(bundle);
+    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
+      expect.any(ProtocolNode),
+      bundle
+    );
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(bundle.length);
 
     for (let i = 0; i < bundle.length; i++) {
       expect(runtime.validateDataItem).toHaveBeenNthCalledWith(
         i + 1,
-        expect.any(Node),
+        expect.any(ProtocolNode),
         standardizeJSON(bundle[i]),
         standardizeJSON(bundle[i])
       );
@@ -1593,14 +1614,17 @@ describe("vote abstain tests", () => {
     // =============================
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(bundle);
+    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
+      expect.any(ProtocolNode),
+      bundle
+    );
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(bundle.length);
 
     for (let i = 0; i < bundle.length; i++) {
       expect(runtime.validateDataItem).toHaveBeenNthCalledWith(
         i + 1,
-        expect.any(Node),
+        expect.any(ProtocolNode),
         standardizeJSON(bundle[i]),
         standardizeJSON(bundle[i])
       );
@@ -1737,7 +1761,10 @@ describe("vote abstain tests", () => {
     // =============================
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(bundle);
+    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
+      expect.any(ProtocolNode),
+      bundle
+    );
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(0);
 
@@ -1871,11 +1898,14 @@ describe("vote abstain tests", () => {
     // =============================
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(bundle);
+    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
+      expect.any(ProtocolNode),
+      bundle
+    );
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(1);
     expect(runtime.validateDataItem).toHaveBeenLastCalledWith(
-      expect.any(Node),
+      expect.any(ProtocolNode),
       standardizeJSON(bundle[0]),
       standardizeJSON(bundle[0])
     );
