@@ -1,3 +1,9 @@
+<div align="center">
+  <h1>@kyvejs/protocol</h1>
+</div>
+
+![banner](https://arweave.net/OZjECT4lY0Nj1-w-bizvAJhuFgBuU2dEwkzjbO84DJo)
+
 # Architecture Overview
 
 The KYVE protocol node is in general responsible for collecting data from various sources and submitting them
