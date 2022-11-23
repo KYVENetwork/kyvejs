@@ -5,7 +5,7 @@
 ![banner](https://arweave.net/RkC-azeak1eOQGOLSaPNzHo-ORc-cWgnmdJnSScedFE)
 
 <p align="center">
-<strong>Tools for building applications on KYVE.</strong>
+<h6>Tools for building applications on KYVE.</h6>
 </p>
 
 KYVE, the Web3 data lake solution, is a protocol that enables data providers to standardize, validate, and permanently store blockchain data streams. By leveraging permanent data storage solutions like Arweave, KYVE’s Cosmos SDK chain creates permanent backups and ensures the scalability, immutability, and availability of these resources over time.

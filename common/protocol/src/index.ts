@@ -174,7 +174,7 @@ export class ProtocolNode {
       .action(() => {
         console.log(`${this.runtime.name} version: ${this.runtime.version}`);
         console.log(`@kyve/core version: ${this.coreVersion}`);
-        console.log(`ProtocolNode version: ${process.version}`);
+        console.log(`Node version: ${process.version}`);
         console.log();
         console.log(`Platform: ${os.platform()}`);
         console.log(`Arch: ${os.arch()}`);
