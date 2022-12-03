@@ -31,7 +31,7 @@ jobs:
             const KYSOR_TAG = 'kysor'
             const tags = JSON.parse(JSON.parse(TAGS));
             const kysorTag = tags.find(it => it.trim().split('/')[1]?.split('@')[0] === KYSOR_TAG)
-            return kysorTag.toString();
+            return kysorTag?.toString();
           result-encoding: string
       - name: print var
         run: echo ${{steps.output-tags.outputs.result}}
@@ -46,10 +46,6 @@ jobs:
         uses: actions/checkout@main
         with:
           ref: 'main'
-      - name: fetch tags
-        run: git fetch --tags
-      - name: set tag
-        run: echo "TAGS=$(git tag --points-at | jq  --raw-input .  | jq --slurp . | jq tostring)" >> $GITHUB_ENV
       - name: install yarn
         run: npm install --global yarn
       - name: setup lerna
