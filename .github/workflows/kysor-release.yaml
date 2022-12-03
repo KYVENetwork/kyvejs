@@ -1,6 +1,7 @@
 name: Create release kysor binaries
 on:
   push:
+    branches: [ main ]
     tags: ['@kyve/kysor@*']
 
 jobs:
