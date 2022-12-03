@@ -16,6 +16,7 @@ export async function fetchBlock(
     );
 
     // TODO: Figure out why `extraData` varies for some blocks.
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     delete block.extraData;
   }

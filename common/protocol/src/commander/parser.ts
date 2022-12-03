@@ -1,4 +1,3 @@
-import BigNumber from "bignumber.js";
 import commander from "commander";
 import { existsSync } from "fs";
 

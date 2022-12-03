@@ -1,6 +1,7 @@
 import { existsSync, mkdirSync } from "fs";
-import { DataItem, ICacheProvider } from "../../types";
 import { Level } from "level";
+
+import { DataItem, ICacheProvider } from "../../types";
 
 export class LevelDBCache implements ICacheProvider {
   public name = "LevelDBCache";

@@ -1,6 +1,7 @@
-import { readFile, writeFile } from "jsonfile";
 import { existsSync, mkdirSync, promises as fs } from "fs";
 import fse from "fs-extra";
+import { readFile, writeFile } from "jsonfile";
+
 import { DataItem, ICacheProvider } from "../../types";
 
 export class JsonFileCache implements ICacheProvider {

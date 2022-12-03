@@ -1,7 +1,9 @@
 import { BigNumber } from "bignumber.js";
 import crypto from "crypto";
+
 import { DataItem } from "..";
 
+const INFINITY_LOOP = true;
 /**
  * Waits for a specific amount of time
  *
@@ -86,7 +88,7 @@ export const toHumanReadable = (amount: string, precision = 4): string => {
  * @return {[number, number][]}
  */
 export const generateIndexPairs = (n: number): [number, number][] => {
-  let pairs: [number, number][] = [];
+  const pairs: [number, number][] = [];
 
   for (let i = 0; i < n; i++) {
     for (let j = 0; j < n; j++) {
@@ -132,35 +134,37 @@ export async function callWithBackoffStrategy<T>(
   let time = options.increaseByMs;
   let requests = 1;
 
-  return new Promise(async (resolve) => {
-    while (true) {
-      try {
-        return resolve(await execution());
-      } catch (e) {
-        if (onError) {
-          await onError(e as Error, {
-            nextTimeoutInMs: time,
-            numberOfRetries: requests,
-            options,
-          });
-        }
-
-        await sleep(time);
-
-        if (time < options.limitTimeoutMs) {
-          time += options.increaseByMs;
-
-          if (time > options.limitTimeoutMs) {
-            time = options.limitTimeoutMs;
+  return new Promise((resolve, reject) => {
+    (async function () {
+      while (INFINITY_LOOP) {
+        try {
+          return resolve(await execution());
+        } catch (e) {
+          if (onError) {
+            await onError(e as Error, {
+              nextTimeoutInMs: time,
+              numberOfRetries: requests,
+              options,
+            });
           }
-        }
 
-        if (options.maxRequests && requests >= options.maxRequests) {
-          throw e;
-        }
+          await sleep(time);
 
-        requests++;
+          if (time < options.limitTimeoutMs) {
+            time += options.increaseByMs;
+
+            if (time > options.limitTimeoutMs) {
+              time = options.limitTimeoutMs;
+            }
+          }
+
+          if (options.maxRequests && requests >= options.maxRequests) {
+            throw e;
+          }
+
+          requests++;
+        }
       }
-    }
+    })().catch((err) => reject(err));
   });
 }

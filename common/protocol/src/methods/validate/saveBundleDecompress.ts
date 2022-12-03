@@ -1,18 +1,18 @@
-import { ProtocolNode } from "../..";
-import { bytesToBundle, standardizeJSON } from "../../utils";
+import { Node } from "../..";
 import { DataItem } from "../../types";
+import { bytesToBundle, standardizeJSON } from "../../utils";
 
 /**
  * saveBundleDecompress decompresses a bundle with the specified compression.
  * It never throws an error and returns no data if one occurs.
  *
  * @method saveBundleDecompress
- * @param {ProtocolNode} this
+ * @param {Node} this
  * @param {Buffer} rawStorageData
  * @return {Promise<DataItem[]>}
  */
 export async function saveBundleDecompress(
-  this: ProtocolNode,
+  this: Node,
   rawStorageData: Buffer
 ): Promise<DataItem[]> {
   try {

@@ -1,6 +1,7 @@
-import { ProtocolNode } from "../..";
-import { sleep, standardizeJSON } from "../../utils";
 import BigNumber from "bignumber.js";
+
+import { Node } from "../..";
+import { sleep, standardizeJSON } from "../../utils";
 
 /**
  * waitForUploadInterval waits until the upload interval of the current
@@ -9,10 +10,10 @@ import BigNumber from "bignumber.js";
  * the next round.
  *
  * @method waitForUploadInterval
- * @param {ProtocolNode} this
+ * @param {Node} this
  * @return {Promise<void>}
  */
-export async function waitForUploadInterval(this: ProtocolNode): Promise<void> {
+export async function waitForUploadInterval(this: Node): Promise<void> {
   try {
     // determine how long the upload interval is still taking
     let timeRemaining = new BigNumber(0);

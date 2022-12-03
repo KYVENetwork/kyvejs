@@ -1,58 +1,57 @@
-import { DataItem, IRuntime, ProtocolNode, sha256 } from '@kyvejs/protocol';
-import { name, version } from '../package.json';
+import { DataItem, IRuntime, Node, sha256 } from '@kyvejs/protocol';
 import { providers } from 'ethers';
+
+import { name, version } from '../package.json';
 
 export default class Evm implements IRuntime {
   public name = name;
   public version = version;
 
   async getDataItem(
-    core: ProtocolNode,
+    core: Node,
     source: string,
     key: string
   ): Promise<DataItem> {
-    try {
-      // set network settings if available
-      let network;
+    // set network settings if available
+    let network;
 
-      if (core.poolConfig.chainId && core.poolConfig.chainName) {
-        network = {
-          chainId: core.poolConfig.chainId,
-          name: core.poolConfig.chainName,
-        };
-      }
-
-      // get auth headers for coinbase cloud endpoints
-      const headers = await this.generateCoinbaseCloudHeaders(core);
-
-      // setup web3 provider
-      const provider = new providers.StaticJsonRpcProvider(
-        {
-          url: source,
-          headers,
-        },
-        network
-      );
-
-      // fetch data item
-      const value = await provider.getBlockWithTransactions(+key);
-
-      // throw if data item is not available
-      if (!value) throw new Error();
-
-      return {
-        key,
-        value,
+    if (core.poolConfig.chainId && core.poolConfig.chainName) {
+      network = {
+        chainId: core.poolConfig.chainId,
+        name: core.poolConfig.chainName,
       };
-    } catch (err) {
-      throw err;
     }
+
+    // get auth headers for coinbase cloud endpoints
+    const headers = await this.generateCoinbaseCloudHeaders(core);
+
+    // setup web3 provider
+    const provider = new providers.StaticJsonRpcProvider(
+      {
+        url: source,
+        headers,
+      },
+      network
+    );
+
+    // fetch data item
+    const value = await provider.getBlockWithTransactions(+key);
+
+    // throw if data item is not available
+    if (!value) throw new Error();
+
+    return {
+      key,
+      value,
+    };
   }
 
-  async transformDataItem(
-    core: ProtocolNode,
-    item: DataItem
-  ): Promise<DataItem> {
+  async prevalidateDataItem(_: Node, __: DataItem): Promise<boolean> {
+    // TODO: return valid for now
+    return true;
+  }
+
+  async transformDataItem(_: Node, item: DataItem): Promise<DataItem> {
     // Delete the number of confirmations from a transaction to keep data deterministic.
     item.value.transactions.forEach(
       (tx: Partial<providers.TransactionResponse>) => delete tx.confirmations
@@ -62,7 +61,7 @@ export default class Evm implements IRuntime {
   }
 
   async validateDataItem(
-    core: ProtocolNode,
+    _: Node,
     proposedDataItem: DataItem,
     validationDataItem: DataItem
   ): Promise<boolean> {
@@ -76,18 +75,15 @@ export default class Evm implements IRuntime {
     return proposedDataItemHash === validationDataItemHash;
   }
 
-  async summarizeDataBundle(
-    core: ProtocolNode,
-    bundle: DataItem[]
-  ): Promise<string> {
+  async summarizeDataBundle(_: Node, bundle: DataItem[]): Promise<string> {
     return bundle.at(-1)?.value?.hash ?? '';
   }
 
-  async nextKey(key: string): Promise<string> {
+  async nextKey(_: Node, key: string): Promise<string> {
     return (parseInt(key) + 1).toString();
   }
 
-  private async generateCoinbaseCloudHeaders(core: ProtocolNode): Promise<any> {
+  private async generateCoinbaseCloudHeaders(core: Node): Promise<any> {
     // requestSignature for coinbase cloud
     const address = core.client.account.address;
     const timestamp = new Date().valueOf().toString();

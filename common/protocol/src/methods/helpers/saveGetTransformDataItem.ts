@@ -1,7 +1,7 @@
 import {
   callWithBackoffStrategy,
   DataItem,
-  ProtocolNode,
+  Node,
   standardizeJSON,
 } from "../..";
 
@@ -9,13 +9,13 @@ import {
  * saveGetTransformDataItem gets the data item with a backoff strategy
  *
  * @method saveGetTransformDataItem
- * @param {ProtocolNode} this
+ * @param {Node} this
  * @param {string} source
  * @param {string} key
- * @return {Promise<DataItem | null>}
+ * @return {Promise<DataItem | null>}
  */
 export async function saveGetTransformDataItem(
-  this: ProtocolNode,
+  this: Node,
   source: string,
   key: string
 ): Promise<DataItem | null> {
@@ -28,6 +28,15 @@ export async function saveGetTransformDataItem(
       let item = await this.runtime.getDataItem(this, source, key);
 
       this.m.runtime_get_data_item_successful.inc();
+
+      // prevalidate data item and reject if it fails
+      const valid = await this.runtime.prevalidateDataItem(this, item);
+
+      if (!valid) {
+        throw new Error(
+          `Prevalidation of data item with key ${key} and source ${source} failed.`
+        );
+      }
 
       // transform data item
       try {

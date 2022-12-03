@@ -1,14 +1,14 @@
-import { ProtocolNode, standardizeJSON } from "../..";
+import { Node, standardizeJSON } from "../..";
 
 /**
  * validateRuntime checks if the runtime of the pool matches with the runtime of
  * the node. If it does not match the node will exit.
  *
  * @method validateRuntime
- * @param {ProtocolNode} this
+ * @param {Node} this
  * @return {void}
  */
-export function validateRuntime(this: ProtocolNode): void {
+export function validateRuntime(this: Node): void {
   try {
     this.logger.debug(`Comparing pool runtime with protocol node runtime`);
 
@@ -22,7 +22,7 @@ export function validateRuntime(this: ProtocolNode): void {
       process.exit(1);
     }
 
-    this.logger.info(`ProtocolNode running on runtime = ${this.runtime.name}`);
+    this.logger.info(`Node running on runtime = ${this.runtime.name}`);
   } catch (err) {
     this.logger.fatal(`Error while validating runtime. Exiting ...`);
     this.logger.fatal(standardizeJSON(err));

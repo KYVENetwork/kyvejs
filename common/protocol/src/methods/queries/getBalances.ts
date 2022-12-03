@@ -1,6 +1,7 @@
-import { ProtocolNode, standardizeJSON } from "../..";
 import { DENOM, KYVE_DECIMALS } from "@kyvejs/sdk/dist/constants";
 import BigNumber from "bignumber.js";
+
+import { Node, standardizeJSON } from "../..";
 
 /**
  * getBalances tries to retrieve the $KYVE balance of the staker account, the $KYVE
@@ -8,10 +9,10 @@ import BigNumber from "bignumber.js";
  * can be of any currency for metrics
  *
  * @method getBalances
- * @param {ProtocolNode} this
+ * @param {Node} this
  * @return {Promise<void>}
  */
-export async function getBalances(this: ProtocolNode): Promise<void> {
+export async function getBalances(this: Node): Promise<void> {
   try {
     this.logger.debug(
       `this.client.nativeClient.getBalance(${this.staker},${DENOM})`

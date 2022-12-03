@@ -1,17 +1,18 @@
-import { ProtocolNode, standardizeJSON } from "../..";
 import { appendFileSync, existsSync, mkdirSync } from "fs";
-import { ILogObject, Logger } from "tslog";
 import path from "path";
+import { ILogObject, Logger } from "tslog";
+
+import { Node, standardizeJSON } from "../..";
 
 /**
  * setupLogger creates the logger instance and defines the home and file
  * where logs are saved for debugging.
  *
  * @method setupLogger
- * @param {ProtocolNode} this
+ * @param {Node} this
  * @return {void}
  */
-export function setupLogger(this: ProtocolNode): void {
+export function setupLogger(this: Node): void {
   try {
     // if "logs" folder under target path does not exist create it
     if (!existsSync(path.join(this.home, "logs"))) {
@@ -43,7 +44,7 @@ export function setupLogger(this: ProtocolNode): void {
         log.fileName
       }:${log.lineNumber}]`;
 
-      for (let arg of log.argumentsArray) {
+      for (const arg of log.argumentsArray) {
         if (typeof arg === "string") {
           format += ` ${arg}`;
         } else {
@@ -61,6 +62,8 @@ export function setupLogger(this: ProtocolNode): void {
       displayFunctionName: this.debug,
     });
 
+    // set log level depending on debug mode
+    // TODO @regenisis: remove deprecated "--verbose" option flag
     logger.setSettings({
       minLevel: this.debug ? undefined : "info",
     });

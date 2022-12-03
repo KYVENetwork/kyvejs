@@ -1,7 +1,7 @@
 {
   "name": "@kyve/kysor",
   "description": "The Cosmovisor for KYVE protocol nodes",
-  "version": "1.0.0-beta",
+  "version": "1.0.0-beta.0",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "homepage": "https://github.com/KYVENetwork/kysor#readme",
@@ -19,7 +19,9 @@
     "build:binaries": "yarn build && rimraf out && pkg --no-bytecode --public-packages '*' --output out/kysor package.json",
     "start": "node ./dist/index.js",
     "format": "prettier --write .",
-    "deploy": "yarn build && yarn npm publish"
+    "deploy": "yarn build && yarn npm publish",
+    "lint": "eslint . --ignore-path ../../.eslintignore --ext ts --ext tsx --ext js --ext jsx",
+    "lint:fix": "eslint --fix . --ignore-path ../../.eslintignore --ext ts --ext tsx --ext js --ext jsx"
   },
   "bin": "./dist/index.js",
   "pkg": {
@@ -36,8 +38,8 @@
   },
   "dependencies": {
     "@iarna/toml": "^2.2.5",
-    "@kyvejs/types": "1.0.0-beta",
-    "@kyvejs/sdk": "1.0.0-beta",
+    "@kyvejs/sdk": "1.0.0-beta.0",
+    "@kyvejs/types": "1.0.0-beta.0",
     "axios": "^0.27.2",
     "bignumber.js": "^9.1.0",
     "commander": "^9.4.0",

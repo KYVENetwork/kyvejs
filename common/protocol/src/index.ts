@@ -1,60 +1,61 @@
-import { IRuntime, ICacheProvider, IMetrics } from "./types";
+import { PoolResponse } from "@kyvejs/types/lcd/kyve/query/v1beta1/pools";
+import KyveSDK, { KyveClient, KyveLCDClientType } from "@kyvejs/sdk";
+import { Command, OptionValues } from "commander";
+import os from "os";
+import { Logger } from "tslog";
+
 import { version as coreVersion } from "../package.json";
 import {
-  setupLogger,
+  parseCache,
+  parseMnemonic,
+  parseNetwork,
+  parsePoolId,
+} from "./commander";
+import {
+  canPropose,
+  canVote,
+  claimUploaderRole,
+  compressionFactory,
+  continueRound,
+  createBundleProposal,
+  getBalances,
+  runCache,
+  runNode,
+  saveBundleDecompress,
+  saveBundleDownload,
+  saveGetTransformDataItem,
+  saveLoadValidationBundle,
   setupCacheProvider,
+  setupLogger,
   setupMetrics,
   setupSDK,
   setupValidator,
-  validateRuntime,
-  validateVersion,
+  skipUploaderRole,
+  storageProviderFactory,
+  submitBundleProposal,
+  syncPoolConfig,
+  syncPoolState,
+  validateBundleProposal,
   validateIsNodeValidator,
   validateIsPoolActive,
-  waitForAuthorization,
-  waitForUploadInterval,
-  waitForNextBundleProposal,
-  waitForCacheContinuation,
-  continueRound,
-  saveGetTransformDataItem,
-  storageProviderFactory,
-  compressionFactory,
-  claimUploaderRole,
-  skipUploaderRole,
+  validateRuntime,
+  validateVersion,
   voteBundleProposal,
-  submitBundleProposal,
-  syncPoolState,
-  syncPoolConfig,
-  getBalances,
-  canVote,
-  canPropose,
-  saveBundleDownload,
-  saveBundleDecompress,
-  saveLoadValidationBundle,
-  validateBundleProposal,
-  createBundleProposal,
-  runNode,
-  runCache,
+  waitForAuthorization,
+  waitForCacheContinuation,
+  waitForNextBundleProposal,
+  waitForUploadInterval,
 } from "./methods";
-import KyveSDK, { KyveClient, KyveLCDClientType } from "@kyvejs/sdk";
-import { Logger } from "tslog";
-import { Command, OptionValues } from "commander";
-import {
-  parseNetwork,
-  parsePoolId,
-  parseMnemonic,
-  parseCache,
-} from "./commander";
-import { PoolResponse } from "@kyvejs/types/lcd/kyve/query/v1beta1/pools";
+import { ICacheProvider, IMetrics, IRuntime } from "./types";
 import { standardizeJSON } from "./utils";
-import os from "os";
 
 /**
  * Main class of KYVE protocol nodes representing a node.
  *
- * @class ProtocolNode
+ * @class Node
  * @constructor
  */
-export class ProtocolNode {
+export class Node {
   // reactor attributes
   protected runtime!: IRuntime;
   protected cacheProvider!: ICacheProvider;
@@ -82,6 +83,8 @@ export class ProtocolNode {
   protected valaccount!: string;
   protected storagePriv!: string;
   protected network!: string;
+  protected rpc!: string;
+  protected rest!: string;
   protected cache!: string;
   protected debug!: boolean;
   protected metrics!: boolean;
@@ -204,6 +207,14 @@ export class ProtocolNode {
         parseNetwork
       )
       .option(
+        "--rpc",
+        "Custom rpc endpoint the node uses for submitting transactions to chain"
+      )
+      .option(
+        "--rest",
+        "Custom rest api endpoint the node uses for querying from chain"
+      )
+      .option(
         "--cache <memory|jsonfile|leveldb>",
         "The cache this node should use",
         parseCache,
@@ -254,6 +265,8 @@ export class ProtocolNode {
     this.valaccount = options.valaccount;
     this.storagePriv = options.storagePriv;
     this.network = options.network;
+    this.rpc = options.rpc;
+    this.rest = options.rest;
     this.cache = options.cache;
     this.debug = options.debug;
     this.metrics = options.metrics;
@@ -269,7 +282,7 @@ export class ProtocolNode {
     await this.setupValidator();
     await this.setupCacheProvider();
 
-    // start the node process. ProtocolNode and cache should run at the same time.
+    // start the node process. Node and cache should run at the same time.
     // Thats why, although they are async they are called synchronously
     try {
       await this.syncPoolState();

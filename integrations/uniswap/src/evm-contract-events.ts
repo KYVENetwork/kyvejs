@@ -1,4 +1,4 @@
-import { DataItem, IRuntime, ProtocolNode, sha256 } from '@kyvejs/protocol';
+import { DataItem, IRuntime, Node, sha256 } from '@kyvejs/protocol';
 import { providers, utils } from 'ethers';
 
 // method to just get the named args
@@ -17,42 +17,36 @@ export default class EvmContractEvents implements IRuntime {
   public name = '';
   public version = '';
 
-  async getDataItem(
-    core: ProtocolNode,
-    source: string,
-    key: string
-  ): Promise<DataItem> {
-    try {
-      // setup web3 provider
-      const provider = new providers.StaticJsonRpcProvider(
-        source + process.env.INFURA_API_KEY
-      );
+  async getDataItem(core: any, source: string, key: string): Promise<DataItem> {
+    // setup web3 provider
+    const provider = new providers.StaticJsonRpcProvider(
+      source + process.env.INFURA_API_KEY
+    );
 
-      // try to fetch data item
-      const value = await provider.getLogs({
-        address: core.poolConfig.contract.address,
-        fromBlock: parseInt(key),
-        toBlock: parseInt(key),
-      });
+    // try to fetch data item
+    const value = await provider.getLogs({
+      address: core.poolConfig.contract.address,
+      fromBlock: parseInt(key),
+      toBlock: parseInt(key),
+    });
 
-      // throw if data item is not available
-      if (!value) throw new Error();
+    // throw if data item is not available
+    if (!value) throw new Error();
 
-      return {
-        key,
-        value,
-      };
-    } catch (err) {
-      throw err;
-    }
+    return {
+      key,
+      value,
+    };
   }
 
-  async transformDataItem(
-    core: ProtocolNode,
-    item: DataItem
-  ): Promise<DataItem> {
+  async prevalidateDataItem(_: Node, __: DataItem): Promise<boolean> {
+    // TODO: return valid for now
+    return true;
+  }
+
+  async transformDataItem(core: Node, item: DataItem): Promise<DataItem> {
     // interface of contract-ABI for decoding the logs
-    let iface = new utils.Interface(core.poolConfig.contract.abi);
+    const iface = new utils.Interface(core.poolConfig.contract.abi);
 
     const result = item.value.map((log: any) => {
       const info = iface.parseLog(log);
@@ -73,7 +67,7 @@ export default class EvmContractEvents implements IRuntime {
   }
 
   async validateDataItem(
-    core: ProtocolNode,
+    _: Node,
     proposedDataItem: DataItem,
     validationDataItem: DataItem
   ): Promise<boolean> {
@@ -87,14 +81,11 @@ export default class EvmContractEvents implements IRuntime {
     return proposedDataItemHash === validationDataItemHash;
   }
 
-  async summarizeDataBundle(
-    core: ProtocolNode,
-    bundle: DataItem[]
-  ): Promise<string> {
+  async summarizeDataBundle(_core: Node, _bundle: DataItem[]): Promise<string> {
     return '';
   }
 
-  async nextKey(key: string): Promise<string> {
+  async nextKey(_: Node, key: string): Promise<string> {
     return (parseInt(key) + 1).toString();
   }
 }

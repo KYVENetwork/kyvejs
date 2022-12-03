@@ -1,4 +1,5 @@
-import { DataItem, IRuntime, ProtocolNode, sha256 } from '@kyvejs/protocol';
+import { DataItem, IRuntime, Node, sha256 } from '@kyvejs/protocol';
+
 import { name, version } from '../package.json';
 import { fetchBlock } from './utils';
 
@@ -6,34 +7,26 @@ export default class Celo implements IRuntime {
   public name = name;
   public version = version;
 
-  async getDataItem(
-    core: ProtocolNode,
-    source: string,
-    key: string
-  ): Promise<DataItem> {
-    let block;
-
-    try {
-      block = await fetchBlock(source, +key);
-    } catch (err) {
-      throw err;
-    }
+  async getDataItem(_: Node, source: string, key: string): Promise<DataItem> {
+    const block = await fetchBlock(source, +key);
 
     if (!block) throw new Error();
 
     return { key, value: block };
   }
 
-  async transformDataItem(
-    core: ProtocolNode,
-    item: DataItem
-  ): Promise<DataItem> {
+  async prevalidateDataItem(_: Node, __: DataItem): Promise<boolean> {
+    // TODO: return valid for now
+    return true;
+  }
+
+  async transformDataItem(_: Node, item: DataItem): Promise<DataItem> {
     // don't transform data item
     return item;
   }
 
   async validateDataItem(
-    core: ProtocolNode,
+    _: Node,
     proposedDataItem: DataItem,
     validationDataItem: DataItem
   ): Promise<boolean> {
@@ -47,14 +40,11 @@ export default class Celo implements IRuntime {
     return proposedDataItemHash === validationDataItemHash;
   }
 
-  async summarizeDataBundle(
-    core: ProtocolNode,
-    bundle: DataItem[]
-  ): Promise<string> {
+  async summarizeDataBundle(_: Node, bundle: DataItem[]): Promise<string> {
     return bundle.at(-1)?.value?.hash ?? '';
   }
 
-  async nextKey(key: string): Promise<string> {
+  async nextKey(_: Node, key: string): Promise<string> {
     return (parseInt(key) + 1).toString();
   }
 }

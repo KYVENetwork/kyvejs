@@ -1,15 +1,16 @@
-import { ProtocolNode } from "../..";
 import { PoolStatus } from "@kyvejs/types/lcd/kyve/pool/v1beta1/pool";
+
+import { Node } from "../..";
 
 /**
  * validateIsPoolActive checks if the pool is active or not.
  * It returns true or false, wether it is active or not.
  *
  * @method validateIsPoolActive
- * @param {ProtocolNode} this
+ * @param {Node} this
  * @return {boolean}
  */
-export function validateIsPoolActive(this: ProtocolNode): boolean {
+export function validateIsPoolActive(this: Node): boolean {
   this.logger.debug(`Validating if pool is active: ${this.pool.status}`);
 
   switch (this.pool.status as PoolStatus) {

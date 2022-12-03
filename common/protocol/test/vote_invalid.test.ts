@@ -3,7 +3,7 @@ import {
   bundleToBytes,
   ICompression,
   IStorageProvider,
-  ProtocolNode,
+  Node,
   sha256,
   standardizeJSON,
 } from "../src/index";
@@ -39,7 +39,7 @@ TEST CASES - invalid votes tests
 */
 
 describe("invalid votes tests", () => {
-  let core: ProtocolNode;
+  let core: Node;
 
   let processExit: jest.Mock<never, never>;
   let setTimeoutMock: jest.Mock;
@@ -48,7 +48,7 @@ describe("invalid votes tests", () => {
   let compression: ICompression;
 
   beforeEach(() => {
-    core = new ProtocolNode(new TestRuntime());
+    core = new Node(new TestRuntime());
 
     core["cacheProvider"] = new TestCacheProvider();
 
@@ -230,15 +230,12 @@ describe("invalid votes tests", () => {
     // =============================
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
-      expect.any(ProtocolNode),
-      bundle
-    );
+    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(bundle);
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(1);
 
     expect(runtime.validateDataItem).toHaveBeenLastCalledWith(
-      expect.any(ProtocolNode),
+      expect.any(Node),
       standardizeJSON(bundle[0]),
       standardizeJSON(bundle[0])
     );
@@ -758,10 +755,7 @@ describe("invalid votes tests", () => {
     // =============================
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
-      expect.any(ProtocolNode),
-      bundle
-    );
+    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(bundle);
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(0);
 
@@ -1026,15 +1020,12 @@ describe("invalid votes tests", () => {
     // =============================
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
-      expect.any(ProtocolNode),
-      bundle
-    );
+    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(bundle);
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(1);
 
     expect(runtime.validateDataItem).toHaveBeenLastCalledWith(
-      expect.any(ProtocolNode),
+      expect.any(Node),
       standardizeJSON(bundle[0]),
       standardizeJSON(bundle[0])
     );
@@ -1435,15 +1426,12 @@ describe("invalid votes tests", () => {
     // =============================
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
-      expect.any(ProtocolNode),
-      bundle
-    );
+    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(bundle);
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(1);
 
     expect(runtime.validateDataItem).toHaveBeenLastCalledWith(
-      expect.any(ProtocolNode),
+      expect.any(Node),
       standardizeJSON(bundle[0]),
       standardizeJSON(bundle[0])
     );
@@ -1598,15 +1586,12 @@ describe("invalid votes tests", () => {
     // =============================
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
-      expect.any(ProtocolNode),
-      bundle
-    );
+    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(bundle);
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(1);
 
     expect(runtime.validateDataItem).toHaveBeenLastCalledWith(
-      expect.any(ProtocolNode),
+      expect.any(Node),
       standardizeJSON(bundle[0]),
       standardizeJSON(bundle[0])
     );
@@ -1745,15 +1730,12 @@ describe("invalid votes tests", () => {
     // =============================
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
-      expect.any(ProtocolNode),
-      bundle
-    );
+    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(bundle);
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(1);
 
     expect(runtime.validateDataItem).toHaveBeenLastCalledWith(
-      expect.any(ProtocolNode),
+      expect.any(Node),
       standardizeJSON(bundle[0]),
       standardizeJSON(bundle[0])
     );

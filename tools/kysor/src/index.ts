@@ -1,7 +1,8 @@
 import { Command } from "commander";
+
 import init from "./commands/init";
-import valaccounts from "./commands/valaccounts";
 import start from "./commands/start";
+import valaccounts from "./commands/valaccounts";
 
 const main = async () => {
   // define main program

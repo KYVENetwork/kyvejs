@@ -1,6 +1,7 @@
 import ArweaveClient from "arweave";
 import { JWKInterface } from "arweave/node/lib/wallet";
 import axios from "axios";
+
 import { BundleTag, IStorageProvider } from "../../types";
 
 export class Arweave implements IStorageProvider {
@@ -28,7 +29,7 @@ export class Arweave implements IStorageProvider {
       data: bundle,
     });
 
-    for (let tag of tags) {
+    for (const tag of tags) {
       transaction.addTag(tag.name, tag.value);
     }
 

@@ -1,4 +1,4 @@
-import { ProtocolNode, standardizeJSON } from "../..";
+import { Node, standardizeJSON } from "../..";
 
 /**
  * claimUploaderRole tries to claim the uploader role for the next bundle proposal
@@ -8,10 +8,10 @@ import { ProtocolNode, standardizeJSON } from "../..";
  * node the tx will just be ignored.
  *
  * @method claimUploaderRole
- * @param {ProtocolNode} this
+ * @param {Node} this
  * @return {Promise<boolean>}
  */
-export async function claimUploaderRole(this: ProtocolNode): Promise<boolean> {
+export async function claimUploaderRole(this: Node): Promise<boolean> {
   try {
     // if next uploader is already defined abort
     if (this.pool.bundle_proposal!.next_uploader) {

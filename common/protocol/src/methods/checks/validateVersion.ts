@@ -1,14 +1,14 @@
-import { ProtocolNode, standardizeJSON } from "../..";
+import { Node, standardizeJSON } from "../..";
 
 /**
  * validateVersion checks if the version of the pool matches with the runtime
  * version of the node. If it does not match the node will exit.
  *
  * @method validateVersion
- * @param {ProtocolNode} this
+ * @param {Node} this
  * @return {void}
  */
-export function validateVersion(this: ProtocolNode): void {
+export function validateVersion(this: Node): void {
   try {
     this.logger.debug(
       `Comparing pool runtime version with protocol node runtime version`
@@ -25,7 +25,7 @@ export function validateVersion(this: ProtocolNode): void {
     }
 
     this.logger.info(
-      `ProtocolNode running on runtime version = ${this.runtime.version}`
+      `Node running on runtime version = ${this.runtime.version}`
     );
   } catch (err) {
     this.logger.fatal(`Error while validating runtime version. Exiting ...`);

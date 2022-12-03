@@ -1,7 +1,8 @@
-import { ProtocolNode } from "../..";
 import BigNumber from "bignumber.js";
-import { callWithBackoffStrategy, standardizeJSON, VOTE } from "../../utils";
+
+import { Node } from "../..";
 import { DataItem } from "../../types";
+import { callWithBackoffStrategy, standardizeJSON, VOTE } from "../../utils";
 
 /**
  * saveLoadValidationBundle loads the bundle from the local
@@ -10,12 +11,12 @@ import { DataItem } from "../../types";
  * with abstain and continues to try to load the bundle
  *
  * @method saveLoadValidationBundle
- * @param {ProtocolNode} this
+ * @param {Node} this
  * @param {number} updatedAt
  * @return {Promise<DataItem[] | null>}
  */
 export async function saveLoadValidationBundle(
-  this: ProtocolNode,
+  this: Node,
   updatedAt: number
 ): Promise<DataItem[] | null> {
   return await callWithBackoffStrategy(

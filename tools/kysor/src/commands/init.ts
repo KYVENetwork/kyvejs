@@ -1,8 +1,8 @@
+import TOML from "@iarna/toml";
+import KyveSDK from "@kyvejs/sdk";
 import { Command } from "commander";
 import fs from "fs";
 import path from "path";
-import TOML from "@iarna/toml";
-import KyveSDK from "@kyvejs/sdk";
 
 const home = path.join(process.env.HOME!, ".kysor");
 

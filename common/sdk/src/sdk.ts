@@ -14,6 +14,9 @@ import {
 } from "@cosmostation/extension-client/types/message";
 import { verifyADR36Amino } from "@keplr-wallet/cosmos";
 import { BigNumber } from "bignumber.js";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import humanize from "humanize-number";
 
 import { getSigningKyveClient } from "./clients/full-client";
 import { createKyveLCDClient } from "./clients/lcd-client/client";
@@ -198,6 +201,14 @@ export class KyveSDK {
     });
 
     return signer.mnemonic;
+  }
+
+  static formatBalance(balance: string, decimals = 2): string {
+    return humanize(
+      new BigNumber(balance)
+        .dividedBy(new BigNumber(10).exponentiatedBy(KYVE_DECIMALS))
+        .toFixed(decimals)
+    );
   }
 
   static getAddressFromPubKey(pubKey: string) {

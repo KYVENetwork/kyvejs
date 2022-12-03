@@ -1,6 +1,7 @@
 import BundlrClient from "@bundlr-network/client";
 import { JWKInterface } from "arweave/node/lib/wallet";
 import axios from "axios";
+
 import { BundleTag, IStorageProvider } from "../../types";
 
 export class Bundlr implements IStorageProvider {

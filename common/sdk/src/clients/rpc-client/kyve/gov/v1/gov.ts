@@ -1,9 +1,10 @@
-import { coins, SigningStargateClient } from "@cosmjs/stargate";
-import { AccountData } from "@cosmjs/amino/build/signer";
 import { StdFee } from "@cosmjs/amino/build/signdoc";
+import { AccountData } from "@cosmjs/amino/build/signer";
+import { coins, SigningStargateClient } from "@cosmjs/stargate";
 import { VoteOption } from "@kyvejs/types/client/cosmos/gov/v1/gov";
-import { signTx, TxPromise } from "../../../../../utils/helper";
-import { DENOM, GOV_AUTHORITY } from "../../../../../constants";
+import { MsgUpdateParams as MsgUpdateParamsBundles } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
+import { MsgUpdateParams as MsgUpdateParamsDelegation } from "@kyvejs/types/client/kyve/delegation/v1beta1/tx";
+import { MsgUpdateParams as MsgUpdateParamsFees } from "@kyvejs/types/client/kyve/fees/v1beta1/tx";
 import {
   MsgCancelRuntimeUpgrade,
   MsgCreatePool,
@@ -12,11 +13,11 @@ import {
   MsgUnpausePool,
   MsgUpdatePool,
 } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
-import { encodeTxMsg } from "../../../../../registry/tx.registry";
 import { MsgUpdateParams as MsgUpdateParamsStakers } from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
-import { MsgUpdateParams as MsgUpdateParamsDelegation } from "@kyvejs/types/client/kyve/delegation/v1beta1/tx";
-import { MsgUpdateParams as MsgUpdateParamsBundles } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
-import { MsgUpdateParams as MsgUpdateParamsFees } from "@kyvejs/types/client/kyve/fees/v1beta1/tx";
+
+import { DENOM, GOV_AUTHORITY } from "../../../../../constants";
+import { encodeTxMsg } from "../../../../../registry/tx.registry";
+import { signTx, TxPromise } from "../../../../../utils/helper";
 
 export default class KyveGovMsg {
   protected nativeClient: SigningStargateClient;
@@ -28,7 +29,7 @@ export default class KyveGovMsg {
   }
 
   private createGovTx(
-    content: { type_url: string; value: Object },
+    content: { type_url: string; value: unknown },
     deposit: string,
     metadata?: string
   ) {

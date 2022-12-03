@@ -1,6 +1,6 @@
 {
   "name": "@kyvejs/sdk",
-  "version": "1.0.0-beta",
+  "version": "1.0.0-beta.0",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "repository": {
@@ -15,7 +15,11 @@
   "scripts": {
     "build": "rimraf dist && tsc",
     "format": "prettier --write .",
-    "doc": "typedoc"
+    "doc": "typedoc",
+    "test": "jest test/unit",
+    "test:integrations": "jest test/integrations",
+    "lint": "eslint . --ignore-path ../../.eslintignore --ext ts --ext tsx --ext js --ext jsx",
+    "lint:fix": "eslint --fix . --ignore-path ../../.eslintignore --ext ts --ext tsx --ext js --ext jsx"
   },
   "dependencies": {
     "@cosmjs/amino": "0.28.3",
@@ -26,10 +30,11 @@
     "@cosmjs/tendermint-rpc": "0.28.0",
     "@cosmostation/extension-client": "^0.0.6",
     "@keplr-wallet/cosmos": "0.9.16",
-    "@kyvejs/types": "1.0.0-beta",
+    "@kyvejs/types": "1.0.0-beta.0",
     "axios": "0.25.0",
     "bech32": "2.0.0",
     "bignumber.js": "9.0.2",
+    "humanize-number": "0.0.2",
     "qs": "^6.10.5"
   },
   "devDependencies": {

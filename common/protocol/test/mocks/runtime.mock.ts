@@ -1,22 +1,20 @@
-import { DataItem, ProtocolNode, sha256 } from "../../src";
+import { DataItem, Node, sha256 } from "../../src";
 
 export const TestRuntime = jest.fn().mockImplementation(() => {
   return {
     name: "@kyve/evm",
     version: "0.0.0",
-    getDataItem: jest.fn(
-      async (core: ProtocolNode, source: string, key: string) => ({
-        key,
-        value: `${key}-value`,
-      })
-    ),
-    transformDataItem: jest.fn(async (core: ProtocolNode, item: DataItem) => ({
+    getDataItem: jest.fn(async (core: Node, source: string, key: string) => ({
+      key,
+      value: `${key}-value`,
+    })),
+    transformDataItem: jest.fn(async (item: DataItem) => ({
       key: item.key,
       value: `${item.value}-transform`,
     })),
     validateDataItem: jest.fn(
       async (
-        core: ProtocolNode,
+        core: Node,
         proposedDataItem: DataItem,
         validationDataItem: DataItem
       ) => {
@@ -30,8 +28,8 @@ export const TestRuntime = jest.fn().mockImplementation(() => {
         return proposedDataItemHash === validationDataItemHash;
       }
     ),
-    summarizeDataBundle: jest.fn(
-      async (core: ProtocolNode, bundle: DataItem[]) => JSON.stringify(bundle)
+    summarizeDataBundle: jest.fn(async (bundle: DataItem[]) =>
+      JSON.stringify(bundle)
     ),
     nextKey: jest.fn(async (key: string) => (parseInt(key) + 1).toString()),
   };

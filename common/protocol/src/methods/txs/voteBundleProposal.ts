@@ -1,4 +1,4 @@
-import { ProtocolNode, standardizeJSON, VOTE } from "../..";
+import { Node, standardizeJSON, VOTE } from "../..";
 
 /**
  * voteBundleProposal submits a vote on the current bundle proposal.
@@ -8,13 +8,13 @@ import { ProtocolNode, standardizeJSON, VOTE } from "../..";
  * resulting in an unwanted vote.
  *
  * @method voteBundleProposal
- * @param {ProtocolNode} this
+ * @param {Node} this
  * @param {string} storageId storage id of the current bundle proposal
  * @param {number} vote can be 1 = VALID, 2 = INVALID or 3 = ABSTAIN
  * @return {Promise<boolean>}
  */
 export async function voteBundleProposal(
-  this: ProtocolNode,
+  this: Node,
   storageId: string,
   vote: number
 ): Promise<boolean> {

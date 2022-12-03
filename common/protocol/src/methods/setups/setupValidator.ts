@@ -1,4 +1,3 @@
-import { ProtocolNode, standardizeJSON } from "../..";
 import Prando from "prando";
 import {
   adjectives,
@@ -7,15 +6,17 @@ import {
   uniqueNamesGenerator,
 } from "unique-names-generator";
 
+import { Node, standardizeJSON } from "../..";
+
 /**
  * setupValidator ensures the node starts as a valid validator
  * and logs some basic validator starting information
  *
  * @method setupValidator
- * @param {ProtocolNode} this
+ * @param {Node} this
  * @return {Promise<void>}
  */
-export async function setupValidator(this: ProtocolNode): Promise<void> {
+export async function setupValidator(this: Node): Promise<void> {
   try {
     // generate deterministic valname based on network, pool id,
     // runtime, runtime version and valaddress

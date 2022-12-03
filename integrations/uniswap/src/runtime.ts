@@ -1,16 +1,14 @@
-import { name, version } from '../package.json';
+import { DataItem, Node } from '@kyvejs/protocol';
 import { BigNumber as EthersBigNumber } from 'ethers';
+
+import { name, version } from '../package.json';
 import EvmContractEvents from './evm-contract-events';
-import { DataItem, ProtocolNode } from '@kyvejs/protocol';
 
 export default class UniswapEvents extends EvmContractEvents {
   public name = name;
   public version = version;
 
-  async summarizeDataBundle(
-    core: ProtocolNode,
-    bundle: DataItem[]
-  ): Promise<string> {
+  async summarizeDataBundle(_: Node, bundle: DataItem[]): Promise<string> {
     let summary = '';
 
     bundle.forEach((item) => {

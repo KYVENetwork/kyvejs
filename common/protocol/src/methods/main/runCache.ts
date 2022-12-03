@@ -1,6 +1,7 @@
-import { DataItem, ProtocolNode } from "../..";
-import { generateIndexPairs, sleep, standardizeJSON } from "../../utils";
 import seedrandom from "seedrandom";
+
+import { DataItem, Node } from "../..";
+import { generateIndexPairs, sleep, standardizeJSON } from "../../utils";
 
 /**
  * runCache is the other main execution thread for collecting data items
@@ -24,10 +25,10 @@ import seedrandom from "seedrandom";
  * following round.
  *
  * @method runCache
- * @param {ProtocolNode} this
+ * @param {Node} this
  * @return {Promise<void>}
  */
-export async function runCache(this: ProtocolNode): Promise<void> {
+export async function runCache(this: Node): Promise<void> {
   // run rounds indefinitely, continueRound returns always
   // true and is only used by unit tests to control the termination of
   // rounds by mocking it
@@ -119,8 +120,8 @@ export async function runCache(this: ProtocolNode): Promise<void> {
           this.logger.debug(`this.runtime.nextKey(${key})`);
         }
 
-        const nextKey = !!key
-          ? await this.runtime.nextKey(key)
+        const nextKey = key
+          ? await this.runtime.nextKey(this, key)
           : this.pool.data!.start_key;
 
         if (!itemFound) {
@@ -141,7 +142,7 @@ export async function runCache(this: ProtocolNode): Promise<void> {
           const indexPairs = generateIndexPairs(results.length);
 
           // validate every data item for each possible index pair
-          for (let pair of indexPairs) {
+          for (const pair of indexPairs) {
             try {
               // validate pair of data items
               valid = await this.runtime.validateDataItem(

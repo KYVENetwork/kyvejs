@@ -1,6 +1,7 @@
 import { StdFee } from "@cosmjs/amino/build/signdoc";
 import { AccountData } from "@cosmjs/amino/build/signer";
 import { coins, SigningStargateClient } from "@cosmjs/stargate";
+import BigNumber from "bignumber.js";
 
 import { DENOM } from "../../../../../constants";
 import { signTx, TxPromise } from "../../../../../utils/helper";
@@ -34,6 +35,30 @@ export default class KyveBaseMsg {
     return new TxPromise(
       this.nativeClient,
       await signTx(this.nativeClient, this.account.address, tx, options)
+    );
+  }
+
+  async multiTransfer(recipient: string[], amount: string) {
+    const allAmount = new BigNumber(amount).multipliedBy(recipient.length);
+    const tx = {
+      typeUrl: "/cosmos.bank.v1beta1.MsgMultiSend",
+      value: {
+        inputs: [
+          {
+            address: this.account.address,
+            coins: coins(allAmount.toString(), DENOM),
+          },
+        ],
+        outputs: recipient.map((address) => ({
+          address,
+          coins: coins(amount, DENOM),
+        })),
+      },
+    };
+
+    return new TxPromise(
+      this.nativeClient,
+      await signTx(this.nativeClient, this.account.address, tx)
     );
   }
 

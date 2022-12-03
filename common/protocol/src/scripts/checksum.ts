@@ -22,7 +22,7 @@ const main = async () => {
   const files = readdirSync(`./out/`);
   let result = "";
 
-  for (let file of files) {
+  for (const file of files) {
     const checksum = await getChecksum(`./out/${file}`);
 
     console.log(`${file} -> ${checksum}`);

@@ -1,11 +1,11 @@
-import { ProtocolNode } from "../..";
+import { Node } from "../..";
 import {
   callWithBackoffStrategy,
   REFRESH_TIME,
   sleep,
   standardizeJSON,
 } from "../../utils";
-
+const INFINITY_LOOP = true;
 /**
  * waitForAuthorization ensures that the node starts with a valid validator
  * who authorized this valaccount. If the valaccount was not authorized
@@ -13,10 +13,10 @@ import {
  * After authorization the node can continue running.
  *
  * @method waitForAuthorization
- * @param {ProtocolNode} this
+ * @param {Node} this
  * @return {Promise<void>}
  */
-export async function waitForAuthorization(this: ProtocolNode): Promise<void> {
+export async function waitForAuthorization(this: Node): Promise<void> {
   try {
     // call canValidate query to check if valaccount
     // was already authorized to run
@@ -72,7 +72,7 @@ export async function waitForAuthorization(this: ProtocolNode): Promise<void> {
     }
 
     // wait until valaccount got authorized
-    while (true) {
+    while (INFINITY_LOOP) {
       const canValidate = await callWithBackoffStrategy(
         async () => {
           this.logger.debug(

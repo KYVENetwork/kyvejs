@@ -1,8 +1,8 @@
-import { ProtocolNode } from "../..";
-import { NoStorageProvider } from "../../reactors/storageProviders/NoStorageProvider";
+import { Node } from "../..";
+import { IStorageProvider } from "../..";
 import { Arweave } from "../../reactors/storageProviders/Arweave";
 import { Bundlr } from "../../reactors/storageProviders/Bundlr";
-import { IStorageProvider } from "../..";
+import { NoStorageProvider } from "../../reactors/storageProviders/NoStorageProvider";
 
 /**
  * storageProviderFactory creates the correct storage provider class
@@ -14,12 +14,12 @@ import { IStorageProvider } from "../..";
  * x - NoStorageProvider (default)
  *
  * @method storageProviderFactory
- * @param {ProtocolNode} this
+ * @param {Node} this
  * @param {number} storageProviderId the id of the storage provider
  * @return {Promise<IStorageProvider>}
  */
 export async function storageProviderFactory(
-  this: ProtocolNode,
+  this: Node,
   storageProviderId: number
 ): Promise<IStorageProvider> {
   switch (storageProviderId) {

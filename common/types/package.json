@@ -1,6 +1,6 @@
 {
   "name": "@kyvejs/types",
-  "version": "1.0.0-beta",
+  "version": "1.0.0-beta.0",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "repository": {
@@ -25,7 +25,6 @@
     "@protobufs/cosmos": "^0.0.11",
     "@protobufs/gogoproto": "^0.0.10",
     "@protobufs/google": "^0.0.10",
-    "lerna": "^5.2.0",
     "nx": "^14.4.3",
     "ts-proto": "^1.115.4"
   },

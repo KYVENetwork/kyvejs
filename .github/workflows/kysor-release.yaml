@@ -1,0 +1,59 @@
+name: Create release kysor binaries
+on:
+  push:
+    tags: ['@kyve/kysor@*']
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@main
+        with:
+          ref: 'main'
+      - name: fetch tags
+        run: git fetch --tags
+      - name: set tag
+        run: echo "TAGS=$(git tag --points-at | jq  --raw-input .  | jq --slurp . | jq tostring)" >> $GITHUB_ENV
+      - name: install yarn
+        run: npm install --global yarn
+      - name: setup lerna
+        run: yarn setup
+      - id: output-tag
+        uses: actions/github-script@master
+        with:
+          script: |
+            const { TAGS } = process.env;
+            const KYSOR_TAG = 'kysor'
+            const tags = JSON.parse(JSON.parse(TAGS));
+            const kysorTag = tags.find(it => it.trim().split('/')[1]?.split('@')[0] === KYSOR_TAG)
+            return kysorTag.toString();
+          result-encoding: string
+      - name: print var
+        run: echo ${{steps.output-tag.outputs.result}}
+        if: steps.output-tag.outputs.result != ''
+      - name: Build Binaries
+        run: |
+          cd tools/kysor
+          yarn build:binaries  
+          cd out
+          zip kysor-linux-arm64.zip kysor-linux-arm64
+          rm  kysor-linux-arm64
+          zip kysor-linux-x64.zip kysor-linux-x64
+          rm kysor-linux-x64
+          zip kysor-macos-x64.zip kysor-macos-x64
+          rm kysor-macos-x64
+
+      - name: Generate Release Body
+        if: steps.output-tag.outputs.result != ''
+        run: npx extract-changelog-release  ${{ github.workspace }}/tools/kysor/CHANGELOG.md > RELEASE_BODY.md
+      - name: Publish the Release
+        if: steps.output-tag.outputs.result != ''
+        uses: softprops/action-gh-release@v1
+        with:
+          body_path: RELEASE_BODY.md
+          tag_name: ${{ steps.output-tag.outputs.result }}
+          files: tools/kysor/out/*
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

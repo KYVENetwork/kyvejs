@@ -1,7 +1,7 @@
-import { ProtocolNode } from "../..";
-import { NoCompression } from "../../reactors/compression/NoCompression";
-import { Gzip } from "../../reactors/compression/Gzip";
+import { Node } from "../..";
 import { ICompression } from "../..";
+import { Gzip } from "../../reactors/compression/Gzip";
+import { NoCompression } from "../../reactors/compression/NoCompression";
 
 /**
  * compressionFactory creates the correct compression class
@@ -12,12 +12,12 @@ import { ICompression } from "../..";
  * x - NoCompression (default)
  *
  * @method compressionFactory
- * @param {ProtocolNode} this
+ * @param {Node} this
  * @param {number} compressionId the id of the compression
  * @return {ICompression}
  */
 export function compressionFactory(
-  this: ProtocolNode,
+  this: Node,
   compressionId: number
 ): ICompression {
   switch (compressionId) {

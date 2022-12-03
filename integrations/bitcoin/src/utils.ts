@@ -1,5 +1,6 @@
 import axios from "axios";
 import { nanoid } from "nanoid";
+
 import { Response } from "./types";
 
 export async function fetchBlock(

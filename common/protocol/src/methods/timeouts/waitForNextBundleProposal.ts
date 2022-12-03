@@ -1,4 +1,4 @@
-import { ProtocolNode } from "../..";
+import { Node } from "../..";
 import { REFRESH_TIME, sleep, standardizeJSON } from "../../utils";
 
 /**
@@ -9,12 +9,12 @@ import { REFRESH_TIME, sleep, standardizeJSON } from "../../utils";
  * the node knows someone submitted a new proposal.
  *
  * @method waitForNextBundleProposal
- * @param {ProtocolNode} this
+ * @param {Node} this
  * @param {number} updatedAt
  * @return {Promise<void>}
  */
 export async function waitForNextBundleProposal(
-  this: ProtocolNode,
+  this: Node,
   updatedAt: number
 ): Promise<void> {
   try {

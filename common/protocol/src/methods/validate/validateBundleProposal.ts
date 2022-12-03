@@ -1,5 +1,6 @@
 import { VoteType } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
-import { ProtocolNode } from "../..";
+
+import { Node } from "../..";
 import { sha256, standardizeJSON, VOTE } from "../../utils";
 
 /**
@@ -10,12 +11,12 @@ import { sha256, standardizeJSON, VOTE } from "../../utils";
  * at the end.
  *
  * @method validateBundleProposal
- * @param {ProtocolNode} this
+ * @param {Node} this
  * @param {number} updatedAt
  * @return {Promise<void>}
  */
 export async function validateBundleProposal(
-  this: ProtocolNode,
+  this: Node,
   updatedAt: number
 ): Promise<void> {
   try {

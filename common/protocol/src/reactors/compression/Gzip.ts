@@ -1,5 +1,6 @@
 import { gunzipSync, gzipSync } from "zlib";
-import { DataItem, ICompression } from "../../types";
+
+import { ICompression } from "../../types";
 
 export class Gzip implements ICompression {
   public name = "Gzip";

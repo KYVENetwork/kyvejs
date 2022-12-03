@@ -1,4 +1,5 @@
 import { Command } from "commander";
+
 import { run } from "../kysor";
 
 const start = new Command("start").description("Start KYSOR");

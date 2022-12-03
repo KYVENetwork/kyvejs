@@ -1,6 +1,22 @@
 import { GeneratedType, Registry } from "@cosmjs/proto-signing";
 import { defaultRegistryTypes } from "@cosmjs/stargate";
-
+/** cosmos **/
+import { MsgSubmitProposal } from "@kyvejs/types/client/cosmos/gov/v1/tx";
+import { MsgVote } from "@kyvejs/types/client/cosmos/gov/v1/tx";
+/** bundles **/
+import { MsgSubmitBundleProposal } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
+import { MsgVoteBundleProposal } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
+import { MsgClaimUploaderRole } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
+import { MsgSkipUploaderRole } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
+import { MsgUpdateParams as MsgUpdateParamsBundles } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
+/** delegations **/
+import { MsgDelegate } from "@kyvejs/types/client/kyve/delegation/v1beta1/tx";
+import { MsgWithdrawRewards } from "@kyvejs/types/client/kyve/delegation/v1beta1/tx";
+import { MsgRedelegate } from "@kyvejs/types/client/kyve/delegation/v1beta1/tx";
+import { MsgUndelegate } from "@kyvejs/types/client/kyve/delegation/v1beta1/tx";
+import { MsgUpdateParams as MsgUpdateParamsDelegation } from "@kyvejs/types/client/kyve/delegation/v1beta1/tx";
+/** fees **/
+import { MsgUpdateParams as MsgUpdateParamsFees } from "@kyvejs/types/client/kyve/fees/v1beta1/tx";
 /** pool **/
 import { MsgFundPool } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
 import { MsgDefundPool } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
@@ -17,24 +33,6 @@ import { MsgJoinPool } from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
 import { MsgUpdateCommission } from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
 import { MsgLeavePool } from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
 import { MsgUpdateParams as MsgUpdateParamsStakers } from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
-/** delegations **/
-import { MsgDelegate } from "@kyvejs/types/client/kyve/delegation/v1beta1/tx";
-import { MsgWithdrawRewards } from "@kyvejs/types/client/kyve/delegation/v1beta1/tx";
-import { MsgRedelegate } from "@kyvejs/types/client/kyve/delegation/v1beta1/tx";
-import { MsgUndelegate } from "@kyvejs/types/client/kyve/delegation/v1beta1/tx";
-import { MsgUpdateParams as MsgUpdateParamsDelegation } from "@kyvejs/types/client/kyve/delegation/v1beta1/tx";
-/** bundles **/
-import { MsgSubmitBundleProposal } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
-import { MsgVoteBundleProposal } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
-import { MsgClaimUploaderRole } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
-import { MsgSkipUploaderRole } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
-import { MsgUpdateParams as MsgUpdateParamsBundles } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
-/** fees **/
-import { MsgUpdateParams as MsgUpdateParamsFees } from "@kyvejs/types/client/kyve/fees/v1beta1/tx";
-
-/** cosmos **/
-import { MsgSubmitProposal } from "@kyvejs/types/client/cosmos/gov/v1/tx";
-import { MsgVote } from "@kyvejs/types/client/cosmos/gov/v1/tx";
 
 export const registry: ReadonlyArray<[string, GeneratedType]> = [
   ...defaultRegistryTypes,

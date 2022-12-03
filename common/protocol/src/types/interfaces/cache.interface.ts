@@ -39,7 +39,7 @@ export interface ICacheProvider {
    * Saves the value with a key
    *
    * @method put
-   * @param {string | number} key
+   * @param {string | number} key
    * @param {DataItem} value
    * @return {Promise<void>}
    */
@@ -49,7 +49,7 @@ export interface ICacheProvider {
    * Loads the value from a key
    *
    * @method get
-   * @param {string | number} key
+   * @param {string | number} key
    * @return {Promise<DataItem>}
    */
   get(key: string): Promise<DataItem>;
@@ -58,7 +58,7 @@ export interface ICacheProvider {
    * Checks whether a value exists for a key
    *
    * @method exists
-   * @param {string | number} key
+   * @param {string | number} key
    * @return {Promise<boolean>}
    */
   exists(key: string): Promise<boolean>;
@@ -67,7 +67,7 @@ export interface ICacheProvider {
    * Deletes the value from a key
    *
    * @method del
-   * @param {string | number} key
+   * @param {string | number} key
    * @return {Promise<void>}
    */
   del(key: string): Promise<void>;

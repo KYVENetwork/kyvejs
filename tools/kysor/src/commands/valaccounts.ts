@@ -1,10 +1,11 @@
-import { Command } from "commander";
+import TOML from "@iarna/toml";
 import KyveSDK from "@kyvejs/sdk";
+import { Command } from "commander";
 import fs from "fs";
 import path from "path";
 import prompts from "prompts";
+
 import { IValaccountConfig } from "../types/interfaces";
-import TOML from "@iarna/toml";
 
 const home = path.join(process.env.HOME!, ".kysor");
 
@@ -54,7 +55,7 @@ valaccounts
       const pools = [];
       const valaccounts = fs.readdirSync(path.join(home, "valaccounts"));
 
-      for (let valaccount of valaccounts) {
+      for (const valaccount of valaccounts) {
         const config: IValaccountConfig = TOML.parse(
           fs.readFileSync(path.join(home, "valaccounts", valaccount), "utf-8")
         ) as any;

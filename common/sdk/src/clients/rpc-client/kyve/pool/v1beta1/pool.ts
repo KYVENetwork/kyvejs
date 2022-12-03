@@ -1,15 +1,15 @@
-import { coins, SigningStargateClient } from "@cosmjs/stargate";
-import { AccountData } from "@cosmjs/amino/build/signer";
 import { StdFee } from "@cosmjs/amino/build/signdoc";
-import { encodeTxMsg, withTypeUrl } from "../../../../../registry/tx.registry";
-import { signTx, TxPromise } from "../../../../../utils/helper";
-
+import { AccountData } from "@cosmjs/amino/build/signer";
+import { coins, SigningStargateClient } from "@cosmjs/stargate";
 import {
   MsgCreatePool,
   MsgDefundPool,
 } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
 import { MsgFundPool } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
+
 import { DENOM, GOV_AUTHORITY } from "../../../../../constants";
+import { encodeTxMsg, withTypeUrl } from "../../../../../registry/tx.registry";
+import { signTx, TxPromise } from "../../../../../utils/helper";
 
 export default class {
   private nativeClient: SigningStargateClient;

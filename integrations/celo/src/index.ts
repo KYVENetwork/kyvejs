@@ -1,6 +1,7 @@
-import { ProtocolNode } from '@kyvejs/protocol';
+import { Node } from '@kyvejs/protocol';
+
 import Celo from './runtime';
 
 const runtime = new Celo();
 
-new ProtocolNode(runtime).bootstrap();
+new Node(runtime).bootstrap();

@@ -1,4 +1,4 @@
-import { ProtocolNode } from "../..";
+import { Node } from "../..";
 import { sleep } from "../../utils";
 
 /**
@@ -8,11 +8,11 @@ import { sleep } from "../../utils";
  * so we only listen here
  *
  * @method waitForCacheContinuation
- * @param {ProtocolNode} this
+ * @param {Node} this
  * @return {Promise<void>}
  */
 export async function waitForCacheContinuation(
-  this: ProtocolNode,
+  this: Node,
   updatedAt: number
 ): Promise<void> {
   // continue if a new proposal is available
