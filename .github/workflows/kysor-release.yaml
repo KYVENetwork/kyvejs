@@ -69,11 +69,10 @@ jobs:
       - name: Generate Release Body
         run: npx extract-changelog-release  ${{ github.workspace }}/tools/kysor/CHANGELOG.md > RELEASE_BODY.md
       - name: Publish the Release
-        if: steps.output-tag.outputs.result != ''
         uses: softprops/action-gh-release@v1
         with:
           body_path: RELEASE_BODY.md
-          tag_name: ${{ steps.output-tag.outputs.result }}
+          tag_name: ${{ needs.prepare.outputs.output }}
           files: ${{ github.workspace }}/tools/kysor/out/*
           prerelease: false
         env:
