@@ -41,6 +41,7 @@ jobs:
   build:
     if: needs.prepare.outputs.output != ''
     runs-on: ubuntu-latest
+    needs: prepare
     steps:
       - name: Checkout the repository
         uses: actions/checkout@main
