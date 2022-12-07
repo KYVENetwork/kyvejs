@@ -5,29 +5,49 @@
 ![banner](https://arweave.net/RkC-azeak1eOQGOLSaPNzHo-ORc-cWgnmdJnSScedFE)
 
 <p align="center">
-<strong>Tools for building applications on KYVE.</strong>
+<strong>Tools for building applications on KYVE</strong>
 </p>
 
 KYVE, the Web3 data lake solution, is a protocol that enables data providers to standardize, validate, and permanently store blockchain data streams. By leveraging permanent data storage solutions like Arweave, KYVE’s Cosmos SDK chain creates permanent backups and ensures the scalability, immutability, and availability of these resources over time.
 
 ## Project Overview
 
-Common:
+**Common:**
 
 - [@kyvejs/types](common/types/README.md) - holds all types for the KYVE application in typescript
 - [@kyvejs/sdk](common/sdk/README.md) - development kit for communicating with the KYVE blockchain
 - [@kyvejs/protocol](common/protocol/README.md) - core functionality for running protocol nodes on the KYVE network
 
-Integrations:
+**Tools:**
 
-- [@kyve/bitcoin](integrations/bitcoin/README.md) - The official KYVE Bitcoin integration
-- [@kyve/celo](integrations/celo/README.md) - The official KYVE Celo integration
-- [@kyve/evm](integrations/evm/README.md) - The official KYVE EVM integration
-- [@kyve/uniswap](integrations/uniswap/README.md) - The official KYVE Uniswap integration
+- [@kyvejs/kysor](integrations/kysor/README.md) - The Cosmovisor of KYVE
 
-- [@kyve/kysor](integrations/kysor/README.md) - The Cosmovisor of KYVE
+**Integrations:**
 
-## Getting Started
+- [@kyvejs/bitcoin](integrations/bitcoin/README.md) - The official KYVE Bitcoin integration
+- [@kyvejs/celo](integrations/celo/README.md) - The official KYVE Celo integration
+- [@kyvejs/cosmos](integrations/cosmos/README.md) - The official KYVE Cosmos integration
+- [@kyvejs/evm](integrations/evm/README.md) - The official KYVE EVM integration
+
+## How to contribute
+
+Clone the repository:
+
+```bash
+git clone git@github.com:KYVENetwork/kyvejs.git
+```
+
+Checkout repository:
+
+```bash
+cd kyvejs
+```
+
+Checkout new branch to implement new features/fixes there
+
+```bash
+git checkout -b [feat/fix]/[my-branch-name]
+```
 
 Install dependencies with yarn:
 
@@ -35,8 +55,11 @@ Install dependencies with yarn:
 yarn install
 ```
 
-To bootstrap and build the entire project:
+Bootstrap and build project:
 
 ```
 yarn setup
 ```
+
+Apply your changes and create a Pull Request to `main`. Once the team has
+reviewed and approved your PR it can be merged and used.

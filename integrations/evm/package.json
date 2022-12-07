@@ -1,5 +1,5 @@
 {
-  "name": "@kyve/evm",
+  "name": "@kyvejs/evm",
   "version": "1.0.1-beta.0",
   "license": "MIT",
   "scripts": {
