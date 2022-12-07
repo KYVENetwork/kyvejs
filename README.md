@@ -20,7 +20,7 @@ KYVE, the Web3 data lake solution, is a protocol that enables data providers to 
 
 **Tools:**
 
-- [@kyvejs/kysor](integrations/kysor/README.md) - The Cosmovisor of KYVE
+- [@kyvejs/kysor](tools/kysor/README.md) - The Cosmovisor of KYVE
 
 **Integrations:**
 
