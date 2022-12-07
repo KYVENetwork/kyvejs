@@ -3,7 +3,7 @@ import { Command } from "commander";
 import init from "./commands/init";
 import start from "./commands/start";
 import valaccounts from "./commands/valaccounts";
-// test
+
 const main = async () => {
   // define main program
   const program = new Command();
