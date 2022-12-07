@@ -51,6 +51,8 @@ import {
 import { ICacheProvider, IMetrics, IRuntime } from "./types";
 import { standardizeJSON } from "./utils";
 
+// test
+
 /**
  * Main class of KYVE protocol nodes representing a validator node.
  *
