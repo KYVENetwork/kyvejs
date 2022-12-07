@@ -1,0 +1,11 @@
+{
+  "entryPoints": ["./src/index.ts"],
+  "includes": ["./src"],
+  "out": "docs",
+  "excludeExternals": false,
+  "theme": "default",
+  "name": "@kyvejs/sdk",
+  "excludePrivate": true,
+  "excludeProtected": true,
+  "hideGenerator": true
+}

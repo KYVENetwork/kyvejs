@@ -1,0 +1,34 @@
+{
+  "name": "@kyvejs/cosmos",
+  "version": "1.0.0-beta",
+  "license": "MIT",
+  "scripts": {
+    "build": "rimraf dist && tsc",
+    "build:binaries": "yarn build && rimraf out && pkg --no-bytecode --public-packages '*' --output out/kyve package.json && node ../../common/protocol/dist/src/scripts/checksum.js",
+    "start": "node ./dist/src/index.js",
+    "format": "prettier --write ."
+  },
+  "bin": "./dist/src/index.js",
+  "pkg": {
+    "scripts": "./dist/src/index.js",
+    "targets": [
+      "latest-linux-x64",
+      "latest-linux-arm64",
+      "latest-macos-x64"
+    ],
+    "outputPath": "out"
+  },
+  "prettier": {
+    "singleQuote": true
+  },
+  "dependencies": {
+    "@kyvejs/protocol": "1.0.0-beta.0",
+    "axios": "^0.27.2"
+  },
+  "devDependencies": {
+    "pkg": "^5.8.0",
+    "prettier": "^2.7.1",
+    "rimraf": "^3.0.2",
+    "typescript": "^4.7.4"
+  }
+}

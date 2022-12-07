@@ -1,0 +1,38 @@
+{
+  "name": "@kyvejs/bitcoin",
+  "version": "1.0.0-beta.0",
+  "license": "MIT",
+  "scripts": {
+    "build": "rimraf dist && tsc",
+    "build:binaries": "yarn build && rimraf out && pkg --no-bytecode --public-packages '*' --output out/kyve package.json && node ../../common/protocol/dist/src/scripts/checksum.js",
+    "start": "node ./dist/src/index.js",
+    "format": "prettier --write .",
+    "lint": "eslint . --ignore-path ../../.eslintignore --ext ts --ext tsx --ext js --ext jsx",
+    "lint:fix": "eslint --fix . --ignore-path ../../.eslintignore --ext ts --ext tsx --ext js --ext jsx"
+  },
+  "bin": "./dist/src/index.js",
+  "pkg": {
+    "scripts": "./dist/src/index.js",
+    "assets": [
+      "../../node_modules/classic-level/**/*"
+    ],
+    "targets": [
+      "latest-linux-x64",
+      "latest-linux-arm64",
+      "latest-macos-x64"
+    ],
+    "outputPath": "out"
+  },
+  "dependencies": {
+    "@kyvejs/protocol": "1.0.0-beta.0",
+    "axios": "^0.26.1",
+    "nanoid": "^3.3.3"
+  },
+  "devDependencies": {
+    "pkg": "^5.8.0",
+    "prettier": "^2.6.2",
+    "rimraf": "^3.0.2",
+    "typescript": "^4.6.3",
+    "webhook-discord": "^3.7.8"
+  }
+}

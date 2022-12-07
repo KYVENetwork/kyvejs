@@ -1,0 +1,25 @@
+name: lint checks
+
+on:
+  - pull_request
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    env:
+      npm_config_user: "root"
+    steps:
+      - name: "checkout repo"
+        uses: actions/checkout@v3
+      - name: "nodejs install"
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install Protoc
+        uses: arduino/setup-protoc@v1
+      - name: install yarn
+        run: npm install --global yarn
+      - name: "setup"
+        run: yarn setup
+      - name: "lint"
+        run: yarn lint

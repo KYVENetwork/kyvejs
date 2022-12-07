@@ -1,0 +1,60 @@
+{
+  "name": "@kyve/kysor",
+  "description": "The Cosmovisor for KYVE protocol nodes",
+  "version": "1.0.0-beta.0",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "homepage": "https://github.com/KYVENetwork/kysor#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KYVENetwork/kyvejs.git"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "author": "Troy Kessler <troy@kyve.network>",
+  "license": "MIT",
+  "scripts": {
+    "build": "rimraf dist && tsc",
+    "build:binaries": "yarn build && rimraf out && pkg --no-bytecode --public-packages '*' --output out/kysor package.json",
+    "start": "node ./dist/index.js",
+    "format": "prettier --write .",
+    "deploy": "yarn build && yarn npm publish",
+    "lint": "eslint . --ignore-path ../../.eslintignore --ext ts --ext tsx --ext js --ext jsx",
+    "lint:fix": "eslint --fix . --ignore-path ../../.eslintignore --ext ts --ext tsx --ext js --ext jsx"
+  },
+  "bin": "./dist/index.js",
+  "pkg": {
+    "scripts": "./dist/index.js",
+    "assets": [
+      "../../node_modules/classic-level/**/*"
+    ],
+    "targets": [
+      "latest-linux-x64",
+      "latest-linux-arm64",
+      "latest-macos-x64"
+    ],
+    "outputPath": "out"
+  },
+  "dependencies": {
+    "@iarna/toml": "^2.2.5",
+    "@kyvejs/sdk": "1.0.0-beta.0",
+    "@kyvejs/types": "1.0.0-beta.0",
+    "axios": "^0.27.2",
+    "bignumber.js": "^9.1.0",
+    "commander": "^9.4.0",
+    "download": "^8.0.0",
+    "extract-zip": "^2.0.1",
+    "pkg": "^5.8.0",
+    "prompts": "^2.4.2",
+    "tslog": "^3.3.3"
+  },
+  "devDependencies": {
+    "@types/download": "^8.0.1",
+    "@types/node": "^18.11.9",
+    "@types/node-fetch": "^2.6.2",
+    "@types/prompts": "^2.0.14",
+    "rimraf": "^3.0.2",
+    "typescript": "^4.6.4"
+  }
+}
