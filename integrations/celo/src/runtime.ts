@@ -8,11 +8,14 @@ export default class Celo implements IRuntime {
   public version = version;
 
   async getDataItem(
-    _: Validator,
+    v: Validator,
     source: string,
     key: string
   ): Promise<DataItem> {
-    const block = await fetchBlock(source, +key);
+    // get auth headers for proxy endpoints
+    const headers = await v.getProxyAuth();
+
+    const block = await fetchBlock(source, +key, headers);
 
     if (!block) throw new Error();
 

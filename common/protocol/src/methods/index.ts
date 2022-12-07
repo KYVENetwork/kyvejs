@@ -21,6 +21,7 @@ export * from "./timeouts/waitForUploadInterval";
 // helpers
 export * from "./helpers/continueRound";
 export * from "./helpers/saveGetTransformDataItem";
+export * from "./helpers/getProxyAuth";
 
 // factories
 export * from "./factories/compressionFactory";

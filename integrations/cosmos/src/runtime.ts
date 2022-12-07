@@ -1,6 +1,6 @@
 import { DataItem, IRuntime, Validator, sha256 } from '@kyvejs/protocol';
+import axios from 'axios';
 import { name, version } from '../package.json';
-import { fetchBlock } from './utils';
 
 export default class Cosmos implements IRuntime {
   public name = name;
@@ -11,10 +11,17 @@ export default class Cosmos implements IRuntime {
     source: string,
     key: string
   ): Promise<DataItem> {
-    const headers = await this.generateCoinbaseCloudHeaders(v);
-    const block = await fetchBlock(source, +key, headers);
+    // get auth headers for proxy endpoints
+    const headers = await v.getProxyAuth();
 
-    return { key, value: block };
+    const { data } = await axios.get(
+      `${source}/cosmos/base/tendermint/v1beta1/blocks/${key}`,
+      {
+        headers,
+      }
+    );
+
+    return { key, value: data };
   }
 
   async prevalidateDataItem(_: Validator, __: DataItem): Promise<boolean> {
@@ -48,24 +55,5 @@ export default class Cosmos implements IRuntime {
 
   async nextKey(_: Validator, key: string): Promise<string> {
     return (parseInt(key) + 1).toString();
-  }
-
-  private async generateCoinbaseCloudHeaders(v: Validator): Promise<any> {
-    // requestSignature for coinbase cloud
-    const address = v.client.account.address;
-    const timestamp = new Date().valueOf().toString();
-    const poolId = v.pool.id;
-
-    const { signature, pub_key } = await v.client.signString(
-      `${address}//${poolId}//${timestamp}`
-    );
-
-    return {
-      'Content-Type': 'application/json',
-      Signature: signature,
-      'Public-Key': pub_key.value,
-      'Pool-ID': poolId,
-      Timestamp: timestamp,
-    };
   }
 }

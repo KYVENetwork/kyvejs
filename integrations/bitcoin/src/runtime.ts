@@ -12,7 +12,9 @@ export default class Bitcoin implements IRuntime {
     source: string,
     key: string
   ): Promise<DataItem> {
-    const headers = await this.generateCoinbaseCloudHeaders(v);
+    // get auth headers for proxy endpoints
+    const headers = await v.getProxyAuth();
+
     const hash = await fetchBlockHash(source, +key, headers);
     const block = await fetchBlock(source, hash, headers);
 

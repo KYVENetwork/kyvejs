@@ -3,9 +3,10 @@ import { providers } from 'ethers';
 
 export async function fetchBlock(
   endpoint: string,
-  height: number
+  height: number,
+  headers: any
 ): Promise<any> {
-  const provider = new StaticCeloProvider(endpoint);
+  const provider = new StaticCeloProvider({ url: endpoint, headers });
   const block = await provider.getBlockWithTransactions(height);
 
   // The block is always defined, unless the height is out of range.

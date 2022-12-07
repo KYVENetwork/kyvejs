@@ -46,6 +46,7 @@ import {
   waitForCacheContinuation,
   waitForNextBundleProposal,
   waitForUploadInterval,
+  getProxyAuth,
 } from "./methods";
 import { ICacheProvider, IMetrics, IRuntime } from "./types";
 import { standardizeJSON } from "./utils";
@@ -114,6 +115,7 @@ export class Validator {
   // helpers
   protected continueRound = continueRound;
   protected saveGetTransformDataItem = saveGetTransformDataItem;
+  public getProxyAuth = getProxyAuth;
 
   // factories
   protected storageProviderFactory = storageProviderFactory;
