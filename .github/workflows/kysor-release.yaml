@@ -31,7 +31,7 @@ jobs:
             const KYSOR_TAG = 'kysor'
             const tags = JSON.parse(JSON.parse(TAGS));
             const kysorTag = tags.find(it => it.trim().split('/')[1]?.split('@')[0] === KYSOR_TAG)
-            return kysorTag?.toString();
+            return kysorTag?.toString() ?? '';
           result-encoding: string
       - name: print var
         run: echo ${{steps.output-tags.outputs.result}}
