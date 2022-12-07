@@ -4,6 +4,56 @@ import _m0 from "protobufjs/minimal";
 
 export const protobufPackage = "kyve.delegation.v1beta1";
 
+/** SlashType ... */
+export enum SlashType {
+  /** SLASH_TYPE_UNSPECIFIED - SLASH_TYPE_UNSPECIFIED ... */
+  SLASH_TYPE_UNSPECIFIED = 0,
+  /** SLASH_TYPE_TIMEOUT - SLASH_TYPE_TIMEOUT ... */
+  SLASH_TYPE_TIMEOUT = 1,
+  /** SLASH_TYPE_VOTE - SLASH_TYPE_VOTE ... */
+  SLASH_TYPE_VOTE = 2,
+  /** SLASH_TYPE_UPLOAD - SLASH_TYPE_UPLOAD ... */
+  SLASH_TYPE_UPLOAD = 3,
+  UNRECOGNIZED = -1,
+}
+
+export function slashTypeFromJSON(object: any): SlashType {
+  switch (object) {
+    case 0:
+    case "SLASH_TYPE_UNSPECIFIED":
+      return SlashType.SLASH_TYPE_UNSPECIFIED;
+    case 1:
+    case "SLASH_TYPE_TIMEOUT":
+      return SlashType.SLASH_TYPE_TIMEOUT;
+    case 2:
+    case "SLASH_TYPE_VOTE":
+      return SlashType.SLASH_TYPE_VOTE;
+    case 3:
+    case "SLASH_TYPE_UPLOAD":
+      return SlashType.SLASH_TYPE_UPLOAD;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return SlashType.UNRECOGNIZED;
+  }
+}
+
+export function slashTypeToJSON(object: SlashType): string {
+  switch (object) {
+    case SlashType.SLASH_TYPE_UNSPECIFIED:
+      return "SLASH_TYPE_UNSPECIFIED";
+    case SlashType.SLASH_TYPE_TIMEOUT:
+      return "SLASH_TYPE_TIMEOUT";
+    case SlashType.SLASH_TYPE_VOTE:
+      return "SLASH_TYPE_VOTE";
+    case SlashType.SLASH_TYPE_UPLOAD:
+      return "SLASH_TYPE_UPLOAD";
+    case SlashType.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+
 /**
  * Delegator stores the information that one address has delegated to another address
  * It stores important information for the F1-Fee distribution algorithm

@@ -1,7 +1,6 @@
 /* eslint-disable */
 import Long from "long";
 import _m0 from "protobufjs/minimal";
-import { SlashType, slashTypeFromJSON, slashTypeToJSON } from "./stakers";
 
 export const protobufPackage = "kyve.stakers.v1beta1";
 
@@ -29,21 +28,6 @@ export interface EventUpdateMetadata {
   website: string;
   /** logo ... */
   logo: string;
-}
-
-/**
- * EventSlash is an event emitted when a protocol node is slashed.
- * emitted_by: MsgSubmitBundleProposal, EndBlock
- */
-export interface EventSlash {
-  /** pool_id is the unique ID of the pool. */
-  pool_id: string;
-  /** staker is the account address of the protocol node. */
-  staker: string;
-  /** amount ... */
-  amount: string;
-  /** slash_type */
-  slash_type: SlashType;
 }
 
 /**
@@ -213,82 +197,6 @@ export const EventUpdateMetadata = {
     message.moniker = object.moniker ?? "";
     message.website = object.website ?? "";
     message.logo = object.logo ?? "";
-    return message;
-  },
-};
-
-function createBaseEventSlash(): EventSlash {
-  return { pool_id: "0", staker: "", amount: "0", slash_type: 0 };
-}
-
-export const EventSlash = {
-  encode(message: EventSlash, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.pool_id !== "0") {
-      writer.uint32(8).uint64(message.pool_id);
-    }
-    if (message.staker !== "") {
-      writer.uint32(18).string(message.staker);
-    }
-    if (message.amount !== "0") {
-      writer.uint32(24).uint64(message.amount);
-    }
-    if (message.slash_type !== 0) {
-      writer.uint32(32).int32(message.slash_type);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): EventSlash {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseEventSlash();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.pool_id = longToString(reader.uint64() as Long);
-          break;
-        case 2:
-          message.staker = reader.string();
-          break;
-        case 3:
-          message.amount = longToString(reader.uint64() as Long);
-          break;
-        case 4:
-          message.slash_type = reader.int32() as any;
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): EventSlash {
-    return {
-      pool_id: isSet(object.pool_id) ? String(object.pool_id) : "0",
-      staker: isSet(object.staker) ? String(object.staker) : "",
-      amount: isSet(object.amount) ? String(object.amount) : "0",
-      slash_type: isSet(object.slash_type) ? slashTypeFromJSON(object.slash_type) : 0,
-    };
-  },
-
-  toJSON(message: EventSlash): unknown {
-    const obj: any = {};
-    message.pool_id !== undefined && (obj.pool_id = message.pool_id);
-    message.staker !== undefined && (obj.staker = message.staker);
-    message.amount !== undefined && (obj.amount = message.amount);
-    message.slash_type !== undefined && (obj.slash_type = slashTypeToJSON(message.slash_type));
-    return obj;
-  },
-
-  fromPartial<I extends Exact<DeepPartial<EventSlash>, I>>(object: I): EventSlash {
-    const message = createBaseEventSlash();
-    message.pool_id = object.pool_id ?? "0";
-    message.staker = object.staker ?? "";
-    message.amount = object.amount ?? "0";
-    message.slash_type = object.slash_type ?? 0;
     return message;
   },
 };

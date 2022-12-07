@@ -4,7 +4,10 @@ import _m0 from "protobufjs/minimal";
 
 export const protobufPackage = "kyve.bundles.v1beta1";
 
-/** BundleStatus ... */
+/**
+ * BundleStatus represents the status of an evaluated bundle
+ * proposal.
+ */
 export enum BundleStatus {
   /** BUNDLE_STATUS_UNSPECIFIED - BUNDLE_STATUS_UNSPECIFIED ... */
   BUNDLE_STATUS_UNSPECIFIED = 0,
@@ -61,69 +64,75 @@ export function bundleStatusToJSON(object: BundleStatus): string {
   }
 }
 
-/** BundleProposal ... */
+/**
+ * BundleProposal represents the current bundle proposal
+ * of a storage pool
+ */
 export interface BundleProposal {
-  /** pool_id ... */
+  /** pool_id is the id of the pool for which this proposal is for */
   pool_id: string;
-  /** storage_id ... */
+  /** storage_id is the id with which the data can be retrieved from */
   storage_id: string;
-  /** uploader ... */
+  /** uploader is the address of the staker who submitted the current proposal */
   uploader: string;
-  /** next_uploader ... */
+  /** next_uploader is the address of the staker who should upload the next proposal */
   next_uploader: string;
-  /** data_size ... */
+  /** data_size the size of the data in bytes */
   data_size: string;
-  /** bundle_size ... */
+  /** bundle_size the size of the bundle (amount of data items) */
   bundle_size: string;
-  /** to_key ... */
+  /** to_key the key of the last data item in the bundle proposal */
   to_key: string;
-  /** bundle_summary ... */
+  /** bundle_summary a string summary of the current proposal */
   bundle_summary: string;
-  /** data_hash ... */
+  /** data_hash a sha256 hash of the raw compressed data */
   data_hash: string;
-  /** updated_at ... */
+  /** updated_at the last time this proposal was edited */
   updated_at: string;
-  /** voters_valid ... */
+  /** voters_valid list of all stakers who voted in favor for current proposal */
   voters_valid: string[];
-  /** voters_invalid ... */
+  /** voters_invalid list of all stakers who voted against for current proposal */
   voters_invalid: string[];
-  /** voters_abstain ... */
+  /** voters_abstain list of all stakers who voted abstain for current proposal */
   voters_abstain: string[];
-  /** from_key ... */
+  /** from_key the key of the first data item in the bundle proposal */
   from_key: string;
-  /** storage_provider_id ... */
+  /** storage_provider_id the id of the storage provider where the bundle is stored */
   storage_provider_id: number;
-  /** compression_id ... */
+  /** compression_id the id of the compression type with which the data was compressed */
   compression_id: number;
 }
 
-/** Proposal ... */
+/**
+ * FinalizedBundle represents a bundle proposal where the majority
+ * agreed on its validity
+ */
 export interface FinalizedBundle {
-  /** pool_id ... */
+  /** pool_id is the id of the pool for which this proposal is for */
   pool_id: string;
-  /** id ... */
+  /** id is a unique identifier for each finalized bundle in a pool */
   id: string;
-  /** storage_id ... */
+  /** storage_id is the id with which the data can be retrieved from */
   storage_id: string;
-  /** uploader ... */
+  /** uploader is the address of the staker who submitted this bundle */
   uploader: string;
-  /** from_index ... */
+  /** from_index is the index from where the bundle starts (inclusive) */
   from_index: string;
-  /** to_index ... */
+  /** to_index is the index to which the bundle goes (exclusive) */
   to_index: string;
-  /** to_key ... */
+  /** to_key the key of the last data item in the bundle proposal */
   to_key: string;
-  /** bundle_summary ... */
+  /** bundle_summary a string summary of the current proposal */
   bundle_summary: string;
-  /** bundle_hash ... */
+  /** data_hash a sha256 hash of the raw compressed data */
   data_hash: string;
-  /** finalized_at ... */
+  /** finalized_at is the block height at which this bundle got finalized */
   finalized_at: string;
-  /** from_key ... */
+  /** from_key the key of the first data item in the bundle proposal */
   from_key: string;
-  /** storage_provider_id ... */
+  /** storage_provider_id the id of the storage provider where the bundle is stored */
   storage_provider_id: number;
-  /** compression_id ... */
+  /** compression_id the id of the compression type with which the data was compressed */
   compression_id: number;
 }
 

@@ -222,7 +222,10 @@ describe("vote valid tests", () => {
     // =============================
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(bundle);
+    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
+      expect.any(Node),
+      bundle
+    );
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(bundle.length);
 
@@ -371,7 +374,10 @@ describe("vote valid tests", () => {
     // =============================
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(bundle);
+    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
+      expect.any(Node),
+      bundle
+    );
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(bundle.length);
 
@@ -532,7 +538,10 @@ describe("vote valid tests", () => {
     // =============================
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(bundle);
+    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
+      expect.any(Node),
+      bundle
+    );
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(bundle.length);
 
@@ -674,7 +683,10 @@ describe("vote valid tests", () => {
     // =============================
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(bundle);
+    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
+      expect.any(Node),
+      bundle
+    );
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(bundle.length);
 
@@ -1067,7 +1079,10 @@ describe("vote valid tests", () => {
     // =============================
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(bundle);
+    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
+      expect.any(Node),
+      bundle
+    );
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(bundle.length);
 

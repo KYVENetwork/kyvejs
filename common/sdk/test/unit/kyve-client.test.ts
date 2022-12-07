@@ -2,53 +2,54 @@ import KyveClient from "../../src/clients/rpc-client/client";
 import { createValidator } from "../helper";
 import * as fs from "fs";
 import { resolve } from "path";
-// import { kyve, cosmos as cosmosProto } from "@kyve/proto";
+// import { kyve, cosmos as cosmosProto } from "@kyvejs/types";
 
 /** pool **/
 import {
   MsgCancelRuntimeUpgrade,
   MsgCreatePool,
   MsgFundPool,
-  MsgPausePool, MsgScheduleRuntimeUpgrade,
+  MsgPausePool,
+  MsgScheduleRuntimeUpgrade,
   MsgUnpausePool,
-  MsgUpdatePool
+  MsgUpdatePool,
 } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
-import {MsgDefundPool} from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
+import { MsgDefundPool } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
 /** stakers **/
 import {
   MsgCreateStaker,
-  MsgUpdateParams as MsgUpdateParamsStakers
+  MsgUpdateParams as MsgUpdateParamsStakers,
 } from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
-import {MsgUpdateMetadata} from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
-import {MsgJoinPool} from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
-import {MsgUpdateCommission} from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
-import {MsgLeavePool} from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
+import { MsgUpdateMetadata } from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
+import { MsgJoinPool } from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
+import { MsgUpdateCommission } from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
+import { MsgLeavePool } from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
 /** delegations **/
 import {
   MsgDelegate,
-  MsgUpdateParams as MsgUpdateParamsDelegation
+  MsgUpdateParams as MsgUpdateParamsDelegation,
 } from "@kyvejs/types/client/kyve/delegation/v1beta1/tx";
-import {MsgWithdrawRewards} from "@kyvejs/types/client/kyve/delegation/v1beta1/tx";
-import {MsgRedelegate} from "@kyvejs/types/client/kyve/delegation/v1beta1/tx";
-import {MsgUndelegate} from "@kyvejs/types/client/kyve/delegation/v1beta1/tx";
+import { MsgWithdrawRewards } from "@kyvejs/types/client/kyve/delegation/v1beta1/tx";
+import { MsgRedelegate } from "@kyvejs/types/client/kyve/delegation/v1beta1/tx";
+import { MsgUndelegate } from "@kyvejs/types/client/kyve/delegation/v1beta1/tx";
 /** bundles **/
 import {
   MsgSubmitBundleProposal,
-  MsgUpdateParams as MsgUpdateParamsBundles
+  MsgUpdateParams as MsgUpdateParamsBundles,
 } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
-import {MsgVoteBundleProposal} from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
-import {MsgClaimUploaderRole} from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
-import {MsgSkipUploaderRole} from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
+import { MsgVoteBundleProposal } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
+import { MsgClaimUploaderRole } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
+import { MsgSkipUploaderRole } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
 
 /** gov **/
 import Mock = jest.Mock;
-import {DENOM, GOV_AUTHORITY} from "../../src/constants";
+import { DENOM, GOV_AUTHORITY } from "../../src/constants";
 
 import { SigningStargateClient } from "@cosmjs/stargate";
 import { cosmos } from "@keplr-wallet/cosmos";
 import TxRaw = cosmos.tx.v1beta1.TxRaw;
 import { OfflineAminoSigner } from "@cosmjs/amino/build/signer";
-import {MsgUpdateParams as MsgUpdateParamsFees} from "@kyvejs/types/client/kyve/fees/v1beta1/tx";
+import { MsgUpdateParams as MsgUpdateParamsFees } from "@kyvejs/types/client/kyve/fees/v1beta1/tx";
 
 function extractTsFromPath(path: string) {
   return fs
@@ -71,9 +72,7 @@ const methodsByGroup = [
   [
     {
       name: "bundles",
-      pathToTypes: extractTsFromPath(
-        "../types/client/kyve/bundles/v1beta1"
-      ),
+      pathToTypes: extractTsFromPath("../proto/client/kyve/bundles/v1beta1"),
     },
     [
       {
@@ -109,9 +108,7 @@ const methodsByGroup = [
   [
     {
       name: "delegation",
-      pathToTypes: extractTsFromPath(
-        "../types/client/kyve/delegation/v1beta1"
-      ),
+      pathToTypes: extractTsFromPath("../proto/client/kyve/delegation/v1beta1"),
     },
     [
       {
@@ -147,7 +144,7 @@ const methodsByGroup = [
   [
     {
       name: "pool",
-      pathToTypes: extractTsFromPath("../types/client/kyve//pool/v1beta1"),
+      pathToTypes: extractTsFromPath("../proto/client/kyve//pool/v1beta1"),
     },
     [
       {
@@ -169,9 +166,7 @@ const methodsByGroup = [
   [
     {
       name: "stakers",
-      pathToTypes: extractTsFromPath(
-        "../types/client/kyve/stakers/v1beta1"
-      ),
+      pathToTypes: extractTsFromPath("../proto/client/kyve/stakers/v1beta1"),
     },
     [
       {
@@ -292,7 +287,7 @@ describe("Base methods", () => {
     expect(fee.gas.toString()).toEqual(TEST_FEE.toString());
     expect(tx.value.amount[0]).toEqual({
       denom: DENOM,
-      amount: testAmount
+      amount: testAmount,
     });
   });
 
@@ -322,18 +317,18 @@ const GovMethods = [
     method: "unpausePool",
     decoder: MsgUnpausePool,
   },
-    {
+  {
     method: "scheduleRuntimeUpgrade",
     decoder: MsgScheduleRuntimeUpgrade,
-    },
+  },
   {
     method: "cancelRuntimeUpgrade",
     decoder: MsgCancelRuntimeUpgrade,
   },
-    {
+  {
     method: "updateParamsStakers",
-   decoder: MsgUpdateParamsStakers,
-    },
+    decoder: MsgUpdateParamsStakers,
+  },
   {
     method: "updateParamsDelegation",
     decoder: MsgUpdateParamsDelegation,
@@ -345,15 +340,15 @@ const GovMethods = [
   {
     method: "updateParamsFees",
     decoder: MsgUpdateParamsFees,
-  }
+  },
 ] as const;
 
 describe("Gov methods", () => {
   GovMethods.forEach((method) => {
     it(`${method.method}`, async () => {
-      const govParam = method.decoder.fromJSON({ authority: GOV_AUTHORITY});
+      const govParam = method.decoder.fromJSON({ authority: GOV_AUTHORITY });
       //@ts-ignore
-      await kyveClient.kyve.gov.v1[method.method](govParam,TEST_AMOUNT, {
+      await kyveClient.kyve.gov.v1[method.method](govParam, TEST_AMOUNT, {
         isExpedited: true,
       });
       expect(mockSign).toHaveBeenCalledTimes(1);
@@ -363,10 +358,12 @@ describe("Gov methods", () => {
         expect.objectContaining({
           typeUrl: expect.any(String),
           value: {
-            messages: [{
-              type_url: expect.any(String),
-              value: expect.any(Uint8Array),
-            }],
+            messages: [
+              {
+                type_url: expect.any(String),
+                value: expect.any(Uint8Array),
+              },
+            ],
             initial_deposit: [
               {
                 denom: DENOM,
@@ -374,23 +371,22 @@ describe("Gov methods", () => {
               },
             ],
             proposer: mockAccountData.address,
-            metadata: {isExpedited: true}
+            metadata: { isExpedited: true },
           },
         })
       );
 
       expect(Object.keys(fee).sort()).toEqual(["amount", "gas"].sort());
-      expect(method.decoder.decode(tx.value.messages[0].value)).toEqual(govParam);
+      expect(method.decoder.decode(tx.value.messages[0].value)).toEqual(
+        govParam
+      );
     });
   });
 
   it("`govVote`", async () => {
     const testProposalNumber = "1";
     const testVoteOptions = "Yes";
-    await kyveClient.kyve.gov.v1.vote(
-      testProposalNumber,
-      testVoteOptions
-    );
+    await kyveClient.kyve.gov.v1.vote(testProposalNumber, testVoteOptions);
     expect(mockSign).toHaveBeenCalledTimes(1);
     const [[testAddress, [tx], fee]] = mockSign.mock.calls;
     expect(testAddress).toEqual(mockAccountData.address);

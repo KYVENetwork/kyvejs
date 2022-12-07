@@ -19,8 +19,12 @@ export class Arweave implements IStorageProvider {
     return this;
   }
 
+  async getAddress() {
+    return await this.client.wallets.getAddress(this.jwk);
+  }
+
   async getBalance() {
-    const account = await this.client.wallets.getAddress(this.jwk);
+    const account = await this.getAddress();
     return await this.client.wallets.getBalance(account);
   }
 

@@ -247,7 +247,10 @@ describe("propose bundle tests", () => {
     // =========================
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(bundle);
+    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
+      expect.any(Node),
+      bundle
+    );
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(0);
 
@@ -530,7 +533,10 @@ describe("propose bundle tests", () => {
     // =========================
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(bundle);
+    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
+      expect.any(Node),
+      bundle
+    );
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(0);
 
@@ -680,7 +686,10 @@ describe("propose bundle tests", () => {
     // =========================
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(bundle);
+    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
+      expect.any(Node),
+      bundle
+    );
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(0);
 
@@ -830,7 +839,10 @@ describe("propose bundle tests", () => {
     // =========================
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(bundle);
+    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
+      expect.any(Node),
+      bundle
+    );
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(0);
 
@@ -989,7 +1001,10 @@ describe("propose bundle tests", () => {
     // =========================
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(bundle);
+    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
+      expect.any(Node),
+      bundle
+    );
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(0);
 
@@ -1282,7 +1297,10 @@ describe("propose bundle tests", () => {
     // =========================
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(bundle);
+    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
+      expect.any(Node),
+      bundle
+    );
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(0);
 
@@ -1427,7 +1445,10 @@ describe("propose bundle tests", () => {
     // =========================
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(bundle);
+    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
+      expect.any(Node),
+      bundle
+    );
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(0);
 
@@ -1573,7 +1594,10 @@ describe("propose bundle tests", () => {
     // =========================
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(bundle);
+    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
+      expect.any(Node),
+      bundle
+    );
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(0);
 

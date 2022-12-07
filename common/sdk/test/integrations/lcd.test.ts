@@ -4,7 +4,7 @@ import { KyveLCDClientType } from "../../src";
 import { createValidator } from "../helper";
 const TEST_NETWORK = "korellia";
 const PATH_TO_QUERY_TYPES =
-  "./node_modules/@kyve/proto/dist/proto/kyve/registry/v1beta1/query";
+  "./node_modules/@kyvejs/types/dist/proto/kyve/registry/v1beta1/query";
 const TEST_HEIGHT = "1000000";
 
 let lcdClient: KyveLCDClientType;

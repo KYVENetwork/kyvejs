@@ -4,17 +4,18 @@ export const TestRuntime = jest.fn().mockImplementation(() => {
   return {
     name: "@kyve/evm",
     version: "0.0.0",
-    getDataItem: jest.fn(async (core: Node, source: string, key: string) => ({
+    getDataItem: jest.fn(async (_: Node, __: string, key: string) => ({
       key,
       value: `${key}-value`,
     })),
-    transformDataItem: jest.fn(async (item: DataItem) => ({
+    prevalidateDataItem: jest.fn(async (_: Node, __: DataItem) => true),
+    transformDataItem: jest.fn(async (_: Node, item: DataItem) => ({
       key: item.key,
       value: `${item.value}-transform`,
     })),
     validateDataItem: jest.fn(
       async (
-        core: Node,
+        _: Node,
         proposedDataItem: DataItem,
         validationDataItem: DataItem
       ) => {
@@ -28,9 +29,11 @@ export const TestRuntime = jest.fn().mockImplementation(() => {
         return proposedDataItemHash === validationDataItemHash;
       }
     ),
-    summarizeDataBundle: jest.fn(async (bundle: DataItem[]) =>
+    summarizeDataBundle: jest.fn(async (_: Node, bundle: DataItem[]) =>
       JSON.stringify(bundle)
     ),
-    nextKey: jest.fn(async (key: string) => (parseInt(key) + 1).toString()),
+    nextKey: jest.fn(async (_: Node, key: string) =>
+      (parseInt(key) + 1).toString()
+    ),
   };
 });

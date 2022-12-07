@@ -38,7 +38,7 @@ export async function claimUploaderRole(this: Node): Promise<boolean> {
     if (receipt.code === 0) {
       this.logger.info(`Successfully claimed uploader role`);
       this.m.tx_claim_uploader_role_successful.inc();
-      this.m.gas_claim_uploader_role.set(receipt.gasUsed);
+      this.m.gas_claim_uploader_role.set(receipt?.gasUsed ?? 0);
 
       return true;
     } else {

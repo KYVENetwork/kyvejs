@@ -1,19 +1,35 @@
 export const client = () =>
   ({
+    nativeClient: {
+      getBalance: jest.fn().mockResolvedValue("0"),
+      getChainId: jest.fn().mockResolvedValue("kyve-local-test"),
+    },
     kyve: {
       bundles: {
         v1beta1: {
           claimUploaderRole: jest.fn().mockResolvedValue({
-            code: 0,
+            txHash: "claim_uploader_role_test_hash",
+            execute: jest.fn().mockResolvedValue({
+              code: 0,
+            }),
           }),
           skipUploaderRole: jest.fn().mockResolvedValue({
-            code: 0,
+            txHash: "skip_uploader_role_test_hash",
+            execute: jest.fn().mockResolvedValue({
+              code: 0,
+            }),
           }),
           voteBundleProposal: jest.fn().mockResolvedValue({
-            code: 0,
+            txHash: "vote_bundle_proposal_test_hash",
+            execute: jest.fn().mockResolvedValue({
+              code: 0,
+            }),
           }),
           submitBundleProposal: jest.fn().mockResolvedValue({
-            code: 0,
+            txHash: "submit_bundle_proposal_test_hash",
+            execute: jest.fn().mockResolvedValue({
+              code: 0,
+            }),
           }),
         },
       },
@@ -22,8 +38,5 @@ export const client = () =>
       address: "test_valaddress",
       algo: "ed25519",
       pubkey: new Uint8Array(),
-    },
-    nativeClient: {
-      getChainId: jest.fn().mockResolvedValue("kyve-local-test"),
     },
   } as any);

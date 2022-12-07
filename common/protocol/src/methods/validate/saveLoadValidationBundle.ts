@@ -84,7 +84,7 @@ export async function saveLoadValidationBundle(
       return standardizeJSON(bundle);
     },
     { limitTimeoutMs: 5 * 60 * 1000, increaseByMs: 10 * 1000 },
-    async (err: any, ctx) => {
+    async (_: any, ctx) => {
       this.logger.info(
         `Loading validation bundle from CacheProvider:${
           this.cacheProvider.name
@@ -92,7 +92,6 @@ export async function saveLoadValidationBundle(
           2
         )}s ...`
       );
-      this.logger.debug(standardizeJSON(err));
 
       // vote abstain if validation bundle could not be loaded from cache.
       // With voting abstain the network knows that the node

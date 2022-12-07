@@ -24,12 +24,12 @@ export async function saveGetTransformDataItem(
     async () => {
       // collect data item from runtime source
       this.logger.debug(`this.runtime.getDataItem($THIS,${source},${key})`);
-
       let item = await this.runtime.getDataItem(this, source, key);
 
       this.m.runtime_get_data_item_successful.inc();
 
       // prevalidate data item and reject if it fails
+      this.logger.debug(`this.runtime.prevalidateDataItem($THIS,$ITEM)`);
       const valid = await this.runtime.prevalidateDataItem(this, item);
 
       if (!valid) {

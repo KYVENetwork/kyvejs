@@ -9,8 +9,12 @@ export class NoStorageProvider implements IStorageProvider {
     return this;
   }
 
+  async getAddress() {
+    return "";
+  }
+
   async getBalance() {
-    return "0";
+    return "";
   }
 
   async saveBundle(bundle: Buffer, _tags: BundleTag[]) {

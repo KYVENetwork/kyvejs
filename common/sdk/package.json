@@ -16,8 +16,6 @@
     "build": "rimraf dist && tsc",
     "format": "prettier --write .",
     "doc": "typedoc",
-    "test": "jest test/unit",
-    "test:integrations": "jest test/integrations",
     "lint": "eslint . --ignore-path ../../.eslintignore --ext ts --ext tsx --ext js --ext jsx",
     "lint:fix": "eslint --fix . --ignore-path ../../.eslintignore --ext ts --ext tsx --ext js --ext jsx"
   },

@@ -84,11 +84,20 @@ export async function runCache(this: Node): Promise<void> {
         i++
       ) {
         try {
-          this.logger.debug(`this.cacheProvider.del(${i.toString()})`);
-          await this.cacheProvider.del(i.toString());
+          this.logger.debug(`this.cacheProvider.exists(${i.toString()})`);
+          const itemFound = await this.cacheProvider.exists(i.toString());
 
-          this.m.cache_current_items.dec();
-        } catch {
+          if (itemFound) {
+            this.logger.debug(`this.cacheProvider.del(${i.toString()})`);
+            await this.cacheProvider.del(i.toString());
+
+            this.m.cache_current_items.dec();
+          }
+        } catch (err) {
+          this.logger.error(
+            `Unexpected error deleting data item ${i.toString()} from local cache. Continuing ...`
+          );
+          this.logger.error(standardizeJSON(err));
           continue;
         }
       }
@@ -107,6 +116,14 @@ export async function runCache(this: Node): Promise<void> {
       );
 
       for (let i = currentIndex; i < targetIndex; i++) {
+        // if there are no sources abort
+        if ((this.poolConfig?.sources ?? []).length === 0) {
+          this.logger.info(
+            `Abort collecting data items. No sources found on pool config`
+          );
+          break;
+        }
+
         // check if data item was already collected. If it was
         // already collected we don't need to retrieve it again
         this.logger.debug(`this.cacheProvider.exists(${i.toString()})`);
@@ -127,7 +144,7 @@ export async function runCache(this: Node): Promise<void> {
         if (!itemFound) {
           // collect and transform data from every source at once
           const results: DataItem[] = await Promise.all(
-            this.poolConfig.sources.map((source: string) =>
+            (this.poolConfig?.sources ?? []).map((source: string) =>
               this.saveGetTransformDataItem(source, nextKey)
             )
           );
@@ -200,7 +217,7 @@ export async function runCache(this: Node): Promise<void> {
 
           // add a timeout so that the runtime data source
           // is not overloaded with requests
-          await sleep(50);
+          await sleep(500);
         }
 
         // assign the next key for the next round

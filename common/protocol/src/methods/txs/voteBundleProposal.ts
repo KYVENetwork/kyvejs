@@ -55,7 +55,7 @@ export async function voteBundleProposal(
       this.logger.info(`Voted ${voteMessage} on bundle "${storageId}"`);
 
       this.m.tx_vote_bundle_proposal_successful.inc();
-      this.m.gas_vote_bundle_proposal.set(receipt.gasUsed);
+      this.m.gas_vote_bundle_proposal.set(receipt?.gasUsed ?? 0);
 
       if (vote === 1) {
         this.m.bundles_voted_valid.inc();

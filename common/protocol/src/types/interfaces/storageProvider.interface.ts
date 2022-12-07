@@ -44,6 +44,14 @@ export interface IStorageProvider {
   init(storagePriv: string): Promise<this>;
 
   /**
+   * Gets the public account address of storage provider wallet
+   *
+   * @method getAddress
+   * @return {Promise<string>}
+   */
+  getAddress(): Promise<string>;
+
+  /**
    * Gets the balance of the storage provider wallet
    *
    * @method getBalance

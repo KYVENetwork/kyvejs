@@ -44,7 +44,7 @@ export async function skipUploaderRole(
     if (receipt.code === 0) {
       this.logger.info(`Successfully skipped uploader role`);
       this.m.tx_skip_uploader_role_successful.inc();
-      this.m.gas_skip_uploader_role.set(receipt.gasUsed);
+      this.m.gas_skip_uploader_role.set(receipt?.gasUsed ?? 0);
 
       return true;
     } else {

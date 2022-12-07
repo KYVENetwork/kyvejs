@@ -39,6 +39,7 @@ import {
   validateIsNodeValidator,
   validateIsPoolActive,
   validateRuntime,
+  validateStorageBalance,
   validateVersion,
   voteBundleProposal,
   waitForAuthorization,
@@ -136,6 +137,7 @@ export class Node {
   protected saveBundleDecompress = saveBundleDecompress;
   protected saveLoadValidationBundle = saveLoadValidationBundle;
   protected validateBundleProposal = validateBundleProposal;
+  protected validateStorageBalance = validateStorageBalance;
 
   // upload
   protected createBundleProposal = createBundleProposal;
@@ -215,10 +217,10 @@ export class Node {
         "Custom rest api endpoint the node uses for querying from chain"
       )
       .option(
-        "--cache <memory|jsonfile|leveldb>",
+        "--cache <jsonfile|memory>",
         "The cache this node should use",
         parseCache,
-        "leveldb"
+        "jsonfile"
       )
       .option("--debug", "Run the validator node in debug mode")
       .option(
@@ -279,14 +281,14 @@ export class Node {
 
     // perform async setups
     await this.setupSDK();
+    await this.syncPoolState();
+    await this.validateStorageBalance();
     await this.setupValidator();
     await this.setupCacheProvider();
 
     // start the node process. Node and cache should run at the same time.
     // Thats why, although they are async they are called synchronously
     try {
-      await this.syncPoolState();
-
       this.runNode();
       this.runCache();
     } catch (err) {

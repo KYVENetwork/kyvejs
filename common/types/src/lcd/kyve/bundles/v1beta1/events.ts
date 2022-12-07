@@ -17,7 +17,7 @@ export interface EventBundleVote {
   staker: string;
   /** storage_id is the unique ID of the bundle. */
   storage_id: string;
-  /** vote is the vote type of the protocol node. */
+  /** vote is for what the validator voted with */
   vote: VoteType;
 }
 
@@ -26,7 +26,7 @@ export interface EventBundleVote {
  * emitted_by: MsgSubmitBundleProposal
  */
 export interface EventBundleProposed {
-  /** pool_id ... */
+  /** pool_id is the unique ID of the pool. */
   pool_id: string;
   /** internal id for the KYVE-bundle */
   id: string;
@@ -37,25 +37,34 @@ export interface EventBundleProposed {
   storage_id: string;
   /** Address of the uploader/proposer of the bundle */
   uploader: string;
-  /** data_size ... */
+  /** data_size size in bytes of the data */
   data_size: string;
-  /** from_index ... */
+  /** from_index starting index of the bundle (inclusive) */
   from_index: string;
-  /** bundle_size ... */
+  /** bundle_size amount of data items in the bundle */
   bundle_size: string;
-  /** from_key ... */
+  /** from_key the key of the first data item in the bundle */
   from_key: string;
-  /** to_key ... */
+  /** to_key the key of the last data item in the bundle */
   to_key: string;
-  /** bundle_summary ... */
+  /**
+   * bundle_summary is a short string holding some useful information of
+   * the bundle which will get stored on-chain
+   */
   bundle_summary: string;
-  /** data_hash ... */
+  /** data_hash is a sha256 hash of the raw compressed data */
   data_hash: string;
-  /** proposed_at ... */
+  /** proposed_at the unix time when the bundle was proposed */
   proposed_at: string;
-  /** storage_provider_id ... */
+  /**
+   * storage_provider_id the unique id of the storage provider where
+   * the data of the bundle is tored
+   */
   storage_provider_id: number;
-  /** compression_id ... */
+  /**
+   * compression_id  the unique id of the compression type the data
+   * of the bundle was compressed with
+   */
   compression_id: number;
 }
 
@@ -64,36 +73,33 @@ export interface EventBundleProposed {
  * emitted_by: MsgSubmitBundleProposal, EndBlock
  */
 export interface EventBundleFinalized {
-  /** pool_id ... */
+  /** pool_id is the unique ID of the pool. */
   pool_id: string;
   /** internal id for the KYVE-bundle */
   id: string;
-  /** Voting Power "valid" in ukyve */
+  /** total voting power which voted for valid */
   valid: string;
-  /** Voting Power "invalid" in ukyve */
+  /** total voting power which voted for invalid */
   invalid: string;
-  /** Voting Power "abstain" in ukyve */
+  /** total voting power which voted for abstain */
   abstain: string;
-  /** Total Voting Power in ukyve */
+  /** total voting power of the pool */
   total: string;
-  /** status ... */
+  /** status of the finalized bundle */
   status: BundleStatus;
   /** rewards transferred to treasury (in ukyve) */
   reward_treasury: string;
-  /** rewardUploader ... */
+  /** rewardUploader rewards directly transferred to uploader (in ukyve) */
   reward_uploader: string;
-  /** rewardDelegation ... */
+  /** rewardDelegation rewards distributed among all delegators (in ukyve) */
   reward_delegation: string;
-  /** rewardTotal ... */
+  /** rewardTotal the total bundle reward */
   reward_total: string;
-  /**
-   * finalized_at ...
-   * could be removed as it is included in the block itself
-   */
+  /** finalized_at the block height where the bundle got finalized */
   finalized_at: string;
-  /** uploader ... */
+  /** uploader the address of the uploader of this bundle */
   uploader: string;
-  /** next_uploader ... */
+  /** next_uploader the address of the next uploader after this bundle */
   next_uploader: string;
 }
 
@@ -102,11 +108,14 @@ export interface EventBundleFinalized {
  * emitted_by: MsgClaimUploaderRole
  */
 export interface EventClaimedUploaderRole {
-  /** pool_id ... */
+  /** pool_id is the unique ID of the pool. */
   pool_id: string;
-  /** id ... */
+  /** id internal id for the KYVE-bundle */
   id: string;
-  /** new_uploader ... */
+  /**
+   * new_uploader the address of the participant who claimed
+   * the free uploader role
+   */
   new_uploader: string;
 }
 
@@ -115,13 +124,13 @@ export interface EventClaimedUploaderRole {
  * emitted_by: MsgSkipUploaderRole
  */
 export interface EventSkippedUploaderRole {
-  /** pool_id ... */
+  /** pool_id is the unique ID of the pool. */
   pool_id: string;
-  /** id ... */
+  /** id internal id for the KYVE-bundle */
   id: string;
-  /** previous_uploader ... */
+  /** previous_uploader is the address of the staker who skipped his uploader role */
   previous_uploader: string;
-  /** new_uploader ... */
+  /** new_uploader is the address of the new uploader who got automatically selected */
   new_uploader: string;
 }
 
@@ -130,11 +139,11 @@ export interface EventSkippedUploaderRole {
  * emitted_by: MsgSubmitBundleProposal, EndBlock
  */
 export interface EventPointIncreased {
-  /** pool_id ... */
+  /** pool_id is the unique ID of the pool. */
   pool_id: string;
-  /** staker ... */
+  /** staker is the address of the staker who received the point */
   staker: string;
-  /** current_points ... */
+  /** current_points is the amount of points the staker has now */
   current_points: string;
 }
 
@@ -143,9 +152,9 @@ export interface EventPointIncreased {
  * emitted_by: MsgSubmitBundleProposal, EndBlock
  */
 export interface EventPointsReset {
-  /** pool_id ... */
+  /** pool_id is the unique ID of the pool. */
   pool_id: string;
-  /** staker ... */
+  /** staker is the address of the staker who has zero points now */
   staker: string;
 }
 

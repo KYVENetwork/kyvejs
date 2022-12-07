@@ -33,7 +33,7 @@ TEST CASES - multiple sources tests
 
 */
 
-describe("multiple sources tests", () => {
+describe.skip("multiple sources tests", () => {
   let core: Node;
 
   let processExit: jest.Mock<never, never>;

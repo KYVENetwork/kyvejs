@@ -2,6 +2,7 @@ import path from "path";
 
 import { Node, standardizeJSON } from "../..";
 import * as cacheProvider from "../../reactors/cacheProvider";
+import fse from "fs-extra";
 
 /**
  * setupCacheProvider creates the cache provider for the node
@@ -27,12 +28,12 @@ export async function setupCacheProvider(this: Node): Promise<void> {
       case "jsonfile":
         this.cacheProvider = new cacheProvider.JsonFileCache();
         break;
-      case "leveldb":
-        this.cacheProvider = new cacheProvider.LevelDBCache();
-        break;
       default:
-        this.cacheProvider = new cacheProvider.LevelDBCache();
+        this.cacheProvider = new cacheProvider.JsonFileCache();
     }
+
+    // delete all contents of cache directory
+    await fse.emptyDir(`${cachePath}/`);
 
     // init cache with work dir
     this.logger.debug(`this.cacheProvider.init(${cachePath})`);

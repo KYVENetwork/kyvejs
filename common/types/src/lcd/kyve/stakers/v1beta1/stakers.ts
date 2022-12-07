@@ -4,73 +4,10 @@ import _m0 from "protobufjs/minimal";
 
 export const protobufPackage = "kyve.stakers.v1beta1";
 
-/** SlashType ... */
-export enum SlashType {
-  /** SLASH_TYPE_UNSPECIFIED - SLASH_TYPE_UNSPECIFIED ... */
-  SLASH_TYPE_UNSPECIFIED = "SLASH_TYPE_UNSPECIFIED",
-  /** SLASH_TYPE_TIMEOUT - SLASH_TYPE_TIMEOUT ... */
-  SLASH_TYPE_TIMEOUT = "SLASH_TYPE_TIMEOUT",
-  /** SLASH_TYPE_VOTE - SLASH_TYPE_VOTE ... */
-  SLASH_TYPE_VOTE = "SLASH_TYPE_VOTE",
-  /** SLASH_TYPE_UPLOAD - SLASH_TYPE_UPLOAD ... */
-  SLASH_TYPE_UPLOAD = "SLASH_TYPE_UPLOAD",
-  UNRECOGNIZED = "UNRECOGNIZED",
-}
-
-export function slashTypeFromJSON(object: any): SlashType {
-  switch (object) {
-    case 0:
-    case "SLASH_TYPE_UNSPECIFIED":
-      return SlashType.SLASH_TYPE_UNSPECIFIED;
-    case 1:
-    case "SLASH_TYPE_TIMEOUT":
-      return SlashType.SLASH_TYPE_TIMEOUT;
-    case 2:
-    case "SLASH_TYPE_VOTE":
-      return SlashType.SLASH_TYPE_VOTE;
-    case 3:
-    case "SLASH_TYPE_UPLOAD":
-      return SlashType.SLASH_TYPE_UPLOAD;
-    case -1:
-    case "UNRECOGNIZED":
-    default:
-      return SlashType.UNRECOGNIZED;
-  }
-}
-
-export function slashTypeToJSON(object: SlashType): string {
-  switch (object) {
-    case SlashType.SLASH_TYPE_UNSPECIFIED:
-      return "SLASH_TYPE_UNSPECIFIED";
-    case SlashType.SLASH_TYPE_TIMEOUT:
-      return "SLASH_TYPE_TIMEOUT";
-    case SlashType.SLASH_TYPE_VOTE:
-      return "SLASH_TYPE_VOTE";
-    case SlashType.SLASH_TYPE_UPLOAD:
-      return "SLASH_TYPE_UPLOAD";
-    case SlashType.UNRECOGNIZED:
-    default:
-      return "UNRECOGNIZED";
-  }
-}
-
-export function slashTypeToNumber(object: SlashType): number {
-  switch (object) {
-    case SlashType.SLASH_TYPE_UNSPECIFIED:
-      return 0;
-    case SlashType.SLASH_TYPE_TIMEOUT:
-      return 1;
-    case SlashType.SLASH_TYPE_VOTE:
-      return 2;
-    case SlashType.SLASH_TYPE_UPLOAD:
-      return 3;
-    case SlashType.UNRECOGNIZED:
-    default:
-      return -1;
-  }
-}
-
-/** Staker ... */
+/**
+ * Staker contains all metadata for a staker
+ * Every address can only create one staker (itself)
+ */
 export interface Staker {
   /** address ... */
   address: string;
@@ -84,45 +21,66 @@ export interface Staker {
   logo: string;
 }
 
-/** Valaccount ... */
+/**
+ * Valaccount gets authorized by a staker to
+ * vote in a given pool by favor of the staker.
+ */
 export interface Valaccount {
-  /** pool_id ... */
+  /**
+   * pool_id defines the pool in which the address
+   * is allowed to vote in.
+   */
   pool_id: string;
-  /** staker ... */
+  /** staker is the address the valaccount is voting for. */
   staker: string;
-  /** valaddress ... */
+  /**
+   * valaddress is the account stored on the protocol
+   * node which votes for the staker in the given pool
+   */
   valaddress: string;
-  /** points ... */
+  /**
+   * When a node is inactive (does not vote at all)
+   * A point is added, after a certain amount of points
+   * is reached the node gets kicked out.
+   */
   points: string;
-  /** isLeaving ... */
+  /** isLeaving indicates if a staker is leaving the given pool. */
   is_leaving: boolean;
 }
 
-/** CommissionChangeEntry ... */
+/**
+ * CommissionChangeEntry stores the information for an
+ * upcoming commission change. A commission change is never
+ * instant, so delegators have time to redelegate in case
+ * they don't agree with the new commission.
+ */
 export interface CommissionChangeEntry {
-  /** index ... */
+  /**
+   * index is needed for the queue-algorithm which
+   * processes the commission changes
+   */
   index: string;
-  /** staker ... */
+  /** staker is the address of the affected staker */
   staker: string;
-  /** commission ... */
+  /**
+   * commission is the new commission which will
+   * be applied after the waiting time is over.
+   */
   commission: string;
-  /** creation_date ... */
+  /**
+   * creation_date is the UNIX-timestamp in seconds
+   * when the entry was created.
+   */
   creation_date: string;
 }
 
-/** UnbondingStakeEntry ... */
-export interface UnbondingStakeEntry {
-  /** index ... */
-  index: string;
-  /** staker ... */
-  staker: string;
-  /** amount ... */
-  amount: string;
-  /** creation_date ... */
-  creation_date: string;
-}
-
-/** LeavePoolEntry ... */
+/**
+ * LeavePoolEntry stores the information for an upcoming
+ * pool leave. A staker can't leave a pool instantly.
+ * Instead a the `LeaveTime` needs to be awaited.
+ * If a staker start to leave a pool, it will be shown
+ * in the UI to the delegators.
+ */
 export interface LeavePoolEntry {
   /** index ... */
   index: string;
@@ -136,9 +94,16 @@ export interface LeavePoolEntry {
 
 /** UnbondingState stores the state for the unbonding of stakes and delegations. */
 export interface QueueState {
-  /** low_index ... */
+  /**
+   * low_index is the tail of the queue. It is the
+   * oldest entry in the queue. If this entry isn't
+   * due, non of the other entries is.
+   */
   low_index: string;
-  /** high_index ... */
+  /**
+   * high_index is the head of the queue. New entries
+   * are added to the top.
+   */
   high_index: string;
 }
 
@@ -383,82 +348,6 @@ export const CommissionChangeEntry = {
     message.index = object.index ?? "0";
     message.staker = object.staker ?? "";
     message.commission = object.commission ?? "";
-    message.creation_date = object.creation_date ?? "0";
-    return message;
-  },
-};
-
-function createBaseUnbondingStakeEntry(): UnbondingStakeEntry {
-  return { index: "0", staker: "", amount: "0", creation_date: "0" };
-}
-
-export const UnbondingStakeEntry = {
-  encode(message: UnbondingStakeEntry, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.index !== "0") {
-      writer.uint32(8).uint64(message.index);
-    }
-    if (message.staker !== "") {
-      writer.uint32(18).string(message.staker);
-    }
-    if (message.amount !== "0") {
-      writer.uint32(24).uint64(message.amount);
-    }
-    if (message.creation_date !== "0") {
-      writer.uint32(32).int64(message.creation_date);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): UnbondingStakeEntry {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseUnbondingStakeEntry();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.index = longToString(reader.uint64() as Long);
-          break;
-        case 2:
-          message.staker = reader.string();
-          break;
-        case 3:
-          message.amount = longToString(reader.uint64() as Long);
-          break;
-        case 4:
-          message.creation_date = longToString(reader.int64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): UnbondingStakeEntry {
-    return {
-      index: isSet(object.index) ? String(object.index) : "0",
-      staker: isSet(object.staker) ? String(object.staker) : "",
-      amount: isSet(object.amount) ? String(object.amount) : "0",
-      creation_date: isSet(object.creation_date) ? String(object.creation_date) : "0",
-    };
-  },
-
-  toJSON(message: UnbondingStakeEntry): unknown {
-    const obj: any = {};
-    message.index !== undefined && (obj.index = message.index);
-    message.staker !== undefined && (obj.staker = message.staker);
-    message.amount !== undefined && (obj.amount = message.amount);
-    message.creation_date !== undefined && (obj.creation_date = message.creation_date);
-    return obj;
-  },
-
-  fromPartial<I extends Exact<DeepPartial<UnbondingStakeEntry>, I>>(object: I): UnbondingStakeEntry {
-    const message = createBaseUnbondingStakeEntry();
-    message.index = object.index ?? "0";
-    message.staker = object.staker ?? "";
-    message.amount = object.amount ?? "0";
     message.creation_date = object.creation_date ?? "0";
     return message;
   },

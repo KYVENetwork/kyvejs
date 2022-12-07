@@ -10,6 +10,7 @@ export * from "./checks/validateIsNodeValidator";
 export * from "./checks/validateIsPoolActive";
 export * from "./checks/validateRuntime";
 export * from "./checks/validateVersion";
+export * from "./checks/validateStorageBalance";
 
 // timeouts
 export * from "./timeouts/waitForAuthorization";

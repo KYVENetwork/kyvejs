@@ -37,18 +37,6 @@ export interface QueryFinalizedBundleResponse {
 }
 
 /** QueryFinalizedBundleRequest is the request type for the Query/Staker RPC method. */
-export interface QueryFinalizedBundleByStorageIdRequest {
-  /** pool_id ... */
-  storage_id: string;
-}
-
-/** QueryFinalizedBundleResponse is the response type for the Query/Staker RPC method. */
-export interface QueryFinalizedBundleByStorageIdResponse {
-  /** finalized_bundle ... */
-  finalized_bundle?: FinalizedBundle;
-}
-
-/** QueryFinalizedBundleRequest is the request type for the Query/Staker RPC method. */
 export interface QueryFinalizedBundlesByHeightRequest {
   /** pool_id ... */
   pool_id: string;
@@ -369,109 +357,6 @@ export const QueryFinalizedBundleResponse = {
 
   fromPartial<I extends Exact<DeepPartial<QueryFinalizedBundleResponse>, I>>(object: I): QueryFinalizedBundleResponse {
     const message = createBaseQueryFinalizedBundleResponse();
-    message.finalized_bundle = (object.finalized_bundle !== undefined && object.finalized_bundle !== null)
-      ? FinalizedBundle.fromPartial(object.finalized_bundle)
-      : undefined;
-    return message;
-  },
-};
-
-function createBaseQueryFinalizedBundleByStorageIdRequest(): QueryFinalizedBundleByStorageIdRequest {
-  return { storage_id: "" };
-}
-
-export const QueryFinalizedBundleByStorageIdRequest = {
-  encode(message: QueryFinalizedBundleByStorageIdRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.storage_id !== "") {
-      writer.uint32(10).string(message.storage_id);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): QueryFinalizedBundleByStorageIdRequest {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseQueryFinalizedBundleByStorageIdRequest();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.storage_id = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): QueryFinalizedBundleByStorageIdRequest {
-    return { storage_id: isSet(object.storage_id) ? String(object.storage_id) : "" };
-  },
-
-  toJSON(message: QueryFinalizedBundleByStorageIdRequest): unknown {
-    const obj: any = {};
-    message.storage_id !== undefined && (obj.storage_id = message.storage_id);
-    return obj;
-  },
-
-  fromPartial<I extends Exact<DeepPartial<QueryFinalizedBundleByStorageIdRequest>, I>>(
-    object: I,
-  ): QueryFinalizedBundleByStorageIdRequest {
-    const message = createBaseQueryFinalizedBundleByStorageIdRequest();
-    message.storage_id = object.storage_id ?? "";
-    return message;
-  },
-};
-
-function createBaseQueryFinalizedBundleByStorageIdResponse(): QueryFinalizedBundleByStorageIdResponse {
-  return { finalized_bundle: undefined };
-}
-
-export const QueryFinalizedBundleByStorageIdResponse = {
-  encode(message: QueryFinalizedBundleByStorageIdResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.finalized_bundle !== undefined) {
-      FinalizedBundle.encode(message.finalized_bundle, writer.uint32(10).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): QueryFinalizedBundleByStorageIdResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseQueryFinalizedBundleByStorageIdResponse();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.finalized_bundle = FinalizedBundle.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): QueryFinalizedBundleByStorageIdResponse {
-    return {
-      finalized_bundle: isSet(object.finalized_bundle) ? FinalizedBundle.fromJSON(object.finalized_bundle) : undefined,
-    };
-  },
-
-  toJSON(message: QueryFinalizedBundleByStorageIdResponse): unknown {
-    const obj: any = {};
-    message.finalized_bundle !== undefined &&
-      (obj.finalized_bundle = message.finalized_bundle ? FinalizedBundle.toJSON(message.finalized_bundle) : undefined);
-    return obj;
-  },
-
-  fromPartial<I extends Exact<DeepPartial<QueryFinalizedBundleByStorageIdResponse>, I>>(
-    object: I,
-  ): QueryFinalizedBundleByStorageIdResponse {
-    const message = createBaseQueryFinalizedBundleByStorageIdResponse();
     message.finalized_bundle = (object.finalized_bundle !== undefined && object.finalized_bundle !== null)
       ? FinalizedBundle.fromPartial(object.finalized_bundle)
       : undefined;
@@ -1110,10 +995,6 @@ export interface QueryBundles {
   FinalizedBundles(request: QueryFinalizedBundlesRequest): Promise<QueryFinalizedBundlesResponse>;
   /** FinalizedBundle ... */
   FinalizedBundle(request: QueryFinalizedBundleRequest): Promise<QueryFinalizedBundleResponse>;
-  /** StorageID -> single */
-  FinalizedBundleByStorageId(
-    request: QueryFinalizedBundleByStorageIdRequest,
-  ): Promise<QueryFinalizedBundleByStorageIdResponse>;
   /** Queries the bundle which contains the data given height */
   FinalizedBundlesByHeight(
     request: QueryFinalizedBundlesByHeightRequest,
@@ -1136,7 +1017,6 @@ export class QueryBundlesClientImpl implements QueryBundles {
     this.rpc = rpc;
     this.FinalizedBundles = this.FinalizedBundles.bind(this);
     this.FinalizedBundle = this.FinalizedBundle.bind(this);
-    this.FinalizedBundleByStorageId = this.FinalizedBundleByStorageId.bind(this);
     this.FinalizedBundlesByHeight = this.FinalizedBundlesByHeight.bind(this);
     this.CurrentVoteStatus = this.CurrentVoteStatus.bind(this);
     this.CanValidate = this.CanValidate.bind(this);
@@ -1153,14 +1033,6 @@ export class QueryBundlesClientImpl implements QueryBundles {
     const data = QueryFinalizedBundleRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "FinalizedBundle", data);
     return promise.then((data) => QueryFinalizedBundleResponse.decode(new _m0.Reader(data)));
-  }
-
-  FinalizedBundleByStorageId(
-    request: QueryFinalizedBundleByStorageIdRequest,
-  ): Promise<QueryFinalizedBundleByStorageIdResponse> {
-    const data = QueryFinalizedBundleByStorageIdRequest.encode(request).finish();
-    const promise = this.rpc.request(this.service, "FinalizedBundleByStorageId", data);
-    return promise.then((data) => QueryFinalizedBundleByStorageIdResponse.decode(new _m0.Reader(data)));
   }
 
   FinalizedBundlesByHeight(

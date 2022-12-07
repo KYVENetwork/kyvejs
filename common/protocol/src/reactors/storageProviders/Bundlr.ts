@@ -23,6 +23,10 @@ export class Bundlr implements IStorageProvider {
     return this;
   }
 
+  async getAddress() {
+    return this.client.address;
+  }
+
   async getBalance() {
     const atomicUnits = await this.client.getLoadedBalance();
     return atomicUnits.toString();
