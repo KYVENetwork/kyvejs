@@ -16,7 +16,7 @@ KYVE, the Web3 data lake solution, is a protocol that enables data providers to 
 
 - [@kyvejs/types](common/types/README.md) - holds all types for the KYVE application in typescript
 - [@kyvejs/sdk](common/sdk/README.md) - development kit for communicating with the KYVE blockchain
-- [@kyvejs/protocol](common/protocol/README.md) - core functionality for running protocol nodes on the KYVE network
+- [@kyvejs/protocol](common/protocol/README.md) - core functionality for running validators on the KYVE network
 
 **Tools:**
 
