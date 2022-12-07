@@ -22,7 +22,7 @@ The basic architecture of a protocol node can be found below:
 <br/>
 
 <p align="center">
-<img src="https://arweave.net/OZjECT4lY0Nj1-w-bizvAJhuFgBuU2dEwkzjbO84DJo" style="display: block; margin-left: auto; margin-right: auto" />
+<img src="https://arweave.net/WK6XCKv12mV8bN9KTJtQDR73_B0BVDfxA4MD0G5AlpE" style="display: block; margin-left: auto; margin-right: auto" />
 </p>
 
 <br/>
