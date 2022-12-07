@@ -1,17 +1,17 @@
 import KyveSDK, { constants } from "@kyvejs/sdk";
 import { KYVE_NETWORK } from "@kyvejs/sdk/dist/constants";
 
-import { Node, standardizeJSON } from "../..";
+import { Validator, standardizeJSON } from "../..";
 
 /**
  * setupSDK creates the main KYVE SDK and the client which is used for transactions
  * and the lcd client which is used for queries
  *
  * @method setupSDK
- * @param {Node} this
+ * @param {Validator} this
  * @return {Promise<void>}
  */
-export async function setupSDK(this: Node): Promise<void> {
+export async function setupSDK(this: Validator): Promise<void> {
   try {
     this.logger.debug(`Initializing KyveSDK with network ${this.network}`);
 

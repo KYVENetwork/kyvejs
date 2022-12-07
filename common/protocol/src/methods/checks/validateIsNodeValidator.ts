@@ -1,4 +1,4 @@
-import { Node, standardizeJSON } from "../..";
+import { Validator, standardizeJSON } from "../..";
 
 /**
  * validateIsNodeValidator checks if the staker of the node is in the
@@ -6,22 +6,24 @@ import { Node, standardizeJSON } from "../..";
  * the node will exit.
  *
  * @method validateIsNodeValidator
- * @param {Node} this
+ * @param {Validator} this
  * @return {void}
  */
-export function validateIsNodeValidator(this: Node): void {
+export function validateIsNodeValidator(this: Validator): void {
   try {
     this.logger.debug(
       `Validating if node operator is included in pool stakers`
     );
 
     if (!this.pool.stakers.includes(this.staker)) {
-      this.logger.fatal(`Node is not in the active validator set! Exiting ...`);
+      this.logger.fatal(
+        `Validator is not in the active validator set! Exiting ...`
+      );
       process.exit(1);
     }
 
     this.logger.info(
-      `Node running as validator in storage pool = ${this.pool.data!.name}`
+      `Validator running as validator in storage pool = ${this.pool.data!.name}`
     );
   } catch (err) {
     this.logger.fatal(

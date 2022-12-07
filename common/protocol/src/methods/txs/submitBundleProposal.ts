@@ -1,4 +1,4 @@
-import { Node, standardizeJSON } from "../..";
+import { Validator, standardizeJSON } from "../..";
 
 /**
  * submitBundleProposal submits a bundle proposal to the
@@ -7,7 +7,7 @@ import { Node, standardizeJSON } from "../..";
  * chosen.
  *
  * @method submitBundleProposal
- * @param {Node} this
+ * @param {Validator} this
  * @param {string} storageId the storage id of the data stored in storage provider
  * @param {number} dataSize the raw byte size of the data stored in storage provider
  * @param {string} dataHash the sha256 hash of the raw data stored in storage provider
@@ -19,7 +19,7 @@ import { Node, standardizeJSON } from "../..";
  * @return {Promise<boolean>}
  */
 export async function submitBundleProposal(
-  this: Node,
+  this: Validator,
   storageId: string,
   dataSize: number,
   dataHash: string,

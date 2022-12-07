@@ -4,7 +4,7 @@ import { Command, OptionValues } from "commander";
 import os from "os";
 import { Logger } from "tslog";
 
-import { version as coreVersion } from "../package.json";
+import { version as protocolVersion } from "../package.json";
 import {
   parseCache,
   parseMnemonic,
@@ -51,12 +51,12 @@ import { ICacheProvider, IMetrics, IRuntime } from "./types";
 import { standardizeJSON } from "./utils";
 
 /**
- * Main class of KYVE protocol nodes representing a node.
+ * Main class of KYVE protocol nodes representing a validator node.
  *
- * @class Node
+ * @class Validator
  * @constructor
  */
-export class Node {
+export class Validator {
   // reactor attributes
   protected runtime!: IRuntime;
   protected cacheProvider!: ICacheProvider;
@@ -67,7 +67,7 @@ export class Node {
   public lcd!: KyveLCDClientType;
 
   // node attributes
-  public coreVersion!: string;
+  public protocolVersion!: string;
   public pool!: PoolResponse;
   public poolConfig!: any;
   public name!: string;
@@ -147,7 +147,7 @@ export class Node {
   protected runCache = runCache;
 
   /**
-   * Constructor for the core class. It is required to provide the
+   * Constructor for the validator class. It is required to provide the
    * runtime class here in order to run the
    *
    * @method constructor
@@ -157,8 +157,8 @@ export class Node {
     // set provided runtime
     this.runtime = runtime;
 
-    // set @kyve/core version
-    this.coreVersion = coreVersion;
+    // set @kyvejs/protocol version
+    this.protocolVersion = protocolVersion;
   }
 
   /**
@@ -175,11 +175,11 @@ export class Node {
     // define version command
     program
       .command("version")
-      .description("Print runtime and core version")
+      .description("Print runtime and protocol version")
       .action(() => {
         console.log(`${this.runtime.name} version: ${this.runtime.version}`);
-        console.log(`@kyve/core version: ${this.coreVersion}`);
-        console.log(`Node version: ${process.version}`);
+        console.log(`@kyvejs/protocol version: ${this.protocolVersion}`);
+        console.log(`Validator version: ${process.version}`);
         console.log();
         console.log(`Platform: ${os.platform()}`);
         console.log(`Arch: ${os.arch()}`);
@@ -250,7 +250,7 @@ export class Node {
   }
 
   /**
-   * Main method of @kyve/core. By running this method the node will start and run.
+   * Main method of @kyvejs/protocol. By running this method the node will start and run.
    * For this method to run the Runtime, Storage Provider and the Cache have to be added first.
    *
    * This method will run indefinetely and only exits on specific exit conditions like running
@@ -286,7 +286,7 @@ export class Node {
     await this.setupValidator();
     await this.setupCacheProvider();
 
-    // start the node process. Node and cache should run at the same time.
+    // start the node process. Validator and cache should run at the same time.
     // Thats why, although they are async they are called synchronously
     try {
       this.runNode();

@@ -3,7 +3,7 @@ import {
   bundleToBytes,
   ICompression,
   IStorageProvider,
-  Node,
+  Validator,
   sha256,
   standardizeJSON,
 } from "../src/index";
@@ -30,7 +30,7 @@ TEST CASES - genesis tests
 */
 
 describe("genesis tests", () => {
-  let core: Node;
+  let v: Validator;
 
   let processExit: jest.Mock<never, never>;
   let setTimeoutMock: jest.Mock;
@@ -39,19 +39,17 @@ describe("genesis tests", () => {
   let compression: ICompression;
 
   beforeEach(() => {
-    core = new Node(new TestRuntime());
+    v = new Validator(new TestRuntime());
 
-    core["cacheProvider"] = new TestCacheProvider();
+    v["cacheProvider"] = new TestCacheProvider();
 
     // mock storage provider
     storageProvider = new TestNormalStorageProvider();
-    core["storageProviderFactory"] = jest
-      .fn()
-      .mockResolvedValue(storageProvider);
+    v["storageProviderFactory"] = jest.fn().mockResolvedValue(storageProvider);
 
     // mock compression
     compression = new TestNormalCompression();
-    core["compressionFactory"] = jest.fn().mockReturnValue(compression);
+    v["compressionFactory"] = jest.fn().mockReturnValue(compression);
 
     // mock process.exit
     processExit = jest.fn<never, never>();
@@ -72,27 +70,27 @@ describe("genesis tests", () => {
     global.setTimeout = setTimeoutMock as any;
 
     // mock logger
-    core.logger = new Logger();
+    v.logger = new Logger();
 
-    core.logger.info = jest.fn();
-    core.logger.debug = jest.fn();
-    core.logger.warn = jest.fn();
-    core.logger.error = jest.fn();
+    v.logger.info = jest.fn();
+    v.logger.debug = jest.fn();
+    v.logger.warn = jest.fn();
+    v.logger.error = jest.fn();
 
-    core["poolId"] = 0;
-    core["staker"] = "test_staker";
+    v["poolId"] = 0;
+    v["staker"] = "test_staker";
 
-    core.client = client();
-    core.lcd = lcd();
+    v.client = client();
+    v.lcd = lcd();
 
-    core["continueRound"] = jest
+    v["continueRound"] = jest
       .fn()
       .mockReturnValueOnce(true)
       .mockReturnValue(false);
 
-    core["waitForNextBundleProposal"] = jest.fn();
+    v["waitForNextBundleProposal"] = jest.fn();
 
-    setupMetrics.call(core);
+    setupMetrics.call(v);
   });
 
   afterEach(() => {
@@ -102,15 +100,15 @@ describe("genesis tests", () => {
 
   test("propose genesis bundle with valid data bundle", async () => {
     // ARRANGE
-    core["syncPoolState"] = jest
+    v["syncPoolState"] = jest
       .fn()
       .mockImplementationOnce(() => {
-        core.pool = {
+        v.pool = {
           ...genesis_pool,
         } as any;
       })
       .mockImplementation(() => {
-        core.pool = {
+        v.pool = {
           ...genesis_pool,
           bundle_proposal: {
             ...genesis_pool.bundle_proposal,
@@ -130,17 +128,17 @@ describe("genesis tests", () => {
       },
     ];
 
-    await core["cacheProvider"].put("0", bundle[0]);
-    await core["cacheProvider"].put("1", bundle[1]);
+    await v["cacheProvider"].put("0", bundle[0]);
+    await v["cacheProvider"].put("1", bundle[1]);
 
     // ACT
-    await runNode.call(core);
+    await runNode.call(v);
 
     // ASSERT
-    const txs = core["client"].kyve.bundles.v1beta1;
-    const queries = core["lcd"].kyve.query.v1beta1;
-    const cacheProvider = core["cacheProvider"];
-    const runtime = core["runtime"];
+    const txs = v["client"].kyve.bundles.v1beta1;
+    const queries = v["lcd"].kyve.query.v1beta1;
+    const cacheProvider = v["cacheProvider"];
+    const runtime = v["runtime"];
 
     // ========================
     // ASSERT CLIENT INTERFACES
@@ -223,7 +221,7 @@ describe("genesis tests", () => {
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
 
     expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
-      expect.any(Node),
+      expect.any(Validator),
       bundle
     );
 
@@ -234,22 +232,22 @@ describe("genesis tests", () => {
     // ========================
 
     // assert that only one round ran
-    expect(core["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
+    expect(v["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
 
     // TODO: assert timeouts
   });
 
   test("propose genesis bundle with no data bundle", async () => {
     // ARRANGE
-    core["syncPoolState"] = jest
+    v["syncPoolState"] = jest
       .fn()
       .mockImplementationOnce(() => {
-        core.pool = {
+        v.pool = {
           ...genesis_pool,
         } as any;
       })
       .mockImplementation(() => {
-        core.pool = {
+        v.pool = {
           ...genesis_pool,
           bundle_proposal: {
             ...genesis_pool.bundle_proposal,
@@ -258,18 +256,18 @@ describe("genesis tests", () => {
         } as any;
       });
 
-    core["cacheProvider"].get = jest
+    v["cacheProvider"].get = jest
       .fn()
       .mockRejectedValue(new Error("not found"));
 
     // ACT
-    await runNode.call(core);
+    await runNode.call(v);
 
     // ASSERT
-    const txs = core["client"].kyve.bundles.v1beta1;
-    const queries = core["lcd"].kyve.query.v1beta1;
-    const cacheProvider = core["cacheProvider"];
-    const runtime = core["runtime"];
+    const txs = v["client"].kyve.bundles.v1beta1;
+    const queries = v["lcd"].kyve.query.v1beta1;
+    const cacheProvider = v["cacheProvider"];
+    const runtime = v["runtime"];
 
     // ========================
     // ASSERT CLIENT INTERFACES
@@ -342,14 +340,14 @@ describe("genesis tests", () => {
     // ========================
 
     // assert that only one round ran
-    expect(core["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
+    expect(v["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
 
     // TODO: assert timeouts
   });
 
   test("be too late to claim uploader role and instead validate", async () => {
     // ARRANGE
-    core["client"].kyve.bundles.v1beta1.claimUploaderRole = jest
+    v["client"].kyve.bundles.v1beta1.claimUploaderRole = jest
       .fn()
       .mockResolvedValue({
         txHash: "test_hash",
@@ -374,15 +372,15 @@ describe("genesis tests", () => {
     const dataSize = compressedBundle.byteLength.toString();
     const dataHash = sha256(bundleBytes);
 
-    core["syncPoolState"] = jest
+    v["syncPoolState"] = jest
       .fn()
       .mockImplementationOnce(() => {
-        core.pool = {
+        v.pool = {
           ...genesis_pool,
         } as any;
       })
       .mockImplementation(() => {
-        core.pool = {
+        v.pool = {
           ...genesis_pool,
           bundle_proposal: {
             ...genesis_pool.bundle_proposal,
@@ -401,7 +399,7 @@ describe("genesis tests", () => {
         } as any;
       });
 
-    core["cacheProvider"].get = jest
+    v["cacheProvider"].get = jest
       .fn()
       .mockResolvedValueOnce({
         key: "test_key_1",
@@ -413,13 +411,13 @@ describe("genesis tests", () => {
       });
 
     // ACT
-    await runNode.call(core);
+    await runNode.call(v);
 
     // ASSERT
-    const txs = core["client"].kyve.bundles.v1beta1;
-    const queries = core["lcd"].kyve.query.v1beta1;
-    const cacheProvider = core["cacheProvider"];
-    const runtime = core["runtime"];
+    const txs = v["client"].kyve.bundles.v1beta1;
+    const queries = v["lcd"].kyve.query.v1beta1;
+    const cacheProvider = v["cacheProvider"];
+    const runtime = v["runtime"];
 
     // ========================
     // ASSERT CLIENT INTERFACES
@@ -492,7 +490,7 @@ describe("genesis tests", () => {
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
     expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
-      expect.any(Node),
+      expect.any(Validator),
       bundle
     );
 
@@ -501,7 +499,7 @@ describe("genesis tests", () => {
     for (let i = 0; i < bundle.length; i++) {
       expect(runtime.validateDataItem).toHaveBeenNthCalledWith(
         i + 1,
-        expect.any(Node),
+        expect.any(Validator),
         standardizeJSON(bundle[i]),
         standardizeJSON(bundle[i])
       );
@@ -512,7 +510,7 @@ describe("genesis tests", () => {
     // ========================
 
     // assert that only one round ran
-    expect(core["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
+    expect(v["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
 
     // TODO: assert timeouts
   });

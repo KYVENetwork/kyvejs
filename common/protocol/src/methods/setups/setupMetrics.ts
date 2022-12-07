@@ -2,24 +2,24 @@ import http from "http";
 import prom_client, { register } from "prom-client";
 import url from "url";
 
-import { IMetrics, Node, standardizeJSON } from "../..";
+import { IMetrics, Validator, standardizeJSON } from "../..";
 
 /**
  * setupMetrics initiates all metrics and starts if enabled a local prometheus
  * metrics server
  *
  * @method setupMetrics
- * @param {Node} this
+ * @param {Validator} this
  * @return {Promise<void>}
  */
-export function setupMetrics(this: Node): void {
+export function setupMetrics(this: Validator): void {
   try {
     // init metric parameters
     this.m = {} as IMetrics;
 
     this.logger.debug(`Initializing metrics: prometheus default metrics`);
     prom_client.collectDefaultMetrics({
-      labels: { app: "kyve-core" },
+      labels: { app: "kyve-validator" },
     });
 
     // TX METRICS

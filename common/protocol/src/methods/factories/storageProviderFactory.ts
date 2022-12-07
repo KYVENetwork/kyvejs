@@ -1,4 +1,4 @@
-import { Node } from "../..";
+import { Validator } from "../..";
 import { IStorageProvider } from "../..";
 import { Arweave } from "../../reactors/storageProviders/Arweave";
 import { Bundlr } from "../../reactors/storageProviders/Bundlr";
@@ -14,12 +14,12 @@ import { NoStorageProvider } from "../../reactors/storageProviders/NoStorageProv
  * x - NoStorageProvider (default)
  *
  * @method storageProviderFactory
- * @param {Node} this
+ * @param {Validator} this
  * @param {number} storageProviderId the id of the storage provider
  * @return {Promise<IStorageProvider>}
  */
 export async function storageProviderFactory(
-  this: Node,
+  this: Validator,
   storageProviderId: number
 ): Promise<IStorageProvider> {
   switch (storageProviderId) {

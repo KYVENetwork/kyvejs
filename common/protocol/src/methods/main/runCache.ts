@@ -1,6 +1,6 @@
 import seedrandom from "seedrandom";
 
-import { DataItem, Node } from "../..";
+import { DataItem, Validator } from "../..";
 import { generateIndexPairs, sleep, standardizeJSON } from "../../utils";
 
 /**
@@ -25,10 +25,10 @@ import { generateIndexPairs, sleep, standardizeJSON } from "../../utils";
  * following round.
  *
  * @method runCache
- * @param {Node} this
+ * @param {Validator} this
  * @return {Promise<void>}
  */
-export async function runCache(this: Node): Promise<void> {
+export async function runCache(this: Validator): Promise<void> {
   // run rounds indefinitely, continueRound returns always
   // true and is only used by unit tests to control the termination of
   // rounds by mocking it

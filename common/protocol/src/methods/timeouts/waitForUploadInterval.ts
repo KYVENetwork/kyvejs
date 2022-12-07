@@ -1,6 +1,6 @@
 import BigNumber from "bignumber.js";
 
-import { Node } from "../..";
+import { Validator } from "../..";
 import { sleep, standardizeJSON } from "../../utils";
 
 /**
@@ -10,10 +10,10 @@ import { sleep, standardizeJSON } from "../../utils";
  * the next round.
  *
  * @method waitForUploadInterval
- * @param {Node} this
+ * @param {Validator} this
  * @return {Promise<void>}
  */
-export async function waitForUploadInterval(this: Node): Promise<void> {
+export async function waitForUploadInterval(this: Validator): Promise<void> {
   try {
     // determine how long the upload interval is still taking
     let timeRemaining = new BigNumber(0);

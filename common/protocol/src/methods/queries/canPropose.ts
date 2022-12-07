@@ -1,4 +1,4 @@
-import { Node } from "../..";
+import { Validator } from "../..";
 import { callWithBackoffStrategy, sleep, standardizeJSON } from "../../utils";
 const INFINITY_LOOP = true;
 /**
@@ -7,12 +7,12 @@ const INFINITY_LOOP = true;
  * It runs indefinitely until the query returns a valid response
  *
  * @method canPropose
- * @param {Node} this
+ * @param {Validator} this
  * @param {number} updatedAt the last update time of the current bundle proposal
  * @return {Promise<boolean>}
  */
 export async function canPropose(
-  this: Node,
+  this: Validator,
   updatedAt: number
 ): Promise<boolean> {
   try {
@@ -29,7 +29,7 @@ export async function canPropose(
         if (this.pool.bundle_proposal!.next_uploader !== this.staker) {
           return {
             possible: false,
-            reason: "Node is not next uploader of this bundle proposal",
+            reason: "Validator is not next uploader of this bundle proposal",
           };
         }
 

@@ -1,4 +1,4 @@
-import { Node, standardizeJSON } from "../..";
+import { Validator, standardizeJSON } from "../..";
 
 /**
  * skipUploaderRole is called by the current next uploader of the
@@ -14,12 +14,12 @@ import { Node, standardizeJSON } from "../..";
  * proposal can start, thus resulting in an unwanted skip.
  *
  * @method skipUploaderRole
- * @param {Node} this
+ * @param {Validator} this
  * @param {number} fromIndex
  * @return {Promise<boolean>}
  */
 export async function skipUploaderRole(
-  this: Node,
+  this: Validator,
   fromIndex: number
 ): Promise<boolean> {
   try {

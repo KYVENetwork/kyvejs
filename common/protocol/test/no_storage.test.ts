@@ -1,5 +1,5 @@
 import { Logger } from "tslog";
-import { ICompression, IStorageProvider, Node } from "../src/index";
+import { ICompression, IStorageProvider, Validator } from "../src/index";
 import { runNode } from "../src/methods/main/runNode";
 import { genesis_pool } from "./mocks/constants";
 import { client } from "./mocks/client.mock";
@@ -26,7 +26,7 @@ TEST CASES - no storage tests
 */
 
 describe("no storage tests", () => {
-  let core: Node;
+  let v: Validator;
 
   let processExit: jest.Mock<never, never>;
   let setTimeoutMock: jest.Mock;
@@ -35,19 +35,17 @@ describe("no storage tests", () => {
   let compression: ICompression;
 
   beforeEach(() => {
-    core = new Node(new TestRuntime());
+    v = new Validator(new TestRuntime());
 
-    core["cacheProvider"] = new TestCacheProvider();
+    v["cacheProvider"] = new TestCacheProvider();
 
     // mock storage provider
     storageProvider = new TestNoStorageProvider();
-    core["storageProviderFactory"] = jest
-      .fn()
-      .mockResolvedValue(storageProvider);
+    v["storageProviderFactory"] = jest.fn().mockResolvedValue(storageProvider);
 
     // mock compression
     compression = new TestNoCompression();
-    core["compressionFactory"] = jest.fn().mockReturnValue(compression);
+    v["compressionFactory"] = jest.fn().mockReturnValue(compression);
 
     // mock process.exit
     processExit = jest.fn<never, never>();
@@ -68,27 +66,27 @@ describe("no storage tests", () => {
     global.setTimeout = setTimeoutMock as any;
 
     // mock logger
-    core.logger = new Logger();
+    v.logger = new Logger();
 
-    core.logger.info = jest.fn();
-    core.logger.debug = jest.fn();
-    core.logger.warn = jest.fn();
-    core.logger.error = jest.fn();
+    v.logger.info = jest.fn();
+    v.logger.debug = jest.fn();
+    v.logger.warn = jest.fn();
+    v.logger.error = jest.fn();
 
-    core["poolId"] = 0;
-    core["staker"] = "test_staker";
+    v["poolId"] = 0;
+    v["staker"] = "test_staker";
 
-    core.client = client();
-    core.lcd = lcd();
+    v.client = client();
+    v.lcd = lcd();
 
-    core["waitForNextBundleProposal"] = jest.fn();
+    v["waitForNextBundleProposal"] = jest.fn();
 
-    core["continueRound"] = jest
+    v["continueRound"] = jest
       .fn()
       .mockReturnValueOnce(true)
       .mockReturnValue(false);
 
-    setupMetrics.call(core);
+    setupMetrics.call(v);
   });
 
   afterEach(() => {
@@ -98,13 +96,13 @@ describe("no storage tests", () => {
 
   test("propose bundle with data", async () => {
     // ARRANGE
-    core["lcd"].kyve.query.v1beta1.canVote = jest.fn().mockResolvedValue({
+    v["lcd"].kyve.query.v1beta1.canVote = jest.fn().mockResolvedValue({
       possible: false,
       reason: "Already voted",
     });
 
-    core["syncPoolState"] = jest.fn().mockImplementation(() => {
-      core.pool = {
+    v["syncPoolState"] = jest.fn().mockImplementation(() => {
+      v.pool = {
         ...genesis_pool,
         data: {
           ...genesis_pool.data,
@@ -147,19 +145,19 @@ describe("no storage tests", () => {
       },
     ];
 
-    await core["cacheProvider"].put("102", bundle[0]);
-    await core["cacheProvider"].put("103", bundle[1]);
-    await core["cacheProvider"].put("104", bundle[2]);
-    await core["cacheProvider"].put("105", bundle[3]);
+    await v["cacheProvider"].put("102", bundle[0]);
+    await v["cacheProvider"].put("103", bundle[1]);
+    await v["cacheProvider"].put("104", bundle[2]);
+    await v["cacheProvider"].put("105", bundle[3]);
 
     // ACT
-    await runNode.call(core);
+    await runNode.call(v);
 
     // ASSERT
-    const txs = core["client"].kyve.bundles.v1beta1;
-    const queries = core["lcd"].kyve.query.v1beta1;
-    const cacheProvider = core["cacheProvider"];
-    const runtime = core["runtime"];
+    const txs = v["client"].kyve.bundles.v1beta1;
+    const queries = v["lcd"].kyve.query.v1beta1;
+    const cacheProvider = v["cacheProvider"];
+    const runtime = v["runtime"];
 
     // ========================
     // ASSERT CLIENT INTERFACES
@@ -245,7 +243,7 @@ describe("no storage tests", () => {
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
     expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
-      expect.any(Node),
+      expect.any(Validator),
       bundle
     );
 
@@ -260,20 +258,20 @@ describe("no storage tests", () => {
     // ========================
 
     // assert that only one round ran
-    expect(core["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
+    expect(v["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
 
     // TODO: assert timeouts
   });
 
   test("propose bundle with no data", async () => {
     // ARRANGE
-    core["lcd"].kyve.query.v1beta1.canVote = jest.fn().mockResolvedValue({
+    v["lcd"].kyve.query.v1beta1.canVote = jest.fn().mockResolvedValue({
       possible: false,
       reason: "Already voted",
     });
 
-    core["syncPoolState"] = jest.fn().mockImplementation(() => {
-      core.pool = {
+    v["syncPoolState"] = jest.fn().mockImplementation(() => {
+      v.pool = {
         ...genesis_pool,
         data: {
           ...genesis_pool.data,
@@ -309,14 +307,14 @@ describe("no storage tests", () => {
     ];
 
     // ACT
-    await runNode.call(core);
+    await runNode.call(v);
 
     // ASSERT
 
-    const txs = core["client"].kyve.bundles.v1beta1;
-    const queries = core["lcd"].kyve.query.v1beta1;
-    const cacheProvider = core["cacheProvider"];
-    const runtime = core["runtime"];
+    const txs = v["client"].kyve.bundles.v1beta1;
+    const queries = v["lcd"].kyve.query.v1beta1;
+    const cacheProvider = v["cacheProvider"];
+    const runtime = v["runtime"];
 
     // ========================
     // ASSERT CLIENT INTERFACES
@@ -395,7 +393,7 @@ describe("no storage tests", () => {
     // ========================
 
     // assert that only one round ran
-    expect(core["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
+    expect(v["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
 
     // TODO: assert timeouts
   });
@@ -407,8 +405,8 @@ describe("no storage tests", () => {
       { key: "test_key_2", value: "test_value_2" },
     ];
 
-    core["syncPoolState"] = jest.fn().mockImplementation(() => {
-      core.pool = {
+    v["syncPoolState"] = jest.fn().mockImplementation(() => {
+      v.pool = {
         ...genesis_pool,
         bundle_proposal: {
           ...genesis_pool.bundle_proposal,
@@ -427,7 +425,7 @@ describe("no storage tests", () => {
       } as any;
     });
 
-    core["cacheProvider"].get = jest
+    v["cacheProvider"].get = jest
       .fn()
       .mockResolvedValueOnce({
         key: "test_key_1",
@@ -439,13 +437,13 @@ describe("no storage tests", () => {
       });
 
     // ACT
-    await runNode.call(core);
+    await runNode.call(v);
 
     // ASSERT
-    const txs = core["client"].kyve.bundles.v1beta1;
-    const queries = core["lcd"].kyve.query.v1beta1;
-    const cacheProvider = core["cacheProvider"];
-    const runtime = core["runtime"];
+    const txs = v["client"].kyve.bundles.v1beta1;
+    const queries = v["lcd"].kyve.query.v1beta1;
+    const cacheProvider = v["cacheProvider"];
+    const runtime = v["runtime"];
 
     // ========================
     // ASSERT CLIENT INTERFACES
@@ -513,7 +511,7 @@ describe("no storage tests", () => {
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
     expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
-      expect.any(Node),
+      expect.any(Validator),
       bundle
     );
 
@@ -524,7 +522,7 @@ describe("no storage tests", () => {
     // ========================
 
     // assert that only one round ran
-    expect(core["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
+    expect(v["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
 
     // TODO: assert timeouts
   });
@@ -536,8 +534,8 @@ describe("no storage tests", () => {
       { key: "test_key_2", value: "test_value_2" },
     ];
 
-    core["syncPoolState"] = jest.fn().mockImplementation(() => {
-      core.pool = {
+    v["syncPoolState"] = jest.fn().mockImplementation(() => {
+      v.pool = {
         ...genesis_pool,
         bundle_proposal: {
           ...genesis_pool.bundle_proposal,
@@ -557,13 +555,13 @@ describe("no storage tests", () => {
     });
 
     // ACT
-    await runNode.call(core);
+    await runNode.call(v);
 
     // ASSERT
-    const txs = core["client"].kyve.bundles.v1beta1;
-    const queries = core["lcd"].kyve.query.v1beta1;
-    const cacheProvider = core["cacheProvider"];
-    const runtime = core["runtime"];
+    const txs = v["client"].kyve.bundles.v1beta1;
+    const queries = v["lcd"].kyve.query.v1beta1;
+    const cacheProvider = v["cacheProvider"];
+    const runtime = v["runtime"];
 
     // ========================
     // ASSERT CLIENT INTERFACES
@@ -636,7 +634,7 @@ describe("no storage tests", () => {
     // ========================
 
     // assert that only one round ran
-    expect(core["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
+    expect(v["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
 
     // TODO: assert timeouts
   });
@@ -648,8 +646,8 @@ describe("no storage tests", () => {
       { key: "test_key_2", value: "test_value_2" },
     ];
 
-    core["syncPoolState"] = jest.fn().mockImplementation(() => {
-      core.pool = {
+    v["syncPoolState"] = jest.fn().mockImplementation(() => {
+      v.pool = {
         ...genesis_pool,
         bundle_proposal: {
           ...genesis_pool.bundle_proposal,
@@ -669,13 +667,13 @@ describe("no storage tests", () => {
     });
 
     // ACT
-    await runNode.call(core);
+    await runNode.call(v);
 
     // ASSERT
-    const txs = core["client"].kyve.bundles.v1beta1;
-    const queries = core["lcd"].kyve.query.v1beta1;
-    const cacheProvider = core["cacheProvider"];
-    const runtime = core["runtime"];
+    const txs = v["client"].kyve.bundles.v1beta1;
+    const queries = v["lcd"].kyve.query.v1beta1;
+    const cacheProvider = v["cacheProvider"];
+    const runtime = v["runtime"];
 
     // ========================
     // ASSERT CLIENT INTERFACES
@@ -748,7 +746,7 @@ describe("no storage tests", () => {
     // ========================
 
     // assert that only one round ran
-    expect(core["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
+    expect(v["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
 
     // TODO: assert timeouts
   });
@@ -760,8 +758,8 @@ describe("no storage tests", () => {
       { key: "test_key_2", value: "test_value_2" },
     ];
 
-    core["syncPoolState"] = jest.fn().mockImplementation(() => {
-      core.pool = {
+    v["syncPoolState"] = jest.fn().mockImplementation(() => {
+      v.pool = {
         ...genesis_pool,
         bundle_proposal: {
           ...genesis_pool.bundle_proposal,
@@ -780,7 +778,7 @@ describe("no storage tests", () => {
       } as any;
     });
 
-    core["cacheProvider"].get = jest
+    v["cacheProvider"].get = jest
       .fn()
       .mockResolvedValueOnce({
         key: "test_key_1",
@@ -792,13 +790,13 @@ describe("no storage tests", () => {
       });
 
     // ACT
-    await runNode.call(core);
+    await runNode.call(v);
 
     // ASSERT
-    const txs = core["client"].kyve.bundles.v1beta1;
-    const queries = core["lcd"].kyve.query.v1beta1;
-    const cacheProvider = core["cacheProvider"];
-    const runtime = core["runtime"];
+    const txs = v["client"].kyve.bundles.v1beta1;
+    const queries = v["lcd"].kyve.query.v1beta1;
+    const cacheProvider = v["cacheProvider"];
+    const runtime = v["runtime"];
 
     // ========================
     // ASSERT CLIENT INTERFACES
@@ -872,7 +870,7 @@ describe("no storage tests", () => {
     // ========================
 
     // assert that only one round ran
-    expect(core["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
+    expect(v["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
 
     // TODO: assert timeouts
   });

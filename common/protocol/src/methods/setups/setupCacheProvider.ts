@@ -1,6 +1,6 @@
 import path from "path";
 
-import { Node, standardizeJSON } from "../..";
+import { Validator, standardizeJSON } from "../..";
 import * as cacheProvider from "../../reactors/cacheProvider";
 import fse from "fs-extra";
 
@@ -8,10 +8,10 @@ import fse from "fs-extra";
  * setupCacheProvider creates the cache provider for the node
  *
  * @method setupCacheProvider
- * @param {Node} this
+ * @param {Validator} this
  * @return {Promise<void>}
  */
-export async function setupCacheProvider(this: Node): Promise<void> {
+export async function setupCacheProvider(this: Validator): Promise<void> {
   try {
     // define cache path where the cached data is saved
     // depending on work dir "home"

@@ -1,4 +1,4 @@
-import { Node } from "../..";
+import { Validator } from "../..";
 import { BundleTag, DataItem } from "../../types";
 import { bundleToBytes, sha256, standardizeJSON } from "../../utils";
 
@@ -13,10 +13,10 @@ import { bundleToBytes, sha256, standardizeJSON } from "../../utils";
  * to prevent slashes.
  *
  * @method createBundleProposal
- * @param {Node} this
+ * @param {Validator} this
  * @return {Promise<void>}
  */
-export async function createBundleProposal(this: Node): Promise<void> {
+export async function createBundleProposal(this: Validator): Promise<void> {
   try {
     this.logger.info(
       `Creating a new bundle proposal for the next bundle proposal round`
@@ -145,8 +145,8 @@ export async function createBundleProposal(this: Node): Promise<void> {
         value: await this.client.nativeClient.getChainId(),
       },
       {
-        name: "@kyve/core",
-        value: "KYVE",
+        name: "@kyvejs/protocol",
+        value: this.protocolVersion,
       },
       {
         name: this.runtime.name,

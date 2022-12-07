@@ -4,7 +4,7 @@ import {
   generateIndexPairs,
   ICompression,
   IStorageProvider,
-  Node,
+  Validator,
   sha256,
 } from "../src/index";
 import { runCache } from "../src/methods/main/runCache";
@@ -34,7 +34,7 @@ TEST CASES - multiple sources tests
 */
 
 describe.skip("multiple sources tests", () => {
-  let core: Node;
+  let v: Validator;
 
   let processExit: jest.Mock<never, never>;
   let setTimeoutMock: jest.Mock;
@@ -43,19 +43,17 @@ describe.skip("multiple sources tests", () => {
   let compression: ICompression;
 
   beforeEach(() => {
-    core = new Node(new TestRuntime());
+    v = new Validator(new TestRuntime());
 
-    core["cacheProvider"] = new TestCacheProvider();
+    v["cacheProvider"] = new TestCacheProvider();
 
     // mock storage provider
     storageProvider = new TestNormalStorageProvider();
-    core["storageProviderFactory"] = jest
-      .fn()
-      .mockResolvedValue(storageProvider);
+    v["storageProviderFactory"] = jest.fn().mockResolvedValue(storageProvider);
 
     // mock compression
     compression = new TestNormalCompression();
-    core["compressionFactory"] = jest.fn().mockReturnValue(compression);
+    v["compressionFactory"] = jest.fn().mockReturnValue(compression);
 
     // mock process.exit
     processExit = jest.fn<never, never>();
@@ -76,16 +74,16 @@ describe.skip("multiple sources tests", () => {
     global.setTimeout = setTimeoutMock as any;
 
     // mock logger
-    core.logger = new Logger();
+    v.logger = new Logger();
 
-    core.logger.info = jest.fn();
-    core.logger.debug = jest.fn();
-    core.logger.warn = jest.fn();
-    core.logger.error = jest.fn();
+    v.logger.info = jest.fn();
+    v.logger.debug = jest.fn();
+    v.logger.warn = jest.fn();
+    v.logger.error = jest.fn();
 
-    core["poolId"] = 0;
-    core["staker"] = "test_staker";
-    core["poolConfig"] = {
+    v["poolId"] = 0;
+    v["staker"] = "test_staker";
+    v["poolConfig"] = {
       sources: [
         "https://rpc.api.moonbeam.network",
         "https://moonbeam.api.onfinality.io/public",
@@ -93,17 +91,17 @@ describe.skip("multiple sources tests", () => {
       ],
     };
 
-    core.client = client();
-    core.lcd = lcd();
+    v.client = client();
+    v.lcd = lcd();
 
-    core["continueRound"] = jest
+    v["continueRound"] = jest
       .fn()
       .mockReturnValueOnce(true)
       .mockReturnValue(false);
 
-    core["waitForCacheContinuation"] = jest.fn();
+    v["waitForCacheContinuation"] = jest.fn();
 
-    setupMetrics.call(core);
+    setupMetrics.call(v);
   });
 
   afterEach(() => {
@@ -113,18 +111,18 @@ describe.skip("multiple sources tests", () => {
 
   test("start caching from a pool with multiple sources which is in genesis state", async () => {
     // ARRANGE
-    core.pool = {
+    v.pool = {
       ...genesis_pool,
     } as any;
 
     // ACT
-    await runCache.call(core);
+    await runCache.call(v);
 
     // ASSERT
-    const txs = core["client"].kyve.bundles.v1beta1;
-    const queries = core["lcd"].kyve.query.v1beta1;
-    const cacheProvider = core["cacheProvider"];
-    const runtime = core["runtime"];
+    const txs = v["client"].kyve.bundles.v1beta1;
+    const queries = v["lcd"].kyve.query.v1beta1;
+    const cacheProvider = v["cacheProvider"];
+    const runtime = v["runtime"];
 
     // ========================
     // ASSERT CLIENT INTERFACES
@@ -201,18 +199,17 @@ describe.skip("multiple sources tests", () => {
     // =========================
 
     expect(runtime.getDataItem).toHaveBeenCalledTimes(
-      parseInt(genesis_pool.data.max_bundle_size) *
-        core.poolConfig.sources.length
+      parseInt(genesis_pool.data.max_bundle_size) * v.poolConfig.sources.length
     );
 
     let n = 1;
 
     for (let b = 0; b < parseInt(genesis_pool.data.max_bundle_size); b++) {
-      for (let s = 0; s < core.poolConfig.sources.length; s++) {
+      for (let s = 0; s < v.poolConfig.sources.length; s++) {
         expect(runtime.getDataItem).toHaveBeenNthCalledWith(
           n,
-          expect.any(Node),
-          core.poolConfig.sources[s],
+          expect.any(Validator),
+          v.poolConfig.sources[s],
           b.toString()
         );
 
@@ -221,14 +218,13 @@ describe.skip("multiple sources tests", () => {
     }
 
     expect(runtime.transformDataItem).toHaveBeenCalledTimes(
-      parseInt(genesis_pool.data.max_bundle_size) *
-        core.poolConfig.sources.length
+      parseInt(genesis_pool.data.max_bundle_size) * v.poolConfig.sources.length
     );
 
     n = 1;
 
     for (let b = 0; b < parseInt(genesis_pool.data.max_bundle_size); b++) {
-      for (let s = 0; s < core.poolConfig.sources.length; s++) {
+      for (let s = 0; s < v.poolConfig.sources.length; s++) {
         const item = {
           key: b.toString(),
           value: `${b}-value`,
@@ -240,11 +236,10 @@ describe.skip("multiple sources tests", () => {
     }
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(
-      parseInt(genesis_pool.data.max_bundle_size) *
-        core.poolConfig.sources.length
+      parseInt(genesis_pool.data.max_bundle_size) * v.poolConfig.sources.length
     );
 
-    const pairs = generateIndexPairs(core.poolConfig.sources.length);
+    const pairs = generateIndexPairs(v.poolConfig.sources.length);
     n = 1;
 
     for (let b = 0; b < parseInt(genesis_pool.data.max_bundle_size); b++) {
@@ -255,7 +250,7 @@ describe.skip("multiple sources tests", () => {
         };
         expect(runtime.validateDataItem).toHaveBeenNthCalledWith(
           n,
-          expect.any(Node),
+          expect.any(Validator),
           item,
           item
         );
@@ -281,14 +276,14 @@ describe.skip("multiple sources tests", () => {
     // ========================
 
     // assert that only one round ran
-    expect(core["waitForCacheContinuation"]).toHaveBeenCalledTimes(1);
+    expect(v["waitForCacheContinuation"]).toHaveBeenCalledTimes(1);
 
     // TODO: assert timeouts
   });
 
   test("start caching from a pool with multiple sources which has a bundle proposal ongoing", async () => {
     // ARRANGE
-    core.pool = {
+    v.pool = {
       ...genesis_pool,
       data: {
         ...genesis_pool.data,
@@ -312,13 +307,13 @@ describe.skip("multiple sources tests", () => {
     } as any;
 
     // ACT
-    await runCache.call(core);
+    await runCache.call(v);
 
     // ASSERT
-    const txs = core["client"].kyve.bundles.v1beta1;
-    const queries = core["lcd"].kyve.query.v1beta1;
-    const cacheProvider = core["cacheProvider"];
-    const runtime = core["runtime"];
+    const txs = v["client"].kyve.bundles.v1beta1;
+    const queries = v["lcd"].kyve.query.v1beta1;
+    const cacheProvider = v["cacheProvider"];
+    const runtime = v["runtime"];
 
     // ========================
     // ASSERT CLIENT INTERFACES
@@ -405,17 +400,17 @@ describe.skip("multiple sources tests", () => {
 
     expect(runtime.getDataItem).toHaveBeenCalledTimes(
       (parseInt(genesis_pool.data.max_bundle_size) + 50) *
-        core.poolConfig.sources.length
+        v.poolConfig.sources.length
     );
 
     let n = 1;
 
     for (let b = 0; b < parseInt(genesis_pool.data.max_bundle_size) + 50; b++) {
-      for (let s = 0; s < core.poolConfig.sources.length; s++) {
+      for (let s = 0; s < v.poolConfig.sources.length; s++) {
         expect(runtime.getDataItem).toHaveBeenNthCalledWith(
           n,
-          expect.any(Node),
-          core.poolConfig.sources[s],
+          expect.any(Validator),
+          v.poolConfig.sources[s],
           (b + parseInt(genesis_pool.data.max_bundle_size)).toString()
         );
 
@@ -425,13 +420,13 @@ describe.skip("multiple sources tests", () => {
 
     expect(runtime.transformDataItem).toHaveBeenCalledTimes(
       (parseInt(genesis_pool.data.max_bundle_size) + 50) *
-        core.poolConfig.sources.length
+        v.poolConfig.sources.length
     );
 
     n = 1;
 
     for (let b = 0; b < parseInt(genesis_pool.data.max_bundle_size) + 50; b++) {
-      for (let s = 0; s < core.poolConfig.sources.length; s++) {
+      for (let s = 0; s < v.poolConfig.sources.length; s++) {
         const item = {
           key: (b + parseInt(genesis_pool.data.max_bundle_size)).toString(),
           value: `${b + parseInt(genesis_pool.data.max_bundle_size)}-value`,
@@ -444,10 +439,10 @@ describe.skip("multiple sources tests", () => {
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(
       (parseInt(genesis_pool.data.max_bundle_size) + 50) *
-        core.poolConfig.sources.length
+        v.poolConfig.sources.length
     );
 
-    const pairs = generateIndexPairs(core.poolConfig.sources.length);
+    const pairs = generateIndexPairs(v.poolConfig.sources.length);
     n = 1;
 
     for (let b = 0; b < parseInt(genesis_pool.data.max_bundle_size) + 50; b++) {
@@ -460,7 +455,7 @@ describe.skip("multiple sources tests", () => {
         };
         expect(runtime.validateDataItem).toHaveBeenNthCalledWith(
           n,
-          expect.any(Node),
+          expect.any(Validator),
           item,
           item
         );
@@ -488,21 +483,21 @@ describe.skip("multiple sources tests", () => {
     // ========================
 
     // assert that only one round ran
-    expect(core["waitForCacheContinuation"]).toHaveBeenCalledTimes(1);
+    expect(v["waitForCacheContinuation"]).toHaveBeenCalledTimes(1);
 
     // TODO: assert timeouts
   });
 
   test("continue caching from a pool with multiple sources which has a bundle proposal ongoing", async () => {
     // ARRANGE
-    core["cacheProvider"].exists = jest
+    v["cacheProvider"].exists = jest
       .fn()
       .mockResolvedValueOnce(true)
       .mockResolvedValueOnce(true)
       .mockResolvedValueOnce(true)
       .mockResolvedValue(false);
 
-    core.pool = {
+    v.pool = {
       ...genesis_pool,
       data: {
         ...genesis_pool.data,
@@ -526,13 +521,13 @@ describe.skip("multiple sources tests", () => {
     } as any;
 
     // ACT
-    await runCache.call(core);
+    await runCache.call(v);
 
     // ASSERT
-    const txs = core["client"].kyve.bundles.v1beta1;
-    const queries = core["lcd"].kyve.query.v1beta1;
-    const cacheProvider = core["cacheProvider"];
-    const runtime = core["runtime"];
+    const txs = v["client"].kyve.bundles.v1beta1;
+    const queries = v["lcd"].kyve.query.v1beta1;
+    const cacheProvider = v["cacheProvider"];
+    const runtime = v["runtime"];
 
     // ========================
     // ASSERT CLIENT INTERFACES
@@ -618,18 +613,17 @@ describe.skip("multiple sources tests", () => {
     // =========================
 
     expect(runtime.getDataItem).toHaveBeenCalledTimes(
-      parseInt(genesis_pool.data.max_bundle_size) *
-        core.poolConfig.sources.length
+      parseInt(genesis_pool.data.max_bundle_size) * v.poolConfig.sources.length
     );
 
     let n = 1;
 
     for (let b = 0; b < parseInt(genesis_pool.data.max_bundle_size); b++) {
-      for (let s = 0; s < core.poolConfig.sources.length; s++) {
+      for (let s = 0; s < v.poolConfig.sources.length; s++) {
         expect(runtime.getDataItem).toHaveBeenNthCalledWith(
           n,
-          expect.any(Node),
-          core.poolConfig.sources[s],
+          expect.any(Validator),
+          v.poolConfig.sources[s],
           (b + parseInt(genesis_pool.data.max_bundle_size) + 3).toString()
         );
 
@@ -638,14 +632,13 @@ describe.skip("multiple sources tests", () => {
     }
 
     expect(runtime.transformDataItem).toHaveBeenCalledTimes(
-      parseInt(genesis_pool.data.max_bundle_size) *
-        core.poolConfig.sources.length
+      parseInt(genesis_pool.data.max_bundle_size) * v.poolConfig.sources.length
     );
 
     n = 1;
 
     for (let b = 0; b < parseInt(genesis_pool.data.max_bundle_size); b++) {
-      for (let s = 0; s < core.poolConfig.sources.length; s++) {
+      for (let s = 0; s < v.poolConfig.sources.length; s++) {
         const item = {
           key: (b + parseInt(genesis_pool.data.max_bundle_size) + 3).toString(),
           value: `${b + parseInt(genesis_pool.data.max_bundle_size) + 3}-value`,
@@ -657,11 +650,10 @@ describe.skip("multiple sources tests", () => {
     }
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(
-      parseInt(genesis_pool.data.max_bundle_size) *
-        core.poolConfig.sources.length
+      parseInt(genesis_pool.data.max_bundle_size) * v.poolConfig.sources.length
     );
 
-    const pairs = generateIndexPairs(core.poolConfig.sources.length);
+    const pairs = generateIndexPairs(v.poolConfig.sources.length);
     n = 1;
 
     for (let b = 0; b < parseInt(genesis_pool.data.max_bundle_size); b++) {
@@ -674,7 +666,7 @@ describe.skip("multiple sources tests", () => {
         };
         expect(runtime.validateDataItem).toHaveBeenNthCalledWith(
           n,
-          expect.any(Node),
+          expect.any(Validator),
           item,
           item
         );
@@ -702,14 +694,14 @@ describe.skip("multiple sources tests", () => {
     // ========================
 
     // assert that only one round ran
-    expect(core["waitForCacheContinuation"]).toHaveBeenCalledTimes(1);
+    expect(v["waitForCacheContinuation"]).toHaveBeenCalledTimes(1);
 
     // TODO: assert timeouts
   });
 
   test("start caching from a pool with multiple sources where last bundle proposal was dropped", async () => {
     // ARRANGE
-    core.pool = {
+    v.pool = {
       ...genesis_pool,
       data: {
         ...genesis_pool.data,
@@ -732,13 +724,13 @@ describe.skip("multiple sources tests", () => {
     } as any;
 
     // ACT
-    await runCache.call(core);
+    await runCache.call(v);
 
     // ASSERT
-    const txs = core["client"].kyve.bundles.v1beta1;
-    const queries = core["lcd"].kyve.query.v1beta1;
-    const cacheProvider = core["cacheProvider"];
-    const runtime = core["runtime"];
+    const txs = v["client"].kyve.bundles.v1beta1;
+    const queries = v["lcd"].kyve.query.v1beta1;
+    const cacheProvider = v["cacheProvider"];
+    const runtime = v["runtime"];
 
     // ========================
     // ASSERT CLIENT INTERFACES
@@ -824,18 +816,17 @@ describe.skip("multiple sources tests", () => {
     // =========================
 
     expect(runtime.getDataItem).toHaveBeenCalledTimes(
-      parseInt(genesis_pool.data.max_bundle_size) *
-        core.poolConfig.sources.length
+      parseInt(genesis_pool.data.max_bundle_size) * v.poolConfig.sources.length
     );
 
     let n = 1;
 
     for (let b = 0; b < parseInt(genesis_pool.data.max_bundle_size); b++) {
-      for (let s = 0; s < core.poolConfig.sources.length; s++) {
+      for (let s = 0; s < v.poolConfig.sources.length; s++) {
         expect(runtime.getDataItem).toHaveBeenNthCalledWith(
           n,
-          expect.any(Node),
-          core.poolConfig.sources[s],
+          expect.any(Validator),
+          v.poolConfig.sources[s],
           (b + parseInt(genesis_pool.data.max_bundle_size)).toString()
         );
 
@@ -844,14 +835,13 @@ describe.skip("multiple sources tests", () => {
     }
 
     expect(runtime.transformDataItem).toHaveBeenCalledTimes(
-      parseInt(genesis_pool.data.max_bundle_size) *
-        core.poolConfig.sources.length
+      parseInt(genesis_pool.data.max_bundle_size) * v.poolConfig.sources.length
     );
 
     n = 1;
 
     for (let b = 0; b < parseInt(genesis_pool.data.max_bundle_size); b++) {
-      for (let s = 0; s < core.poolConfig.sources.length; s++) {
+      for (let s = 0; s < v.poolConfig.sources.length; s++) {
         const item = {
           key: (b + parseInt(genesis_pool.data.max_bundle_size)).toString(),
           value: `${b + parseInt(genesis_pool.data.max_bundle_size)}-value`,
@@ -863,11 +853,10 @@ describe.skip("multiple sources tests", () => {
     }
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(
-      parseInt(genesis_pool.data.max_bundle_size) *
-        core.poolConfig.sources.length
+      parseInt(genesis_pool.data.max_bundle_size) * v.poolConfig.sources.length
     );
 
-    const pairs = generateIndexPairs(core.poolConfig.sources.length);
+    const pairs = generateIndexPairs(v.poolConfig.sources.length);
     n = 1;
 
     for (let b = 0; b < parseInt(genesis_pool.data.max_bundle_size); b++) {
@@ -880,7 +869,7 @@ describe.skip("multiple sources tests", () => {
         };
         expect(runtime.validateDataItem).toHaveBeenNthCalledWith(
           n,
-          expect.any(Node),
+          expect.any(Validator),
           item,
           item
         );
@@ -908,48 +897,48 @@ describe.skip("multiple sources tests", () => {
     // ========================
 
     // assert that only one round ran
-    expect(core["waitForCacheContinuation"]).toHaveBeenCalledTimes(1);
+    expect(v["waitForCacheContinuation"]).toHaveBeenCalledTimes(1);
 
     // TODO: assert timeouts
   });
 
   test("start caching from a pool with multiple sources where getDataItem fails once", async () => {
     // ARRANGE
-    core["runtime"].getDataItem = jest
+    v["runtime"].getDataItem = jest
       .fn()
-      .mockImplementationOnce((core: Node, source: string, key: string) =>
+      .mockImplementationOnce((v: Validator, source: string, key: string) =>
         Promise.resolve({
           key,
           value: `${key}-value`,
         })
       )
-      .mockImplementationOnce((core: Node, source: string, key: string) =>
+      .mockImplementationOnce((v: Validator, source: string, key: string) =>
         Promise.resolve({
           key,
           value: `${key}-value`,
         })
       )
-      .mockImplementationOnce((core: Node, source: string, key: string) =>
+      .mockImplementationOnce((v: Validator, source: string, key: string) =>
         Promise.resolve({
           key,
           value: `${key}-value`,
         })
       )
-      .mockImplementationOnce((core: Node, source: string, key: string) =>
+      .mockImplementationOnce((v: Validator, source: string, key: string) =>
         Promise.resolve({
           key,
           value: `${key}-value`,
         })
       )
       .mockRejectedValueOnce(new Error("network error"))
-      .mockImplementation((core: Node, source: string, key: string) =>
+      .mockImplementation((v: Validator, source: string, key: string) =>
         Promise.resolve({
           key,
           value: `${key}-value`,
         })
       );
 
-    core.pool = {
+    v.pool = {
       ...genesis_pool,
       data: {
         ...genesis_pool.data,
@@ -958,13 +947,13 @@ describe.skip("multiple sources tests", () => {
     } as any;
 
     // ACT
-    await runCache.call(core);
+    await runCache.call(v);
 
     // ASSERT
-    const txs = core["client"].kyve.bundles.v1beta1;
-    const queries = core["lcd"].kyve.query.v1beta1;
-    const cacheProvider = core["cacheProvider"];
-    const runtime = core["runtime"];
+    const txs = v["client"].kyve.bundles.v1beta1;
+    const queries = v["lcd"].kyve.query.v1beta1;
+    const cacheProvider = v["cacheProvider"];
+    const runtime = v["runtime"];
 
     // ========================
     // ASSERT CLIENT INTERFACES
@@ -1037,49 +1026,49 @@ describe.skip("multiple sources tests", () => {
     // =========================
 
     expect(runtime.getDataItem).toHaveBeenCalledTimes(
-      2 * core.poolConfig.sources.length + 1
+      2 * v.poolConfig.sources.length + 1
     );
 
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       1,
-      expect.any(Node),
-      core.poolConfig.sources[0],
+      expect.any(Validator),
+      v.poolConfig.sources[0],
       "0"
     );
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       2,
-      expect.any(Node),
-      core.poolConfig.sources[1],
+      expect.any(Validator),
+      v.poolConfig.sources[1],
       "0"
     );
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       3,
-      expect.any(Node),
-      core.poolConfig.sources[2],
+      expect.any(Validator),
+      v.poolConfig.sources[2],
       "0"
     );
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       4,
-      expect.any(Node),
-      core.poolConfig.sources[0],
+      expect.any(Validator),
+      v.poolConfig.sources[0],
       "1"
     );
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       5,
-      expect.any(Node),
-      core.poolConfig.sources[1],
+      expect.any(Validator),
+      v.poolConfig.sources[1],
       "1"
     );
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       5,
-      expect.any(Node),
-      core.poolConfig.sources[1],
+      expect.any(Validator),
+      v.poolConfig.sources[1],
       "1"
     );
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       6,
-      expect.any(Node),
-      core.poolConfig.sources[2],
+      expect.any(Validator),
+      v.poolConfig.sources[2],
       "1"
     );
 
@@ -1088,7 +1077,7 @@ describe.skip("multiple sources tests", () => {
     let n = 1;
 
     for (let b = 0; b < 2; b++) {
-      for (let s = 0; s < core.poolConfig.sources.length; s++) {
+      for (let s = 0; s < v.poolConfig.sources.length; s++) {
         const item = {
           key: b.toString(),
           value: `${b}-value`,
@@ -1100,10 +1089,10 @@ describe.skip("multiple sources tests", () => {
     }
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(
-      2 * core.poolConfig.sources.length
+      2 * v.poolConfig.sources.length
     );
 
-    const pairs = generateIndexPairs(core.poolConfig.sources.length);
+    const pairs = generateIndexPairs(v.poolConfig.sources.length);
     n = 1;
 
     for (let b = 0; b < 2; b++) {
@@ -1114,7 +1103,7 @@ describe.skip("multiple sources tests", () => {
         };
         expect(runtime.validateDataItem).toHaveBeenNthCalledWith(
           n,
-          expect.any(Node),
+          expect.any(Validator),
           item,
           item
         );
@@ -1138,56 +1127,56 @@ describe.skip("multiple sources tests", () => {
     // ========================
 
     // assert that only one round ran
-    expect(core["waitForCacheContinuation"]).toHaveBeenCalledTimes(1);
+    expect(v["waitForCacheContinuation"]).toHaveBeenCalledTimes(1);
 
     // TODO: assert timeouts
   });
 
   test("start caching from a pool with multiple sources where getDataItem fails multiple times", async () => {
     // ARRANGE
-    core["runtime"].getDataItem = jest
+    v["runtime"].getDataItem = jest
       .fn()
-      .mockImplementationOnce((core: Node, source: string, key: string) =>
+      .mockImplementationOnce((v: Validator, source: string, key: string) =>
         Promise.resolve({
           key,
           value: `${key}-value`,
         })
       )
-      .mockImplementationOnce((core: Node, source: string, key: string) =>
+      .mockImplementationOnce((v: Validator, source: string, key: string) =>
         Promise.resolve({
           key,
           value: `${key}-value`,
         })
       )
-      .mockImplementationOnce((core: Node, source: string, key: string) =>
-        Promise.resolve({
-          key,
-          value: `${key}-value`,
-        })
-      )
-      .mockRejectedValueOnce(new Error("network error"))
-      .mockImplementationOnce((core: Node, source: string, key: string) =>
+      .mockImplementationOnce((v: Validator, source: string, key: string) =>
         Promise.resolve({
           key,
           value: `${key}-value`,
         })
       )
       .mockRejectedValueOnce(new Error("network error"))
-      .mockImplementation((core: Node, source: string, key: string) =>
+      .mockImplementationOnce((v: Validator, source: string, key: string) =>
+        Promise.resolve({
+          key,
+          value: `${key}-value`,
+        })
+      )
+      .mockRejectedValueOnce(new Error("network error"))
+      .mockImplementation((v: Validator, source: string, key: string) =>
         Promise.resolve({
           key,
           value: `${key}-value`,
         })
       );
 
-    core["cacheProvider"].exists = jest
+    v["cacheProvider"].exists = jest
       .fn()
       .mockResolvedValueOnce(true)
       .mockResolvedValueOnce(true)
       .mockResolvedValueOnce(true)
       .mockResolvedValue(false);
 
-    core.pool = {
+    v.pool = {
       ...genesis_pool,
       data: {
         ...genesis_pool.data,
@@ -1211,13 +1200,13 @@ describe.skip("multiple sources tests", () => {
     } as any;
 
     // ACT
-    await runCache.call(core);
+    await runCache.call(v);
 
     // ASSERT
-    const txs = core["client"].kyve.bundles.v1beta1;
-    const queries = core["lcd"].kyve.query.v1beta1;
-    const cacheProvider = core["cacheProvider"];
-    const runtime = core["runtime"];
+    const txs = v["client"].kyve.bundles.v1beta1;
+    const queries = v["lcd"].kyve.query.v1beta1;
+    const cacheProvider = v["cacheProvider"];
+    const runtime = v["runtime"];
 
     // ========================
     // ASSERT CLIENT INTERFACES
@@ -1304,65 +1293,64 @@ describe.skip("multiple sources tests", () => {
 
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       1,
-      expect.any(Node),
-      core.poolConfig.sources[0],
+      expect.any(Validator),
+      v.poolConfig.sources[0],
       "103"
     );
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       2,
-      expect.any(Node),
-      core.poolConfig.sources[1],
+      expect.any(Validator),
+      v.poolConfig.sources[1],
       "103"
     );
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       3,
-      expect.any(Node),
-      core.poolConfig.sources[2],
+      expect.any(Validator),
+      v.poolConfig.sources[2],
       "103"
     );
 
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       4,
-      expect.any(Node),
-      core.poolConfig.sources[0],
+      expect.any(Validator),
+      v.poolConfig.sources[0],
       "104"
     );
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       5,
-      expect.any(Node),
-      core.poolConfig.sources[1],
+      expect.any(Validator),
+      v.poolConfig.sources[1],
       "104"
     );
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       6,
-      expect.any(Node),
-      core.poolConfig.sources[2],
+      expect.any(Validator),
+      v.poolConfig.sources[2],
       "104"
     );
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       7,
-      expect.any(Node),
-      core.poolConfig.sources[0],
+      expect.any(Validator),
+      v.poolConfig.sources[0],
       "104"
     );
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       8,
-      expect.any(Node),
-      core.poolConfig.sources[2],
+      expect.any(Validator),
+      v.poolConfig.sources[2],
       "104"
     );
 
     // ...
 
     expect(runtime.transformDataItem).toHaveBeenCalledTimes(
-      parseInt(genesis_pool.data.max_bundle_size) *
-        core.poolConfig.sources.length
+      parseInt(genesis_pool.data.max_bundle_size) * v.poolConfig.sources.length
     );
 
     let n = 1;
 
     for (let b = 0; b < 2; b++) {
-      for (let s = 0; s < core.poolConfig.sources.length; s++) {
+      for (let s = 0; s < v.poolConfig.sources.length; s++) {
         const item = {
           key: (b + parseInt(genesis_pool.data.max_bundle_size) + 3).toString(),
           value: `${b + parseInt(genesis_pool.data.max_bundle_size) + 3}-value`,
@@ -1374,11 +1362,10 @@ describe.skip("multiple sources tests", () => {
     }
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(
-      parseInt(genesis_pool.data.max_bundle_size) *
-        core.poolConfig.sources.length
+      parseInt(genesis_pool.data.max_bundle_size) * v.poolConfig.sources.length
     );
 
-    const pairs = generateIndexPairs(core.poolConfig.sources.length);
+    const pairs = generateIndexPairs(v.poolConfig.sources.length);
     n = 1;
 
     for (let b = 0; b < 2; b++) {
@@ -1391,7 +1378,7 @@ describe.skip("multiple sources tests", () => {
         };
         expect(runtime.validateDataItem).toHaveBeenNthCalledWith(
           n,
-          expect.any(Node),
+          expect.any(Validator),
           item,
           item
         );
@@ -1419,53 +1406,53 @@ describe.skip("multiple sources tests", () => {
     // ========================
 
     // assert that only one round ran
-    expect(core["waitForCacheContinuation"]).toHaveBeenCalledTimes(1);
+    expect(v["waitForCacheContinuation"]).toHaveBeenCalledTimes(1);
 
     // TODO: assert timeouts
   });
 
   test("start caching from multiple sources but sources return different result", async () => {
     // ARRANGE
-    core["runtime"].getDataItem = jest
+    v["runtime"].getDataItem = jest
       .fn()
-      .mockImplementationOnce((core: Node, source: string, key: string) =>
+      .mockImplementationOnce((v: Validator, source: string, key: string) =>
         Promise.resolve({
           key,
           value: `${key}-value`,
         })
       )
-      .mockImplementationOnce((core: Node, source: string, key: string) =>
+      .mockImplementationOnce((v: Validator, source: string, key: string) =>
         Promise.resolve({
           key,
           value: `${key}-value`,
         })
       )
-      .mockImplementationOnce((core: Node, source: string, key: string) =>
+      .mockImplementationOnce((v: Validator, source: string, key: string) =>
         Promise.resolve({
           key,
           value: `${key}-value`,
         })
       )
-      .mockImplementationOnce((core: Node, source: string, key: string) =>
+      .mockImplementationOnce((v: Validator, source: string, key: string) =>
         Promise.resolve({
           key,
           value: `${key}-value`,
         })
       )
-      .mockImplementationOnce((core: Node, source: string, key: string) =>
+      .mockImplementationOnce((v: Validator, source: string, key: string) =>
         Promise.resolve({
           key,
           value: `${key}-value-invalid`,
         })
       )
-      .mockImplementation((core: Node, source: string, key: string) =>
+      .mockImplementation((v: Validator, source: string, key: string) =>
         Promise.resolve({
           key,
           value: `${key}-value`,
         })
       );
 
-    core.pool = {
+    v.pool = {
       ...genesis_pool,
       data: {
         ...genesis_pool.data,
@@ -1474,13 +1461,13 @@ describe.skip("multiple sources tests", () => {
     } as any;
 
     // ACT
-    await runCache.call(core);
+    await runCache.call(v);
 
     // ASSERT
-    const txs = core["client"].kyve.bundles.v1beta1;
-    const queries = core["lcd"].kyve.query.v1beta1;
-    const cacheProvider = core["cacheProvider"];
-    const runtime = core["runtime"];
+    const txs = v["client"].kyve.bundles.v1beta1;
+    const queries = v["lcd"].kyve.query.v1beta1;
+    const cacheProvider = v["cacheProvider"];
+    const runtime = v["runtime"];
 
     // ========================
     // ASSERT CLIENT INTERFACES
@@ -1553,17 +1540,17 @@ describe.skip("multiple sources tests", () => {
     // =========================
 
     expect(runtime.getDataItem).toHaveBeenCalledTimes(
-      2 * core.poolConfig.sources.length
+      2 * v.poolConfig.sources.length
     );
 
     let n = 1;
 
     for (let b = 0; b < 2; b++) {
-      for (let s = 0; s < core.poolConfig.sources.length; s++) {
+      for (let s = 0; s < v.poolConfig.sources.length; s++) {
         expect(runtime.getDataItem).toHaveBeenNthCalledWith(
           n,
-          expect.any(Node),
-          core.poolConfig.sources[s],
+          expect.any(Validator),
+          v.poolConfig.sources[s],
           b.toString()
         );
 
@@ -1572,13 +1559,13 @@ describe.skip("multiple sources tests", () => {
     }
 
     expect(runtime.transformDataItem).toHaveBeenCalledTimes(
-      2 * core.poolConfig.sources.length
+      2 * v.poolConfig.sources.length
     );
 
     n = 1;
 
     for (let b = 0; b < 2; b++) {
-      for (let s = 0; s < core.poolConfig.sources.length; s++) {
+      for (let s = 0; s < v.poolConfig.sources.length; s++) {
         let item;
 
         if (n === 5) {
@@ -1598,14 +1585,14 @@ describe.skip("multiple sources tests", () => {
       }
     }
 
-    const pairs = generateIndexPairs(core.poolConfig.sources.length);
+    const pairs = generateIndexPairs(v.poolConfig.sources.length);
     n = 1;
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(4);
 
     expect(runtime.validateDataItem).toHaveBeenNthCalledWith(
       1,
-      expect.any(Node),
+      expect.any(Validator),
       {
         key: `0`,
         value: `0-value-transform`,
@@ -1617,7 +1604,7 @@ describe.skip("multiple sources tests", () => {
     );
     expect(runtime.validateDataItem).toHaveBeenNthCalledWith(
       2,
-      expect.any(Node),
+      expect.any(Validator),
       {
         key: `0`,
         value: `0-value-transform`,
@@ -1629,7 +1616,7 @@ describe.skip("multiple sources tests", () => {
     );
     expect(runtime.validateDataItem).toHaveBeenNthCalledWith(
       3,
-      expect.any(Node),
+      expect.any(Validator),
       {
         key: `0`,
         value: `0-value-transform`,
@@ -1641,7 +1628,7 @@ describe.skip("multiple sources tests", () => {
     );
     expect(runtime.validateDataItem).toHaveBeenNthCalledWith(
       4,
-      expect.any(Node),
+      expect.any(Validator),
       {
         key: `1`,
         value: `1-value-transform`,
@@ -1668,18 +1655,18 @@ describe.skip("multiple sources tests", () => {
     // ========================
 
     // assert that only one round ran
-    expect(core["waitForCacheContinuation"]).toHaveBeenCalledTimes(1);
+    expect(v["waitForCacheContinuation"]).toHaveBeenCalledTimes(1);
 
     // TODO: assert timeouts
   });
 
   test("start caching from multiple sources but sources but validateDataItem fails", async () => {
     // ARRANGE
-    core["runtime"].validateDataItem = jest
+    v["runtime"].validateDataItem = jest
       .fn()
       .mockImplementationOnce(
         async (
-          core: Node,
+          v: Validator,
           proposedDataItem: DataItem,
           validationDataItem: DataItem
         ) => {
@@ -1696,7 +1683,7 @@ describe.skip("multiple sources tests", () => {
       .mockRejectedValueOnce(new Error())
       .mockImplementation(
         async (
-          core: Node,
+          v: Validator,
           proposedDataItem: DataItem,
           validationDataItem: DataItem
         ) => {
@@ -1711,7 +1698,7 @@ describe.skip("multiple sources tests", () => {
         }
       );
 
-    core.pool = {
+    v.pool = {
       ...genesis_pool,
       data: {
         ...genesis_pool.data,
@@ -1720,13 +1707,13 @@ describe.skip("multiple sources tests", () => {
     } as any;
 
     // ACT
-    await runCache.call(core);
+    await runCache.call(v);
 
     // ASSERT
-    const txs = core["client"].kyve.bundles.v1beta1;
-    const queries = core["lcd"].kyve.query.v1beta1;
-    const cacheProvider = core["cacheProvider"];
-    const runtime = core["runtime"];
+    const txs = v["client"].kyve.bundles.v1beta1;
+    const queries = v["lcd"].kyve.query.v1beta1;
+    const cacheProvider = v["cacheProvider"];
+    const runtime = v["runtime"];
 
     // ========================
     // ASSERT CLIENT INTERFACES
@@ -1785,16 +1772,16 @@ describe.skip("multiple sources tests", () => {
     // =========================
 
     expect(runtime.getDataItem).toHaveBeenCalledTimes(
-      core.poolConfig.sources.length
+      v.poolConfig.sources.length
     );
 
     let n = 1;
 
-    for (let s = 0; s < core.poolConfig.sources.length; s++) {
+    for (let s = 0; s < v.poolConfig.sources.length; s++) {
       expect(runtime.getDataItem).toHaveBeenNthCalledWith(
         n,
-        expect.any(Node),
-        core.poolConfig.sources[s],
+        expect.any(Validator),
+        v.poolConfig.sources[s],
         "0"
       );
 
@@ -1802,12 +1789,12 @@ describe.skip("multiple sources tests", () => {
     }
 
     expect(runtime.transformDataItem).toHaveBeenCalledTimes(
-      core.poolConfig.sources.length
+      v.poolConfig.sources.length
     );
 
     n = 1;
 
-    for (let s = 0; s < core.poolConfig.sources.length; s++) {
+    for (let s = 0; s < v.poolConfig.sources.length; s++) {
       expect(runtime.transformDataItem).toHaveBeenNthCalledWith(n, {
         key: "0",
         value: "0-value",
@@ -1821,7 +1808,7 @@ describe.skip("multiple sources tests", () => {
 
     expect(runtime.validateDataItem).toHaveBeenNthCalledWith(
       1,
-      expect.any(Node),
+      expect.any(Validator),
       {
         key: `0`,
         value: `0-value-transform`,
@@ -1833,7 +1820,7 @@ describe.skip("multiple sources tests", () => {
     );
     expect(runtime.validateDataItem).toHaveBeenNthCalledWith(
       2,
-      expect.any(Node),
+      expect.any(Validator),
       {
         key: `0`,
         value: `0-value-transform`,
@@ -1856,7 +1843,7 @@ describe.skip("multiple sources tests", () => {
     // ========================
 
     // assert that only one round ran
-    expect(core["waitForCacheContinuation"]).toHaveBeenCalledTimes(1);
+    expect(v["waitForCacheContinuation"]).toHaveBeenCalledTimes(1);
 
     // TODO: assert timeouts
   });

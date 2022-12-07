@@ -1,15 +1,15 @@
 import BigNumber from "bignumber.js";
-import { Node, standardizeJSON } from "../..";
+import { Validator, standardizeJSON } from "../..";
 
 /**
  * validateStorageBalance checks if the account of the storage provider
  * has more than 0$ funds available
  *
  * @method validateStorageBalance
- * @param {Node} this
+ * @param {Validator} this
  * @return {Promise<void>}
  */
-export async function validateStorageBalance(this: Node): Promise<void> {
+export async function validateStorageBalance(this: Validator): Promise<void> {
   try {
     const storageProvider = await this.storageProviderFactory(
       this.pool.data?.current_storage_provider_id ?? 0

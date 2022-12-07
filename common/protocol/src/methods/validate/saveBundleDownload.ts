@@ -1,6 +1,6 @@
 import BigNumber from "bignumber.js";
 
-import { Node } from "../..";
+import { Validator } from "../..";
 import { callWithBackoffStrategy, standardizeJSON, VOTE } from "../../utils";
 
 /**
@@ -15,12 +15,12 @@ import { callWithBackoffStrategy, standardizeJSON, VOTE } from "../../utils";
  * the bundle.
  *
  * @method saveBundleDownload
- * @param {Node} this
+ * @param {Validator} this
  * @param {number} updatedAt
  * @return {Promise<Buffer | null>}
  */
 export async function saveBundleDownload(
-  this: Node,
+  this: Validator,
   updatedAt: number
 ): Promise<Buffer | null> {
   return await callWithBackoffStrategy(

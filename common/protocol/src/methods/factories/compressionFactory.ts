@@ -1,4 +1,4 @@
-import { Node } from "../..";
+import { Validator } from "../..";
 import { ICompression } from "../..";
 import { Gzip } from "../../reactors/compression/Gzip";
 import { NoCompression } from "../../reactors/compression/NoCompression";
@@ -12,12 +12,12 @@ import { NoCompression } from "../../reactors/compression/NoCompression";
  * x - NoCompression (default)
  *
  * @method compressionFactory
- * @param {Node} this
+ * @param {Validator} this
  * @param {number} compressionId the id of the compression
  * @return {ICompression}
  */
 export function compressionFactory(
-  this: Node,
+  this: Validator,
   compressionId: number
 ): ICompression {
   switch (compressionId) {

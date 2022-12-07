@@ -1,21 +1,21 @@
-import { DataItem, Node, sha256 } from "../../src";
+import { DataItem, Validator, sha256 } from "../../src";
 
 export const TestRuntime = jest.fn().mockImplementation(() => {
   return {
     name: "@kyve/evm",
     version: "0.0.0",
-    getDataItem: jest.fn(async (_: Node, __: string, key: string) => ({
+    getDataItem: jest.fn(async (_: Validator, __: string, key: string) => ({
       key,
       value: `${key}-value`,
     })),
-    prevalidateDataItem: jest.fn(async (_: Node, __: DataItem) => true),
-    transformDataItem: jest.fn(async (_: Node, item: DataItem) => ({
+    prevalidateDataItem: jest.fn(async (_: Validator, __: DataItem) => true),
+    transformDataItem: jest.fn(async (_: Validator, item: DataItem) => ({
       key: item.key,
       value: `${item.value}-transform`,
     })),
     validateDataItem: jest.fn(
       async (
-        _: Node,
+        _: Validator,
         proposedDataItem: DataItem,
         validationDataItem: DataItem
       ) => {
@@ -29,10 +29,10 @@ export const TestRuntime = jest.fn().mockImplementation(() => {
         return proposedDataItemHash === validationDataItemHash;
       }
     ),
-    summarizeDataBundle: jest.fn(async (_: Node, bundle: DataItem[]) =>
+    summarizeDataBundle: jest.fn(async (_: Validator, bundle: DataItem[]) =>
       JSON.stringify(bundle)
     ),
-    nextKey: jest.fn(async (_: Node, key: string) =>
+    nextKey: jest.fn(async (_: Validator, key: string) =>
       (parseInt(key) + 1).toString()
     ),
   };

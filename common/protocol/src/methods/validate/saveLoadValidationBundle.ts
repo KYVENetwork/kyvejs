@@ -1,6 +1,6 @@
 import BigNumber from "bignumber.js";
 
-import { Node } from "../..";
+import { Validator } from "../..";
 import { DataItem } from "../../types";
 import { callWithBackoffStrategy, standardizeJSON, VOTE } from "../../utils";
 
@@ -11,12 +11,12 @@ import { callWithBackoffStrategy, standardizeJSON, VOTE } from "../../utils";
  * with abstain and continues to try to load the bundle
  *
  * @method saveLoadValidationBundle
- * @param {Node} this
+ * @param {Validator} this
  * @param {number} updatedAt
  * @return {Promise<DataItem[] | null>}
  */
 export async function saveLoadValidationBundle(
-  this: Node,
+  this: Validator,
   updatedAt: number
 ): Promise<DataItem[] | null> {
   return await callWithBackoffStrategy(

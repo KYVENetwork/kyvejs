@@ -1,4 +1,4 @@
-import { Node } from "../..";
+import { Validator } from "../..";
 import { DataItem } from "../../types";
 import { bytesToBundle, standardizeJSON } from "../../utils";
 
@@ -7,12 +7,12 @@ import { bytesToBundle, standardizeJSON } from "../../utils";
  * It never throws an error and returns no data if one occurs.
  *
  * @method saveBundleDecompress
- * @param {Node} this
+ * @param {Validator} this
  * @param {Buffer} rawStorageData
  * @return {Promise<DataItem[]>}
  */
 export async function saveBundleDecompress(
-  this: Node,
+  this: Validator,
   rawStorageData: Buffer
 ): Promise<DataItem[]> {
   try {

@@ -1,5 +1,10 @@
 import { Logger } from "tslog";
-import { ICompression, IStorageProvider, Node, sha256 } from "../src/index";
+import {
+  ICompression,
+  IStorageProvider,
+  Validator,
+  sha256,
+} from "../src/index";
 import { runNode } from "../src/methods/main/runNode";
 import { genesis_pool } from "./mocks/constants";
 import { client } from "./mocks/client.mock";
@@ -29,7 +34,7 @@ TEST CASES - propose bundle tests
 */
 
 describe("propose bundle tests", () => {
-  let core: Node;
+  let v: Validator;
 
   let processExit: jest.Mock<never, never>;
   let setTimeoutMock: jest.Mock;
@@ -38,19 +43,17 @@ describe("propose bundle tests", () => {
   let compression: ICompression;
 
   beforeEach(() => {
-    core = new Node(new TestRuntime());
+    v = new Validator(new TestRuntime());
 
-    core["cacheProvider"] = new TestCacheProvider();
+    v["cacheProvider"] = new TestCacheProvider();
 
     // mock storage provider
     storageProvider = new TestNormalStorageProvider();
-    core["storageProviderFactory"] = jest
-      .fn()
-      .mockResolvedValue(storageProvider);
+    v["storageProviderFactory"] = jest.fn().mockResolvedValue(storageProvider);
 
     // mock compression
     compression = new TestNormalCompression();
-    core["compressionFactory"] = jest.fn().mockReturnValue(compression);
+    v["compressionFactory"] = jest.fn().mockReturnValue(compression);
 
     // mock process.exit
     processExit = jest.fn<never, never>();
@@ -71,27 +74,27 @@ describe("propose bundle tests", () => {
     global.setTimeout = setTimeoutMock as any;
 
     // mock logger
-    core.logger = new Logger();
+    v.logger = new Logger();
 
-    core.logger.info = jest.fn();
-    core.logger.debug = jest.fn();
-    core.logger.warn = jest.fn();
-    core.logger.error = jest.fn();
+    v.logger.info = jest.fn();
+    v.logger.debug = jest.fn();
+    v.logger.warn = jest.fn();
+    v.logger.error = jest.fn();
 
-    core["poolId"] = 0;
-    core["staker"] = "test_staker";
+    v["poolId"] = 0;
+    v["staker"] = "test_staker";
 
-    core.client = client();
-    core.lcd = lcd();
+    v.client = client();
+    v.lcd = lcd();
 
-    core["waitForNextBundleProposal"] = jest.fn();
+    v["waitForNextBundleProposal"] = jest.fn();
 
-    core["continueRound"] = jest
+    v["continueRound"] = jest
       .fn()
       .mockReturnValueOnce(true)
       .mockReturnValue(false);
 
-    setupMetrics.call(core);
+    setupMetrics.call(v);
   });
 
   afterEach(() => {
@@ -101,13 +104,13 @@ describe("propose bundle tests", () => {
 
   test("propose bundle with data", async () => {
     // ARRANGE
-    core["lcd"].kyve.query.v1beta1.canVote = jest.fn().mockResolvedValue({
+    v["lcd"].kyve.query.v1beta1.canVote = jest.fn().mockResolvedValue({
       possible: false,
       reason: "Already voted",
     });
 
-    core["syncPoolState"] = jest.fn().mockImplementation(() => {
-      core.pool = {
+    v["syncPoolState"] = jest.fn().mockImplementation(() => {
+      v.pool = {
         ...genesis_pool,
         data: {
           ...genesis_pool.data,
@@ -150,19 +153,19 @@ describe("propose bundle tests", () => {
       },
     ];
 
-    await core["cacheProvider"].put("102", bundle[0]);
-    await core["cacheProvider"].put("103", bundle[1]);
-    await core["cacheProvider"].put("104", bundle[2]);
-    await core["cacheProvider"].put("105", bundle[3]);
+    await v["cacheProvider"].put("102", bundle[0]);
+    await v["cacheProvider"].put("103", bundle[1]);
+    await v["cacheProvider"].put("104", bundle[2]);
+    await v["cacheProvider"].put("105", bundle[3]);
 
     // ACT
-    await runNode.call(core);
+    await runNode.call(v);
 
     // ASSERT
-    const txs = core["client"].kyve.bundles.v1beta1;
-    const queries = core["lcd"].kyve.query.v1beta1;
-    const cacheProvider = core["cacheProvider"];
-    const runtime = core["runtime"];
+    const txs = v["client"].kyve.bundles.v1beta1;
+    const queries = v["lcd"].kyve.query.v1beta1;
+    const cacheProvider = v["cacheProvider"];
+    const runtime = v["runtime"];
 
     // ========================
     // ASSERT CLIENT INTERFACES
@@ -248,7 +251,7 @@ describe("propose bundle tests", () => {
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
     expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
-      expect.any(Node),
+      expect.any(Validator),
       bundle
     );
 
@@ -263,20 +266,20 @@ describe("propose bundle tests", () => {
     // ========================
 
     // assert that only one round ran
-    expect(core["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
+    expect(v["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
 
     // TODO: assert timeouts
   });
 
   test("propose bundle with no data", async () => {
     // ARRANGE
-    core["lcd"].kyve.query.v1beta1.canVote = jest.fn().mockResolvedValue({
+    v["lcd"].kyve.query.v1beta1.canVote = jest.fn().mockResolvedValue({
       possible: false,
       reason: "Already voted",
     });
 
-    core["syncPoolState"] = jest.fn().mockImplementation(() => {
-      core.pool = {
+    v["syncPoolState"] = jest.fn().mockImplementation(() => {
+      v.pool = {
         ...genesis_pool,
         data: {
           ...genesis_pool.data,
@@ -312,14 +315,14 @@ describe("propose bundle tests", () => {
     ];
 
     // ACT
-    await runNode.call(core);
+    await runNode.call(v);
 
     // ASSERT
 
-    const txs = core["client"].kyve.bundles.v1beta1;
-    const queries = core["lcd"].kyve.query.v1beta1;
-    const cacheProvider = core["cacheProvider"];
-    const runtime = core["runtime"];
+    const txs = v["client"].kyve.bundles.v1beta1;
+    const queries = v["lcd"].kyve.query.v1beta1;
+    const cacheProvider = v["cacheProvider"];
+    const runtime = v["runtime"];
 
     // ========================
     // ASSERT CLIENT INTERFACES
@@ -398,20 +401,20 @@ describe("propose bundle tests", () => {
     // ========================
 
     // assert that only one round ran
-    expect(core["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
+    expect(v["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
 
     // TODO: assert timeouts
   });
 
   test("propose bundle after last bundle has been dropped", async () => {
     // ARRANGE
-    core["lcd"].kyve.query.v1beta1.canVote = jest.fn().mockResolvedValue({
+    v["lcd"].kyve.query.v1beta1.canVote = jest.fn().mockResolvedValue({
       possible: false,
       reason: "Already voted",
     });
 
-    core["syncPoolState"] = jest.fn().mockImplementation(() => {
-      core.pool = {
+    v["syncPoolState"] = jest.fn().mockImplementation(() => {
+      v.pool = {
         ...genesis_pool,
         data: {
           ...genesis_pool.data,
@@ -445,18 +448,18 @@ describe("propose bundle tests", () => {
       },
     ];
 
-    await core["cacheProvider"].put("100", bundle[0]);
-    await core["cacheProvider"].put("101", bundle[1]);
+    await v["cacheProvider"].put("100", bundle[0]);
+    await v["cacheProvider"].put("101", bundle[1]);
 
     // ACT
-    await runNode.call(core);
+    await runNode.call(v);
 
     // ASSERT
 
-    const txs = core["client"].kyve.bundles.v1beta1;
-    const queries = core["lcd"].kyve.query.v1beta1;
-    const cacheProvider = core["cacheProvider"];
-    const runtime = core["runtime"];
+    const txs = v["client"].kyve.bundles.v1beta1;
+    const queries = v["lcd"].kyve.query.v1beta1;
+    const cacheProvider = v["cacheProvider"];
+    const runtime = v["runtime"];
 
     // ========================
     // ASSERT CLIENT INTERFACES
@@ -534,7 +537,7 @@ describe("propose bundle tests", () => {
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
     expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
-      expect.any(Node),
+      expect.any(Validator),
       bundle
     );
 
@@ -549,22 +552,22 @@ describe("propose bundle tests", () => {
     // ========================
 
     // assert that only one round ran
-    expect(core["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
+    expect(v["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
 
     // TODO: assert timeouts
   });
 
   test("propose bundle where saveBundle fails", async () => {
     // ARRANGE
-    core["lcd"].kyve.query.v1beta1.canVote = jest.fn().mockResolvedValue({
+    v["lcd"].kyve.query.v1beta1.canVote = jest.fn().mockResolvedValue({
       possible: false,
       reason: "Already voted",
     });
 
     storageProvider.saveBundle = jest.fn().mockRejectedValue(new Error());
 
-    core["syncPoolState"] = jest.fn().mockImplementation(() => {
-      core.pool = {
+    v["syncPoolState"] = jest.fn().mockImplementation(() => {
+      v.pool = {
         ...genesis_pool,
         data: {
           ...genesis_pool.data,
@@ -599,18 +602,18 @@ describe("propose bundle tests", () => {
       },
     ];
 
-    await core["cacheProvider"].put("102", bundle[0]);
-    await core["cacheProvider"].put("103", bundle[1]);
+    await v["cacheProvider"].put("102", bundle[0]);
+    await v["cacheProvider"].put("103", bundle[1]);
 
     // ACT
-    await runNode.call(core);
+    await runNode.call(v);
 
     // ASSERT
 
-    const txs = core["client"].kyve.bundles.v1beta1;
-    const queries = core["lcd"].kyve.query.v1beta1;
-    const cacheProvider = core["cacheProvider"];
-    const runtime = core["runtime"];
+    const txs = v["client"].kyve.bundles.v1beta1;
+    const queries = v["lcd"].kyve.query.v1beta1;
+    const cacheProvider = v["cacheProvider"];
+    const runtime = v["runtime"];
 
     // ========================
     // ASSERT CLIENT INTERFACES
@@ -687,7 +690,7 @@ describe("propose bundle tests", () => {
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
     expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
-      expect.any(Node),
+      expect.any(Validator),
       bundle
     );
 
@@ -702,22 +705,22 @@ describe("propose bundle tests", () => {
     // ========================
 
     // assert that only one round ran
-    expect(core["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
+    expect(v["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
 
     // TODO: assert timeouts
   });
 
   test("propose bundle but saveBundle does not return a storage id", async () => {
     // ARRANGE
-    core["lcd"].kyve.query.v1beta1.canVote = jest.fn().mockResolvedValue({
+    v["lcd"].kyve.query.v1beta1.canVote = jest.fn().mockResolvedValue({
       possible: false,
       reason: "Already voted",
     });
 
     storageProvider.saveBundle = jest.fn().mockResolvedValue(null);
 
-    core["syncPoolState"] = jest.fn().mockImplementation(() => {
-      core.pool = {
+    v["syncPoolState"] = jest.fn().mockImplementation(() => {
+      v.pool = {
         ...genesis_pool,
         data: {
           ...genesis_pool.data,
@@ -752,18 +755,18 @@ describe("propose bundle tests", () => {
       },
     ];
 
-    await core["cacheProvider"].put("102", bundle[0]);
-    await core["cacheProvider"].put("103", bundle[1]);
+    await v["cacheProvider"].put("102", bundle[0]);
+    await v["cacheProvider"].put("103", bundle[1]);
 
     // ACT
-    await runNode.call(core);
+    await runNode.call(v);
 
     // ASSERT
 
-    const txs = core["client"].kyve.bundles.v1beta1;
-    const queries = core["lcd"].kyve.query.v1beta1;
-    const cacheProvider = core["cacheProvider"];
-    const runtime = core["runtime"];
+    const txs = v["client"].kyve.bundles.v1beta1;
+    const queries = v["lcd"].kyve.query.v1beta1;
+    const cacheProvider = v["cacheProvider"];
+    const runtime = v["runtime"];
 
     // ========================
     // ASSERT CLIENT INTERFACES
@@ -840,7 +843,7 @@ describe("propose bundle tests", () => {
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
     expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
-      expect.any(Node),
+      expect.any(Validator),
       bundle
     );
 
@@ -855,24 +858,24 @@ describe("propose bundle tests", () => {
     // ========================
 
     // assert that only one round ran
-    expect(core["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
+    expect(v["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
 
     // TODO: assert timeouts
   });
 
   test("propose bundle where submitBundleProposal fails", async () => {
     // ARRANGE
-    core["lcd"].kyve.query.v1beta1.canVote = jest.fn().mockResolvedValue({
+    v["lcd"].kyve.query.v1beta1.canVote = jest.fn().mockResolvedValue({
       possible: false,
       reason: "Already voted",
     });
 
-    core["client"].kyve.bundles.v1beta1.submitBundleProposal = jest
+    v["client"].kyve.bundles.v1beta1.submitBundleProposal = jest
       .fn()
       .mockRejectedValue(new Error());
 
-    core["syncPoolState"] = jest.fn().mockImplementation(() => {
-      core.pool = {
+    v["syncPoolState"] = jest.fn().mockImplementation(() => {
+      v.pool = {
         ...genesis_pool,
         data: {
           ...genesis_pool.data,
@@ -907,18 +910,18 @@ describe("propose bundle tests", () => {
       },
     ];
 
-    await core["cacheProvider"].put("102", bundle[0]);
-    await core["cacheProvider"].put("103", bundle[1]);
+    await v["cacheProvider"].put("102", bundle[0]);
+    await v["cacheProvider"].put("103", bundle[1]);
 
     // ACT
-    await runNode.call(core);
+    await runNode.call(v);
 
     // ASSERT
 
-    const txs = core["client"].kyve.bundles.v1beta1;
-    const queries = core["lcd"].kyve.query.v1beta1;
-    const cacheProvider = core["cacheProvider"];
-    const runtime = core["runtime"];
+    const txs = v["client"].kyve.bundles.v1beta1;
+    const queries = v["lcd"].kyve.query.v1beta1;
+    const cacheProvider = v["cacheProvider"];
+    const runtime = v["runtime"];
 
     // ========================
     // ASSERT CLIENT INTERFACES
@@ -1002,7 +1005,7 @@ describe("propose bundle tests", () => {
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
     expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
-      expect.any(Node),
+      expect.any(Validator),
       bundle
     );
 
@@ -1017,24 +1020,24 @@ describe("propose bundle tests", () => {
     // ========================
 
     // assert that only one round ran
-    expect(core["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
+    expect(v["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
 
     // TODO: assert timeouts
   });
 
   test("propose bundle where skipUploaderRole fails", async () => {
     // ARRANGE
-    core["lcd"].kyve.query.v1beta1.canVote = jest.fn().mockResolvedValue({
+    v["lcd"].kyve.query.v1beta1.canVote = jest.fn().mockResolvedValue({
       possible: false,
       reason: "Already voted",
     });
 
-    core["client"].kyve.bundles.v1beta1.skipUploaderRole = jest
+    v["client"].kyve.bundles.v1beta1.skipUploaderRole = jest
       .fn()
       .mockRejectedValue(new Error());
 
-    core["syncPoolState"] = jest.fn().mockImplementation(() => {
-      core.pool = {
+    v["syncPoolState"] = jest.fn().mockImplementation(() => {
+      v.pool = {
         ...genesis_pool,
         data: {
           ...genesis_pool.data,
@@ -1070,14 +1073,14 @@ describe("propose bundle tests", () => {
     ];
 
     // ACT
-    await runNode.call(core);
+    await runNode.call(v);
 
     // ASSERT
 
-    const txs = core["client"].kyve.bundles.v1beta1;
-    const queries = core["lcd"].kyve.query.v1beta1;
-    const cacheProvider = core["cacheProvider"];
-    const runtime = core["runtime"];
+    const txs = v["client"].kyve.bundles.v1beta1;
+    const queries = v["lcd"].kyve.query.v1beta1;
+    const cacheProvider = v["cacheProvider"];
+    const runtime = v["runtime"];
 
     // ========================
     // ASSERT CLIENT INTERFACES
@@ -1156,26 +1159,26 @@ describe("propose bundle tests", () => {
     // ========================
 
     // assert that only one round ran
-    expect(core["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
+    expect(v["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
 
     // TODO: assert timeouts
   });
 
   test("propose bundle where saveBundle and skipUploaderRole fails", async () => {
     // ARRANGE
-    core["lcd"].kyve.query.v1beta1.canVote = jest.fn().mockResolvedValue({
+    v["lcd"].kyve.query.v1beta1.canVote = jest.fn().mockResolvedValue({
       possible: false,
       reason: "Already voted",
     });
 
     storageProvider.saveBundle = jest.fn().mockRejectedValue(new Error());
 
-    core["client"].kyve.bundles.v1beta1.skipUploaderRole = jest
+    v["client"].kyve.bundles.v1beta1.skipUploaderRole = jest
       .fn()
       .mockRejectedValue(new Error());
 
-    core["syncPoolState"] = jest.fn().mockImplementation(() => {
-      core.pool = {
+    v["syncPoolState"] = jest.fn().mockImplementation(() => {
+      v.pool = {
         ...genesis_pool,
         data: {
           ...genesis_pool.data,
@@ -1210,18 +1213,18 @@ describe("propose bundle tests", () => {
       },
     ];
 
-    await core["cacheProvider"].put("102", bundle[0]);
-    await core["cacheProvider"].put("103", bundle[1]);
+    await v["cacheProvider"].put("102", bundle[0]);
+    await v["cacheProvider"].put("103", bundle[1]);
 
     // ACT
-    await runNode.call(core);
+    await runNode.call(v);
 
     // ASSERT
 
-    const txs = core["client"].kyve.bundles.v1beta1;
-    const queries = core["lcd"].kyve.query.v1beta1;
-    const cacheProvider = core["cacheProvider"];
-    const runtime = core["runtime"];
+    const txs = v["client"].kyve.bundles.v1beta1;
+    const queries = v["lcd"].kyve.query.v1beta1;
+    const cacheProvider = v["cacheProvider"];
+    const runtime = v["runtime"];
 
     // ========================
     // ASSERT CLIENT INTERFACES
@@ -1298,7 +1301,7 @@ describe("propose bundle tests", () => {
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
     expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
-      expect.any(Node),
+      expect.any(Validator),
       bundle
     );
 
@@ -1313,24 +1316,22 @@ describe("propose bundle tests", () => {
     // ========================
 
     // assert that only one round ran
-    expect(core["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
+    expect(v["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
 
     // TODO: assert timeouts
   });
 
   test("propose bundle where summarizeDataBundle fails", async () => {
     // ARRANGE
-    core["lcd"].kyve.query.v1beta1.canVote = jest.fn().mockResolvedValue({
+    v["lcd"].kyve.query.v1beta1.canVote = jest.fn().mockResolvedValue({
       possible: false,
       reason: "Already voted",
     });
 
-    core["runtime"].summarizeDataBundle = jest
-      .fn()
-      .mockRejectedValue(new Error());
+    v["runtime"].summarizeDataBundle = jest.fn().mockRejectedValue(new Error());
 
-    core["syncPoolState"] = jest.fn().mockImplementation(() => {
-      core.pool = {
+    v["syncPoolState"] = jest.fn().mockImplementation(() => {
+      v.pool = {
         ...genesis_pool,
         data: {
           ...genesis_pool.data,
@@ -1365,18 +1366,18 @@ describe("propose bundle tests", () => {
       },
     ];
 
-    await core["cacheProvider"].put("102", bundle[0]);
-    await core["cacheProvider"].put("103", bundle[1]);
+    await v["cacheProvider"].put("102", bundle[0]);
+    await v["cacheProvider"].put("103", bundle[1]);
 
     // ACT
-    await runNode.call(core);
+    await runNode.call(v);
 
     // ASSERT
 
-    const txs = core["client"].kyve.bundles.v1beta1;
-    const queries = core["lcd"].kyve.query.v1beta1;
-    const cacheProvider = core["cacheProvider"];
-    const runtime = core["runtime"];
+    const txs = v["client"].kyve.bundles.v1beta1;
+    const queries = v["lcd"].kyve.query.v1beta1;
+    const cacheProvider = v["cacheProvider"];
+    const runtime = v["runtime"];
 
     // ========================
     // ASSERT CLIENT INTERFACES
@@ -1446,7 +1447,7 @@ describe("propose bundle tests", () => {
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
     expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
-      expect.any(Node),
+      expect.any(Validator),
       bundle
     );
 
@@ -1461,22 +1462,22 @@ describe("propose bundle tests", () => {
     // ========================
 
     // assert that only one round ran
-    expect(core["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
+    expect(v["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
 
     // TODO: assert timeouts
   });
 
   test("propose bundle where compress fails", async () => {
     // ARRANGE
-    core["lcd"].kyve.query.v1beta1.canVote = jest.fn().mockResolvedValue({
+    v["lcd"].kyve.query.v1beta1.canVote = jest.fn().mockResolvedValue({
       possible: false,
       reason: "Already voted",
     });
 
     compression.compress = jest.fn().mockRejectedValue(new Error());
 
-    core["syncPoolState"] = jest.fn().mockImplementation(() => {
-      core.pool = {
+    v["syncPoolState"] = jest.fn().mockImplementation(() => {
+      v.pool = {
         ...genesis_pool,
         data: {
           ...genesis_pool.data,
@@ -1511,18 +1512,18 @@ describe("propose bundle tests", () => {
       },
     ];
 
-    await core["cacheProvider"].put("102", bundle[0]);
-    await core["cacheProvider"].put("103", bundle[1]);
+    await v["cacheProvider"].put("102", bundle[0]);
+    await v["cacheProvider"].put("103", bundle[1]);
 
     // ACT
-    await runNode.call(core);
+    await runNode.call(v);
 
     // ASSERT
 
-    const txs = core["client"].kyve.bundles.v1beta1;
-    const queries = core["lcd"].kyve.query.v1beta1;
-    const cacheProvider = core["cacheProvider"];
-    const runtime = core["runtime"];
+    const txs = v["client"].kyve.bundles.v1beta1;
+    const queries = v["lcd"].kyve.query.v1beta1;
+    const cacheProvider = v["cacheProvider"];
+    const runtime = v["runtime"];
 
     // ========================
     // ASSERT CLIENT INTERFACES
@@ -1595,7 +1596,7 @@ describe("propose bundle tests", () => {
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
     expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
-      expect.any(Node),
+      expect.any(Validator),
       bundle
     );
 
@@ -1610,7 +1611,7 @@ describe("propose bundle tests", () => {
     // ========================
 
     // assert that only one round ran
-    expect(core["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
+    expect(v["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
 
     // TODO: assert timeouts
   });

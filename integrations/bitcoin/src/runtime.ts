@@ -1,4 +1,4 @@
-import { DataItem, IRuntime, Node, sha256 } from "@kyvejs/protocol";
+import { DataItem, IRuntime, Validator, sha256 } from "@kyvejs/protocol";
 
 import { name, version } from "../package.json";
 import { fetchBlock, fetchBlockHash } from "./utils";
@@ -8,29 +8,29 @@ export default class Bitcoin implements IRuntime {
   public version = version;
 
   async getDataItem(
-    core: Node,
+    v: Validator,
     source: string,
     key: string
   ): Promise<DataItem> {
-    const headers = await this.generateCoinbaseCloudHeaders(core);
+    const headers = await this.generateCoinbaseCloudHeaders(v);
     const hash = await fetchBlockHash(source, +key, headers);
     const block = await fetchBlock(source, hash, headers);
 
     return { key, value: block };
   }
 
-  async prevalidateDataItem(_: Node, __: DataItem): Promise<boolean> {
+  async prevalidateDataItem(_: Validator, __: DataItem): Promise<boolean> {
     // TODO: validate if PoW is valid, return valid for now
     return true;
   }
 
-  async transformDataItem(_: Node, item: DataItem): Promise<DataItem> {
+  async transformDataItem(_: Validator, item: DataItem): Promise<DataItem> {
     // don't transform data item
     return item;
   }
 
   async validateDataItem(
-    _: Node,
+    _: Validator,
     proposedDataItem: DataItem,
     validationDataItem: DataItem
   ): Promise<boolean> {
@@ -45,23 +45,23 @@ export default class Bitcoin implements IRuntime {
   }
 
   public async summarizeDataBundle(
-    _: Node,
+    _: Validator,
     bundle: DataItem[]
   ): Promise<string> {
     return bundle.at(-1)?.value?.hash ?? "";
   }
 
-  public async nextKey(_: Node, key: string): Promise<string> {
+  public async nextKey(_: Validator, key: string): Promise<string> {
     return (parseInt(key) + 1).toString();
   }
 
-  private async generateCoinbaseCloudHeaders(core: Node): Promise<any> {
+  private async generateCoinbaseCloudHeaders(v: Validator): Promise<any> {
     // requestSignature for coinbase cloud
-    const address = core.client.account.address;
+    const address = v.client.account.address;
     const timestamp = new Date().valueOf().toString();
-    const poolId = core.pool.id;
+    const poolId = v.pool.id;
 
-    const { signature, pub_key } = await core.client.signString(
+    const { signature, pub_key } = await v.client.signString(
       `${address}//${poolId}//${timestamp}`
     );
 

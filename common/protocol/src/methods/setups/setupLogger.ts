@@ -2,17 +2,17 @@ import { appendFileSync, existsSync, mkdirSync } from "fs";
 import path from "path";
 import { ILogObject, Logger } from "tslog";
 
-import { Node, standardizeJSON } from "../..";
+import { Validator, standardizeJSON } from "../..";
 
 /**
  * setupLogger creates the logger instance and defines the home and file
  * where logs are saved for debugging.
  *
  * @method setupLogger
- * @param {Node} this
+ * @param {Validator} this
  * @return {void}
  */
-export function setupLogger(this: Node): void {
+export function setupLogger(this: Validator): void {
   try {
     // if "logs" folder under target path does not exist create it
     if (!existsSync(path.join(this.home, "logs"))) {

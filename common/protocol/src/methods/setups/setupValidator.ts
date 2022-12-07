@@ -6,17 +6,17 @@ import {
   uniqueNamesGenerator,
 } from "unique-names-generator";
 
-import { Node, standardizeJSON } from "../..";
+import { Validator, standardizeJSON } from "../..";
 
 /**
  * setupValidator ensures the node starts as a valid validator
  * and logs some basic validator starting information
  *
  * @method setupValidator
- * @param {Node} this
+ * @param {Validator} this
  * @return {Promise<void>}
  */
-export async function setupValidator(this: Node): Promise<void> {
+export async function setupValidator(this: Validator): Promise<void> {
   try {
     // generate deterministic valname based on network, pool id,
     // runtime, runtime version and valaddress
@@ -52,7 +52,7 @@ export async function setupValidator(this: Node): Promise<void> {
     this.logger.info(`Runtime \t\t = ${this.runtime.name}`);
     this.logger.info(`Network \t\t = ${this.network}\n`);
 
-    this.logger.info(`@kyve/core \t = v${this.coreVersion}`);
+    this.logger.info(`@kyvejs/protocol \t = v${this.protocolVersion}`);
     this.logger.info(`${this.runtime.name} \t = v${this.runtime.version}\n`);
 
     this.m.cache_current_items.set(0);

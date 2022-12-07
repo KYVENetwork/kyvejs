@@ -1,4 +1,4 @@
-import { Node } from "../..";
+import { Validator } from "../..";
 import { callWithBackoffStrategy, standardizeJSON } from "../../utils";
 
 /**
@@ -7,11 +7,14 @@ import { callWithBackoffStrategy, standardizeJSON } from "../../utils";
  * It runs indefinitely until the query returns a valid response
  *
  * @method canVote
- * @param {Node} this
+ * @param {Validator} this
  * @param {number} updatedAt the last update time of the current bundle proposal
  * @return {Promise<boolean>}
  */
-export async function canVote(this: Node, updatedAt: number): Promise<boolean> {
+export async function canVote(
+  this: Validator,
+  updatedAt: number
+): Promise<boolean> {
   try {
     const canVote = await callWithBackoffStrategy(
       async () => {
@@ -21,7 +24,7 @@ export async function canVote(this: Node, updatedAt: number): Promise<boolean> {
         if (this.pool.bundle_proposal!.uploader === this.staker) {
           return {
             possible: false,
-            reason: "Node is uploader of this bundle proposal",
+            reason: "Validator is uploader of this bundle proposal",
           };
         }
 

@@ -1,5 +1,10 @@
 import { Logger } from "tslog";
-import { DataItem, ICompression, IStorageProvider, Node } from "../src/index";
+import {
+  DataItem,
+  ICompression,
+  IStorageProvider,
+  Validator,
+} from "../src/index";
 import { runCache } from "../src/methods/main/runCache";
 import { genesis_pool } from "./mocks/constants";
 import { client } from "./mocks/client.mock";
@@ -31,7 +36,7 @@ TEST CASES - cache tests
 */
 
 describe("cache tests", () => {
-  let core: Node;
+  let v: Validator;
 
   let processExit: jest.Mock<never, never>;
   let setTimeoutMock: jest.Mock;
@@ -40,19 +45,17 @@ describe("cache tests", () => {
   let compression: ICompression;
 
   beforeEach(() => {
-    core = new Node(new TestRuntime());
+    v = new Validator(new TestRuntime());
 
-    core["cacheProvider"] = new TestCacheProvider();
+    v["cacheProvider"] = new TestCacheProvider();
 
     // mock storage provider
     storageProvider = new TestNormalStorageProvider();
-    core["storageProviderFactory"] = jest
-      .fn()
-      .mockResolvedValue(storageProvider);
+    v["storageProviderFactory"] = jest.fn().mockResolvedValue(storageProvider);
 
     // mock compression
     compression = new TestNormalCompression();
-    core["compressionFactory"] = jest.fn().mockReturnValue(compression);
+    v["compressionFactory"] = jest.fn().mockReturnValue(compression);
 
     // mock process.exit
     processExit = jest.fn<never, never>();
@@ -73,30 +76,30 @@ describe("cache tests", () => {
     global.setTimeout = setTimeoutMock as any;
 
     // mock logger
-    core.logger = new Logger();
+    v.logger = new Logger();
 
-    core.logger.info = jest.fn();
-    core.logger.debug = jest.fn();
-    core.logger.warn = jest.fn();
-    core.logger.error = jest.fn();
+    v.logger.info = jest.fn();
+    v.logger.debug = jest.fn();
+    v.logger.warn = jest.fn();
+    v.logger.error = jest.fn();
 
-    core["poolId"] = 0;
-    core["staker"] = "test_staker";
-    core["poolConfig"] = {
+    v["poolId"] = 0;
+    v["staker"] = "test_staker";
+    v["poolConfig"] = {
       sources: ["https://rpc.api.moonbeam.network"],
     };
 
-    core.client = client();
-    core.lcd = lcd();
+    v.client = client();
+    v.lcd = lcd();
 
-    core["continueRound"] = jest
+    v["continueRound"] = jest
       .fn()
       .mockReturnValueOnce(true)
       .mockReturnValue(false);
 
-    core["waitForCacheContinuation"] = jest.fn();
+    v["waitForCacheContinuation"] = jest.fn();
 
-    setupMetrics.call(core);
+    setupMetrics.call(v);
   });
 
   afterEach(() => {
@@ -106,18 +109,18 @@ describe("cache tests", () => {
 
   test("start caching from a pool which is in genesis state", async () => {
     // ARRANGE
-    core.pool = {
+    v.pool = {
       ...genesis_pool,
     } as any;
 
     // ACT
-    await runCache.call(core);
+    await runCache.call(v);
 
     // ASSERT
-    const txs = core["client"].kyve.bundles.v1beta1;
-    const queries = core["lcd"].kyve.query.v1beta1;
-    const cacheProvider = core["cacheProvider"];
-    const runtime = core["runtime"];
+    const txs = v["client"].kyve.bundles.v1beta1;
+    const queries = v["lcd"].kyve.query.v1beta1;
+    const cacheProvider = v["cacheProvider"];
+    const runtime = v["runtime"];
 
     // ========================
     // ASSERT CLIENT INTERFACES
@@ -200,8 +203,8 @@ describe("cache tests", () => {
     for (let n = 0; n < parseInt(genesis_pool.data.max_bundle_size); n++) {
       expect(runtime.getDataItem).toHaveBeenNthCalledWith(
         n + 1,
-        core,
-        core.poolConfig.sources[0],
+        v,
+        v.poolConfig.sources[0],
         n.toString()
       );
     }
@@ -217,7 +220,7 @@ describe("cache tests", () => {
       };
       expect(runtime.transformDataItem).toHaveBeenNthCalledWith(
         n + 1,
-        expect.any(Node),
+        expect.any(Validator),
         item
       );
     }
@@ -234,7 +237,7 @@ describe("cache tests", () => {
     for (let n = 0; n < parseInt(genesis_pool.data.max_bundle_size) - 1; n++) {
       expect(runtime.nextKey).toHaveBeenNthCalledWith(
         n + 1,
-        expect.any(Node),
+        expect.any(Validator),
         n.toString()
       );
     }
@@ -246,14 +249,14 @@ describe("cache tests", () => {
     // ========================
 
     // assert that only one round ran
-    expect(core["waitForCacheContinuation"]).toHaveBeenCalledTimes(1);
+    expect(v["waitForCacheContinuation"]).toHaveBeenCalledTimes(1);
 
     // TODO: assert timeouts
   });
 
   test("start caching from a pool which has a bundle proposal ongoing", async () => {
     // ARRANGE
-    core.pool = {
+    v.pool = {
       ...genesis_pool,
       data: {
         ...genesis_pool.data,
@@ -277,13 +280,13 @@ describe("cache tests", () => {
     } as any;
 
     // ACT
-    await runCache.call(core);
+    await runCache.call(v);
 
     // ASSERT
-    const txs = core["client"].kyve.bundles.v1beta1;
-    const queries = core["lcd"].kyve.query.v1beta1;
-    const cacheProvider = core["cacheProvider"];
-    const runtime = core["runtime"];
+    const txs = v["client"].kyve.bundles.v1beta1;
+    const queries = v["lcd"].kyve.query.v1beta1;
+    const cacheProvider = v["cacheProvider"];
+    const runtime = v["runtime"];
 
     // ========================
     // ASSERT CLIENT INTERFACES
@@ -376,8 +379,8 @@ describe("cache tests", () => {
     for (let n = 0; n < parseInt(genesis_pool.data.max_bundle_size) + 50; n++) {
       expect(runtime.getDataItem).toHaveBeenNthCalledWith(
         n + 1,
-        core,
-        core.poolConfig.sources[0],
+        v,
+        v.poolConfig.sources[0],
         (n + parseInt(genesis_pool.data.max_bundle_size)).toString()
       );
     }
@@ -393,7 +396,7 @@ describe("cache tests", () => {
       };
       expect(runtime.transformDataItem).toHaveBeenNthCalledWith(
         n + 1,
-        expect.any(Node),
+        expect.any(Validator),
         item
       );
     }
@@ -409,7 +412,7 @@ describe("cache tests", () => {
     for (let n = 0; n < parseInt(genesis_pool.data.max_bundle_size) + 50; n++) {
       expect(runtime.nextKey).toHaveBeenNthCalledWith(
         n + 1,
-        expect.any(Node),
+        expect.any(Validator),
         (n + parseInt(genesis_pool.data.max_bundle_size) - 1).toString()
       );
     }
@@ -421,21 +424,19 @@ describe("cache tests", () => {
     // ========================
 
     // assert that only one round ran
-    expect(core["waitForCacheContinuation"]).toHaveBeenCalledTimes(1);
+    expect(v["waitForCacheContinuation"]).toHaveBeenCalledTimes(1);
 
     // TODO: assert timeouts
   });
 
   test("continue caching from a pool which has a bundle proposal ongoing", async () => {
     // ARRANGE
-    core["cacheProvider"].exists = jest
-      .fn()
-      .mockImplementation((key: string) => {
-        const height = parseInt(key);
-        return height >= 100 && height <= 102;
-      });
+    v["cacheProvider"].exists = jest.fn().mockImplementation((key: string) => {
+      const height = parseInt(key);
+      return height >= 100 && height <= 102;
+    });
 
-    core.pool = {
+    v.pool = {
       ...genesis_pool,
       data: {
         ...genesis_pool.data,
@@ -459,13 +460,13 @@ describe("cache tests", () => {
     } as any;
 
     // ACT
-    await runCache.call(core);
+    await runCache.call(v);
 
     // ASSERT
-    const txs = core["client"].kyve.bundles.v1beta1;
-    const queries = core["lcd"].kyve.query.v1beta1;
-    const cacheProvider = core["cacheProvider"];
-    const runtime = core["runtime"];
+    const txs = v["client"].kyve.bundles.v1beta1;
+    const queries = v["lcd"].kyve.query.v1beta1;
+    const cacheProvider = v["cacheProvider"];
+    const runtime = v["runtime"];
 
     // ========================
     // ASSERT CLIENT INTERFACES
@@ -558,8 +559,8 @@ describe("cache tests", () => {
     for (let n = 0; n < parseInt(genesis_pool.data.max_bundle_size); n++) {
       expect(runtime.getDataItem).toHaveBeenNthCalledWith(
         n + 1,
-        core,
-        core.poolConfig.sources[0],
+        v,
+        v.poolConfig.sources[0],
         (n + parseInt(genesis_pool.data.max_bundle_size) + 3).toString()
       );
     }
@@ -575,7 +576,7 @@ describe("cache tests", () => {
       };
       expect(runtime.transformDataItem).toHaveBeenNthCalledWith(
         n + 1,
-        expect.any(Node),
+        expect.any(Validator),
         item
       );
     }
@@ -591,7 +592,7 @@ describe("cache tests", () => {
     for (let n = 0; n < parseInt(genesis_pool.data.max_bundle_size) + 3; n++) {
       expect(runtime.nextKey).toHaveBeenNthCalledWith(
         n + 1,
-        expect.any(Node),
+        expect.any(Validator),
         (n + 100 - 1).toString()
       );
     }
@@ -603,14 +604,14 @@ describe("cache tests", () => {
     // ========================
 
     // assert that only one round ran
-    expect(core["waitForCacheContinuation"]).toHaveBeenCalledTimes(1);
+    expect(v["waitForCacheContinuation"]).toHaveBeenCalledTimes(1);
 
     // TODO: assert timeouts
   });
 
   test("start caching from a pool where last bundle proposal was dropped", async () => {
     // ARRANGE
-    core.pool = {
+    v.pool = {
       ...genesis_pool,
       data: {
         ...genesis_pool.data,
@@ -633,13 +634,13 @@ describe("cache tests", () => {
     } as any;
 
     // ACT
-    await runCache.call(core);
+    await runCache.call(v);
 
     // ASSERT
-    const txs = core["client"].kyve.bundles.v1beta1;
-    const queries = core["lcd"].kyve.query.v1beta1;
-    const cacheProvider = core["cacheProvider"];
-    const runtime = core["runtime"];
+    const txs = v["client"].kyve.bundles.v1beta1;
+    const queries = v["lcd"].kyve.query.v1beta1;
+    const cacheProvider = v["cacheProvider"];
+    const runtime = v["runtime"];
 
     // ========================
     // ASSERT CLIENT INTERFACES
@@ -724,8 +725,8 @@ describe("cache tests", () => {
     for (let n = 0; n < parseInt(genesis_pool.data.max_bundle_size); n++) {
       expect(runtime.getDataItem).toHaveBeenNthCalledWith(
         n + 1,
-        core,
-        core.poolConfig.sources[0],
+        v,
+        v.poolConfig.sources[0],
         (n + parseInt(genesis_pool.data.max_bundle_size)).toString()
       );
     }
@@ -741,7 +742,7 @@ describe("cache tests", () => {
       };
       expect(runtime.transformDataItem).toHaveBeenNthCalledWith(
         n + 1,
-        expect.any(Node),
+        expect.any(Validator),
         item
       );
     }
@@ -757,7 +758,7 @@ describe("cache tests", () => {
     for (let n = 0; n < parseInt(genesis_pool.data.max_bundle_size); n++) {
       expect(runtime.nextKey).toHaveBeenNthCalledWith(
         n + 1,
-        expect.any(Node),
+        expect.any(Validator),
         (n + parseInt(genesis_pool.data.max_bundle_size) - 1).toString()
       );
     }
@@ -769,30 +770,30 @@ describe("cache tests", () => {
     // ========================
 
     // assert that only one round ran
-    expect(core["waitForCacheContinuation"]).toHaveBeenCalledTimes(1);
+    expect(v["waitForCacheContinuation"]).toHaveBeenCalledTimes(1);
 
     // TODO: assert timeouts
   });
 
   test("start caching from a pool where getNextDataItem fails once", async () => {
     // ARRANGE
-    core["runtime"].getDataItem = jest
+    v["runtime"].getDataItem = jest
       .fn()
-      .mockImplementationOnce((_: Node, __: string, key: string) =>
+      .mockImplementationOnce((_: Validator, __: string, key: string) =>
         Promise.resolve({
           key,
           value: `${key}-value`,
         })
       )
       .mockRejectedValueOnce(new Error("network error"))
-      .mockImplementation((_: Node, __: string, key: string) =>
+      .mockImplementation((_: Validator, __: string, key: string) =>
         Promise.resolve({
           key,
           value: `${key}-value`,
         })
       );
 
-    core.pool = {
+    v.pool = {
       ...genesis_pool,
       data: {
         ...genesis_pool.data,
@@ -801,13 +802,13 @@ describe("cache tests", () => {
     } as any;
 
     // ACT
-    await runCache.call(core);
+    await runCache.call(v);
 
     // ASSERT
-    const txs = core["client"].kyve.bundles.v1beta1;
-    const queries = core["lcd"].kyve.query.v1beta1;
-    const cacheProvider = core["cacheProvider"];
-    const runtime = core["runtime"];
+    const txs = v["client"].kyve.bundles.v1beta1;
+    const queries = v["lcd"].kyve.query.v1beta1;
+    const cacheProvider = v["cacheProvider"];
+    const runtime = v["runtime"];
 
     // ========================
     // ASSERT CLIENT INTERFACES
@@ -883,20 +884,20 @@ describe("cache tests", () => {
 
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       1,
-      expect.any(Node),
-      core.poolConfig.sources[0],
+      expect.any(Validator),
+      v.poolConfig.sources[0],
       "0"
     );
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       2,
-      expect.any(Node),
-      core.poolConfig.sources[0],
+      expect.any(Validator),
+      v.poolConfig.sources[0],
       "1"
     );
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       3,
-      expect.any(Node),
-      core.poolConfig.sources[0],
+      expect.any(Validator),
+      v.poolConfig.sources[0],
       "1"
     );
 
@@ -909,7 +910,7 @@ describe("cache tests", () => {
       };
       expect(runtime.transformDataItem).toHaveBeenNthCalledWith(
         n + 1,
-        expect.any(Node),
+        expect.any(Validator),
         item
       );
     }
@@ -924,7 +925,7 @@ describe("cache tests", () => {
     for (let n = 0; n < 2 - 1; n++) {
       expect(runtime.nextKey).toHaveBeenNthCalledWith(
         n + 1,
-        expect.any(Node),
+        expect.any(Validator),
         n.toString()
       );
     }
@@ -936,44 +937,42 @@ describe("cache tests", () => {
     // ========================
 
     // assert that only one round ran
-    expect(core["waitForCacheContinuation"]).toHaveBeenCalledTimes(1);
+    expect(v["waitForCacheContinuation"]).toHaveBeenCalledTimes(1);
 
     // TODO: assert timeouts
   });
 
   test("start caching from a pool where getNextDataItem fails multiple times", async () => {
     // ARRANGE
-    core["runtime"].getDataItem = jest
+    v["runtime"].getDataItem = jest
       .fn()
-      .mockImplementationOnce((_: Node, __: string, key: string) =>
+      .mockImplementationOnce((_: Validator, __: string, key: string) =>
         Promise.resolve({
           key,
           value: `${key}-value`,
         })
       )
       .mockRejectedValueOnce(new Error("network error"))
-      .mockImplementationOnce((_: Node, __: string, key: string) =>
+      .mockImplementationOnce((_: Validator, __: string, key: string) =>
         Promise.resolve({
           key,
           value: `${key}-value`,
         })
       )
       .mockRejectedValueOnce(new Error("network error"))
-      .mockImplementation((_: Node, __: string, key: string) =>
+      .mockImplementation((_: Validator, __: string, key: string) =>
         Promise.resolve({
           key,
           value: `${key}-value`,
         })
       );
 
-    core["cacheProvider"].exists = jest
-      .fn()
-      .mockImplementation((key: string) => {
-        const height = parseInt(key);
-        return height >= 100 && height <= 102;
-      });
+    v["cacheProvider"].exists = jest.fn().mockImplementation((key: string) => {
+      const height = parseInt(key);
+      return height >= 100 && height <= 102;
+    });
 
-    core.pool = {
+    v.pool = {
       ...genesis_pool,
       data: {
         ...genesis_pool.data,
@@ -997,13 +996,13 @@ describe("cache tests", () => {
     } as any;
 
     // ACT
-    await runCache.call(core);
+    await runCache.call(v);
 
     // ASSERT
-    const txs = core["client"].kyve.bundles.v1beta1;
-    const queries = core["lcd"].kyve.query.v1beta1;
-    const cacheProvider = core["cacheProvider"];
-    const runtime = core["runtime"];
+    const txs = v["client"].kyve.bundles.v1beta1;
+    const queries = v["lcd"].kyve.query.v1beta1;
+    const cacheProvider = v["cacheProvider"];
+    const runtime = v["runtime"];
 
     // ========================
     // ASSERT CLIENT INTERFACES
@@ -1095,57 +1094,57 @@ describe("cache tests", () => {
 
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       1,
-      core,
-      core.poolConfig.sources[0],
+      v,
+      v.poolConfig.sources[0],
       (0 + parseInt(genesis_pool.data.max_bundle_size) + 3).toString()
     );
 
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       2,
-      core,
-      core.poolConfig.sources[0],
+      v,
+      v.poolConfig.sources[0],
       (1 + parseInt(genesis_pool.data.max_bundle_size) + 3).toString()
     );
 
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       3,
-      core,
-      core.poolConfig.sources[0],
+      v,
+      v.poolConfig.sources[0],
       (1 + parseInt(genesis_pool.data.max_bundle_size) + 3).toString()
     );
 
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       4,
-      core,
-      core.poolConfig.sources[0],
+      v,
+      v.poolConfig.sources[0],
       (2 + parseInt(genesis_pool.data.max_bundle_size) + 3).toString()
     );
 
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       5,
-      core,
-      core.poolConfig.sources[0],
+      v,
+      v.poolConfig.sources[0],
       (2 + parseInt(genesis_pool.data.max_bundle_size) + 3).toString()
     );
 
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       6,
-      core,
-      core.poolConfig.sources[0],
+      v,
+      v.poolConfig.sources[0],
       (3 + parseInt(genesis_pool.data.max_bundle_size) + 3).toString()
     );
 
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       7,
-      core,
-      core.poolConfig.sources[0],
+      v,
+      v.poolConfig.sources[0],
       (4 + parseInt(genesis_pool.data.max_bundle_size) + 3).toString()
     );
 
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       8,
-      core,
-      core.poolConfig.sources[0],
+      v,
+      v.poolConfig.sources[0],
       (5 + parseInt(genesis_pool.data.max_bundle_size) + 3).toString()
     );
 
@@ -1162,7 +1161,7 @@ describe("cache tests", () => {
       };
       expect(runtime.transformDataItem).toHaveBeenNthCalledWith(
         n + 1,
-        expect.any(Node),
+        expect.any(Validator),
         item
       );
     }
@@ -1178,7 +1177,7 @@ describe("cache tests", () => {
     for (let n = 0; n < parseInt(genesis_pool.data.max_bundle_size) + 3; n++) {
       expect(runtime.nextKey).toHaveBeenNthCalledWith(
         n + 1,
-        expect.any(Node),
+        expect.any(Validator),
         (n + 100 - 1).toString()
       );
     }
@@ -1190,36 +1189,36 @@ describe("cache tests", () => {
     // ========================
 
     // assert that only one round ran
-    expect(core["waitForCacheContinuation"]).toHaveBeenCalledTimes(1);
+    expect(v["waitForCacheContinuation"]).toHaveBeenCalledTimes(1);
 
     // TODO: assert timeouts
   });
 
   test("start caching from a pool where transformDataItem fails", async () => {
     // ARRANGE
-    core["runtime"].transformDataItem = jest
+    v["runtime"].transformDataItem = jest
       .fn()
-      .mockImplementationOnce((_: Node, item: DataItem) =>
+      .mockImplementationOnce((_: Validator, item: DataItem) =>
         Promise.resolve({
           key: item.key,
           value: `${item.value}-transform`,
         })
       )
-      .mockImplementationOnce((_: Node, item: DataItem) =>
+      .mockImplementationOnce((_: Validator, item: DataItem) =>
         Promise.resolve({
           key: item.key,
           value: `${item.value}-transform`,
         })
       )
       .mockRejectedValueOnce(new Error())
-      .mockImplementation((_: Node, item: DataItem) =>
+      .mockImplementation((_: Validator, item: DataItem) =>
         Promise.resolve({
           key: item.key,
           value: `${item.value}-transform`,
         })
       );
 
-    core.pool = {
+    v.pool = {
       ...genesis_pool,
       data: {
         ...genesis_pool.data,
@@ -1228,13 +1227,13 @@ describe("cache tests", () => {
     } as any;
 
     // ACT
-    await runCache.call(core);
+    await runCache.call(v);
 
     // ASSERT
-    const txs = core["client"].kyve.bundles.v1beta1;
-    const queries = core["lcd"].kyve.query.v1beta1;
-    const cacheProvider = core["cacheProvider"];
-    const runtime = core["runtime"];
+    const txs = v["client"].kyve.bundles.v1beta1;
+    const queries = v["lcd"].kyve.query.v1beta1;
+    const cacheProvider = v["cacheProvider"];
+    const runtime = v["runtime"];
 
     // ========================
     // ASSERT CLIENT INTERFACES
@@ -1323,8 +1322,8 @@ describe("cache tests", () => {
     for (let n = 0; n < 5; n++) {
       expect(runtime.getDataItem).toHaveBeenNthCalledWith(
         n + 1,
-        expect.any(Node),
-        core.poolConfig.sources[0],
+        expect.any(Validator),
+        v.poolConfig.sources[0],
         n.toString()
       );
     }
@@ -1338,7 +1337,7 @@ describe("cache tests", () => {
       };
       expect(runtime.transformDataItem).toHaveBeenNthCalledWith(
         n + 1,
-        expect.any(Node),
+        expect.any(Validator),
         item
       );
     }
@@ -1353,7 +1352,7 @@ describe("cache tests", () => {
     for (let n = 0; n < 5 - 1; n++) {
       expect(runtime.nextKey).toHaveBeenNthCalledWith(
         n + 1,
-        expect.any(Node),
+        expect.any(Validator),
         n.toString()
       );
     }
@@ -1365,16 +1364,16 @@ describe("cache tests", () => {
     // ========================
 
     // assert that only one round ran
-    expect(core["waitForCacheContinuation"]).toHaveBeenCalledTimes(1);
+    expect(v["waitForCacheContinuation"]).toHaveBeenCalledTimes(1);
 
     // TODO: assert timeouts
   });
 
   test("start caching from a pool where nextKey fails", async () => {
     // ARRANGE
-    core["runtime"].nextKey = jest.fn().mockRejectedValue(new Error());
+    v["runtime"].nextKey = jest.fn().mockRejectedValue(new Error());
 
-    core.pool = {
+    v.pool = {
       ...genesis_pool,
       data: {
         ...genesis_pool.data,
@@ -1398,13 +1397,13 @@ describe("cache tests", () => {
     } as any;
 
     // ACT
-    await runCache.call(core);
+    await runCache.call(v);
 
     // ASSERT
-    const txs = core["client"].kyve.bundles.v1beta1;
-    const queries = core["lcd"].kyve.query.v1beta1;
-    const cacheProvider = core["cacheProvider"];
-    const runtime = core["runtime"];
+    const txs = v["client"].kyve.bundles.v1beta1;
+    const queries = v["lcd"].kyve.query.v1beta1;
+    const cacheProvider = v["cacheProvider"];
+    const runtime = v["runtime"];
 
     // ========================
     // ASSERT CLIENT INTERFACES
@@ -1479,7 +1478,11 @@ describe("cache tests", () => {
 
     expect(runtime.nextKey).toHaveBeenCalledTimes(1);
 
-    expect(runtime.nextKey).toHaveBeenNthCalledWith(1, expect.any(Node), "99");
+    expect(runtime.nextKey).toHaveBeenNthCalledWith(
+      1,
+      expect.any(Validator),
+      "99"
+    );
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(0);
 
@@ -1488,18 +1491,16 @@ describe("cache tests", () => {
     // ========================
 
     // assert that only one round ran
-    expect(core["waitForCacheContinuation"]).toHaveBeenCalledTimes(0);
+    expect(v["waitForCacheContinuation"]).toHaveBeenCalledTimes(0);
 
     // TODO: assert timeouts
   });
 
   test("start caching from a pool where cache methods fail", async () => {
     // ARRANGE
-    core["cacheProvider"].put = jest
-      .fn()
-      .mockRejectedValue(new Error("io error"));
+    v["cacheProvider"].put = jest.fn().mockRejectedValue(new Error("io error"));
 
-    core.pool = {
+    v.pool = {
       ...genesis_pool,
       data: {
         ...genesis_pool.data,
@@ -1523,13 +1524,13 @@ describe("cache tests", () => {
     } as any;
 
     // ACT
-    await runCache.call(core);
+    await runCache.call(v);
 
     // ASSERT
-    const txs = core["client"].kyve.bundles.v1beta1;
-    const queries = core["lcd"].kyve.query.v1beta1;
-    const cacheProvider = core["cacheProvider"];
-    const runtime = core["runtime"];
+    const txs = v["client"].kyve.bundles.v1beta1;
+    const queries = v["lcd"].kyve.query.v1beta1;
+    const cacheProvider = v["cacheProvider"];
+    const runtime = v["runtime"];
 
     // ========================
     // ASSERT CLIENT INTERFACES
@@ -1600,8 +1601,8 @@ describe("cache tests", () => {
 
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       1,
-      core,
-      core.poolConfig.sources[0],
+      v,
+      v.poolConfig.sources[0],
       "100"
     );
 
@@ -1609,7 +1610,7 @@ describe("cache tests", () => {
 
     expect(runtime.transformDataItem).toHaveBeenNthCalledWith(
       1,
-      expect.any(Node),
+      expect.any(Validator),
       {
         key: "100",
         value: `100-value`,
@@ -1620,7 +1621,11 @@ describe("cache tests", () => {
 
     expect(runtime.nextKey).toHaveBeenCalledTimes(1);
 
-    expect(runtime.nextKey).toHaveBeenNthCalledWith(1, expect.any(Node), "99");
+    expect(runtime.nextKey).toHaveBeenNthCalledWith(
+      1,
+      expect.any(Validator),
+      "99"
+    );
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(0);
 
@@ -1629,7 +1634,7 @@ describe("cache tests", () => {
     // ========================
 
     // assert that only one round ran
-    expect(core["waitForCacheContinuation"]).toHaveBeenCalledTimes(0);
+    expect(v["waitForCacheContinuation"]).toHaveBeenCalledTimes(0);
 
     // TODO: assert timeouts
   });

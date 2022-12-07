@@ -1,4 +1,4 @@
-import { Node } from "../..";
+import { Validator } from "../..";
 import { callWithBackoffStrategy, standardizeJSON } from "../../utils";
 
 /**
@@ -9,10 +9,10 @@ import { callWithBackoffStrategy, standardizeJSON } from "../../utils";
  * because without the newest state the node can't continue.
  *
  * @method syncPoolState
- * @param {Node} this
+ * @param {Validator} this
  * @return {Promise<void>}
  */
-export async function syncPoolState(this: Node): Promise<void> {
+export async function syncPoolState(this: Validator): Promise<void> {
   await callWithBackoffStrategy(
     async () => {
       this.logger.debug(
