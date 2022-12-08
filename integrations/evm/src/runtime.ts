@@ -12,33 +12,14 @@ export default class Evm implements IRuntime {
     source: string,
     key: string
   ): Promise<DataItem> {
-    // set network settings if available
-    let network;
-
-    if (v.poolConfig.chainId && v.poolConfig.chainName) {
-      network = {
-        chainId: v.poolConfig.chainId,
-        name: v.poolConfig.chainName,
-      };
-    }
-
     // get auth headers for proxy endpoints
     const headers = await v.getProxyAuth();
 
-    // setup web3 provider
-    const provider = new providers.StaticJsonRpcProvider(
-      {
-        url: source,
-        headers,
-      },
-      network
-    );
-
-    // fetch data item
+    const provider = new providers.StaticJsonRpcProvider({
+      url: source,
+      headers,
+    });
     const value = await provider.getBlockWithTransactions(+key);
-
-    // throw if data item is not available
-    if (!value) throw new Error();
 
     return {
       key,
@@ -46,9 +27,9 @@ export default class Evm implements IRuntime {
     };
   }
 
-  async prevalidateDataItem(_: Validator, __: DataItem): Promise<boolean> {
-    // TODO: return valid for now
-    return true;
+  async prevalidateDataItem(_: Validator, item: DataItem): Promise<boolean> {
+    // check if item value is not null
+    return !!item.value;
   }
 
   async transformDataItem(_: Validator, item: DataItem): Promise<DataItem> {

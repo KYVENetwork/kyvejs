@@ -14,19 +14,19 @@ export default class Cosmos implements IRuntime {
     // get auth headers for proxy endpoints
     const headers = await v.getProxyAuth();
 
-    const { data } = await axios.get(
+    const { data: value } = await axios.get(
       `${source}/cosmos/base/tendermint/v1beta1/blocks/${key}`,
       {
         headers,
       }
     );
 
-    return { key, value: data };
+    return { key, value };
   }
 
-  async prevalidateDataItem(_: Validator, __: DataItem): Promise<boolean> {
-    // TODO: return valid for now
-    return true;
+  async prevalidateDataItem(_: Validator, item: DataItem): Promise<boolean> {
+    // check if item value is not null
+    return !!item.value;
   }
 
   async transformDataItem(_: Validator, item: DataItem): Promise<DataItem> {
