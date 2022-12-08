@@ -181,7 +181,7 @@ export class Validator {
       .action(() => {
         console.log(`${this.runtime.name} version: ${this.runtime.version}`);
         console.log(`@kyvejs/protocol version: ${this.protocolVersion}`);
-        console.log(`Validator version: ${process.version}`);
+        console.log(`Node version: ${process.version}`);
         console.log();
         console.log(`Platform: ${os.platform()}`);
         console.log(`Arch: ${os.arch()}`);

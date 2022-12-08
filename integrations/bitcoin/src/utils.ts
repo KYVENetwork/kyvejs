@@ -10,9 +10,6 @@ export async function fetchBlock(
 ): Promise<any> {
   const block = await call<any>(endpoint, "getblock", [hash, 2], headers);
 
-  // Remove confirmations to maintain determinism.
-  delete block.confirmations;
-
   return block;
 }
 

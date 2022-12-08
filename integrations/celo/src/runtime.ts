@@ -1,7 +1,8 @@
+import { StaticCeloProvider } from '@celo-tools/celo-ethers-wrapper';
 import { DataItem, IRuntime, Validator, sha256 } from '@kyvejs/protocol';
+import { providers } from 'ethers';
 
 import { name, version } from '../package.json';
-import { fetchBlock } from './utils';
 
 export default class Celo implements IRuntime {
   public name = name;
@@ -15,20 +16,26 @@ export default class Celo implements IRuntime {
     // get auth headers for proxy endpoints
     const headers = await v.getProxyAuth();
 
-    const block = await fetchBlock(source, +key, headers);
+    const provider = new StaticCeloProvider({ url: source, headers });
+    const value = await provider.getBlockWithTransactions(+key);
 
-    if (!block) throw new Error();
-
-    return { key, value: block };
+    return { key, value };
   }
 
-  async prevalidateDataItem(_: Validator, __: DataItem): Promise<boolean> {
-    // TODO: return valid for now
-    return true;
+  async prevalidateDataItem(_: Validator, item: DataItem): Promise<boolean> {
+    // check if item value is not null
+    return !!item.value;
   }
 
   async transformDataItem(_: Validator, item: DataItem): Promise<DataItem> {
-    // don't transform data item
+    // Delete the number of confirmations from a transaction to maintain determinism.
+    item.value.transactions.forEach(
+      (tx: Partial<providers.TransactionResponse>) => delete tx.confirmations
+    );
+
+    // TODO: Figure out why `extraData` varies for some blocks.
+    delete item.value.extraData;
+
     return item;
   }
 

@@ -58,7 +58,7 @@ export async function waitForAuthorization(this: Validator): Promise<void> {
         `Valaccount ${this.client.account.address} has not joined the pool with id ${this.poolId} yet`
       );
       this.logger.info(
-        `Visit https://app.kyve.network/#/pools/${this.poolId} and add join the pool with the following information:\n`
+        `Visit https://app.kyve.network and join the pool from your validator account:\n`
       );
 
       this.logger.info(`Valaddress:    ${this.client.account.address}`);

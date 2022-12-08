@@ -21,13 +21,16 @@ export default class Bitcoin implements IRuntime {
     return { key, value: block };
   }
 
-  async prevalidateDataItem(_: Validator, __: DataItem): Promise<boolean> {
-    // TODO: validate if PoW is valid, return valid for now
-    return true;
+  async prevalidateDataItem(_: Validator, item: DataItem): Promise<boolean> {
+    // TODO: maybe validate if PoW is valid
+    // check if item value is not null
+    return !!item.value;
   }
 
   async transformDataItem(_: Validator, item: DataItem): Promise<DataItem> {
-    // don't transform data item
+    // Remove confirmations to maintain determinism.
+    delete item.value.confirmations;
+
     return item;
   }
 
@@ -55,24 +58,5 @@ export default class Bitcoin implements IRuntime {
 
   public async nextKey(_: Validator, key: string): Promise<string> {
     return (parseInt(key) + 1).toString();
-  }
-
-  private async generateCoinbaseCloudHeaders(v: Validator): Promise<any> {
-    // requestSignature for coinbase cloud
-    const address = v.client.account.address;
-    const timestamp = new Date().valueOf().toString();
-    const poolId = v.pool.id;
-
-    const { signature, pub_key } = await v.client.signString(
-      `${address}//${poolId}//${timestamp}`
-    );
-
-    return {
-      "Content-Type": "application/json",
-      Signature: signature,
-      "Public-Key": pub_key.value,
-      "Pool-ID": poolId,
-      Timestamp: timestamp,
-    };
   }
 }
