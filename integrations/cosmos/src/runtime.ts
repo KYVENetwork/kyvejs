@@ -1,5 +1,5 @@
 import { DataItem, IRuntime, Validator, sha256 } from '@kyvejs/protocol';
-import axios from 'axios';
+import { fetchBlock } from './utils';
 import { name, version } from '../package.json';
 
 export default class Cosmos implements IRuntime {
@@ -13,13 +13,7 @@ export default class Cosmos implements IRuntime {
   ): Promise<DataItem> {
     // get auth headers for proxy endpoints
     const headers = await v.getProxyAuth();
-
-    const { data: value } = await axios.get(
-      `${source}/cosmos/base/tendermint/v1beta1/blocks/${key}`,
-      {
-        headers,
-      }
-    );
+    const value = await fetchBlock(source, +key, headers);
 
     return { key, value };
   }
