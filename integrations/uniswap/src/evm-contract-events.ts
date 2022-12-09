@@ -37,9 +37,6 @@ export default class Evm implements IRuntime {
       toBlock: parseInt(key),
     });
 
-    // throw if data item is not available
-    if (!value) throw new Error();
-
     return {
       key,
       value,
