@@ -6,6 +6,7 @@ on:
       - '*'
 jobs:
   prepare:
+    name: 'Check integrations for release'
     runs-on: ubuntu-latest
     outputs:
       output: ${{ steps.set_env.outputs.test }}
@@ -14,7 +15,7 @@ jobs:
         uses: actions/checkout@main
         with:
           ref: 'main'
-      - name: featch tags
+      - name: fetch tags
         run: git fetch --tags
       - name: collect integrations names
         run: |
@@ -42,6 +43,7 @@ jobs:
   build:
     if: needs.prepare.outputs.output != '[]'
     runs-on: ubuntu-latest
+    name: 'Integrations build & release'
     needs: prepare
     strategy:
       matrix:
