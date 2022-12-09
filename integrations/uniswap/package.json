@@ -1,10 +1,10 @@
 {
-  "name": "@kyve/uniswap",
+  "name": "@kyvejs/uniswap",
   "version": "1.0.0-beta.1",
   "license": "MIT",
   "scripts": {
     "build": "rimraf dist && tsc",
-    "build:binaries": "yarn build && rimraf out && pkg --no-bytecode --public-packages '*' --output out/kyve package.json && node ../../common/core/dist/src/scripts/checksum.js",
+    "build:binaries": "yarn build && rimraf out && pkg --no-bytecode --public-packages '*' --output out/kyve package.json && node ../../common/protocol/dist/src/scripts/checksum.js",
     "start": "node ./dist/src/index.js",
     "format": "prettier --write .",
     "lint": "eslint . --ignore-path ../../.eslintignore --ext ts --ext tsx --ext js --ext jsx",
