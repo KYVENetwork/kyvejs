@@ -1,5 +1,5 @@
 import { DataItem, IRuntime, Validator, sha256 } from '@kyvejs/protocol';
-import { providers, utils } from "ethers";
+import { providers, utils } from 'ethers';
 
 // Method to get the named args
 const parseArgs = (struct: any) => {
@@ -88,7 +88,7 @@ export default class Evm implements IRuntime {
     return proposedDataItemHash === validationDataItemHash;
   }
 
-  async summarizeDataBundle(_: Validator, bundle: DataItem[]): Promise<string> {
+  async summarizeDataBundle(_: Validator, __: DataItem[]): Promise<string> {
     return '';
   }
 
