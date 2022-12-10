@@ -1467,32 +1467,6 @@
     big-integer "^1.6.48"
     utility-types "^3.10.0"
 
-"@kyvejs/protocol@1.0.0-beta.1":
-  version "1.0.0-beta.1"
-  resolved "https://registry.yarnpkg.com/@kyvejs/protocol/-/protocol-1.0.0-beta.1.tgz#9edfa171ed663486dae89ea5a2390468ac68ec8f"
-  integrity sha512-17wUi9HsxSckaiVtZFwiMe/WMi7mS1tFnnehG/P8hC+VRRg3GjA/9QA9LeHH+DM1RHyvTFHfnpMYKxN+K8YigQ==
-  dependencies:
-    "@bundlr-network/client" "^0.8.9"
-    "@cosmjs/proto-signing" "^0.27.1"
-    "@cosmjs/stargate" "^0.27.1"
-    "@kyvejs/sdk" "1.0.0-beta.1"
-    "@kyvejs/types" "1.0.0-beta.1"
-    "@types/cli-progress" "^3.9.2"
-    "@types/jsonfile" "^6.0.1"
-    arweave "^1.10.17"
-    axios "^0.24.0"
-    bignumber.js "^9.0.1"
-    commander "^9.4.1"
-    fs-extra "^10.0.1"
-    jsonfile "^6.1.0"
-    level "^8.0.0"
-    prando "^6.0.1"
-    prom-client "^14.1.0"
-    protobufjs "^6.11.2"
-    seedrandom "^3.0.5"
-    tslog "^3.2.2"
-    unique-names-generator "^4.6.0"
-
 "@lerna/add@6.1.0":
   version "6.1.0"
   resolved "https://registry.yarnpkg.com/@lerna/add/-/add-6.1.0.tgz#0f09495c5e1af4c4f316344af34b6d1a91b15b19"
