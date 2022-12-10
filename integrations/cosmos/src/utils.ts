@@ -45,10 +45,14 @@ async function fetchTransactions(
       );
 
       txs.push(tx.tx_response);
-    } catch {
-      txs.push(null);
+    } catch (err: any) {
+      if (err.response.status === 400) {
+        txs.push(null);
+      } else {
+        throw err;
+      }
     } finally {
-      await sleep(500);
+      await sleep(1000);
     }
   }
 
