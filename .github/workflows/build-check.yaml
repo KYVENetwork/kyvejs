@@ -1,0 +1,17 @@
+name: Build check
+on:
+  - pull_request
+
+jobs:
+  build-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "checkout repo"
+        uses: actions/checkout@v3
+      - name: install yarn
+        run: npm install --global yarn
+      - name: "setup"
+        run: yarn setup
+      - name: "build:binaries"
+        working-directory: .
+        run: yarn build:binaries
