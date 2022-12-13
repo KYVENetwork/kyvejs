@@ -1,8 +1,10 @@
 import { StdSignature } from "@cosmjs/amino";
+import { StdFee } from "@cosmjs/amino/build/signdoc";
 import { AccountData, OfflineAminoSigner } from "@cosmjs/amino/build/signer";
 import { SigningStargateClient } from "@cosmjs/stargate";
 import { makeADR36AminoSignDoc } from "@keplr-wallet/cosmos";
 
+import { signTx, TxPromise } from "../../utils/helper";
 import KyveBaseMethods from "./kyve/base/v1beta1/base";
 import KyveBundlesMethods from "./kyve/bundles/v1beta1/bundles";
 import KyveDelegationMethods from "./kyve/delegation/v1beta1/delegation";
@@ -73,5 +75,18 @@ export default class KyveClient {
       signDoc
     );
     return signature;
+  }
+  async txsAll(
+    txs: TxPromise[],
+    options?: {
+      fee?: StdFee | "auto" | number;
+      memo?: string;
+    }
+  ) {
+    const txMessages = txs.map((tx) => tx.tx).flat();
+    return new TxPromise(
+      this.nativeClient,
+      await signTx(this.nativeClient, this.account.address, txMessages, options)
+    );
   }
 }
