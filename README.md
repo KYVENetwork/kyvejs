@@ -21,13 +21,13 @@
 </div>
 
 <div align="center">
-  <a href="https://twitter.com/KYVENetwork">
+  <a href="https://twitter.com/KYVENetwork" target="_blank">
     <img alt="Twitter" src="https://badgen.net/badge/icon/twitter?icon=twitter&label" />
   </a>
-  <a href="https://discord.com/invite/kyve">
+  <a href="https://discord.com/invite/kyve" target="_blank">
     <img alt="Discord" src="https://badgen.net/badge/icon/discord?icon=discord&label" />
   </a>
-  <a href="https://t.me/kyvenet">
+  <a href="https://t.me/kyvenet" target="_blank">
     <img alt="Telegram" src="https://badgen.net/badge/icon/telegram?icon=telegram&label" />
   </a>
 </div>
