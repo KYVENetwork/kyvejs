@@ -1,10 +1,15 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
+    "lib": [
+      "dom",
+      "esNext"
+    ],
     "declaration": true,
     "esModuleInterop": true,
     "outDir": "dist",
-    "strict": true
+    "strict": true,
+    "moduleResolution": "node"
   },
   "include": ["src/types/"],
   "files": ["src/index.ts"]

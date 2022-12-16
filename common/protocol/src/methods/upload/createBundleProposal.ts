@@ -1,6 +1,11 @@
 import { Validator } from "../..";
 import { BundleTag, DataItem } from "../../types";
-import { bundleToBytes, sha256, standardizeJSON } from "../../utils";
+import {
+  bundleToBytes,
+  MAX_BUNDLE_BYTE_SIZE,
+  sha256,
+  standardizeJSON,
+} from "../../utils";
 
 /**
  * createBundleProposal assembles a bundle proposal by loading
@@ -105,11 +110,23 @@ export async function createBundleProposal(this: Validator): Promise<void> {
       this.pool.data?.current_compression_id ?? 0
     );
 
+    const uploadBundle = bundleToBytes(bundleProposal);
+
+    // check if raw bundle size is below the max limit
+    if (uploadBundle.byteLength > MAX_BUNDLE_BYTE_SIZE) {
+      this.logger.info(
+        `Bundle with byte size ${uploadBundle.byteLength} is too big (MAX_BUNDLE_BYTE_SIZE=${MAX_BUNDLE_BYTE_SIZE})`
+      );
+
+      await this.skipUploaderRole(fromIndex);
+      return;
+    }
+
     // if data was found on the cache proceed with compressing the
     // bundle for the upload to the storage provider
     this.logger.debug(`this.compression.compress($RAW_BUNDLE_PROPOSAL)`);
     const storageProviderData = await compression
-      .compress(bundleToBytes(bundleProposal))
+      .compress(uploadBundle)
       .catch((err) => {
         this.logger.error(
           `Unexpected error compressing bundle. Skipping Uploader Role ...`
