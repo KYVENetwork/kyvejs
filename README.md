@@ -8,6 +8,32 @@
 <strong>Tools for building applications on KYVE</strong>
 </p>
 
+<br/>
+
+<div align="center">
+  <img alt="License: Apache-2.0" src="https://badgen.net/github/license/KYVENetwork/kyvejs?color=green" />
+
+  <img alt="License: Apache-2.0" src="https://badgen.net/github/stars/KYVENetwork/kyvejs?color=green" />
+
+  <img alt="License: Apache-2.0" src="https://badgen.net/github/contributors/KYVENetwork/kyvejs?color=green" />
+
+  <img alt="License: Apache-2.0" src="https://badgen.net/github/releases/KYVENetwork/kyvejs?color=green" />
+</div>
+
+<div align="center">
+  <a href="https://twitter.com/KYVENetwork" target="_blank">
+    <img alt="Twitter" src="https://badgen.net/badge/icon/twitter?icon=twitter&label" />
+  </a>
+  <a href="https://discord.com/invite/kyve" target="_blank">
+    <img alt="Discord" src="https://badgen.net/badge/icon/discord?icon=discord&label" />
+  </a>
+  <a href="https://t.me/kyvenet" target="_blank">
+    <img alt="Telegram" src="https://badgen.net/badge/icon/telegram?icon=telegram&label" />
+  </a>
+</div>
+
+<br/>
+
 KYVE, the Web3 data lake solution, is a protocol that enables data providers to standardize, validate, and permanently store blockchain data streams. By leveraging permanent data storage solutions like Arweave, KYVE’s Cosmos SDK chain creates permanent backups and ensures the scalability, immutability, and availability of these resources over time.
 
 ## Project Overview
@@ -28,6 +54,7 @@ KYVE, the Web3 data lake solution, is a protocol that enables data providers to 
 - [@kyvejs/celo](integrations/celo/README.md) - The official KYVE Celo integration
 - [@kyvejs/cosmos](integrations/cosmos/README.md) - The official KYVE Cosmos integration
 - [@kyvejs/evm](integrations/evm/README.md) - The official KYVE EVM integration
+- [@kyvejs/uniswap](integrations/uniswap/README.md) - The official KYVE Uniswap integration
 
 ## How to contribute
 
