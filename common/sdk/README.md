@@ -100,7 +100,7 @@ We are highly recommend to use typescript for better intellisense and type safet
 
 [//]: # (# todo: create better naming for this. TransactionPromise is not a good name)
 
-Each transaction returns a transaction promise. It's a not executed transaction. It's helpful because you can get the transaction hash before executed.
+Each transaction returns a transaction promise. It's a not execute transaction. It's helpful because you can get the transaction hash before executed.
 ```ts
     const transferTxPromise = await client.kyve.base.v1beta1.transfer('kyve1qcual...', '1000000000');
     transferTxPromise.txHash // returns transaction hash
