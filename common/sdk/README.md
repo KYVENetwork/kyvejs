@@ -134,7 +134,7 @@ const multiTransferTxPromise = await sdkInstance.kyve.base.v1beta1.multiTransfer
 Any transaction can be added to the `txsAll` method. Also, you can pass to `txsAll` result of another `txsAll` method.
 
 ```ts
-    const txsAllResultPromise = await sdkInstance.txsAll([txsAllResultPromise, transferTxPromise]);
+    const txsAllResultPromise = await sdkInstance.txsAll([await sdkInstance.txsAll([trx1, trx2]), transferTxPromise]);
     const receipt = await txsAllResultPromise.execute();
 ```
 The approach is same like you work with JavaScript `Promise` and `Promise.all` methods.
