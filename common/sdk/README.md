@@ -31,7 +31,7 @@ yarn add @kyvejs/sdk
 
 ### Table of contents
  - [Configuring an sdk](#configuring-an-sdk)
- - [Initiate client](#initiate-client])
+ - [Initiate client](#initiate-client)
  - [Transactions](#transactions)
  - [Transactions all](#transactions-all)
  - [Queries](#queries)
