@@ -137,7 +137,7 @@ Any transaction can be added to the `txsAll` method. Also, you can pass to `txsA
     const txsAllResultPromise = await sdkInstance.txsAll([txsAllResultPromise, transferTxPromise]);
     const receipt = await txsAllResultPromise.execute();
 ```
-The approach is same like you work with JavaScript `Promise` and `Promise.all` method.
+The approach is same like you work with JavaScript `Promise` and `Promise.all` methods.
 
 ## Queries
 To interact with the Kyve blockchain rest api, you can use `lcdClient`.
