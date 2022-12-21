@@ -107,7 +107,8 @@ Each transaction returns a transaction promise. It's a not executed transaction.
     const receipt = await transferTxPromise.execute();
 ```
 ### Cosmos transactions
-@kyve/sdk is a wrapper around Cosmjs. You can access cosmos [SigningStargateClient](https://cosmos.github.io/cosmjs/latest/stargate/classes/SigningStargateClient.html) instance with `nativeClient` property.
+
+@kyve/sdk is a wrapper around Cosmjs, you can access Cosmjs [SigningStargateClient](https://cosmos.github.io/cosmjs/latest/stargate/classes/SigningStargateClient.html) instance with `nativeClient` property.
 ```ts
     const tx = await client.nativeClient.signAndBroadcast(
       wallet.address,
