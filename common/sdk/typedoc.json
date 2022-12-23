@@ -1,7 +1,8 @@
 {
-  "entryPoints": ["./src/index.ts"],
+  "entryPoints": ["./src"],
   "includes": ["./src"],
   "out": "docs",
+  "entryPointStrategy": "expand",
   "excludeExternals": false,
   "theme": "default",
   "name": "@kyvejs/sdk",
