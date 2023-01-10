@@ -31,14 +31,15 @@ export const parseKeyfile = (value: string): string => {
   return value;
 };
 
-export const parseNetwork = (value: string): string => {
-  if (!["local", "alpha", "beta", "korellia"].includes(value)) {
+export const parseEndpoints = (value: string): string[] => {
+  try {
+    console.log(value);
+    return value.split(",").map((v) => v.trim());
+  } catch (err) {
     throw new commander.InvalidArgumentError(
-      "Network must be either 'local', 'alpha', 'beta' or 'korellia'."
+      "Endpoints must be comma separated string"
     );
   }
-
-  return value;
 };
 
 export const parseCache = (value: string): string => {
