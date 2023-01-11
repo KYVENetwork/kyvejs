@@ -33,7 +33,6 @@ export const parseKeyfile = (value: string): string => {
 
 export const parseEndpoints = (value: string): string[] => {
   try {
-    console.log(value);
     return value.split(",").map((v) => v.trim());
   } catch (err) {
     throw new commander.InvalidArgumentError(

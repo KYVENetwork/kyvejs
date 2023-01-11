@@ -12,11 +12,11 @@ import { Validator } from "../..";
 export async function getProxyAuth(
   this: Validator
 ): Promise<{ [key: string]: string | number }> {
-  const address = this.client.account.address;
+  const address = this.client[0].account.address;
   const timestamp = new Date().valueOf().toString();
   const poolId = this.pool.id;
 
-  const { signature, pub_key } = await this.client.signString(
+  const { signature, pub_key } = await this.client[0].signString(
     `${address}//${poolId}//${timestamp}`
   );
 

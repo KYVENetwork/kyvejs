@@ -20,7 +20,7 @@ export async function setupValidator(this: Validator): Promise<void> {
   try {
     // generate deterministic valname based on chainId, pool id,
     // runtime, runtime version and valaddress
-    const valnameSeed = `${this.chainId}-${this.poolId}-${this.runtime.name}-${this.runtime.version}-${this.client.account.address}`;
+    const valnameSeed = `${this.chainId}-${this.poolId}-${this.runtime.name}-${this.runtime.version}-${this.client[0].account.address}`;
 
     this.logger.debug(`Creating seed for valname generation`);
     this.logger.debug(valnameSeed);
@@ -44,7 +44,7 @@ export async function setupValidator(this: Validator): Promise<void> {
 
     // log basic node info on startup
     this.logger.info("Starting node ...\n");
-    this.logger.info(`Valaddress \t = ${this.client.account.address}`);
+    this.logger.info(`Valaddress \t = ${this.client[0].account.address}`);
     this.logger.info(`Staker \t\t = ${this.staker}`);
     this.logger.info(`Valname \t\t = ${this.name}\n`);
 
