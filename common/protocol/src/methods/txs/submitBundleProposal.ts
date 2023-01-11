@@ -29,53 +29,62 @@ export async function submitBundleProposal(
   toKey: string,
   bundleSummary: string
 ): Promise<boolean> {
-  try {
-    this.logger.debug(
-      `this.client.kyve.bundles.v1beta1.submitBundleProposal({staker: ${
-        this.staker
-      },pool_id: ${this.poolId.toString()},storage_id: ${storageId},data_size: ${dataSize.toString()},data_hash: ${dataHash},from_index: ${fromIndex.toString()},bundle_size: ${bundleSize.toString()},from_key: ${fromKey},to_key: ${toKey},bundle_summary: ${bundleSummary}})`
-    );
+  for (let c = 0; c < this.client.length; c++) {
+    try {
+      this.logger.debug(this.rpc[c]);
+      this.logger.debug(
+        `this.client.kyve.bundles.v1beta1.submitBundleProposal({staker: ${
+          this.staker
+        },pool_id: ${this.poolId.toString()},storage_id: ${storageId},data_size: ${dataSize.toString()},data_hash: ${dataHash},from_index: ${fromIndex.toString()},bundle_size: ${bundleSize.toString()},from_key: ${fromKey},to_key: ${toKey},bundle_summary: ${bundleSummary}})`
+      );
 
-    const tx = await this.client.kyve.bundles.v1beta1.submitBundleProposal({
-      staker: this.staker,
-      pool_id: this.poolId.toString(),
-      storage_id: storageId,
-      data_size: dataSize.toString(),
-      data_hash: dataHash,
-      from_index: fromIndex.toString(),
-      bundle_size: bundleSize.toString(),
-      from_key: fromKey,
-      to_key: toKey,
-      bundle_summary: bundleSummary,
-    });
+      const tx = await this.client[c].kyve.bundles.v1beta1.submitBundleProposal(
+        {
+          staker: this.staker,
+          pool_id: this.poolId.toString(),
+          storage_id: storageId,
+          data_size: dataSize.toString(),
+          data_hash: dataHash,
+          from_index: fromIndex.toString(),
+          bundle_size: bundleSize.toString(),
+          from_key: fromKey,
+          to_key: toKey,
+          bundle_summary: bundleSummary,
+        }
+      );
 
-    this.logger.debug(`SubmitBundleProposal = ${tx.txHash}`);
+      this.logger.debug(`SubmitBundleProposal = ${tx.txHash}`);
 
-    const receipt = await tx.execute();
+      const receipt = await tx.execute();
 
-    this.logger.debug(JSON.stringify({ ...receipt, rawLog: null, data: null }));
+      this.logger.debug(
+        JSON.stringify({ ...receipt, rawLog: null, data: null })
+      );
 
-    if (receipt.code === 0) {
-      this.m.tx_submit_bundle_proposal_successful.inc();
-      this.m.gas_submit_bundle_proposal.set(receipt?.gasUsed ?? 0);
+      if (receipt.code === 0) {
+        this.m.tx_submit_bundle_proposal_successful.inc();
+        this.m.gas_submit_bundle_proposal.set(receipt?.gasUsed ?? 0);
 
-      this.m.bundles_proposed.inc();
-      this.m.bundles_amount.inc();
-      this.m.bundles_data_items.set(bundleSize);
-      this.m.bundles_byte_size.set(dataSize);
+        this.m.bundles_proposed.inc();
+        this.m.bundles_amount.inc();
+        this.m.bundles_data_items.set(bundleSize);
+        this.m.bundles_byte_size.set(dataSize);
 
-      return true;
-    } else {
-      this.logger.info(`Could not submit bundle proposal. Continuing ...`);
-      this.m.tx_submit_bundle_proposal_unsuccessful.inc();
+        return true;
+      } else {
+        this.logger.info(`Could not submit bundle proposal. Continuing ...`);
+        this.m.tx_submit_bundle_proposal_unsuccessful.inc();
 
-      return false;
+        return false;
+      }
+    } catch (err) {
+      this.logger.error(`RPC call to "${this.rpc[c]}" failed`);
+      this.logger.error(standardizeJSON(err));
     }
-  } catch (err) {
-    this.logger.error(`Failed to submit bundle proposal. Continuing ...`);
-    this.logger.error(standardizeJSON(err));
-    this.m.tx_submit_bundle_proposal_failed.inc();
-
-    return false;
   }
+
+  this.logger.error(`Failed to submit bundle proposal. Continuing ...`);
+  this.m.tx_submit_bundle_proposal_failed.inc();
+
+  return false;
 }
