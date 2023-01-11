@@ -224,10 +224,6 @@ export class Validator {
       )
       .option("--debug", "Run the validator node in debug mode")
       .option(
-        "--verbose",
-        "[DEPRECATED] Run the validator node in verbose logging mode"
-      )
-      .option(
         "--metrics",
         "Start a prometheus metrics server on http://localhost:8080/metrics"
       )
