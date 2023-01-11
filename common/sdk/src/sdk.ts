@@ -227,11 +227,11 @@ export class KyveSDK {
     return account.address;
   }
 
-  static async verifyString(
+  static verifyString(
     signature: string,
     data: string,
     pubKey: string
-  ): Promise<boolean> {
+  ): boolean {
     return verifyADR36Amino(
       PREFIX,
       KyveSDK.getAddressFromPubKey(pubKey),
