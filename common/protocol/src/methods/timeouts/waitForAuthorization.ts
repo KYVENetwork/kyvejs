@@ -28,6 +28,7 @@ export async function waitForAuthorization(this: Validator): Promise<void> {
       async () => {
         for (let l = 0; l < this.lcd.length; l++) {
           try {
+            this.logger.debug(this.rest[l]);
             this.logger.debug(
               `this.lcd.kyve.query.v1beta1.canValidate({pool_id: ${this.poolId.toString()},valaddress: ${
                 this.client[0].account.address
@@ -39,7 +40,7 @@ export async function waitForAuthorization(this: Validator): Promise<void> {
               valaddress,
             });
           } catch (err) {
-            this.logger.error(`REST call to "${this.lcd[l]}" failed`);
+            this.logger.error(`REST call to "${this.rest[l]}" failed`);
             this.logger.error(standardizeJSON(err));
           }
         }
@@ -90,6 +91,7 @@ export async function waitForAuthorization(this: Validator): Promise<void> {
         async () => {
           for (let l = 0; l < this.lcd.length; l++) {
             try {
+              this.logger.debug(this.rest[l]);
               this.logger.debug(
                 `this.lcd.kyve.query.v1beta1.canValidate({pool_id: ${this.poolId.toString()},valaddress: ${valaddress}})`
               );
@@ -99,7 +101,7 @@ export async function waitForAuthorization(this: Validator): Promise<void> {
                 valaddress,
               });
             } catch (err) {
-              this.logger.error(`REST call to "${this.lcd[l]}" failed`);
+              this.logger.error(`REST call to "${this.rest[l]}" failed`);
               this.logger.error(standardizeJSON(err));
             }
           }

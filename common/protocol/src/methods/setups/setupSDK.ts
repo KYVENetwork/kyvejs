@@ -13,6 +13,10 @@ export async function setupSDK(this: Validator): Promise<void> {
   try {
     this.logger.debug(`Initializing KyveSDK with chain ID ${this.chainId}`);
 
+    if (!this.rpc.length || !this.rest.length) {
+      throw new Error("rpc and rest endpoints must be specified");
+    }
+
     if (this.rpc.length !== this.rest.length) {
       throw new Error("rpc and rest endpoints must have same lengths");
     }

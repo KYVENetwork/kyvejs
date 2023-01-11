@@ -52,7 +52,7 @@ export async function canPropose(
             // means we have to wait for the next block in the blockchain
             // because the chain time only updates on every new block
             while (INFINITY_LOOP) {
-              this.logger.debug(this.lcd[l]);
+              this.logger.debug(this.rest[l]);
               this.logger.debug(
                 `this.lcd.kyve.query.v1beta1.canPropose({pool_id: ${this.poolId.toString()},staker: ${
                   this.staker
@@ -83,7 +83,7 @@ export async function canPropose(
               return canPropose;
             }
           } catch (err) {
-            this.logger.error(`REST call to "${this.lcd[l]}" failed`);
+            this.logger.error(`REST call to "${this.rest[l]}" failed`);
             this.logger.error(standardizeJSON(err));
           }
         }

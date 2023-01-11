@@ -17,7 +17,7 @@ export async function syncPoolState(this: Validator): Promise<void> {
     async () => {
       for (let l = 0; l < this.lcd.length; l++) {
         try {
-          this.logger.debug(this.lcd[l]);
+          this.logger.debug(this.rest[l]);
           this.logger.debug(
             `this.lcd.kyve.query.v1beta1.pool({id: ${this.poolId.toString()}})`
           );
@@ -36,9 +36,9 @@ export async function syncPoolState(this: Validator): Promise<void> {
             await this.syncPoolConfig();
           }
 
-          break;
+          return;
         } catch (err) {
-          this.logger.error(`REST call to "${this.lcd[l]}" failed`);
+          this.logger.error(`REST call to "${this.rest[l]}" failed`);
           this.logger.error(standardizeJSON(err));
         }
       }

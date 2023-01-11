@@ -43,11 +43,11 @@ export async function getBalances(this: Validator): Promise<void> {
     try {
       this.logger.debug(this.rpc[c]);
       this.logger.debug(
-        `this.client.nativeClient.getBalance(${this.client[c].account.address},${DENOM})`
+        `this.client.nativeClient.getBalance(${this.client[0].account.address},${DENOM})`
       );
 
       const valaccountBalanceRaw = await this.client[c].nativeClient.getBalance(
-        this.client[c].account.address,
+        this.client[0].account.address,
         DENOM
       );
 

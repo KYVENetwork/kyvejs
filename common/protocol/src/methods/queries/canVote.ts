@@ -46,7 +46,7 @@ export async function canVote(
               };
             }
 
-            this.logger.debug(this.lcd[l]);
+            this.logger.debug(this.rest[l]);
             this.logger.debug(
               `this.lcd.kyve.query.v1beta1.canVote({pool_id: ${this.poolId.toString()},staker: ${
                 this.staker
@@ -62,7 +62,7 @@ export async function canVote(
               storage_id: this.pool.bundle_proposal!.storage_id,
             });
           } catch (err) {
-            this.logger.error(`REST call to "${this.lcd[l]}" failed`);
+            this.logger.error(`REST call to "${this.rest[l]}" failed`);
             this.logger.error(standardizeJSON(err));
           }
         }
