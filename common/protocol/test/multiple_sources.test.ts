@@ -91,8 +91,11 @@ describe.skip("multiple sources tests", () => {
       ],
     };
 
-    v.client = client();
-    v.lcd = lcd();
+    v["rpc"] = ["http://0.0.0.0:26657"];
+    v.client = [client()];
+
+    v["rest"] = ["http://0.0.0.0:1317"];
+    v.lcd = [lcd()];
 
     v["continueRound"] = jest
       .fn()
@@ -119,8 +122,8 @@ describe.skip("multiple sources tests", () => {
     await runCache.call(v);
 
     // ASSERT
-    const txs = v["client"].kyve.bundles.v1beta1;
-    const queries = v["lcd"].kyve.query.v1beta1;
+    const txs = v["client"][0].kyve.bundles.v1beta1;
+    const queries = v["lcd"][0].kyve.query.v1beta1;
     const cacheProvider = v["cacheProvider"];
     const runtime = v["runtime"];
 
@@ -229,7 +232,11 @@ describe.skip("multiple sources tests", () => {
           key: b.toString(),
           value: `${b}-value`,
         };
-        expect(runtime.transformDataItem).toHaveBeenNthCalledWith(n, item);
+        expect(runtime.transformDataItem).toHaveBeenNthCalledWith(
+          n,
+          expect.any(Validator),
+          item
+        );
 
         n++;
       }
@@ -266,7 +273,11 @@ describe.skip("multiple sources tests", () => {
     );
 
     for (let n = 0; n < parseInt(genesis_pool.data.max_bundle_size) - 1; n++) {
-      expect(runtime.nextKey).toHaveBeenNthCalledWith(n + 1, n.toString());
+      expect(runtime.nextKey).toHaveBeenNthCalledWith(
+        n + 1,
+        expect.any(Validator),
+        n.toString()
+      );
     }
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(0);
@@ -310,8 +321,8 @@ describe.skip("multiple sources tests", () => {
     await runCache.call(v);
 
     // ASSERT
-    const txs = v["client"].kyve.bundles.v1beta1;
-    const queries = v["lcd"].kyve.query.v1beta1;
+    const txs = v["client"][0].kyve.bundles.v1beta1;
+    const queries = v["lcd"][0].kyve.query.v1beta1;
     const cacheProvider = v["cacheProvider"];
     const runtime = v["runtime"];
 
@@ -431,7 +442,11 @@ describe.skip("multiple sources tests", () => {
           key: (b + parseInt(genesis_pool.data.max_bundle_size)).toString(),
           value: `${b + parseInt(genesis_pool.data.max_bundle_size)}-value`,
         };
-        expect(runtime.transformDataItem).toHaveBeenNthCalledWith(n, item);
+        expect(runtime.transformDataItem).toHaveBeenNthCalledWith(
+          n,
+          expect.any(Validator),
+          item
+        );
 
         n++;
       }
@@ -472,6 +487,7 @@ describe.skip("multiple sources tests", () => {
     for (let n = 0; n < parseInt(genesis_pool.data.max_bundle_size) + 50; n++) {
       expect(runtime.nextKey).toHaveBeenNthCalledWith(
         n + 1,
+        expect.any(Validator),
         (n + parseInt(genesis_pool.data.max_bundle_size) - 1).toString()
       );
     }
@@ -524,8 +540,8 @@ describe.skip("multiple sources tests", () => {
     await runCache.call(v);
 
     // ASSERT
-    const txs = v["client"].kyve.bundles.v1beta1;
-    const queries = v["lcd"].kyve.query.v1beta1;
+    const txs = v["client"][0].kyve.bundles.v1beta1;
+    const queries = v["lcd"][0].kyve.query.v1beta1;
     const cacheProvider = v["cacheProvider"];
     const runtime = v["runtime"];
 
@@ -643,7 +659,11 @@ describe.skip("multiple sources tests", () => {
           key: (b + parseInt(genesis_pool.data.max_bundle_size) + 3).toString(),
           value: `${b + parseInt(genesis_pool.data.max_bundle_size) + 3}-value`,
         };
-        expect(runtime.transformDataItem).toHaveBeenNthCalledWith(n, item);
+        expect(runtime.transformDataItem).toHaveBeenNthCalledWith(
+          n,
+          expect.any(Validator),
+          item
+        );
 
         n++;
       }
@@ -683,6 +703,7 @@ describe.skip("multiple sources tests", () => {
     for (let n = 0; n < parseInt(genesis_pool.data.max_bundle_size) + 3; n++) {
       expect(runtime.nextKey).toHaveBeenNthCalledWith(
         n + 1,
+        expect.any(Validator),
         (n + 100 - 1).toString()
       );
     }
@@ -727,8 +748,8 @@ describe.skip("multiple sources tests", () => {
     await runCache.call(v);
 
     // ASSERT
-    const txs = v["client"].kyve.bundles.v1beta1;
-    const queries = v["lcd"].kyve.query.v1beta1;
+    const txs = v["client"][0].kyve.bundles.v1beta1;
+    const queries = v["lcd"][0].kyve.query.v1beta1;
     const cacheProvider = v["cacheProvider"];
     const runtime = v["runtime"];
 
@@ -846,7 +867,11 @@ describe.skip("multiple sources tests", () => {
           key: (b + parseInt(genesis_pool.data.max_bundle_size)).toString(),
           value: `${b + parseInt(genesis_pool.data.max_bundle_size)}-value`,
         };
-        expect(runtime.transformDataItem).toHaveBeenNthCalledWith(n, item);
+        expect(runtime.transformDataItem).toHaveBeenNthCalledWith(
+          n,
+          expect.any(Validator),
+          item
+        );
 
         n++;
       }
@@ -886,6 +911,7 @@ describe.skip("multiple sources tests", () => {
     for (let n = 0; n < parseInt(genesis_pool.data.max_bundle_size); n++) {
       expect(runtime.nextKey).toHaveBeenNthCalledWith(
         n + 1,
+        expect.any(Validator),
         (n + parseInt(genesis_pool.data.max_bundle_size) - 1).toString()
       );
     }
@@ -950,8 +976,8 @@ describe.skip("multiple sources tests", () => {
     await runCache.call(v);
 
     // ASSERT
-    const txs = v["client"].kyve.bundles.v1beta1;
-    const queries = v["lcd"].kyve.query.v1beta1;
+    const txs = v["client"][0].kyve.bundles.v1beta1;
+    const queries = v["lcd"][0].kyve.query.v1beta1;
     const cacheProvider = v["cacheProvider"];
     const runtime = v["runtime"];
 
@@ -1082,7 +1108,11 @@ describe.skip("multiple sources tests", () => {
           key: b.toString(),
           value: `${b}-value`,
         };
-        expect(runtime.transformDataItem).toHaveBeenNthCalledWith(n, item);
+        expect(runtime.transformDataItem).toHaveBeenNthCalledWith(
+          n,
+          expect.any(Validator),
+          item
+        );
 
         n++;
       }
@@ -1117,7 +1147,11 @@ describe.skip("multiple sources tests", () => {
     expect(runtime.nextKey).toHaveBeenCalledTimes(2 - 1);
 
     for (let n = 0; n < 2 - 1; n++) {
-      expect(runtime.nextKey).toHaveBeenNthCalledWith(n + 1, n.toString());
+      expect(runtime.nextKey).toHaveBeenNthCalledWith(
+        n + 1,
+        expect.any(Validator),
+        n.toString()
+      );
     }
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(0);
@@ -1203,8 +1237,8 @@ describe.skip("multiple sources tests", () => {
     await runCache.call(v);
 
     // ASSERT
-    const txs = v["client"].kyve.bundles.v1beta1;
-    const queries = v["lcd"].kyve.query.v1beta1;
+    const txs = v["client"][0].kyve.bundles.v1beta1;
+    const queries = v["lcd"][0].kyve.query.v1beta1;
     const cacheProvider = v["cacheProvider"];
     const runtime = v["runtime"];
 
@@ -1355,7 +1389,11 @@ describe.skip("multiple sources tests", () => {
           key: (b + parseInt(genesis_pool.data.max_bundle_size) + 3).toString(),
           value: `${b + parseInt(genesis_pool.data.max_bundle_size) + 3}-value`,
         };
-        expect(runtime.transformDataItem).toHaveBeenNthCalledWith(n, item);
+        expect(runtime.transformDataItem).toHaveBeenNthCalledWith(
+          n,
+          expect.any(Validator),
+          item
+        );
 
         n++;
       }
@@ -1395,6 +1433,7 @@ describe.skip("multiple sources tests", () => {
     for (let n = 0; n < parseInt(genesis_pool.data.max_bundle_size) + 3; n++) {
       expect(runtime.nextKey).toHaveBeenNthCalledWith(
         n + 1,
+        expect.any(Validator),
         (n + 100 - 1).toString()
       );
     }
@@ -1464,8 +1503,8 @@ describe.skip("multiple sources tests", () => {
     await runCache.call(v);
 
     // ASSERT
-    const txs = v["client"].kyve.bundles.v1beta1;
-    const queries = v["lcd"].kyve.query.v1beta1;
+    const txs = v["client"][0].kyve.bundles.v1beta1;
+    const queries = v["lcd"][0].kyve.query.v1beta1;
     const cacheProvider = v["cacheProvider"];
     const runtime = v["runtime"];
 
@@ -1580,7 +1619,11 @@ describe.skip("multiple sources tests", () => {
           };
         }
 
-        expect(runtime.transformDataItem).toHaveBeenNthCalledWith(n, item);
+        expect(runtime.transformDataItem).toHaveBeenNthCalledWith(
+          n,
+          expect.any(Validator),
+          item
+        );
         n++;
       }
     }
@@ -1645,7 +1688,11 @@ describe.skip("multiple sources tests", () => {
     expect(runtime.nextKey).toHaveBeenCalledTimes(2 - 1);
 
     for (let n = 0; n < 2 - 1; n++) {
-      expect(runtime.nextKey).toHaveBeenNthCalledWith(n + 1, n.toString());
+      expect(runtime.nextKey).toHaveBeenNthCalledWith(
+        n + 1,
+        expect.any(Validator),
+        n.toString()
+      );
     }
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(0);
@@ -1710,8 +1757,8 @@ describe.skip("multiple sources tests", () => {
     await runCache.call(v);
 
     // ASSERT
-    const txs = v["client"].kyve.bundles.v1beta1;
-    const queries = v["lcd"].kyve.query.v1beta1;
+    const txs = v["client"][0].kyve.bundles.v1beta1;
+    const queries = v["lcd"][0].kyve.query.v1beta1;
     const cacheProvider = v["cacheProvider"];
     const runtime = v["runtime"];
 
@@ -1795,10 +1842,14 @@ describe.skip("multiple sources tests", () => {
     n = 1;
 
     for (let s = 0; s < v.poolConfig.sources.length; s++) {
-      expect(runtime.transformDataItem).toHaveBeenNthCalledWith(n, {
-        key: "0",
-        value: "0-value",
-      });
+      expect(runtime.transformDataItem).toHaveBeenNthCalledWith(
+        n,
+        expect.any(Validator),
+        {
+          key: "0",
+          value: "0-value",
+        }
+      );
       n++;
     }
 

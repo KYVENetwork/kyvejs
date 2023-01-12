@@ -84,8 +84,11 @@ describe("propose bundle tests", () => {
     v["poolId"] = 0;
     v["staker"] = "test_staker";
 
-    v.client = client();
-    v.lcd = lcd();
+    v["rpc"] = ["http://0.0.0.0:26657"];
+    v.client = [client()];
+
+    v["rest"] = ["http://0.0.0.0:1317"];
+    v.lcd = [lcd()];
 
     v["waitForNextBundleProposal"] = jest.fn();
 
@@ -104,7 +107,7 @@ describe("propose bundle tests", () => {
 
   test("propose bundle with data", async () => {
     // ARRANGE
-    v["lcd"].kyve.query.v1beta1.canVote = jest.fn().mockResolvedValue({
+    v["lcd"][0].kyve.query.v1beta1.canVote = jest.fn().mockResolvedValue({
       possible: false,
       reason: "Already voted",
     });
@@ -162,8 +165,8 @@ describe("propose bundle tests", () => {
     await runNode.call(v);
 
     // ASSERT
-    const txs = v["client"].kyve.bundles.v1beta1;
-    const queries = v["lcd"].kyve.query.v1beta1;
+    const txs = v["client"][0].kyve.bundles.v1beta1;
+    const queries = v["lcd"][0].kyve.query.v1beta1;
     const cacheProvider = v["cacheProvider"];
     const runtime = v["runtime"];
 
@@ -273,7 +276,7 @@ describe("propose bundle tests", () => {
 
   test("propose bundle with no data", async () => {
     // ARRANGE
-    v["lcd"].kyve.query.v1beta1.canVote = jest.fn().mockResolvedValue({
+    v["lcd"][0].kyve.query.v1beta1.canVote = jest.fn().mockResolvedValue({
       possible: false,
       reason: "Already voted",
     });
@@ -319,8 +322,8 @@ describe("propose bundle tests", () => {
 
     // ASSERT
 
-    const txs = v["client"].kyve.bundles.v1beta1;
-    const queries = v["lcd"].kyve.query.v1beta1;
+    const txs = v["client"][0].kyve.bundles.v1beta1;
+    const queries = v["lcd"][0].kyve.query.v1beta1;
     const cacheProvider = v["cacheProvider"];
     const runtime = v["runtime"];
 
@@ -408,7 +411,7 @@ describe("propose bundle tests", () => {
 
   test("propose bundle after last bundle has been dropped", async () => {
     // ARRANGE
-    v["lcd"].kyve.query.v1beta1.canVote = jest.fn().mockResolvedValue({
+    v["lcd"][0].kyve.query.v1beta1.canVote = jest.fn().mockResolvedValue({
       possible: false,
       reason: "Already voted",
     });
@@ -456,8 +459,8 @@ describe("propose bundle tests", () => {
 
     // ASSERT
 
-    const txs = v["client"].kyve.bundles.v1beta1;
-    const queries = v["lcd"].kyve.query.v1beta1;
+    const txs = v["client"][0].kyve.bundles.v1beta1;
+    const queries = v["lcd"][0].kyve.query.v1beta1;
     const cacheProvider = v["cacheProvider"];
     const runtime = v["runtime"];
 
@@ -559,7 +562,7 @@ describe("propose bundle tests", () => {
 
   test("propose bundle where saveBundle fails", async () => {
     // ARRANGE
-    v["lcd"].kyve.query.v1beta1.canVote = jest.fn().mockResolvedValue({
+    v["lcd"][0].kyve.query.v1beta1.canVote = jest.fn().mockResolvedValue({
       possible: false,
       reason: "Already voted",
     });
@@ -610,8 +613,8 @@ describe("propose bundle tests", () => {
 
     // ASSERT
 
-    const txs = v["client"].kyve.bundles.v1beta1;
-    const queries = v["lcd"].kyve.query.v1beta1;
+    const txs = v["client"][0].kyve.bundles.v1beta1;
+    const queries = v["lcd"][0].kyve.query.v1beta1;
     const cacheProvider = v["cacheProvider"];
     const runtime = v["runtime"];
 
@@ -712,7 +715,7 @@ describe("propose bundle tests", () => {
 
   test("propose bundle but saveBundle does not return a storage id", async () => {
     // ARRANGE
-    v["lcd"].kyve.query.v1beta1.canVote = jest.fn().mockResolvedValue({
+    v["lcd"][0].kyve.query.v1beta1.canVote = jest.fn().mockResolvedValue({
       possible: false,
       reason: "Already voted",
     });
@@ -763,8 +766,8 @@ describe("propose bundle tests", () => {
 
     // ASSERT
 
-    const txs = v["client"].kyve.bundles.v1beta1;
-    const queries = v["lcd"].kyve.query.v1beta1;
+    const txs = v["client"][0].kyve.bundles.v1beta1;
+    const queries = v["lcd"][0].kyve.query.v1beta1;
     const cacheProvider = v["cacheProvider"];
     const runtime = v["runtime"];
 
@@ -865,12 +868,12 @@ describe("propose bundle tests", () => {
 
   test("propose bundle where submitBundleProposal fails", async () => {
     // ARRANGE
-    v["lcd"].kyve.query.v1beta1.canVote = jest.fn().mockResolvedValue({
+    v["lcd"][0].kyve.query.v1beta1.canVote = jest.fn().mockResolvedValue({
       possible: false,
       reason: "Already voted",
     });
 
-    v["client"].kyve.bundles.v1beta1.submitBundleProposal = jest
+    v["client"][0].kyve.bundles.v1beta1.submitBundleProposal = jest
       .fn()
       .mockRejectedValue(new Error());
 
@@ -918,8 +921,8 @@ describe("propose bundle tests", () => {
 
     // ASSERT
 
-    const txs = v["client"].kyve.bundles.v1beta1;
-    const queries = v["lcd"].kyve.query.v1beta1;
+    const txs = v["client"][0].kyve.bundles.v1beta1;
+    const queries = v["lcd"][0].kyve.query.v1beta1;
     const cacheProvider = v["cacheProvider"];
     const runtime = v["runtime"];
 
@@ -1027,12 +1030,12 @@ describe("propose bundle tests", () => {
 
   test("propose bundle where skipUploaderRole fails", async () => {
     // ARRANGE
-    v["lcd"].kyve.query.v1beta1.canVote = jest.fn().mockResolvedValue({
+    v["lcd"][0].kyve.query.v1beta1.canVote = jest.fn().mockResolvedValue({
       possible: false,
       reason: "Already voted",
     });
 
-    v["client"].kyve.bundles.v1beta1.skipUploaderRole = jest
+    v["client"][0].kyve.bundles.v1beta1.skipUploaderRole = jest
       .fn()
       .mockRejectedValue(new Error());
 
@@ -1077,8 +1080,8 @@ describe("propose bundle tests", () => {
 
     // ASSERT
 
-    const txs = v["client"].kyve.bundles.v1beta1;
-    const queries = v["lcd"].kyve.query.v1beta1;
+    const txs = v["client"][0].kyve.bundles.v1beta1;
+    const queries = v["lcd"][0].kyve.query.v1beta1;
     const cacheProvider = v["cacheProvider"];
     const runtime = v["runtime"];
 
@@ -1166,14 +1169,14 @@ describe("propose bundle tests", () => {
 
   test("propose bundle where saveBundle and skipUploaderRole fails", async () => {
     // ARRANGE
-    v["lcd"].kyve.query.v1beta1.canVote = jest.fn().mockResolvedValue({
+    v["lcd"][0].kyve.query.v1beta1.canVote = jest.fn().mockResolvedValue({
       possible: false,
       reason: "Already voted",
     });
 
     storageProvider.saveBundle = jest.fn().mockRejectedValue(new Error());
 
-    v["client"].kyve.bundles.v1beta1.skipUploaderRole = jest
+    v["client"][0].kyve.bundles.v1beta1.skipUploaderRole = jest
       .fn()
       .mockRejectedValue(new Error());
 
@@ -1221,8 +1224,8 @@ describe("propose bundle tests", () => {
 
     // ASSERT
 
-    const txs = v["client"].kyve.bundles.v1beta1;
-    const queries = v["lcd"].kyve.query.v1beta1;
+    const txs = v["client"][0].kyve.bundles.v1beta1;
+    const queries = v["lcd"][0].kyve.query.v1beta1;
     const cacheProvider = v["cacheProvider"];
     const runtime = v["runtime"];
 
@@ -1323,7 +1326,7 @@ describe("propose bundle tests", () => {
 
   test("propose bundle where summarizeDataBundle fails", async () => {
     // ARRANGE
-    v["lcd"].kyve.query.v1beta1.canVote = jest.fn().mockResolvedValue({
+    v["lcd"][0].kyve.query.v1beta1.canVote = jest.fn().mockResolvedValue({
       possible: false,
       reason: "Already voted",
     });
@@ -1374,8 +1377,8 @@ describe("propose bundle tests", () => {
 
     // ASSERT
 
-    const txs = v["client"].kyve.bundles.v1beta1;
-    const queries = v["lcd"].kyve.query.v1beta1;
+    const txs = v["client"][0].kyve.bundles.v1beta1;
+    const queries = v["lcd"][0].kyve.query.v1beta1;
     const cacheProvider = v["cacheProvider"];
     const runtime = v["runtime"];
 
@@ -1469,7 +1472,7 @@ describe("propose bundle tests", () => {
 
   test("propose bundle where compress fails", async () => {
     // ARRANGE
-    v["lcd"].kyve.query.v1beta1.canVote = jest.fn().mockResolvedValue({
+    v["lcd"][0].kyve.query.v1beta1.canVote = jest.fn().mockResolvedValue({
       possible: false,
       reason: "Already voted",
     });
@@ -1520,8 +1523,8 @@ describe("propose bundle tests", () => {
 
     // ASSERT
 
-    const txs = v["client"].kyve.bundles.v1beta1;
-    const queries = v["lcd"].kyve.query.v1beta1;
+    const txs = v["client"][0].kyve.bundles.v1beta1;
+    const queries = v["lcd"][0].kyve.query.v1beta1;
     const cacheProvider = v["cacheProvider"];
     const runtime = v["runtime"];
 
