@@ -37,15 +37,46 @@ init
           recursive: true,
         });
 
+        let rpc;
+        let rest;
+
+        // verify that rpc and rest endpoints are valid
         try {
-          new KyveSDK(options.network);
+          rpc = options.rpc.split(",").map((r: string) => r.trim());
+          rest = options.rest.split(",").map((r: string) => r.trim());
+
+          if (!rpc.length || !rest.length) {
+            throw new Error("rpc and rest endpoints must be specified");
+          }
+
+          if (rpc.length !== rest.length) {
+            throw new Error("rpc and rest endpoints must have same lengths");
+          }
         } catch (err) {
-          console.log(`ERROR: network ${options.network} was not recognized`);
+          console.log(`ERROR: Could parse provided rpc and rest endpoints`);
+          console.log(JSON.parse(JSON.stringify(err)));
+          return;
+        }
+
+        try {
+          new KyveSDK({
+            chainId: options.chainId,
+            rpc: rpc[0],
+            rest: rest[0],
+            chainName: `KYVE - ${options.chainId}`,
+          });
+        } catch (err) {
+          console.log(
+            `ERROR: Could not init KYVE SDK with provided network options`
+          );
+          console.log(JSON.parse(JSON.stringify(err)));
           return;
         }
 
         const config = {
-          network: options.network,
+          chainId: options.chainId,
+          rpc: options.rpc,
+          rest: options.rest,
           autoDownloadBinaries: options.autoDownloadBinaries,
         };
 
