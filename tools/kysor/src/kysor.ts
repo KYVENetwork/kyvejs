@@ -119,7 +119,7 @@ export const run = async (options: any) => {
     process.exit(0);
   }
 
-  // verify kyve sdk client can be created
+  // create lcd clients
   lcd = rpc.map((_, i) => {
     try {
       return new KyveSDK({
@@ -164,8 +164,8 @@ export const run = async (options: any) => {
     }
 
     if (!data) {
-      await sleep(10000);
-      continue;
+      logger.error(`Unable to fetch pool state. Exiting KYSOR ...`);
+      process.exit(0);
     }
 
     pool = data.pool as PoolResponse;
