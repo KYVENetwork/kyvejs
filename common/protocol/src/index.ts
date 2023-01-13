@@ -213,7 +213,7 @@ export class Validator {
       )
       .requiredOption(
         "--rest <string>",
-        "Comma separated list of rest endpoints. If the first fails the next endpoint will be used as fallback. ",
+        "Comma separated list of rest endpoints. If the first fails the next endpoint will be used as fallback.",
         parseEndpoints
       )
       .option(

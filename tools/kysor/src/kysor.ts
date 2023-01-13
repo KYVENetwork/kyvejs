@@ -18,13 +18,15 @@ const logger = setupLogger();
 
 export const run = async (options: any) => {
   let config: IConfig = {} as IConfig;
+  let rpc: string[];
+  let rest: string[];
   let valaccount: IValaccountConfig = {} as IValaccountConfig;
   let pool: PoolResponse;
   let lcd: KyveLCDClientType = {} as KyveLCDClientType;
 
   if (!fs.existsSync(path.join(home, `config.toml`))) {
     logger.error(
-      `KYSOR is not initialized yet. You can initialize it by running: ./kysor init --network <desired_network> --auto-download-binaries`
+      `KYSOR is not initialized yet. You can initialize it by running: ./kysor init --chain-id <chain_id> --rpc <rpc_1,rpc_2...> --rest <rest_1,rest_2...> --auto-download-binaries`
     );
     return;
   }
@@ -55,6 +57,26 @@ export const run = async (options: any) => {
   } catch (err) {
     logger.error(
       `Error parsing KYSOR config file config.toml. Exiting KYSOR ...`
+    );
+    logger.error(err);
+    process.exit(0);
+  }
+
+  // verify that rpc and rest endpoints are valid
+  try {
+    rpc = config.rpc.split(",").map((r) => r.trim());
+    rest = config.rest.split(",").map((r) => r.trim());
+
+    if (!rpc.length || !rest.length) {
+      throw new Error("rpc and rest endpoints must be specified");
+    }
+
+    if (rpc.length !== rest.length) {
+      throw new Error("rpc and rest endpoints must have same lengths");
+    }
+  } catch (err) {
+    logger.error(
+      `Error validating rpc and rest endpoints. Edit the config.toml accordingly. Exiting KYSOR ...`
     );
     logger.error(err);
     process.exit(0);
@@ -99,10 +121,15 @@ export const run = async (options: any) => {
 
   // verify kyve sdk client can be created
   try {
-    lcd = new KyveSDK(config.network).createLCDClient();
+    lcd = new KyveSDK({
+      chainId: config.chainId,
+      rpc: rpc[0],
+      rest: rest[0],
+      chainName: `KYVE - ${config.chainId}`,
+    }).createLCDClient();
   } catch (err) {
     logger.error(
-      `Error creating LCD client from network ${options.network}. Exiting KYSOR ...`
+      `Error creating LCD client from chain id ${config.chainId}, rpc ${rpc[0]} and rest ${rest[0]}. Exiting KYSOR ...`
     );
     logger.error(err);
   }
@@ -319,14 +346,20 @@ export const run = async (options: any) => {
         `${valaccount.valaccount}`,
         `--storage-priv`,
         `${valaccount.storagePriv}`,
-        `--network`,
-        `${config.network}`,
+        `--chain-id`,
+        `${config.chainId}`,
+        `--rpc`,
+        `${config.rpc}`,
+        `--rest`,
+        `${config.rest}`,
+        `--cache`,
+        `${valaccount.cache}`,
         `--home`,
         `${versionHome}`,
       ];
 
-      if (valaccount.verbose) {
-        args.push("--verbose");
+      if (options.debug) {
+        args.push("--debug");
       }
 
       if (valaccount.metrics) {

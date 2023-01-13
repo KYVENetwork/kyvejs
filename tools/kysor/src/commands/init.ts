@@ -9,9 +9,14 @@ const home = path.join(process.env.HOME!, ".kysor");
 const init = new Command("init").description("Init KYSOR");
 
 init
+  .requiredOption("--chain-id <string>", "The chain ID of the network")
   .requiredOption(
-    "-n, --network <local|alpha|beta|korellia>",
-    "The network the KYSOR should run on"
+    "--rpc <string>",
+    "Comma seperated list of rpc endpoints. If the first fails the next endpoint will be used as fallback."
+  )
+  .requiredOption(
+    "--rest <string>",
+    "Comma separated list of rest endpoints. If the first fails the next endpoint will be used as fallback. "
   )
   .option(
     "-d, --auto-download-binaries",
