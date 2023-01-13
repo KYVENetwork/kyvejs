@@ -594,4 +594,383 @@ describe("fallback tests", () => {
 
     // TODO: assert timeouts
   });
+
+  test("submit ClaimUploaderRole tx with one rpc endpoint which fails", async () => {
+    // ARRANGE
+    v["client"][0].kyve.bundles.v1beta1.claimUploaderRole = jest
+      .fn()
+      .mockRejectedValue(new Error());
+
+    const canProposeMock = jest.fn().mockResolvedValue({
+      possible: false,
+      reason: "",
+    });
+
+    v["lcd"][0].kyve.query.v1beta1.canPropose = canProposeMock;
+
+    v["syncPoolState"] = jest
+      .fn()
+      .mockImplementationOnce(() => {
+        v.pool = {
+          ...genesis_pool,
+        } as any;
+      })
+      .mockImplementation(() => {
+        v.pool = {
+          ...genesis_pool,
+          bundle_proposal: {
+            ...genesis_pool.bundle_proposal,
+            next_uploader: "test_staker",
+          },
+        } as any;
+      });
+
+    const bundle = [
+      {
+        key: "test_key_1",
+        value: "test_value_1",
+      },
+      {
+        key: "test_key_2",
+        value: "test_value_2",
+      },
+    ];
+
+    await v["cacheProvider"].put("0", bundle[0]);
+    await v["cacheProvider"].put("1", bundle[1]);
+
+    // ACT
+    await runNode.call(v);
+
+    // ASSERT
+    const txs = v["client"][0].kyve.bundles.v1beta1;
+    const queries = v["lcd"][0].kyve.query.v1beta1;
+    const cacheProvider = v["cacheProvider"];
+    const runtime = v["runtime"];
+
+    // ========================
+    // ASSERT CLIENT INTERFACES
+    // ========================
+
+    expect(txs.claimUploaderRole).toHaveBeenCalledTimes(1);
+    expect(txs.claimUploaderRole).toHaveBeenLastCalledWith({
+      staker: "test_staker",
+      pool_id: "0",
+    });
+
+    expect(txs.voteBundleProposal).toHaveBeenCalledTimes(0);
+
+    expect(txs.submitBundleProposal).toHaveBeenCalledTimes(0);
+
+    expect(txs.skipUploaderRole).toHaveBeenCalledTimes(0);
+
+    // =====================
+    // ASSERT LCD INTERFACES
+    // =====================
+
+    expect(queries.canVote).toHaveBeenCalledTimes(0);
+
+    expect(queries.canPropose).toHaveBeenCalledTimes(1);
+    expect(queries.canPropose).toHaveBeenLastCalledWith({
+      staker: "test_staker",
+      pool_id: "0",
+      proposer: "test_valaddress",
+      from_index: "0",
+    });
+
+    // =========================
+    // ASSERT STORAGE INTERFACES
+    // =========================
+
+    expect(storageProvider.saveBundle).toHaveBeenCalledTimes(0);
+
+    expect(storageProvider.retrieveBundle).toHaveBeenCalledTimes(0);
+
+    // =======================
+    // ASSERT CACHE INTERFACES
+    // =======================
+
+    expect(cacheProvider.get).toHaveBeenCalledTimes(0);
+
+    // =============================
+    // ASSERT COMPRESSION INTERFACES
+    // =============================
+
+    expect(compression.compress).toHaveBeenCalledTimes(0);
+
+    expect(compression.decompress).toHaveBeenCalledTimes(0);
+
+    // =============================
+    // ASSERT INTEGRATION INTERFACES
+    // =============================
+
+    expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(0);
+
+    expect(runtime.validateDataItem).toHaveBeenCalledTimes(0);
+
+    // ========================
+    // ASSERT NODEJS INTERFACES
+    // ========================
+
+    // assert that only one round ran
+    expect(v["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
+
+    // TODO: assert timeouts
+  });
+
+  test("submit ClaimUploaderRole tx with two rpc endpoints where first fails", async () => {
+    // ARRANGE
+    v["rpc"].push("http://0.0.0.0:26657");
+    v["client"].push(client());
+
+    v["client"][0].kyve.bundles.v1beta1.claimUploaderRole = jest
+      .fn()
+      .mockRejectedValue(new Error());
+
+    const canProposeMock = jest.fn().mockResolvedValue({
+      possible: false,
+      reason: "",
+    });
+
+    v["lcd"][0].kyve.query.v1beta1.canPropose = canProposeMock;
+
+    v["syncPoolState"] = jest
+      .fn()
+      .mockImplementationOnce(() => {
+        v.pool = {
+          ...genesis_pool,
+        } as any;
+      })
+      .mockImplementation(() => {
+        v.pool = {
+          ...genesis_pool,
+          bundle_proposal: {
+            ...genesis_pool.bundle_proposal,
+            next_uploader: "test_staker",
+          },
+        } as any;
+      });
+
+    const bundle = [
+      {
+        key: "test_key_1",
+        value: "test_value_1",
+      },
+      {
+        key: "test_key_2",
+        value: "test_value_2",
+      },
+    ];
+
+    await v["cacheProvider"].put("0", bundle[0]);
+    await v["cacheProvider"].put("1", bundle[1]);
+
+    // ACT
+    await runNode.call(v);
+
+    // ASSERT
+    const txs = v["client"][0].kyve.bundles.v1beta1;
+    const queries = v["lcd"][0].kyve.query.v1beta1;
+    const cacheProvider = v["cacheProvider"];
+    const runtime = v["runtime"];
+
+    // ========================
+    // ASSERT CLIENT INTERFACES
+    // ========================
+
+    expect(txs.claimUploaderRole).toHaveBeenCalledTimes(1);
+    expect(txs.claimUploaderRole).toHaveBeenLastCalledWith({
+      staker: "test_staker",
+      pool_id: "0",
+    });
+
+    expect(txs.voteBundleProposal).toHaveBeenCalledTimes(0);
+
+    expect(txs.submitBundleProposal).toHaveBeenCalledTimes(0);
+
+    expect(txs.skipUploaderRole).toHaveBeenCalledTimes(0);
+
+    // =====================
+    // ASSERT LCD INTERFACES
+    // =====================
+
+    expect(queries.canVote).toHaveBeenCalledTimes(0);
+
+    expect(queries.canPropose).toHaveBeenCalledTimes(1);
+    expect(queries.canPropose).toHaveBeenLastCalledWith({
+      staker: "test_staker",
+      pool_id: "0",
+      proposer: "test_valaddress",
+      from_index: "0",
+    });
+
+    // =========================
+    // ASSERT STORAGE INTERFACES
+    // =========================
+
+    expect(storageProvider.saveBundle).toHaveBeenCalledTimes(0);
+
+    expect(storageProvider.retrieveBundle).toHaveBeenCalledTimes(0);
+
+    // =======================
+    // ASSERT CACHE INTERFACES
+    // =======================
+
+    expect(cacheProvider.get).toHaveBeenCalledTimes(0);
+
+    // =============================
+    // ASSERT COMPRESSION INTERFACES
+    // =============================
+
+    expect(compression.compress).toHaveBeenCalledTimes(0);
+
+    expect(compression.decompress).toHaveBeenCalledTimes(0);
+
+    // =============================
+    // ASSERT INTEGRATION INTERFACES
+    // =============================
+
+    expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(0);
+
+    expect(runtime.validateDataItem).toHaveBeenCalledTimes(0);
+
+    // ========================
+    // ASSERT NODEJS INTERFACES
+    // ========================
+
+    // assert that only one round ran
+    expect(v["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
+
+    // TODO: assert timeouts
+  });
+
+  test("submit ClaimUploaderRole tx with two rpc endpoints where both fail", async () => {
+    // ARRANGE
+    v["rpc"].push("http://0.0.0.0:26657");
+    v["client"].push(client());
+
+    v["client"][0].kyve.bundles.v1beta1.claimUploaderRole = jest
+      .fn()
+      .mockRejectedValue(new Error());
+
+    v["client"][1].kyve.bundles.v1beta1.claimUploaderRole = jest
+      .fn()
+      .mockRejectedValue(new Error());
+
+    const canProposeMock = jest.fn().mockResolvedValue({
+      possible: false,
+      reason: "",
+    });
+
+    v["lcd"][0].kyve.query.v1beta1.canPropose = canProposeMock;
+
+    v["syncPoolState"] = jest
+      .fn()
+      .mockImplementationOnce(() => {
+        v.pool = {
+          ...genesis_pool,
+        } as any;
+      })
+      .mockImplementation(() => {
+        v.pool = {
+          ...genesis_pool,
+          bundle_proposal: {
+            ...genesis_pool.bundle_proposal,
+            next_uploader: "test_staker",
+          },
+        } as any;
+      });
+
+    const bundle = [
+      {
+        key: "test_key_1",
+        value: "test_value_1",
+      },
+      {
+        key: "test_key_2",
+        value: "test_value_2",
+      },
+    ];
+
+    await v["cacheProvider"].put("0", bundle[0]);
+    await v["cacheProvider"].put("1", bundle[1]);
+
+    // ACT
+    await runNode.call(v);
+
+    // ASSERT
+    const txs = v["client"][0].kyve.bundles.v1beta1;
+    const queries = v["lcd"][0].kyve.query.v1beta1;
+    const cacheProvider = v["cacheProvider"];
+    const runtime = v["runtime"];
+
+    // ========================
+    // ASSERT CLIENT INTERFACES
+    // ========================
+
+    expect(txs.claimUploaderRole).toHaveBeenCalledTimes(1);
+    expect(txs.claimUploaderRole).toHaveBeenLastCalledWith({
+      staker: "test_staker",
+      pool_id: "0",
+    });
+
+    expect(txs.voteBundleProposal).toHaveBeenCalledTimes(0);
+
+    expect(txs.submitBundleProposal).toHaveBeenCalledTimes(0);
+
+    expect(txs.skipUploaderRole).toHaveBeenCalledTimes(0);
+
+    // =====================
+    // ASSERT LCD INTERFACES
+    // =====================
+
+    expect(queries.canVote).toHaveBeenCalledTimes(0);
+
+    expect(queries.canPropose).toHaveBeenCalledTimes(1);
+    expect(queries.canPropose).toHaveBeenLastCalledWith({
+      staker: "test_staker",
+      pool_id: "0",
+      proposer: "test_valaddress",
+      from_index: "0",
+    });
+
+    // =========================
+    // ASSERT STORAGE INTERFACES
+    // =========================
+
+    expect(storageProvider.saveBundle).toHaveBeenCalledTimes(0);
+
+    expect(storageProvider.retrieveBundle).toHaveBeenCalledTimes(0);
+
+    // =======================
+    // ASSERT CACHE INTERFACES
+    // =======================
+
+    expect(cacheProvider.get).toHaveBeenCalledTimes(0);
+
+    // =============================
+    // ASSERT COMPRESSION INTERFACES
+    // =============================
+
+    expect(compression.compress).toHaveBeenCalledTimes(0);
+
+    expect(compression.decompress).toHaveBeenCalledTimes(0);
+
+    // =============================
+    // ASSERT INTEGRATION INTERFACES
+    // =============================
+
+    expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(0);
+
+    expect(runtime.validateDataItem).toHaveBeenCalledTimes(0);
+
+    // ========================
+    // ASSERT NODEJS INTERFACES
+    // ========================
+
+    // assert that only one round ran
+    expect(v["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
+
+    // TODO: assert timeouts
+  });
 });
