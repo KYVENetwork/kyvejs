@@ -1,5 +1,5 @@
 import TOML from "@iarna/toml";
-import KyveSDK, { KyveLCDClientType } from "@kyvejs/sdk";
+import KyveSDK from "@kyvejs/sdk";
 import { PoolResponse } from "@kyvejs/types/lcd/kyve/query/v1beta1/pools";
 import download from "download";
 import extract from "extract-zip";
@@ -8,7 +8,7 @@ import os from "os";
 import path from "path";
 
 import { IConfig, IValaccountConfig } from "./types/interfaces";
-import { getChecksum, setupLogger, sleep, startNodeProcess } from "./utils";
+import { getChecksum, setupLogger, startNodeProcess } from "./utils";
 
 const home = path.join(process.env.HOME!, ".kysor");
 const platform = os.platform() === "darwin" ? "macos" : os.platform();
@@ -22,7 +22,6 @@ export const run = async (options: any) => {
   let rest: string[];
   let valaccount: IValaccountConfig = {} as IValaccountConfig;
   let pool: PoolResponse;
-  let lcd: KyveLCDClientType[];
 
   if (!fs.existsSync(path.join(home, `config.toml`))) {
     logger.error(
@@ -120,7 +119,7 @@ export const run = async (options: any) => {
   }
 
   // create lcd clients
-  lcd = rpc.map((_, i) => {
+  const lcd = rpc.map((_, i) => {
     try {
       return new KyveSDK({
         chainId: config.chainId,
