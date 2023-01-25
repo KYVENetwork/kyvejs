@@ -80,8 +80,11 @@ describe("genesis tests", () => {
     v["poolId"] = 0;
     v["staker"] = "test_staker";
 
-    v.client = client();
-    v.lcd = lcd();
+    v["rpc"] = ["http://0.0.0.0:26657"];
+    v.client = [client()];
+
+    v["rest"] = ["http://0.0.0.0:1317"];
+    v.lcd = [lcd()];
 
     v["continueRound"] = jest
       .fn()
@@ -135,8 +138,8 @@ describe("genesis tests", () => {
     await runNode.call(v);
 
     // ASSERT
-    const txs = v["client"].kyve.bundles.v1beta1;
-    const queries = v["lcd"].kyve.query.v1beta1;
+    const txs = v["client"][0].kyve.bundles.v1beta1;
+    const queries = v["lcd"][0].kyve.query.v1beta1;
     const cacheProvider = v["cacheProvider"];
     const runtime = v["runtime"];
 
@@ -264,8 +267,8 @@ describe("genesis tests", () => {
     await runNode.call(v);
 
     // ASSERT
-    const txs = v["client"].kyve.bundles.v1beta1;
-    const queries = v["lcd"].kyve.query.v1beta1;
+    const txs = v["client"][0].kyve.bundles.v1beta1;
+    const queries = v["lcd"][0].kyve.query.v1beta1;
     const cacheProvider = v["cacheProvider"];
     const runtime = v["runtime"];
 
@@ -347,7 +350,7 @@ describe("genesis tests", () => {
 
   test("be too late to claim uploader role and instead validate", async () => {
     // ARRANGE
-    v["client"].kyve.bundles.v1beta1.claimUploaderRole = jest
+    v["client"][0].kyve.bundles.v1beta1.claimUploaderRole = jest
       .fn()
       .mockResolvedValue({
         txHash: "test_hash",
@@ -414,8 +417,8 @@ describe("genesis tests", () => {
     await runNode.call(v);
 
     // ASSERT
-    const txs = v["client"].kyve.bundles.v1beta1;
-    const queries = v["lcd"].kyve.query.v1beta1;
+    const txs = v["client"][0].kyve.bundles.v1beta1;
+    const queries = v["lcd"][0].kyve.query.v1beta1;
     const cacheProvider = v["cacheProvider"];
     const runtime = v["runtime"];
 
