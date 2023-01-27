@@ -1,7 +1,7 @@
-import { KYVE_NETWORK } from "@kyvejs/sdk/dist/constants";
-
 export interface IConfig {
-  network: KYVE_NETWORK;
+  chainId: string;
+  rpc: string;
+  rest: string;
   autoDownloadBinaries: boolean;
 }
 
@@ -9,7 +9,7 @@ export interface IValaccountConfig {
   pool: number;
   valaccount: string;
   storagePriv: string;
-  verbose: boolean;
+  cache: string;
   metrics: boolean;
   metricsPort: string;
 }

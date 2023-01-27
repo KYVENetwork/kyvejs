@@ -7,8 +7,8 @@ import { Logger } from "tslog";
 import { version as protocolVersion } from "../package.json";
 import {
   parseCache,
+  parseEndpoints,
   parseMnemonic,
-  parseNetwork,
   parsePoolId,
 } from "./commander";
 import {
@@ -63,9 +63,9 @@ export class Validator {
   protected cacheProvider!: ICacheProvider;
 
   // sdk attributes
-  public sdk!: KyveSDK;
-  public client!: KyveClient;
-  public lcd!: KyveLCDClientType;
+  public sdk!: KyveSDK[];
+  public client!: KyveClient[];
+  public lcd!: KyveLCDClientType[];
 
   // node attributes
   public protocolVersion!: string;
@@ -84,9 +84,9 @@ export class Validator {
   protected staker!: string;
   protected valaccount!: string;
   protected storagePriv!: string;
-  protected network!: string;
-  protected rpc!: string;
-  protected rest!: string;
+  protected chainId!: string;
+  protected rpc!: string[];
+  protected rest!: string[];
   protected cache!: string;
   protected debug!: boolean;
   protected metrics!: boolean;
@@ -205,18 +205,16 @@ export class Validator {
         "--storage-priv <string>",
         "The private key of the storage provider"
       )
+      .requiredOption("--chain-id <string>", "The chain ID of the network")
       .requiredOption(
-        "--network <local|alpha|beta|korellia>",
-        "The network of the KYVE chain",
-        parseNetwork
+        "--rpc <string>",
+        "Comma seperated list of rpc endpoints. If the first fails the next endpoint will be used as fallback.",
+        parseEndpoints
       )
-      .option(
-        "--rpc",
-        "Custom rpc endpoint the node uses for submitting transactions to chain"
-      )
-      .option(
-        "--rest",
-        "Custom rest api endpoint the node uses for querying from chain"
+      .requiredOption(
+        "--rest <string>",
+        "Comma separated list of rest endpoints. If the first fails the next endpoint will be used as fallback.",
+        parseEndpoints
       )
       .option(
         "--cache <jsonfile|memory>",
@@ -225,10 +223,6 @@ export class Validator {
         "jsonfile"
       )
       .option("--debug", "Run the validator node in debug mode")
-      .option(
-        "--verbose",
-        "[DEPRECATED] Run the validator node in verbose logging mode"
-      )
       .option(
         "--metrics",
         "Start a prometheus metrics server on http://localhost:8080/metrics"
@@ -268,7 +262,7 @@ export class Validator {
     this.poolId = options.pool;
     this.valaccount = options.valaccount;
     this.storagePriv = options.storagePriv;
-    this.network = options.network;
+    this.chainId = options.chainId;
     this.rpc = options.rpc;
     this.rest = options.rest;
     this.cache = options.cache;

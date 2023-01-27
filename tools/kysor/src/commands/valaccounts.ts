@@ -28,7 +28,11 @@ valaccounts
     "--storage-priv <string>",
     "The private key of the storage provider"
   )
-  .option("--verbose", "Run the validator node in verbose logging mode")
+  .option(
+    "--cache <jsonfile|memory>",
+    "The cache this node should use",
+    "jsonfile"
+  )
   .option(
     "--metrics",
     "Start a prometheus metrics server on http://localhost:8080/metrics"
@@ -107,7 +111,7 @@ valaccounts
         pool,
         valaccount,
         storagePriv: options.storagePriv,
-        verbose: options.verbose,
+        cache: options.cache,
         metrics: options.metrics,
         metricsPort: options.metricsPort,
       };

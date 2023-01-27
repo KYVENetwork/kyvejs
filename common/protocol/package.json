@@ -1,6 +1,6 @@
 {
   "name": "@kyvejs/protocol",
-  "version": "1.0.0-beta.2",
+  "version": "1.0.0-beta.3",
   "main": "./dist/src/index.js",
   "types": "./dist/src/index.d.ts",
   "repository": {
@@ -22,7 +22,7 @@
     "@bundlr-network/client": "^0.8.9",
     "@cosmjs/proto-signing": "^0.27.1",
     "@cosmjs/stargate": "^0.27.1",
-    "@kyvejs/sdk": "1.0.0-beta.1",
+    "@kyvejs/sdk": "1.0.0-beta.2",
     "@kyvejs/types": "1.0.0-beta.1",
     "@types/cli-progress": "^3.9.2",
     "@types/jsonfile": "^6.0.1",

@@ -18,9 +18,9 @@ import { Validator, standardizeJSON } from "../..";
  */
 export async function setupValidator(this: Validator): Promise<void> {
   try {
-    // generate deterministic valname based on network, pool id,
+    // generate deterministic valname based on chainId, pool id,
     // runtime, runtime version and valaddress
-    const valnameSeed = `${this.network}-${this.poolId}-${this.runtime.name}-${this.runtime.version}-${this.client.account.address}`;
+    const valnameSeed = `${this.chainId}-${this.poolId}-${this.runtime.name}-${this.runtime.version}-${this.client[0].account.address}`;
 
     this.logger.debug(`Creating seed for valname generation`);
     this.logger.debug(valnameSeed);
@@ -44,13 +44,13 @@ export async function setupValidator(this: Validator): Promise<void> {
 
     // log basic node info on startup
     this.logger.info("Starting node ...\n");
-    this.logger.info(`Valaddress \t = ${this.client.account.address}`);
+    this.logger.info(`Valaddress \t = ${this.client[0].account.address}`);
     this.logger.info(`Staker \t\t = ${this.staker}`);
     this.logger.info(`Valname \t\t = ${this.name}\n`);
 
     this.logger.info(`Pool ID \t\t = ${this.poolId}`);
     this.logger.info(`Runtime \t\t = ${this.runtime.name}`);
-    this.logger.info(`Network \t\t = ${this.network}\n`);
+    this.logger.info(`Chain ID \t\t = ${this.chainId}\n`);
 
     this.logger.info(`@kyvejs/protocol \t = v${this.protocolVersion}`);
     this.logger.info(`${this.runtime.name} \t = v${this.runtime.version}\n`);

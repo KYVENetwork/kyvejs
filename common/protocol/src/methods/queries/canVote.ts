@@ -18,46 +18,56 @@ export async function canVote(
   try {
     const canVote = await callWithBackoffStrategy(
       async () => {
-        await this.syncPoolState();
+        for (let l = 0; l < this.lcd.length; l++) {
+          try {
+            await this.syncPoolState();
 
-        // abort if staker is the current uploader
-        if (this.pool.bundle_proposal!.uploader === this.staker) {
-          return {
-            possible: false,
-            reason: "Validator is uploader of this bundle proposal",
-          };
+            // abort if staker is the current uploader
+            if (this.pool.bundle_proposal!.uploader === this.staker) {
+              return {
+                possible: false,
+                reason: "Validator is uploader of this bundle proposal",
+              };
+            }
+
+            // abort if bundle proposal is empty
+            if (!this.pool.bundle_proposal!.storage_id) {
+              return {
+                possible: false,
+                reason: "Current bundle proposal is empty",
+              };
+            }
+
+            // abort if a new bundle proposal was found
+            if (parseInt(this.pool.bundle_proposal!.updated_at) > updatedAt) {
+              return {
+                possible: false,
+                reason: "New bundle proposal was found",
+              };
+            }
+
+            this.logger.debug(this.rest[l]);
+            this.logger.debug(
+              `this.lcd.kyve.query.v1beta1.canVote({pool_id: ${this.poolId.toString()},staker: ${
+                this.staker
+              },voter: ${this.client[0].account.address},storage_id: ${
+                this.pool.bundle_proposal!.storage_id
+              }})`
+            );
+
+            return await this.lcd[l].kyve.query.v1beta1.canVote({
+              pool_id: this.poolId.toString(),
+              staker: this.staker,
+              voter: this.client[0].account.address,
+              storage_id: this.pool.bundle_proposal!.storage_id,
+            });
+          } catch (err) {
+            this.logger.error(`REST call to "${this.rest[l]}" failed`);
+            this.logger.error(standardizeJSON(err));
+          }
         }
 
-        // abort if bundle proposal is empty
-        if (!this.pool.bundle_proposal!.storage_id) {
-          return {
-            possible: false,
-            reason: "Current bundle proposal is empty",
-          };
-        }
-
-        // abort if a new bundle proposal was found
-        if (parseInt(this.pool.bundle_proposal!.updated_at) > updatedAt) {
-          return {
-            possible: false,
-            reason: "New bundle proposal was found",
-          };
-        }
-
-        this.logger.debug(
-          `this.lcd.kyve.query.v1beta1.canVote({pool_id: ${this.poolId.toString()},staker: ${
-            this.staker
-          },voter: ${this.client.account.address},storage_id: ${
-            this.pool.bundle_proposal!.storage_id
-          }})`
-        );
-
-        return await this.lcd.kyve.query.v1beta1.canVote({
-          pool_id: this.poolId.toString(),
-          staker: this.staker,
-          voter: this.client.account.address,
-          storage_id: this.pool.bundle_proposal!.storage_id,
-        });
+        throw new Error();
       },
       { limitTimeoutMs: 5 * 60 * 1000, increaseByMs: 10 * 1000 },
       async (err: any, ctx) => {

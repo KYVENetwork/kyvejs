@@ -15,23 +15,35 @@ import { callWithBackoffStrategy, standardizeJSON } from "../../utils";
 export async function syncPoolState(this: Validator): Promise<void> {
   await callWithBackoffStrategy(
     async () => {
-      this.logger.debug(
-        `this.lcd.kyve.query.v1beta1.pool({id: ${this.poolId.toString()}})`
-      );
+      for (let l = 0; l < this.lcd.length; l++) {
+        try {
+          this.logger.debug(this.rest[l]);
+          this.logger.debug(
+            `this.lcd.kyve.query.v1beta1.pool({id: ${this.poolId.toString()}})`
+          );
 
-      const prevPoolConfig = this.pool?.data?.config ?? "";
+          const prevPoolConfig = this.pool?.data?.config ?? "";
 
-      const { pool } = await this.lcd.kyve.query.v1beta1.pool({
-        id: this.poolId.toString(),
-      });
-      this.pool = pool!;
+          const { pool } = await this.lcd[l].kyve.query.v1beta1.pool({
+            id: this.poolId.toString(),
+          });
+          this.pool = pool!;
 
-      this.m.query_pool_successful.inc();
+          this.m.query_pool_successful.inc();
 
-      // if config link has changed sync the config
-      if (prevPoolConfig !== this.pool.data!.config) {
-        await this.syncPoolConfig();
+          // if config link has changed sync the config
+          if (prevPoolConfig !== this.pool.data!.config) {
+            await this.syncPoolConfig();
+          }
+
+          return;
+        } catch (err) {
+          this.logger.error(`REST call to "${this.rest[l]}" failed`);
+          this.logger.error(standardizeJSON(err));
+        }
       }
+
+      throw new Error();
     },
     { limitTimeoutMs: 5 * 60 * 1000, increaseByMs: 10 * 1000 },
     (err: any, ctx) => {

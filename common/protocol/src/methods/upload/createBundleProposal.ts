@@ -159,7 +159,7 @@ export async function createBundleProposal(this: Validator): Promise<void> {
       },
       {
         name: "ChainId",
-        value: await this.client.nativeClient.getChainId(),
+        value: this.chainId,
       },
       {
         name: "@kyvejs/protocol",
@@ -175,7 +175,7 @@ export async function createBundleProposal(this: Validator): Promise<void> {
       },
       {
         name: "Uploader",
-        value: this.client.account.address,
+        value: this.client[0].account.address,
       },
       {
         name: "FromIndex",
