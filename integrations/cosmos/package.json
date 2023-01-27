@@ -1,6 +1,6 @@
 {
   "name": "@kyvejs/cosmos",
-  "version": "1.0.0-beta.3",
+  "version": "1.0.0-beta.4",
   "license": "MIT",
   "scripts": {
     "build": "rimraf dist && tsc",
@@ -22,7 +22,7 @@
     "singleQuote": true
   },
   "dependencies": {
-    "@kyvejs/protocol": "1.0.0-beta.3",
+    "@kyvejs/protocol": "1.0.0-beta.4",
     "axios": "^0.27.2"
   },
   "devDependencies": {
