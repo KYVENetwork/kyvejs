@@ -357,14 +357,22 @@ export const run = async (options: any) => {
       const binName = fs.readdirSync(binHome)[0];
       const binPath = path.join(binHome, binName);
 
+      // export env secrets so binary can read them
+      const valaccountEnv = `VALACCOUNT_${options.valaccount}`.toUpperCase();
+      process.env[valaccountEnv] = valaccount.valaccount;
+
+      const storagePrivEnv =
+        `STORAGE_PRIV_${options.storagePriv}`.toUpperCase();
+      process.env[storagePrivEnv] = valaccount.storagePriv;
+
       const args = [
         `start`,
         `--pool`,
         `${valaccount.pool}`,
         `--valaccount`,
-        `${valaccount.valaccount}`,
+        `${valaccountEnv}`,
         `--storage-priv`,
-        `${valaccount.storagePriv}`,
+        `${storagePrivEnv}`,
         `--chain-id`,
         `${config.chainId}`,
         `--rpc`,
