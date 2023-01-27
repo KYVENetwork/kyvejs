@@ -3,8 +3,7 @@ import KyveSDK from "@kyvejs/sdk";
 import { Command } from "commander";
 import fs from "fs";
 import path from "path";
-
-const home = path.join(process.env.HOME!, ".kysor");
+import { HOME } from "../utils/constants";
 
 const init = new Command("init").description("Init KYSOR");
 
@@ -24,16 +23,16 @@ init
   )
   .action(async (options) => {
     try {
-      if (fs.existsSync(path.join(home, `config.toml`))) {
+      if (fs.existsSync(path.join(HOME, `config.toml`))) {
         console.log(
           `KYSOR was already initialized. You can directly edit the config file under ${path.join(
-            home,
+            HOME,
             `config.toml`
           )}`
         );
       } else {
         // create KYSOR home directory
-        fs.mkdirSync(home, {
+        fs.mkdirSync(HOME, {
           recursive: true,
         });
 
@@ -81,12 +80,12 @@ init
         };
 
         fs.writeFileSync(
-          path.join(home, `config.toml`),
+          path.join(HOME, `config.toml`),
           TOML.stringify(config as any)
         );
 
         console.log(
-          `Successfully initialized KYSOR in the following home directory: ${home}`
+          `Successfully initialized KYSOR in the following home directory: ${HOME}`
         );
       }
     } catch (err) {
