@@ -1,8 +1,8 @@
 /* eslint-disable */
 import _m0 from "protobufjs/minimal";
-import { Params } from "./fees";
+import { Params } from "./global";
 
-export const protobufPackage = "kyve.fees.v1beta1";
+export const protobufPackage = "kyve.global.v1beta1";
 
 /** QueryParamsRequest is request type for the Query/Params RPC method. */
 export interface QueryParamsRequest {
@@ -112,7 +112,7 @@ export class QueryClientImpl implements Query {
   private readonly rpc: Rpc;
   private readonly service: string;
   constructor(rpc: Rpc, opts?: { service?: string }) {
-    this.service = opts?.service || "kyve.fees.v1beta1.Query";
+    this.service = opts?.service || "kyve.global.v1beta1.Query";
     this.rpc = rpc;
     this.Params = this.Params.bind(this);
   }

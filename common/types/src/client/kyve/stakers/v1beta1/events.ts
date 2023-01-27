@@ -46,13 +46,16 @@ export interface EventUpdateCommission {
  * emitted_by: MsgJoinPool
  */
 export interface EventJoinPool {
-  /** pool_id ... */
+  /** pool_id is the pool the staker joined */
   pool_id: string;
-  /** staker ... */
+  /** staker is the address of the staker */
   staker: string;
-  /** valaddress ... */
+  /**
+   * valaddress is the address of the protocol node which
+   * votes in favor of the staker
+   */
   valaddress: string;
-  /** amount ... */
+  /** amount is the amount of funds transferred to the valaddress */
   amount: string;
 }
 

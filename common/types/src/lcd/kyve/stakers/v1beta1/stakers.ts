@@ -82,13 +82,19 @@ export interface CommissionChangeEntry {
  * in the UI to the delegators.
  */
 export interface LeavePoolEntry {
-  /** index ... */
+  /**
+   * index is needed for the queue-algorithm which
+   * processes the commission changes
+   */
   index: string;
-  /** staker ... */
+  /** staker is the address of the affected staker */
   staker: string;
-  /** pool_id ... */
+  /** pool_id indicates the pool the staker wants to leave */
   pool_id: string;
-  /** creation_date ... */
+  /**
+   * creation_date is the UNIX-timestamp in seconds
+   * when the entry was created.
+   */
   creation_date: string;
 }
 

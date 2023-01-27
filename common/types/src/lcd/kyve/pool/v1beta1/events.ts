@@ -9,33 +9,57 @@ export const protobufPackage = "kyve.pool.v1beta1";
  * emitted_by: EndBlock(gov)
  */
 export interface EventCreatePool {
-  /** id ... */
+  /** id is the unique ID of the pool. */
   id: string;
-  /** name ... */
+  /** name is the human readable name of the pool */
   name: string;
-  /** runtime ... */
+  /** runtime is the runtime name of the pool */
   runtime: string;
-  /** logo ... */
+  /** logo is the logo url of the pool */
   logo: string;
-  /** config ... */
+  /**
+   * config is either a json stringified config or an
+   * external link pointing to the config
+   */
   config: string;
-  /** start_key ... */
+  /**
+   * start_key is the first key the pool should start
+   * indexing
+   */
   start_key: string;
-  /** upload_interval ... */
+  /**
+   * upload_interval is the interval the pool should validate
+   * bundles with
+   */
   upload_interval: string;
-  /** operating_cost ... */
+  /**
+   * operating_cost is the fixed cost which gets paid out
+   * to every successful uploader
+   */
   operating_cost: string;
-  /** min_delegation ... */
+  /**
+   * min_delegation is the minimum amount of $KYVE the pool has
+   * to have in order to produce bundles
+   */
   min_delegation: string;
-  /** max_bundle_size ... */
+  /**
+   * max_bundle_size is the max size a data bundle can have
+   * (amount of data items)
+   */
   max_bundle_size: string;
-  /** version ... */
+  /** version is the current version of the protocol nodes */
   version: string;
-  /** binaries ... */
+  /** binaries points to the current binaries of the protocol node */
   binaries: string;
-  /** storage_provider_id ... */
+  /**
+   * storage_provider_id is the unique id of the storage provider
+   * the pool is archiving the data on
+   */
   storage_provider_id: number;
-  /** compression_id ... */
+  /**
+   * compression_id is the unique id of the compression type the bundles
+   * get compressed with
+   */
   compression_id: number;
 }
 
@@ -48,7 +72,7 @@ export interface EventFundPool {
   pool_id: string;
   /** address is the account address of the pool funder. */
   address: string;
-  /** amount ... */
+  /** amount is the amount in ukyve the funder has funded */
   amount: string;
 }
 
@@ -61,7 +85,7 @@ export interface EventDefundPool {
   pool_id: string;
   /** address is the account address of the pool funder. */
   address: string;
-  /** amount ... */
+  /** amount is the amount in ukyve the funder has defunded */
   amount: string;
 }
 
@@ -74,7 +98,7 @@ export interface EventPoolFundsSlashed {
   pool_id: string;
   /** address is the account address of the pool funder. */
   address: string;
-  /** amount ... */
+  /** amount is the amount in ukyve the validator has lost due to the slash */
   amount: string;
 }
 

@@ -15,8 +15,8 @@ export interface QueryPoolsRequest {
   search: string;
   /** runtime ... */
   runtime: string;
-  /** paused ... */
-  paused: boolean;
+  /** disabled ... */
+  disabled: boolean;
   /** storage_provider_id ... */
   storage_provider_id: number;
 }
@@ -60,7 +60,7 @@ export interface QueryPoolResponse {
 }
 
 function createBaseQueryPoolsRequest(): QueryPoolsRequest {
-  return { pagination: undefined, search: "", runtime: "", paused: false, storage_provider_id: 0 };
+  return { pagination: undefined, search: "", runtime: "", disabled: false, storage_provider_id: 0 };
 }
 
 export const QueryPoolsRequest = {
@@ -74,8 +74,8 @@ export const QueryPoolsRequest = {
     if (message.runtime !== "") {
       writer.uint32(26).string(message.runtime);
     }
-    if (message.paused === true) {
-      writer.uint32(32).bool(message.paused);
+    if (message.disabled === true) {
+      writer.uint32(32).bool(message.disabled);
     }
     if (message.storage_provider_id !== 0) {
       writer.uint32(40).uint32(message.storage_provider_id);
@@ -100,7 +100,7 @@ export const QueryPoolsRequest = {
           message.runtime = reader.string();
           break;
         case 4:
-          message.paused = reader.bool();
+          message.disabled = reader.bool();
           break;
         case 5:
           message.storage_provider_id = reader.uint32();
@@ -118,7 +118,7 @@ export const QueryPoolsRequest = {
       pagination: isSet(object.pagination) ? PageRequest.fromJSON(object.pagination) : undefined,
       search: isSet(object.search) ? String(object.search) : "",
       runtime: isSet(object.runtime) ? String(object.runtime) : "",
-      paused: isSet(object.paused) ? Boolean(object.paused) : false,
+      disabled: isSet(object.disabled) ? Boolean(object.disabled) : false,
       storage_provider_id: isSet(object.storage_provider_id) ? Number(object.storage_provider_id) : 0,
     };
   },
@@ -129,7 +129,7 @@ export const QueryPoolsRequest = {
       (obj.pagination = message.pagination ? PageRequest.toJSON(message.pagination) : undefined);
     message.search !== undefined && (obj.search = message.search);
     message.runtime !== undefined && (obj.runtime = message.runtime);
-    message.paused !== undefined && (obj.paused = message.paused);
+    message.disabled !== undefined && (obj.disabled = message.disabled);
     message.storage_provider_id !== undefined && (obj.storage_provider_id = Math.round(message.storage_provider_id));
     return obj;
   },
@@ -141,7 +141,7 @@ export const QueryPoolsRequest = {
       : undefined;
     message.search = object.search ?? "";
     message.runtime = object.runtime ?? "";
-    message.paused = object.paused ?? false;
+    message.disabled = object.disabled ?? false;
     message.storage_provider_id = object.storage_provider_id ?? 0;
     return message;
   },
