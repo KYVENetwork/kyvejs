@@ -82,28 +82,28 @@ export interface MsgUpdatePool {
 export interface MsgUpdatePoolResponse {
 }
 
-/** MsgPausePool defines a SDK message for pausing an existing pool. */
-export interface MsgPausePool {
+/** MsgDisablePool defines a SDK message for disabling an existing pool. */
+export interface MsgDisablePool {
   /** authority is the address of the governance account. */
   authority: string;
   /** id ... */
   id: string;
 }
 
-/** MsgPausePoolResponse defines the Msg/PausePool response type. */
-export interface MsgPausePoolResponse {
+/** MsgDisablePoolResponse defines the Msg/DisablePool response type. */
+export interface MsgDisablePoolResponse {
 }
 
-/** MsgUnpausePool defines a SDK message for unpausing an existing pool. */
-export interface MsgUnpausePool {
+/** MsgEnablePool defines a SDK message for enabling an existing pool. */
+export interface MsgEnablePool {
   /** authority is the address of the governance account. */
   authority: string;
   /** id ... */
   id: string;
 }
 
-/** MsgUnpausePoolResponse defines the Msg/UnpausePool response type. */
-export interface MsgUnpausePoolResponse {
+/** MsgEnablePoolResponse defines the Msg/EnablePool response type. */
+export interface MsgEnablePoolResponse {
 }
 
 /** MsgScheduleRuntimeUpgrade defines a SDK message for scheduling a runtime upgrade. */
@@ -676,12 +676,12 @@ export const MsgUpdatePoolResponse = {
   },
 };
 
-function createBaseMsgPausePool(): MsgPausePool {
+function createBaseMsgDisablePool(): MsgDisablePool {
   return { authority: "", id: "0" };
 }
 
-export const MsgPausePool = {
-  encode(message: MsgPausePool, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const MsgDisablePool = {
+  encode(message: MsgDisablePool, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.authority !== "") {
       writer.uint32(10).string(message.authority);
     }
@@ -691,10 +691,10 @@ export const MsgPausePool = {
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): MsgPausePool {
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgDisablePool {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgPausePool();
+    const message = createBaseMsgDisablePool();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -712,41 +712,41 @@ export const MsgPausePool = {
     return message;
   },
 
-  fromJSON(object: any): MsgPausePool {
+  fromJSON(object: any): MsgDisablePool {
     return {
       authority: isSet(object.authority) ? String(object.authority) : "",
       id: isSet(object.id) ? String(object.id) : "0",
     };
   },
 
-  toJSON(message: MsgPausePool): unknown {
+  toJSON(message: MsgDisablePool): unknown {
     const obj: any = {};
     message.authority !== undefined && (obj.authority = message.authority);
     message.id !== undefined && (obj.id = message.id);
     return obj;
   },
 
-  fromPartial<I extends Exact<DeepPartial<MsgPausePool>, I>>(object: I): MsgPausePool {
-    const message = createBaseMsgPausePool();
+  fromPartial<I extends Exact<DeepPartial<MsgDisablePool>, I>>(object: I): MsgDisablePool {
+    const message = createBaseMsgDisablePool();
     message.authority = object.authority ?? "";
     message.id = object.id ?? "0";
     return message;
   },
 };
 
-function createBaseMsgPausePoolResponse(): MsgPausePoolResponse {
+function createBaseMsgDisablePoolResponse(): MsgDisablePoolResponse {
   return {};
 }
 
-export const MsgPausePoolResponse = {
-  encode(_: MsgPausePoolResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const MsgDisablePoolResponse = {
+  encode(_: MsgDisablePoolResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): MsgPausePoolResponse {
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgDisablePoolResponse {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgPausePoolResponse();
+    const message = createBaseMsgDisablePoolResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -758,27 +758,27 @@ export const MsgPausePoolResponse = {
     return message;
   },
 
-  fromJSON(_: any): MsgPausePoolResponse {
+  fromJSON(_: any): MsgDisablePoolResponse {
     return {};
   },
 
-  toJSON(_: MsgPausePoolResponse): unknown {
+  toJSON(_: MsgDisablePoolResponse): unknown {
     const obj: any = {};
     return obj;
   },
 
-  fromPartial<I extends Exact<DeepPartial<MsgPausePoolResponse>, I>>(_: I): MsgPausePoolResponse {
-    const message = createBaseMsgPausePoolResponse();
+  fromPartial<I extends Exact<DeepPartial<MsgDisablePoolResponse>, I>>(_: I): MsgDisablePoolResponse {
+    const message = createBaseMsgDisablePoolResponse();
     return message;
   },
 };
 
-function createBaseMsgUnpausePool(): MsgUnpausePool {
+function createBaseMsgEnablePool(): MsgEnablePool {
   return { authority: "", id: "0" };
 }
 
-export const MsgUnpausePool = {
-  encode(message: MsgUnpausePool, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const MsgEnablePool = {
+  encode(message: MsgEnablePool, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.authority !== "") {
       writer.uint32(10).string(message.authority);
     }
@@ -788,10 +788,10 @@ export const MsgUnpausePool = {
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): MsgUnpausePool {
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgEnablePool {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgUnpausePool();
+    const message = createBaseMsgEnablePool();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -809,41 +809,41 @@ export const MsgUnpausePool = {
     return message;
   },
 
-  fromJSON(object: any): MsgUnpausePool {
+  fromJSON(object: any): MsgEnablePool {
     return {
       authority: isSet(object.authority) ? String(object.authority) : "",
       id: isSet(object.id) ? String(object.id) : "0",
     };
   },
 
-  toJSON(message: MsgUnpausePool): unknown {
+  toJSON(message: MsgEnablePool): unknown {
     const obj: any = {};
     message.authority !== undefined && (obj.authority = message.authority);
     message.id !== undefined && (obj.id = message.id);
     return obj;
   },
 
-  fromPartial<I extends Exact<DeepPartial<MsgUnpausePool>, I>>(object: I): MsgUnpausePool {
-    const message = createBaseMsgUnpausePool();
+  fromPartial<I extends Exact<DeepPartial<MsgEnablePool>, I>>(object: I): MsgEnablePool {
+    const message = createBaseMsgEnablePool();
     message.authority = object.authority ?? "";
     message.id = object.id ?? "0";
     return message;
   },
 };
 
-function createBaseMsgUnpausePoolResponse(): MsgUnpausePoolResponse {
+function createBaseMsgEnablePoolResponse(): MsgEnablePoolResponse {
   return {};
 }
 
-export const MsgUnpausePoolResponse = {
-  encode(_: MsgUnpausePoolResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const MsgEnablePoolResponse = {
+  encode(_: MsgEnablePoolResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): MsgUnpausePoolResponse {
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgEnablePoolResponse {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgUnpausePoolResponse();
+    const message = createBaseMsgEnablePoolResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -855,17 +855,17 @@ export const MsgUnpausePoolResponse = {
     return message;
   },
 
-  fromJSON(_: any): MsgUnpausePoolResponse {
+  fromJSON(_: any): MsgEnablePoolResponse {
     return {};
   },
 
-  toJSON(_: MsgUnpausePoolResponse): unknown {
+  toJSON(_: MsgEnablePoolResponse): unknown {
     const obj: any = {};
     return obj;
   },
 
-  fromPartial<I extends Exact<DeepPartial<MsgUnpausePoolResponse>, I>>(_: I): MsgUnpausePoolResponse {
-    const message = createBaseMsgUnpausePoolResponse();
+  fromPartial<I extends Exact<DeepPartial<MsgEnablePoolResponse>, I>>(_: I): MsgEnablePoolResponse {
+    const message = createBaseMsgEnablePoolResponse();
     return message;
   },
 };
@@ -1119,15 +1119,15 @@ export interface Msg {
    */
   UpdatePool(request: MsgUpdatePool): Promise<MsgUpdatePoolResponse>;
   /**
-   * PausingPool defines a governance operation for pausing an existing pool.
+   * DisablePool defines a governance operation for disabling an existing pool.
    * The authority is hard-coded to the x/gov module account.
    */
-  PausePool(request: MsgPausePool): Promise<MsgPausePoolResponse>;
+  DisablePool(request: MsgDisablePool): Promise<MsgDisablePoolResponse>;
   /**
-   * UnpausePool defines a governance operation for unpausing an existing pool.
+   * EnablePool defines a governance operation for enabling an existing pool.
    * The authority is hard-coded to the x/gov module account.
    */
-  UnpausePool(request: MsgUnpausePool): Promise<MsgUnpausePoolResponse>;
+  EnablePool(request: MsgEnablePool): Promise<MsgEnablePoolResponse>;
   /**
    * ScheduleRuntimeUpgrade defines a governance operation for scheduling a runtime upgrade.
    * The authority is hard-coded to the x/gov module account.
@@ -1150,8 +1150,8 @@ export class MsgClientImpl implements Msg {
     this.DefundPool = this.DefundPool.bind(this);
     this.CreatePool = this.CreatePool.bind(this);
     this.UpdatePool = this.UpdatePool.bind(this);
-    this.PausePool = this.PausePool.bind(this);
-    this.UnpausePool = this.UnpausePool.bind(this);
+    this.DisablePool = this.DisablePool.bind(this);
+    this.EnablePool = this.EnablePool.bind(this);
     this.ScheduleRuntimeUpgrade = this.ScheduleRuntimeUpgrade.bind(this);
     this.CancelRuntimeUpgrade = this.CancelRuntimeUpgrade.bind(this);
   }
@@ -1179,16 +1179,16 @@ export class MsgClientImpl implements Msg {
     return promise.then((data) => MsgUpdatePoolResponse.decode(new _m0.Reader(data)));
   }
 
-  PausePool(request: MsgPausePool): Promise<MsgPausePoolResponse> {
-    const data = MsgPausePool.encode(request).finish();
-    const promise = this.rpc.request(this.service, "PausePool", data);
-    return promise.then((data) => MsgPausePoolResponse.decode(new _m0.Reader(data)));
+  DisablePool(request: MsgDisablePool): Promise<MsgDisablePoolResponse> {
+    const data = MsgDisablePool.encode(request).finish();
+    const promise = this.rpc.request(this.service, "DisablePool", data);
+    return promise.then((data) => MsgDisablePoolResponse.decode(new _m0.Reader(data)));
   }
 
-  UnpausePool(request: MsgUnpausePool): Promise<MsgUnpausePoolResponse> {
-    const data = MsgUnpausePool.encode(request).finish();
-    const promise = this.rpc.request(this.service, "UnpausePool", data);
-    return promise.then((data) => MsgUnpausePoolResponse.decode(new _m0.Reader(data)));
+  EnablePool(request: MsgEnablePool): Promise<MsgEnablePoolResponse> {
+    const data = MsgEnablePool.encode(request).finish();
+    const promise = this.rpc.request(this.service, "EnablePool", data);
+    return promise.then((data) => MsgEnablePoolResponse.decode(new _m0.Reader(data)));
   }
 
   ScheduleRuntimeUpgrade(request: MsgScheduleRuntimeUpgrade): Promise<MsgScheduleRuntimeUpgradeResponse> {

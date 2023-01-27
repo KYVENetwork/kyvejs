@@ -1,13 +1,13 @@
 /* eslint-disable */
 import _m0 from "protobufjs/minimal";
 
-export const protobufPackage = "kyve.fees.v1beta1";
+export const protobufPackage = "kyve.global.v1beta1";
 
 /** MsgUpdateParams defines a SDK message for updating the module parameters. */
 export interface MsgUpdateParams {
   /** authority is the address of the governance account. */
   authority: string;
-  /** payload defines the x/fees parameters to update. */
+  /** payload defines the x/global parameters to update. */
   payload: string;
 }
 
@@ -115,8 +115,9 @@ export const MsgUpdateParamsResponse = {
 /** Msg defines the Msg service. */
 export interface Msg {
   /**
-   * UpdateParams defines a governance operation for updating the x/fees module
-   * parameters. The authority is hard-coded to the x/gov module account.
+   * UpdateParams defines a governance operation for updating the x/global
+   * module parameters. The authority is hard-coded to the x/gov module
+   * account.
    */
   UpdateParams(request: MsgUpdateParams): Promise<MsgUpdateParamsResponse>;
 }
@@ -125,7 +126,7 @@ export class MsgClientImpl implements Msg {
   private readonly rpc: Rpc;
   private readonly service: string;
   constructor(rpc: Rpc, opts?: { service?: string }) {
-    this.service = opts?.service || "kyve.fees.v1beta1.Msg";
+    this.service = opts?.service || "kyve.global.v1beta1.Msg";
     this.rpc = rpc;
     this.UpdateParams = this.UpdateParams.bind(this);
   }
