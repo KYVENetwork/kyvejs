@@ -3,18 +3,17 @@ import crypto from "crypto";
 import fs from "fs";
 import path from "path";
 import { ILogObject, Logger } from "tslog";
-
-const home = path.join(process.env.HOME!, ".kysor");
+import { HOME } from "./constants";
 
 export const setupLogger = () => {
   // create log folder
-  fs.mkdirSync(path.join(home, `logs`), { recursive: true });
+  fs.mkdirSync(path.join(HOME, `logs`), { recursive: true });
 
   const logFile = `${new Date().toISOString()}.log`;
 
   const logToTransport = (log: ILogObject) => {
     fs.appendFileSync(
-      path.join(home, `logs`, logFile),
+      path.join(HOME, `logs`, logFile),
       JSON.stringify(log) + "\n"
     );
   };

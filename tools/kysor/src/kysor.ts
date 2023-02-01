@@ -4,15 +4,12 @@ import { PoolResponse } from "@kyvejs/types/lcd/kyve/query/v1beta1/pools";
 import download from "download";
 import extract from "extract-zip";
 import fs from "fs";
-import os from "os";
 import path from "path";
 
 import { IConfig, IValaccountConfig } from "./types/interfaces";
 import { getChecksum, setupLogger, startNodeProcess } from "./utils";
+import { ARCH, HOME, PLATFORM } from "./utils/constants";
 
-const home = path.join(process.env.HOME!, ".kysor");
-const platform = os.platform() === "darwin" ? "macos" : os.platform();
-const arch = os.arch();
 const INFINITY_LOOP = true;
 const logger = setupLogger();
 
@@ -23,7 +20,7 @@ export const run = async (options: any) => {
   let valaccount: IValaccountConfig = {} as IValaccountConfig;
   let pool: PoolResponse;
 
-  if (!fs.existsSync(path.join(home, `config.toml`))) {
+  if (!fs.existsSync(path.join(HOME, `config.toml`))) {
     logger.error(
       `KYSOR is not initialized yet. You can initialize it by running: ./kysor init --chain-id <chain_id> --rpc <rpc_1,rpc_2...> --rest <rest_1,rest_2...> --auto-download-binaries`
     );
@@ -31,11 +28,11 @@ export const run = async (options: any) => {
   }
 
   logger.info("Starting KYSOR ...");
-  logger.info(`Running on platform and architecture "${platform}" - "${arch}"`);
+  logger.info(`Running on platform and architecture "${PLATFORM}" - "${ARCH}"`);
 
   // verify that KYSOR config toml exists and can be parsed
   try {
-    if (!fs.existsSync(path.join(home, `config.toml`))) {
+    if (!fs.existsSync(path.join(HOME, `config.toml`))) {
       logger.error(`KYSOR config.toml does not exist. Exiting KYSOR ...`);
       process.exit(0);
     }
@@ -50,7 +47,7 @@ export const run = async (options: any) => {
   // verify that KYSOR config toml can be parsed
   try {
     config = TOML.parse(
-      fs.readFileSync(path.join(home, `config.toml`), "utf-8")
+      fs.readFileSync(path.join(HOME, `config.toml`), "utf-8")
     ) as any;
     logger.info(`Found KYSOR config file "config.toml"`);
   } catch (err) {
@@ -85,7 +82,7 @@ export const run = async (options: any) => {
   try {
     if (
       !fs.existsSync(
-        path.join(home, "valaccounts", `${options.valaccount}.toml`)
+        path.join(HOME, "valaccounts", `${options.valaccount}.toml`)
       )
     ) {
       logger.error(
@@ -105,7 +102,7 @@ export const run = async (options: any) => {
   try {
     valaccount = TOML.parse(
       fs.readFileSync(
-        path.join(home, "valaccounts", `${options.valaccount}.toml`),
+        path.join(HOME, "valaccounts", `${options.valaccount}.toml`),
         "utf-8"
       )
     ) as any;
@@ -142,7 +139,7 @@ export const run = async (options: any) => {
     // create pool directory if it does not exist yet
     if (!fs.existsSync("./upgrades")) {
       logger.info(`Creating "upgrades" directory ...`);
-      fs.mkdirSync(path.join(home, `upgrades`), {
+      fs.mkdirSync(path.join(HOME, `upgrades`), {
         recursive: true,
       });
     }
@@ -177,15 +174,15 @@ export const run = async (options: any) => {
     }
 
     // create pool directory if does not exist yet
-    if (!fs.existsSync(path.join(home, `upgrades`, `pool-${pool.id}`))) {
-      fs.mkdirSync(path.join(home, `upgrades`, `pool-${pool.id}`), {
+    if (!fs.existsSync(path.join(HOME, `upgrades`, `pool-${pool.id}`))) {
+      fs.mkdirSync(path.join(HOME, `upgrades`, `pool-${pool.id}`), {
         recursive: true,
       });
     }
 
     // check if directory with version already exists
     if (
-      fs.existsSync(path.join(home, `upgrades`, `pool-${pool.id}`, version))
+      fs.existsSync(path.join(HOME, `upgrades`, `pool-${pool.id}`, version))
     ) {
       logger.info(
         `Binary of pool "${pool.id}" with version ${version} found locally`
@@ -204,12 +201,12 @@ export const run = async (options: any) => {
       }
 
       const binaries = JSON.parse(pool.data!.protocol!.binaries);
-      const downloadLink = binaries[`kyve-${platform}-${arch}`];
+      const downloadLink = binaries[`kyve-${PLATFORM}-${ARCH}`];
 
       // if download link was not found exit
       if (!downloadLink) {
         logger.error(
-          `Upgrade binary "kyve-${platform}-${arch}" not found on pool. Exiting KYSOR ...`
+          `Upgrade binary "kyve-${PLATFORM}-${ARCH}" not found on pool. Exiting KYSOR ...`
         );
         process.exit(0);
       }
@@ -220,7 +217,7 @@ export const run = async (options: any) => {
 
       // create directories for new version
       fs.mkdirSync(
-        path.join(home, `upgrades`, `pool-${pool.id}`, version, `bin`),
+        path.join(HOME, `upgrades`, `pool-${pool.id}`, version, `bin`),
         {
           recursive: true,
         }
@@ -232,7 +229,7 @@ export const run = async (options: any) => {
 
         fs.writeFileSync(
           path.join(
-            home,
+            HOME,
             `upgrades`,
             `pool-${pool.id}`,
             version,
@@ -248,7 +245,7 @@ export const run = async (options: any) => {
         logger.error(JSON.parse(JSON.stringify(err)));
 
         // exit and delete version folders if binary could not be downloaded
-        fs.rmSync(path.join(home, `upgrades`, `pool-${pool.id}`, version), {
+        fs.rmSync(path.join(HOME, `upgrades`, `pool-${pool.id}`, version), {
           recursive: true,
         });
         process.exit(0);
@@ -257,7 +254,7 @@ export const run = async (options: any) => {
       try {
         logger.info(
           `Extracting binary to ${path.join(
-            home,
+            HOME,
             `upgrades`,
             `pool-${pool.id}`,
             version,
@@ -267,7 +264,7 @@ export const run = async (options: any) => {
         );
         await extract(
           path.join(
-            home,
+            HOME,
             `upgrades`,
             `pool-${pool.id}`,
             version,
@@ -276,7 +273,7 @@ export const run = async (options: any) => {
           ),
           {
             dir: path.resolve(
-              path.join(home, `upgrades`, `pool-${pool.id}`, version, `bin`)
+              path.join(HOME, `upgrades`, `pool-${pool.id}`, version, `bin`)
             ),
           }
         );
@@ -285,7 +282,7 @@ export const run = async (options: any) => {
         if (
           fs.existsSync(
             path.join(
-              home,
+              HOME,
               `upgrades`,
               `pool-${pool.id}`,
               version,
@@ -298,7 +295,7 @@ export const run = async (options: any) => {
           // delete zip afterwards
           fs.unlinkSync(
             path.join(
-              home,
+              HOME,
               `upgrades`,
               `pool-${pool.id}`,
               version,
@@ -312,7 +309,7 @@ export const run = async (options: any) => {
         logger.error(JSON.parse(JSON.stringify(err)));
 
         // exit and delete version folders if binary could not be extracted
-        fs.rmSync(path.join(home, `upgrades`, `pool-${pool.id}`, version), {
+        fs.rmSync(path.join(HOME, `upgrades`, `pool-${pool.id}`, version), {
           recursive: true,
         });
         process.exit(0);
@@ -320,7 +317,7 @@ export const run = async (options: any) => {
 
       if (checksum) {
         const versionHome = path.join(
-          home,
+          HOME,
           `upgrades`,
           `pool-${pool.id}`,
           version
@@ -348,7 +345,7 @@ export const run = async (options: any) => {
 
     try {
       const versionHome = path.join(
-        home,
+        HOME,
         `upgrades`,
         `pool-${pool.id}`,
         version
@@ -357,14 +354,22 @@ export const run = async (options: any) => {
       const binName = fs.readdirSync(binHome)[0];
       const binPath = path.join(binHome, binName);
 
+      // export env secrets so binary can read them
+      const valaccountEnv = `VALACCOUNT_${options.valaccount}`.toUpperCase();
+      process.env[valaccountEnv] = valaccount.valaccount;
+
+      const storagePrivEnv =
+        `STORAGE_PRIV_${options.storagePriv}`.toUpperCase();
+      process.env[storagePrivEnv] = valaccount.storagePriv;
+
       const args = [
         `start`,
         `--pool`,
         `${valaccount.pool}`,
         `--valaccount`,
-        `${valaccount.valaccount}`,
+        `${valaccountEnv}`,
         `--storage-priv`,
-        `${valaccount.storagePriv}`,
+        `${storagePrivEnv}`,
         `--chain-id`,
         `${config.chainId}`,
         `--rpc`,
