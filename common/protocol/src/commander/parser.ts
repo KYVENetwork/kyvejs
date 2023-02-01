@@ -10,15 +10,32 @@ export const parsePoolId = (value: string): number => {
   return parsedValue;
 };
 
-export const parseMnemonic = (value: string): string => {
-  const parsedValue = value.split(" ");
+export const parseValaccount = (value: string): string => {
+  if (!process.env[value]) {
+    throw new commander.InvalidArgumentError(
+      `Environment variable "${value}" has no value`
+    );
+  }
+
+  const parsedValue = process.env[value]?.split(" ") ?? [];
 
   if (!(parsedValue.length === 12 || parsedValue.length === 24)) {
     throw new commander.InvalidArgumentError(
       "Mnemonic must have 12 or 24 words."
     );
   }
-  return value;
+
+  return process.env[value] || "";
+};
+
+export const parseStoragePriv = (value: string): string => {
+  if (!process.env[value]) {
+    throw new commander.InvalidArgumentError(
+      `Environment variable "${value}" has no value`
+    );
+  }
+
+  return process.env[value] || "";
 };
 
 export const parseKeyfile = (value: string): string => {

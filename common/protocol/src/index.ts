@@ -8,8 +8,9 @@ import { version as protocolVersion } from "../package.json";
 import {
   parseCache,
   parseEndpoints,
-  parseMnemonic,
+  parseValaccount,
   parsePoolId,
+  parseStoragePriv,
 } from "./commander";
 import {
   canPropose,
@@ -198,12 +199,13 @@ export class Validator {
       )
       .requiredOption(
         "--valaccount <string>",
-        "The mnemonic of the valaccount",
-        parseMnemonic
+        "The environment variable pointing to the valaccount mnemonic",
+        parseValaccount
       )
       .requiredOption(
         "--storage-priv <string>",
-        "The private key of the storage provider"
+        "The environment variable pointing to the private key of the storage provider",
+        parseStoragePriv
       )
       .requiredOption("--chain-id <string>", "The chain ID of the network")
       .requiredOption(
