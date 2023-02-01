@@ -2,6 +2,7 @@ import seedrandom from "seedrandom";
 
 import { DataItem, Validator } from "../..";
 import { generateIndexPairs, sleep, standardizeJSON } from "../../utils";
+import clone from "clone";
 
 /**
  * runCache is the other main execution thread for collecting data items
@@ -36,8 +37,10 @@ export async function runCache(this: Validator): Promise<void> {
     try {
       // temp save current pool state because the runNode thread could
       // overwrite this value during runtime
-      const poolRound = structuredClone(this.pool);
-      const poolConfigRound = structuredClone(this.poolConfig);
+      // const poolRound = structuredClone(this.pool);
+      // const poolConfigRound = structuredClone(this.poolConfig);
+      const poolRound = clone(this.pool);
+      const poolConfigRound = clone(this.poolConfig);
 
       // if there is no storage id we can assume that the last
       // bundle has been dropped or invalidated. In that case we
