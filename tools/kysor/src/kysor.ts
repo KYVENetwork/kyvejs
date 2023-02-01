@@ -1,40 +1,38 @@
 import TOML from "@iarna/toml";
-import KyveSDK, { KyveLCDClientType } from "@kyvejs/sdk";
+import KyveSDK from "@kyvejs/sdk";
 import { PoolResponse } from "@kyvejs/types/lcd/kyve/query/v1beta1/pools";
 import download from "download";
 import extract from "extract-zip";
 import fs from "fs";
-import os from "os";
 import path from "path";
 
 import { IConfig, IValaccountConfig } from "./types/interfaces";
 import { getChecksum, setupLogger, startNodeProcess } from "./utils";
+import { ARCH, HOME, PLATFORM } from "./utils/constants";
 
-const home = path.join(process.env.HOME!, ".kysor");
-const platform = os.platform() === "darwin" ? "macos" : os.platform();
-const arch = os.arch();
 const INFINITY_LOOP = true;
 const logger = setupLogger();
 
 export const run = async (options: any) => {
   let config: IConfig = {} as IConfig;
+  let rpc: string[];
+  let rest: string[];
   let valaccount: IValaccountConfig = {} as IValaccountConfig;
   let pool: PoolResponse;
-  let lcd: KyveLCDClientType = {} as KyveLCDClientType;
 
-  if (!fs.existsSync(path.join(home, `config.toml`))) {
+  if (!fs.existsSync(path.join(HOME, `config.toml`))) {
     logger.error(
-      `KYSOR is not initialized yet. You can initialize it by running: ./kysor init --network <desired_network> --auto-download-binaries`
+      `KYSOR is not initialized yet. You can initialize it by running: ./kysor init --chain-id <chain_id> --rpc <rpc_1,rpc_2...> --rest <rest_1,rest_2...> --auto-download-binaries`
     );
     return;
   }
 
   logger.info("Starting KYSOR ...");
-  logger.info(`Running on platform and architecture "${platform}" - "${arch}"`);
+  logger.info(`Running on platform and architecture "${PLATFORM}" - "${ARCH}"`);
 
   // verify that KYSOR config toml exists and can be parsed
   try {
-    if (!fs.existsSync(path.join(home, `config.toml`))) {
+    if (!fs.existsSync(path.join(HOME, `config.toml`))) {
       logger.error(`KYSOR config.toml does not exist. Exiting KYSOR ...`);
       process.exit(0);
     }
@@ -42,21 +40,41 @@ export const run = async (options: any) => {
     logger.error(
       `Error opening KYSOR config file config.toml. Exiting KYSOR ...`
     );
-    logger.error(err);
+    logger.error(JSON.parse(JSON.stringify(err)));
     process.exit(0);
   }
 
   // verify that KYSOR config toml can be parsed
   try {
     config = TOML.parse(
-      fs.readFileSync(path.join(home, `config.toml`), "utf-8")
+      fs.readFileSync(path.join(HOME, `config.toml`), "utf-8")
     ) as any;
     logger.info(`Found KYSOR config file "config.toml"`);
   } catch (err) {
     logger.error(
       `Error parsing KYSOR config file config.toml. Exiting KYSOR ...`
     );
-    logger.error(err);
+    logger.error(JSON.parse(JSON.stringify(err)));
+    process.exit(0);
+  }
+
+  // verify that rpc and rest endpoints are valid
+  try {
+    rpc = config.rpc.split(",").map((r) => r.trim());
+    rest = config.rest.split(",").map((r) => r.trim());
+
+    if (!rpc.length || !rest.length) {
+      throw new Error("rpc and rest endpoints must be specified");
+    }
+
+    if (rpc.length !== rest.length) {
+      throw new Error("rpc and rest endpoints must have same lengths");
+    }
+  } catch (err) {
+    logger.error(
+      `Error validating rpc and rest endpoints. Edit the config.toml accordingly. Exiting KYSOR ...`
+    );
+    logger.error(JSON.parse(JSON.stringify(err)));
     process.exit(0);
   }
 
@@ -64,7 +82,7 @@ export const run = async (options: any) => {
   try {
     if (
       !fs.existsSync(
-        path.join(home, "valaccounts", `${options.valaccount}.toml`)
+        path.join(HOME, "valaccounts", `${options.valaccount}.toml`)
       )
     ) {
       logger.error(
@@ -76,7 +94,7 @@ export const run = async (options: any) => {
     logger.error(
       `Error opening valaccount config file ${options.valaccount}.toml. Exiting KYSOR ...`
     );
-    logger.error(err);
+    logger.error(JSON.parse(JSON.stringify(err)));
     process.exit(0);
   }
 
@@ -84,7 +102,7 @@ export const run = async (options: any) => {
   try {
     valaccount = TOML.parse(
       fs.readFileSync(
-        path.join(home, "valaccounts", `${options.valaccount}.toml`),
+        path.join(HOME, "valaccounts", `${options.valaccount}.toml`),
         "utf-8"
       )
     ) as any;
@@ -93,33 +111,58 @@ export const run = async (options: any) => {
     logger.error(
       `Error parsing valaccount config file ${options.valaccount}.toml. Exiting KYSOR ...`
     );
-    logger.error(err);
+    logger.error(JSON.parse(JSON.stringify(err)));
     process.exit(0);
   }
 
-  // verify kyve sdk client can be created
-  try {
-    lcd = new KyveSDK(config.network).createLCDClient();
-  } catch (err) {
-    logger.error(
-      `Error creating LCD client from network ${options.network}. Exiting KYSOR ...`
-    );
-    logger.error(err);
-  }
+  // create lcd clients
+  const lcd = rpc.map((_, i) => {
+    try {
+      return new KyveSDK({
+        chainId: config.chainId,
+        rpc: rpc[i],
+        rest: rest[i],
+        chainName: `KYVE - ${config.chainId}`,
+      }).createLCDClient();
+    } catch (err) {
+      logger.error(
+        `Error creating LCD client from chain id ${config.chainId}, rpc ${rpc[i]} and rest ${rest[i]}. Exiting KYSOR ...`
+      );
+      logger.error(JSON.parse(JSON.stringify(err)));
+      process.exit(0);
+    }
+  });
 
   while (INFINITY_LOOP) {
+    let data;
+
     // create pool directory if it does not exist yet
     if (!fs.existsSync("./upgrades")) {
       logger.info(`Creating "upgrades" directory ...`);
-      fs.mkdirSync(path.join(home, `upgrades`), {
+      fs.mkdirSync(path.join(HOME, `upgrades`), {
         recursive: true,
       });
     }
 
     // fetch pool state
-    const data = await lcd.kyve.query.v1beta1.pool({
-      id: valaccount.pool.toString(),
-    });
+    for (let l = 0; l < lcd.length; l++) {
+      try {
+        logger.info(`Calling rest ${rest[l]}`);
+
+        data = await lcd[l].kyve.query.v1beta1.pool({
+          id: valaccount.pool.toString(),
+        });
+      } catch (err) {
+        logger.error(`Call to rest ${rest[l]} failed`);
+        logger.error(JSON.parse(JSON.stringify(err)));
+        continue;
+      }
+    }
+
+    if (!data) {
+      logger.error(`Unable to fetch pool state. Exiting KYSOR ...`);
+      process.exit(0);
+    }
 
     pool = data.pool as PoolResponse;
 
@@ -131,15 +174,15 @@ export const run = async (options: any) => {
     }
 
     // create pool directory if does not exist yet
-    if (!fs.existsSync(path.join(home, `upgrades`, `pool-${pool.id}`))) {
-      fs.mkdirSync(path.join(home, `upgrades`, `pool-${pool.id}`), {
+    if (!fs.existsSync(path.join(HOME, `upgrades`, `pool-${pool.id}`))) {
+      fs.mkdirSync(path.join(HOME, `upgrades`, `pool-${pool.id}`), {
         recursive: true,
       });
     }
 
     // check if directory with version already exists
     if (
-      fs.existsSync(path.join(home, `upgrades`, `pool-${pool.id}`, version))
+      fs.existsSync(path.join(HOME, `upgrades`, `pool-${pool.id}`, version))
     ) {
       logger.info(
         `Binary of pool "${pool.id}" with version ${version} found locally`
@@ -158,12 +201,12 @@ export const run = async (options: any) => {
       }
 
       const binaries = JSON.parse(pool.data!.protocol!.binaries);
-      const downloadLink = binaries[`kyve-${platform}-${arch}`];
+      const downloadLink = binaries[`kyve-${PLATFORM}-${ARCH}`];
 
       // if download link was not found exit
       if (!downloadLink) {
         logger.error(
-          `Upgrade binary "kyve-${platform}-${arch}" not found on pool. Exiting KYSOR ...`
+          `Upgrade binary "kyve-${PLATFORM}-${ARCH}" not found on pool. Exiting KYSOR ...`
         );
         process.exit(0);
       }
@@ -174,7 +217,7 @@ export const run = async (options: any) => {
 
       // create directories for new version
       fs.mkdirSync(
-        path.join(home, `upgrades`, `pool-${pool.id}`, version, `bin`),
+        path.join(HOME, `upgrades`, `pool-${pool.id}`, version, `bin`),
         {
           recursive: true,
         }
@@ -186,7 +229,7 @@ export const run = async (options: any) => {
 
         fs.writeFileSync(
           path.join(
-            home,
+            HOME,
             `upgrades`,
             `pool-${pool.id}`,
             version,
@@ -199,10 +242,10 @@ export const run = async (options: any) => {
         logger.error(
           `Error downloading binary from ${downloadLink}. Exiting KYSOR ...`
         );
-        logger.error(err);
+        logger.error(JSON.parse(JSON.stringify(err)));
 
         // exit and delete version folders if binary could not be downloaded
-        fs.rmSync(path.join(home, `upgrades`, `pool-${pool.id}`, version), {
+        fs.rmSync(path.join(HOME, `upgrades`, `pool-${pool.id}`, version), {
           recursive: true,
         });
         process.exit(0);
@@ -211,7 +254,7 @@ export const run = async (options: any) => {
       try {
         logger.info(
           `Extracting binary to ${path.join(
-            home,
+            HOME,
             `upgrades`,
             `pool-${pool.id}`,
             version,
@@ -221,7 +264,7 @@ export const run = async (options: any) => {
         );
         await extract(
           path.join(
-            home,
+            HOME,
             `upgrades`,
             `pool-${pool.id}`,
             version,
@@ -230,7 +273,7 @@ export const run = async (options: any) => {
           ),
           {
             dir: path.resolve(
-              path.join(home, `upgrades`, `pool-${pool.id}`, version, `bin`)
+              path.join(HOME, `upgrades`, `pool-${pool.id}`, version, `bin`)
             ),
           }
         );
@@ -239,7 +282,7 @@ export const run = async (options: any) => {
         if (
           fs.existsSync(
             path.join(
-              home,
+              HOME,
               `upgrades`,
               `pool-${pool.id}`,
               version,
@@ -252,7 +295,7 @@ export const run = async (options: any) => {
           // delete zip afterwards
           fs.unlinkSync(
             path.join(
-              home,
+              HOME,
               `upgrades`,
               `pool-${pool.id}`,
               version,
@@ -263,10 +306,10 @@ export const run = async (options: any) => {
         }
       } catch (err) {
         logger.error("Error extracting binary. Exiting KYSOR ...");
-        logger.error(err);
+        logger.error(JSON.parse(JSON.stringify(err)));
 
         // exit and delete version folders if binary could not be extracted
-        fs.rmSync(path.join(home, `upgrades`, `pool-${pool.id}`, version), {
+        fs.rmSync(path.join(HOME, `upgrades`, `pool-${pool.id}`, version), {
           recursive: true,
         });
         process.exit(0);
@@ -274,7 +317,7 @@ export const run = async (options: any) => {
 
       if (checksum) {
         const versionHome = path.join(
-          home,
+          HOME,
           `upgrades`,
           `pool-${pool.id}`,
           version
@@ -302,7 +345,7 @@ export const run = async (options: any) => {
 
     try {
       const versionHome = path.join(
-        home,
+        HOME,
         `upgrades`,
         `pool-${pool.id}`,
         version
@@ -311,22 +354,39 @@ export const run = async (options: any) => {
       const binName = fs.readdirSync(binHome)[0];
       const binPath = path.join(binHome, binName);
 
+      // export env secrets so binary can read them
+      const valaccountEnv = `VALACCOUNT_${options.valaccount}`.toUpperCase();
+      process.env[valaccountEnv] = valaccount.valaccount;
+
+      const storagePrivEnv =
+        `STORAGE_PRIV_${options.storagePriv}`.toUpperCase();
+      process.env[storagePrivEnv] = valaccount.storagePriv;
+
       const args = [
         `start`,
         `--pool`,
         `${valaccount.pool}`,
         `--valaccount`,
-        `${valaccount.valaccount}`,
+        `${valaccountEnv}`,
         `--storage-priv`,
-        `${valaccount.storagePriv}`,
-        `--network`,
-        `${config.network}`,
+        `${storagePrivEnv}`,
+        `--chain-id`,
+        `${config.chainId}`,
+        `--rpc`,
+        `${config.rpc}`,
+        `--rest`,
+        `${config.rest}`,
         `--home`,
         `${versionHome}`,
       ];
 
-      if (valaccount.verbose) {
-        args.push("--verbose");
+      if (options.debug) {
+        args.push("--debug");
+      }
+
+      if (valaccount.cache) {
+        args.push(`--cache`);
+        args.push(`${valaccount.cache}`);
       }
 
       if (valaccount.metrics) {
@@ -347,7 +407,7 @@ export const run = async (options: any) => {
     } catch (err) {
       logger.error("Found unexpected runtime error. Exiting KYSOR ...");
       if (err) {
-        logger.error(err);
+        logger.error(JSON.parse(JSON.stringify(err)));
       }
       process.exit(1);
     }

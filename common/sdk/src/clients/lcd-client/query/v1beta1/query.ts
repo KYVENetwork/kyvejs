@@ -83,8 +83,8 @@ export class KyveRegistryLCDClient extends AbstractKyveLCDClient {
       parameters.runtime = params.runtime;
     }
 
-    if (typeof params?.paused !== "undefined") {
-      parameters.paused = params.paused;
+    if (typeof params?.disabled !== "undefined") {
+      parameters.disabled = params.disabled;
     }
 
     if (typeof params?.storage_provider_id !== "undefined") {

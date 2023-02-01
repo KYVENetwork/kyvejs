@@ -10,15 +10,32 @@ export const parsePoolId = (value: string): number => {
   return parsedValue;
 };
 
-export const parseMnemonic = (value: string): string => {
-  const parsedValue = value.split(" ");
+export const parseValaccount = (value: string): string => {
+  if (!process.env[value]) {
+    throw new commander.InvalidArgumentError(
+      `Environment variable "${value}" has no value`
+    );
+  }
+
+  const parsedValue = process.env[value]?.split(" ") ?? [];
 
   if (!(parsedValue.length === 12 || parsedValue.length === 24)) {
     throw new commander.InvalidArgumentError(
       "Mnemonic must have 12 or 24 words."
     );
   }
-  return value;
+
+  return process.env[value] || "";
+};
+
+export const parseStoragePriv = (value: string): string => {
+  if (!process.env[value]) {
+    throw new commander.InvalidArgumentError(
+      `Environment variable "${value}" has no value`
+    );
+  }
+
+  return process.env[value] || "";
 };
 
 export const parseKeyfile = (value: string): string => {
@@ -31,14 +48,14 @@ export const parseKeyfile = (value: string): string => {
   return value;
 };
 
-export const parseNetwork = (value: string): string => {
-  if (!["local", "alpha", "beta", "korellia"].includes(value)) {
+export const parseEndpoints = (value: string): string[] => {
+  try {
+    return value.split(",").map((v) => v.trim());
+  } catch (err) {
     throw new commander.InvalidArgumentError(
-      "Network must be either 'local', 'alpha', 'beta' or 'korellia'."
+      "Endpoints must be comma separated string"
     );
   }
-
-  return value;
 };
 
 export const parseCache = (value: string): string => {

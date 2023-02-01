@@ -16,14 +16,14 @@ import { MsgRedelegate } from "@kyvejs/types/client/kyve/delegation/v1beta1/tx";
 import { MsgUndelegate } from "@kyvejs/types/client/kyve/delegation/v1beta1/tx";
 import { MsgUpdateParams as MsgUpdateParamsDelegation } from "@kyvejs/types/client/kyve/delegation/v1beta1/tx";
 /** fees **/
-import { MsgUpdateParams as MsgUpdateParamsFees } from "@kyvejs/types/client/kyve/fees/v1beta1/tx";
+import { MsgUpdateParams as MsgUpdateParamsGlobal } from "@kyvejs/types/client/kyve/global/v1beta1/tx";
 /** pool **/
 import { MsgFundPool } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
 import { MsgDefundPool } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
 import { MsgCreatePool } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
 import { MsgUpdatePool } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
-import { MsgPausePool } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
-import { MsgUnpausePool } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
+import { MsgDisablePool } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
+import { MsgEnablePool } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
 import { MsgScheduleRuntimeUpgrade } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
 import { MsgCancelRuntimeUpgrade } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
 /** stakers **/
@@ -41,8 +41,8 @@ export const registry: ReadonlyArray<[string, GeneratedType]> = [
   ["/kyve.pool.v1beta1.MsgDefundPool", MsgDefundPool],
   ["/kyve.pool.v1beta1.MsgCreatePool", MsgCreatePool],
   ["/kyve.pool.v1beta1.UpdatePool", MsgUpdatePool],
-  ["/kyve.pool.v1beta1.MsgPausePool", MsgPausePool],
-  ["/kyve.pool.v1beta1.MsgUnpausePool", MsgUnpausePool],
+  ["/kyve.pool.v1beta1.MsgDisablePool", MsgDisablePool],
+  ["/kyve.pool.v1beta1.MsgEnablePool", MsgEnablePool],
   ["/kyve.pool.v1beta1.MsgScheduleRuntimeUpgrade", MsgScheduleRuntimeUpgrade],
   ["/kyve.pool.v1beta1.MsgCancelRuntimeUpgrade", MsgCancelRuntimeUpgrade],
   /** stakers **/
@@ -99,17 +99,17 @@ export const encodeTxMsg = {
     };
   },
 
-  pausePool(value: MsgPausePool) {
+  disablePool(value: MsgDisablePool) {
     return {
-      type_url: "/kyve.pool.v1beta1.MsgPausePool",
-      value: MsgPausePool.encode(value).finish(),
+      type_url: "/kyve.pool.v1beta1.MsgDisablePool",
+      value: MsgDisablePool.encode(value).finish(),
     };
   },
 
-  unpausePool(value: MsgUnpausePool) {
+  enablePool(value: MsgEnablePool) {
     return {
-      type_url: "/kyve.pool.v1beta1.MsgUnpausePool",
-      value: MsgUnpausePool.encode(value).finish(),
+      type_url: "/kyve.pool.v1beta1.MsgEnablePool",
+      value: MsgEnablePool.encode(value).finish(),
     };
   },
 
@@ -231,10 +231,10 @@ export const encodeTxMsg = {
     };
   },
 
-  updateParamsFees(value: MsgUpdateParamsFees) {
+  updateParamsGlobal(value: MsgUpdateParamsGlobal) {
     return {
-      type_url: "/kyve.fees.v1beta1.MsgUpdateParams",
-      value: MsgUpdateParamsFees.encode(value).finish(),
+      type_url: "/kyve.global.v1beta1.MsgUpdateParams",
+      value: MsgUpdateParamsGlobal.encode(value).finish(),
     };
   },
 };
@@ -268,16 +268,16 @@ export const withTypeUrl = {
     };
   },
 
-  pausePool(value: MsgPausePool) {
+  disablePool(value: MsgDisablePool) {
     return {
-      typeUrl: "/kyve.pool.v1beta1.MsgPausePool",
+      typeUrl: "/kyve.pool.v1beta1.MsgDisablePool",
       value,
     };
   },
 
-  unpausePool(value: MsgUnpausePool) {
+  enablePool(value: MsgEnablePool) {
     return {
-      typeUrl: "/kyve.pool.v1beta1.MsgUnpausePool",
+      typeUrl: "/kyve.pool.v1beta1.MsgEnablePool",
       value,
     };
   },
@@ -393,9 +393,9 @@ export const withTypeUrl = {
       value,
     };
   },
-  updateParamsFees(value: MsgUpdateParamsFees) {
+  updateParamsGlobal(value: MsgUpdateParamsGlobal) {
     return {
-      typeUrl: "/kyve.fees.v1beta1.MsgUpdateParams",
+      typeUrl: "/kyve.global.v1beta1.MsgUpdateParams",
       value,
     };
   },

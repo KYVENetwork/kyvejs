@@ -16,9 +16,9 @@ export function validateIsPoolActive(this: Validator): boolean {
   switch (this.pool.status as PoolStatus) {
     case PoolStatus.POOL_STATUS_ACTIVE:
       return false;
-    case PoolStatus.POOL_STATUS_PAUSED:
+    case PoolStatus.POOL_STATUS_DISABLED:
       this.logger.info(
-        "Pool is paused. Waiting for pool being unpaused. Idling ..."
+        "Pool is disabled. Waiting for pool being enabled. Idling ..."
       );
       return true;
     case PoolStatus.POOL_STATUS_NO_FUNDS:

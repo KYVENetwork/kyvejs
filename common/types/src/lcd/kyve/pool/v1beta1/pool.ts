@@ -10,8 +10,8 @@ export enum PoolStatus {
   POOL_STATUS_UNSPECIFIED = "POOL_STATUS_UNSPECIFIED",
   /** POOL_STATUS_ACTIVE - POOL_STATUS_ACTIVE ... */
   POOL_STATUS_ACTIVE = "POOL_STATUS_ACTIVE",
-  /** POOL_STATUS_PAUSED - POOL_STATUS_PAUSED ... */
-  POOL_STATUS_PAUSED = "POOL_STATUS_PAUSED",
+  /** POOL_STATUS_DISABLED - POOL_STATUS_DISABLED ... */
+  POOL_STATUS_DISABLED = "POOL_STATUS_DISABLED",
   /** POOL_STATUS_NO_FUNDS - POOL_STATUS_NO_FUNDS ... */
   POOL_STATUS_NO_FUNDS = "POOL_STATUS_NO_FUNDS",
   /** POOL_STATUS_NOT_ENOUGH_DELEGATION - POOL_STATUS_NOT_ENOUGH_DELEGATION ... */
@@ -30,8 +30,8 @@ export function poolStatusFromJSON(object: any): PoolStatus {
     case "POOL_STATUS_ACTIVE":
       return PoolStatus.POOL_STATUS_ACTIVE;
     case 2:
-    case "POOL_STATUS_PAUSED":
-      return PoolStatus.POOL_STATUS_PAUSED;
+    case "POOL_STATUS_DISABLED":
+      return PoolStatus.POOL_STATUS_DISABLED;
     case 3:
     case "POOL_STATUS_NO_FUNDS":
       return PoolStatus.POOL_STATUS_NO_FUNDS;
@@ -54,8 +54,8 @@ export function poolStatusToJSON(object: PoolStatus): string {
       return "POOL_STATUS_UNSPECIFIED";
     case PoolStatus.POOL_STATUS_ACTIVE:
       return "POOL_STATUS_ACTIVE";
-    case PoolStatus.POOL_STATUS_PAUSED:
-      return "POOL_STATUS_PAUSED";
+    case PoolStatus.POOL_STATUS_DISABLED:
+      return "POOL_STATUS_DISABLED";
     case PoolStatus.POOL_STATUS_NO_FUNDS:
       return "POOL_STATUS_NO_FUNDS";
     case PoolStatus.POOL_STATUS_NOT_ENOUGH_DELEGATION:
@@ -74,7 +74,7 @@ export function poolStatusToNumber(object: PoolStatus): number {
       return 0;
     case PoolStatus.POOL_STATUS_ACTIVE:
       return 1;
-    case PoolStatus.POOL_STATUS_PAUSED:
+    case PoolStatus.POOL_STATUS_DISABLED:
       return 2;
     case PoolStatus.POOL_STATUS_NO_FUNDS:
       return 3;
@@ -88,47 +88,66 @@ export function poolStatusToNumber(object: PoolStatus): number {
   }
 }
 
-/** Protocol ... */
+/**
+ * Protocol holds all info about the current pool version and the
+ * available binaries for participating as a validator in a pool
+ */
 export interface Protocol {
-  /** version ... */
+  /** version holds the current software version tag of the pool binaries */
   version: string;
-  /** binaries ... */
+  /**
+   * binaries is a stringified json object which holds binaries in the
+   * current version for multiple platforms and architectures
+   */
   binaries: string;
-  /** last_upgrade ... */
+  /** last_upgrade is the unix time the pool was upgraded the last time */
   last_upgrade: string;
 }
 
-/** Upgrade ... */
+/** Upgrade holds all info when a pool has a scheduled upgrade */
 export interface UpgradePlan {
-  /** version ... */
+  /** version is the new software version tag of the upgrade */
   version: string;
-  /** binaries ... */
+  /**
+   * binaries is the new stringified json object which holds binaries in the
+   * upgrade version for multiple platforms and architectures
+   */
   binaries: string;
-  /** scheduled_at ... */
+  /** scheduled_at is the unix time the upgrade is supposed to be done */
   scheduled_at: string;
-  /** duration ... */
+  /**
+   * duration is the time in seconds how long the pool should halt
+   * during the upgrade to give all validators a chance of switching
+   * to the new binaries
+   */
   duration: string;
 }
 
-/** Funder ... */
+/** Funder is the object which holds info about a single pool funder */
 export interface Funder {
-  /** address ... */
+  /** address is the address of the funder */
   address: string;
-  /** amount ... */
+  /**
+   * amount is the current amount of funds in ukyve the funder has
+   * still funded the pool with
+   */
   amount: string;
 }
 
 /** Pool ... */
 export interface Pool {
-  /** id ... */
+  /** id - unique identifier of the pool, can not be changed */
   id: string;
-  /** name ... */
+  /** name is a human readable name for the pool */
   name: string;
-  /** runtime ... */
+  /** runtime specified which protocol and which version needs is required */
   runtime: string;
-  /** logo ... */
+  /** logo is a link to an image file */
   logo: string;
-  /** config ... */
+  /**
+   * config is either a JSON encoded string or a link to an external storage provider.
+   * This is up to the implementation of the protocol node.
+   */
   config: string;
   /** start_key ... */
   start_key: string;
@@ -138,7 +157,7 @@ export interface Pool {
   current_summary: string;
   /** current_index ... */
   current_index: string;
-  /** total_bundles ... */
+  /** total_bundles is the number of total finalized bundles */
   total_bundles: string;
   /** upload_interval ... */
   upload_interval: string;
@@ -148,8 +167,11 @@ export interface Pool {
   min_delegation: string;
   /** max_bundle_size ... */
   max_bundle_size: string;
-  /** paused ... */
-  paused: boolean;
+  /**
+   * disabled is true when the pool is disabled.
+   * Can only be done via governance.
+   */
+  disabled: boolean;
   /** funders ... */
   funders: Funder[];
   /** total_funds ... */
@@ -381,7 +403,7 @@ function createBasePool(): Pool {
     operating_cost: "0",
     min_delegation: "0",
     max_bundle_size: "0",
-    paused: false,
+    disabled: false,
     funders: [],
     total_funds: "0",
     protocol: undefined,
@@ -435,8 +457,8 @@ export const Pool = {
     if (message.max_bundle_size !== "0") {
       writer.uint32(112).uint64(message.max_bundle_size);
     }
-    if (message.paused === true) {
-      writer.uint32(120).bool(message.paused);
+    if (message.disabled === true) {
+      writer.uint32(120).bool(message.disabled);
     }
     for (const v of message.funders) {
       Funder.encode(v!, writer.uint32(130).fork()).ldelim();
@@ -509,7 +531,7 @@ export const Pool = {
           message.max_bundle_size = longToString(reader.uint64() as Long);
           break;
         case 15:
-          message.paused = reader.bool();
+          message.disabled = reader.bool();
           break;
         case 16:
           message.funders.push(Funder.decode(reader, reader.uint32()));
@@ -553,7 +575,7 @@ export const Pool = {
       operating_cost: isSet(object.operating_cost) ? String(object.operating_cost) : "0",
       min_delegation: isSet(object.min_delegation) ? String(object.min_delegation) : "0",
       max_bundle_size: isSet(object.max_bundle_size) ? String(object.max_bundle_size) : "0",
-      paused: isSet(object.paused) ? Boolean(object.paused) : false,
+      disabled: isSet(object.disabled) ? Boolean(object.disabled) : false,
       funders: Array.isArray(object?.funders) ? object.funders.map((e: any) => Funder.fromJSON(e)) : [],
       total_funds: isSet(object.total_funds) ? String(object.total_funds) : "0",
       protocol: isSet(object.protocol) ? Protocol.fromJSON(object.protocol) : undefined,
@@ -581,7 +603,7 @@ export const Pool = {
     message.operating_cost !== undefined && (obj.operating_cost = message.operating_cost);
     message.min_delegation !== undefined && (obj.min_delegation = message.min_delegation);
     message.max_bundle_size !== undefined && (obj.max_bundle_size = message.max_bundle_size);
-    message.paused !== undefined && (obj.paused = message.paused);
+    message.disabled !== undefined && (obj.disabled = message.disabled);
     if (message.funders) {
       obj.funders = message.funders.map((e) => e ? Funder.toJSON(e) : undefined);
     } else {
@@ -614,7 +636,7 @@ export const Pool = {
     message.operating_cost = object.operating_cost ?? "0";
     message.min_delegation = object.min_delegation ?? "0";
     message.max_bundle_size = object.max_bundle_size ?? "0";
-    message.paused = object.paused ?? false;
+    message.disabled = object.disabled ?? false;
     message.funders = object.funders?.map((e) => Funder.fromPartial(e)) || [];
     message.total_funds = object.total_funds ?? "0";
     message.protocol = (object.protocol !== undefined && object.protocol !== null)

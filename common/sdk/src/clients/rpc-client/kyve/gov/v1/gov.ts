@@ -4,13 +4,13 @@ import { coins, SigningStargateClient } from "@cosmjs/stargate";
 import { VoteOption } from "@kyvejs/types/client/cosmos/gov/v1/gov";
 import { MsgUpdateParams as MsgUpdateParamsBundles } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
 import { MsgUpdateParams as MsgUpdateParamsDelegation } from "@kyvejs/types/client/kyve/delegation/v1beta1/tx";
-import { MsgUpdateParams as MsgUpdateParamsFees } from "@kyvejs/types/client/kyve/fees/v1beta1/tx";
+import { MsgUpdateParams as MsgUpdateParamsGlobal } from "@kyvejs/types/client/kyve/global/v1beta1/tx";
 import {
   MsgCancelRuntimeUpgrade,
   MsgCreatePool,
-  MsgPausePool,
+  MsgDisablePool,
   MsgScheduleRuntimeUpgrade,
-  MsgUnpausePool,
+  MsgEnablePool,
   MsgUpdatePool,
 } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
 import { MsgUpdateParams as MsgUpdateParamsStakers } from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
@@ -92,8 +92,8 @@ export default class KyveGovMsg {
     );
   }
 
-  public async pausePool(
-    value: Omit<MsgPausePool, "authority">,
+  public async disablePool(
+    value: Omit<MsgDisablePool, "authority">,
     deposit: string,
     metadata?: string,
     options?: {
@@ -102,7 +102,7 @@ export default class KyveGovMsg {
     }
   ) {
     const tx = this.createGovTx(
-      encodeTxMsg.pausePool({
+      encodeTxMsg.disablePool({
         ...value,
         authority: GOV_AUTHORITY,
       }),
@@ -116,8 +116,8 @@ export default class KyveGovMsg {
     );
   }
 
-  public async unpausePool(
-    value: Omit<MsgUnpausePool, "authority">,
+  public async enablePool(
+    value: Omit<MsgEnablePool, "authority">,
     deposit: string,
     metadata?: string,
     options?: {
@@ -126,7 +126,7 @@ export default class KyveGovMsg {
     }
   ) {
     const tx = this.createGovTx(
-      encodeTxMsg.unpausePool({
+      encodeTxMsg.enablePool({
         ...value,
         authority: GOV_AUTHORITY,
       }),
@@ -260,8 +260,8 @@ export default class KyveGovMsg {
     );
   }
 
-  public async updateParamsFees(
-    value: Omit<MsgUpdateParamsFees, "authority">,
+  public async updateParamsGlobal(
+    value: Omit<MsgUpdateParamsGlobal, "authority">,
     deposit: string,
     metadata?: string,
     options?: {
@@ -270,7 +270,7 @@ export default class KyveGovMsg {
     }
   ) {
     const tx = this.createGovTx(
-      encodeTxMsg.updateParamsFees({
+      encodeTxMsg.updateParamsGlobal({
         ...value,
         authority: GOV_AUTHORITY,
       }),

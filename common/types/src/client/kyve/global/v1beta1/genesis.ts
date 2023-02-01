@@ -1,10 +1,10 @@
 /* eslint-disable */
 import _m0 from "protobufjs/minimal";
-import { Params } from "./fees";
+import { Params } from "./global";
 
-export const protobufPackage = "kyve.fees.v1beta1";
+export const protobufPackage = "kyve.global.v1beta1";
 
-/** GenesisState defines the fees module's genesis state. */
+/** GenesisState defines the global module's genesis state. */
 export interface GenesisState {
   /** params defines all the parameters of the module. */
   params?: Params;

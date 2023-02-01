@@ -1,4 +1,4 @@
-import { DataItem, IRuntime, Validator, sha256 } from "@kyvejs/protocol";
+import { DataItem, IRuntime, sha256, Validator } from "@kyvejs/protocol";
 
 import { name, version } from "../package.json";
 import { fetchBlock, fetchBlockHash } from "./utils";

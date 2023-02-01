@@ -7,6 +7,7 @@ import { toHex } from "@cosmjs/encoding";
 import { coins, SigningStargateClient } from "@cosmjs/stargate";
 
 type signTxResponseType = {
+  tx: EncodeObject[];
   txRawBytes: Uint8Array;
   fee: StdFee;
 };
@@ -15,10 +16,12 @@ export class TxPromise {
   private txBytes: Uint8Array;
   readonly txHash: string;
   readonly fee: StdFee;
+  readonly tx: EncodeObject[];
   constructor(nativeClient: SigningStargateClient, tx: signTxResponseType) {
     this.nativeClient = nativeClient;
     this.txBytes = tx.txRawBytes;
     this.fee = tx.fee;
+    this.tx = tx.tx;
     this.txHash = toHex(sha256(this.txBytes)).toUpperCase();
   }
   async execute() {
@@ -37,50 +40,58 @@ async function calcFee(gasEstimation: number, fee: "auto" | number) {
 export async function signTx(
   nativeClient: SigningStargateClient,
   address: string,
-  tx: EncodeObject,
+  tx: EncodeObject | EncodeObject[],
   options?: {
     fee?: StdFee | "auto" | number;
     memo?: string;
   }
 ): Promise<signTxResponseType> {
+  const txArr = Array.isArray(tx) ? tx : [tx];
   if (!options || options.fee == undefined) {
-    const gasEstimation = await nativeClient.simulate(address, [tx], undefined);
+    const gasEstimation = await nativeClient.simulate(
+      address,
+      txArr,
+      undefined
+    );
     const fee = await calcFee(gasEstimation, "auto");
     const txRaw = await nativeClient.sign(
       address,
-      [tx],
+      txArr,
       fee,
       options?.memo ? options?.memo : ""
     );
     return {
       txRawBytes: TxRaw.encode(txRaw).finish(),
       fee,
+      tx: txArr,
     };
   } else if (options.fee === "auto" || typeof options.fee == "number") {
     const gasEstimation = await nativeClient.simulate(
       address,
-      [tx],
+      txArr,
       options?.memo
     );
     const fee = await calcFee(gasEstimation, options.fee);
     const txRaw = await nativeClient.sign(
       address,
-      [tx],
+      txArr,
       fee,
       options?.memo ? options?.memo : ""
     );
     return {
       txRawBytes: TxRaw.encode(txRaw).finish(),
       fee,
+      tx: txArr,
     };
   } else {
     const txRaw = await nativeClient.sign(
       address,
-      [tx],
+      txArr,
       options.fee,
       options?.memo ? options?.memo : ""
     );
     return {
+      tx: txArr,
       txRawBytes: TxRaw.encode(txRaw).finish(),
       fee: options.fee,
     };

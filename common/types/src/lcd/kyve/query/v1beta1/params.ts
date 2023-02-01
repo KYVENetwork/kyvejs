@@ -3,8 +3,9 @@ import _m0 from "protobufjs/minimal";
 import { QueryParamsResponse as QueryParamsResponse3 } from "../../../cosmos/gov/v1/query";
 import { Params } from "../../bundles/v1beta1/params";
 import { Params as Params1 } from "../../delegation/v1beta1/params";
-import { Params as Params2 } from "../../fees/v1beta1/fees";
+import { Params as Params2 } from "../../global/v1beta1/global";
 import { Params as Params4 } from "../../stakers/v1beta1/params";
+import { Params as Params5 } from "../../team/v1beta1/params";
 
 export const protobufPackage = "kyve.query.v1beta1";
 
@@ -18,12 +19,14 @@ export interface QueryParamsResponse {
   bundles_params?: Params;
   /** delegation_params ... */
   delegation_params?: Params1;
-  /** fees_params ... */
-  fees_params?: Params2;
+  /** global_params ... */
+  global_params?: Params2;
   /** gov_params ... */
   gov_params?: QueryParamsResponse3;
   /** stakers_params ... */
   stakers_params?: Params4;
+  /** team_params ... */
+  team_params?: Params5;
 }
 
 function createBaseQueryParamsRequest(): QueryParamsRequest {
@@ -69,9 +72,10 @@ function createBaseQueryParamsResponse(): QueryParamsResponse {
   return {
     bundles_params: undefined,
     delegation_params: undefined,
-    fees_params: undefined,
+    global_params: undefined,
     gov_params: undefined,
     stakers_params: undefined,
+    team_params: undefined,
   };
 }
 
@@ -83,14 +87,17 @@ export const QueryParamsResponse = {
     if (message.delegation_params !== undefined) {
       Params1.encode(message.delegation_params, writer.uint32(18).fork()).ldelim();
     }
-    if (message.fees_params !== undefined) {
-      Params2.encode(message.fees_params, writer.uint32(26).fork()).ldelim();
+    if (message.global_params !== undefined) {
+      Params2.encode(message.global_params, writer.uint32(26).fork()).ldelim();
     }
     if (message.gov_params !== undefined) {
       QueryParamsResponse3.encode(message.gov_params, writer.uint32(34).fork()).ldelim();
     }
     if (message.stakers_params !== undefined) {
       Params4.encode(message.stakers_params, writer.uint32(42).fork()).ldelim();
+    }
+    if (message.team_params !== undefined) {
+      Params5.encode(message.team_params, writer.uint32(50).fork()).ldelim();
     }
     return writer;
   },
@@ -109,13 +116,16 @@ export const QueryParamsResponse = {
           message.delegation_params = Params1.decode(reader, reader.uint32());
           break;
         case 3:
-          message.fees_params = Params2.decode(reader, reader.uint32());
+          message.global_params = Params2.decode(reader, reader.uint32());
           break;
         case 4:
           message.gov_params = QueryParamsResponse3.decode(reader, reader.uint32());
           break;
         case 5:
           message.stakers_params = Params4.decode(reader, reader.uint32());
+          break;
+        case 6:
+          message.team_params = Params5.decode(reader, reader.uint32());
           break;
         default:
           reader.skipType(tag & 7);
@@ -129,9 +139,10 @@ export const QueryParamsResponse = {
     return {
       bundles_params: isSet(object.bundles_params) ? Params.fromJSON(object.bundles_params) : undefined,
       delegation_params: isSet(object.delegation_params) ? Params1.fromJSON(object.delegation_params) : undefined,
-      fees_params: isSet(object.fees_params) ? Params2.fromJSON(object.fees_params) : undefined,
+      global_params: isSet(object.global_params) ? Params2.fromJSON(object.global_params) : undefined,
       gov_params: isSet(object.gov_params) ? QueryParamsResponse3.fromJSON(object.gov_params) : undefined,
       stakers_params: isSet(object.stakers_params) ? Params4.fromJSON(object.stakers_params) : undefined,
+      team_params: isSet(object.team_params) ? Params5.fromJSON(object.team_params) : undefined,
     };
   },
 
@@ -141,12 +152,14 @@ export const QueryParamsResponse = {
       (obj.bundles_params = message.bundles_params ? Params.toJSON(message.bundles_params) : undefined);
     message.delegation_params !== undefined &&
       (obj.delegation_params = message.delegation_params ? Params1.toJSON(message.delegation_params) : undefined);
-    message.fees_params !== undefined &&
-      (obj.fees_params = message.fees_params ? Params2.toJSON(message.fees_params) : undefined);
+    message.global_params !== undefined &&
+      (obj.global_params = message.global_params ? Params2.toJSON(message.global_params) : undefined);
     message.gov_params !== undefined &&
       (obj.gov_params = message.gov_params ? QueryParamsResponse3.toJSON(message.gov_params) : undefined);
     message.stakers_params !== undefined &&
       (obj.stakers_params = message.stakers_params ? Params4.toJSON(message.stakers_params) : undefined);
+    message.team_params !== undefined &&
+      (obj.team_params = message.team_params ? Params5.toJSON(message.team_params) : undefined);
     return obj;
   },
 
@@ -158,14 +171,17 @@ export const QueryParamsResponse = {
     message.delegation_params = (object.delegation_params !== undefined && object.delegation_params !== null)
       ? Params1.fromPartial(object.delegation_params)
       : undefined;
-    message.fees_params = (object.fees_params !== undefined && object.fees_params !== null)
-      ? Params2.fromPartial(object.fees_params)
+    message.global_params = (object.global_params !== undefined && object.global_params !== null)
+      ? Params2.fromPartial(object.global_params)
       : undefined;
     message.gov_params = (object.gov_params !== undefined && object.gov_params !== null)
       ? QueryParamsResponse3.fromPartial(object.gov_params)
       : undefined;
     message.stakers_params = (object.stakers_params !== undefined && object.stakers_params !== null)
       ? Params4.fromPartial(object.stakers_params)
+      : undefined;
+    message.team_params = (object.team_params !== undefined && object.team_params !== null)
+      ? Params5.fromPartial(object.team_params)
       : undefined;
     return message;
   },

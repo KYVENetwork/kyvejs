@@ -22,42 +22,49 @@ export async function skipUploaderRole(
   this: Validator,
   fromIndex: number
 ): Promise<boolean> {
-  try {
-    this.logger.debug(
-      `this.client.kyve.bundles.v1beta1.skipUploaderRole({staker: ${
-        this.staker
-      },pool_id: ${this.poolId.toString()},from_index: ${fromIndex.toString()}})`
-    );
+  for (let c = 0; c < this.client.length; c++) {
+    try {
+      this.logger.debug(this.rpc[c]);
+      this.logger.debug(
+        `this.client.kyve.bundles.v1beta1.skipUploaderRole({staker: ${
+          this.staker
+        },pool_id: ${this.poolId.toString()},from_index: ${fromIndex.toString()}})`
+      );
 
-    const tx = await this.client.kyve.bundles.v1beta1.skipUploaderRole({
-      staker: this.staker,
-      pool_id: this.poolId.toString(),
-      from_index: fromIndex.toString(),
-    });
+      const tx = await this.client[c].kyve.bundles.v1beta1.skipUploaderRole({
+        staker: this.staker,
+        pool_id: this.poolId.toString(),
+        from_index: fromIndex.toString(),
+      });
 
-    this.logger.debug(`SkipUploaderRole = ${tx.txHash}`);
+      this.logger.debug(`SkipUploaderRole = ${tx.txHash}`);
 
-    const receipt = await tx.execute();
+      const receipt = await tx.execute();
 
-    this.logger.debug(JSON.stringify({ ...receipt, rawLog: null, data: null }));
+      this.logger.debug(
+        JSON.stringify({ ...receipt, rawLog: null, data: null })
+      );
 
-    if (receipt.code === 0) {
-      this.logger.info(`Successfully skipped uploader role`);
-      this.m.tx_skip_uploader_role_successful.inc();
-      this.m.gas_skip_uploader_role.set(receipt?.gasUsed ?? 0);
+      if (receipt.code === 0) {
+        this.logger.info(`Successfully skipped uploader role`);
+        this.m.tx_skip_uploader_role_successful.inc();
+        this.m.gas_skip_uploader_role.set(receipt?.gasUsed ?? 0);
 
-      return true;
-    } else {
-      this.logger.info(`Could not skip uploader role. Continuing ...`);
-      this.m.tx_skip_uploader_role_unsuccessful.inc();
+        return true;
+      } else {
+        this.logger.info(`Could not skip uploader role. Continuing ...`);
+        this.m.tx_skip_uploader_role_unsuccessful.inc();
 
-      return false;
+        return false;
+      }
+    } catch (err) {
+      this.logger.error(`RPC call to "${this.rpc[c]}" failed`);
+      this.logger.error(standardizeJSON(err));
     }
-  } catch (err) {
-    this.logger.error("Failed to skip uploader role. Continuing ...");
-    this.logger.error(standardizeJSON(err));
-    this.m.tx_skip_uploader_role_failed.inc();
-
-    return false;
   }
+
+  this.logger.error("Failed to skip uploader role. Continuing ...");
+  this.m.tx_skip_uploader_role_failed.inc();
+
+  return false;
 }

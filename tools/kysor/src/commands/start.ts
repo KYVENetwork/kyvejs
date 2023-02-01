@@ -6,7 +6,7 @@ const start = new Command("start").description("Start KYSOR");
 
 start
   .requiredOption("-v, --valaccount <string>", "Name of the valaccount to run")
-  .option("-d, --auto-download-binaries")
+  .option("--debug", "Run the validator node in debug mode")
   .action(async (options) => {
     await run(options);
   });

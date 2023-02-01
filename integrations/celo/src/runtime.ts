@@ -1,5 +1,5 @@
 import { StaticCeloProvider } from '@celo-tools/celo-ethers-wrapper';
-import { DataItem, IRuntime, Validator, sha256 } from '@kyvejs/protocol';
+import { DataItem, IRuntime, sha256, Validator } from '@kyvejs/protocol';
 import { providers } from 'ethers';
 
 import { name, version } from '../package.json';

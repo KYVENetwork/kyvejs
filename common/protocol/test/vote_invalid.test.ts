@@ -89,8 +89,11 @@ describe("invalid votes tests", () => {
     v["poolId"] = 0;
     v["staker"] = "test_staker";
 
-    v.client = client();
-    v.lcd = lcd();
+    v["rpc"] = ["http://0.0.0.0:26657"];
+    v.client = [client()];
+
+    v["rest"] = ["http://0.0.0.0:1317"];
+    v.lcd = [lcd()];
 
     v["waitForNextBundleProposal"] = jest.fn();
 
@@ -157,8 +160,8 @@ describe("invalid votes tests", () => {
     await runNode.call(v);
 
     // ASSERT
-    const txs = v["client"].kyve.bundles.v1beta1;
-    const queries = v["lcd"].kyve.query.v1beta1;
+    const txs = v["client"][0].kyve.bundles.v1beta1;
+    const queries = v["lcd"][0].kyve.query.v1beta1;
     const cacheProvider = v["cacheProvider"];
     const runtime = v["runtime"];
 
@@ -298,8 +301,8 @@ describe("invalid votes tests", () => {
     await runNode.call(v);
 
     // ASSERT
-    const txs = v["client"].kyve.bundles.v1beta1;
-    const queries = v["lcd"].kyve.query.v1beta1;
+    const txs = v["client"][0].kyve.bundles.v1beta1;
+    const queries = v["lcd"][0].kyve.query.v1beta1;
     const cacheProvider = v["cacheProvider"];
     const runtime = v["runtime"];
 
@@ -426,8 +429,8 @@ describe("invalid votes tests", () => {
     await runNode.call(v);
 
     // ASSERT
-    const txs = v["client"].kyve.bundles.v1beta1;
-    const queries = v["lcd"].kyve.query.v1beta1;
+    const txs = v["client"][0].kyve.bundles.v1beta1;
+    const queries = v["lcd"][0].kyve.query.v1beta1;
     const cacheProvider = v["cacheProvider"];
     const runtime = v["runtime"];
 
@@ -556,8 +559,8 @@ describe("invalid votes tests", () => {
     await runNode.call(v);
 
     // ASSERT
-    const txs = v["client"].kyve.bundles.v1beta1;
-    const queries = v["lcd"].kyve.query.v1beta1;
+    const txs = v["client"][0].kyve.bundles.v1beta1;
+    const queries = v["lcd"][0].kyve.query.v1beta1;
     const cacheProvider = v["cacheProvider"];
     const runtime = v["runtime"];
 
@@ -686,8 +689,8 @@ describe("invalid votes tests", () => {
     await runNode.call(v);
 
     // ASSERT
-    const txs = v["client"].kyve.bundles.v1beta1;
-    const queries = v["lcd"].kyve.query.v1beta1;
+    const txs = v["client"][0].kyve.bundles.v1beta1;
+    const queries = v["lcd"][0].kyve.query.v1beta1;
     const cacheProvider = v["cacheProvider"];
     const runtime = v["runtime"];
 
@@ -820,8 +823,8 @@ describe("invalid votes tests", () => {
     await runNode.call(v);
 
     // ASSERT
-    const txs = v["client"].kyve.bundles.v1beta1;
-    const queries = v["lcd"].kyve.query.v1beta1;
+    const txs = v["client"][0].kyve.bundles.v1beta1;
+    const queries = v["lcd"][0].kyve.query.v1beta1;
     const cacheProvider = v["cacheProvider"];
     const runtime = v["runtime"];
 
@@ -953,8 +956,8 @@ describe("invalid votes tests", () => {
     await runNode.call(v);
 
     // ASSERT
-    const txs = v["client"].kyve.bundles.v1beta1;
-    const queries = v["lcd"].kyve.query.v1beta1;
+    const txs = v["client"][0].kyve.bundles.v1beta1;
+    const queries = v["lcd"][0].kyve.query.v1beta1;
     const cacheProvider = v["cacheProvider"];
     const runtime = v["runtime"];
 
@@ -1058,7 +1061,7 @@ describe("invalid votes tests", () => {
       reaseon: "already voted invalid",
     });
 
-    v.lcd.kyve.query.v1beta1.canVote = canVoteMock;
+    v["lcd"][0].kyve.query.v1beta1.canVote = canVoteMock;
 
     const bundle = [
       { key: "test_key_1", value: "test_value_1" },
@@ -1106,8 +1109,8 @@ describe("invalid votes tests", () => {
     await runNode.call(v);
 
     // ASSERT
-    const txs = v["client"].kyve.bundles.v1beta1;
-    const queries = v["lcd"].kyve.query.v1beta1;
+    const txs = v["client"][0].kyve.bundles.v1beta1;
+    const queries = v["lcd"][0].kyve.query.v1beta1;
     const cacheProvider = v["cacheProvider"];
     const runtime = v["runtime"];
 
@@ -1187,7 +1190,7 @@ describe("invalid votes tests", () => {
       possible: false,
       reaseon: "already voted valid",
     });
-    v.lcd.kyve.query.v1beta1.canVote = canVoteMock;
+    v["lcd"][0].kyve.query.v1beta1.canVote = canVoteMock;
 
     const bundle = [
       { key: "test_key_1", value: "test_value_1" },
@@ -1234,8 +1237,8 @@ describe("invalid votes tests", () => {
     await runNode.call(v);
 
     // ASSERT
-    const txs = v["client"].kyve.bundles.v1beta1;
-    const queries = v["lcd"].kyve.query.v1beta1;
+    const txs = v["client"][0].kyve.bundles.v1beta1;
+    const queries = v["lcd"][0].kyve.query.v1beta1;
     const cacheProvider = v["cacheProvider"];
     const runtime = v["runtime"];
 
@@ -1355,8 +1358,8 @@ describe("invalid votes tests", () => {
     await runNode.call(v);
 
     // ASSERT
-    const txs = v["client"].kyve.bundles.v1beta1;
-    const queries = v["lcd"].kyve.query.v1beta1;
+    const txs = v["client"][0].kyve.bundles.v1beta1;
+    const queries = v["lcd"][0].kyve.query.v1beta1;
     const cacheProvider = v["cacheProvider"];
     const runtime = v["runtime"];
 
@@ -1513,8 +1516,8 @@ describe("invalid votes tests", () => {
     await runNode.call(v);
 
     // ASSERT
-    const txs = v["client"].kyve.bundles.v1beta1;
-    const queries = v["lcd"].kyve.query.v1beta1;
+    const txs = v["client"][0].kyve.bundles.v1beta1;
+    const queries = v["lcd"][0].kyve.query.v1beta1;
     const cacheProvider = v["cacheProvider"];
     const runtime = v["runtime"];
 
@@ -1623,7 +1626,7 @@ describe("invalid votes tests", () => {
     // ARRANGE
     v["runtime"].validateDataItem = jest.fn().mockResolvedValue(false);
 
-    v["client"].kyve.bundles.v1beta1.voteBundleProposal = jest
+    v["client"][0].kyve.bundles.v1beta1.voteBundleProposal = jest
       .fn()
       .mockRejectedValue(new Error());
 
@@ -1672,8 +1675,8 @@ describe("invalid votes tests", () => {
     await runNode.call(v);
 
     // ASSERT
-    const txs = v["client"].kyve.bundles.v1beta1;
-    const queries = v["lcd"].kyve.query.v1beta1;
+    const txs = v["client"][0].kyve.bundles.v1beta1;
+    const queries = v["lcd"][0].kyve.query.v1beta1;
     const cacheProvider = v["cacheProvider"];
     const runtime = v["runtime"];
 

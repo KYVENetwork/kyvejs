@@ -1,6 +1,4 @@
-import KyveSDK, { constants } from "@kyvejs/sdk";
-import { KYVE_NETWORK } from "@kyvejs/sdk/dist/constants";
-
+import KyveSDK from "@kyvejs/sdk";
 import { Validator, standardizeJSON } from "../..";
 
 /**
@@ -13,28 +11,33 @@ import { Validator, standardizeJSON } from "../..";
  */
 export async function setupSDK(this: Validator): Promise<void> {
   try {
-    this.logger.debug(`Initializing KyveSDK with network ${this.network}`);
+    this.logger.debug(`Initializing KyveSDK with chain ID ${this.chainId}`);
 
-    // get KYVE network settings from network parameter
-    // TODO @regenisis: use chain-id as new network property
-    let network = constants.KYVE_ENDPOINTS[this.network as KYVE_NETWORK];
-
-    if (this.rpc) {
-      network = { ...network, rpc: this.rpc };
+    if (!this.rpc.length || !this.rest.length) {
+      throw new Error("rpc and rest endpoints must be specified");
     }
 
-    if (this.rest) {
-      network = { ...network, rest: this.rest };
+    if (this.rpc.length !== this.rest.length) {
+      throw new Error("rpc and rest endpoints must have same lengths");
     }
 
-    this.sdk = new KyveSDK(network);
+    this.sdk = this.rpc.map(
+      (_, i) =>
+        new KyveSDK({
+          rpc: this.rpc[i],
+          rest: this.rest[i],
+          chainId: this.chainId,
+          chainName: `KYVE - ${this.chainId}`,
+        })
+    );
 
     this.logger.debug(`Initializing KyveClient from valaccount mnemonic`);
-
-    this.client = await this.sdk.fromMnemonic(this.valaccount);
+    this.client = await Promise.all(
+      this.sdk.map(async (sdk) => await sdk.fromMnemonic(this.valaccount))
+    );
 
     this.logger.debug(`Initializing KyveLCD from sdk`);
-    this.lcd = this.sdk.createLCDClient();
+    this.lcd = this.sdk.map((sdk) => sdk.createLCDClient());
   } catch (err) {
     this.logger.fatal(`Failed to init KYVE SDK. Exiting ...`);
     this.logger.fatal(standardizeJSON(err));
