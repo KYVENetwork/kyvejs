@@ -37,8 +37,6 @@ export async function runCache(this: Validator): Promise<void> {
     try {
       // temp save current pool state because the runNode thread could
       // overwrite this value during runtime
-      // const poolRound = structuredClone(this.pool);
-      // const poolConfigRound = structuredClone(this.poolConfig);
       const poolRound = clone(this.pool);
       const poolConfigRound = clone(this.poolConfig);
 
