@@ -36,8 +36,8 @@ export async function runCache(this: Validator): Promise<void> {
     try {
       // temp save current pool state because the runNode thread could
       // overwrite this value during runtime
-      const poolRound = this.pool;
-      const poolConfigRound = this.poolConfig;
+      const poolRound = structuredClone(this.pool);
+      const poolConfigRound = structuredClone(this.poolConfig);
 
       // if there is no storage id we can assume that the last
       // bundle has been dropped or invalidated. In that case we
