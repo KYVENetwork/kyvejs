@@ -267,7 +267,7 @@ export async function createBundleProposal(this: Validator): Promise<void> {
       }
     } catch (err) {
       this.logger.info(
-        `Saving bundle proposal on StorageProvider was unsucessful`
+        `Saving bundle proposal on StorageProvider was unsuccessful`
       );
       this.logger.debug(standardizeJSON(err));
 
