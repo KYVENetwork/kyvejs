@@ -3,6 +3,7 @@ import { StdFee } from "@cosmjs/amino/build/signdoc";
 import { AccountData, OfflineAminoSigner } from "@cosmjs/amino/build/signer";
 import { SigningStargateClient } from "@cosmjs/stargate";
 import { makeADR36AminoSignDoc } from "@keplr-wallet/cosmos";
+import { SDKConfig } from "../../constants";
 
 import { signTx, TxPromise } from "../../utils/helper";
 import KyveBaseMethods from "./kyve/base/v1beta1/base";
@@ -15,6 +16,7 @@ import KyveStakersMethods from "./kyve/stakers/v1beta1/stakers";
 export default class KyveClient {
   public nativeClient: SigningStargateClient;
   public readonly account: AccountData;
+  public readonly config: SDKConfig;
   public kyve: {
     base: {
       v1beta1: KyveBaseMethods;
@@ -40,29 +42,43 @@ export default class KyveClient {
   constructor(
     client: SigningStargateClient,
     account: AccountData,
+    config: SDKConfig,
     aminoSigner: OfflineAminoSigner | null
   ) {
     this.account = account;
+    this.config = config;
     this.nativeClient = client;
     this.aminoSigner = aminoSigner;
     this.kyve = {
       base: {
-        v1beta1: new KyveBaseMethods(this.nativeClient, this.account),
+        v1beta1: new KyveBaseMethods(this.nativeClient, this.account, config),
       },
       bundles: {
-        v1beta1: new KyveBundlesMethods(this.nativeClient, this.account),
+        v1beta1: new KyveBundlesMethods(
+          this.nativeClient,
+          this.account,
+          config
+        ),
       },
       delegation: {
-        v1beta1: new KyveDelegationMethods(this.nativeClient, this.account),
+        v1beta1: new KyveDelegationMethods(
+          this.nativeClient,
+          this.account,
+          config
+        ),
       },
       gov: {
-        v1: new KyveGovMethodsV1(this.nativeClient, this.account),
+        v1: new KyveGovMethodsV1(this.nativeClient, this.account, config),
       },
       pool: {
-        v1beta1: new KyvePoolMethods(this.nativeClient, this.account),
+        v1beta1: new KyvePoolMethods(this.nativeClient, this.account, config),
       },
       stakers: {
-        v1beta1: new KyveStakersMethods(this.nativeClient, this.account),
+        v1beta1: new KyveStakersMethods(
+          this.nativeClient,
+          this.account,
+          config
+        ),
       },
     };
   }
