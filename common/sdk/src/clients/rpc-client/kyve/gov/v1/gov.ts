@@ -43,10 +43,7 @@ export default class KyveGovMsg {
       typeUrl: "/cosmos.gov.v1.MsgSubmitProposal",
       value: {
         messages: [content],
-        initial_deposit: coins(
-          deposit.toString(),
-          this.config.coinMinimalDenom
-        ),
+        initial_deposit: coins(deposit.toString(), this.config.coinDenom),
         proposer: this.account.address,
         metadata,
       },

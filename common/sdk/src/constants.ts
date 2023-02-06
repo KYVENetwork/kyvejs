@@ -2,10 +2,10 @@ import { AddChainParams } from "@cosmostation/extension-client/types/message";
 import { Bech32Address } from "@keplr-wallet/cosmos";
 import { ChainInfo } from "@keplr-wallet/types";
 
-export const DEFAULT_COIN_DENOM = "KYVE";
-export const DEFAULT_COIN_MINIMAL_DENOM = "tkyve";
+export const DEFAULT_COIN_DENOM = "tkyve";
 export const DEFAULT_COIN_DECIMALS = 9;
 
+export const COIN = "KYVE";
 export const PREFIX = "kyve";
 export const GOV_AUTHORITY = "kyve10d07y265gmmuvt4z0w9aw880jnsr700jdv7nah";
 
@@ -20,7 +20,6 @@ export type SDKConfig = {
   rpc: string;
   rest: string;
   coinDenom: string;
-  coinMinimalDenom: string;
   coinDecimals: number;
 };
 
@@ -30,7 +29,6 @@ export type SDKConfigInput = {
   rpc: string;
   rest: string;
   coinDenom?: string;
-  coinMinimalDenom?: string;
   coinDecimals?: number;
 };
 
@@ -40,7 +38,7 @@ export const KYVE_KEPLR_CONFIG: ChainInfo = {
   chainId: "",
   chainName: "",
   stakeCurrency: {
-    coinDenom: "",
+    coinDenom: "KYVE",
     coinMinimalDenom: "",
     coinDecimals: 0,
   },
@@ -59,7 +57,7 @@ export const KYVE_COSMOSTATION_CONFIG: AddChainParams = {
   restURL: "",
   chainName: "",
   baseDenom: "",
-  displayDenom: "",
+  displayDenom: "KYVE",
   addressPrefix: PREFIX,
   coinType: "118",
   decimals: 0,

@@ -1,8 +1,5 @@
 // kyve coin denom
-export const KYVE_COIN_DENOM = "KYVE";
-
-// kyve coin base denom
-export const KYVE_COIN_MINIMAL_DENOM = "tkyve";
+export const KYVE_COIN_DENOM = "tkyve";
 
 // kyve coin decimals
 export const KYVE_COIN_DECIMALS = 9;

@@ -34,7 +34,7 @@ export default class KyveBaseMsg {
       value: {
         fromAddress: this.account.address,
         toAddress: recipient,
-        amount: coins(amount, this.config.coinMinimalDenom),
+        amount: coins(amount, this.config.coinDenom),
       },
     };
 
@@ -52,12 +52,12 @@ export default class KyveBaseMsg {
         inputs: [
           {
             address: this.account.address,
-            coins: coins(allAmount.toString(), this.config.coinMinimalDenom),
+            coins: coins(allAmount.toString(), this.config.coinDenom),
           },
         ],
         outputs: recipient.map((address) => ({
           address,
-          coins: coins(amount, this.config.coinMinimalDenom),
+          coins: coins(amount, this.config.coinDenom),
         })),
       },
     };
@@ -71,7 +71,7 @@ export default class KyveBaseMsg {
   async getKyveBalance() {
     const data = await this.nativeClient.getBalance(
       this.account.address,
-      this.config.coinMinimalDenom
+      this.config.coinDenom
     );
     return data.amount;
   }

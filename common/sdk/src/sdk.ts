@@ -24,7 +24,6 @@ import {
   SUPPORTED_WALLETS,
   SDKConfig,
   DEFAULT_COIN_DENOM,
-  DEFAULT_COIN_MINIMAL_DENOM,
   DEFAULT_COIN_DECIMALS,
   SDKConfigInput,
 } from "./constants";
@@ -51,7 +50,6 @@ export class KyveSDK {
       rpc: config.rpc,
       rest: config.rest,
       coinDenom: config.coinDenom || DEFAULT_COIN_DENOM,
-      coinMinimalDenom: config.coinMinimalDenom || DEFAULT_COIN_MINIMAL_DENOM,
       coinDecimals: config.coinDecimals || DEFAULT_COIN_DECIMALS,
     };
   }
@@ -97,8 +95,8 @@ export class KyveSDK {
     if (!window.keplr) throw new Error("Please install Keplr.");
 
     const KYVE_COIN = {
-      coinDenom: this.config.coinDenom,
-      coinMinimalDenom: this.config.coinMinimalDenom,
+      coinDenom: "KYVE",
+      coinMinimalDenom: this.config.coinDenom,
       coinDecimals: this.config.coinDecimals,
     };
 
@@ -162,8 +160,7 @@ export class KyveSDK {
         restURL: this.config.rest,
         chainId: this.config.chainId,
         chainName: this.config.chainName,
-        displayDenom: this.config.coinDenom || DEFAULT_COIN_DENOM,
-        baseDenom: this.config.coinMinimalDenom || DEFAULT_COIN_MINIMAL_DENOM,
+        baseDenom: this.config.coinDenom,
         decimals: this.config.coinDecimals || DEFAULT_COIN_DECIMALS,
       });
       cosmostationAccount = await cosmostationMethods.requestAccount(

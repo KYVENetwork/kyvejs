@@ -3,7 +3,7 @@ import BigNumber from "bignumber.js";
 import {
   Validator,
   standardizeJSON,
-  KYVE_COIN_MINIMAL_DENOM,
+  KYVE_COIN_DENOM,
   KYVE_COIN_DECIMALS,
 } from "../..";
 
@@ -21,12 +21,12 @@ export async function getBalances(this: Validator): Promise<void> {
     try {
       this.logger.debug(this.rpc[c]);
       this.logger.debug(
-        `this.client.nativeClient.getBalance(${this.staker},${KYVE_COIN_MINIMAL_DENOM})`
+        `this.client.nativeClient.getBalance(${this.staker},${KYVE_COIN_DENOM})`
       );
 
       const stakerBalanceRaw = await this.client[c].nativeClient.getBalance(
         this.staker,
-        KYVE_COIN_MINIMAL_DENOM
+        KYVE_COIN_DENOM
       );
 
       this.logger.debug(JSON.stringify(stakerBalanceRaw));
@@ -47,12 +47,12 @@ export async function getBalances(this: Validator): Promise<void> {
     try {
       this.logger.debug(this.rpc[c]);
       this.logger.debug(
-        `this.client.nativeClient.getBalance(${this.client[0].account.address},${KYVE_COIN_MINIMAL_DENOM})`
+        `this.client.nativeClient.getBalance(${this.client[0].account.address},${KYVE_COIN_DENOM})`
       );
 
       const valaccountBalanceRaw = await this.client[c].nativeClient.getBalance(
         this.client[0].account.address,
-        KYVE_COIN_MINIMAL_DENOM
+        KYVE_COIN_DENOM
       );
 
       this.logger.debug(JSON.stringify(valaccountBalanceRaw));
