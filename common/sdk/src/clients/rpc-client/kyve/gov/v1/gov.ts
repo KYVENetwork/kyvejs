@@ -15,16 +15,22 @@ import {
 } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
 import { MsgUpdateParams as MsgUpdateParamsStakers } from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
 
-import { DENOM, GOV_AUTHORITY } from "../../../../../constants";
+import { GOV_AUTHORITY, SDKConfig } from "../../../../../constants";
 import { encodeTxMsg } from "../../../../../registry/tx.registry";
 import { signTx, TxPromise } from "../../../../../utils/helper";
 
 export default class KyveGovMsg {
   protected nativeClient: SigningStargateClient;
   public readonly account: AccountData;
+  public readonly config: SDKConfig;
 
-  constructor(client: SigningStargateClient, account: AccountData) {
+  constructor(
+    client: SigningStargateClient,
+    account: AccountData,
+    config: SDKConfig
+  ) {
     this.account = account;
+    this.config = config;
     this.nativeClient = client;
   }
 
@@ -37,7 +43,7 @@ export default class KyveGovMsg {
       typeUrl: "/cosmos.gov.v1.MsgSubmitProposal",
       value: {
         messages: [content],
-        initial_deposit: coins(deposit.toString(), DENOM),
+        initial_deposit: coins(deposit.toString(), this.config.coinDenom),
         proposer: this.account.address,
         metadata,
       },

@@ -5,15 +5,22 @@ import { MsgDelegate } from "@kyvejs/types/client/kyve/delegation/v1beta1/tx";
 import { MsgWithdrawRewards } from "@kyvejs/types/client/kyve/delegation/v1beta1/tx";
 import { MsgUndelegate } from "@kyvejs/types/client/kyve/delegation/v1beta1/tx";
 import { MsgRedelegate } from "@kyvejs/types/client/kyve/delegation/v1beta1/tx";
+import { SDKConfig } from "../../../../../constants";
 
 import { withTypeUrl } from "../../../../../registry/tx.registry";
 import { signTx, TxPromise } from "../../../../../utils/helper";
 export default class {
   private nativeClient: SigningStargateClient;
   public readonly account: AccountData;
+  public readonly config: SDKConfig;
 
-  constructor(client: SigningStargateClient, account: AccountData) {
+  constructor(
+    client: SigningStargateClient,
+    account: AccountData,
+    config: SDKConfig
+  ) {
     this.account = account;
+    this.config = config;
     this.nativeClient = client;
   }
 

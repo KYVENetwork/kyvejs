@@ -2,17 +2,23 @@ import { StdFee } from "@cosmjs/amino/build/signdoc";
 import { AccountData } from "@cosmjs/amino/build/signer";
 import { coins, SigningStargateClient } from "@cosmjs/stargate";
 import BigNumber from "bignumber.js";
+import { SDKConfig } from "../../../../../constants";
 
-import { DENOM } from "../../../../../constants";
 import { signTx, TxPromise } from "../../../../../utils/helper";
 
 export default class KyveBaseMsg {
   private nativeClient: SigningStargateClient;
   public readonly account: AccountData;
+  public readonly config: SDKConfig;
 
-  constructor(client: SigningStargateClient, account: AccountData) {
+  constructor(
+    client: SigningStargateClient,
+    account: AccountData,
+    config: SDKConfig
+  ) {
     this.account = account;
     this.nativeClient = client;
+    this.config = config;
   }
 
   async transfer(
@@ -28,7 +34,7 @@ export default class KyveBaseMsg {
       value: {
         fromAddress: this.account.address,
         toAddress: recipient,
-        amount: coins(amount, DENOM),
+        amount: coins(amount, this.config.coinDenom),
       },
     };
 
@@ -46,12 +52,12 @@ export default class KyveBaseMsg {
         inputs: [
           {
             address: this.account.address,
-            coins: coins(allAmount.toString(), DENOM),
+            coins: coins(allAmount.toString(), this.config.coinDenom),
           },
         ],
         outputs: recipient.map((address) => ({
           address,
-          coins: coins(amount, DENOM),
+          coins: coins(amount, this.config.coinDenom),
         })),
       },
     };
@@ -65,7 +71,7 @@ export default class KyveBaseMsg {
   async getKyveBalance() {
     const data = await this.nativeClient.getBalance(
       this.account.address,
-      DENOM
+      this.config.coinDenom
     );
     return data.amount;
   }
