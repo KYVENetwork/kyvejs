@@ -18,6 +18,16 @@ init
     "Comma separated list of rest endpoints. If the first fails the next endpoint will be used as fallback. "
   )
   .option(
+    "--denom <string>",
+    "The denom of the base currency [default = tkyve]",
+    "tkyve"
+  )
+  .option(
+    "--decimals <number>",
+    "The decimals of the base currency [default = 9]",
+    "9"
+  )
+  .option(
     "-d, --auto-download-binaries",
     "Allow automatic download and execution of new upgrade binaries"
   )
@@ -76,6 +86,8 @@ init
           chainId: options.chainId,
           rpc: options.rpc,
           rest: options.rest,
+          denom: options.denom,
+          decimals: parseInt(options.decimals),
           autoDownloadBinaries: options.autoDownloadBinaries,
         };
 
