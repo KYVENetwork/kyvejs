@@ -1,12 +1,18 @@
 import TOML from "@iarna/toml";
 import KyveSDK from "@kyvejs/sdk";
+import BigNumber from "bignumber.js";
 import { Command } from "commander";
 import fs from "fs";
 import path from "path";
 import prompts from "prompts";
 
 import { IValaccountConfig } from "../types/interfaces";
-import { FILE_ACCESS, HOME } from "../utils/constants";
+import {
+  DEFAULT_COIN_DECIMALS,
+  DEFAULT_COIN_DENOM,
+  FILE_ACCESS,
+  HOME,
+} from "../utils/constants";
 
 const valaccounts = new Command("valaccounts").description(
   "Create and delete valaccounts"
@@ -125,6 +131,170 @@ valaccounts
       console.log(`Successfully created valaccount ${options.name}`);
     } catch (err) {
       console.log(`ERROR: Could not create valaccount: ${err}`);
+    }
+  });
+
+valaccounts
+  .command("show-address")
+  .description("Show address of a valaccount")
+  .requiredOption(
+    "--name <string>",
+    "Name of the valaccount (name only used locally for KYSOR)"
+  )
+  .action(async (options) => {
+    try {
+      if (
+        !fs.existsSync(path.join(HOME, "valaccounts", `${options.name}.toml`))
+      ) {
+        console.log(`Valaccount with name ${options.name} does not exist`);
+        return;
+      }
+
+      const valaccount = TOML.parse(
+        fs.readFileSync(
+          path.join(HOME, "valaccounts", `${options.name}.toml`),
+          "utf-8"
+        )
+      ) as any;
+
+      const address = await KyveSDK.getAddressFromMnemonic(
+        valaccount.valaccount
+      );
+      console.log(address);
+    } catch (err) {
+      console.log(`ERROR: Could not show address of valaccount: ${err}`);
+    }
+  });
+
+valaccounts
+  .command("show-balance")
+  .description("Show balance of a valaccount")
+  .requiredOption(
+    "--name <string>",
+    "Name of the valaccount (name only used locally for KYSOR)"
+  )
+  .action(async (options) => {
+    try {
+      if (
+        !fs.existsSync(path.join(HOME, "valaccounts", `${options.name}.toml`))
+      ) {
+        console.log(`Valaccount with name ${options.name} does not exist`);
+        return;
+      }
+
+      const config = TOML.parse(
+        fs.readFileSync(path.join(HOME, "config.toml"), "utf-8")
+      ) as any;
+
+      const valaccount = TOML.parse(
+        fs.readFileSync(
+          path.join(HOME, "valaccounts", `${options.name}.toml`),
+          "utf-8"
+        )
+      ) as any;
+
+      const client = await new KyveSDK({
+        chainId: config.chainId,
+        chainName: config.chainId.toUpperCase(),
+        rpc: config.rpc.split(",")[0],
+        rest: config.rest.split(",")[0],
+      }).fromMnemonic(valaccount.valaccount);
+
+      const balance = await client.nativeClient.getBalance(
+        client.account.address,
+        config.denom || DEFAULT_COIN_DENOM
+      );
+
+      console.log(`${balance.amount} ${config.denom || DEFAULT_COIN_DENOM}`);
+    } catch (err) {
+      console.log(`ERROR: Could not show balance of valaccount: ${err}`);
+    }
+  });
+
+valaccounts
+  .command("transfer")
+  .description("Transfer funds from valaccount to a recipient")
+  .requiredOption(
+    "--from <string>",
+    "Name of the valaccount the amount should be transferred from (name only used locally for KYSOR)"
+  )
+  .requiredOption(
+    "--amount <string>",
+    "Amount to send to recipient (base unit)"
+  )
+  .requiredOption("--recipient <string>", "Wallet address of the recipient")
+  .action(async (options) => {
+    try {
+      if (
+        !fs.existsSync(path.join(HOME, "valaccounts", `${options.from}.toml`))
+      ) {
+        console.log(`Valaccount with name ${options.from} does not exist`);
+        return;
+      }
+
+      const config = TOML.parse(
+        fs.readFileSync(path.join(HOME, "config.toml"), "utf-8")
+      ) as any;
+
+      const valaccount = TOML.parse(
+        fs.readFileSync(
+          path.join(HOME, "valaccounts", `${options.from}.toml`),
+          "utf-8"
+        )
+      ) as any;
+
+      const client = await new KyveSDK({
+        chainId: config.chainId,
+        chainName: config.chainId.toUpperCase(),
+        rpc: config.rpc.split(",")[0],
+        rest: config.rest.split(",")[0],
+      }).fromMnemonic(valaccount.valaccount);
+
+      const tx = await client.kyve.base.v1beta1.transfer(
+        options.recipient,
+        options.amount
+      );
+
+      const { value } = await prompts(
+        {
+          type: "confirm",
+          name: "value",
+          message: `Confirm transfer of ${options.amount} ${
+            options.denom || DEFAULT_COIN_DENOM
+          } (${new BigNumber(options.amount)
+            .dividedBy(
+              new BigNumber(10).exponentiatedBy(
+                options.denom || DEFAULT_COIN_DECIMALS
+              )
+            )
+            .toString(10)} $KYVE) to recipient ${options.recipient}`,
+        },
+        {
+          onCancel: () => {
+            throw Error("Aborted transfer confirmation");
+          },
+        }
+      );
+
+      if (value) {
+        console.log(`Waiting for confirmation: ${tx.txHash} ...`);
+
+        const receipt = await tx.execute();
+
+        if (receipt.code === 0) {
+          console.log(
+            `Successfully transferred ${options.amount} ${
+              config.denom || DEFAULT_COIN_DENOM
+            } to recipient ${options.recipient}`
+          );
+        } else {
+          `Transfer failed with receipt ${JSON.stringify(receipt)}`;
+        }
+      } else {
+        console.log("Aborted transfer");
+      }
+    } catch (err) {
+      console.log(`ERROR: Could not transfer funds from valaccount: ${err}`);
     }
   });
 
