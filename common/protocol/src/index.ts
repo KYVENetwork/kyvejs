@@ -51,6 +51,7 @@ import {
 } from "./methods";
 import { ICacheProvider, IMetrics, IRuntime } from "./types";
 import { standardizeJSON } from "./utils";
+import { SupportedChains } from "@kyvejs/sdk/dist/constants";
 
 /**
  * Main class of KYVE protocol nodes representing a validator node.
@@ -85,9 +86,10 @@ export class Validator {
   protected staker!: string;
   protected valaccount!: string;
   protected storagePriv!: string;
-  protected chainId!: string;
+  protected chainId!: SupportedChains;
   protected rpc!: string[];
   protected rest!: string[];
+  protected gasPrice: number | undefined;
   protected cache!: string;
   protected debug!: boolean;
   protected metrics!: boolean;
@@ -219,6 +221,10 @@ export class Validator {
         parseEndpoints
       )
       .option(
+        "--gas-price <number>",
+        "The gas price the node should use to calculate transaction fees"
+      )
+      .option(
         "--cache <jsonfile|memory>",
         "The cache this node should use",
         parseCache,
@@ -267,6 +273,7 @@ export class Validator {
     this.chainId = options.chainId;
     this.rpc = options.rpc;
     this.rest = options.rest;
+    this.gasPrice = options.gasPrice;
     this.cache = options.cache;
     this.debug = options.debug;
     this.metrics = options.metrics;

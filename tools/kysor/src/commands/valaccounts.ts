@@ -193,11 +193,10 @@ valaccounts
         )
       ) as any;
 
-      const client = await new KyveSDK({
-        chainId: config.chainId,
-        chainName: config.chainId.toUpperCase(),
+      const client = await new KyveSDK(config.chainId, {
         rpc: config.rpc.split(",")[0],
         rest: config.rest.split(",")[0],
+        gasPrice: config.gasPrice,
       }).fromMnemonic(valaccount.valaccount);
 
       const balance = await client.nativeClient.getBalance(
@@ -243,11 +242,10 @@ valaccounts
         )
       ) as any;
 
-      const client = await new KyveSDK({
-        chainId: config.chainId,
-        chainName: config.chainId.toUpperCase(),
+      const client = await new KyveSDK(config.chainId, {
         rpc: config.rpc.split(",")[0],
         rest: config.rest.split(",")[0],
+        gasPrice: config.gasPrice,
       }).fromMnemonic(valaccount.valaccount);
 
       const tx = await client.kyve.base.v1beta1.transfer(
