@@ -23,8 +23,8 @@ import {
   PREFIX,
   SUPPORTED_WALLETS,
   IConfig,
-  DEFAULT_COIN_DENOM,
-  DEFAULT_COIN_DECIMALS,
+  SupportedChains,
+  SUPPORTED_CHAIN_CONFIGS,
 } from "./constants";
 import {
   cosmostationMethods,
@@ -35,31 +35,23 @@ import { KeplrAminoSigner } from "./utils/keplr-helper";
 /** Class representing a KyveSDK. */
 export class KyveSDK {
   public readonly config: IConfig;
-  private walletSupports: Set<keyof typeof SUPPORTED_WALLETS>;
+  private walletSupports = new Set<keyof typeof SUPPORTED_WALLETS>();
 
   /**
    * Create sdk instance.
-   * @param config - The config type, e.g mainnet, testnet, etc
+   * @param chainId - The chainId of the chain the sdk should connect to
+   * @param options - The default config of the sdk can be overwritten here
    */
-  constructor(config: {
-    chainId: string;
-    chainName: string;
-    rpc: string;
-    rest: string;
-    gasPrice: number;
-    coinDenom?: string;
-    coinDecimals?: number;
-  }) {
-    this.walletSupports = new Set<keyof typeof SUPPORTED_WALLETS>();
-    this.config = {
-      chainId: config.chainId,
-      chainName: config.chainName,
-      rpc: config.rpc,
-      rest: config.rest,
-      gasPrice: config.gasPrice,
-      coinDenom: config.coinDenom || DEFAULT_COIN_DENOM,
-      coinDecimals: config.coinDecimals || DEFAULT_COIN_DECIMALS,
-    };
+  constructor(
+    chainId: SupportedChains,
+    options: {
+      chainName?: string;
+      rpc?: string;
+      rest?: string;
+      gasPrice?: number;
+    }
+  ) {
+    this.config = { ...SUPPORTED_CHAIN_CONFIGS[chainId], ...options };
   }
 
   /**
@@ -103,7 +95,7 @@ export class KyveSDK {
     if (!window.keplr) throw new Error("Please install Keplr.");
 
     const KYVE_COIN = {
-      coinDenom: "KYVE",
+      coinDenom: this.config.coin,
       coinMinimalDenom: this.config.coinDenom,
       coinDecimals: this.config.coinDecimals,
     };
@@ -120,19 +112,22 @@ export class KyveSDK {
         {
           ...KYVE_COIN,
           gasPriceStep: {
-            low: 0.02,
-            average: 0.03,
-            high: 0.04,
+            low: this.config.gasPrice,
+            average: this.config.gasPrice * 1.5,
+            high: this.config.gasPrice * 3,
           },
         },
       ],
     });
+
     await window.keplr.enable(this.config.chainId);
-    window.keplr.defaultOptions = {
-      sign: {
-        preferNoSetFee: true,
-      },
-    };
+
+    // window.keplr.defaultOptions = {
+    //   sign: {
+    //     preferNoSetFee: true,
+    //   },
+    // };
+
     const signer = window.keplr.getOfflineSigner(this.config.chainId);
     const walletName = (await window.keplr.getKey(this.config.chainId)).name;
     const keplr = window.keplr;
@@ -168,8 +163,9 @@ export class KyveSDK {
         restURL: this.config.rest,
         chainId: this.config.chainId,
         chainName: this.config.chainName,
+        displayDenom: this.config.coin,
         baseDenom: this.config.coinDenom,
-        decimals: this.config.coinDecimals || DEFAULT_COIN_DECIMALS,
+        decimals: this.config.coinDecimals,
       });
       cosmostationAccount = await cosmostationMethods.requestAccount(
         this.config.chainName

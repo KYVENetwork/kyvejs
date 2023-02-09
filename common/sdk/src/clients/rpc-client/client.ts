@@ -1,5 +1,4 @@
 import { StdSignature } from "@cosmjs/amino";
-import { StdFee } from "@cosmjs/amino/build/signdoc";
 import { AccountData, OfflineAminoSigner } from "@cosmjs/amino/build/signer";
 import { SigningStargateClient } from "@cosmjs/stargate";
 import { makeADR36AminoSignDoc } from "@keplr-wallet/cosmos";
