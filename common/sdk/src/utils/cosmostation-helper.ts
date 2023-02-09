@@ -11,7 +11,8 @@ import {
   SignOptions,
 } from "@cosmostation/extension-client/types/message";
 import { SignDoc } from "cosmjs-types/cosmos/tx/v1beta1/tx";
-import { SDKConfig } from "../constants";
+
+import { IConfig } from "../constants";
 
 export const cosmostationMethods = {
   getSupportedChains() {
@@ -39,7 +40,6 @@ export const cosmostationMethods = {
         doc,
         isEditMemo: !!options?.memo,
         isEditFee: !!options?.fee,
-        gasRate: options?.gasRate,
       },
     });
   },
@@ -58,13 +58,13 @@ export const cosmostationMethods = {
 };
 
 export class CosmostationSigner implements OfflineDirectSigner {
-  private config: SDKConfig;
+  private config: IConfig;
   private cosmostationAccount: RequestAccountResponse;
   private cosmostationOption: SignOptions | undefined;
 
   constructor(
     cosmostationAccount: RequestAccountResponse,
-    config: SDKConfig,
+    config: IConfig,
     cosmostationOption?: SignOptions
   ) {
     this.config = config;

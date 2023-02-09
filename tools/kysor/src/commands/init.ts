@@ -3,6 +3,7 @@ import KyveSDK from "@kyvejs/sdk";
 import { Command } from "commander";
 import fs from "fs";
 import path from "path";
+
 import { HOME } from "../utils/constants";
 
 const init = new Command("init").description("Init KYSOR");
@@ -18,14 +19,8 @@ init
     "Comma separated list of rest endpoints. If the first fails the next endpoint will be used as fallback. "
   )
   .option(
-    "--denom <string>",
-    "The denom of the base currency [default = tkyve]",
-    "tkyve"
-  )
-  .option(
-    "--decimals <number>",
-    "The decimals of the base currency [default = 9]",
-    "9"
+    "--gas-price <number>",
+    "The gas price the node should use to calculate transaction fees"
   )
   .option(
     "-d, --auto-download-binaries",
@@ -68,11 +63,10 @@ init
         }
 
         try {
-          new KyveSDK({
-            chainId: options.chainId,
+          new KyveSDK(options.chainId, {
             rpc: rpc[0],
             rest: rest[0],
-            chainName: `KYVE - ${options.chainId}`,
+            gasPrice: options.gasPrice,
           });
         } catch (err) {
           console.log(
@@ -86,8 +80,7 @@ init
           chainId: options.chainId,
           rpc: options.rpc,
           rest: options.rest,
-          denom: options.denom,
-          decimals: parseInt(options.decimals),
+          gasPrice: options.gasPrice,
           autoDownloadBinaries: options.autoDownloadBinaries,
         };
 

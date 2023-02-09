@@ -1,28 +1,11 @@
 import { StdFee } from "@cosmjs/amino/build/signdoc";
-import { AccountData } from "@cosmjs/amino/build/signer";
-import { SigningStargateClient } from "@cosmjs/stargate";
 import { MsgDefundPool } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
 import { MsgFundPool } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
 
-import { SDKConfig } from "../../../../../constants";
 import { withTypeUrl } from "../../../../../registry/tx.registry";
-import { signTx, TxPromise } from "../../../../../utils/helper";
+import { KyveSigning } from "../../../signing";
 
-export default class {
-  private nativeClient: SigningStargateClient;
-  public readonly account: AccountData;
-  public readonly config: SDKConfig;
-
-  constructor(
-    client: SigningStargateClient,
-    account: AccountData,
-    config: SDKConfig
-  ) {
-    this.account = account;
-    this.config = config;
-    this.nativeClient = client;
-  }
-
+export default class KyvePoolMethods extends KyveSigning {
   public async fundPool(
     value: Omit<MsgFundPool, "creator">,
     options?: {
@@ -35,10 +18,7 @@ export default class {
       creator: this.account.address,
     });
 
-    return new TxPromise(
-      this.nativeClient,
-      await signTx(this.nativeClient, this.account.address, tx, options)
-    );
+    return await this.getPendingSignedTx(tx, options);
   }
 
   public async defundPool(
@@ -52,9 +32,6 @@ export default class {
       ...value,
       creator: this.account.address,
     });
-    return new TxPromise(
-      this.nativeClient,
-      await signTx(this.nativeClient, this.account.address, tx, options)
-    );
+    return await this.getPendingSignedTx(tx, options);
   }
 }

@@ -1,26 +1,10 @@
 import { StdFee } from "@cosmjs/amino/build/signdoc";
-import { AccountData } from "@cosmjs/amino/build/signer";
-import { coins, SigningStargateClient } from "@cosmjs/stargate";
+import { coins } from "@cosmjs/stargate";
 import BigNumber from "bignumber.js";
-import { SDKConfig } from "../../../../../constants";
 
-import { signTx, TxPromise } from "../../../../../utils/helper";
+import { KyveSigning, PendingSignedTx } from "../../../signing";
 
-export default class KyveBaseMsg {
-  private nativeClient: SigningStargateClient;
-  public readonly account: AccountData;
-  public readonly config: SDKConfig;
-
-  constructor(
-    client: SigningStargateClient,
-    account: AccountData,
-    config: SDKConfig
-  ) {
-    this.account = account;
-    this.nativeClient = client;
-    this.config = config;
-  }
-
+export default class KyveBaseMsg extends KyveSigning {
   async transfer(
     recipient: string,
     amount: string,
@@ -38,13 +22,17 @@ export default class KyveBaseMsg {
       },
     };
 
-    return new TxPromise(
-      this.nativeClient,
-      await signTx(this.nativeClient, this.account.address, tx, options)
-    );
+    return await this.getPendingSignedTx(tx, options);
   }
 
-  async multiTransfer(recipient: string[], amount: string) {
+  async multiTransfer(
+    recipient: string[],
+    amount: string,
+    options?: {
+      fee?: StdFee | "auto" | number;
+      memo?: string;
+    }
+  ) {
     const allAmount = new BigNumber(amount).multipliedBy(recipient.length);
     const tx = {
       typeUrl: "/cosmos.bank.v1beta1.MsgMultiSend",
@@ -62,17 +50,18 @@ export default class KyveBaseMsg {
       },
     };
 
-    return new TxPromise(
-      this.nativeClient,
-      await signTx(this.nativeClient, this.account.address, tx)
-    );
+    return await this.getPendingSignedTx(tx, options);
   }
 
-  async getKyveBalance() {
-    const data = await this.nativeClient.getBalance(
-      this.account.address,
-      this.config.coinDenom
-    );
-    return data.amount;
+  async txsAll(
+    txs: PendingSignedTx[],
+    options?: {
+      fee?: StdFee | "auto" | number;
+      memo?: string;
+    }
+  ) {
+    const txMessages = txs.map((tx) => tx.tx).flat();
+
+    return await this.getPendingSignedTx(txMessages, options);
   }
 }

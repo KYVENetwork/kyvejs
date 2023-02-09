@@ -3,6 +3,7 @@ import crypto from "crypto";
 import fs from "fs";
 import path from "path";
 import { ILogObject, Logger } from "tslog";
+
 import { HOME } from "./constants";
 
 export const setupLogger = () => {

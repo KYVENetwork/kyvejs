@@ -118,11 +118,10 @@ export const run = async (options: any) => {
   // create lcd clients
   const lcd = rpc.map((_, i) => {
     try {
-      return new KyveSDK({
-        chainId: config.chainId,
+      return new KyveSDK(config.chainId, {
         rpc: rpc[i],
         rest: rest[i],
-        chainName: `KYVE - ${config.chainId}`,
+        gasPrice: config.gasPrice,
       }).createLCDClient();
     } catch (err) {
       logger.error(

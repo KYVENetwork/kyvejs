@@ -1,7 +1,10 @@
+import { SupportedChains } from "@kyvejs/sdk/dist/constants";
+
 export interface IConfig {
-  chainId: string;
+  chainId: SupportedChains;
   rpc: string;
   rest: string;
+  gasPrice: number;
   autoDownloadBinaries: boolean;
 }
 

@@ -5,12 +5,13 @@ import {
   OfflineAminoSigner,
 } from "@cosmjs/amino/build/signer";
 import { Keplr } from "@keplr-wallet/types";
-import { SDKConfig } from "../constants";
+
+import { IConfig } from "../constants";
 
 export class KeplrAminoSigner implements OfflineAminoSigner {
   private keplr: Keplr;
-  private config: SDKConfig;
-  constructor(keplr: Keplr, config: SDKConfig) {
+  private config: IConfig;
+  constructor(keplr: Keplr, config: IConfig) {
     this.keplr = keplr;
     this.config = config;
   }

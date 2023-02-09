@@ -1,30 +1,13 @@
 import { StdFee } from "@cosmjs/amino/build/signdoc";
-import { AccountData } from "@cosmjs/amino/build/signer";
-import { SigningStargateClient } from "@cosmjs/stargate";
 import { MsgSubmitBundleProposal } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
 import { MsgVoteBundleProposal } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
 import { MsgClaimUploaderRole } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
 import { MsgSkipUploaderRole } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
-import { SDKConfig } from "../../../../../constants";
 
 import { withTypeUrl } from "../../../../../registry/tx.registry";
-import { signTx, TxPromise } from "../../../../../utils/helper";
+import { KyveSigning } from "../../../signing";
 
-export default class {
-  private nativeClient: SigningStargateClient;
-  public readonly account: AccountData;
-  public readonly config: SDKConfig;
-
-  constructor(
-    client: SigningStargateClient,
-    account: AccountData,
-    config: SDKConfig
-  ) {
-    this.account = account;
-    this.config = config;
-    this.nativeClient = client;
-  }
-
+export default class KyveBundlesMethods extends KyveSigning {
   public async submitBundleProposal(
     value: Omit<MsgSubmitBundleProposal, "creator">,
     options?: {
@@ -36,10 +19,8 @@ export default class {
       ...value,
       creator: this.account.address,
     });
-    return new TxPromise(
-      this.nativeClient,
-      await signTx(this.nativeClient, this.account.address, tx, options)
-    );
+
+    return await this.getPendingSignedTx(tx, options);
   }
 
   public async voteBundleProposal(
@@ -53,10 +34,8 @@ export default class {
       ...value,
       creator: this.account.address,
     });
-    return new TxPromise(
-      this.nativeClient,
-      await signTx(this.nativeClient, this.account.address, tx, options)
-    );
+
+    return await this.getPendingSignedTx(tx, options);
   }
 
   public async claimUploaderRole(
@@ -70,11 +49,10 @@ export default class {
       ...value,
       creator: this.account.address,
     });
-    return new TxPromise(
-      this.nativeClient,
-      await signTx(this.nativeClient, this.account.address, tx, options)
-    );
+
+    return await this.getPendingSignedTx(tx, options);
   }
+
   public async skipUploaderRole(
     value: Omit<MsgSkipUploaderRole, "creator">,
     options?: {
@@ -86,9 +64,7 @@ export default class {
       ...value,
       creator: this.account.address,
     });
-    return new TxPromise(
-      this.nativeClient,
-      await signTx(this.nativeClient, this.account.address, tx, options)
-    );
+
+    return await this.getPendingSignedTx(tx, options);
   }
 }

@@ -2,35 +2,81 @@ import { AddChainParams } from "@cosmostation/extension-client/types/message";
 import { Bech32Address } from "@keplr-wallet/cosmos";
 import { ChainInfo } from "@keplr-wallet/types";
 
-export const DEFAULT_COIN_DENOM = "tkyve";
-export const DEFAULT_COIN_DECIMALS = 9;
-
-export const COIN = "KYVE";
 export const PREFIX = "kyve";
 export const GOV_AUTHORITY = "kyve10d07y265gmmuvt4z0w9aw880jnsr700jdv7nah";
+export const GAS_MULTIPLIER = 1.3;
+
+export type IConfig = {
+  chainId: string;
+  chainName: string;
+  rpc: string;
+  rest: string;
+  coin: string;
+  coinDenom: string;
+  coinDecimals: number;
+  gasPrice: number;
+};
+
+// chains are always identified by their chain id
+export const SUPPORTED_CHAIN_CONFIGS = {
+  "kyve-local": {
+    chainId: "kyve-local",
+    chainName: "KYVE Local",
+    rpc: "http://0.0.0.0:26657",
+    rest: "http://0.0.0.0:1317",
+    coin: "KYVE",
+    coinDenom: "tkyve",
+    coinDecimals: 9,
+    gasPrice: 1,
+  },
+  "kyve-alpha": {
+    chainId: "kyve-alpha",
+    chainName: "KYVE Alpha",
+    rpc: "https://rpc.alpha.kyve.network",
+    rest: "https://api.alpha.kyve.network",
+    coin: "KYVE",
+    coinDenom: "tkyve",
+    coinDecimals: 9,
+    gasPrice: 1,
+  },
+  "kyve-beta": {
+    chainId: "kyve-beta",
+    chainName: "KYVE Beta",
+    rpc: "https://rpc.beta.kyve.network",
+    rest: "https://api.beta.kyve.network",
+    coin: "KYVE",
+    coinDenom: "tkyve",
+    coinDecimals: 9,
+    gasPrice: 1,
+  },
+  korellia: {
+    chainId: "korellia",
+    chainName: "KYVE Korellia",
+    rpc: "https://rpc.kyve.network",
+    rest: "https://api.kyve.network",
+    coin: "KYVE",
+    coinDenom: "tkyve",
+    coinDecimals: 9,
+    gasPrice: 1,
+  },
+  "kaon-1": {
+    chainId: "kaon-1",
+    chainName: "KYVE Kaon",
+    rpc: "https://rpc-eu-1.kaon.kyve.network/",
+    rest: "https://api-eu-1.kaon.kyve.network",
+    coin: "KYVE",
+    coinDenom: "tkyve",
+    coinDecimals: 6,
+    gasPrice: 0.02,
+  },
+};
+
+export type SupportedChains = keyof typeof SUPPORTED_CHAIN_CONFIGS;
 
 export const SUPPORTED_WALLETS = {
   KEPLER: "KEPLER",
   COSMOSTATION: "COSMOSTATION",
 } as const;
-
-export type SDKConfig = {
-  chainId: string;
-  chainName: string;
-  rpc: string;
-  rest: string;
-  coinDenom: string;
-  coinDecimals: number;
-};
-
-export type SDKConfigInput = {
-  chainId: string;
-  chainName: string;
-  rpc: string;
-  rest: string;
-  coinDenom?: string;
-  coinDecimals?: number;
-};
 
 export const KYVE_KEPLR_CONFIG: ChainInfo = {
   rpc: "",
@@ -38,7 +84,7 @@ export const KYVE_KEPLR_CONFIG: ChainInfo = {
   chainId: "",
   chainName: "",
   stakeCurrency: {
-    coinDenom: "KYVE",
+    coinDenom: "",
     coinMinimalDenom: "",
     coinDecimals: 0,
   },
@@ -57,13 +103,13 @@ export const KYVE_COSMOSTATION_CONFIG: AddChainParams = {
   restURL: "",
   chainName: "",
   baseDenom: "",
-  displayDenom: "KYVE",
+  displayDenom: "",
   addressPrefix: PREFIX,
   coinType: "118",
   decimals: 0,
   gasRate: {
-    tiny: "1.6",
-    low: "2",
-    average: "0.8",
+    tiny: "1",
+    low: "1.5",
+    average: "3",
   },
 };

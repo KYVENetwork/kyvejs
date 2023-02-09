@@ -7,12 +7,7 @@ import path from "path";
 import prompts from "prompts";
 
 import { IValaccountConfig } from "../types/interfaces";
-import {
-  DEFAULT_COIN_DECIMALS,
-  DEFAULT_COIN_DENOM,
-  FILE_ACCESS,
-  HOME,
-} from "../utils/constants";
+import { FILE_ACCESS, HOME } from "../utils/constants";
 
 const valaccounts = new Command("valaccounts").description(
   "Create and delete valaccounts"
@@ -193,19 +188,15 @@ valaccounts
         )
       ) as any;
 
-      const client = await new KyveSDK({
-        chainId: config.chainId,
-        chainName: config.chainId.toUpperCase(),
+      const client = await new KyveSDK(config.chainId, {
         rpc: config.rpc.split(",")[0],
         rest: config.rest.split(",")[0],
+        gasPrice: config.gasPrice,
       }).fromMnemonic(valaccount.valaccount);
 
-      const balance = await client.nativeClient.getBalance(
-        client.account.address,
-        config.denom || DEFAULT_COIN_DENOM
-      );
+      const balance = await client.getKyveBalance();
 
-      console.log(`${balance.amount} ${config.denom || DEFAULT_COIN_DENOM}`);
+      console.log(`${balance} ${client.config.coinDenom}`);
     } catch (err) {
       console.log(`ERROR: Could not show balance of valaccount: ${err}`);
     }
@@ -243,11 +234,10 @@ valaccounts
         )
       ) as any;
 
-      const client = await new KyveSDK({
-        chainId: config.chainId,
-        chainName: config.chainId.toUpperCase(),
+      const client = await new KyveSDK(config.chainId, {
         rpc: config.rpc.split(",")[0],
         rest: config.rest.split(",")[0],
+        gasPrice: config.gasPrice,
       }).fromMnemonic(valaccount.valaccount);
 
       const tx = await client.kyve.base.v1beta1.transfer(
@@ -260,14 +250,14 @@ valaccounts
           type: "confirm",
           name: "value",
           message: `Confirm transfer of ${options.amount} ${
-            options.denom || DEFAULT_COIN_DENOM
+            client.config.coinDenom
           } (${new BigNumber(options.amount)
             .dividedBy(
-              new BigNumber(10).exponentiatedBy(
-                options.denom || DEFAULT_COIN_DECIMALS
-              )
+              new BigNumber(10).exponentiatedBy(client.config.coinDecimals)
             )
-            .toString(10)} $KYVE) to recipient ${options.recipient}`,
+            .toString(10)} ${client.config.coin}) to recipient ${
+            options.recipient
+          }`,
         },
         {
           onCancel: () => {
@@ -283,9 +273,7 @@ valaccounts
 
         if (receipt.code === 0) {
           console.log(
-            `Successfully transferred ${options.amount} ${
-              config.denom || DEFAULT_COIN_DENOM
-            } to recipient ${options.recipient}`
+            `Successfully transferred ${options.amount} ${client.config.coinDenom} to recipient ${options.recipient}`
           );
         } else {
           `Transfer failed with receipt ${JSON.stringify(receipt)}`;
