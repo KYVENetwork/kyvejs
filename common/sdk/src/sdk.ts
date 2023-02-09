@@ -44,14 +44,34 @@ export class KyveSDK {
    */
   constructor(
     chainId: SupportedChains,
-    options: {
+    options?: {
       chainName?: string;
       rpc?: string;
       rest?: string;
       gasPrice?: number;
     }
   ) {
-    this.config = { ...SUPPORTED_CHAIN_CONFIGS[chainId], ...options };
+    if (!SUPPORTED_CHAIN_CONFIGS[chainId]) {
+      throw new Error(`ChainId "${chainId}" not supported.`);
+    }
+
+    this.config = { ...SUPPORTED_CHAIN_CONFIGS[chainId] };
+
+    if (options?.chainName) {
+      this.config = { ...this.config, chainName: options.chainName };
+    }
+
+    if (options?.rpc) {
+      this.config = { ...this.config, rpc: options.rpc };
+    }
+
+    if (options?.rest) {
+      this.config = { ...this.config, rest: options.rest };
+    }
+
+    if (options?.gasPrice) {
+      this.config = { ...this.config, gasPrice: options.gasPrice };
+    }
   }
 
   /**
