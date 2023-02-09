@@ -8,6 +8,7 @@ export const DEFAULT_COIN_DECIMALS = 9;
 export const COIN = "KYVE";
 export const PREFIX = "kyve";
 export const GOV_AUTHORITY = "kyve10d07y265gmmuvt4z0w9aw880jnsr700jdv7nah";
+export const GAS_MULTIPLIER = 1.3;
 
 export const SUPPORTED_WALLETS = {
   KEPLER: "KEPLER",

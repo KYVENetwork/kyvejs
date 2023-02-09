@@ -5,7 +5,6 @@ import { SigningStargateClient } from "@cosmjs/stargate";
 import { makeADR36AminoSignDoc } from "@keplr-wallet/cosmos";
 import { IConfig } from "../../constants";
 
-import { signTx, TxPromise } from "../../utils/helper";
 import KyveBaseMethods from "./kyve/base/v1beta1/base";
 import KyveBundlesMethods from "./kyve/bundles/v1beta1/bundles";
 import KyveDelegationMethods from "./kyve/delegation/v1beta1/delegation";
@@ -82,6 +81,7 @@ export default class KyveClient {
       },
     };
   }
+
   async signString(message: string): Promise<StdSignature> {
     if (this.aminoSigner === null)
       throw new Error("Wallet doesn't support adr-036");
@@ -92,17 +92,12 @@ export default class KyveClient {
     );
     return signature;
   }
-  async txsAll(
-    txs: TxPromise[],
-    options?: {
-      fee?: StdFee | "auto" | number;
-      memo?: string;
-    }
-  ) {
-    const txMessages = txs.map((tx) => tx.tx).flat();
-    return new TxPromise(
-      this.nativeClient,
-      await signTx(this.nativeClient, this.account.address, txMessages, options)
+
+  async getKyveBalance(): Promise<string> {
+    const data = await this.nativeClient.getBalance(
+      this.account.address,
+      this.config.coinDenom
     );
+    return data.amount;
   }
 }

@@ -1,6 +1,5 @@
 import { StdFee } from "@cosmjs/amino/build/signdoc";
-import { AccountData } from "@cosmjs/amino/build/signer";
-import { coins, SigningStargateClient } from "@cosmjs/stargate";
+import { coins } from "@cosmjs/stargate";
 import { VoteOption } from "@kyvejs/types/client/cosmos/gov/v1/gov";
 import { MsgUpdateParams as MsgUpdateParamsBundles } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
 import { MsgUpdateParams as MsgUpdateParamsDelegation } from "@kyvejs/types/client/kyve/delegation/v1beta1/tx";
@@ -14,26 +13,11 @@ import {
   MsgUpdatePool,
 } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
 import { MsgUpdateParams as MsgUpdateParamsStakers } from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
-
-import { GOV_AUTHORITY, SDKConfig } from "../../../../../constants";
+import { GOV_AUTHORITY } from "../../../../../constants";
 import { encodeTxMsg } from "../../../../../registry/tx.registry";
-import { signTx, TxPromise } from "../../../../../utils/helper";
+import { KyveSigning } from "../../../signing";
 
-export default class KyveGovMsg {
-  protected nativeClient: SigningStargateClient;
-  public readonly account: AccountData;
-  public readonly config: SDKConfig;
-
-  constructor(
-    client: SigningStargateClient,
-    account: AccountData,
-    config: SDKConfig
-  ) {
-    this.account = account;
-    this.config = config;
-    this.nativeClient = client;
-  }
-
+export default class KyveGovMsg extends KyveSigning {
   private createGovTx(
     content: { type_url: string; value: unknown },
     deposit: string,
@@ -68,10 +52,7 @@ export default class KyveGovMsg {
       metadata
     );
 
-    return new TxPromise(
-      this.nativeClient,
-      await signTx(this.nativeClient, this.account.address, tx, options)
-    );
+    return await this.getPendingSignedTx(tx, options);
   }
 
   public async updatePool(
@@ -92,10 +73,7 @@ export default class KyveGovMsg {
       metadata
     );
 
-    return new TxPromise(
-      this.nativeClient,
-      await signTx(this.nativeClient, this.account.address, tx, options)
-    );
+    return await this.getPendingSignedTx(tx, options);
   }
 
   public async disablePool(
@@ -116,10 +94,7 @@ export default class KyveGovMsg {
       metadata
     );
 
-    return new TxPromise(
-      this.nativeClient,
-      await signTx(this.nativeClient, this.account.address, tx, options)
-    );
+    return await this.getPendingSignedTx(tx, options);
   }
 
   public async enablePool(
@@ -140,10 +115,7 @@ export default class KyveGovMsg {
       metadata
     );
 
-    return new TxPromise(
-      this.nativeClient,
-      await signTx(this.nativeClient, this.account.address, tx, options)
-    );
+    return await this.getPendingSignedTx(tx, options);
   }
 
   public async scheduleRuntimeUpgrade(
@@ -164,10 +136,7 @@ export default class KyveGovMsg {
       metadata
     );
 
-    return new TxPromise(
-      this.nativeClient,
-      await signTx(this.nativeClient, this.account.address, tx, options)
-    );
+    return await this.getPendingSignedTx(tx, options);
   }
 
   public async cancelRuntimeUpgrade(
@@ -188,10 +157,7 @@ export default class KyveGovMsg {
       metadata
     );
 
-    return new TxPromise(
-      this.nativeClient,
-      await signTx(this.nativeClient, this.account.address, tx, options)
-    );
+    return await this.getPendingSignedTx(tx, options);
   }
 
   public async updateParamsStakers(
@@ -212,10 +178,7 @@ export default class KyveGovMsg {
       metadata
     );
 
-    return new TxPromise(
-      this.nativeClient,
-      await signTx(this.nativeClient, this.account.address, tx, options)
-    );
+    return await this.getPendingSignedTx(tx, options);
   }
 
   public async updateParamsDelegation(
@@ -236,10 +199,7 @@ export default class KyveGovMsg {
       metadata
     );
 
-    return new TxPromise(
-      this.nativeClient,
-      await signTx(this.nativeClient, this.account.address, tx, options)
-    );
+    return await this.getPendingSignedTx(tx, options);
   }
 
   public async updateParamsBundles(
@@ -260,10 +220,7 @@ export default class KyveGovMsg {
       metadata
     );
 
-    return new TxPromise(
-      this.nativeClient,
-      await signTx(this.nativeClient, this.account.address, tx, options)
-    );
+    return await this.getPendingSignedTx(tx, options);
   }
 
   public async updateParamsGlobal(
@@ -284,10 +241,7 @@ export default class KyveGovMsg {
       metadata
     );
 
-    return new TxPromise(
-      this.nativeClient,
-      await signTx(this.nativeClient, this.account.address, tx, options)
-    );
+    return await this.getPendingSignedTx(tx, options);
   }
 
   public async vote(
@@ -324,9 +278,6 @@ export default class KyveGovMsg {
       },
     };
 
-    return new TxPromise(
-      this.nativeClient,
-      await signTx(this.nativeClient, this.account.address, tx, options)
-    );
+    return await this.getPendingSignedTx(tx, options);
   }
 }
