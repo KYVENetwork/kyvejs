@@ -63,7 +63,9 @@ export async function submitBundleProposal(
 
       if (receipt.code === 0) {
         this.m.tx_submit_bundle_proposal_successful.inc();
-        this.m.gas_submit_bundle_proposal.set(receipt?.gasUsed ?? 0);
+        this.m.fees_submit_bundle_proposal.inc(
+          parseInt(tx.fee.amount[0].amount)
+        );
 
         this.m.bundles_proposed.inc();
         this.m.bundles_amount.inc();
