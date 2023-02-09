@@ -1,7 +1,7 @@
 import { AccountData, OfflineAminoSigner } from "@cosmjs/amino/build/signer";
 import { SigningStargateClient } from "@cosmjs/stargate";
-import { IConfig } from "../../constants";
 
+import { IConfig } from "../../constants";
 import KyveClient from "./client";
 
 export default class KyveWebClient extends KyveClient {

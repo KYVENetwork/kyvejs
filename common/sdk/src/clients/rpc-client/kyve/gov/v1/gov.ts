@@ -8,11 +8,12 @@ import {
   MsgCancelRuntimeUpgrade,
   MsgCreatePool,
   MsgDisablePool,
-  MsgScheduleRuntimeUpgrade,
   MsgEnablePool,
+  MsgScheduleRuntimeUpgrade,
   MsgUpdatePool,
 } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
 import { MsgUpdateParams as MsgUpdateParamsStakers } from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
+
 import { GOV_AUTHORITY } from "../../../../../constants";
 import { encodeTxMsg } from "../../../../../registry/tx.registry";
 import { KyveSigning } from "../../../signing";

@@ -1,8 +1,8 @@
 import { OfflineAminoSigner } from "@cosmjs/amino/build/signer";
 import { OfflineSigner, Registry } from "@cosmjs/proto-signing";
 import { GasPrice, SigningStargateClient } from "@cosmjs/stargate";
-import { IConfig } from "../constants";
 
+import { IConfig } from "../constants";
 import * as KyveRegistryTx from "../registry/tx.registry";
 import KyveClient from "./rpc-client/client";
 import KyveWebClient from "./rpc-client/web.client";

@@ -3,6 +3,7 @@ import { MsgSubmitBundleProposal } from "@kyvejs/types/client/kyve/bundles/v1bet
 import { MsgVoteBundleProposal } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
 import { MsgClaimUploaderRole } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
 import { MsgSkipUploaderRole } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
+
 import { withTypeUrl } from "../../../../../registry/tx.registry";
 import { KyveSigning } from "../../../signing";
 

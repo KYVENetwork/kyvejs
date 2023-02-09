@@ -1,9 +1,9 @@
 import { Command } from "commander";
 
-import version from "./commands/version";
 import init from "./commands/init";
 import start from "./commands/start";
 import valaccounts from "./commands/valaccounts";
+import version from "./commands/version";
 
 const main = async () => {
   // define main program

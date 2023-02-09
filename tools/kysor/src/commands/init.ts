@@ -3,6 +3,7 @@ import KyveSDK from "@kyvejs/sdk";
 import { Command } from "commander";
 import fs from "fs";
 import path from "path";
+
 import { HOME } from "../utils/constants";
 
 const init = new Command("init").description("Init KYSOR");

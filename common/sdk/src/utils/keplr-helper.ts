@@ -5,6 +5,7 @@ import {
   OfflineAminoSigner,
 } from "@cosmjs/amino/build/signer";
 import { Keplr } from "@keplr-wallet/types";
+
 import { IConfig } from "../constants";
 
 export class KeplrAminoSigner implements OfflineAminoSigner {

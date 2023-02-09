@@ -11,6 +11,7 @@ import {
   SignOptions,
 } from "@cosmostation/extension-client/types/message";
 import { SignDoc } from "cosmjs-types/cosmos/tx/v1beta1/tx";
+
 import { IConfig } from "../constants";
 
 export const cosmostationMethods = {

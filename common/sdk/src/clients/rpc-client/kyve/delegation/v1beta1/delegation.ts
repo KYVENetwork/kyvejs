@@ -3,6 +3,7 @@ import { MsgDelegate } from "@kyvejs/types/client/kyve/delegation/v1beta1/tx";
 import { MsgWithdrawRewards } from "@kyvejs/types/client/kyve/delegation/v1beta1/tx";
 import { MsgUndelegate } from "@kyvejs/types/client/kyve/delegation/v1beta1/tx";
 import { MsgRedelegate } from "@kyvejs/types/client/kyve/delegation/v1beta1/tx";
+
 import { withTypeUrl } from "../../../../../registry/tx.registry";
 import { KyveSigning } from "../../../signing";
 export default class KyveDelegationMethods extends KyveSigning {

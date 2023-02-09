@@ -4,6 +4,7 @@ import { MsgUpdateMetadata } from "@kyvejs/types/client/kyve/stakers/v1beta1/tx"
 import { MsgUpdateCommission } from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
 import { MsgJoinPool } from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
 import { MsgLeavePool } from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
+
 import { withTypeUrl } from "../../../../../registry/tx.registry";
 import { KyveSigning } from "../../../signing";
 

@@ -1,6 +1,7 @@
 import { StdFee } from "@cosmjs/amino/build/signdoc";
 import { coins } from "@cosmjs/stargate";
 import BigNumber from "bignumber.js";
+
 import { KyveSigning, PendingSignedTx } from "../../../signing";
 
 export default class KyveBaseMsg extends KyveSigning {

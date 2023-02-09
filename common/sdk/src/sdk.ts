@@ -8,23 +8,21 @@ import {
   DirectSecp256k1HdWallet,
   DirectSecp256k1Wallet,
 } from "@cosmjs/proto-signing";
-import {
-  RequestAccountResponse,
-  SignOptions,
-} from "@cosmostation/extension-client/types/message";
+import { RequestAccountResponse } from "@cosmostation/extension-client/types/message";
 import { verifyADR36Amino } from "@keplr-wallet/cosmos";
+
 import { getSigningKyveClient } from "./clients/full-client";
 import { createKyveLCDClient } from "./clients/lcd-client/client";
 import KyveClient from "./clients/rpc-client/client";
 import KyveWebClient from "./clients/rpc-client/web.client";
 import {
+  IConfig,
   KYVE_COSMOSTATION_CONFIG,
   KYVE_KEPLR_CONFIG,
   PREFIX,
-  SUPPORTED_WALLETS,
-  IConfig,
-  SupportedChains,
   SUPPORTED_CHAIN_CONFIGS,
+  SUPPORTED_WALLETS,
+  SupportedChains,
 } from "./constants";
 import {
   cosmostationMethods,
