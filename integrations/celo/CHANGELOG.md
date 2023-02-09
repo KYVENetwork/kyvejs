@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.0.0-beta.8](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/celo@1.0.0-beta.7...@kyvejs/celo@1.0.0-beta.8) (2023-02-09)
+
+**Note:** Version bump only for package @kyvejs/celo
+
 # [1.0.0-beta.7](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/celo@1.0.0-beta.6...@kyvejs/celo@1.0.0-beta.7) (2023-02-06)
 
 **Note:** Version bump only for package @kyvejs/celo
