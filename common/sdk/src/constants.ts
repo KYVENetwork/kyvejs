@@ -22,8 +22,8 @@ export const SUPPORTED_CHAIN_CONFIGS = {
   "kyve-local": {
     chainId: "kyve-local",
     chainName: "KYVE Local",
-    rpc: "http://0.0.0.0/26657",
-    rest: "http://0.0.0.0/1317",
+    rpc: "http://0.0.0.0:26657",
+    rest: "http://0.0.0.0:1317",
     coin: "KYVE",
     coinDenom: "tkyve",
     coinDecimals: 9,
@@ -108,8 +108,8 @@ export const KYVE_COSMOSTATION_CONFIG: AddChainParams = {
   coinType: "118",
   decimals: 0,
   gasRate: {
-    tiny: "1.6",
-    low: "2",
-    average: "0.8",
+    tiny: "1",
+    low: "1.5",
+    average: "3",
   },
 };

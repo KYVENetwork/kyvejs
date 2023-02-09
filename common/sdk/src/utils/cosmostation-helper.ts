@@ -39,7 +39,6 @@ export const cosmostationMethods = {
         doc,
         isEditMemo: !!options?.memo,
         isEditFee: !!options?.fee,
-        gasRate: options?.gasRate,
       },
     });
   },

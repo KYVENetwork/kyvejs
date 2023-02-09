@@ -160,7 +160,7 @@ export class KyveSDK {
    * Crate a client from Cosmostaion wallet if installed
    * @return Promise<KyveWebClient>
    */
-  async fromCosmostation(config?: SignOptions): Promise<KyveWebClient> {
+  async fromCosmostation(): Promise<KyveWebClient> {
     if (typeof window === "undefined") throw new Error("Unsupported.");
     if (!window.cosmostation) throw new Error("Please install cosmostation.");
 
@@ -180,6 +180,11 @@ export class KyveSDK {
         displayDenom: this.config.coin,
         baseDenom: this.config.coinDenom,
         decimals: this.config.coinDecimals,
+        gasRate: {
+          tiny: this.config.gasPrice.toString(),
+          low: (this.config.gasPrice * 1.5).toString(),
+          average: (this.config.gasPrice * 3).toString(),
+        },
       });
       cosmostationAccount = await cosmostationMethods.requestAccount(
         this.config.chainName
@@ -189,7 +194,10 @@ export class KyveSDK {
     const cosmostationSigner = new CosmostationSigner(
       cosmostationAccount,
       this.config,
-      config ? config : {}
+      {
+        memo: true,
+        fee: true,
+      }
     );
 
     const client = await getSigningKyveClient(
