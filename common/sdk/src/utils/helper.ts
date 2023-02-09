@@ -2,7 +2,7 @@ import { EncodeObject } from "@cosmjs/proto-signing";
 import { StdFee } from "@cosmjs/amino/build/signdoc";
 import { sha256 } from "@cosmjs/crypto";
 import { toHex } from "@cosmjs/encoding";
-import { coins, SigningStargateClient } from "@cosmjs/stargate";
+import { coins, GasPrice, SigningStargateClient } from "@cosmjs/stargate";
 import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
 
 type signTxResponseType = {

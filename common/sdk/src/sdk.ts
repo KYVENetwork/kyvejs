@@ -22,10 +22,9 @@ import {
   KYVE_KEPLR_CONFIG,
   PREFIX,
   SUPPORTED_WALLETS,
-  SDKConfig,
+  IConfig,
   DEFAULT_COIN_DENOM,
   DEFAULT_COIN_DECIMALS,
-  SDKConfigInput,
 } from "./constants";
 import {
   cosmostationMethods,
@@ -35,20 +34,29 @@ import { KeplrAminoSigner } from "./utils/keplr-helper";
 
 /** Class representing a KyveSDK. */
 export class KyveSDK {
-  public readonly config: SDKConfig;
+  public readonly config: IConfig;
   private walletSupports: Set<keyof typeof SUPPORTED_WALLETS>;
 
   /**
    * Create sdk instance.
    * @param config - The config type, e.g mainnet, testnet, etc
    */
-  constructor(config: SDKConfigInput) {
+  constructor(config: {
+    chainId: string;
+    chainName: string;
+    rpc: string;
+    rest: string;
+    gasPrice: number;
+    coinDenom?: string;
+    coinDecimals?: number;
+  }) {
     this.walletSupports = new Set<keyof typeof SUPPORTED_WALLETS>();
     this.config = {
       chainId: config.chainId,
       chainName: config.chainName,
       rpc: config.rpc,
       rest: config.rest,
+      gasPrice: config.gasPrice,
       coinDenom: config.coinDenom || DEFAULT_COIN_DENOM,
       coinDecimals: config.coinDecimals || DEFAULT_COIN_DECIMALS,
     };
@@ -112,9 +120,9 @@ export class KyveSDK {
         {
           ...KYVE_COIN,
           gasPriceStep: {
-            low: 2,
-            average: 2.5,
-            high: 10,
+            low: 0.02,
+            average: 0.03,
+            high: 0.04,
           },
         },
       ],

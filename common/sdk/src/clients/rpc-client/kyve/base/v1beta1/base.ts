@@ -2,19 +2,19 @@ import { StdFee } from "@cosmjs/amino/build/signdoc";
 import { AccountData } from "@cosmjs/amino/build/signer";
 import { coins, SigningStargateClient } from "@cosmjs/stargate";
 import BigNumber from "bignumber.js";
-import { SDKConfig } from "../../../../../constants";
+import { IConfig } from "../../../../../constants";
 
 import { signTx, TxPromise } from "../../../../../utils/helper";
 
 export default class KyveBaseMsg {
   private nativeClient: SigningStargateClient;
   public readonly account: AccountData;
-  public readonly config: SDKConfig;
+  public readonly config: IConfig;
 
   constructor(
     client: SigningStargateClient,
     account: AccountData,
-    config: SDKConfig
+    config: IConfig
   ) {
     this.account = account;
     this.nativeClient = client;

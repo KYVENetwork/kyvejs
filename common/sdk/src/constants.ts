@@ -14,22 +14,14 @@ export const SUPPORTED_WALLETS = {
   COSMOSTATION: "COSMOSTATION",
 } as const;
 
-export type SDKConfig = {
+export type IConfig = {
   chainId: string;
   chainName: string;
   rpc: string;
   rest: string;
+  gasPrice: number;
   coinDenom: string;
   coinDecimals: number;
-};
-
-export type SDKConfigInput = {
-  chainId: string;
-  chainName: string;
-  rpc: string;
-  rest: string;
-  coinDenom?: string;
-  coinDecimals?: number;
 };
 
 export const KYVE_KEPLR_CONFIG: ChainInfo = {

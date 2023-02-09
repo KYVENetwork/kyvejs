@@ -5,7 +5,7 @@ import { MsgSubmitBundleProposal } from "@kyvejs/types/client/kyve/bundles/v1bet
 import { MsgVoteBundleProposal } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
 import { MsgClaimUploaderRole } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
 import { MsgSkipUploaderRole } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
-import { SDKConfig } from "../../../../../constants";
+import { IConfig } from "../../../../../constants";
 
 import { withTypeUrl } from "../../../../../registry/tx.registry";
 import { signTx, TxPromise } from "../../../../../utils/helper";
@@ -13,12 +13,12 @@ import { signTx, TxPromise } from "../../../../../utils/helper";
 export default class {
   private nativeClient: SigningStargateClient;
   public readonly account: AccountData;
-  public readonly config: SDKConfig;
+  public readonly config: IConfig;
 
   constructor(
     client: SigningStargateClient,
     account: AccountData,
-    config: SDKConfig
+    config: IConfig
   ) {
     this.account = account;
     this.config = config;
