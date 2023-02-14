@@ -18,6 +18,15 @@ import { Validator, standardizeJSON } from "../..";
  */
 export async function setupValidator(this: Validator): Promise<void> {
   try {
+    // log basic node info on startup
+    this.logger.info(`Chain ID = ${this.chainId}`);
+    this.logger.info(`Pool ID = ${this.poolId}`);
+    this.logger.info(`Runtime = ${this.runtime.name}`);
+    this.logger.info(`Valaddress = ${this.client[0].account.address}\n`);
+
+    this.logger.info(`${this.runtime.name} = v${this.runtime.version}`);
+    this.logger.info(`@kyvejs/protocol = v${this.protocolVersion}\n`);
+
     // generate deterministic valname based on chainId, pool id,
     // runtime, runtime version and valaddress
     const valnameSeed = `${this.chainId}-${this.poolId}-${this.runtime.name}-${this.runtime.version}-${this.client[0].account.address}`;
@@ -42,18 +51,8 @@ export async function setupValidator(this: Validator): Promise<void> {
     // check if valaccount was already authorized by a validator
     await this.waitForAuthorization();
 
-    // log basic node info on startup
-    this.logger.info("Starting node ...\n");
-    this.logger.info(`Valaddress \t = ${this.client[0].account.address}`);
-    this.logger.info(`Staker \t\t = ${this.staker}`);
-    this.logger.info(`Valname \t\t = ${this.name}\n`);
-
-    this.logger.info(`Pool ID \t\t = ${this.poolId}`);
-    this.logger.info(`Runtime \t\t = ${this.runtime.name}`);
-    this.logger.info(`Chain ID \t\t = ${this.chainId}\n`);
-
-    this.logger.info(`@kyvejs/protocol \t = v${this.protocolVersion}`);
-    this.logger.info(`${this.runtime.name} \t = v${this.runtime.version}\n`);
+    this.logger.info(`Successfully joined pool: ${this.poolId}`);
+    this.logger.info(`Running for validator: ${this.staker}\n`);
 
     this.m.cache_current_items.set(0);
   } catch (err) {

@@ -35,7 +35,7 @@ export async function validateStorageBalance(this: Validator): Promise<void> {
     }
 
     this.logger.info(
-      `Account has available funds on StorageProvider:${storageProvider.name}`
+      `Account has available funds on StorageProvider:${storageProvider.name}\n`
     );
   } catch (err) {
     this.logger.fatal(

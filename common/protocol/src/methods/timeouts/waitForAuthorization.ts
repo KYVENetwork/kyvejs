@@ -69,7 +69,7 @@ export async function waitForAuthorization(this: Validator): Promise<void> {
     } else {
       // log information so that staker can authorize this valaccount
       this.logger.info(
-        `Valaccount ${valaddress} has not joined the pool with id ${this.poolId} yet`
+        `Valaccount has not joined the pool with id ${this.poolId} yet`
       );
       this.logger.info(
         `Visit https://app.kyve.network and join the pool from your validator account:\n`
@@ -79,7 +79,7 @@ export async function waitForAuthorization(this: Validator): Promise<void> {
       this.logger.info(`Valname:       ${this.name}\n`);
 
       this.logger.info(
-        `The node will not continue until the account is authorized`
+        `The node will not continue until the account is authorized\n`
       );
 
       await sleep(REFRESH_TIME);
