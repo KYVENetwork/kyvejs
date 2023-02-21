@@ -43,11 +43,5 @@ export async function syncPoolConfig(this: Validator): Promise<void> {
     if (!this.poolConfig) {
       this.poolConfig = {};
     }
-  } finally {
-    // drop cache if new config is available
-    this.logger.debug(`this.cacheProvider.drop()`);
-    await this.cacheProvider.drop();
-
-    this.m.cache_current_items.set(0);
   }
 }
