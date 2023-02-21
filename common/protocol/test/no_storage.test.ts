@@ -47,6 +47,9 @@ describe("no storage tests", () => {
     compression = new TestNoCompression();
     v["compressionFactory"] = jest.fn().mockReturnValue(compression);
 
+    // mock archiveDebugBundle
+    v["archiveDebugBundle"] = jest.fn();
+
     // mock process.exit
     processExit = jest.fn<never, never>();
     process.exit = processExit;
