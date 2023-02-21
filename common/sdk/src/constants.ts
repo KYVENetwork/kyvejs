@@ -74,8 +74,9 @@ export const SUPPORTED_CHAIN_CONFIGS = {
 export type SupportedChains = keyof typeof SUPPORTED_CHAIN_CONFIGS;
 
 export const SUPPORTED_WALLETS = {
-  KEPLER: "KEPLER",
+  KEPLR: "KEPLR",
   COSMOSTATION: "COSMOSTATION",
+  LEAP: "LEAP",
 } as const;
 
 export const KYVE_KEPLR_CONFIG: ChainInfo = {
@@ -112,4 +113,24 @@ export const KYVE_COSMOSTATION_CONFIG: AddChainParams = {
     low: "1.5",
     average: "3",
   },
+};
+
+export const KYVE_LEAP_CONFIG: ChainInfo = {
+  rpc: "",
+  rest: "",
+  chainId: "",
+  chainName: "",
+  stakeCurrency: {
+    coinDenom: "",
+    coinMinimalDenom: "",
+    coinDecimals: 0,
+  },
+  bip44: {
+    coinType: 118,
+  },
+  bech32Config: Bech32Address.defaultBech32Config("kyve"),
+  currencies: [],
+  feeCurrencies: [],
+  coinType: 118,
+  features: ["ibc-transfer", "ibc-go"],
 };

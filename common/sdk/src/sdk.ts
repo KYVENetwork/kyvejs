@@ -23,6 +23,7 @@ import {
   SUPPORTED_CHAIN_CONFIGS,
   SUPPORTED_WALLETS,
   SupportedChains,
+  KYVE_LEAP_CONFIG,
 } from "./constants";
 import {
   cosmostationMethods,
@@ -105,7 +106,7 @@ export class KyveSDK {
   }
 
   /**
-   * Crate a client from Keplr wallet if installed
+   * Create a client from Keplr wallet if installed
    * @return Promise<KyveWebClient>
    */
   async fromKeplr(): Promise<KyveWebClient> {
@@ -150,12 +151,12 @@ export class KyveSDK {
       keplrAminoSigner,
       walletName
     );
-    this.walletSupports.add(SUPPORTED_WALLETS.KEPLER);
+    this.walletSupports.add(SUPPORTED_WALLETS.KEPLR);
     return client;
   }
 
   /**
-   * Crate a client from Cosmostaion wallet if installed
+   * Create a client from Cosmostaion wallet if installed
    * @return Promise<KyveWebClient>
    */
   async fromCosmostation(): Promise<KyveWebClient> {
@@ -210,14 +211,95 @@ export class KyveSDK {
   }
 
   /**
+   * Create a client from Leap wallet if installed
+   * @return Promise<KyveWebClient>
+   */
+  async fromLeap(): Promise<KyveWebClient> {
+    if (typeof window === "undefined") throw new Error("Unsupported.");
+    if (!window.leap) throw new Error("Please install Leap.");
+
+    const KYVE_COIN = {
+      coinDenom: this.config.coin,
+      coinMinimalDenom: this.config.coinDenom,
+      coinDecimals: this.config.coinDecimals,
+    };
+
+    console.log(
+      JSON.stringify({
+        ...KYVE_LEAP_CONFIG,
+        chainName: this.config.chainName,
+        chainId: this.config.chainId,
+        rpc: this.config.rpc,
+        rest: this.config.rest,
+        stakeCurrency: KYVE_COIN,
+        currencies: [KYVE_COIN],
+        feeCurrencies: [
+          {
+            ...KYVE_COIN,
+            gasPriceStep: {
+              low: this.config.gasPrice,
+              average: this.config.gasPrice * 1.5,
+              high: this.config.gasPrice * 3,
+            },
+          },
+        ],
+      })
+    );
+
+    await window.leap.experimentalSuggestChain({
+      ...KYVE_LEAP_CONFIG,
+      chainName: this.config.chainName,
+      chainId: this.config.chainId,
+      rpc: this.config.rpc,
+      rest: this.config.rest,
+      stakeCurrency: KYVE_COIN,
+      currencies: [KYVE_COIN],
+      feeCurrencies: [
+        {
+          ...KYVE_COIN,
+          gasPriceStep: {
+            low: this.config.gasPrice,
+            average: this.config.gasPrice * 1.5,
+            high: this.config.gasPrice * 3,
+          },
+        },
+      ],
+    });
+
+    await window.leap.enable(this.config.chainId);
+
+    const signer = await window.leap.getOfflineSignerAuto(this.config.chainId);
+    const walletName = (await window.leap.getKey(this.config.chainId))
+      .name as string;
+    const leap = window.leap;
+    const keplrAminoSigner = new KeplrAminoSigner(leap, this.config);
+    const client = await getSigningKyveClient(
+      this.config,
+      signer,
+      keplrAminoSigner,
+      walletName
+    );
+    this.walletSupports.add(SUPPORTED_WALLETS.LEAP);
+    return client;
+  }
+
+  /**
    * Listener to detect if account in wallet changed, support fromKeplr and fromCosmostation  instances
    * @param cb
    */
   async onAccountChange(cb: () => void) {
-    if (this.walletSupports.has(SUPPORTED_WALLETS.COSMOSTATION))
-      return window.cosmostation.tendermint.on("accountChanged", cb);
-    if (this.walletSupports.has(SUPPORTED_WALLETS.KEPLER))
+    if (this.walletSupports.has(SUPPORTED_WALLETS.KEPLR)) {
       return window.addEventListener("keplr_keystorechange", cb);
+    }
+
+    if (this.walletSupports.has(SUPPORTED_WALLETS.COSMOSTATION)) {
+      return window.cosmostation.tendermint.on("accountChanged", cb);
+    }
+
+    if (this.walletSupports.has(SUPPORTED_WALLETS.LEAP)) {
+      return window.addEventListener("leap_keystorechange", cb);
+    }
+
     throw new Error("Need to initiate from wallet");
   }
 
