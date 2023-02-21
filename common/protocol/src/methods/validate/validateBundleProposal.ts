@@ -97,6 +97,9 @@ export async function validateBundleProposal(
     if (this.pool.bundle_proposal!.from_key !== validationBundle.at(0)?.key) {
       this.logger.info(`Found different value on proposed bundle from_key`);
 
+      // archive local invalid bundle for debug purposes
+      this.archiveDebugBundle(validationBundle);
+
       await this.voteBundleProposal(
         this.pool.bundle_proposal!.storage_id,
         VOTE.INVALID
@@ -115,6 +118,9 @@ export async function validateBundleProposal(
 
     if (this.pool.bundle_proposal!.to_key !== validationBundle.at(-1)?.key) {
       this.logger.info(`Found different value on proposed bundle to_key`);
+
+      // archive local invalid bundle for debug purposes
+      this.archiveDebugBundle(validationBundle);
 
       await this.voteBundleProposal(
         this.pool.bundle_proposal!.storage_id,
@@ -158,6 +164,9 @@ export async function validateBundleProposal(
 
     if (this.pool.bundle_proposal!.bundle_summary !== bundleSummary) {
       this.logger.info(`Found different value on proposed bundle summary`);
+
+      // archive local invalid bundle for debug purposes
+      this.archiveDebugBundle(validationBundle);
 
       await this.voteBundleProposal(
         this.pool.bundle_proposal!.storage_id,
@@ -213,6 +222,11 @@ export async function validateBundleProposal(
         this.logger.debug(
           `Finished validating bundle by custom runtime validation. Result = ${valid}`
         );
+
+        if (!valid) {
+          // archive local invalid bundle for debug purposes
+          this.archiveDebugBundle(validationBundle);
+        }
 
         // vote with either valid or invalid
         const vote = valid

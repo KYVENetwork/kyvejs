@@ -13,6 +13,7 @@ import {
   parseStoragePriv,
 } from "./commander";
 import {
+  archiveDebugBundle,
   canPropose,
   canVote,
   claimUploaderRole,
@@ -116,6 +117,7 @@ export class Validator {
   protected waitForCacheContinuation = waitForCacheContinuation;
 
   // helpers
+  protected archiveDebugBundle = archiveDebugBundle;
   protected continueRound = continueRound;
   protected saveGetTransformDataItem = saveGetTransformDataItem;
   public getProxyAuth = getProxyAuth;
