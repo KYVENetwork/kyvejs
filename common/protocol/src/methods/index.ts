@@ -19,6 +19,7 @@ export * from "./timeouts/waitForNextBundleProposal";
 export * from "./timeouts/waitForUploadInterval";
 
 // helpers
+export * from "./helpers/archiveDebugBundle";
 export * from "./helpers/continueRound";
 export * from "./helpers/saveGetTransformDataItem";
 export * from "./helpers/getProxyAuth";
