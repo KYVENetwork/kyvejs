@@ -21,7 +21,7 @@ export type IConfig = {
 export const SUPPORTED_CHAIN_CONFIGS = {
   "kyve-local": {
     chainId: "kyve-local",
-    chainName: "KYVE Local",
+    chainName: "KYVE-Local",
     rpc: "http://0.0.0.0:26657",
     rest: "http://0.0.0.0:1317",
     coin: "KYVE",
@@ -31,7 +31,7 @@ export const SUPPORTED_CHAIN_CONFIGS = {
   },
   "kyve-alpha": {
     chainId: "kyve-alpha",
-    chainName: "KYVE Alpha",
+    chainName: "KYVE-Alpha",
     rpc: "https://rpc.alpha.kyve.network",
     rest: "https://api.alpha.kyve.network",
     coin: "KYVE",
@@ -41,7 +41,7 @@ export const SUPPORTED_CHAIN_CONFIGS = {
   },
   "kyve-beta": {
     chainId: "kyve-beta",
-    chainName: "KYVE Beta",
+    chainName: "KYVE-Beta",
     rpc: "https://rpc.beta.kyve.network",
     rest: "https://api.beta.kyve.network",
     coin: "KYVE",
@@ -51,7 +51,7 @@ export const SUPPORTED_CHAIN_CONFIGS = {
   },
   korellia: {
     chainId: "korellia",
-    chainName: "KYVE Korellia",
+    chainName: "Korellia",
     rpc: "https://rpc.kyve.network",
     rest: "https://api.kyve.network",
     coin: "KYVE",
@@ -61,8 +61,8 @@ export const SUPPORTED_CHAIN_CONFIGS = {
   },
   "kaon-1": {
     chainId: "kaon-1",
-    chainName: "KYVE Kaon",
-    rpc: "https://rpc-eu-1.kaon.kyve.network/",
+    chainName: "Kaon",
+    rpc: "https://rpc-eu-1.kaon.kyve.network",
     rest: "https://api-eu-1.kaon.kyve.network",
     coin: "KYVE",
     coinDenom: "tkyve",
