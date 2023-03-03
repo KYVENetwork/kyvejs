@@ -10,7 +10,7 @@ export class NoStorageProvider implements IStorageProvider {
   }
 
   async getBalance() {
-    return "0";
+    return "";
   }
 
   async saveBundle(bundle: Buffer, _tags: BundleTag[]) {

@@ -24,6 +24,7 @@
     "@cosmjs/stargate": "^0.27.1",
     "@kyvejs/sdk": "1.0.0-beta.6",
     "@kyvejs/types": "1.0.0-beta.2",
+    "@lighthouse-web3/sdk": "^0.1.12",
     "@types/cli-progress": "^3.9.2",
     "@types/jsonfile": "^6.0.1",
     "arweave": "^1.10.17",
