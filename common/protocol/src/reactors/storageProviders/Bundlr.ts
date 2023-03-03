@@ -8,27 +8,30 @@ export class Bundlr implements IStorageProvider {
   public name = "Bundlr";
   public decimals = 12;
 
-  private jwk!: JWKInterface;
-  private client!: BundlrClient;
+  private readonly storagePriv: string;
 
-  async init(storagePriv: string) {
-    this.jwk = JSON.parse(storagePriv);
+  constructor(storagePriv: string) {
+    this.storagePriv = storagePriv;
+  }
 
-    this.client = new BundlrClient(
+  private get bundlrKeyfile(): JWKInterface {
+    return JSON.parse(this.storagePriv);
+  }
+
+  private get bundlrClient(): BundlrClient {
+    return new BundlrClient(
       "http://node1.bundlr.network",
       "arweave",
-      this.jwk
+      this.bundlrKeyfile
     );
-
-    return this;
   }
 
   async getAddress() {
-    return this.client.address;
+    return this.bundlrClient.address;
   }
 
   async getBalance() {
-    const atomicUnits = await this.client.getLoadedBalance();
+    const atomicUnits = await this.bundlrClient.getLoadedBalance();
     return atomicUnits.toString();
   }
 
@@ -43,7 +46,7 @@ export class Bundlr implements IStorageProvider {
       ],
     };
 
-    const transaction = this.client.createTransaction(
+    const transaction = this.bundlrClient.createTransaction(
       bundle,
       transactionOptions
     );

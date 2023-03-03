@@ -54,11 +54,15 @@ describe("invalid votes tests", () => {
 
     // mock storage provider
     storageProvider = new TestNormalStorageProvider();
-    v["storageProviderFactory"] = jest.fn().mockResolvedValue(storageProvider);
+    jest
+      .spyOn(Validator, "storageProviderFactory")
+      .mockImplementation(() => storageProvider);
 
     // mock compression
     compression = new TestNormalCompression();
-    v["compressionFactory"] = jest.fn().mockReturnValue(compression);
+    jest
+      .spyOn(Validator, "compressionFactory")
+      .mockImplementation(() => compression);
 
     // mock archiveDebugBundle
     v["archiveDebugBundle"] = jest.fn();

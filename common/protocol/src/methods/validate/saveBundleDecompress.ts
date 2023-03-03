@@ -20,7 +20,7 @@ export async function saveBundleDecompress(
     this.logger.debug(
       `compressionFactory(${this.pool.bundle_proposal?.compression_id ?? 0})`
     );
-    const compression = this.compressionFactory(
+    const compression = Validator.compressionFactory(
       this.pool.bundle_proposal?.compression_id ?? 0
     );
 

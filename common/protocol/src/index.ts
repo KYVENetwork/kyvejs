@@ -17,7 +17,6 @@ import {
   canPropose,
   canVote,
   claimUploaderRole,
-  compressionFactory,
   continueRound,
   createBundleProposal,
   getBalances,
@@ -33,7 +32,6 @@ import {
   setupSDK,
   setupValidator,
   skipUploaderRole,
-  storageProviderFactory,
   submitBundleProposal,
   syncPoolConfig,
   syncPoolState,
@@ -53,6 +51,9 @@ import {
 import { ICacheProvider, IMetrics, IRuntime } from "./types";
 import { standardizeJSON } from "./utils";
 import { SupportedChains } from "@kyvejs/sdk/dist/constants";
+import { storageProviderFactory } from "./reactors/storageProviders";
+import { compressionFactory } from "./reactors/compression";
+import { cacheProviderFactory } from "./reactors/cacheProvider";
 
 /**
  * Main class of KYVE protocol nodes representing a validator node.
@@ -122,10 +123,6 @@ export class Validator {
   protected saveGetTransformDataItem = saveGetTransformDataItem;
   public getProxyAuth = getProxyAuth;
 
-  // factories
-  protected storageProviderFactory = storageProviderFactory;
-  protected compressionFactory = compressionFactory;
-
   // txs
   protected claimUploaderRole = claimUploaderRole;
   protected skipUploaderRole = skipUploaderRole;
@@ -152,6 +149,11 @@ export class Validator {
   // main
   protected runNode = runNode;
   protected runCache = runCache;
+
+  // factories
+  public static cacheProviderFactory = cacheProviderFactory;
+  public static storageProviderFactory = storageProviderFactory;
+  public static compressionFactory = compressionFactory;
 
   /**
    * Constructor for the validator class. It is required to provide the
