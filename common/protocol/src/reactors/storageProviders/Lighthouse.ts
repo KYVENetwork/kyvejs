@@ -55,11 +55,9 @@ export class Lighthouse implements IStorageProvider {
   async retrieveBundle(storageId: string, timeout: number) {
     const { data: storageData } = await axios.get(
       `https://gateway.lighthouse.storage/ipfs/${storageId}`,
-      {
-        timeout,
-      }
+      { responseType: "arraybuffer", timeout }
     );
 
-    return { storageId, storageData };
+    return { storageId, storageData: Buffer.from(storageData) };
   }
 }
