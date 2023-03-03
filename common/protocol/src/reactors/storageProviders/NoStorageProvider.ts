@@ -5,16 +5,12 @@ export class NoStorageProvider implements IStorageProvider {
   public name = "NoStorageProvider";
   public decimals = 0;
 
-  async init(_storagePriv: string) {
-    return this;
-  }
-
   async getAddress() {
     return "";
   }
 
   async getBalance() {
-    return "";
+    return "0";
   }
 
   async saveBundle(bundle: Buffer, _tags: BundleTag[]) {

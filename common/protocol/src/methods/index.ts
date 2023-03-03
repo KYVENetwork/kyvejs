@@ -24,10 +24,6 @@ export * from "./helpers/continueRound";
 export * from "./helpers/saveGetTransformDataItem";
 export * from "./helpers/getProxyAuth";
 
-// factories
-export * from "./factories/compressionFactory";
-export * from "./factories/storageProviderFactory";
-
 // txs
 export * from "./txs/claimUploaderRole";
 export * from "./txs/skipUploaderRole";
