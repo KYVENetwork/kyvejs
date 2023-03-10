@@ -14,7 +14,7 @@ export default class TendermintBSync implements IRuntime {
     // fetch block from rpc at given block height
     const { data } = await axios.get(`${source}/block?height=${key}`);
 
-    return { key, value: data?.block ?? null };
+    return { key, value: data?.result?.block ?? null };
   }
 
   async prevalidateDataItem(_: Validator, item: DataItem): Promise<boolean> {
@@ -42,8 +42,8 @@ export default class TendermintBSync implements IRuntime {
     return proposedDataItemHash === validationDataItemHash;
   }
 
-  async summarizeDataBundle(_: Validator, __: DataItem[]): Promise<string> {
-    return '';
+  async summarizeDataBundle(_: Validator, bundle: DataItem[]): Promise<string> {
+    return bundle.at(-1)?.value?.header?.height ?? '';
   }
 
   async nextKey(_: Validator, key: string): Promise<string> {
