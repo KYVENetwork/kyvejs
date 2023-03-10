@@ -6,6 +6,7 @@ import {
   Validator,
   sha256,
   standardizeJSON,
+  ICacheProvider,
 } from "../src/index";
 import { runNode } from "../src/methods/main/runNode";
 import { genesis_pool } from "./mocks/constants";
@@ -46,21 +47,32 @@ describe("vote abstain tests", () => {
   let processExit: jest.Mock<never, never>;
   let setTimeoutMock: jest.Mock;
 
+  let cacheProvider: ICacheProvider;
   let storageProvider: IStorageProvider;
   let compression: ICompression;
 
   beforeEach(() => {
     v = new Validator(new TestRuntime());
 
-    v["cacheProvider"] = new TestCacheProvider();
+    // mock cache provider
+    cacheProvider = new TestCacheProvider();
+    jest
+      .spyOn(Validator, "cacheProviderFactory")
+      .mockImplementation(() => cacheProvider);
+
+    v["cacheProvider"] = cacheProvider;
 
     // mock storage provider
     storageProvider = new TestNormalStorageProvider();
-    v["storageProviderFactory"] = jest.fn().mockResolvedValue(storageProvider);
+    jest
+      .spyOn(Validator, "storageProviderFactory")
+      .mockImplementation(() => storageProvider);
 
     // mock compression
     compression = new TestNormalCompression();
-    v["compressionFactory"] = jest.fn().mockReturnValue(compression);
+    jest
+      .spyOn(Validator, "compressionFactory")
+      .mockImplementation(() => compression);
 
     // mock process.exit
     processExit = jest.fn<never, never>();

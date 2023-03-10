@@ -41,11 +41,18 @@ describe("no storage tests", () => {
 
     // mock storage provider
     storageProvider = new TestNoStorageProvider();
-    v["storageProviderFactory"] = jest.fn().mockResolvedValue(storageProvider);
+    jest
+      .spyOn(Validator, "storageProviderFactory")
+      .mockImplementation(() => storageProvider);
 
     // mock compression
     compression = new TestNoCompression();
-    v["compressionFactory"] = jest.fn().mockReturnValue(compression);
+    jest
+      .spyOn(Validator, "compressionFactory")
+      .mockImplementation(() => compression);
+
+    // mock archiveDebugBundle
+    v["archiveDebugBundle"] = jest.fn();
 
     // mock process.exit
     processExit = jest.fn<never, never>();
