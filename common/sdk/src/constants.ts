@@ -5,6 +5,7 @@ import { ChainInfo } from "@keplr-wallet/types";
 export const PREFIX = "kyve";
 export const GOV_AUTHORITY = "kyve10d07y265gmmuvt4z0w9aw880jnsr700jdv7nah";
 export const GAS_MULTIPLIER = 1.3;
+export const COIN_TYPE = 118;
 
 export type IConfig = {
   chainId: string;
@@ -99,12 +100,12 @@ export const KYVE_KEPLR_CONFIG: ChainInfo = {
     coinDecimals: 0,
   },
   bip44: {
-    coinType: 118,
+    coinType: COIN_TYPE,
   },
   bech32Config: Bech32Address.defaultBech32Config("kyve"),
   currencies: [],
   feeCurrencies: [],
-  coinType: 118,
+  coinType: COIN_TYPE,
   features: ["ibc-transfer", "ibc-go"],
 };
 
@@ -115,7 +116,7 @@ export const KYVE_COSMOSTATION_CONFIG: AddChainParams = {
   baseDenom: "",
   displayDenom: "",
   addressPrefix: PREFIX,
-  coinType: "118",
+  coinType: COIN_TYPE.toString(),
   decimals: 0,
   gasRate: {
     tiny: "1",
