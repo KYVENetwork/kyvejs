@@ -42,8 +42,8 @@ export const SUPPORTED_CHAIN_CONFIGS = {
   korellia: {
     chainId: "korellia",
     chainName: "KYVE Korellia",
-    rpc: "https://rpc.korellia.kyve.network",
-    rest: "https://api.korellia.kyve.network",
+    rpc: "https://rpc-eu-1.korellia.kyve.network",
+    rest: "https://api-eu-1.korellia.kyve.network",
     coin: "KYVE",
     coinDenom: "tkyve",
     coinDecimals: 9,
