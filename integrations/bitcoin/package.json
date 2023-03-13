@@ -1,6 +1,6 @@
 {
   "name": "@kyvejs/bitcoin",
-  "version": "1.0.0-beta.10",
+  "version": "1.0.0-beta.11",
   "license": "MIT",
   "scripts": {
     "build": "rimraf dist && tsc",
@@ -24,7 +24,7 @@
     "outputPath": "out"
   },
   "dependencies": {
-    "@kyvejs/protocol": "1.0.0-beta.10",
+    "@kyvejs/protocol": "1.0.0-beta.11",
     "axios": "^0.26.1",
     "nanoid": "^3.3.3"
   },
