@@ -1,6 +1,6 @@
 {
   "name": "@kyvejs/evm",
-  "version": "1.0.0-beta.12",
+  "version": "1.0.0-beta.13",
   "license": "MIT",
   "scripts": {
     "build": "rimraf dist && tsc",
@@ -27,7 +27,7 @@
     "singleQuote": true
   },
   "dependencies": {
-    "@kyvejs/protocol": "1.0.0-beta.12",
+    "@kyvejs/protocol": "1.0.0-beta.13",
     "ethers": "^5.6.5"
   },
   "devDependencies": {
