@@ -224,28 +224,6 @@ export class KyveSDK {
       coinDecimals: this.config.coinDecimals,
     };
 
-    console.log(
-      JSON.stringify({
-        ...KYVE_LEAP_CONFIG,
-        chainName: this.config.chainName,
-        chainId: this.config.chainId,
-        rpc: this.config.rpc,
-        rest: this.config.rest,
-        stakeCurrency: KYVE_COIN,
-        currencies: [KYVE_COIN],
-        feeCurrencies: [
-          {
-            ...KYVE_COIN,
-            gasPriceStep: {
-              low: this.config.gasPrice,
-              average: this.config.gasPrice * 1.5,
-              high: this.config.gasPrice * 3,
-            },
-          },
-        ],
-      })
-    );
-
     await window.leap.experimentalSuggestChain({
       ...KYVE_LEAP_CONFIG,
       chainName: this.config.chainName,
@@ -268,7 +246,7 @@ export class KyveSDK {
 
     await window.leap.enable(this.config.chainId);
 
-    const signer = await window.leap.getOfflineSignerAuto(this.config.chainId);
+    const signer = await window.leap.getOfflineSigner(this.config.chainId);
     const walletName = (await window.leap.getKey(this.config.chainId))
       .name as string;
     const leap = window.leap;
