@@ -38,11 +38,11 @@ export class KyveSDK {
 
   /**
    * Create sdk instance.
-   * @param chainId - The chainId of the chain the sdk should connect to
+   * @param chainId - The chainId of the chain the sdk should connect to [default = kyve-1]
    * @param options - The default config of the sdk can be overwritten here
    */
   constructor(
-    chainId: SupportedChains,
+    chainId: SupportedChains = "kyve-1",
     options?: {
       chainName?: string;
       rpc?: string;

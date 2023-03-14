@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.0.0-beta.14](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/uniswap@1.0.0-beta.13...@kyvejs/uniswap@1.0.0-beta.14) (2023-03-13)
+
+**Note:** Version bump only for package @kyvejs/uniswap
+
+
+
+
+
+# [1.0.0-beta.13](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/uniswap@1.0.0-beta.12...@kyvejs/uniswap@1.0.0-beta.13) (2023-03-13)
+
+**Note:** Version bump only for package @kyvejs/uniswap
+
+# [1.0.0-beta.12](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/uniswap@1.0.0-beta.11...@kyvejs/uniswap@1.0.0-beta.12) (2023-03-13)
+
+**Note:** Version bump only for package @kyvejs/uniswap
+
 # [1.0.0-beta.11](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/uniswap@1.0.0-beta.10...@kyvejs/uniswap@1.0.0-beta.11) (2023-03-10)
 
 **Note:** Version bump only for package @kyvejs/uniswap
