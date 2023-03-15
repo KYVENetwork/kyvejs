@@ -1,10 +1,12 @@
-import { DataItem, Validator, sha256 } from "../../src";
+import { DataItem, Validator, sha256FromJson } from "../../src";
 
 export const TestRuntime = jest.fn().mockImplementation(() => {
   return {
     name: "@kyve/evm",
     version: "0.0.0",
-    getDataItem: jest.fn(async (_: Validator, __: string, key: string) => ({
+    config: "config",
+    validateSetConfig: jest.fn(),
+    getDataItem: jest.fn(async (_: Validator, key: string) => ({
       key,
       value: `${key}-value`,
     })),
@@ -19,12 +21,8 @@ export const TestRuntime = jest.fn().mockImplementation(() => {
         proposedDataItem: DataItem,
         validationDataItem: DataItem
       ) => {
-        const proposedDataItemHash = sha256(
-          Buffer.from(JSON.stringify(proposedDataItem))
-        );
-        const validationDataItemHash = sha256(
-          Buffer.from(JSON.stringify(validationDataItem))
-        );
+        const proposedDataItemHash = sha256FromJson(proposedDataItem);
+        const validationDataItemHash = sha256FromJson(validationDataItem);
 
         return proposedDataItemHash === validationDataItemHash;
       }
