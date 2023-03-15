@@ -1,7 +1,12 @@
 import seedrandom from "seedrandom";
 
 import { DataItem, Validator } from "../..";
-import { generateIndexPairs, sleep, standardizeJSON } from "../../utils";
+import {
+  callWithBackoffStrategy,
+  generateIndexPairs,
+  sleep,
+  standardizeJSON,
+} from "../../utils";
 import clone from "clone";
 
 /**
@@ -140,21 +145,43 @@ export async function runCache(this: Validator): Promise<void> {
 
         if (!itemFound) {
           // collect data item for next key
-          let dataItem = await this.runtime.getDataItem(this, nextKey);
+          const dataItem: DataItem = await callWithBackoffStrategy(
+            async () => {
+              const data = await this.runtime.getDataItem(this, nextKey);
 
-          // prevalidate data item and reject if it fails
-          this.logger.debug(`this.runtime.prevalidateDataItem($THIS,$ITEM)`);
-          const valid = await this.runtime.prevalidateDataItem(this, dataItem);
+              this.m.runtime_get_data_item_successful.inc();
 
-          if (!valid) {
-            throw new Error(
-              `Prevalidation of data item with key ${nextKey} failed.`
-            );
-          }
+              // prevalidate data item and reject if it fails
+              this.logger.debug(
+                `this.runtime.prevalidateDataItem($THIS,$ITEM)`
+              );
+              const valid = await this.runtime.prevalidateDataItem(this, data);
 
-          // transform data item
-          this.logger.debug(`this.runtime.transformDataItem($ITEM)`);
-          dataItem = await this.runtime.transformDataItem(this, dataItem);
+              if (!valid) {
+                throw new Error(
+                  `Prevalidation of data item with key ${nextKey} failed.`
+                );
+              }
+
+              // transform data item
+              this.logger.debug(`this.runtime.transformDataItem($ITEM)`);
+              return await this.runtime.transformDataItem(this, data);
+            },
+            {
+              limitTimeoutMs: 5 * 60 * 1000,
+              increaseByMs: 10 * 1000,
+            },
+            (err, ctx) => {
+              this.logger.info(
+                `Requesting getDataItem with key ${nextKey} was unsuccessful. Retrying in ${(
+                  ctx.nextTimeoutInMs / 1000
+                ).toFixed(2)}s ...`
+              );
+              this.logger.debug(standardizeJSON(err));
+
+              this.m.runtime_get_data_item_failed.inc();
+            }
+          );
 
           // add this data item to the cache
           this.logger.debug(`this.cacheProvider.put(${i.toString()},$ITEM)`);
