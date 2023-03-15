@@ -11,6 +11,7 @@ export * from "./checks/validateIsPoolActive";
 export * from "./checks/validateRuntime";
 export * from "./checks/validateVersion";
 export * from "./checks/validateStorageBalance";
+export * from "./checks/validateDataAvailability";
 
 // timeouts
 export * from "./timeouts/waitForAuthorization";
@@ -21,7 +22,6 @@ export * from "./timeouts/waitForUploadInterval";
 // helpers
 export * from "./helpers/archiveDebugBundle";
 export * from "./helpers/continueRound";
-export * from "./helpers/saveGetTransformDataItem";
 export * from "./helpers/getProxyAuth";
 
 // txs
@@ -34,7 +34,6 @@ export * from "./txs/voteBundleProposal";
 export * from "./queries/canPropose";
 export * from "./queries/canVote";
 export * from "./queries/getBalances";
-export * from "./queries/syncPoolConfig";
 export * from "./queries/syncPoolState";
 
 // validate

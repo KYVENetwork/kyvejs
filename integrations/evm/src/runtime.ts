@@ -1,29 +1,64 @@
-import { DataItem, IRuntime, sha256, Validator } from '@kyvejs/protocol';
+import { BlockWithTransactions } from '@ethersproject/abstract-provider';
+import {
+  DataItem,
+  IRuntime,
+  sha256FromJson,
+  Validator,
+} from '@kyvejs/protocol';
 import { providers } from 'ethers';
-
 import { name, version } from '../package.json';
+
+// EVM config
+interface IConfig {
+  sources: string[];
+}
 
 export default class Evm implements IRuntime {
   public name = name;
   public version = version;
+  public config!: IConfig;
 
-  async getDataItem(
-    v: Validator,
-    source: string,
-    key: string
-  ): Promise<DataItem> {
-    // get auth headers for proxy endpoints
-    const headers = await v.getProxyAuth();
+  async validateSetConfig(rawConfig: string): Promise<void> {
+    const config: IConfig = JSON.parse(rawConfig);
 
-    const provider = new providers.StaticJsonRpcProvider({
-      url: source,
-      headers,
-    });
-    const value = await provider.getBlockWithTransactions(+key);
+    if (!config.sources.length) {
+      throw new Error(`Config does not have any sources`);
+    }
+
+    this.config = config;
+  }
+
+  async getDataItem(v: Validator, key: string): Promise<DataItem> {
+    const results: BlockWithTransactions[] = [];
+
+    for (let source of this.config.sources) {
+      // get auth headers for proxy endpoints
+      const headers = await v.getProxyAuth();
+
+      const provider = new providers.StaticJsonRpcProvider({
+        url: source,
+        headers,
+      });
+      const block = await provider.getBlockWithTransactions(+key);
+
+      // delete confirmations from transactions to keep data deterministic
+      block.transactions.forEach(
+        (tx: Partial<providers.TransactionResponse>) => delete tx.confirmations
+      );
+
+      results.push(block);
+    }
+
+    // check if results from the different sources match
+    if (
+      !results.every((b) => sha256FromJson(b) === sha256FromJson(results[0]))
+    ) {
+      throw new Error(`Sources returned different results`);
+    }
 
     return {
       key,
-      value,
+      value: results[0],
     };
   }
 
@@ -33,11 +68,7 @@ export default class Evm implements IRuntime {
   }
 
   async transformDataItem(_: Validator, item: DataItem): Promise<DataItem> {
-    // Delete the number of confirmations from a transaction to keep data deterministic.
-    item.value.transactions.forEach(
-      (tx: Partial<providers.TransactionResponse>) => delete tx.confirmations
-    );
-
+    // do not transform data item
     return item;
   }
 
@@ -46,12 +77,8 @@ export default class Evm implements IRuntime {
     proposedDataItem: DataItem,
     validationDataItem: DataItem
   ): Promise<boolean> {
-    const proposedDataItemHash = sha256(
-      Buffer.from(JSON.stringify(proposedDataItem))
-    );
-    const validationDataItemHash = sha256(
-      Buffer.from(JSON.stringify(validationDataItem))
-    );
+    const proposedDataItemHash = sha256FromJson(proposedDataItem);
+    const validationDataItemHash = sha256FromJson(validationDataItem);
 
     return proposedDataItemHash === validationDataItemHash;
   }

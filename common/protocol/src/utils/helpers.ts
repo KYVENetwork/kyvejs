@@ -60,6 +60,17 @@ export const sha256 = (data: Buffer): string => {
 };
 
 /**
+ * Creates a sha256 hash of a JSON object
+ *
+ * @method sha256FromJson
+ * @param {any} data
+ * @return {string}
+ */
+export const sha256FromJson = (data: any): string => {
+  return sha256(Buffer.from(JSON.stringify(data)));
+};
+
+/**
  * Formats any bignumber into a human readable format
  *
  * @method toHumanReadable
