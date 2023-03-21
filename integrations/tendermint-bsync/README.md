@@ -91,6 +91,13 @@ This architecture diagram summarizes the setup of the Cosmos Hub integration on 
 Here this runtime is responsible for communicating with the tendermint application (purple) - in this case gaia, and forwarding the data to the KYVE core protocol. The KYVE core then handles the communication with the pool. This entire process (yellow) is the KYVE protocol node. The resulting
 data are the blocks from the tendermint application - validated and permanently stored on a storage provider like Arweave.
 
+#### Requirements
+
+The following **minimum** hardware requirements have to be met:
+
+- RAM: 8GB
+- Storage: 128GB
+
 #### Step 1: Start gaia node
 
 The first step is to start an archival gaia node. For that the gaia binary with the version `v4.2.1` has
@@ -122,6 +129,7 @@ Peers can be added via this addrbook which can be retrieved here:
 ```bash
 wget https://dl2.quicksync.io/json/addrbook.cosmos.json
 mv addrbook.cosmos.json ~/.gaia/config/addrbook.json
+chmod 666 ~/.gaia/config/addrbook.json
 ```
 
 Finally, the node can be started:
@@ -145,6 +153,9 @@ curl http://localhost:26657/block?height=6000000
 If it returns a valid block response you can continue with starting the actual KYVE protocol node
 and start participating in the validation and archival process.
 
+**TIP**: to save storage space you can start pruning blocks manually after they have been archived
+by the pool since after that they are not needed anymore.
+
 #### Step 2: Start kyve node
 
-The remaining installation of the KYVE protocol node is the same for every other protocol node. You can now follow the official docs starting from [here](https://docs.kyve.network/validators/protocol_nodes/installation)
+The remaining installation of the KYVE protocol node is the same for every other protocol node. You can now follow the official docs starting from [here](https://docs.kyve.network/validators/protocol_nodes/requirements)
