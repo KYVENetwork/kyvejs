@@ -76,8 +76,6 @@ export KYVEJS_TENDERMINT_BSYNC_RPC="https://my-custom-rpc-endpoint:26657"
 
 ## Join pools
 
-### Devnet (Korellia)
-
 The following Pools are currently live and can be joined
 
 ### Cosmos Hub // cosmoshub-4
@@ -127,6 +125,10 @@ mv addrbook.cosmos.json ~/.gaia/config/addrbook.json
 ```
 
 Finally, the node can be started:
+
+**NOTE**: For some users it might be required to increase the limit of open files on your system with `ulimit -n 4096`
+
+**INFO**: Since the genesis file is quite big (over 100MB) the starting process can take a serveral minutes before the node starts to sync blocks.
 
 ```bash
 ./gaiad start --x-crisis-skip-assert-invariants
