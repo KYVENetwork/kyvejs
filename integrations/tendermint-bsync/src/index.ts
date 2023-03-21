@@ -1,6 +1,6 @@
 import { Validator } from '@kyvejs/protocol';
-import Tendermint from './runtime';
+import TendermintBSync from './runtime';
 
-const runtime = new Tendermint();
+const runtime = new TendermintBSync();
 
 new Validator(runtime).bootstrap();

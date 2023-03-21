@@ -4,8 +4,8 @@ import {
   sha256FromJson,
   Validator,
 } from '@kyvejs/protocol';
-import { providers, utils } from 'ethers';
 import axios from 'axios';
+import { providers, utils } from 'ethers';
 
 // Method to get the named args
 const parseArgs = (struct: any) => {
@@ -72,7 +72,7 @@ export default class Evm implements IRuntime {
   async getDataItem(_: Validator, key: string): Promise<DataItem> {
     const results: providers.Log[][] = [];
 
-    for (let source of this.config.sources) {
+    for (const source of this.config.sources) {
       const apiObj = JSON.parse(process.env.API_KEYS!);
 
       // setup web3 provider

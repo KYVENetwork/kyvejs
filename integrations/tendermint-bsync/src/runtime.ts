@@ -7,12 +7,13 @@ import {
 import { name, version } from '../package.json';
 import axios from 'axios';
 
-// Tendermint config
+// TendermintBSync config
 interface IConfig {
-  sources: string[];
+  network: string;
+  rpc: string;
 }
 
-export default class Tendermint implements IRuntime {
+export default class TendermintBSync implements IRuntime {
   public name = name;
   public version = version;
   public config!: IConfig;
@@ -20,35 +21,41 @@ export default class Tendermint implements IRuntime {
   async validateSetConfig(rawConfig: string): Promise<void> {
     const config: IConfig = JSON.parse(rawConfig);
 
-    if (!config.sources.length) {
-      throw new Error(`Config does not have any sources`);
+    if (!config.network) {
+      throw new Error(`Config does not have property "network" defined`);
+    }
+
+    if (!config.rpc) {
+      throw new Error(`Config does not have property "rpc" defined`);
+    }
+
+    if (process.env.KYVE_JS_TENDERMINT_BSYNC_RPC) {
+      config.rpc = process.env.KYVE_JS_TENDERMINT_BSYNC_RPC;
     }
 
     this.config = config;
   }
 
   async getDataItem(_: Validator, key: string): Promise<DataItem> {
-    const results: any[] = [];
+    // fetch block from rpc at given block height
+    const { data } = await axios.get(`${this.config.rpc}/block?height=${key}`);
+    const block = data.result.block;
 
-    for (let source of this.config.sources) {
-      // fetch block from rpc at given block height
-      const { data } = await axios.get(`${source}/block?height=${key}`);
-      results.push(data.result.block);
-    }
-
-    // check if results from the different sources match
-    if (
-      !results.every((b) => sha256FromJson(b) === sha256FromJson(results[0]))
-    ) {
-      throw new Error(`Sources returned different results`);
-    }
-
-    return { key, value: results[0] };
+    return { key, value: block };
   }
 
   async prevalidateDataItem(_: Validator, item: DataItem): Promise<boolean> {
-    // check if item value is not null
-    return !!item.value;
+    // check if block is defined
+    if (!item.value) {
+      return false;
+    }
+
+    // check if network matches
+    if (this.config.network != item.value.header.chain_id) {
+      return false;
+    }
+
+    return true;
   }
 
   async transformDataItem(_: Validator, item: DataItem): Promise<DataItem> {
@@ -61,6 +68,7 @@ export default class Tendermint implements IRuntime {
     proposedDataItem: DataItem,
     validationDataItem: DataItem
   ): Promise<boolean> {
+    // apply hash comparison
     const proposedDataItemHash = sha256FromJson(proposedDataItem);
     const validationDataItemHash = sha256FromJson(validationDataItem);
 
@@ -68,10 +76,12 @@ export default class Tendermint implements IRuntime {
   }
 
   async summarizeDataBundle(_: Validator, bundle: DataItem[]): Promise<string> {
+    // use latest block height as bundle summary
     return bundle.at(-1)?.value?.header?.height ?? '';
   }
 
   async nextKey(_: Validator, key: string): Promise<string> {
+    // the next key is always current block height + 1
     return (parseInt(key) + 1).toString();
   }
 }

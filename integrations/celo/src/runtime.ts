@@ -32,7 +32,7 @@ export default class Celo implements IRuntime {
   async getDataItem(v: Validator, key: string): Promise<DataItem> {
     const results: any[] = [];
 
-    for (let source of this.config.sources) {
+    for (const source of this.config.sources) {
       // get auth headers for proxy endpoints
       const headers = await v.getProxyAuth();
 

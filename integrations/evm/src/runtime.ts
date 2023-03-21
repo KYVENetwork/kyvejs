@@ -6,6 +6,7 @@ import {
   Validator,
 } from '@kyvejs/protocol';
 import { providers } from 'ethers';
+
 import { name, version } from '../package.json';
 
 // EVM config
@@ -31,7 +32,7 @@ export default class Evm implements IRuntime {
   async getDataItem(v: Validator, key: string): Promise<DataItem> {
     const results: BlockWithTransactions[] = [];
 
-    for (let source of this.config.sources) {
+    for (const source of this.config.sources) {
       // get auth headers for proxy endpoints
       const headers = await v.getProxyAuth();
 
