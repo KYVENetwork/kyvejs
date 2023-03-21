@@ -76,4 +76,73 @@ export KYVEJS_TENDERMINT_BSYNC_RPC="https://my-custom-rpc-endpoint:26657"
 
 ## Join pools
 
-In order to join
+### Devnet (Korellia)
+
+The following Pools are currently live and can be joined
+
+### Cosmos Hub // cosmoshub-4
+
+Every protocol node runner will run their own Cosmos Hub blockchain node as a data source. This ensures
+that the data which is getting proposed and validated actually comes from decentralized sources. Furthermore, since the gaia blockchain node only serves valid blocks we further increase the validation
+of this data. With that setup a user who wants to join this pool first has to sync his gaia node to the current height the pool has already archived the blocks and then start the actual KYVE protocol node.
+
+This architecture diagram summarizes the setup of the Cosmos Hub integration on KYVE:
+
+![tendermint-bsync](assets/tendermint-bsync.png)
+
+Here this runtime is responsible for communicating with the tendermint application (purple) - in this case gaia, and forwarding the data to the KYVE core protocol. The KYVE core then handles the communication with the pool. This entire process (yellow) is the KYVE protocol node. The resulting
+data are the blocks from the tendermint application - validated and permanently stored on a storage provider like Arweave.
+
+#### Step 1: Start gaia node
+
+The first step is to start an archival gaia node. For that the gaia binary with the version `v4.2.1` has
+to be installed. You can follow the official installation instructions [here](https://hub.cosmos.network/main/getting-started/installation.html) or download the binary directly from [here](https://github.com/cosmos/gaia/releases/tag/v4.2.1).
+
+You can verify the successful installation with
+
+```
+./gaiad version
+4.2.1
+```
+
+In order to setup the gaia config first choose a moniker and init gaia:
+
+```bash
+./gaiad init <your-moniker> --chain-id cosmoshub-4
+```
+
+To install the genesis file execute the following command:
+
+```bash
+wget https://raw.githubusercontent.com/cosmos/mainnet/master/genesis/genesis.cosmoshub-4.json.gz
+gzip -d genesis.cosmoshub-4.json.gz
+mv genesis.cosmoshub-4.json ~/.gaia/config/genesis.json
+```
+
+Peers can be added via this addrbook which can be retrieved here:
+
+```bash
+wget https://dl2.quicksync.io/json/addrbook.cosmos.json
+mv addrbook.cosmos.json ~/.gaia/config/addrbook.json
+```
+
+Finally, the node can be started:
+
+```bash
+./gaiad start --x-crisis-skip-assert-invariants
+```
+
+Now you have to sync blocks until the latest summary of the pool is reached. For example
+if the latest pool summary is 6,000,000 you can check if the node has synced the blocks until
+that height with:
+
+```bash
+curl http://localhost:26657/block?height=6000000
+```
+
+If it returns a valid block response you can continue with starting the actual KYVE protocol node
+and start participating in the validation and archival process.
+
+#### Step 2: Start kyve node
+
+The remaining installation of the KYVE protocol node is the same for every other protocol node. You can now follow the official docs starting from [here](https://docs.kyve.network/validators/protocol_nodes/installation)
