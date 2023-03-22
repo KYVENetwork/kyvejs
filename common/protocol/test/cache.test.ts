@@ -89,9 +89,6 @@ describe("cache tests", () => {
 
     v["poolId"] = 0;
     v["staker"] = "test_staker";
-    v["poolConfig"] = {
-      sources: ["https://rpc.api.moonbeam.network"],
-    };
 
     v["rpc"] = ["http://0.0.0.0:26657"];
     v.client = [client()];
@@ -211,7 +208,6 @@ describe("cache tests", () => {
       expect(runtime.getDataItem).toHaveBeenNthCalledWith(
         n + 1,
         v,
-        v.poolConfig.sources[0],
         n.toString()
       );
     }
@@ -387,7 +383,6 @@ describe("cache tests", () => {
       expect(runtime.getDataItem).toHaveBeenNthCalledWith(
         n + 1,
         v,
-        v.poolConfig.sources[0],
         (n + parseInt(genesis_pool.data.max_bundle_size)).toString()
       );
     }
@@ -567,7 +562,6 @@ describe("cache tests", () => {
       expect(runtime.getDataItem).toHaveBeenNthCalledWith(
         n + 1,
         v,
-        v.poolConfig.sources[0],
         (n + parseInt(genesis_pool.data.max_bundle_size) + 3).toString()
       );
     }
@@ -733,7 +727,6 @@ describe("cache tests", () => {
       expect(runtime.getDataItem).toHaveBeenNthCalledWith(
         n + 1,
         v,
-        v.poolConfig.sources[0],
         (n + parseInt(genesis_pool.data.max_bundle_size)).toString()
       );
     }
@@ -786,14 +779,14 @@ describe("cache tests", () => {
     // ARRANGE
     v["runtime"].getDataItem = jest
       .fn()
-      .mockImplementationOnce((_: Validator, __: string, key: string) =>
+      .mockImplementationOnce((_: Validator, key: string) =>
         Promise.resolve({
           key,
           value: `${key}-value`,
         })
       )
       .mockRejectedValueOnce(new Error("network error"))
-      .mockImplementation((_: Validator, __: string, key: string) =>
+      .mockImplementation((_: Validator, key: string) =>
         Promise.resolve({
           key,
           value: `${key}-value`,
@@ -892,19 +885,16 @@ describe("cache tests", () => {
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       1,
       expect.any(Validator),
-      v.poolConfig.sources[0],
       "0"
     );
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       2,
       expect.any(Validator),
-      v.poolConfig.sources[0],
       "1"
     );
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       3,
       expect.any(Validator),
-      v.poolConfig.sources[0],
       "1"
     );
 
@@ -953,21 +943,21 @@ describe("cache tests", () => {
     // ARRANGE
     v["runtime"].getDataItem = jest
       .fn()
-      .mockImplementationOnce((_: Validator, __: string, key: string) =>
+      .mockImplementationOnce((_: Validator, key: string) =>
         Promise.resolve({
           key,
           value: `${key}-value`,
         })
       )
       .mockRejectedValueOnce(new Error("network error"))
-      .mockImplementationOnce((_: Validator, __: string, key: string) =>
+      .mockImplementationOnce((_: Validator, key: string) =>
         Promise.resolve({
           key,
           value: `${key}-value`,
         })
       )
       .mockRejectedValueOnce(new Error("network error"))
-      .mockImplementation((_: Validator, __: string, key: string) =>
+      .mockImplementation((_: Validator, key: string) =>
         Promise.resolve({
           key,
           value: `${key}-value`,
@@ -1102,56 +1092,48 @@ describe("cache tests", () => {
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       1,
       v,
-      v.poolConfig.sources[0],
       (0 + parseInt(genesis_pool.data.max_bundle_size) + 3).toString()
     );
 
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       2,
       v,
-      v.poolConfig.sources[0],
       (1 + parseInt(genesis_pool.data.max_bundle_size) + 3).toString()
     );
 
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       3,
       v,
-      v.poolConfig.sources[0],
       (1 + parseInt(genesis_pool.data.max_bundle_size) + 3).toString()
     );
 
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       4,
       v,
-      v.poolConfig.sources[0],
       (2 + parseInt(genesis_pool.data.max_bundle_size) + 3).toString()
     );
 
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       5,
       v,
-      v.poolConfig.sources[0],
       (2 + parseInt(genesis_pool.data.max_bundle_size) + 3).toString()
     );
 
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       6,
       v,
-      v.poolConfig.sources[0],
       (3 + parseInt(genesis_pool.data.max_bundle_size) + 3).toString()
     );
 
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       7,
       v,
-      v.poolConfig.sources[0],
       (4 + parseInt(genesis_pool.data.max_bundle_size) + 3).toString()
     );
 
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       8,
       v,
-      v.poolConfig.sources[0],
       (5 + parseInt(genesis_pool.data.max_bundle_size) + 3).toString()
     );
 
@@ -1277,27 +1259,15 @@ describe("cache tests", () => {
     expect(cacheProvider.put).toHaveBeenCalledTimes(5);
 
     for (let n = 0; n < 5; n++) {
-      if (n === 2) {
-        const item = {
-          key: n.toString(),
-          value: `${n}-value`,
-        };
-        expect(cacheProvider.put).toHaveBeenNthCalledWith(
-          n + 1,
-          n.toString(),
-          item
-        );
-      } else {
-        const item = {
-          key: n.toString(),
-          value: `${n}-value-transform`,
-        };
-        expect(cacheProvider.put).toHaveBeenNthCalledWith(
-          n + 1,
-          n.toString(),
-          item
-        );
-      }
+      const item = {
+        key: n.toString(),
+        value: `${n}-value-transform`,
+      };
+      expect(cacheProvider.put).toHaveBeenNthCalledWith(
+        n + 1,
+        n.toString(),
+        item
+      );
     }
 
     expect(cacheProvider.get).toHaveBeenCalledTimes(0);
@@ -1324,39 +1294,108 @@ describe("cache tests", () => {
     // ASSERT RUNTIME INTERFACES
     // =========================
 
-    expect(runtime.getDataItem).toHaveBeenCalledTimes(5);
+    expect(runtime.getDataItem).toHaveBeenCalledTimes(6);
 
-    for (let n = 0; n < 5; n++) {
-      expect(runtime.getDataItem).toHaveBeenNthCalledWith(
-        n + 1,
-        expect.any(Validator),
-        v.poolConfig.sources[0],
-        n.toString()
-      );
-    }
+    expect(runtime.getDataItem).toHaveBeenNthCalledWith(
+      1,
+      expect.any(Validator),
+      "0"
+    );
 
-    expect(runtime.transformDataItem).toHaveBeenCalledTimes(5);
+    expect(runtime.getDataItem).toHaveBeenNthCalledWith(
+      2,
+      expect.any(Validator),
+      "1"
+    );
 
-    for (let n = 0; n < 5; n++) {
-      const item = {
-        key: n.toString(),
-        value: `${n}-value`,
-      };
-      expect(runtime.transformDataItem).toHaveBeenNthCalledWith(
-        n + 1,
-        expect.any(Validator),
-        item
-      );
-    }
+    expect(runtime.getDataItem).toHaveBeenNthCalledWith(
+      3,
+      expect.any(Validator),
+      "2"
+    );
+
+    expect(runtime.getDataItem).toHaveBeenNthCalledWith(
+      4,
+      expect.any(Validator),
+      "2"
+    );
+
+    expect(runtime.getDataItem).toHaveBeenNthCalledWith(
+      5,
+      expect.any(Validator),
+      "3"
+    );
+
+    expect(runtime.getDataItem).toHaveBeenNthCalledWith(
+      6,
+      expect.any(Validator),
+      "4"
+    );
+
+    expect(runtime.transformDataItem).toHaveBeenCalledTimes(6);
+
+    expect(runtime.transformDataItem).toHaveBeenNthCalledWith(
+      1,
+      expect.any(Validator),
+      {
+        key: "0",
+        value: `0-value`,
+      }
+    );
+
+    expect(runtime.transformDataItem).toHaveBeenNthCalledWith(
+      2,
+      expect.any(Validator),
+      {
+        key: "1",
+        value: `1-value`,
+      }
+    );
+
+    expect(runtime.transformDataItem).toHaveBeenNthCalledWith(
+      3,
+      expect.any(Validator),
+      {
+        key: "2",
+        value: `2-value`,
+      }
+    );
+
+    expect(runtime.transformDataItem).toHaveBeenNthCalledWith(
+      4,
+      expect.any(Validator),
+      {
+        key: "2",
+        value: `2-value`,
+      }
+    );
+
+    expect(runtime.transformDataItem).toHaveBeenNthCalledWith(
+      5,
+      expect.any(Validator),
+      {
+        key: "3",
+        value: `3-value`,
+      }
+    );
+
+    expect(runtime.transformDataItem).toHaveBeenNthCalledWith(
+      6,
+      expect.any(Validator),
+      {
+        key: "4",
+        value: `4-value`,
+      }
+    );
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(0);
 
     // we only call getNextKey max_bundle_size - 1 because
     // the pool is in genesis state and therefore start_key
     // is used for the first time
-    expect(runtime.nextKey).toHaveBeenCalledTimes(5 - 1);
+    expect(runtime.nextKey).toHaveBeenCalledTimes(4);
 
-    for (let n = 0; n < 5 - 1; n++) {
+    for (let n = 0; n < 4; n++) {
       expect(runtime.nextKey).toHaveBeenNthCalledWith(
         n + 1,
         expect.any(Validator),
@@ -1606,12 +1645,7 @@ describe("cache tests", () => {
 
     expect(runtime.getDataItem).toHaveBeenCalledTimes(1);
 
-    expect(runtime.getDataItem).toHaveBeenNthCalledWith(
-      1,
-      v,
-      v.poolConfig.sources[0],
-      "100"
-    );
+    expect(runtime.getDataItem).toHaveBeenNthCalledWith(1, v, "100");
 
     expect(runtime.transformDataItem).toHaveBeenCalledTimes(1);
 
