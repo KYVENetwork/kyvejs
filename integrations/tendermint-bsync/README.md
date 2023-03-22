@@ -96,7 +96,9 @@ data are the blocks from the tendermint application - validated and permanently 
 The following **minimum** hardware requirements have to be met:
 
 - RAM: 8GB
-- Storage: 128GB
+- Storage: 512GB\*
+
+\*This can increase over time
 
 #### Step 1: Start gaia node
 
@@ -132,9 +134,27 @@ mv addrbook.cosmos.json ~/.gaia/config/addrbook.json
 chmod 666 ~/.gaia/config/addrbook.json
 ```
 
+For pruning the following settings are recommended to decrease the disk usage:
+
+~/.gaia/config/config.toml
+
+```toml
+[tx_index]
+
+indexer = "null"
+```
+
+~/.gaia/config/app.toml
+
+```toml
+pruning = "everything"
+
+index-events = [""]
+```
+
 Finally, the node can be started:
 
-**NOTE**: For some users it might be required to increase the limit of open files on your system with `ulimit -n 4096`
+**NOTE**: For some users it might be required to increase the limit of open files on your system with `ulimit -n 65536`
 
 **INFO**: Since the genesis file is quite big (over 100MB) the starting process can take a serveral minutes before the node starts to sync blocks.
 

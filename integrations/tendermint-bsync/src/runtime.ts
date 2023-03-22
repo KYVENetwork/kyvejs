@@ -1,9 +1,4 @@
-import {
-  DataItem,
-  IRuntime,
-  Validator,
-  sha256FromJson,
-} from '@kyvejs/protocol';
+import { DataItem, IRuntime, Validator } from '@kyvejs/protocol';
 import { name, version } from '../package.json';
 import axios from 'axios';
 
@@ -68,11 +63,10 @@ export default class TendermintBSync implements IRuntime {
     proposedDataItem: DataItem,
     validationDataItem: DataItem
   ): Promise<boolean> {
-    // apply hash comparison
-    const proposedDataItemHash = sha256FromJson(proposedDataItem);
-    const validationDataItemHash = sha256FromJson(validationDataItem);
-
-    return proposedDataItemHash === validationDataItemHash;
+    // apply equal comparison
+    return (
+      JSON.stringify(proposedDataItem) === JSON.stringify(validationDataItem)
+    );
   }
 
   async summarizeDataBundle(_: Validator, bundle: DataItem[]): Promise<string> {

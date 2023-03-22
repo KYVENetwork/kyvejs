@@ -1,9 +1,4 @@
-import {
-  DataItem,
-  IRuntime,
-  Validator,
-  sha256FromJson,
-} from '@kyvejs/protocol';
+import { DataItem, IRuntime, Validator } from '@kyvejs/protocol';
 import { fetchBlock } from './utils';
 import { name, version } from '../package.json';
 
@@ -40,7 +35,7 @@ export default class Cosmos implements IRuntime {
 
     // check if results from the different sources match
     if (
-      !results.every((b) => sha256FromJson(b) === sha256FromJson(results[0]))
+      !results.every((b) => JSON.stringify(b) === JSON.stringify(results[0]))
     ) {
       throw new Error(`Sources returned different results`);
     }
@@ -63,10 +58,10 @@ export default class Cosmos implements IRuntime {
     proposedDataItem: DataItem,
     validationDataItem: DataItem
   ): Promise<boolean> {
-    const proposedDataItemHash = sha256FromJson(proposedDataItem);
-    const validationDataItemHash = sha256FromJson(validationDataItem);
-
-    return proposedDataItemHash === validationDataItemHash;
+    // apply equal comparison
+    return (
+      JSON.stringify(proposedDataItem) === JSON.stringify(validationDataItem)
+    );
   }
 
   async summarizeDataBundle(_: Validator, bundle: DataItem[]): Promise<string> {
