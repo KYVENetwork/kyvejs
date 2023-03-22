@@ -156,6 +156,8 @@ and start participating in the validation and archival process.
 **TIP**: to save storage space you can start pruning blocks manually after they have been archived
 by the pool since after that they are not needed anymore.
 
+**TIP**: to make it easier during chain upgrades we also recommend running the chain with _cosmosvisor_. You can find official instructions [here](https://hub.cosmos.network/main/hub-tutorials/upgrade-node.html#cosmovisor)
+
 #### Step 2: Start kyve node
 
 The remaining installation of the KYVE protocol node is the same for every other protocol node. You can now follow the official docs starting from [here](https://docs.kyve.network/validators/protocol_nodes/requirements)
