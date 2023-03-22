@@ -1,9 +1,3 @@
-// kyve coin denom
-export const KYVE_COIN_DENOM = "tkyve";
-
-// kyve coin decimals
-export const KYVE_COIN_DECIMALS = 9;
-
 // the time a node should halt if the node decides to idle
 export const IDLE_TIME = 60 * 1000;
 
