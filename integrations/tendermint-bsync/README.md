@@ -134,6 +134,8 @@ mv addrbook.cosmos.json ~/.gaia/config/addrbook.json
 chmod 666 ~/.gaia/config/addrbook.json
 ```
 
+**TIP**: You can also add persistent_peers from Polkachu to ensure that you will actually find peers where you can sync with the network: https://polkachu.com/live_peers/cosmos
+
 For pruning the following settings are recommended to decrease the disk usage:
 
 ~/.gaia/config/config.toml
@@ -181,3 +183,5 @@ by the pool since after that they are not needed anymore.
 #### Step 2: Start kyve node
 
 The remaining installation of the KYVE protocol node is the same for every other protocol node. You can now follow the official docs starting from [here](https://docs.kyve.network/validators/protocol_nodes/requirements)
+
+The Binaries of this runtime with which to join the pool can be found here: https://github.com/KYVENetwork/kyvejs/releases?q=tendermint-bsync
