@@ -110,7 +110,7 @@ export default class TokenPrices implements IRuntime {
     return bundle[bundle.length - 1].value.toString() ?? "";
   }
 
-  public async nextKey(_: Validator, __: string): Promise<string> {
-    return Date.now().toString();
+  public async nextKey(_: Validator, key: string): Promise<string> {
+    return (Number(key) + 1).toString();
   }
 }
