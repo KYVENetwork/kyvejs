@@ -1,22 +1,23 @@
 import axios from "axios";
 import { Coincap, Binance } from "./DataSource";
 
-import { Response } from "./types";
-
 export async function fetchPrice(endpoint: string): Promise<any> {
-  const { data } = await axios.get<Response<any>>(endpoint);
+  const { data } = await axios.get<any>(endpoint);
 
-  return data.result;
+  return data;
 }
 
-export async function extractPrices(priceObject: any): Promise<any> {
-  if (Object.keys(priceObject)[0] === "https://api.coincap.io/v2/assets") {
+export async function extractPrices(
+  endpoint: string,
+  priceObject: any
+): Promise<any> {
+  if (endpoint === "https://api.coincap.io/v2/assets") {
     return new Coincap(
-      priceObject["https://api.coincap.io/v2/assets"]
+      priceObject
     ).extractPrices();
-  } else if (Object.keys(priceObject)[0] === "https://data.binance.com/api/v3/ticker/price") {
+  } else if (endpoint === "https://data.binance.com/api/v3/ticker/price") {
     return new Binance(
-      priceObject["https://data.binance.com/api/v3/ticker/price"]
+      priceObject
     ).extractPrices();
   }
 }

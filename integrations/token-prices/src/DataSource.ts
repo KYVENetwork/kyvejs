@@ -10,19 +10,11 @@ export class Binance implements DataSource {
   }
   extractPrices(): Record<string, BigNumber> {
     const { price: bitcoin } =
-      this.prices.find((obj: any) => obj.symbol === "BNBBTC") || {};
+      this.prices.find((obj: any) => obj.symbol === "BTCUSDT");
     const { price: ethereum } =
-      this.prices.find((obj: any) => obj.symbol === "ETHBTC") || {};
+      this.prices.find((obj: any) => obj.symbol === "ETHUSDT");
     const { price: atom } =
-      this.prices.find((obj: any) => obj.symbol === "ATOMBTC") || {};
-
-    if (
-      !Object.keys(bitcoin).length ||
-      !Object.keys(ethereum).length ||
-      !Object.keys(atom).length
-    ) {
-      console.error("Price extraction of Binance failed.");
-    }
+      this.prices.find((obj: any) => obj.symbol === "ATOMUSDT");
 
     return {
       BTC: new BigNumber(bitcoin).decimalPlaces(4),
@@ -38,20 +30,12 @@ export class Coincap implements DataSource {
     this.prices = priceObject;
   }
   extractPrices(): Record<string, BigNumber> {
-    const { bitcoin } =
-      this.prices.data.find((obj: any) => obj.name === "Bitcoin") || {};
-    const { ethereum } =
-      this.prices.data.find((obj: any) => obj.name === "Ethereum") || {};
-    const { atom } =
-      this.prices.data.find((obj: any) => obj.name === "Cosmos") || {};
-
-    if (
-      !Object.keys(bitcoin).length ||
-      !Object.keys(ethereum).length ||
-      !Object.keys(atom).length
-    ) {
-      console.error("Price extraction of Coincap failed.");
-    }
+    const bitcoin =
+      (this.prices.data.find((obj: any) => obj.name === "Bitcoin")).priceUsd;
+    const ethereum =
+      (this.prices.data.find((obj: any) => obj.name === "Ethereum")).priceUsd;
+    const atom =
+      (this.prices.data.find((obj: any) => obj.name === "Cosmos")).priceUsd;
 
     return {
       BTC: new BigNumber(bitcoin).decimalPlaces(4),

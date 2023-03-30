@@ -1,4 +1,5 @@
 import { DataItem, IRuntime, Validator } from "@kyvejs/protocol";
+import axios from "axios";
 
 import { name, version } from "../package.json";
 import { extractPrices, fetchPrice, median } from "./utils";
@@ -6,7 +7,7 @@ import { extractPrices, fetchPrice, median } from "./utils";
 // TokenPrices config
 interface IConfig {
   sources: any[];
-  slippage: number;
+  slippage: any;
 }
 
 export default class TokenPrices implements IRuntime {
@@ -15,10 +16,24 @@ export default class TokenPrices implements IRuntime {
   public config!: IConfig;
 
   async validateSetConfig(rawConfig: string): Promise<void> {
-    const config: IConfig = JSON.parse(rawConfig);
+    let url: string;
+    // allow ipfs:// or ar:// as external config urls
+    if (rawConfig.startsWith("ipfs://")) {
+      url = rawConfig.replace("ipfs://", "https://ipfs.io/");
+    } else if (rawConfig.startsWith("ar://")) {
+      url = rawConfig.replace("ar://", "https://arweave.net/");
+    } else {
+      throw Error("Unsupported config link protocol");
+    }
+
+    const { data: config } = await axios.get<IConfig>(url);
 
     if (!config.sources.length) {
       throw new Error(`Config does not have any sources`);
+    }
+
+    if (!config.slippage) {
+      throw new Error(`Config does not have any slippage`);
     }
 
     this.config = config;
@@ -33,7 +48,7 @@ export default class TokenPrices implements IRuntime {
 
     for (const endpoint of this.config.sources) {
       const response = await fetchPrice(endpoint);
-      const priceObjects = await extractPrices({ endpoint: response });
+      const priceObjects = await extractPrices(endpoint, response);
 
       for (const key in priceObjects) {
         if (Object.prototype.hasOwnProperty.call(priceObjects, key)) {
@@ -92,7 +107,7 @@ export default class TokenPrices implements IRuntime {
     _: Validator,
     bundle: DataItem[]
   ): Promise<string> {
-    return bundle[bundle.length - 1].value ?? "";
+    return bundle[bundle.length - 1].value.toString() ?? "";
   }
 
   public async nextKey(_: Validator, __: string): Promise<string> {
