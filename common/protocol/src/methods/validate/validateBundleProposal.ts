@@ -209,9 +209,12 @@ export async function validateBundleProposal(
               proposedBundle[i],
               validationBundle[i]
             );
-            this.logger.debug(
-              `Validated data item: index:${i} - key:${proposedBundle[i].key} - result:${valid}`
-            );
+
+            if (!valid) {
+              this.logger.info(
+                `Validated data item: index:${i} - key:${proposedBundle[i].key} - result:${valid}`
+              );
+            }
           } else {
             // abort further validation if an invalid data item was
             // found in bundle
