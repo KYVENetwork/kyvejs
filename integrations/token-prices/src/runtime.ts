@@ -92,10 +92,10 @@ export default class TokenPrices implements IRuntime {
         const slippage = proposedPrice * this.config.slippage;
 
         if (proposedPrice > validationPrice) {
-          if (!(proposedPrice - validationPrice <= slippage)) return false;
+          if (proposedPrice - validationPrice >= slippage) return false;
         }
         if (validationPrice > proposedPrice) {
-          if (!(validationPrice - proposedPrice <= slippage)) return false;
+          if (validationPrice - proposedPrice >= slippage) return false;
         }
       }
     }
