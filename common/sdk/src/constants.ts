@@ -78,7 +78,7 @@ export const SUPPORTED_CHAIN_CONFIGS = {
     coin: "KYVE",
     coinDenom: "tkyve",
     coinDecimals: 6,
-    gasPrice: 0.02,
+    gasPrice: 1,
   },
 };
 

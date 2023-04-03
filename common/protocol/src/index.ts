@@ -24,7 +24,6 @@ import {
   runNode,
   saveBundleDecompress,
   saveBundleDownload,
-  saveGetTransformDataItem,
   saveLoadValidationBundle,
   setupCacheProvider,
   setupLogger,
@@ -33,7 +32,6 @@ import {
   setupValidator,
   skipUploaderRole,
   submitBundleProposal,
-  syncPoolConfig,
   syncPoolState,
   validateBundleProposal,
   validateIsNodeValidator,
@@ -41,6 +39,7 @@ import {
   validateRuntime,
   validateStorageBalance,
   validateVersion,
+  validateDataAvailability,
   voteBundleProposal,
   waitForAuthorization,
   waitForCacheContinuation,
@@ -74,7 +73,6 @@ export class Validator {
   // node attributes
   public protocolVersion!: string;
   public pool!: PoolResponse;
-  public poolConfig!: any;
   public name!: string;
 
   // logger attributes
@@ -91,7 +89,8 @@ export class Validator {
   protected chainId!: SupportedChains;
   protected rpc!: string[];
   protected rest!: string[];
-  protected gasPrice: number | undefined;
+  protected gasPrice!: number;
+  protected requestBackoff!: number;
   protected cache!: string;
   protected debug!: boolean;
   protected metrics!: boolean;
@@ -110,6 +109,7 @@ export class Validator {
   protected validateVersion = validateVersion;
   protected validateIsNodeValidator = validateIsNodeValidator;
   protected validateIsPoolActive = validateIsPoolActive;
+  protected validateDataAvailability = validateDataAvailability;
 
   // timeouts
   protected waitForAuthorization = waitForAuthorization;
@@ -120,7 +120,6 @@ export class Validator {
   // helpers
   protected archiveDebugBundle = archiveDebugBundle;
   protected continueRound = continueRound;
-  protected saveGetTransformDataItem = saveGetTransformDataItem;
   public getProxyAuth = getProxyAuth;
 
   // txs
@@ -131,7 +130,6 @@ export class Validator {
 
   // queries
   protected syncPoolState = syncPoolState;
-  protected syncPoolConfig = syncPoolConfig;
   protected getBalances = getBalances;
   protected canVote = canVote;
   protected canPropose = canPropose;
@@ -229,6 +227,11 @@ export class Validator {
         "The gas price the node should use to calculate transaction fees"
       )
       .option(
+        "--request-backoff <number>",
+        "The time in milliseconds between each getDataItem request where the node sleeps [default = 50]",
+        "50"
+      )
+      .option(
         "--cache <jsonfile|memory>",
         "The cache this node should use",
         parseCache,
@@ -269,8 +272,7 @@ export class Validator {
    * @return {Promise<void>}
    */
   private async start(options: OptionValues): Promise<void> {
-    // assign program options
-    // to node instance
+    // assign program options to node instance
     this.poolId = options.pool;
     this.valaccount = options.valaccount;
     this.storagePriv = options.storagePriv;
@@ -278,10 +280,11 @@ export class Validator {
     this.rpc = options.rpc;
     this.rest = options.rest;
     this.gasPrice = options.gasPrice;
+    this.requestBackoff = parseInt(options.requestBackoff);
     this.cache = options.cache;
     this.debug = options.debug;
     this.metrics = options.metrics;
-    this.metricsPort = options.metricsPort;
+    this.metricsPort = parseInt(options.metricsPort);
     this.home = options.home;
 
     // perform setups
@@ -290,8 +293,10 @@ export class Validator {
 
     // perform async setups
     await this.setupSDK();
-    await this.syncPoolState();
+    await this.syncPoolState(true);
     await this.validateStorageBalance();
+    await this.validateDataAvailability();
+
     await this.setupValidator();
     await this.setupCacheProvider();
 

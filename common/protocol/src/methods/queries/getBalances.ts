@@ -1,11 +1,6 @@
 import BigNumber from "bignumber.js";
 
-import {
-  Validator,
-  standardizeJSON,
-  KYVE_COIN_DENOM,
-  KYVE_COIN_DECIMALS,
-} from "../..";
+import { Validator, standardizeJSON } from "../..";
 
 /**
  * getBalances tries to retrieve the $KYVE balance of the staker account, the $KYVE
@@ -21,18 +16,20 @@ export async function getBalances(this: Validator): Promise<void> {
     try {
       this.logger.debug(this.rpc[c]);
       this.logger.debug(
-        `this.client.nativeClient.getBalance(${this.staker},${KYVE_COIN_DENOM})`
+        `this.client.nativeClient.getBalance(${this.staker},${this.sdk[c].config.coinDenom})`
       );
 
       const stakerBalanceRaw = await this.client[c].nativeClient.getBalance(
         this.staker,
-        KYVE_COIN_DENOM
+        this.sdk[c].config.coinDenom
       );
 
       this.logger.debug(JSON.stringify(stakerBalanceRaw));
 
       const stakerBalance = new BigNumber(stakerBalanceRaw.amount)
-        .dividedBy(new BigNumber(10).exponentiatedBy(KYVE_COIN_DECIMALS))
+        .dividedBy(
+          new BigNumber(10).exponentiatedBy(this.sdk[c].config.coinDecimals)
+        )
         .toNumber();
 
       this.m.balance_staker.set(stakerBalance);
@@ -47,18 +44,20 @@ export async function getBalances(this: Validator): Promise<void> {
     try {
       this.logger.debug(this.rpc[c]);
       this.logger.debug(
-        `this.client.nativeClient.getBalance(${this.client[0].account.address},${KYVE_COIN_DENOM})`
+        `this.client.nativeClient.getBalance(${this.client[0].account.address},${this.sdk[c].config.coinDenom})`
       );
 
       const valaccountBalanceRaw = await this.client[c].nativeClient.getBalance(
         this.client[0].account.address,
-        KYVE_COIN_DENOM
+        this.sdk[c].config.coinDenom
       );
 
       this.logger.debug(JSON.stringify(valaccountBalanceRaw));
 
       const valaccountBalance = new BigNumber(valaccountBalanceRaw.amount)
-        .dividedBy(new BigNumber(10).exponentiatedBy(KYVE_COIN_DECIMALS))
+        .dividedBy(
+          new BigNumber(10).exponentiatedBy(this.sdk[c].config.coinDecimals)
+        )
         .toNumber();
 
       this.m.balance_valaccount.set(valaccountBalance);

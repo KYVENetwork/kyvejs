@@ -10,9 +10,13 @@ import { callWithBackoffStrategy, standardizeJSON } from "../../utils";
  *
  * @method syncPoolState
  * @param {Validator} this
+ * @param {boolean} exitOnConfigError exits if the config is invalid
  * @return {Promise<void>}
  */
-export async function syncPoolState(this: Validator): Promise<void> {
+export async function syncPoolState(
+  this: Validator,
+  exitOnConfigError: boolean = false
+): Promise<void> {
   await callWithBackoffStrategy(
     async () => {
       for (let l = 0; l < this.lcd.length; l++) {
@@ -22,7 +26,7 @@ export async function syncPoolState(this: Validator): Promise<void> {
             `this.lcd.kyve.query.v1beta1.pool({id: ${this.poolId.toString()}})`
           );
 
-          const prevPoolConfig = this.pool?.data?.config ?? "";
+          const prevConfig = this.pool?.data?.config ?? "";
 
           const { pool } = await this.lcd[l].kyve.query.v1beta1.pool({
             id: this.poolId.toString(),
@@ -32,8 +36,29 @@ export async function syncPoolState(this: Validator): Promise<void> {
           this.m.query_pool_successful.inc();
 
           // if config link has changed sync the config
-          if (prevPoolConfig !== this.pool.data!.config) {
-            await this.syncPoolConfig();
+          if (prevConfig !== this.pool.data!.config) {
+            try {
+              this.logger.debug(
+                `this.runtime.validateSetConfig(${this.pool.data!.config})`
+              );
+
+              // validate, parse and set config in runtime
+              await this.runtime.validateSetConfig(this.pool.data!.config);
+
+              // error if config was not set on runtime
+              if (!this.runtime.config) {
+                throw new Error(`Config was not set on runtime`);
+              }
+
+              this.logger.info(`Successfully synced runtime config`);
+            } catch (err) {
+              this.logger.fatal(
+                `Failed to sync runtime config. Either the config could not be parsed or was invalid.`
+              );
+              this.logger.fatal(standardizeJSON(err));
+
+              if (exitOnConfigError) process.exit(1);
+            }
           }
 
           return;

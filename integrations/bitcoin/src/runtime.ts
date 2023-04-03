@@ -1,24 +1,52 @@
-import { DataItem, IRuntime, sha256, Validator } from "@kyvejs/protocol";
+import { DataItem, IRuntime, Validator } from "@kyvejs/protocol";
 
 import { name, version } from "../package.json";
 import { fetchBlock, fetchBlockHash } from "./utils";
 
+// Bitcoin config
+interface IConfig {
+  sources: string[];
+}
+
 export default class Bitcoin implements IRuntime {
   public name = name;
   public version = version;
+  public config!: IConfig;
 
-  async getDataItem(
-    v: Validator,
-    source: string,
-    key: string
-  ): Promise<DataItem> {
-    // get auth headers for proxy endpoints
-    const headers = await v.getProxyAuth();
+  async validateSetConfig(rawConfig: string): Promise<void> {
+    const config: IConfig = JSON.parse(rawConfig);
 
-    const hash = await fetchBlockHash(source, +key, headers);
-    const block = await fetchBlock(source, hash, headers);
+    if (!config.sources.length) {
+      throw new Error(`Config does not have any sources`);
+    }
 
-    return { key, value: block };
+    this.config = config;
+  }
+
+  async getDataItem(v: Validator, key: string): Promise<DataItem> {
+    const results: any[] = [];
+
+    for (const source of this.config.sources) {
+      // get auth headers for proxy endpoints
+      const headers = await v.getProxyAuth();
+
+      const hash = await fetchBlockHash(source, +key, headers);
+      const block = await fetchBlock(source, hash, headers);
+
+      // remove confirmations to maintain determinism.
+      delete block.confirmations;
+
+      results.push(block);
+    }
+
+    // check if results from the different sources match
+    if (
+      !results.every((b) => JSON.stringify(b) === JSON.stringify(results[0]))
+    ) {
+      throw new Error(`Sources returned different results`);
+    }
+
+    return { key, value: results[0] };
   }
 
   async prevalidateDataItem(_: Validator, item: DataItem): Promise<boolean> {
@@ -28,9 +56,7 @@ export default class Bitcoin implements IRuntime {
   }
 
   async transformDataItem(_: Validator, item: DataItem): Promise<DataItem> {
-    // Remove confirmations to maintain determinism.
-    delete item.value.confirmations;
-
+    // do not transform data item
     return item;
   }
 
@@ -39,14 +65,10 @@ export default class Bitcoin implements IRuntime {
     proposedDataItem: DataItem,
     validationDataItem: DataItem
   ): Promise<boolean> {
-    const proposedDataItemHash = sha256(
-      Buffer.from(JSON.stringify(proposedDataItem))
+    // apply equal comparison
+    return (
+      JSON.stringify(proposedDataItem) === JSON.stringify(validationDataItem)
     );
-    const validationDataItemHash = sha256(
-      Buffer.from(JSON.stringify(validationDataItem))
-    );
-
-    return proposedDataItemHash === validationDataItemHash;
   }
 
   public async summarizeDataBundle(

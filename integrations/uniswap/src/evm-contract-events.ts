@@ -1,4 +1,5 @@
-import { DataItem, IRuntime, sha256, Validator } from '@kyvejs/protocol';
+import { DataItem, IRuntime, Validator } from '@kyvejs/protocol';
+import axios from 'axios';
 import { providers, utils } from 'ethers';
 
 // Method to get the named args
@@ -15,31 +16,85 @@ const parseArgs = (struct: any) => {
 
 import { name, version } from '../package.json';
 
+// EVM config
+interface IConfig {
+  sources: string[];
+  contract: {
+    address: string;
+    abi: any;
+  };
+}
+
 export default class Evm implements IRuntime {
   public name = name;
   public version = version;
+  public config!: IConfig;
 
-  async getDataItem(
-    v: Validator,
-    source: string,
-    key: string
-  ): Promise<DataItem> {
-    const apiObj = JSON.parse(process.env.API_KEYS!);
-    // setup web3 provider
-    const provider = new providers.StaticJsonRpcProvider(
-      source + apiObj[source]
-    );
+  async validateSetConfig(rawConfig: string): Promise<void> {
+    let url: string;
 
-    // try to fetch data item
-    const value = await provider.getLogs({
-      address: v.poolConfig.contract.address,
-      fromBlock: parseInt(key),
-      toBlock: parseInt(key),
-    });
+    // allow ipfs:// or ar:// as external config urls
+    if (rawConfig.startsWith('ipfs://')) {
+      url = rawConfig.replace('ipfs://', 'https://ipfs.io/');
+    } else if (rawConfig.startsWith('ar://')) {
+      url = rawConfig.replace('ar://', 'https://arweave.net/');
+    } else {
+      throw Error('Unsupported config link protocol');
+    }
+
+    const { data: config } = await axios.get<IConfig>(url);
+
+    if (!config.sources.length) {
+      throw new Error(`Config does not have any sources`);
+    }
+
+    if (!config.contract?.address) {
+      throw new Error(`Config has not contract address`);
+    }
+
+    if (!config.contract?.abi) {
+      throw new Error(`Config has not contract ABI`);
+    }
+
+    // check if required env variables are set
+    if (!process.env.API_KEYS) {
+      throw new Error(`Env variable API_KEYS not set`);
+    }
+
+    this.config = config;
+  }
+
+  async getDataItem(_: Validator, key: string): Promise<DataItem> {
+    const results: providers.Log[][] = [];
+
+    for (const source of this.config.sources) {
+      const apiObj = JSON.parse(process.env.API_KEYS!);
+
+      // setup web3 provider
+      const provider = new providers.StaticJsonRpcProvider(
+        source + apiObj[source]
+      );
+
+      // try to fetch logs
+      const logs = await provider.getLogs({
+        address: this.config.contract.address,
+        fromBlock: parseInt(key),
+        toBlock: parseInt(key),
+      });
+
+      results.push(logs);
+    }
+
+    // check if results from the different sources match
+    if (
+      !results.every((b) => JSON.stringify(b) === JSON.stringify(results[0]))
+    ) {
+      throw new Error(`Sources returned different results`);
+    }
 
     return {
       key,
-      value,
+      value: results[0],
     };
   }
 
@@ -48,9 +103,9 @@ export default class Evm implements IRuntime {
     return !!item.value;
   }
 
-  async transformDataItem(v: Validator, item: DataItem): Promise<DataItem> {
+  async transformDataItem(_: Validator, item: DataItem): Promise<DataItem> {
     // interface of contract-ABI for decoding the logs
-    const iface = new utils.Interface(v.poolConfig.contract.abi);
+    const iface = new utils.Interface(this.config.contract.abi);
 
     const result = item.value.map((log: any) => {
       const info = iface.parseLog(log);
@@ -75,14 +130,10 @@ export default class Evm implements IRuntime {
     proposedDataItem: DataItem,
     validationDataItem: DataItem
   ): Promise<boolean> {
-    const proposedDataItemHash = sha256(
-      Buffer.from(JSON.stringify(proposedDataItem))
+    // apply equal comparison
+    return (
+      JSON.stringify(proposedDataItem) === JSON.stringify(validationDataItem)
     );
-    const validationDataItemHash = sha256(
-      Buffer.from(JSON.stringify(validationDataItem))
-    );
-
-    return proposedDataItemHash === validationDataItemHash;
   }
 
   async summarizeDataBundle(_: Validator, __: DataItem[]): Promise<string> {
