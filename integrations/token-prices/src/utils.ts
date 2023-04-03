@@ -1,24 +1,17 @@
-import axios from "axios";
-import { Coincap, Binance } from "./DataSource";
+import { Binance } from "../data-sources/Binance";
+import { Coincap } from "../data-sources/Coincap";
+import { CryptoCompare } from "../data-sources/CryptoCompare";
 
-export async function fetchPrice(endpoint: string): Promise<any> {
-  const { data } = await axios.get<any>(endpoint);
-
-  return data;
-}
-
-export async function extractPrices(
-  endpoint: string,
-  priceObject: any
-): Promise<any> {
+export async function getPrices(endpoint: string, tickers: string[]): Promise<any> {
   if (endpoint === "https://api.coincap.io/v2/assets") {
-    return new Coincap(
-      priceObject
-    ).extractPrices();
+    return new Coincap().extractPrices(tickers);
   } else if (endpoint === "https://data.binance.com/api/v3/ticker/price") {
-    return new Binance(
-      priceObject
-    ).extractPrices();
+    return new Binance().extractPrices(tickers);
+  } else if (endpoint === "https://min-api.cryptocompare.com/data/pricemulti&tsyms=USD") {
+    return new CryptoCompare().extractPrices(tickers);
+  }
+  else {
+    console.error(endpoint, " not implemented.")
   }
 }
 

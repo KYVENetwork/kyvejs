@@ -2,12 +2,13 @@ import { DataItem, IRuntime, Validator } from "@kyvejs/protocol";
 import axios from "axios";
 
 import { name, version } from "../package.json";
-import { extractPrices, fetchPrice, median } from "./utils";
+import { getPrices, median } from "./utils";
 
 // TokenPrices config
 interface IConfig {
   sources: any[];
   slippage: any;
+  tickers: string[];
 }
 
 export default class TokenPrices implements IRuntime {
@@ -40,15 +41,14 @@ export default class TokenPrices implements IRuntime {
   }
 
   async getDataItem(v: Validator, key: string): Promise<DataItem> {
-    const prices: Record<string, number[]> = {
-      BTC: [],
-      ETH: [],
-      ATOM: [],
-    };
+    const prices: Record<string, number[]> = {};
+
+    for (const ticker of this.config.tickers) {
+      prices[ticker] = [];
+    }
 
     for (const endpoint of this.config.sources) {
-      const response = await fetchPrice(endpoint);
-      const priceObjects = await extractPrices(endpoint, response);
+      const priceObjects = await getPrices(endpoint, this.config.tickers);
 
       for (const key in priceObjects) {
         if (Object.prototype.hasOwnProperty.call(priceObjects, key)) {
@@ -70,8 +70,7 @@ export default class TokenPrices implements IRuntime {
     for (const key in item.value) {
       if (Object.prototype.hasOwnProperty.call(item.value, key)) {
         const values = item.value[key];
-        const medianValue = median(values);
-        result[key] = medianValue;
+        result[key] = median(values);
       }
     }
     return { key: item.key, value: result };
@@ -107,7 +106,7 @@ export default class TokenPrices implements IRuntime {
     _: Validator,
     bundle: DataItem[]
   ): Promise<string> {
-    return bundle[bundle.length - 1].value.toString() ?? "";
+    return JSON.stringify(bundle[bundle.length - 1].value) ?? "";
   }
 
   public async nextKey(_: Validator, key: string): Promise<string> {
