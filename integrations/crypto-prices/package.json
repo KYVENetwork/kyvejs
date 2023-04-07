@@ -1,5 +1,5 @@
 {
-  "name": "@kyvejs/token-prices",
+  "name": "@kyvejs/crypto-prices",
   "version": "1.0.0-beta.1",
   "license": "MIT",
   "scripts": {

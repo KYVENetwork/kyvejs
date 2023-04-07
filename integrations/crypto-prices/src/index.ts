@@ -1,7 +1,7 @@
 import { Validator } from "@kyvejs/protocol";
 
-import TokenPrices from "./runtime";
+import CryptoPrices from "./runtime";
 
-const runtime = new TokenPrices();
+const runtime = new CryptoPrices();
 
 new Validator(runtime).bootstrap();

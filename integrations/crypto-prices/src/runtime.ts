@@ -11,7 +11,7 @@ interface IConfig {
   tickers: string[];
 }
 
-export default class TokenPrices implements IRuntime {
+export default class CryptoPrices implements IRuntime {
   public name = name;
   public version = version;
   public config!: IConfig;
