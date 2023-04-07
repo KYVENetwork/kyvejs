@@ -17,8 +17,12 @@ export class Coincap implements DataSource {
     const prices: Record<string, BigNumber> = {};
 
     for (const ticker of tickers) {
-      const price = (this.response.data.find((obj: any) => obj.symbol === ticker)).priceUsd;
-      prices[ticker] = new BigNumber(price).decimalPlaces(4)
+      try {
+        const price = (this.response.data.find((obj: any) => obj.symbol === ticker)).priceUsd;
+        prices[ticker] = new BigNumber(price).decimalPlaces(4)
+      } catch (e) {
+        console.error(`Coincap doesnt provide ${ticker} price data.`)
+      }
     }
     return prices;
   }

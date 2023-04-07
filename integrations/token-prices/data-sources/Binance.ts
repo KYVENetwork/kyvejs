@@ -17,8 +17,12 @@ export class Binance implements DataSource {
     const prices: Record<string, BigNumber> = {};
 
     for (const ticker of tickers) {
-      const { price: price } = this.response.find((obj: any) => obj.symbol === ticker + "USDT");
-      prices[ticker] = new BigNumber(price).decimalPlaces(4)
+      try {
+        const { price: price } = this.response.find((obj: any) => obj.symbol === ticker + "USDT");
+        prices[ticker] = new BigNumber(price).decimalPlaces(4)
+      } catch (e) {
+        console.error(`Binance doesnt provide ${ticker} price data.`)
+      }
     }
     return prices;
   }
