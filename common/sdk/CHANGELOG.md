@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.0.0-beta.13](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/sdk@1.0.0-beta.12...@kyvejs/sdk@1.0.0-beta.13) (2023-04-12)
+
+**Note:** Version bump only for package @kyvejs/sdk
+
 # [1.0.0-beta.12](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/sdk@1.0.0-beta.11...@kyvejs/sdk@1.0.0-beta.12) (2023-04-03)
 
 **Note:** Version bump only for package @kyvejs/sdk
