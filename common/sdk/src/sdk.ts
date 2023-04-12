@@ -47,6 +47,9 @@ export class KyveSDK {
       chainName?: string;
       rpc?: string;
       rest?: string;
+      coin?: string;
+      coinDenom?: string;
+      coinDecimals?: number;
       gasPrice?: number;
     }
   ) {
@@ -66,6 +69,18 @@ export class KyveSDK {
 
     if (options?.rest) {
       this.config = { ...this.config, rest: options.rest };
+    }
+
+    if (options?.coin) {
+      this.config = { ...this.config, coin: options.coin };
+    }
+
+    if (options?.coinDenom) {
+      this.config = { ...this.config, coinDenom: options.coinDenom };
+    }
+
+    if (options?.coinDecimals) {
+      this.config = { ...this.config, coinDecimals: options.coinDecimals };
     }
 
     if (options?.gasPrice) {
