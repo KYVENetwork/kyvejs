@@ -26,6 +26,8 @@ export async function setupSDK(this: Validator): Promise<void> {
         new KyveSDK(this.chainId, {
           rpc: this.rpc[i],
           rest: this.rest[i],
+          coinDenom: this.coinDenom,
+          coinDecimals: this.coinDecimals,
           gasPrice: this.gasPrice,
         })
     );

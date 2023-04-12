@@ -89,6 +89,8 @@ export class Validator {
   protected chainId!: SupportedChains;
   protected rpc!: string[];
   protected rest!: string[];
+  protected coinDenom!: string;
+  protected coinDecimals!: number;
   protected gasPrice!: number;
   protected requestBackoff!: number;
   protected cache!: string;
@@ -223,8 +225,16 @@ export class Validator {
         parseEndpoints
       )
       .option(
+        "--coin-denom <string>",
+        "The denom of the coin, this value will be loaded by default based on the chain id"
+      )
+      .option(
+        "--coin-decimals <number>",
+        "The decimals of the coin, this value will be loaded by default based on the chain id"
+      )
+      .option(
         "--gas-price <number>",
-        "The gas price the node should use to calculate transaction fees"
+        "The gas price the node should use to calculate transaction fees, this value will be loaded by default based on the chain id"
       )
       .option(
         "--request-backoff <number>",
@@ -279,6 +289,8 @@ export class Validator {
     this.chainId = options.chainId;
     this.rpc = options.rpc;
     this.rest = options.rest;
+    this.coinDenom = options.coinDenom;
+    this.coinDecimals = options.coinDecimals;
     this.gasPrice = options.gasPrice;
     this.requestBackoff = parseInt(options.requestBackoff);
     this.cache = options.cache;
