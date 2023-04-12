@@ -28,57 +28,82 @@ The following integrations are running on this runtime and are currently live.
 ### Devnet (Korellia)
 
 - **Cosmos Hub // cosmoshub-4**
-  - Pool ID: TBD
+  - Pool ID: 24
   - Chain ID: _cosmoshub-4_
   - Base Height: _5200791_
-- **Axelar // axelar-dojo-1**
-  - Pool ID: TBD
-  - Chain ID: _axelar-dojo-1_
-  - Base Height: _1_
-- **Osmosis // osmosis-1**
-  - Pool ID: TBD
-  - Chain ID: _osmosis-1_
-  - Base Height: _1_
-- **Evmos // evmos_9001-2**
-  - Pool ID: TBD
-  - Chain ID: _evmos_9001-2_
-  - Base Height: _58701_
 
-## Config
+## Binary Installation
 
-This runtime requires the following config format in order to run:
+This section explains how to install a protocol node with this runtime. This is only relevant for protocol node
+operators who want to run a node in a pool which has this runtime.
 
-```json
-{
-  "network": "CHAIN_ID_OF_INTEGRATION",
-  "rpc": "https://rpc-endpoint-of-integration:26657"
-}
-```
+### Build from source
 
-Here the properties have the following reason:
-
-- `network`: the chain ID of the network. This is a check to verify that only blocks from this network are validated and archived. The runtime rejects blocks that do not match with this ID
-- `rpc`: the default rpc endpoint of the network to collect blocks from. This should only be a base URL **without** a trailing slash. This can be a public rpc endpoint from a dedicated provider or an URL pointing to localhost in order to signal that every protocol node has to host their own blockchain node
-
-This config should then be stringified on the pool and should look like this:
-
-```json
-{
-  "config": "{\"network\":\"CHAIN_ID_OF_INTEGRATION\",\"rpc\":\"https://rpc-endpoint-of-integration:26657\"}"
-}
-```
-
-With this setup the runtime is able to run. Furthermore an optional environment variable can be set to override the default rpc endpoint (`rpc`).
+The first option to install the binary is to build it from source. For that you have to execute the following
+commands:
 
 ```bash
-export KYVEJS_TENDERMINT_BSYNC_RPC="https://my-custom-rpc-endpoint:26657"
+git clone git@github.com:KYVENetwork/kyvejs.git
+cd kyvejs
 ```
 
-## Join pools
+If you want to build a specific version you can checkout the tag and continue from the version branch.
+If you want to build the latest version you can skip this step.
 
-The following Pools are currently live and can be joined
+```bash
+git checkout tags/@kyvejs/tendermint-bsync@x.x.x -b x.x.x
+```
 
-### Cosmos Hub // cosmoshub-4
+After you have cloned the project and have the desired version the dependencies can be installed and the project build:
+
+```bash
+yarn install
+yarn setup
+```
+
+Finally, you can build the runtime binaries.
+
+**INFO**: During the binary build log warnings can occur. You can safely ignore them.
+
+```bash
+cd integrations/tendermint-bsync
+yarn build:binaries
+```
+
+You can verify the installation with printing the version:
+
+```bash
+./out/kyve-linux-64 version
+```
+
+After the build succeeded you can find the binaries in the `out` folder where you can move them to use
+desired location (like KYSOR).
+
+### Download prebuild binary
+
+You can find all prebuild binaries in the releases of the kyvejs repository. For this specific runtime they
+can be found [here](https://github.com/KYVENetwork/kyvejs/releases?q=tendermint).
+
+You can verify the installation with printing the version:
+
+```bash
+./kyve-linux-64 version
+```
+
+Once you have downloaded the binary for the correct platform and version you can simply unzip them and move them
+to your desired location (like KYSOR).
+
+## Run a node
+
+This section explains which runtime specific setup you must have in order to run a node. This is only relevant for
+protocol node operators who have already installed the binary (previous section) and want to run a node in a pool
+which has this runtime.
+
+Depending on the integration which are currently live the following setup has to be done.
+
+### Cosmos Hub // Block Sync
+
+**INFO**: Live on Korellia: Pool Id 24
 
 Every protocol node runner will run their own Cosmos Hub blockchain node as a data source. This ensures
 that the data which is getting proposed and validated actually comes from decentralized sources. Furthermore, since the gaia blockchain node only serves valid blocks we further increase the validation
@@ -185,3 +210,71 @@ by the pool since after that they are not needed anymore.
 The remaining installation of the KYVE protocol node is the same for every other protocol node. You can now follow the official docs starting from [here](https://docs.kyve.network/validators/protocol_nodes/requirements)
 
 The Binaries of this runtime with which to join the pool can be found here: https://github.com/KYVENetwork/kyvejs/releases?q=tendermint-bsync
+
+## Creating a pool with the runtime
+
+This section explains how you can create a storage pool on KYVE with this specific runtime. This is only relevant for
+users or projects, who are interested in archiving and validating a new data source.
+
+### Config
+
+This runtime requires the following config format in order to run:
+
+```json
+{
+  "network": "CHAIN_ID_OF_INTEGRATION",
+  "rpc": "https://rpc-endpoint-of-integration:26657"
+}
+```
+
+Here the properties have the following reason:
+
+- `network`: the chain ID of the network. This is a check to verify that only blocks from this network are validated and archived. The runtime rejects blocks that do not match with this ID
+- `rpc`: the default rpc endpoint of the network to collect blocks from. This should only be a base URL **without** a trailing slash. This can be a public rpc endpoint from a dedicated provider or an URL pointing to localhost in order to signal that every protocol node has to host their own blockchain node
+
+This config should then be stringified on the pool and should look like this:
+
+```json
+{
+  "config": "{\"network\":\"CHAIN_ID_OF_INTEGRATION\",\"rpc\":\"https://rpc-endpoint-of-integration:26657\"}"
+}
+```
+
+With this setup the runtime is able to run. Furthermore an optional environment variable can be set to override the default rpc endpoint (`rpc`).
+
+```bash
+export KYVEJS_TENDERMINT_BSYNC_RPC="https://my-custom-rpc-endpoint:26657"
+```
+
+### Create Pool governance proposal
+
+In order to create a pool it has to go through the Governance process (more on that can be found [here](https://docs.kyve.network/token_holders/governance)). An example proposal with which a storage pool with this runtime could be created can be found below:
+
+```json
+{
+  "messages": [
+    {
+      "@type": "/kyve.pool.v1beta1.MsgCreatePool",
+      "authority": "kyve10d07y265gmmuvt4z0w9aw880jnsr700jdv7nah",
+      "name": "<your pool name>",
+      "runtime": "@kyvejs/tendermint-bsync",
+      "logo": "ar://<your logo stored on arweave>",
+      "config": "<your config like described above>",
+      "start_key": "<the initial height of the tendermint chain>",
+      "upload_interval": "120", // 120s is the recommended value
+      "operating_cost": "<your base bundle reward>", // for example 1000000 if the base reward per bundle should be 1 $KYVE
+      "min_delegation": "<your required min delegation", // for example 1000000000 if the pool should only run if more than 1000 $KYVE are bonded in this pool
+      "max_bundle_size": "100", // 100 blocks per bundle is the recommended value
+      "version": "<runtime version>", // the current version of this runtime
+      "binaries": "{\"kyve-linux-arm64\":\"<linux-arm64 binary download URL>\",\"kyve-linux-x64\":\"<linux-x64 binary download URL>\",\"kyve-macos-x64\":\"<macos-x64 binary download URL>\"}", // download URLs of binaries for KYSOR
+      "storageProviderId": "1", // Arweave is the recommended storage provider
+      "compressionId": "1" // Gzip is the recommended bundle compression
+    }
+  ],
+  "metadata": "<your ipfs metadata info>", // gov proposal metadata
+  "deposit": "<your deposit>ukyve" // proposal deposit, check the required min deposit
+}
+```
+
+Once your proposal is ready you can submit it to the network. Please follow the official governance process to increase
+the chances of getting your proposal accepted.

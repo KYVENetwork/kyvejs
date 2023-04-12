@@ -1,12 +1,5 @@
-import seedrandom from "seedrandom";
-
 import { DataItem, Validator } from "../..";
-import {
-  callWithBackoffStrategy,
-  generateIndexPairs,
-  sleep,
-  standardizeJSON,
-} from "../../utils";
+import { callWithBackoffStrategy, sleep, standardizeJSON } from "../../utils";
 import clone from "clone";
 
 /**
@@ -147,6 +140,8 @@ export async function runCache(this: Validator): Promise<void> {
           // collect data item for next key
           const dataItem: DataItem = await callWithBackoffStrategy(
             async () => {
+              // get the data item from the runtime by key
+              this.logger.debug(`this.runtime.getDataItem($THIS,${nextKey})`);
               const data = await this.runtime.getDataItem(this, nextKey);
 
               this.m.runtime_get_data_item_successful.inc();
@@ -191,8 +186,8 @@ export async function runCache(this: Validator): Promise<void> {
           this.m.cache_index_head.set(i);
 
           // add a timeout so that the runtime data source
-          // is not overloaded with requests
-          await sleep(500);
+          // is not overloaded with requests, 50ms by default
+          await sleep(this.requestBackoff);
         }
 
         // assign the next key for the next round
