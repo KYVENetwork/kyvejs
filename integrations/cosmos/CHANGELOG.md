@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.0.0-beta.20](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/cosmos@1.0.0-beta.19...@kyvejs/cosmos@1.0.0-beta.20) (2023-04-13)
+
+**Note:** Version bump only for package @kyvejs/cosmos
+
 # [1.0.0-beta.19](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/cosmos@1.0.0-beta.18...@kyvejs/cosmos@1.0.0-beta.19) (2023-04-12)
 
 **Note:** Version bump only for package @kyvejs/cosmos
