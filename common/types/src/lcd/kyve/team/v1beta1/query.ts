@@ -1,20 +1,9 @@
 /* eslint-disable */
 import Long from "long";
 import _m0 from "protobufjs/minimal";
-import { Params } from "./params";
 import { TeamVestingAccount } from "./team";
 
 export const protobufPackage = "kyve.team.v1beta1";
-
-/** QueryParamsRequest is request type for the Query/Params RPC method. */
-export interface QueryParamsRequest {
-}
-
-/** QueryParamsResponse is response type for the Query/Params RPC method. */
-export interface QueryParamsResponse {
-  /** params holds all the parameters of this module. */
-  params?: Params;
-}
 
 /** QueryAccountsRequest is request type for the Query/TeamInfo RPC method. */
 export interface QueryTeamInfoRequest {
@@ -22,8 +11,10 @@ export interface QueryTeamInfoRequest {
 
 /** QueryAccountsResponse is response type for the Query/TeamInfo RPC method. */
 export interface QueryTeamInfoResponse {
-  /** authority is the authorities address */
-  authority: string;
+  /** foundation is the authority foundation address */
+  foundation_authority: string;
+  /** bcp is the authority bcp address */
+  bcp_authority: string;
   /** total_team_allocation is the total allocation in $KYVE the team module has in order to reward team members */
   total_team_allocation: string;
   /** issued_team_allocation is the amount in $KYVE tied to team vesting accounts and which are not available anymore */
@@ -113,7 +104,7 @@ export interface QueryTeamVestingStatusByTimeResponse {
   status?: QueryVestingStatus;
 }
 
-/** QueryVestingStatus ... */
+/** QueryVestingStatus is a type holding information about the account's vesting progress */
 export interface QueryVestingStatus {
   /** total_vested_amount ... */
   total_vested_amount: string;
@@ -135,12 +126,10 @@ export interface QueryVestingStatus {
   available_rewards: string;
 }
 
-/** QueryTeamVestingPlanResponse is the response type for the Query/TeamVestingPlan RPC method. */
+/** QueryVestingPlan is a type holding information about the account's vesting data which does not change */
 export interface QueryVestingPlan {
-  /** maximum_vesting_amount ... */
-  maximum_vesting_amount: string;
-  /** clawback_amount ... */
-  clawback_amount: string;
+  /** commencement ... */
+  commencement: string;
   /** token_vesting_start ... */
   token_vesting_start: string;
   /** token_vesting_finished ... */
@@ -149,95 +138,13 @@ export interface QueryVestingPlan {
   token_unlock_start: string;
   /** token_unlock_finished ... */
   token_unlock_finished: string;
+  /** clawback ... */
+  clawback: string;
+  /** clawback_amount ... */
+  clawback_amount: string;
+  /** maximum_vesting_amount ... */
+  maximum_vesting_amount: string;
 }
-
-function createBaseQueryParamsRequest(): QueryParamsRequest {
-  return {};
-}
-
-export const QueryParamsRequest = {
-  encode(_: QueryParamsRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): QueryParamsRequest {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseQueryParamsRequest();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(_: any): QueryParamsRequest {
-    return {};
-  },
-
-  toJSON(_: QueryParamsRequest): unknown {
-    const obj: any = {};
-    return obj;
-  },
-
-  fromPartial<I extends Exact<DeepPartial<QueryParamsRequest>, I>>(_: I): QueryParamsRequest {
-    const message = createBaseQueryParamsRequest();
-    return message;
-  },
-};
-
-function createBaseQueryParamsResponse(): QueryParamsResponse {
-  return { params: undefined };
-}
-
-export const QueryParamsResponse = {
-  encode(message: QueryParamsResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.params !== undefined) {
-      Params.encode(message.params, writer.uint32(10).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): QueryParamsResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseQueryParamsResponse();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.params = Params.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): QueryParamsResponse {
-    return { params: isSet(object.params) ? Params.fromJSON(object.params) : undefined };
-  },
-
-  toJSON(message: QueryParamsResponse): unknown {
-    const obj: any = {};
-    message.params !== undefined && (obj.params = message.params ? Params.toJSON(message.params) : undefined);
-    return obj;
-  },
-
-  fromPartial<I extends Exact<DeepPartial<QueryParamsResponse>, I>>(object: I): QueryParamsResponse {
-    const message = createBaseQueryParamsResponse();
-    message.params = (object.params !== undefined && object.params !== null)
-      ? Params.fromPartial(object.params)
-      : undefined;
-    return message;
-  },
-};
 
 function createBaseQueryTeamInfoRequest(): QueryTeamInfoRequest {
   return {};
@@ -280,7 +187,8 @@ export const QueryTeamInfoRequest = {
 
 function createBaseQueryTeamInfoResponse(): QueryTeamInfoResponse {
   return {
-    authority: "",
+    foundation_authority: "",
+    bcp_authority: "",
     total_team_allocation: "0",
     issued_team_allocation: "0",
     available_team_allocation: "0",
@@ -297,41 +205,44 @@ function createBaseQueryTeamInfoResponse(): QueryTeamInfoResponse {
 
 export const QueryTeamInfoResponse = {
   encode(message: QueryTeamInfoResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.authority !== "") {
-      writer.uint32(10).string(message.authority);
+    if (message.foundation_authority !== "") {
+      writer.uint32(10).string(message.foundation_authority);
+    }
+    if (message.bcp_authority !== "") {
+      writer.uint32(18).string(message.bcp_authority);
     }
     if (message.total_team_allocation !== "0") {
-      writer.uint32(16).uint64(message.total_team_allocation);
+      writer.uint32(24).uint64(message.total_team_allocation);
     }
     if (message.issued_team_allocation !== "0") {
-      writer.uint32(24).uint64(message.issued_team_allocation);
+      writer.uint32(32).uint64(message.issued_team_allocation);
     }
     if (message.available_team_allocation !== "0") {
-      writer.uint32(32).uint64(message.available_team_allocation);
+      writer.uint32(40).uint64(message.available_team_allocation);
     }
     if (message.total_authority_rewards !== "0") {
-      writer.uint32(40).uint64(message.total_authority_rewards);
+      writer.uint32(48).uint64(message.total_authority_rewards);
     }
     if (message.claimed_authority_rewards !== "0") {
-      writer.uint32(48).uint64(message.claimed_authority_rewards);
+      writer.uint32(56).uint64(message.claimed_authority_rewards);
     }
     if (message.available_authority_rewards !== "0") {
-      writer.uint32(56).uint64(message.available_authority_rewards);
+      writer.uint32(64).uint64(message.available_authority_rewards);
     }
     if (message.total_account_rewards !== "0") {
-      writer.uint32(64).uint64(message.total_account_rewards);
+      writer.uint32(72).uint64(message.total_account_rewards);
     }
     if (message.claimed_account_rewards !== "0") {
-      writer.uint32(72).uint64(message.claimed_account_rewards);
+      writer.uint32(80).uint64(message.claimed_account_rewards);
     }
     if (message.available_account_rewards !== "0") {
-      writer.uint32(80).uint64(message.available_account_rewards);
+      writer.uint32(88).uint64(message.available_account_rewards);
     }
     if (message.required_module_balance !== "0") {
-      writer.uint32(88).uint64(message.required_module_balance);
+      writer.uint32(96).uint64(message.required_module_balance);
     }
     if (message.team_module_balance !== "0") {
-      writer.uint32(96).uint64(message.team_module_balance);
+      writer.uint32(104).uint64(message.team_module_balance);
     }
     return writer;
   },
@@ -344,39 +255,42 @@ export const QueryTeamInfoResponse = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.authority = reader.string();
+          message.foundation_authority = reader.string();
           break;
         case 2:
-          message.total_team_allocation = longToString(reader.uint64() as Long);
+          message.bcp_authority = reader.string();
           break;
         case 3:
-          message.issued_team_allocation = longToString(reader.uint64() as Long);
+          message.total_team_allocation = longToString(reader.uint64() as Long);
           break;
         case 4:
-          message.available_team_allocation = longToString(reader.uint64() as Long);
+          message.issued_team_allocation = longToString(reader.uint64() as Long);
           break;
         case 5:
-          message.total_authority_rewards = longToString(reader.uint64() as Long);
+          message.available_team_allocation = longToString(reader.uint64() as Long);
           break;
         case 6:
-          message.claimed_authority_rewards = longToString(reader.uint64() as Long);
+          message.total_authority_rewards = longToString(reader.uint64() as Long);
           break;
         case 7:
-          message.available_authority_rewards = longToString(reader.uint64() as Long);
+          message.claimed_authority_rewards = longToString(reader.uint64() as Long);
           break;
         case 8:
-          message.total_account_rewards = longToString(reader.uint64() as Long);
+          message.available_authority_rewards = longToString(reader.uint64() as Long);
           break;
         case 9:
-          message.claimed_account_rewards = longToString(reader.uint64() as Long);
+          message.total_account_rewards = longToString(reader.uint64() as Long);
           break;
         case 10:
-          message.available_account_rewards = longToString(reader.uint64() as Long);
+          message.claimed_account_rewards = longToString(reader.uint64() as Long);
           break;
         case 11:
-          message.required_module_balance = longToString(reader.uint64() as Long);
+          message.available_account_rewards = longToString(reader.uint64() as Long);
           break;
         case 12:
+          message.required_module_balance = longToString(reader.uint64() as Long);
+          break;
+        case 13:
           message.team_module_balance = longToString(reader.uint64() as Long);
           break;
         default:
@@ -389,7 +303,8 @@ export const QueryTeamInfoResponse = {
 
   fromJSON(object: any): QueryTeamInfoResponse {
     return {
-      authority: isSet(object.authority) ? String(object.authority) : "",
+      foundation_authority: isSet(object.foundation_authority) ? String(object.foundation_authority) : "",
+      bcp_authority: isSet(object.bcp_authority) ? String(object.bcp_authority) : "",
       total_team_allocation: isSet(object.total_team_allocation) ? String(object.total_team_allocation) : "0",
       issued_team_allocation: isSet(object.issued_team_allocation) ? String(object.issued_team_allocation) : "0",
       available_team_allocation: isSet(object.available_team_allocation)
@@ -414,7 +329,8 @@ export const QueryTeamInfoResponse = {
 
   toJSON(message: QueryTeamInfoResponse): unknown {
     const obj: any = {};
-    message.authority !== undefined && (obj.authority = message.authority);
+    message.foundation_authority !== undefined && (obj.foundation_authority = message.foundation_authority);
+    message.bcp_authority !== undefined && (obj.bcp_authority = message.bcp_authority);
     message.total_team_allocation !== undefined && (obj.total_team_allocation = message.total_team_allocation);
     message.issued_team_allocation !== undefined && (obj.issued_team_allocation = message.issued_team_allocation);
     message.available_team_allocation !== undefined &&
@@ -435,7 +351,8 @@ export const QueryTeamInfoResponse = {
 
   fromPartial<I extends Exact<DeepPartial<QueryTeamInfoResponse>, I>>(object: I): QueryTeamInfoResponse {
     const message = createBaseQueryTeamInfoResponse();
-    message.authority = object.authority ?? "";
+    message.foundation_authority = object.foundation_authority ?? "";
+    message.bcp_authority = object.bcp_authority ?? "";
     message.total_team_allocation = object.total_team_allocation ?? "0";
     message.issued_team_allocation = object.issued_team_allocation ?? "0";
     message.available_team_allocation = object.available_team_allocation ?? "0";
@@ -1036,34 +953,42 @@ export const QueryVestingStatus = {
 
 function createBaseQueryVestingPlan(): QueryVestingPlan {
   return {
-    maximum_vesting_amount: "0",
-    clawback_amount: "0",
+    commencement: "",
     token_vesting_start: "",
     token_vesting_finished: "",
     token_unlock_start: "",
     token_unlock_finished: "",
+    clawback: "0",
+    clawback_amount: "0",
+    maximum_vesting_amount: "0",
   };
 }
 
 export const QueryVestingPlan = {
   encode(message: QueryVestingPlan, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.maximum_vesting_amount !== "0") {
-      writer.uint32(8).uint64(message.maximum_vesting_amount);
-    }
-    if (message.clawback_amount !== "0") {
-      writer.uint32(16).uint64(message.clawback_amount);
+    if (message.commencement !== "") {
+      writer.uint32(10).string(message.commencement);
     }
     if (message.token_vesting_start !== "") {
-      writer.uint32(26).string(message.token_vesting_start);
+      writer.uint32(18).string(message.token_vesting_start);
     }
     if (message.token_vesting_finished !== "") {
-      writer.uint32(34).string(message.token_vesting_finished);
+      writer.uint32(26).string(message.token_vesting_finished);
     }
     if (message.token_unlock_start !== "") {
-      writer.uint32(42).string(message.token_unlock_start);
+      writer.uint32(34).string(message.token_unlock_start);
     }
     if (message.token_unlock_finished !== "") {
-      writer.uint32(50).string(message.token_unlock_finished);
+      writer.uint32(42).string(message.token_unlock_finished);
+    }
+    if (message.clawback !== "0") {
+      writer.uint32(48).uint64(message.clawback);
+    }
+    if (message.clawback_amount !== "0") {
+      writer.uint32(56).uint64(message.clawback_amount);
+    }
+    if (message.maximum_vesting_amount !== "0") {
+      writer.uint32(64).uint64(message.maximum_vesting_amount);
     }
     return writer;
   },
@@ -1076,22 +1001,28 @@ export const QueryVestingPlan = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.maximum_vesting_amount = longToString(reader.uint64() as Long);
+          message.commencement = reader.string();
           break;
         case 2:
-          message.clawback_amount = longToString(reader.uint64() as Long);
-          break;
-        case 3:
           message.token_vesting_start = reader.string();
           break;
-        case 4:
+        case 3:
           message.token_vesting_finished = reader.string();
           break;
-        case 5:
+        case 4:
           message.token_unlock_start = reader.string();
           break;
-        case 6:
+        case 5:
           message.token_unlock_finished = reader.string();
+          break;
+        case 6:
+          message.clawback = longToString(reader.uint64() as Long);
+          break;
+        case 7:
+          message.clawback_amount = longToString(reader.uint64() as Long);
+          break;
+        case 8:
+          message.maximum_vesting_amount = longToString(reader.uint64() as Long);
           break;
         default:
           reader.skipType(tag & 7);
@@ -1103,42 +1034,46 @@ export const QueryVestingPlan = {
 
   fromJSON(object: any): QueryVestingPlan {
     return {
-      maximum_vesting_amount: isSet(object.maximum_vesting_amount) ? String(object.maximum_vesting_amount) : "0",
-      clawback_amount: isSet(object.clawback_amount) ? String(object.clawback_amount) : "0",
+      commencement: isSet(object.commencement) ? String(object.commencement) : "",
       token_vesting_start: isSet(object.token_vesting_start) ? String(object.token_vesting_start) : "",
       token_vesting_finished: isSet(object.token_vesting_finished) ? String(object.token_vesting_finished) : "",
       token_unlock_start: isSet(object.token_unlock_start) ? String(object.token_unlock_start) : "",
       token_unlock_finished: isSet(object.token_unlock_finished) ? String(object.token_unlock_finished) : "",
+      clawback: isSet(object.clawback) ? String(object.clawback) : "0",
+      clawback_amount: isSet(object.clawback_amount) ? String(object.clawback_amount) : "0",
+      maximum_vesting_amount: isSet(object.maximum_vesting_amount) ? String(object.maximum_vesting_amount) : "0",
     };
   },
 
   toJSON(message: QueryVestingPlan): unknown {
     const obj: any = {};
-    message.maximum_vesting_amount !== undefined && (obj.maximum_vesting_amount = message.maximum_vesting_amount);
-    message.clawback_amount !== undefined && (obj.clawback_amount = message.clawback_amount);
+    message.commencement !== undefined && (obj.commencement = message.commencement);
     message.token_vesting_start !== undefined && (obj.token_vesting_start = message.token_vesting_start);
     message.token_vesting_finished !== undefined && (obj.token_vesting_finished = message.token_vesting_finished);
     message.token_unlock_start !== undefined && (obj.token_unlock_start = message.token_unlock_start);
     message.token_unlock_finished !== undefined && (obj.token_unlock_finished = message.token_unlock_finished);
+    message.clawback !== undefined && (obj.clawback = message.clawback);
+    message.clawback_amount !== undefined && (obj.clawback_amount = message.clawback_amount);
+    message.maximum_vesting_amount !== undefined && (obj.maximum_vesting_amount = message.maximum_vesting_amount);
     return obj;
   },
 
   fromPartial<I extends Exact<DeepPartial<QueryVestingPlan>, I>>(object: I): QueryVestingPlan {
     const message = createBaseQueryVestingPlan();
-    message.maximum_vesting_amount = object.maximum_vesting_amount ?? "0";
-    message.clawback_amount = object.clawback_amount ?? "0";
+    message.commencement = object.commencement ?? "";
     message.token_vesting_start = object.token_vesting_start ?? "";
     message.token_vesting_finished = object.token_vesting_finished ?? "";
     message.token_unlock_start = object.token_unlock_start ?? "";
     message.token_unlock_finished = object.token_unlock_finished ?? "";
+    message.clawback = object.clawback ?? "0";
+    message.clawback_amount = object.clawback_amount ?? "0";
+    message.maximum_vesting_amount = object.maximum_vesting_amount ?? "0";
     return message;
   },
 };
 
 /** Query defines the gRPC querier service. */
 export interface Query {
-  /** Parameters queries the parameters of the module. */
-  Params(request: QueryParamsRequest): Promise<QueryParamsResponse>;
   /** TeamInfo queries all important information from the team module */
   TeamInfo(request: QueryTeamInfoRequest): Promise<QueryTeamInfoResponse>;
   /** TeamVestingAccounts queries all team vesting accounts of the module. */
@@ -1157,19 +1092,12 @@ export class QueryClientImpl implements Query {
   constructor(rpc: Rpc, opts?: { service?: string }) {
     this.service = opts?.service || "kyve.team.v1beta1.Query";
     this.rpc = rpc;
-    this.Params = this.Params.bind(this);
     this.TeamInfo = this.TeamInfo.bind(this);
     this.TeamVestingAccounts = this.TeamVestingAccounts.bind(this);
     this.TeamVestingAccount = this.TeamVestingAccount.bind(this);
     this.TeamVestingStatus = this.TeamVestingStatus.bind(this);
     this.TeamVestingStatusByTime = this.TeamVestingStatusByTime.bind(this);
   }
-  Params(request: QueryParamsRequest): Promise<QueryParamsResponse> {
-    const data = QueryParamsRequest.encode(request).finish();
-    const promise = this.rpc.request(this.service, "Params", data);
-    return promise.then((data) => QueryParamsResponse.decode(new _m0.Reader(data)));
-  }
-
   TeamInfo(request: QueryTeamInfoRequest): Promise<QueryTeamInfoResponse> {
     const data = QueryTeamInfoRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "TeamInfo", data);

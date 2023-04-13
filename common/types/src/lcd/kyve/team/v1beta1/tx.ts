@@ -78,18 +78,6 @@ export interface MsgCreateTeamVestingAccount {
 export interface MsgCreateTeamVestingAccountResponse {
 }
 
-/** MsgUpdateParams defines a SDK message for updating the module parameters. */
-export interface MsgUpdateParams {
-  /** authority ... */
-  authority: string;
-  /** payload defines the x/team parameters to update. */
-  payload: string;
-}
-
-/** MsgUpdateParamsResponse defines the Msg/UpdateParams response type. */
-export interface MsgUpdateParamsResponse {
-}
-
 function createBaseMsgClaimUnlocked(): MsgClaimUnlocked {
   return { authority: "", id: "0", amount: "0", recipient: "" };
 }
@@ -215,10 +203,10 @@ export const MsgClaimAuthorityRewards = {
       writer.uint32(10).string(message.authority);
     }
     if (message.amount !== "0") {
-      writer.uint32(24).uint64(message.amount);
+      writer.uint32(16).uint64(message.amount);
     }
     if (message.recipient !== "") {
-      writer.uint32(34).string(message.recipient);
+      writer.uint32(26).string(message.recipient);
     }
     return writer;
   },
@@ -233,10 +221,10 @@ export const MsgClaimAuthorityRewards = {
         case 1:
           message.authority = reader.string();
           break;
-        case 3:
+        case 2:
           message.amount = longToString(reader.uint64() as Long);
           break;
-        case 4:
+        case 3:
           message.recipient = reader.string();
           break;
         default:
@@ -642,103 +630,6 @@ export const MsgCreateTeamVestingAccountResponse = {
   },
 };
 
-function createBaseMsgUpdateParams(): MsgUpdateParams {
-  return { authority: "", payload: "" };
-}
-
-export const MsgUpdateParams = {
-  encode(message: MsgUpdateParams, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.authority !== "") {
-      writer.uint32(10).string(message.authority);
-    }
-    if (message.payload !== "") {
-      writer.uint32(18).string(message.payload);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): MsgUpdateParams {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgUpdateParams();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.authority = reader.string();
-          break;
-        case 2:
-          message.payload = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): MsgUpdateParams {
-    return {
-      authority: isSet(object.authority) ? String(object.authority) : "",
-      payload: isSet(object.payload) ? String(object.payload) : "",
-    };
-  },
-
-  toJSON(message: MsgUpdateParams): unknown {
-    const obj: any = {};
-    message.authority !== undefined && (obj.authority = message.authority);
-    message.payload !== undefined && (obj.payload = message.payload);
-    return obj;
-  },
-
-  fromPartial<I extends Exact<DeepPartial<MsgUpdateParams>, I>>(object: I): MsgUpdateParams {
-    const message = createBaseMsgUpdateParams();
-    message.authority = object.authority ?? "";
-    message.payload = object.payload ?? "";
-    return message;
-  },
-};
-
-function createBaseMsgUpdateParamsResponse(): MsgUpdateParamsResponse {
-  return {};
-}
-
-export const MsgUpdateParamsResponse = {
-  encode(_: MsgUpdateParamsResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): MsgUpdateParamsResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgUpdateParamsResponse();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(_: any): MsgUpdateParamsResponse {
-    return {};
-  },
-
-  toJSON(_: MsgUpdateParamsResponse): unknown {
-    const obj: any = {};
-    return obj;
-  },
-
-  fromPartial<I extends Exact<DeepPartial<MsgUpdateParamsResponse>, I>>(_: I): MsgUpdateParamsResponse {
-    const message = createBaseMsgUpdateParamsResponse();
-    return message;
-  },
-};
-
 /** Msg defines the Msg service. */
 export interface Msg {
   /** ClaimUnlocked ... */
@@ -751,8 +642,6 @@ export interface Msg {
   ClaimAuthorityRewards(request: MsgClaimAuthorityRewards): Promise<MsgClaimAuthorityRewardsResponse>;
   /** ClaimInflationRewards ... */
   ClaimAccountRewards(request: MsgClaimAccountRewards): Promise<MsgClaimAccountRewardsResponse>;
-  /** UpdateParams defines an operation for updating the x/team module parameters. */
-  UpdateParams(request: MsgUpdateParams): Promise<MsgUpdateParamsResponse>;
 }
 
 export class MsgClientImpl implements Msg {
@@ -766,7 +655,6 @@ export class MsgClientImpl implements Msg {
     this.CreateTeamVestingAccount = this.CreateTeamVestingAccount.bind(this);
     this.ClaimAuthorityRewards = this.ClaimAuthorityRewards.bind(this);
     this.ClaimAccountRewards = this.ClaimAccountRewards.bind(this);
-    this.UpdateParams = this.UpdateParams.bind(this);
   }
   ClaimUnlocked(request: MsgClaimUnlocked): Promise<MsgClaimUnlockedResponse> {
     const data = MsgClaimUnlocked.encode(request).finish();
@@ -796,12 +684,6 @@ export class MsgClientImpl implements Msg {
     const data = MsgClaimAccountRewards.encode(request).finish();
     const promise = this.rpc.request(this.service, "ClaimAccountRewards", data);
     return promise.then((data) => MsgClaimAccountRewardsResponse.decode(new _m0.Reader(data)));
-  }
-
-  UpdateParams(request: MsgUpdateParams): Promise<MsgUpdateParamsResponse> {
-    const data = MsgUpdateParams.encode(request).finish();
-    const promise = this.rpc.request(this.service, "UpdateParams", data);
-    return promise.then((data) => MsgUpdateParamsResponse.decode(new _m0.Reader(data)));
   }
 }
 

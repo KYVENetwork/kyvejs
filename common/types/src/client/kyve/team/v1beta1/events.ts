@@ -9,6 +9,8 @@ export const protobufPackage = "kyve.team.v1beta1";
  * emitted_by: MsgCreateTeamVestingAccount
  */
 export interface EventCreateTeamVestingAccount {
+  /** authority which initiated this action */
+  authority: string;
   /** id is a unique identify for each vesting account, tied to a single team member. */
   id: string;
   /** total_allocation is the number of tokens reserved for this team member. */
@@ -22,6 +24,8 @@ export interface EventCreateTeamVestingAccount {
  * emitted_by: MsgClawback
  */
 export interface EventClawback {
+  /** authority which initiated this action */
+  authority: string;
   /** id is a unique identify for each vesting account, tied to a single team member. */
   id: string;
   /**
@@ -38,6 +42,8 @@ export interface EventClawback {
  * emitted_by: MsgClaimUnlocked
  */
 export interface EventClaimedUnlocked {
+  /** authority which initiated this action */
+  authority: string;
   /** id is a unique identify for each vesting account, tied to a single team member. */
   id: string;
   /** amount is the number of tokens claimed from the unlocked amount. */
@@ -51,6 +57,8 @@ export interface EventClaimedUnlocked {
  * emitted_by: MsgClaimInflationRewards
  */
 export interface EventClaimInflationRewards {
+  /** authority which initiated this action */
+  authority: string;
   /** id is a unique identify for each vesting account, tied to a single team member. */
   id: string;
   /** amount is the amount of inflation rewards the authority should claim for the account holder */
@@ -64,6 +72,8 @@ export interface EventClaimInflationRewards {
  * emitted_by: MsgClaimAuthorityRewards
  */
 export interface EventClaimAuthorityRewards {
+  /** authority which initiated this action */
+  authority: string;
   /** amount is the amount of inflation rewards the authority should claim for the account holder */
   amount: string;
   /** recipient is the receiver address of the claim. */
@@ -71,19 +81,22 @@ export interface EventClaimAuthorityRewards {
 }
 
 function createBaseEventCreateTeamVestingAccount(): EventCreateTeamVestingAccount {
-  return { id: "0", total_allocation: "0", commencement: "0" };
+  return { authority: "", id: "0", total_allocation: "0", commencement: "0" };
 }
 
 export const EventCreateTeamVestingAccount = {
   encode(message: EventCreateTeamVestingAccount, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.authority !== "") {
+      writer.uint32(10).string(message.authority);
+    }
     if (message.id !== "0") {
-      writer.uint32(8).uint64(message.id);
+      writer.uint32(16).uint64(message.id);
     }
     if (message.total_allocation !== "0") {
-      writer.uint32(16).uint64(message.total_allocation);
+      writer.uint32(24).uint64(message.total_allocation);
     }
     if (message.commencement !== "0") {
-      writer.uint32(24).uint64(message.commencement);
+      writer.uint32(32).uint64(message.commencement);
     }
     return writer;
   },
@@ -96,12 +109,15 @@ export const EventCreateTeamVestingAccount = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.id = longToString(reader.uint64() as Long);
+          message.authority = reader.string();
           break;
         case 2:
-          message.total_allocation = longToString(reader.uint64() as Long);
+          message.id = longToString(reader.uint64() as Long);
           break;
         case 3:
+          message.total_allocation = longToString(reader.uint64() as Long);
+          break;
+        case 4:
           message.commencement = longToString(reader.uint64() as Long);
           break;
         default:
@@ -114,6 +130,7 @@ export const EventCreateTeamVestingAccount = {
 
   fromJSON(object: any): EventCreateTeamVestingAccount {
     return {
+      authority: isSet(object.authority) ? String(object.authority) : "",
       id: isSet(object.id) ? String(object.id) : "0",
       total_allocation: isSet(object.total_allocation) ? String(object.total_allocation) : "0",
       commencement: isSet(object.commencement) ? String(object.commencement) : "0",
@@ -122,6 +139,7 @@ export const EventCreateTeamVestingAccount = {
 
   toJSON(message: EventCreateTeamVestingAccount): unknown {
     const obj: any = {};
+    message.authority !== undefined && (obj.authority = message.authority);
     message.id !== undefined && (obj.id = message.id);
     message.total_allocation !== undefined && (obj.total_allocation = message.total_allocation);
     message.commencement !== undefined && (obj.commencement = message.commencement);
@@ -132,6 +150,7 @@ export const EventCreateTeamVestingAccount = {
     object: I,
   ): EventCreateTeamVestingAccount {
     const message = createBaseEventCreateTeamVestingAccount();
+    message.authority = object.authority ?? "";
     message.id = object.id ?? "0";
     message.total_allocation = object.total_allocation ?? "0";
     message.commencement = object.commencement ?? "0";
@@ -140,19 +159,22 @@ export const EventCreateTeamVestingAccount = {
 };
 
 function createBaseEventClawback(): EventClawback {
-  return { id: "0", clawback: "0", amount: "0" };
+  return { authority: "", id: "0", clawback: "0", amount: "0" };
 }
 
 export const EventClawback = {
   encode(message: EventClawback, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.authority !== "") {
+      writer.uint32(10).string(message.authority);
+    }
     if (message.id !== "0") {
-      writer.uint32(8).uint64(message.id);
+      writer.uint32(16).uint64(message.id);
     }
     if (message.clawback !== "0") {
-      writer.uint32(16).uint64(message.clawback);
+      writer.uint32(24).uint64(message.clawback);
     }
     if (message.amount !== "0") {
-      writer.uint32(24).uint64(message.amount);
+      writer.uint32(32).uint64(message.amount);
     }
     return writer;
   },
@@ -165,12 +187,15 @@ export const EventClawback = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.id = longToString(reader.uint64() as Long);
+          message.authority = reader.string();
           break;
         case 2:
-          message.clawback = longToString(reader.uint64() as Long);
+          message.id = longToString(reader.uint64() as Long);
           break;
         case 3:
+          message.clawback = longToString(reader.uint64() as Long);
+          break;
+        case 4:
           message.amount = longToString(reader.uint64() as Long);
           break;
         default:
@@ -183,6 +208,7 @@ export const EventClawback = {
 
   fromJSON(object: any): EventClawback {
     return {
+      authority: isSet(object.authority) ? String(object.authority) : "",
       id: isSet(object.id) ? String(object.id) : "0",
       clawback: isSet(object.clawback) ? String(object.clawback) : "0",
       amount: isSet(object.amount) ? String(object.amount) : "0",
@@ -191,6 +217,7 @@ export const EventClawback = {
 
   toJSON(message: EventClawback): unknown {
     const obj: any = {};
+    message.authority !== undefined && (obj.authority = message.authority);
     message.id !== undefined && (obj.id = message.id);
     message.clawback !== undefined && (obj.clawback = message.clawback);
     message.amount !== undefined && (obj.amount = message.amount);
@@ -199,6 +226,7 @@ export const EventClawback = {
 
   fromPartial<I extends Exact<DeepPartial<EventClawback>, I>>(object: I): EventClawback {
     const message = createBaseEventClawback();
+    message.authority = object.authority ?? "";
     message.id = object.id ?? "0";
     message.clawback = object.clawback ?? "0";
     message.amount = object.amount ?? "0";
@@ -207,19 +235,22 @@ export const EventClawback = {
 };
 
 function createBaseEventClaimedUnlocked(): EventClaimedUnlocked {
-  return { id: "0", amount: "0", recipient: "" };
+  return { authority: "", id: "0", amount: "0", recipient: "" };
 }
 
 export const EventClaimedUnlocked = {
   encode(message: EventClaimedUnlocked, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.authority !== "") {
+      writer.uint32(10).string(message.authority);
+    }
     if (message.id !== "0") {
-      writer.uint32(8).uint64(message.id);
+      writer.uint32(16).uint64(message.id);
     }
     if (message.amount !== "0") {
-      writer.uint32(16).uint64(message.amount);
+      writer.uint32(24).uint64(message.amount);
     }
     if (message.recipient !== "") {
-      writer.uint32(26).string(message.recipient);
+      writer.uint32(34).string(message.recipient);
     }
     return writer;
   },
@@ -232,12 +263,15 @@ export const EventClaimedUnlocked = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.id = longToString(reader.uint64() as Long);
+          message.authority = reader.string();
           break;
         case 2:
-          message.amount = longToString(reader.uint64() as Long);
+          message.id = longToString(reader.uint64() as Long);
           break;
         case 3:
+          message.amount = longToString(reader.uint64() as Long);
+          break;
+        case 4:
           message.recipient = reader.string();
           break;
         default:
@@ -250,6 +284,7 @@ export const EventClaimedUnlocked = {
 
   fromJSON(object: any): EventClaimedUnlocked {
     return {
+      authority: isSet(object.authority) ? String(object.authority) : "",
       id: isSet(object.id) ? String(object.id) : "0",
       amount: isSet(object.amount) ? String(object.amount) : "0",
       recipient: isSet(object.recipient) ? String(object.recipient) : "",
@@ -258,6 +293,7 @@ export const EventClaimedUnlocked = {
 
   toJSON(message: EventClaimedUnlocked): unknown {
     const obj: any = {};
+    message.authority !== undefined && (obj.authority = message.authority);
     message.id !== undefined && (obj.id = message.id);
     message.amount !== undefined && (obj.amount = message.amount);
     message.recipient !== undefined && (obj.recipient = message.recipient);
@@ -266,6 +302,7 @@ export const EventClaimedUnlocked = {
 
   fromPartial<I extends Exact<DeepPartial<EventClaimedUnlocked>, I>>(object: I): EventClaimedUnlocked {
     const message = createBaseEventClaimedUnlocked();
+    message.authority = object.authority ?? "";
     message.id = object.id ?? "0";
     message.amount = object.amount ?? "0";
     message.recipient = object.recipient ?? "";
@@ -274,19 +311,22 @@ export const EventClaimedUnlocked = {
 };
 
 function createBaseEventClaimInflationRewards(): EventClaimInflationRewards {
-  return { id: "0", amount: "0", recipient: "" };
+  return { authority: "", id: "0", amount: "0", recipient: "" };
 }
 
 export const EventClaimInflationRewards = {
   encode(message: EventClaimInflationRewards, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.authority !== "") {
+      writer.uint32(10).string(message.authority);
+    }
     if (message.id !== "0") {
-      writer.uint32(8).uint64(message.id);
+      writer.uint32(16).uint64(message.id);
     }
     if (message.amount !== "0") {
-      writer.uint32(16).uint64(message.amount);
+      writer.uint32(24).uint64(message.amount);
     }
     if (message.recipient !== "") {
-      writer.uint32(26).string(message.recipient);
+      writer.uint32(34).string(message.recipient);
     }
     return writer;
   },
@@ -299,12 +339,15 @@ export const EventClaimInflationRewards = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.id = longToString(reader.uint64() as Long);
+          message.authority = reader.string();
           break;
         case 2:
-          message.amount = longToString(reader.uint64() as Long);
+          message.id = longToString(reader.uint64() as Long);
           break;
         case 3:
+          message.amount = longToString(reader.uint64() as Long);
+          break;
+        case 4:
           message.recipient = reader.string();
           break;
         default:
@@ -317,6 +360,7 @@ export const EventClaimInflationRewards = {
 
   fromJSON(object: any): EventClaimInflationRewards {
     return {
+      authority: isSet(object.authority) ? String(object.authority) : "",
       id: isSet(object.id) ? String(object.id) : "0",
       amount: isSet(object.amount) ? String(object.amount) : "0",
       recipient: isSet(object.recipient) ? String(object.recipient) : "",
@@ -325,6 +369,7 @@ export const EventClaimInflationRewards = {
 
   toJSON(message: EventClaimInflationRewards): unknown {
     const obj: any = {};
+    message.authority !== undefined && (obj.authority = message.authority);
     message.id !== undefined && (obj.id = message.id);
     message.amount !== undefined && (obj.amount = message.amount);
     message.recipient !== undefined && (obj.recipient = message.recipient);
@@ -333,6 +378,7 @@ export const EventClaimInflationRewards = {
 
   fromPartial<I extends Exact<DeepPartial<EventClaimInflationRewards>, I>>(object: I): EventClaimInflationRewards {
     const message = createBaseEventClaimInflationRewards();
+    message.authority = object.authority ?? "";
     message.id = object.id ?? "0";
     message.amount = object.amount ?? "0";
     message.recipient = object.recipient ?? "";
@@ -341,11 +387,14 @@ export const EventClaimInflationRewards = {
 };
 
 function createBaseEventClaimAuthorityRewards(): EventClaimAuthorityRewards {
-  return { amount: "0", recipient: "" };
+  return { authority: "", amount: "0", recipient: "" };
 }
 
 export const EventClaimAuthorityRewards = {
   encode(message: EventClaimAuthorityRewards, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.authority !== "") {
+      writer.uint32(10).string(message.authority);
+    }
     if (message.amount !== "0") {
       writer.uint32(16).uint64(message.amount);
     }
@@ -362,6 +411,9 @@ export const EventClaimAuthorityRewards = {
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
+        case 1:
+          message.authority = reader.string();
+          break;
         case 2:
           message.amount = longToString(reader.uint64() as Long);
           break;
@@ -378,6 +430,7 @@ export const EventClaimAuthorityRewards = {
 
   fromJSON(object: any): EventClaimAuthorityRewards {
     return {
+      authority: isSet(object.authority) ? String(object.authority) : "",
       amount: isSet(object.amount) ? String(object.amount) : "0",
       recipient: isSet(object.recipient) ? String(object.recipient) : "",
     };
@@ -385,6 +438,7 @@ export const EventClaimAuthorityRewards = {
 
   toJSON(message: EventClaimAuthorityRewards): unknown {
     const obj: any = {};
+    message.authority !== undefined && (obj.authority = message.authority);
     message.amount !== undefined && (obj.amount = message.amount);
     message.recipient !== undefined && (obj.recipient = message.recipient);
     return obj;
@@ -392,6 +446,7 @@ export const EventClaimAuthorityRewards = {
 
   fromPartial<I extends Exact<DeepPartial<EventClaimAuthorityRewards>, I>>(object: I): EventClaimAuthorityRewards {
     const message = createBaseEventClaimAuthorityRewards();
+    message.authority = object.authority ?? "";
     message.amount = object.amount ?? "0";
     message.recipient = object.recipient ?? "";
     return message;

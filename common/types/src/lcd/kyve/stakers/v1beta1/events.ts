@@ -1,8 +1,22 @@
 /* eslint-disable */
 import Long from "long";
 import _m0 from "protobufjs/minimal";
+import { Params } from "./params";
 
 export const protobufPackage = "kyve.stakers.v1beta1";
+
+/**
+ * EventUpdateParams is an event emitted when the module parameters are updated.
+ * emitted_by: MsgUpdateParams
+ */
+export interface EventUpdateParams {
+  /** old_params is the module's old parameters. */
+  old_params?: Params;
+  /** new_params is the module's new parameters. */
+  new_params?: Params;
+  /** payload is the parameter updates that were performed. */
+  payload: string;
+}
 
 /**
  * EventCreateStaker is an event emitted when a protocol node stakes in a pool.
@@ -13,6 +27,8 @@ export interface EventCreateStaker {
   staker: string;
   /** amount ... */
   amount: string;
+  /** commission */
+  commission: string;
 }
 
 /**
@@ -26,8 +42,12 @@ export interface EventUpdateMetadata {
   moniker: string;
   /** website ... */
   website: string;
-  /** logo ... */
-  logo: string;
+  /** identity ... */
+  identity: string;
+  /** security_contact ... */
+  security_contact: string;
+  /** details ... */
+  details: string;
 }
 
 /**
@@ -70,8 +90,81 @@ export interface EventLeavePool {
   staker: string;
 }
 
+function createBaseEventUpdateParams(): EventUpdateParams {
+  return { old_params: undefined, new_params: undefined, payload: "" };
+}
+
+export const EventUpdateParams = {
+  encode(message: EventUpdateParams, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.old_params !== undefined) {
+      Params.encode(message.old_params, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.new_params !== undefined) {
+      Params.encode(message.new_params, writer.uint32(18).fork()).ldelim();
+    }
+    if (message.payload !== "") {
+      writer.uint32(26).string(message.payload);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): EventUpdateParams {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseEventUpdateParams();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.old_params = Params.decode(reader, reader.uint32());
+          break;
+        case 2:
+          message.new_params = Params.decode(reader, reader.uint32());
+          break;
+        case 3:
+          message.payload = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): EventUpdateParams {
+    return {
+      old_params: isSet(object.old_params) ? Params.fromJSON(object.old_params) : undefined,
+      new_params: isSet(object.new_params) ? Params.fromJSON(object.new_params) : undefined,
+      payload: isSet(object.payload) ? String(object.payload) : "",
+    };
+  },
+
+  toJSON(message: EventUpdateParams): unknown {
+    const obj: any = {};
+    message.old_params !== undefined &&
+      (obj.old_params = message.old_params ? Params.toJSON(message.old_params) : undefined);
+    message.new_params !== undefined &&
+      (obj.new_params = message.new_params ? Params.toJSON(message.new_params) : undefined);
+    message.payload !== undefined && (obj.payload = message.payload);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<EventUpdateParams>, I>>(object: I): EventUpdateParams {
+    const message = createBaseEventUpdateParams();
+    message.old_params = (object.old_params !== undefined && object.old_params !== null)
+      ? Params.fromPartial(object.old_params)
+      : undefined;
+    message.new_params = (object.new_params !== undefined && object.new_params !== null)
+      ? Params.fromPartial(object.new_params)
+      : undefined;
+    message.payload = object.payload ?? "";
+    return message;
+  },
+};
+
 function createBaseEventCreateStaker(): EventCreateStaker {
-  return { staker: "", amount: "0" };
+  return { staker: "", amount: "0", commission: "" };
 }
 
 export const EventCreateStaker = {
@@ -81,6 +174,9 @@ export const EventCreateStaker = {
     }
     if (message.amount !== "0") {
       writer.uint32(16).uint64(message.amount);
+    }
+    if (message.commission !== "") {
+      writer.uint32(26).string(message.commission);
     }
     return writer;
   },
@@ -98,6 +194,9 @@ export const EventCreateStaker = {
         case 2:
           message.amount = longToString(reader.uint64() as Long);
           break;
+        case 3:
+          message.commission = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -110,6 +209,7 @@ export const EventCreateStaker = {
     return {
       staker: isSet(object.staker) ? String(object.staker) : "",
       amount: isSet(object.amount) ? String(object.amount) : "0",
+      commission: isSet(object.commission) ? String(object.commission) : "",
     };
   },
 
@@ -117,6 +217,7 @@ export const EventCreateStaker = {
     const obj: any = {};
     message.staker !== undefined && (obj.staker = message.staker);
     message.amount !== undefined && (obj.amount = message.amount);
+    message.commission !== undefined && (obj.commission = message.commission);
     return obj;
   },
 
@@ -124,12 +225,13 @@ export const EventCreateStaker = {
     const message = createBaseEventCreateStaker();
     message.staker = object.staker ?? "";
     message.amount = object.amount ?? "0";
+    message.commission = object.commission ?? "";
     return message;
   },
 };
 
 function createBaseEventUpdateMetadata(): EventUpdateMetadata {
-  return { staker: "", moniker: "", website: "", logo: "" };
+  return { staker: "", moniker: "", website: "", identity: "", security_contact: "", details: "" };
 }
 
 export const EventUpdateMetadata = {
@@ -143,8 +245,14 @@ export const EventUpdateMetadata = {
     if (message.website !== "") {
       writer.uint32(26).string(message.website);
     }
-    if (message.logo !== "") {
-      writer.uint32(34).string(message.logo);
+    if (message.identity !== "") {
+      writer.uint32(34).string(message.identity);
+    }
+    if (message.security_contact !== "") {
+      writer.uint32(42).string(message.security_contact);
+    }
+    if (message.details !== "") {
+      writer.uint32(50).string(message.details);
     }
     return writer;
   },
@@ -166,7 +274,13 @@ export const EventUpdateMetadata = {
           message.website = reader.string();
           break;
         case 4:
-          message.logo = reader.string();
+          message.identity = reader.string();
+          break;
+        case 5:
+          message.security_contact = reader.string();
+          break;
+        case 6:
+          message.details = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -181,7 +295,9 @@ export const EventUpdateMetadata = {
       staker: isSet(object.staker) ? String(object.staker) : "",
       moniker: isSet(object.moniker) ? String(object.moniker) : "",
       website: isSet(object.website) ? String(object.website) : "",
-      logo: isSet(object.logo) ? String(object.logo) : "",
+      identity: isSet(object.identity) ? String(object.identity) : "",
+      security_contact: isSet(object.security_contact) ? String(object.security_contact) : "",
+      details: isSet(object.details) ? String(object.details) : "",
     };
   },
 
@@ -190,7 +306,9 @@ export const EventUpdateMetadata = {
     message.staker !== undefined && (obj.staker = message.staker);
     message.moniker !== undefined && (obj.moniker = message.moniker);
     message.website !== undefined && (obj.website = message.website);
-    message.logo !== undefined && (obj.logo = message.logo);
+    message.identity !== undefined && (obj.identity = message.identity);
+    message.security_contact !== undefined && (obj.security_contact = message.security_contact);
+    message.details !== undefined && (obj.details = message.details);
     return obj;
   },
 
@@ -199,7 +317,9 @@ export const EventUpdateMetadata = {
     message.staker = object.staker ?? "";
     message.moniker = object.moniker ?? "";
     message.website = object.website ?? "";
-    message.logo = object.logo ?? "";
+    message.identity = object.identity ?? "";
+    message.security_contact = object.security_contact ?? "";
+    message.details = object.details ?? "";
     return message;
   },
 };
