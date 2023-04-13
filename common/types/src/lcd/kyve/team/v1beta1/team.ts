@@ -18,14 +18,14 @@ export interface TeamVestingAccount {
   id: string;
   /** total_allocation is the number of tokens reserved for this team member. */
   total_allocation: string;
-  /** commencement is the unix timestamp of the member's official start date. */
+  /** commencement is the unix timestamp of the member's official start date in seconds */
   commencement: string;
   /**
-   * clawback is a unix timestamp of a clawback. If timestamp is zero
+   * clawback is a unix timestamp of a clawback in seconds. If timestamp is zero
    * it means that the account has not received a clawback
    */
   clawback: string;
-  /** claimed is the amount of $KYVE already claimed by the account holder */
+  /** unlocked_claimed is the amount of $KYVE already claimed by the account holder */
   unlocked_claimed: string;
   /** the last time the unlocked amount was claimed */
   last_claimed_time: string;

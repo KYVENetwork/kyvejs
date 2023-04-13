@@ -5,7 +5,6 @@ import { Params } from "../../bundles/v1beta1/params";
 import { Params as Params1 } from "../../delegation/v1beta1/params";
 import { Params as Params2 } from "../../global/v1beta1/global";
 import { Params as Params4 } from "../../stakers/v1beta1/params";
-import { Params as Params5 } from "../../team/v1beta1/params";
 
 export const protobufPackage = "kyve.query.v1beta1";
 
@@ -25,8 +24,6 @@ export interface QueryParamsResponse {
   gov_params?: QueryParamsResponse3;
   /** stakers_params ... */
   stakers_params?: Params4;
-  /** team_params ... */
-  team_params?: Params5;
 }
 
 function createBaseQueryParamsRequest(): QueryParamsRequest {
@@ -75,7 +72,6 @@ function createBaseQueryParamsResponse(): QueryParamsResponse {
     global_params: undefined,
     gov_params: undefined,
     stakers_params: undefined,
-    team_params: undefined,
   };
 }
 
@@ -95,9 +91,6 @@ export const QueryParamsResponse = {
     }
     if (message.stakers_params !== undefined) {
       Params4.encode(message.stakers_params, writer.uint32(42).fork()).ldelim();
-    }
-    if (message.team_params !== undefined) {
-      Params5.encode(message.team_params, writer.uint32(50).fork()).ldelim();
     }
     return writer;
   },
@@ -124,9 +117,6 @@ export const QueryParamsResponse = {
         case 5:
           message.stakers_params = Params4.decode(reader, reader.uint32());
           break;
-        case 6:
-          message.team_params = Params5.decode(reader, reader.uint32());
-          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -142,7 +132,6 @@ export const QueryParamsResponse = {
       global_params: isSet(object.global_params) ? Params2.fromJSON(object.global_params) : undefined,
       gov_params: isSet(object.gov_params) ? QueryParamsResponse3.fromJSON(object.gov_params) : undefined,
       stakers_params: isSet(object.stakers_params) ? Params4.fromJSON(object.stakers_params) : undefined,
-      team_params: isSet(object.team_params) ? Params5.fromJSON(object.team_params) : undefined,
     };
   },
 
@@ -158,8 +147,6 @@ export const QueryParamsResponse = {
       (obj.gov_params = message.gov_params ? QueryParamsResponse3.toJSON(message.gov_params) : undefined);
     message.stakers_params !== undefined &&
       (obj.stakers_params = message.stakers_params ? Params4.toJSON(message.stakers_params) : undefined);
-    message.team_params !== undefined &&
-      (obj.team_params = message.team_params ? Params5.toJSON(message.team_params) : undefined);
     return obj;
   },
 
@@ -179,9 +166,6 @@ export const QueryParamsResponse = {
       : undefined;
     message.stakers_params = (object.stakers_params !== undefined && object.stakers_params !== null)
       ? Params4.fromPartial(object.stakers_params)
-      : undefined;
-    message.team_params = (object.team_params !== undefined && object.team_params !== null)
-      ? Params5.fromPartial(object.team_params)
       : undefined;
     return message;
   },

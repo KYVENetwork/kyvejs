@@ -4,12 +4,17 @@ import _m0 from "protobufjs/minimal";
 
 export const protobufPackage = "kyve.stakers.v1beta1";
 
-/** MsgStakePool defines a SDK message for staking in a pool. */
+/** MsgCreateStaker defines a SDK message for creating a staker. */
 export interface MsgCreateStaker {
-  /** creator ... */
+  /** creator is the address of the staker. */
   creator: string;
-  /** amount ... */
+  /** amount is the initial self-stake of the staker. */
   amount: string;
+  /**
+   * commission is the percentage that is deducted from rewards before
+   * distributing the staker's delegators.
+   */
+  commission: string;
 }
 
 /** MsgStakePoolResponse defines the Msg/StakePool response type. */
@@ -24,8 +29,12 @@ export interface MsgUpdateMetadata {
   moniker: string;
   /** website ... */
   website: string;
-  /** logo */
-  logo: string;
+  /** identity from keybase.io */
+  identity: string;
+  /** security_contact ... */
+  security_contact: string;
+  /** details ... */
+  details: string;
 }
 
 /** MsgUpdateMetadataResponse defines the Msg/MsgUpdateMetadata response type. */
@@ -85,7 +94,7 @@ export interface MsgUpdateParamsResponse {
 }
 
 function createBaseMsgCreateStaker(): MsgCreateStaker {
-  return { creator: "", amount: "0" };
+  return { creator: "", amount: "0", commission: "" };
 }
 
 export const MsgCreateStaker = {
@@ -95,6 +104,9 @@ export const MsgCreateStaker = {
     }
     if (message.amount !== "0") {
       writer.uint32(16).uint64(message.amount);
+    }
+    if (message.commission !== "") {
+      writer.uint32(26).string(message.commission);
     }
     return writer;
   },
@@ -112,6 +124,9 @@ export const MsgCreateStaker = {
         case 2:
           message.amount = longToString(reader.uint64() as Long);
           break;
+        case 3:
+          message.commission = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -124,6 +139,7 @@ export const MsgCreateStaker = {
     return {
       creator: isSet(object.creator) ? String(object.creator) : "",
       amount: isSet(object.amount) ? String(object.amount) : "0",
+      commission: isSet(object.commission) ? String(object.commission) : "",
     };
   },
 
@@ -131,6 +147,7 @@ export const MsgCreateStaker = {
     const obj: any = {};
     message.creator !== undefined && (obj.creator = message.creator);
     message.amount !== undefined && (obj.amount = message.amount);
+    message.commission !== undefined && (obj.commission = message.commission);
     return obj;
   },
 
@@ -138,6 +155,7 @@ export const MsgCreateStaker = {
     const message = createBaseMsgCreateStaker();
     message.creator = object.creator ?? "";
     message.amount = object.amount ?? "0";
+    message.commission = object.commission ?? "";
     return message;
   },
 };
@@ -182,7 +200,7 @@ export const MsgCreateStakerResponse = {
 };
 
 function createBaseMsgUpdateMetadata(): MsgUpdateMetadata {
-  return { creator: "", moniker: "", website: "", logo: "" };
+  return { creator: "", moniker: "", website: "", identity: "", security_contact: "", details: "" };
 }
 
 export const MsgUpdateMetadata = {
@@ -196,8 +214,14 @@ export const MsgUpdateMetadata = {
     if (message.website !== "") {
       writer.uint32(26).string(message.website);
     }
-    if (message.logo !== "") {
-      writer.uint32(34).string(message.logo);
+    if (message.identity !== "") {
+      writer.uint32(34).string(message.identity);
+    }
+    if (message.security_contact !== "") {
+      writer.uint32(42).string(message.security_contact);
+    }
+    if (message.details !== "") {
+      writer.uint32(50).string(message.details);
     }
     return writer;
   },
@@ -219,7 +243,13 @@ export const MsgUpdateMetadata = {
           message.website = reader.string();
           break;
         case 4:
-          message.logo = reader.string();
+          message.identity = reader.string();
+          break;
+        case 5:
+          message.security_contact = reader.string();
+          break;
+        case 6:
+          message.details = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -234,7 +264,9 @@ export const MsgUpdateMetadata = {
       creator: isSet(object.creator) ? String(object.creator) : "",
       moniker: isSet(object.moniker) ? String(object.moniker) : "",
       website: isSet(object.website) ? String(object.website) : "",
-      logo: isSet(object.logo) ? String(object.logo) : "",
+      identity: isSet(object.identity) ? String(object.identity) : "",
+      security_contact: isSet(object.security_contact) ? String(object.security_contact) : "",
+      details: isSet(object.details) ? String(object.details) : "",
     };
   },
 
@@ -243,7 +275,9 @@ export const MsgUpdateMetadata = {
     message.creator !== undefined && (obj.creator = message.creator);
     message.moniker !== undefined && (obj.moniker = message.moniker);
     message.website !== undefined && (obj.website = message.website);
-    message.logo !== undefined && (obj.logo = message.logo);
+    message.identity !== undefined && (obj.identity = message.identity);
+    message.security_contact !== undefined && (obj.security_contact = message.security_contact);
+    message.details !== undefined && (obj.details = message.details);
     return obj;
   },
 
@@ -252,7 +286,9 @@ export const MsgUpdateMetadata = {
     message.creator = object.creator ?? "";
     message.moniker = object.moniker ?? "";
     message.website = object.website ?? "";
-    message.logo = object.logo ?? "";
+    message.identity = object.identity ?? "";
+    message.security_contact = object.security_contact ?? "";
+    message.details = object.details ?? "";
     return message;
   },
 };
