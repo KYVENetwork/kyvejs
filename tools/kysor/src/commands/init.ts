@@ -19,6 +19,14 @@ init
     "Comma separated list of rest endpoints. If the first fails the next endpoint will be used as fallback. "
   )
   .option(
+    "--coin-denom <string>",
+    "The denom of the coin, this value will be loaded by default based on the chain id"
+  )
+  .option(
+    "--coin-decimals <number>",
+    "The decimals of the coin, this value will be loaded by default based on the chain id"
+  )
+  .option(
     "--gas-price <number>",
     "The gas price the node should use to calculate transaction fees"
   )
