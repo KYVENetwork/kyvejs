@@ -649,7 +649,7 @@ describe("no storage tests", () => {
     // TODO: assert timeouts
   });
 
-  test("vote invalid because data hash is not empty", async () => {
+  test("vote abstain because data hash is not empty", async () => {
     // ARRANGE
     const bundle = [
       { key: "test_key_1", value: "test_value_1" },
@@ -696,7 +696,7 @@ describe("no storage tests", () => {
       staker: "test_staker",
       pool_id: "0",
       storage_id: "another_test_storage_id",
-      vote: VoteType.VOTE_TYPE_INVALID,
+      vote: VoteType.VOTE_TYPE_ABSTAIN,
     });
 
     expect(txs.submitBundleProposal).toHaveBeenCalledTimes(0);

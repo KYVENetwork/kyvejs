@@ -783,7 +783,7 @@ describe("invalid votes tests", () => {
     // TODO: assert timeouts
   });
 
-  test("vote invalid because proposed data_hash does not match", async () => {
+  test("vote abstain because proposed data_hash does not match", async () => {
     // ARRANGE
     const bundle = [
       { key: "test_key_1", value: "test_value_1" },
@@ -846,7 +846,7 @@ describe("invalid votes tests", () => {
       staker: "test_staker",
       pool_id: "0",
       storage_id: "another_test_storage_id",
-      vote: VoteType.VOTE_TYPE_INVALID,
+      vote: VoteType.VOTE_TYPE_ABSTAIN,
     });
 
     expect(txs.submitBundleProposal).toHaveBeenCalledTimes(0);

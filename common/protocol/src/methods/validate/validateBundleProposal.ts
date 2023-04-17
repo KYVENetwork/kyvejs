@@ -58,7 +58,9 @@ export async function validateBundleProposal(
       `Found matching data size = ${this.pool.bundle_proposal!.data_size} Bytes`
     );
 
-    // vote invalid if data hash does not match with proposed data hash
+    // vote abstain if data hash does not match with proposed data hash.
+    // we vote abstain on a differing hash since it could be the fault of the
+    // storage provider that the data integrity was broken
     this.logger.debug(`Validating bundle proposal by data hash`);
     this.logger.debug(`Proposed = ${this.pool.bundle_proposal!.data_hash}`);
     this.logger.debug(`Actual   = ${sha256(storageProviderResult)}`);
@@ -72,7 +74,7 @@ export async function validateBundleProposal(
 
       await this.voteBundleProposal(
         this.pool.bundle_proposal!.storage_id,
-        VOTE.INVALID
+        VOTE.ABSTAIN
       );
       return;
     }
