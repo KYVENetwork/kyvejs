@@ -29,6 +29,11 @@ valaccounts
     "The private key of the storage provider"
   )
   .option(
+    "--request-backoff <number>",
+    "The time in milliseconds between each getDataItem request where the node sleeps [default = 50]",
+    "50"
+  )
+  .option(
     "--cache <jsonfile|memory>",
     "The cache this node should use",
     "jsonfile"
@@ -111,6 +116,7 @@ valaccounts
         pool,
         valaccount,
         storagePriv: options.storagePriv,
+        requestBackoff: options.requestBackoff,
         cache: options.cache,
         metrics: options.metrics,
         metricsPort: options.metricsPort,

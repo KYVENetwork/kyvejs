@@ -24,8 +24,8 @@ export default class TendermintBSync implements IRuntime {
       throw new Error(`Config does not have property "rpc" defined`);
     }
 
-    if (process.env.KYVE_JS_TENDERMINT_BSYNC_RPC) {
-      config.rpc = process.env.KYVE_JS_TENDERMINT_BSYNC_RPC;
+    if (process.env.KYVEJS_TENDERMINT_BSYNC_RPC) {
+      config.rpc = process.env.KYVEJS_TENDERMINT_BSYNC_RPC;
     }
 
     this.config = config;
