@@ -1,5 +1,25 @@
 # @kyvejs/tendermint-bsync
 
+## Content
+
+- [Introduction](#introduction)
+- [Use cases](#use-cases)
+- [Integrations currently live](#integrations-currently-live)
+  - [Mainnet](#mainnet)
+  - [Testnet](#testnet)
+  - [Devnet](#devnet)
+- [Binary Installation](#binary-installation)
+  - [Build from source](#build-from-source)
+  - [Download prebuilt binary](#download-prebuilt-binary)
+- [Run a node](#run-a-node)
+  - [Cosmos Hub](#cosmos-hub)
+    - [Requirements](#requirements)
+    - [Step 1: Start gaia node](#step-1-start-gaia-node)
+    - [Step 2: Start kyve node](#step-2-start-kyve-node)
+- [Creating a pool with the runtime](#creating-a-pool-with-the-runtime)
+  - [Config](#config)
+  - [Create Pool governance proposal](#create-pool-governance-proposal)
+
 ## Introduction
 
 This runtime validates and archives blocks from any tendermint based blockchain application. It only stores blocks from and to a given height and makes
@@ -13,19 +33,19 @@ to bootstrap themselves and sync to the current network height. This may make ex
 already permanently and immutably archived. Additionally, block data can be retrieved over an ELT pipeline, further analyzing and using
 it for different applications like block explorers.
 
-## Integrations
+## Integrations currently live
 
 The following integrations are running on this runtime and are currently live.
 
-### Mainnet (KYVE)
+### Mainnet
 
 (planned - currently in test)
 
-### Testnet (Kaon)
+### Testnet
 
 (planned - currently in test)
 
-### Devnet (Korellia)
+### Devnet
 
 - **Cosmos Hub // cosmoshub-4**
   - Pool ID: 24
@@ -79,9 +99,9 @@ You can verify the installation with printing the version:
 After the build succeeded you can find the binaries in the `out` folder where you can move them to use
 desired location (like KYSOR).
 
-### Download prebuild binary
+### Download prebuilt binary
 
-You can find all prebuild binaries in the releases of the kyvejs repository. For this specific runtime they
+You can find all prebuilt binaries in the releases of the kyvejs repository. For this specific runtime they
 can be found [here](https://github.com/KYVENetwork/kyvejs/releases?q=tendermint).
 
 You can verify the installation with printing the version:
@@ -101,7 +121,7 @@ which has this runtime.
 
 Depending on the integration which are currently live the following setup has to be done.
 
-### Cosmos Hub // Block Sync
+### Cosmos Hub
 
 **INFO**: Live on Korellia: Pool Id 24
 
@@ -120,7 +140,7 @@ data are the blocks from the tendermint application - validated and permanently 
 
 The following **minimum** hardware requirements have to be met:
 
-- RAM: 8GB
+- RAM: 16GB
 - Storage: 512GB\*
 
 \*This can increase over time
