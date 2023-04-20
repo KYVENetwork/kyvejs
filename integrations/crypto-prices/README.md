@@ -1,1 +1,1 @@
-# @kyve/bitcoin
+# @kyve/crypto-prices
