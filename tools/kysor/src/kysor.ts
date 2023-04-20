@@ -5,6 +5,7 @@ import download from "download";
 import extract from "extract-zip";
 import fs from "fs";
 import path from "path";
+import dotenv from "dotenv";
 
 import { IConfig, IValaccountConfig } from "./types/interfaces";
 import { getChecksum, setupLogger, startNodeProcess } from "./utils";
@@ -19,6 +20,7 @@ export const run = async (options: any) => {
   let rest: string[];
   let valaccount: IValaccountConfig = {} as IValaccountConfig;
   let pool: PoolResponse;
+  let env: any;
 
   if (!fs.existsSync(path.join(HOME, `config.toml`))) {
     logger.error(
@@ -115,12 +117,28 @@ export const run = async (options: any) => {
     process.exit(0);
   }
 
+  // verify that .env can be parsed
+  if (options.envFile) {
+    try {
+      env = dotenv.parse(fs.readFileSync(options.envFile, "utf-8"));
+      logger.info(`Found .env config file "${options.envFile}"`);
+    } catch (err) {
+      logger.error(
+        `Error parsing .env config file ${options.envFile}. Exiting KYSOR ...`
+      );
+      logger.error(JSON.parse(JSON.stringify(err)));
+      process.exit(0);
+    }
+  }
+
   // create lcd clients
   const lcd = rpc.map((_, i) => {
     try {
       return new KyveSDK(config.chainId, {
         rpc: rpc[i],
         rest: rest[i],
+        coinDenom: config.coinDenom,
+        coinDecimals: config.coinDecimals,
         gasPrice: config.gasPrice,
       }).createLCDClient();
     } catch (err) {
@@ -357,9 +375,13 @@ export const run = async (options: any) => {
       const valaccountEnv = `VALACCOUNT_${options.valaccount}`.toUpperCase();
       process.env[valaccountEnv] = valaccount.valaccount;
 
-      const storagePrivEnv =
-        `STORAGE_PRIV_${options.storagePriv}`.toUpperCase();
+      const storagePrivEnv = `STORAGE_PRIV_${options.valaccount}`.toUpperCase();
       process.env[storagePrivEnv] = valaccount.storagePriv;
+
+      // export custom env variables
+      for (const key of Object.keys(env)) {
+        process.env[key] = env[key];
+      }
 
       const args = [
         `start`,
@@ -381,6 +403,11 @@ export const run = async (options: any) => {
 
       if (options.debug) {
         args.push("--debug");
+      }
+
+      if (valaccount.requestBackoff) {
+        args.push(`--request-backoff`);
+        args.push(`${valaccount.requestBackoff}`);
       }
 
       if (valaccount.cache) {
