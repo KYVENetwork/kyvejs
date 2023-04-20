@@ -85,7 +85,7 @@ export default class CryptoPrices implements IRuntime {
     const validationPrices = validationDataItem.value;
 
     for (const key in proposedPrices) {
-      if (validationPrices.hasOwnProperty(key)) {
+      if (validationPrices[key]) {
         const proposedPrice = proposedPrices[key];
         const validationPrice = validationPrices[key];
 

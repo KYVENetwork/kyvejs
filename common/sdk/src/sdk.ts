@@ -19,11 +19,11 @@ import {
   IConfig,
   KYVE_COSMOSTATION_CONFIG,
   KYVE_KEPLR_CONFIG,
+  KYVE_LEAP_CONFIG,
   PREFIX,
   SUPPORTED_CHAIN_CONFIGS,
   SUPPORTED_WALLETS,
   SupportedChains,
-  KYVE_LEAP_CONFIG,
 } from "./constants";
 import {
   cosmostationMethods,
