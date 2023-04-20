@@ -6,9 +6,10 @@ export class CryptoCompare implements DataSource {
   private response: any;
 
   async fetchPrices(tickers: string[]): Promise<any> {
-    if (!process.env.CryptoCompare) {
+    if (!process.env.CRYPTOCOMPARE_APIKEY) {
       console.error("Export the API Key for CryptoCompare correctly.")
     }
+
     const cryptoCompareAPIKey = process.env.CryptoCompare;
 
     let endpoint: string = "https://min-api.cryptocompare.com/data/pricemulti?fsyms={tickers}&tsyms=USD"

@@ -6,6 +6,9 @@ export class Coinmarketcap implements DataSource {
   private response: any;
 
   async fetchPrices(tickers: string[]): Promise<any> {
+    if (!process.env.COINMARKETCAP_APIKEY) {
+      console.error("Export the API Key for Coinmarketcap correctly.")
+    }
     const { data } = await axios.get<any>("https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest", {
       headers: {
         "X-CMC_PRO_API_KEY": process.env.COINMARKETCAP_APIKEY!,

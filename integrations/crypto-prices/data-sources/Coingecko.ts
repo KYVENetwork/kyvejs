@@ -6,6 +6,9 @@ export class Coingecko implements DataSource {
   private response: any;
 
   async fetchPrices(): Promise<any> {
+    if (!process.env.COINGECKO_APIKEY) {
+      console.error("Export the API Key for Coingecko correctly.")
+    }
     const { data } = await axios.get<any>(
       "https://pro-api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=500&page=1&sparkline=false&locale=en",
       {
