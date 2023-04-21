@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# 1.0.0-beta.2 (2023-04-21)
+
+**Note:** Version bump only for package @kyvejs/crypto-prices
+
 # [1.0.0-beta.15](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/bitcoin@1.0.0-beta.14...@kyvejs/bitcoin@1.0.0-beta.15) (2023-03-22)
 
 **Note:** Version bump only for package @kyvejs/bitcoin
