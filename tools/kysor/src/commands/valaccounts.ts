@@ -60,27 +60,6 @@ valaccounts
       // create home directory for valaccount configs
       fs.mkdirSync(path.join(HOME, "valaccounts"), { recursive: true });
 
-      // check if valaccount with same pool id was already created
-      const pools = [];
-      const valaccounts = fs.readdirSync(path.join(HOME, "valaccounts"));
-
-      for (const valaccount of valaccounts) {
-        const config: IValaccountConfig = TOML.parse(
-          fs.readFileSync(path.join(HOME, "valaccounts", valaccount), "utf-8")
-        ) as any;
-        pools.push(config.pool);
-      }
-
-      // parse pool id
-      const pool = parseInt(options.pool, 10);
-
-      if (pools.includes(pool)) {
-        console.log(
-          `ERROR: Already created a valaccount with Pool Id = ${pool}`
-        );
-        return;
-      }
-
       // get mnemonic for valaccount
       let valaccount;
 
@@ -112,8 +91,28 @@ valaccounts
         valaccount = await KyveSDK.generateMnemonic();
       }
 
+      // check if same valaccount was already created
+      const configs = fs.readdirSync(path.join(HOME, "valaccounts"));
+      const valaccounts = [];
+
+      for (const config of configs) {
+        const valaccount: IValaccountConfig = TOML.parse(
+          fs.readFileSync(path.join(HOME, "valaccounts", config), "utf-8")
+        ) as any;
+        valaccounts.push(valaccount.valaccount);
+      }
+
+      if (valaccounts.includes(valaccount)) {
+        console.log(
+          `ERROR: Already created a valaccount with same mnemonic = ${await KyveSDK.getAddressFromMnemonic(
+            valaccount
+          )}`
+        );
+        return;
+      }
+
       const config: IValaccountConfig = {
-        pool,
+        pool: parseInt(options.pool, 10),
         valaccount,
         storagePriv: options.storagePriv,
         requestBackoff: options.requestBackoff,
