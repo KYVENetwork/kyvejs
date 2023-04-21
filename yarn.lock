@@ -1362,6 +1362,64 @@
     big-integer "^1.6.48"
     utility-types "^3.10.0"
 
+"@kyvejs/protocol@1.0.0-beta.19":
+  version "1.0.0-beta.19"
+  resolved "https://registry.yarnpkg.com/@kyvejs/protocol/-/protocol-1.0.0-beta.19.tgz#a9c82884a581830293946d5c46336c2fd7052acf"
+  integrity sha512-OD0S118zfJYBWD/CElL3OofbKPJVzhjx0f7bAhrSEnTnb1K51pszxX35sP0vTO26McOqf6fksvzvF6Qmc7Ggxw==
+  dependencies:
+    "@bundlr-network/client" "^0.8.9"
+    "@cosmjs/proto-signing" "^0.27.1"
+    "@cosmjs/stargate" "^0.27.1"
+    "@kyvejs/sdk" "1.0.0-beta.13"
+    "@kyvejs/types" "1.0.0-beta.2"
+    "@types/cli-progress" "^3.9.2"
+    "@types/jsonfile" "^6.0.1"
+    arweave "^1.10.17"
+    axios "^0.24.0"
+    bignumber.js "^9.0.1"
+    clone "^2.1.2"
+    commander "^9.4.1"
+    fs-extra "^10.0.1"
+    jsonfile "^6.1.0"
+    level "^8.0.0"
+    prando "^6.0.1"
+    prom-client "^14.1.0"
+    protobufjs "^6.11.2"
+    seedrandom "^3.0.5"
+    tslog "^3.2.2"
+    unique-names-generator "^4.6.0"
+
+"@kyvejs/sdk@1.0.0-beta.13":
+  version "1.0.0-beta.13"
+  resolved "https://registry.yarnpkg.com/@kyvejs/sdk/-/sdk-1.0.0-beta.13.tgz#d54cf1c65cb284251ad8aa3dd4f5bbb032a0a017"
+  integrity sha512-g/VK/6NyyEsehfWo0Ut6j0usKUQ6E0JvRyaX/uiGaPN9jl+9kebK6CaMKigL9Zyu/fY/HDnBt/FmzTjN14lgXQ==
+  dependencies:
+    "@cosmjs/amino" "0.28.3"
+    "@cosmjs/crypto" "0.27.1"
+    "@cosmjs/encoding" "0.27.1"
+    "@cosmjs/proto-signing" "0.28.0"
+    "@cosmjs/stargate" "0.28.0"
+    "@cosmjs/tendermint-rpc" "0.28.0"
+    "@cosmostation/extension-client" "^0.0.6"
+    "@keplr-wallet/cosmos" "^0.11.38"
+    "@kyvejs/types" "1.0.0-beta.2"
+    axios "0.25.0"
+    bech32 "2.0.0"
+    bignumber.js "9.0.2"
+    humanize-number "0.0.2"
+    qs "^6.10.5"
+
+"@kyvejs/types@1.0.0-beta.2":
+  version "1.0.0-beta.2"
+  resolved "https://registry.yarnpkg.com/@kyvejs/types/-/types-1.0.0-beta.2.tgz#b847970bb6af6c6670037e4fed37bbfa6dc01f71"
+  integrity sha512-vV01ACifE+ar12Y8lpmmqDSmWlVT6QKgogPjh/uAWeb57ELmSJwww1CcqNEVJiG5NA5bj1OIvwtgqDvwHbrREg==
+  dependencies:
+    "@protobufs/cosmos" "^0.0.11"
+    "@protobufs/gogoproto" "^0.0.10"
+    "@protobufs/google" "^0.0.10"
+    nx "^14.4.3"
+    ts-proto "^1.115.4"
+
 "@lerna/add@6.1.0":
   version "6.1.0"
   resolved "https://registry.yarnpkg.com/@lerna/add/-/add-6.1.0.tgz#0f09495c5e1af4c4f316344af34b6d1a91b15b19"

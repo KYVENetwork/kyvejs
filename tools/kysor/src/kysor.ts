@@ -379,7 +379,7 @@ export const run = async (options: any) => {
       process.env[storagePrivEnv] = valaccount.storagePriv;
 
       // export custom env variables
-      for (const key of Object.keys(env)) {
+      for (const key of Object.keys(env || {})) {
         process.env[key] = env[key];
       }
 
