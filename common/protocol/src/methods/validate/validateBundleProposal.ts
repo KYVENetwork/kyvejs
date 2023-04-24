@@ -253,10 +253,10 @@ export async function validateBundleProposal(
       this.m.bundles_data_items.set(proposedBundle.length);
       this.m.bundles_byte_size.set(storageProviderResult.byteLength);
     } else {
-      // TODO: double check if this can be abused
+      // if proposed bundle is empty we always vote abstain
       await this.voteBundleProposal(
         this.pool.bundle_proposal!.storage_id,
-        VoteType.VOTE_TYPE_VALID
+        VoteType.VOTE_TYPE_ABSTAIN
       );
 
       // update metrics
