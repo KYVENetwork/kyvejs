@@ -135,54 +135,6 @@ export async function validateBundleProposal(
       `Found matching to key = ${this.pool.bundle_proposal!.to_key}`
     );
 
-    // vote invalid if bundle summary does not match with proposed summary
-    this.logger.debug(`Validating bundle proposal by bundle summary`);
-    this.logger.debug(`this.runtime.summarizeDataBundle($VALIDATION_BUNDLE)`);
-
-    const bundleSummary = await this.runtime
-      .summarizeDataBundle(this, validationBundle)
-      .catch((err) => {
-        this.logger.error(
-          `Unexpected error summarizing bundle with runtime. Voting abstain ...`
-        );
-        this.logger.error(standardizeJSON(err));
-
-        return null;
-      });
-
-    // vote abstain if bundleSummary is null
-    if (bundleSummary === null) {
-      await this.voteBundleProposal(
-        this.pool.bundle_proposal!.storage_id,
-        VOTE.ABSTAIN
-      );
-      return;
-    }
-
-    this.logger.debug(
-      `Proposed = ${this.pool.bundle_proposal!.bundle_summary}`
-    );
-    this.logger.debug(`Actual   = ${bundleSummary}`);
-
-    if (this.pool.bundle_proposal!.bundle_summary !== bundleSummary) {
-      this.logger.info(`Found different value on proposed bundle summary`);
-
-      // archive local invalid bundle for debug purposes
-      this.archiveDebugBundle(validationBundle);
-
-      await this.voteBundleProposal(
-        this.pool.bundle_proposal!.storage_id,
-        VOTE.INVALID
-      );
-      return;
-    }
-
-    this.logger.info(
-      `Found matching bundle summary = ${
-        this.pool.bundle_proposal!.bundle_summary
-      }`
-    );
-
     // if storage provider result is empty skip runtime validation
     if (storageProviderResult.byteLength) {
       // decompress the bundle with the specified compression type
@@ -212,6 +164,7 @@ export async function validateBundleProposal(
               validationBundle[i]
             );
 
+            // only log if data item validation returned invalid
             if (!valid) {
               this.logger.info(
                 `Validated data item: index:${i} - key:${proposedBundle[i].key} - result:${valid}`
@@ -227,6 +180,47 @@ export async function validateBundleProposal(
         this.logger.debug(
           `Finished validating bundle by custom runtime validation. Result = ${valid}`
         );
+
+        // only continue with bundle summary validation if proposed bundle is valid
+        if (valid) {
+          // vote invalid if bundle summary does not match with proposed summary
+          this.logger.debug(`Validating bundle proposal by bundle summary`);
+          this.logger.debug(
+            `this.runtime.summarizeDataBundle($PROPOSED_BUNDLE)`
+          );
+
+          const bundleSummary = await this.runtime
+            .summarizeDataBundle(this, proposedBundle)
+            .catch((err) => {
+              this.logger.error(
+                `Unexpected error summarizing bundle with runtime. Voting abstain ...`
+              );
+              this.logger.error(standardizeJSON(err));
+
+              return null;
+            });
+
+          // vote abstain if bundleSummary is null
+          if (bundleSummary === null) {
+            await this.voteBundleProposal(
+              this.pool.bundle_proposal!.storage_id,
+              VOTE.ABSTAIN
+            );
+            return;
+          }
+
+          this.logger.debug(
+            `Proposed = ${this.pool.bundle_proposal!.bundle_summary}`
+          );
+          this.logger.debug(`Actual   = ${bundleSummary}`);
+
+          // validate bundle summary by equal comparison
+          valid = this.pool.bundle_proposal!.bundle_summary === bundleSummary;
+
+          this.logger.debug(
+            `Finished validating bundle by bundle summary. Result = ${valid}`
+          );
+        }
 
         if (!valid) {
           // archive local invalid bundle for debug purposes
@@ -259,9 +253,10 @@ export async function validateBundleProposal(
       this.m.bundles_data_items.set(proposedBundle.length);
       this.m.bundles_byte_size.set(storageProviderResult.byteLength);
     } else {
+      // if proposed bundle is empty we always vote abstain
       await this.voteBundleProposal(
         this.pool.bundle_proposal!.storage_id,
-        VoteType.VOTE_TYPE_VALID
+        VoteType.VOTE_TYPE_ABSTAIN
       );
 
       // update metrics

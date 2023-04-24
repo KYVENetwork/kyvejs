@@ -1765,7 +1765,8 @@ describe("vote abstain tests", () => {
 
     expect(compression.compress).toHaveBeenCalledTimes(0);
 
-    expect(compression.decompress).toHaveBeenCalledTimes(0);
+    expect(compression.decompress).toHaveBeenCalledTimes(1);
+    expect(compression.decompress).toHaveBeenLastCalledWith(compressedBundle);
 
     // =============================
     // ASSERT INTEGRATION INTERFACES
@@ -1777,7 +1778,20 @@ describe("vote abstain tests", () => {
       bundle
     );
 
-    expect(runtime.validateDataItem).toHaveBeenCalledTimes(0);
+    expect(runtime.validateDataItem).toHaveBeenCalledTimes(2);
+
+    expect(runtime.validateDataItem).toHaveBeenNthCalledWith(
+      1,
+      expect.any(Validator),
+      standardizeJSON(bundle[0]),
+      standardizeJSON(bundle[0])
+    );
+    expect(runtime.validateDataItem).toHaveBeenNthCalledWith(
+      2,
+      expect.any(Validator),
+      standardizeJSON(bundle[1]),
+      standardizeJSON(bundle[1])
+    );
 
     // ========================
     // ASSERT NODEJS INTERFACES
@@ -1908,11 +1922,7 @@ describe("vote abstain tests", () => {
     // ASSERT INTEGRATION INTERFACES
     // =============================
 
-    expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
-      expect.any(Validator),
-      bundle
-    );
+    expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(0);
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(1);
     expect(runtime.validateDataItem).toHaveBeenLastCalledWith(
