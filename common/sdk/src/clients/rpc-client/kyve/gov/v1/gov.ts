@@ -16,7 +16,7 @@ import { MsgUpdateParams as MsgUpdateParamsStakers } from "@kyvejs/types/client/
 
 import { GOV_AUTHORITY } from "../../../../../constants";
 import { encodeTxMsg } from "../../../../../registry/tx.registry";
-import { KyveSigning } from "../../../signing";
+import { KyveSigning, PendingTx } from "../../../signing";
 
 export default class KyveGovMsg extends KyveSigning {
   private createGovTx(
@@ -35,7 +35,7 @@ export default class KyveGovMsg extends KyveSigning {
     };
   }
 
-  public async createPool(
+  public createPool(
     value: Omit<MsgCreatePool, "authority">,
     deposit: string,
     metadata?: string,
@@ -53,10 +53,12 @@ export default class KyveGovMsg extends KyveSigning {
       metadata
     );
 
-    return await this.getPendingSignedTx(tx, options);
+    return new PendingTx({ tx: [tx] }, () =>
+      this.getPendingSignedTx(tx, options)
+    );
   }
 
-  public async updatePool(
+  public updatePool(
     value: Omit<MsgUpdatePool, "authority">,
     deposit: string,
     metadata?: string,
@@ -74,10 +76,12 @@ export default class KyveGovMsg extends KyveSigning {
       metadata
     );
 
-    return await this.getPendingSignedTx(tx, options);
+    return new PendingTx({ tx: [tx] }, () =>
+      this.getPendingSignedTx(tx, options)
+    );
   }
 
-  public async disablePool(
+  public disablePool(
     value: Omit<MsgDisablePool, "authority">,
     deposit: string,
     metadata?: string,
@@ -95,10 +99,12 @@ export default class KyveGovMsg extends KyveSigning {
       metadata
     );
 
-    return await this.getPendingSignedTx(tx, options);
+    return new PendingTx({ tx: [tx] }, () =>
+      this.getPendingSignedTx(tx, options)
+    );
   }
 
-  public async enablePool(
+  public enablePool(
     value: Omit<MsgEnablePool, "authority">,
     deposit: string,
     metadata?: string,
@@ -116,10 +122,12 @@ export default class KyveGovMsg extends KyveSigning {
       metadata
     );
 
-    return await this.getPendingSignedTx(tx, options);
+    return new PendingTx({ tx: [tx] }, () =>
+      this.getPendingSignedTx(tx, options)
+    );
   }
 
-  public async scheduleRuntimeUpgrade(
+  public scheduleRuntimeUpgrade(
     value: Omit<MsgScheduleRuntimeUpgrade, "authority">,
     deposit: string,
     metadata?: string,
@@ -137,10 +145,12 @@ export default class KyveGovMsg extends KyveSigning {
       metadata
     );
 
-    return await this.getPendingSignedTx(tx, options);
+    return new PendingTx({ tx: [tx] }, () =>
+      this.getPendingSignedTx(tx, options)
+    );
   }
 
-  public async cancelRuntimeUpgrade(
+  public cancelRuntimeUpgrade(
     value: Omit<MsgCancelRuntimeUpgrade, "authority">,
     deposit: string,
     metadata?: string,
@@ -158,10 +168,12 @@ export default class KyveGovMsg extends KyveSigning {
       metadata
     );
 
-    return await this.getPendingSignedTx(tx, options);
+    return new PendingTx({ tx: [tx] }, () =>
+      this.getPendingSignedTx(tx, options)
+    );
   }
 
-  public async updateParamsStakers(
+  public updateParamsStakers(
     value: Omit<MsgUpdateParamsStakers, "authority">,
     deposit: string,
     metadata?: string,
@@ -179,10 +191,12 @@ export default class KyveGovMsg extends KyveSigning {
       metadata
     );
 
-    return await this.getPendingSignedTx(tx, options);
+    return new PendingTx({ tx: [tx] }, () =>
+      this.getPendingSignedTx(tx, options)
+    );
   }
 
-  public async updateParamsDelegation(
+  public updateParamsDelegation(
     value: Omit<MsgUpdateParamsDelegation, "authority">,
     deposit: string,
     metadata?: string,
@@ -200,10 +214,12 @@ export default class KyveGovMsg extends KyveSigning {
       metadata
     );
 
-    return await this.getPendingSignedTx(tx, options);
+    return new PendingTx({ tx: [tx] }, () =>
+      this.getPendingSignedTx(tx, options)
+    );
   }
 
-  public async updateParamsBundles(
+  public updateParamsBundles(
     value: Omit<MsgUpdateParamsBundles, "authority">,
     deposit: string,
     metadata?: string,
@@ -221,10 +237,12 @@ export default class KyveGovMsg extends KyveSigning {
       metadata
     );
 
-    return await this.getPendingSignedTx(tx, options);
+    return new PendingTx({ tx: [tx] }, () =>
+      this.getPendingSignedTx(tx, options)
+    );
   }
 
-  public async updateParamsGlobal(
+  public updateParamsGlobal(
     value: Omit<MsgUpdateParamsGlobal, "authority">,
     deposit: string,
     metadata?: string,
@@ -242,10 +260,12 @@ export default class KyveGovMsg extends KyveSigning {
       metadata
     );
 
-    return await this.getPendingSignedTx(tx, options);
+    return new PendingTx({ tx: [tx] }, () =>
+      this.getPendingSignedTx(tx, options)
+    );
   }
 
-  public async vote(
+  public vote(
     id: string,
     voteOption: "Yes" | "Abstain" | "No" | "NoWithVeto",
     options?: {
@@ -279,6 +299,8 @@ export default class KyveGovMsg extends KyveSigning {
       },
     };
 
-    return await this.getPendingSignedTx(tx, options);
+    return new PendingTx({ tx: [tx] }, () =>
+      this.getPendingSignedTx(tx, options)
+    );
   }
 }

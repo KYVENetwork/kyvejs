@@ -10,6 +10,40 @@ import {
 import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
 
 import { GAS_MULTIPLIER, IConfig } from "../../constants";
+export interface IBasePendingTx {
+  tx: EncodeObject[];
+}
+export class PendingTx<T> implements PromiseLike<T>, IBasePendingTx {
+  public readonly tx: EncodeObject[];
+  private executor: () => Promise<T>;
+  constructor(options: { tx: EncodeObject[] }, executor: () => Promise<T>) {
+    this.tx = options.tx;
+    this.executor = executor;
+  }
+  then<TResult1 = T, TResult2 = never>(
+    onfulfilled?:
+      | ((value: T) => PromiseLike<TResult1> | TResult1)
+      | undefined
+      | null,
+    onrejected?:
+      | ((reason: any) => PromiseLike<TResult2> | TResult2)
+      | undefined
+      | null
+  ): Promise<TResult1 | TResult2> {
+    return this.executor().then(onfulfilled, onrejected);
+  }
+  catch<TResult = never>(
+    onrejected?:
+      | ((reason: any) => PromiseLike<TResult> | TResult)
+      | undefined
+      | null
+  ): Promise<T | TResult> {
+    return this.executor().catch(onrejected);
+  }
+  finally(onfinally?: (() => void) | undefined | null): Promise<T> {
+    return this.executor().finally(onfinally);
+  }
+}
 
 type SignedTx = {
   tx: EncodeObject[];
@@ -17,7 +51,7 @@ type SignedTx = {
   fee: StdFee;
 };
 
-export class PendingSignedTx {
+export class PendingSignedTx implements IBasePendingTx {
   private nativeClient: SigningStargateClient;
   private txBytes: Uint8Array;
   readonly txHash: string;
@@ -36,7 +70,6 @@ export class PendingSignedTx {
     return await this.nativeClient.broadcastTx(this.txBytes);
   }
 }
-
 export class KyveSigning {
   public nativeClient: SigningStargateClient;
   public readonly account: AccountData;
