@@ -12,7 +12,7 @@
         "no-restricted-syntax": [
           "error",
           {
-            // disallow to use async func in RPC methods, beacuse async func will return Promise<PromiseLike<PendingSignedTx>>, but we expect PendingTx<PendingSignedTx> PromsieLike object
+            // disallow to use async func in RPC methods, beacuse async func will return Promise<PendingTx<PendingSignedTx>>, but we expect PendingTx<PendingSignedTx> PromiseLike object
             "selector": "[async=true]",
             "message": "Async function are not allowed in RPC methods use PendingTx (PromiseLike) instead"
           }
