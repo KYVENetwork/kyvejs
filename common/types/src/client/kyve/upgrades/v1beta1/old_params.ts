@@ -4,7 +4,7 @@ import _m0 from "protobufjs/minimal";
 
 export const protobufPackage = "kyve.upgrades.v1beta1";
 
-/** Params defines the bundles module parameters. */
+/** OldBundlesParams defines the bundles module parameters. */
 export interface OldBundlesParams {
   /** upload_timeout ... */
   upload_timeout: string;
@@ -16,7 +16,7 @@ export interface OldBundlesParams {
   max_points: string;
 }
 
-/** Params defines the delegation module parameters. */
+/** OldDelegationParams defines the delegation module parameters. */
 export interface OldDelegationParams {
   /** unbonding_delegation_time ... */
   unbonding_delegation_time: string;

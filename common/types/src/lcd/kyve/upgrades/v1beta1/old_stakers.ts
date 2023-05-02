@@ -22,7 +22,7 @@ export interface OldStaker {
 }
 
 /**
- * CommissionChangeEntry stores the information for an
+ * OldCommissionChangeEntry stores the information for an
  * upcoming commission change. A commission change is never
  * instant, so delegators have time to redelegate in case
  * they don't agree with the new commission.
