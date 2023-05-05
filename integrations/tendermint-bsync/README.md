@@ -33,6 +33,11 @@ to bootstrap themselves and sync to the current network height. This may make ex
 already permanently and immutably archived. Additionally, block data can be retrieved over an ELT pipeline, further analyzing and using
 it for different applications like block explorers.
 
+## Required Setup
+
+This runtime requires the node operator to run a tendermint node which is used as the source and the KYVE protocol node. Depending
+on which tendermint chain gets archived the minimum hardware requirements are at least the min requirements of that tendermint node.
+
 ## Integrations currently live
 
 The following integrations are running on this runtime and are currently live.
@@ -43,7 +48,9 @@ The following integrations are running on this runtime and are currently live.
 
 ### Testnet
 
-(planned - currently in test)
+- Pool ID: 0
+  - Chain ID: _cosmoshub-4_
+  - Base Height: _5200791_
 
 ### Devnet
 
@@ -123,7 +130,7 @@ Depending on the integration which are currently live the following setup has to
 
 ### Cosmos Hub
 
-**INFO**: Live on Korellia: Pool Id 24
+**INFO**: This pool archives the current Cosmos Hub (Chain Id: cosmoshub-4) from block 5,200,791 to the current block (~14M).
 
 Every protocol node runner will run their own Cosmos Hub blockchain node as a data source. This ensures
 that the data which is getting proposed and validated actually comes from decentralized sources. Furthermore, since the gaia blockchain node only serves valid blocks we further increase the validation
