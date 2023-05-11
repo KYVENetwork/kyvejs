@@ -153,24 +153,11 @@ export class KyveSDK {
         },
       ],
     });
-<<<<<<< HEAD
-    await window.keplr.enable(this.network.chainId);
-    window.keplr.defaultOptions = {
-      sign: {
-        preferNoSetFee: true,
-      },
-    };
-    const signer = await window.keplr.getOfflineSignerAuto(
-      this.network.chainId
-    );
-    const walletName = (await window.keplr.getKey(this.network.chainId)).name;
-=======
 
     await window.keplr.enable(this.config.chainId);
 
     const signer = await window.keplr.getOfflineSignerAuto(this.config.chainId);
     const walletName = (await window.keplr.getKey(this.config.chainId)).name;
->>>>>>> main
     const keplr = window.keplr;
     const keplrAminoSigner = new KeplrAminoSigner(keplr, this.config);
     const client = await getSigningKyveClient(

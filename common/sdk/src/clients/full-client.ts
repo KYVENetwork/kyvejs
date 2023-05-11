@@ -8,6 +8,7 @@ import KyveClient from "./rpc-client/client";
 import KyveWebClient from "./rpc-client/web.client";
 
 import { createPoolAminoConverters } from "../amino/tx.amino";
+import { createStakersAminoConverters } from "../amino/tx.amino";
 import { createBankAminoConverters } from "@cosmjs/stargate/build/modules/bank/aminomessages";
 
 export async function getSigningKyveClient(
@@ -42,6 +43,7 @@ export async function getSigningKyveClient(
       aminoTypes: new AminoTypes({
         ...createBankAminoConverters(),
         ...createPoolAminoConverters(),
+        ...createStakersAminoConverters(),
       }),
     });
 
