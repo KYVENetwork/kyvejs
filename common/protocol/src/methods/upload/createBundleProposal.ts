@@ -106,7 +106,7 @@ export async function createBundleProposal(this: Validator): Promise<void> {
     this.logger.debug(
       `compressionFactory(${this.pool.data?.current_compression_id ?? 0})`
     );
-    const compression = this.compressionFactory(
+    const compression = Validator.compressionFactory(
       this.pool.data?.current_compression_id ?? 0
     );
 
@@ -213,8 +213,9 @@ export async function createBundleProposal(this: Validator): Promise<void> {
           this.pool.data?.current_storage_provider_id ?? 0
         }, $STORAGE_PRIV)`
       );
-      const storageProvider = await this.storageProviderFactory(
-        this.pool.data?.current_storage_provider_id ?? 0
+      const storageProvider = Validator.storageProviderFactory(
+        this.pool.data?.current_storage_provider_id ?? 0,
+        this.storagePriv
       );
 
       // upload the bundle proposal to the storage provider
@@ -251,7 +252,7 @@ export async function createBundleProposal(this: Validator): Promise<void> {
       // if the bundle was successfully uploaded to the storage provider
       // the node can finally submit the actual bundle proposal to
       // the network
-      await this.submitBundleProposal(
+      const success = await this.submitBundleProposal(
         storageId,
         dataSize,
         dataHash,
@@ -262,10 +263,12 @@ export async function createBundleProposal(this: Validator): Promise<void> {
         bundleSummary
       );
 
-      this.logger.info(`Successfully submitted BundleProposal:${storageId}`);
+      if (success) {
+        this.logger.info(`Successfully submitted BundleProposal:${storageId}`);
+      }
     } catch (err) {
       this.logger.info(
-        `Saving bundle proposal on StorageProvider was unsucessful`
+        `Saving bundle proposal on StorageProvider was unsuccessful`
       );
       this.logger.debug(standardizeJSON(err));
 

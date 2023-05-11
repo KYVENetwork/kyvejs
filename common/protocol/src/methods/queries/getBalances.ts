@@ -1,4 +1,3 @@
-import { DENOM, KYVE_DECIMALS } from "@kyvejs/sdk/dist/constants";
 import BigNumber from "bignumber.js";
 
 import { Validator, standardizeJSON } from "../..";
@@ -17,18 +16,20 @@ export async function getBalances(this: Validator): Promise<void> {
     try {
       this.logger.debug(this.rpc[c]);
       this.logger.debug(
-        `this.client.nativeClient.getBalance(${this.staker},${DENOM})`
+        `this.client.nativeClient.getBalance(${this.staker},${this.sdk[c].config.coinDenom})`
       );
 
       const stakerBalanceRaw = await this.client[c].nativeClient.getBalance(
         this.staker,
-        DENOM
+        this.sdk[c].config.coinDenom
       );
 
       this.logger.debug(JSON.stringify(stakerBalanceRaw));
 
       const stakerBalance = new BigNumber(stakerBalanceRaw.amount)
-        .dividedBy(new BigNumber(10).exponentiatedBy(KYVE_DECIMALS))
+        .dividedBy(
+          new BigNumber(10).exponentiatedBy(this.sdk[c].config.coinDecimals)
+        )
         .toNumber();
 
       this.m.balance_staker.set(stakerBalance);
@@ -43,18 +44,20 @@ export async function getBalances(this: Validator): Promise<void> {
     try {
       this.logger.debug(this.rpc[c]);
       this.logger.debug(
-        `this.client.nativeClient.getBalance(${this.client[0].account.address},${DENOM})`
+        `this.client.nativeClient.getBalance(${this.client[0].account.address},${this.sdk[c].config.coinDenom})`
       );
 
       const valaccountBalanceRaw = await this.client[c].nativeClient.getBalance(
         this.client[0].account.address,
-        DENOM
+        this.sdk[c].config.coinDenom
       );
 
       this.logger.debug(JSON.stringify(valaccountBalanceRaw));
 
       const valaccountBalance = new BigNumber(valaccountBalanceRaw.amount)
-        .dividedBy(new BigNumber(10).exponentiatedBy(KYVE_DECIMALS))
+        .dividedBy(
+          new BigNumber(10).exponentiatedBy(this.sdk[c].config.coinDecimals)
+        )
         .toNumber();
 
       this.m.balance_valaccount.set(valaccountBalance);
@@ -72,8 +75,9 @@ export async function getBalances(this: Validator): Promise<void> {
         this.pool.data?.current_storage_provider_id ?? 0
       }, $STORAGE_PRIV)`
     );
-    const storageProvider = await this.storageProviderFactory(
-      this.pool.data?.current_storage_provider_id ?? 0
+    const storageProvider = Validator.storageProviderFactory(
+      this.pool.data?.current_storage_provider_id ?? 0,
+      this.storagePriv
     );
 
     this.logger.debug(`this.storageProvider.getBalance()`);

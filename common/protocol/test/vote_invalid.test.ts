@@ -54,11 +54,18 @@ describe("invalid votes tests", () => {
 
     // mock storage provider
     storageProvider = new TestNormalStorageProvider();
-    v["storageProviderFactory"] = jest.fn().mockResolvedValue(storageProvider);
+    jest
+      .spyOn(Validator, "storageProviderFactory")
+      .mockImplementation(() => storageProvider);
 
     // mock compression
     compression = new TestNormalCompression();
-    v["compressionFactory"] = jest.fn().mockReturnValue(compression);
+    jest
+      .spyOn(Validator, "compressionFactory")
+      .mockImplementation(() => compression);
+
+    // mock archiveDebugBundle
+    v["archiveDebugBundle"] = jest.fn();
 
     // mock process.exit
     processExit = jest.fn<never, never>();
@@ -230,11 +237,7 @@ describe("invalid votes tests", () => {
     // ASSERT INTEGRATION INTERFACES
     // =============================
 
-    expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
-      expect.any(Validator),
-      bundle
-    );
+    expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(0);
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(1);
 
@@ -752,7 +755,8 @@ describe("invalid votes tests", () => {
 
     expect(compression.compress).toHaveBeenCalledTimes(0);
 
-    expect(compression.decompress).toHaveBeenCalledTimes(0);
+    expect(compression.decompress).toHaveBeenCalledTimes(1);
+    expect(compression.decompress).toHaveBeenLastCalledWith(compressedBundle);
 
     // =============================
     // ASSERT INTEGRATION INTERFACES
@@ -764,7 +768,20 @@ describe("invalid votes tests", () => {
       bundle
     );
 
-    expect(runtime.validateDataItem).toHaveBeenCalledTimes(0);
+    expect(runtime.validateDataItem).toHaveBeenCalledTimes(2);
+
+    expect(runtime.validateDataItem).toHaveBeenNthCalledWith(
+      1,
+      expect.any(Validator),
+      standardizeJSON(bundle[0]),
+      standardizeJSON(bundle[0])
+    );
+    expect(runtime.validateDataItem).toHaveBeenNthCalledWith(
+      2,
+      expect.any(Validator),
+      standardizeJSON(bundle[1]),
+      standardizeJSON(bundle[1])
+    );
 
     // ========================
     // ASSERT NODEJS INTERFACES
@@ -776,7 +793,7 @@ describe("invalid votes tests", () => {
     // TODO: assert timeouts
   });
 
-  test("vote invalid because proposed data_hash does not match", async () => {
+  test("vote abstain because proposed data_hash does not match", async () => {
     // ARRANGE
     const bundle = [
       { key: "test_key_1", value: "test_value_1" },
@@ -839,7 +856,7 @@ describe("invalid votes tests", () => {
       staker: "test_staker",
       pool_id: "0",
       storage_id: "another_test_storage_id",
-      vote: VoteType.VOTE_TYPE_INVALID,
+      vote: VoteType.VOTE_TYPE_ABSTAIN,
     });
 
     expect(txs.submitBundleProposal).toHaveBeenCalledTimes(0);
@@ -1026,11 +1043,7 @@ describe("invalid votes tests", () => {
     // ASSERT INTEGRATION INTERFACES
     // =============================
 
-    expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
-      expect.any(Validator),
-      bundle
-    );
+    expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(0);
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(1);
 
@@ -1435,11 +1448,7 @@ describe("invalid votes tests", () => {
     // ASSERT INTEGRATION INTERFACES
     // =============================
 
-    expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
-      expect.any(Validator),
-      bundle
-    );
+    expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(0);
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(1);
 
@@ -1598,11 +1607,7 @@ describe("invalid votes tests", () => {
     // ASSERT INTEGRATION INTERFACES
     // =============================
 
-    expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
-      expect.any(Validator),
-      bundle
-    );
+    expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(0);
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(1);
 
@@ -1745,11 +1750,7 @@ describe("invalid votes tests", () => {
     // ASSERT INTEGRATION INTERFACES
     // =============================
 
-    expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
-      expect.any(Validator),
-      bundle
-    );
+    expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(0);
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(1);
 

@@ -8,14 +8,15 @@ import { version as protocolVersion } from "../package.json";
 import {
   parseCache,
   parseEndpoints,
-  parseMnemonic,
+  parseValaccount,
   parsePoolId,
+  parseStoragePriv,
 } from "./commander";
 import {
+  archiveDebugBundle,
   canPropose,
   canVote,
   claimUploaderRole,
-  compressionFactory,
   continueRound,
   createBundleProposal,
   getBalances,
@@ -23,7 +24,6 @@ import {
   runNode,
   saveBundleDecompress,
   saveBundleDownload,
-  saveGetTransformDataItem,
   saveLoadValidationBundle,
   setupCacheProvider,
   setupLogger,
@@ -31,9 +31,7 @@ import {
   setupSDK,
   setupValidator,
   skipUploaderRole,
-  storageProviderFactory,
   submitBundleProposal,
-  syncPoolConfig,
   syncPoolState,
   validateBundleProposal,
   validateIsNodeValidator,
@@ -41,6 +39,7 @@ import {
   validateRuntime,
   validateStorageBalance,
   validateVersion,
+  validateDataAvailability,
   voteBundleProposal,
   waitForAuthorization,
   waitForCacheContinuation,
@@ -50,6 +49,10 @@ import {
 } from "./methods";
 import { ICacheProvider, IMetrics, IRuntime } from "./types";
 import { standardizeJSON } from "./utils";
+import { SupportedChains } from "@kyvejs/sdk/dist/constants";
+import { storageProviderFactory } from "./reactors/storageProviders";
+import { compressionFactory } from "./reactors/compression";
+import { cacheProviderFactory } from "./reactors/cacheProvider";
 
 /**
  * Main class of KYVE protocol nodes representing a validator node.
@@ -70,7 +73,6 @@ export class Validator {
   // node attributes
   public protocolVersion!: string;
   public pool!: PoolResponse;
-  public poolConfig!: any;
   public name!: string;
 
   // logger attributes
@@ -84,9 +86,13 @@ export class Validator {
   protected staker!: string;
   protected valaccount!: string;
   protected storagePriv!: string;
-  protected chainId!: string;
+  protected chainId!: SupportedChains;
   protected rpc!: string[];
   protected rest!: string[];
+  protected coinDenom!: string;
+  protected coinDecimals!: number;
+  protected gasPrice!: number;
+  protected requestBackoff!: number;
   protected cache!: string;
   protected debug!: boolean;
   protected metrics!: boolean;
@@ -105,6 +111,7 @@ export class Validator {
   protected validateVersion = validateVersion;
   protected validateIsNodeValidator = validateIsNodeValidator;
   protected validateIsPoolActive = validateIsPoolActive;
+  protected validateDataAvailability = validateDataAvailability;
 
   // timeouts
   protected waitForAuthorization = waitForAuthorization;
@@ -113,13 +120,9 @@ export class Validator {
   protected waitForCacheContinuation = waitForCacheContinuation;
 
   // helpers
+  protected archiveDebugBundle = archiveDebugBundle;
   protected continueRound = continueRound;
-  protected saveGetTransformDataItem = saveGetTransformDataItem;
   public getProxyAuth = getProxyAuth;
-
-  // factories
-  protected storageProviderFactory = storageProviderFactory;
-  protected compressionFactory = compressionFactory;
 
   // txs
   protected claimUploaderRole = claimUploaderRole;
@@ -129,7 +132,6 @@ export class Validator {
 
   // queries
   protected syncPoolState = syncPoolState;
-  protected syncPoolConfig = syncPoolConfig;
   protected getBalances = getBalances;
   protected canVote = canVote;
   protected canPropose = canPropose;
@@ -147,6 +149,11 @@ export class Validator {
   // main
   protected runNode = runNode;
   protected runCache = runCache;
+
+  // factories
+  public static cacheProviderFactory = cacheProviderFactory;
+  public static storageProviderFactory = storageProviderFactory;
+  public static compressionFactory = compressionFactory;
 
   /**
    * Constructor for the validator class. It is required to provide the
@@ -198,12 +205,13 @@ export class Validator {
       )
       .requiredOption(
         "--valaccount <string>",
-        "The mnemonic of the valaccount",
-        parseMnemonic
+        "The environment variable pointing to the valaccount mnemonic",
+        parseValaccount
       )
       .requiredOption(
         "--storage-priv <string>",
-        "The private key of the storage provider"
+        "The environment variable pointing to the private key of the storage provider",
+        parseStoragePriv
       )
       .requiredOption("--chain-id <string>", "The chain ID of the network")
       .requiredOption(
@@ -215,6 +223,23 @@ export class Validator {
         "--rest <string>",
         "Comma separated list of rest endpoints. If the first fails the next endpoint will be used as fallback.",
         parseEndpoints
+      )
+      .option(
+        "--coin-denom <string>",
+        "The denom of the coin, this value will be loaded by default based on the chain id"
+      )
+      .option(
+        "--coin-decimals <number>",
+        "The decimals of the coin, this value will be loaded by default based on the chain id"
+      )
+      .option(
+        "--gas-price <number>",
+        "The gas price the node should use to calculate transaction fees, this value will be loaded by default based on the chain id"
+      )
+      .option(
+        "--request-backoff <number>",
+        "The time in milliseconds between each getDataItem request where the node sleeps [default = 50]",
+        "50"
       )
       .option(
         "--cache <jsonfile|memory>",
@@ -257,18 +282,21 @@ export class Validator {
    * @return {Promise<void>}
    */
   private async start(options: OptionValues): Promise<void> {
-    // assign program options
-    // to node instance
+    // assign program options to node instance
     this.poolId = options.pool;
     this.valaccount = options.valaccount;
     this.storagePriv = options.storagePriv;
     this.chainId = options.chainId;
     this.rpc = options.rpc;
     this.rest = options.rest;
+    this.coinDenom = options.coinDenom;
+    this.coinDecimals = options.coinDecimals;
+    this.gasPrice = options.gasPrice;
+    this.requestBackoff = parseInt(options.requestBackoff);
     this.cache = options.cache;
     this.debug = options.debug;
     this.metrics = options.metrics;
-    this.metricsPort = options.metricsPort;
+    this.metricsPort = parseInt(options.metricsPort);
     this.home = options.home;
 
     // perform setups
@@ -277,8 +305,10 @@ export class Validator {
 
     // perform async setups
     await this.setupSDK();
-    await this.syncPoolState();
+    await this.syncPoolState(true);
     await this.validateStorageBalance();
+    await this.validateDataAvailability();
+
     await this.setupValidator();
     await this.setupCacheProvider();
 

@@ -11,8 +11,9 @@ import { Validator, standardizeJSON } from "../..";
  */
 export async function validateStorageBalance(this: Validator): Promise<void> {
   try {
-    const storageProvider = await this.storageProviderFactory(
-      this.pool.data?.current_storage_provider_id ?? 0
+    const storageProvider = Validator.storageProviderFactory(
+      this.pool.data?.current_storage_provider_id ?? 0,
+      this.storagePriv
     );
 
     this.logger.info(
@@ -35,7 +36,7 @@ export async function validateStorageBalance(this: Validator): Promise<void> {
     }
 
     this.logger.info(
-      `Account has available funds on StorageProvider:${storageProvider.name}`
+      `Account has available funds on StorageProvider:${storageProvider.name}\n`
     );
   } catch (err) {
     this.logger.fatal(

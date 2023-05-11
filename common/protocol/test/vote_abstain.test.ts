@@ -6,6 +6,7 @@ import {
   Validator,
   sha256,
   standardizeJSON,
+  ICacheProvider,
 } from "../src/index";
 import { runNode } from "../src/methods/main/runNode";
 import { genesis_pool } from "./mocks/constants";
@@ -46,21 +47,32 @@ describe("vote abstain tests", () => {
   let processExit: jest.Mock<never, never>;
   let setTimeoutMock: jest.Mock;
 
+  let cacheProvider: ICacheProvider;
   let storageProvider: IStorageProvider;
   let compression: ICompression;
 
   beforeEach(() => {
     v = new Validator(new TestRuntime());
 
-    v["cacheProvider"] = new TestCacheProvider();
+    // mock cache provider
+    cacheProvider = new TestCacheProvider();
+    jest
+      .spyOn(Validator, "cacheProviderFactory")
+      .mockImplementation(() => cacheProvider);
+
+    v["cacheProvider"] = cacheProvider;
 
     // mock storage provider
     storageProvider = new TestNormalStorageProvider();
-    v["storageProviderFactory"] = jest.fn().mockResolvedValue(storageProvider);
+    jest
+      .spyOn(Validator, "storageProviderFactory")
+      .mockImplementation(() => storageProvider);
 
     // mock compression
     compression = new TestNormalCompression();
-    v["compressionFactory"] = jest.fn().mockReturnValue(compression);
+    jest
+      .spyOn(Validator, "compressionFactory")
+      .mockImplementation(() => compression);
 
     // mock process.exit
     processExit = jest.fn<never, never>();
@@ -1753,7 +1765,8 @@ describe("vote abstain tests", () => {
 
     expect(compression.compress).toHaveBeenCalledTimes(0);
 
-    expect(compression.decompress).toHaveBeenCalledTimes(0);
+    expect(compression.decompress).toHaveBeenCalledTimes(1);
+    expect(compression.decompress).toHaveBeenLastCalledWith(compressedBundle);
 
     // =============================
     // ASSERT INTEGRATION INTERFACES
@@ -1765,7 +1778,20 @@ describe("vote abstain tests", () => {
       bundle
     );
 
-    expect(runtime.validateDataItem).toHaveBeenCalledTimes(0);
+    expect(runtime.validateDataItem).toHaveBeenCalledTimes(2);
+
+    expect(runtime.validateDataItem).toHaveBeenNthCalledWith(
+      1,
+      expect.any(Validator),
+      standardizeJSON(bundle[0]),
+      standardizeJSON(bundle[0])
+    );
+    expect(runtime.validateDataItem).toHaveBeenNthCalledWith(
+      2,
+      expect.any(Validator),
+      standardizeJSON(bundle[1]),
+      standardizeJSON(bundle[1])
+    );
 
     // ========================
     // ASSERT NODEJS INTERFACES
@@ -1896,11 +1922,7 @@ describe("vote abstain tests", () => {
     // ASSERT INTEGRATION INTERFACES
     // =============================
 
-    expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
-      expect.any(Validator),
-      bundle
-    );
+    expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(0);
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(1);
     expect(runtime.validateDataItem).toHaveBeenLastCalledWith(

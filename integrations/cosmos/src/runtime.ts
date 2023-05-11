@@ -1,21 +1,46 @@
-import { DataItem, IRuntime, Validator, sha256 } from '@kyvejs/protocol';
+import { DataItem, IRuntime, Validator } from '@kyvejs/protocol';
 import { fetchBlock } from './utils';
 import { name, version } from '../package.json';
+
+// Celo config
+interface IConfig {
+  sources: string[];
+}
 
 export default class Cosmos implements IRuntime {
   public name = name;
   public version = version;
+  public config!: IConfig;
 
-  async getDataItem(
-    v: Validator,
-    source: string,
-    key: string
-  ): Promise<DataItem> {
-    // get auth headers for proxy endpoints
-    const headers = await v.getProxyAuth();
-    const value = await fetchBlock(source, +key, headers);
+  async validateSetConfig(rawConfig: string): Promise<void> {
+    const config: IConfig = JSON.parse(rawConfig);
 
-    return { key, value };
+    if (!config.sources.length) {
+      throw new Error(`Config does not have any sources`);
+    }
+
+    this.config = config;
+  }
+
+  async getDataItem(v: Validator, key: string): Promise<DataItem> {
+    const results: any[] = [];
+
+    for (let source of this.config.sources) {
+      // get auth headers for proxy endpoints
+      const headers = await v.getProxyAuth();
+      const block = await fetchBlock(source, +key, headers);
+
+      results.push(block);
+    }
+
+    // check if results from the different sources match
+    if (
+      !results.every((b) => JSON.stringify(b) === JSON.stringify(results[0]))
+    ) {
+      throw new Error(`Sources returned different results`);
+    }
+
+    return { key, value: results[0] };
   }
 
   async prevalidateDataItem(_: Validator, item: DataItem): Promise<boolean> {
@@ -33,14 +58,10 @@ export default class Cosmos implements IRuntime {
     proposedDataItem: DataItem,
     validationDataItem: DataItem
   ): Promise<boolean> {
-    const proposedDataItemHash = sha256(
-      Buffer.from(JSON.stringify(proposedDataItem))
+    // apply equal comparison
+    return (
+      JSON.stringify(proposedDataItem) === JSON.stringify(validationDataItem)
     );
-    const validationDataItemHash = sha256(
-      Buffer.from(JSON.stringify(validationDataItem))
-    );
-
-    return proposedDataItemHash === validationDataItemHash;
   }
 
   async summarizeDataBundle(_: Validator, bundle: DataItem[]): Promise<string> {

@@ -4,7 +4,7 @@ import { Command } from "commander";
 import fs from "fs";
 import path from "path";
 
-const home = path.join(process.env.HOME!, ".kysor");
+import { HOME } from "../utils/constants";
 
 const init = new Command("init").description("Init KYSOR");
 
@@ -19,21 +19,33 @@ init
     "Comma separated list of rest endpoints. If the first fails the next endpoint will be used as fallback. "
   )
   .option(
+    "--coin-denom <string>",
+    "The denom of the coin, this value will be loaded by default based on the chain id"
+  )
+  .option(
+    "--coin-decimals <number>",
+    "The decimals of the coin, this value will be loaded by default based on the chain id"
+  )
+  .option(
+    "--gas-price <number>",
+    "The gas price the node should use to calculate transaction fees"
+  )
+  .option(
     "-d, --auto-download-binaries",
     "Allow automatic download and execution of new upgrade binaries"
   )
   .action(async (options) => {
     try {
-      if (fs.existsSync(path.join(home, `config.toml`))) {
+      if (fs.existsSync(path.join(HOME, `config.toml`))) {
         console.log(
           `KYSOR was already initialized. You can directly edit the config file under ${path.join(
-            home,
+            HOME,
             `config.toml`
           )}`
         );
       } else {
         // create KYSOR home directory
-        fs.mkdirSync(home, {
+        fs.mkdirSync(HOME, {
           recursive: true,
         });
 
@@ -59,11 +71,10 @@ init
         }
 
         try {
-          new KyveSDK({
-            chainId: options.chainId,
+          new KyveSDK(options.chainId, {
             rpc: rpc[0],
             rest: rest[0],
-            chainName: `KYVE - ${options.chainId}`,
+            gasPrice: options.gasPrice,
           });
         } catch (err) {
           console.log(
@@ -77,16 +88,17 @@ init
           chainId: options.chainId,
           rpc: options.rpc,
           rest: options.rest,
+          gasPrice: options.gasPrice,
           autoDownloadBinaries: options.autoDownloadBinaries,
         };
 
         fs.writeFileSync(
-          path.join(home, `config.toml`),
+          path.join(HOME, `config.toml`),
           TOML.stringify(config as any)
         );
 
         console.log(
-          `Successfully initialized KYSOR in the following home directory: ${home}`
+          `Successfully initialized KYSOR in the following home directory: ${HOME}`
         );
       }
     } catch (err) {

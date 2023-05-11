@@ -1,25 +1,56 @@
 import { StaticCeloProvider } from '@celo-tools/celo-ethers-wrapper';
-import { DataItem, IRuntime, sha256, Validator } from '@kyvejs/protocol';
+import { DataItem, IRuntime, Validator } from '@kyvejs/protocol';
 import { providers } from 'ethers';
 
 import { name, version } from '../package.json';
 
+// Celo config
+interface IConfig {
+  sources: string[];
+}
+
 export default class Celo implements IRuntime {
   public name = name;
   public version = version;
+  public config!: IConfig;
 
-  async getDataItem(
-    v: Validator,
-    source: string,
-    key: string
-  ): Promise<DataItem> {
-    // get auth headers for proxy endpoints
-    const headers = await v.getProxyAuth();
+  async validateSetConfig(rawConfig: string): Promise<void> {
+    const config: IConfig = JSON.parse(rawConfig);
 
-    const provider = new StaticCeloProvider({ url: source, headers });
-    const value = await provider.getBlockWithTransactions(+key);
+    if (!config.sources.length) {
+      throw new Error(`Config does not have any sources`);
+    }
 
-    return { key, value };
+    this.config = config;
+  }
+
+  async getDataItem(v: Validator, key: string): Promise<DataItem> {
+    const results: any[] = [];
+
+    for (const source of this.config.sources) {
+      // get auth headers for proxy endpoints
+      const headers = await v.getProxyAuth();
+
+      const provider = new StaticCeloProvider({ url: source, headers });
+      const block = await provider.getBlockWithTransactions(+key);
+
+      // delete confirmations from transactions to keep data deterministic
+      block.transactions.forEach(
+        (tx: Partial<providers.TransactionResponse>) => delete tx.confirmations
+      );
+
+      // delete extraData since it is undeterministic
+      block.extraData = '';
+    }
+
+    // check if results from the different sources match
+    if (
+      !results.every((b) => JSON.stringify(b) === JSON.stringify(results[0]))
+    ) {
+      throw new Error(`Sources returned different results`);
+    }
+
+    return { key, value: results[0] };
   }
 
   async prevalidateDataItem(_: Validator, item: DataItem): Promise<boolean> {
@@ -28,14 +59,7 @@ export default class Celo implements IRuntime {
   }
 
   async transformDataItem(_: Validator, item: DataItem): Promise<DataItem> {
-    // Delete the number of confirmations from a transaction to maintain determinism.
-    item.value.transactions.forEach(
-      (tx: Partial<providers.TransactionResponse>) => delete tx.confirmations
-    );
-
-    // TODO: Figure out why `extraData` varies for some blocks.
-    delete item.value.extraData;
-
+    // do not transform data item
     return item;
   }
 
@@ -44,14 +68,10 @@ export default class Celo implements IRuntime {
     proposedDataItem: DataItem,
     validationDataItem: DataItem
   ): Promise<boolean> {
-    const proposedDataItemHash = sha256(
-      Buffer.from(JSON.stringify(proposedDataItem))
+    // apply equal comparison
+    return (
+      JSON.stringify(proposedDataItem) === JSON.stringify(validationDataItem)
     );
-    const validationDataItemHash = sha256(
-      Buffer.from(JSON.stringify(validationDataItem))
-    );
-
-    return proposedDataItemHash === validationDataItemHash;
   }
 
   async summarizeDataBundle(_: Validator, bundle: DataItem[]): Promise<string> {

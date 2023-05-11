@@ -34,16 +34,6 @@ export interface IStorageProvider {
   decimals: number;
 
   /**
-   * Initializes the Storage Provider with a wallet. This method is responsible
-   * for setting up the wallet so the storage provider can save data
-   *
-   * @method init
-   * @param {string} storagePriv can be a pk, a mnemonic or a keyfile which is used to setup the storage provider wallet
-   * @return {this}
-   */
-  init(storagePriv: string): Promise<this>;
-
-  /**
    * Gets the public account address of storage provider wallet
    *
    * @method getAddress

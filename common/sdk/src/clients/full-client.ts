@@ -2,6 +2,7 @@ import { OfflineAminoSigner } from "@cosmjs/amino/build/signer";
 import { OfflineSigner, Registry } from "@cosmjs/proto-signing";
 import { AminoTypes, GasPrice, SigningStargateClient } from "@cosmjs/stargate";
 
+import { IConfig } from "../constants";
 import * as KyveRegistryTx from "../registry/tx.registry";
 import KyveClient from "./rpc-client/client";
 import KyveWebClient from "./rpc-client/web.client";
@@ -10,7 +11,7 @@ import { createPoolAminoConverters } from "../amino/tx.amino";
 import { createBankAminoConverters } from "@cosmjs/stargate/build/modules/bank/aminomessages";
 
 export async function getSigningKyveClient(
-  rpcEndpoint: string,
+  config: IConfig,
   signer: OfflineSigner,
   aminoSigner: OfflineAminoSigner | null,
   walletName?: undefined,
@@ -18,7 +19,7 @@ export async function getSigningKyveClient(
 ): Promise<KyveClient>;
 
 export async function getSigningKyveClient(
-  rpcEndpoint: string,
+  config: IConfig,
   signer: OfflineSigner,
   aminoSigner: OfflineAminoSigner | null,
   walletName?: string,
@@ -26,15 +27,16 @@ export async function getSigningKyveClient(
 ): Promise<KyveWebClient>;
 
 export async function getSigningKyveClient(
-  rpcEndpoint: string,
+  config: IConfig,
   signer: OfflineSigner,
   aminoSigner: OfflineAminoSigner | null,
   walletName?: string
 ): Promise<KyveWebClient | KyveClient> {
   const registry = new Registry([...KyveRegistryTx.registry]);
-  const gasPrice = GasPrice.fromString("0tkyve");
+  const gasPrice = GasPrice.fromString(`${config.gasPrice}${config.coinDenom}`);
+
   const client: SigningStargateClient =
-    await SigningStargateClient.connectWithSigner(rpcEndpoint, signer, {
+    await SigningStargateClient.connectWithSigner(config.rpc, signer, {
       registry,
       gasPrice,
       aminoTypes: new AminoTypes({
@@ -42,8 +44,12 @@ export async function getSigningKyveClient(
         ...createPoolAminoConverters(),
       }),
     });
+
   const [account] = await signer.getAccounts();
-  if (typeof walletName === "string")
-    return new KyveWebClient(client, account, aminoSigner, walletName);
-  return new KyveClient(client, account, aminoSigner);
+
+  if (typeof walletName === "string") {
+    return new KyveWebClient(client, account, config, aminoSigner, walletName);
+  }
+
+  return new KyveClient(client, account, config, aminoSigner);
 }

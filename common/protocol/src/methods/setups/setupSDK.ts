@@ -23,11 +23,12 @@ export async function setupSDK(this: Validator): Promise<void> {
 
     this.sdk = this.rpc.map(
       (_, i) =>
-        new KyveSDK({
+        new KyveSDK(this.chainId, {
           rpc: this.rpc[i],
           rest: this.rest[i],
-          chainId: this.chainId,
-          chainName: `KYVE - ${this.chainId}`,
+          coinDenom: this.coinDenom,
+          coinDecimals: this.coinDecimals,
+          gasPrice: this.gasPrice,
         })
     );
 
