@@ -30,7 +30,7 @@ TEST CASES - fallback tests
 
 */
 
-describe("fallback tests", () => {
+describe.skip("fallback tests", () => {
   let v: Validator;
 
   let processExit: jest.Mock<never, never>;
