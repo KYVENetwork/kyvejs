@@ -6,10 +6,10 @@ import { MsgJoinPool } from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
 import { MsgLeavePool } from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
 
 import { withTypeUrl } from "../../../../../registry/tx.registry";
-import { KyveSigning } from "../../../signing";
+import { KyveSigning, PendingTx } from "../../../signing";
 
 export default class KyveStakersMethods extends KyveSigning {
-  public async createStaker(
+  public createStaker(
     value: Omit<MsgCreateStaker, "creator">,
     options?: {
       fee?: StdFee | "auto" | number;
@@ -21,10 +21,12 @@ export default class KyveStakersMethods extends KyveSigning {
       creator: this.account.address,
     });
 
-    return await this.getPendingSignedTx(tx, options);
+    return new PendingTx({ tx: [tx] }, () =>
+      this.getPendingSignedTx(tx, options)
+    );
   }
 
-  public async updateMetadata(
+  public updateMetadata(
     value: Omit<MsgUpdateMetadata, "creator">,
     options?: {
       fee?: StdFee | "auto" | number;
@@ -36,10 +38,12 @@ export default class KyveStakersMethods extends KyveSigning {
       creator: this.account.address,
     });
 
-    return await this.getPendingSignedTx(tx, options);
+    return new PendingTx({ tx: [tx] }, () =>
+      this.getPendingSignedTx(tx, options)
+    );
   }
 
-  public async updateCommission(
+  public updateCommission(
     value: Omit<MsgUpdateCommission, "creator">,
     options?: {
       fee?: StdFee | "auto" | number;
@@ -51,10 +55,12 @@ export default class KyveStakersMethods extends KyveSigning {
       creator: this.account.address,
     });
 
-    return await this.getPendingSignedTx(tx, options);
+    return new PendingTx({ tx: [tx] }, () =>
+      this.getPendingSignedTx(tx, options)
+    );
   }
 
-  public async joinPool(
+  public joinPool(
     value: Omit<MsgJoinPool, "creator">,
     options?: {
       fee?: StdFee | "auto" | number;
@@ -66,10 +72,12 @@ export default class KyveStakersMethods extends KyveSigning {
       creator: this.account.address,
     });
 
-    return await this.getPendingSignedTx(tx, options);
+    return new PendingTx({ tx: [tx] }, () =>
+      this.getPendingSignedTx(tx, options)
+    );
   }
 
-  public async leavePool(
+  public leavePool(
     value: Omit<MsgLeavePool, "creator">,
     options?: {
       fee?: StdFee | "auto" | number;
@@ -81,6 +89,8 @@ export default class KyveStakersMethods extends KyveSigning {
       creator: this.account.address,
     });
 
-    return await this.getPendingSignedTx(tx, options);
+    return new PendingTx({ tx: [tx] }, () =>
+      this.getPendingSignedTx(tx, options)
+    );
   }
 }

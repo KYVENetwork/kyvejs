@@ -2,10 +2,14 @@ import { StdFee } from "@cosmjs/amino/build/signdoc";
 import { coins } from "@cosmjs/stargate";
 import BigNumber from "bignumber.js";
 
-import { KyveSigning, PendingSignedTx } from "../../../signing";
-
+import {
+  IBasePendingTx,
+  KyveSigning,
+  PendingSignedTx,
+  PendingTx,
+} from "../../../signing";
 export default class KyveBaseMsg extends KyveSigning {
-  async transfer(
+  transfer(
     recipient: string,
     amount: string,
     options?: {
@@ -22,10 +26,12 @@ export default class KyveBaseMsg extends KyveSigning {
       },
     };
 
-    return await this.getPendingSignedTx(tx, options);
+    return new PendingTx({ tx: [tx] }, () =>
+      this.getPendingSignedTx(tx, options)
+    );
   }
 
-  async multiTransfer(
+  multiTransfer(
     recipient: string[],
     amount: string,
     options?: {
@@ -49,12 +55,13 @@ export default class KyveBaseMsg extends KyveSigning {
         })),
       },
     };
-
-    return await this.getPendingSignedTx(tx, options);
+    return new PendingTx({ tx: [tx] }, () =>
+      this.getPendingSignedTx(tx, options)
+    );
   }
 
-  async txsAll(
-    txs: PendingSignedTx[],
+  txsAll(
+    txs: PendingSignedTx[] | IBasePendingTx[],
     options?: {
       fee?: StdFee | "auto" | number;
       memo?: string;
@@ -62,6 +69,8 @@ export default class KyveBaseMsg extends KyveSigning {
   ) {
     const txMessages = txs.map((tx) => tx.tx).flat();
 
-    return await this.getPendingSignedTx(txMessages, options);
+    return new PendingTx({ tx: txMessages }, () =>
+      this.getPendingSignedTx(txMessages, options)
+    );
   }
 }

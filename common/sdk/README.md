@@ -96,15 +96,13 @@ All kyve transactions can be accessible with `kyve` property
 
 We are highly recommend to use typescript for better intellisense and type safety.
 
-### Transaction Promise
+### Pending transactions
 
-[//]: # (# todo: create better naming for this. TransactionPromise is not a good name)
-
-Each transaction returns a transaction promise. It's a not execute transaction. It's helpful because you can get the transaction hash before executed.
+Each transaction returns a pending transaction. It's a not executed transaction. It's helpful because you can get the transaction hash before executed.
 ```ts
-    const transferTxPromise = await client.kyve.base.v1beta1.transfer('kyve1qcual...', '1000000000');
-    transferTxPromise.txHash // returns transaction hash
-    const receipt = await transferTxPromise.execute();
+    const transferTxPending = await client.kyve.base.v1beta1.transfer('kyve1qcual...', '1000000000');
+    transferTxPending.txHash // returns transaction hash
+    const receipt = await transferTxPending.execute();
 ```
 ### Cosmos transactions
 
@@ -122,22 +120,33 @@ Each transaction returns a transaction promise. It's a not execute transaction. 
 
 Each transaction returns an incomplete transaction. It gives the ability to execute several messages in one transaction
 ```ts
-const multiTransferTxPromise = await sdkInstance.kyve.base.v1beta1.multiTransfer([
+const multiTransferTxSignedPending = await sdkInstance.kyve.base.v1beta1.multiTransfer([
         'kyve1qcual...',
         'kyve1pfs...'
     ], '1000000000');
-    const transferTxPromise = await sdkInstance.kyve.base.v1beta1.transfer('kyve1qcua....', '1000000000');
+    const transferTxSignedPending = await sdkInstance.kyve.base.v1beta1.transfer('kyve1qcua....', '1000000000');
     // combine several messages to one
-    const txsAllResultPromise = await sdkInstance.txsAll([multiTransferTxPromise, transferTxPromise]);
+    const txsAllResultSignedPending = await sdkInstance.kyve.base.v1beta1.txsAll([multiTransferTxSignedPending, transferTxSignedPending]);
     const receipt = await txsAllResultPromise.execute();
 ```
-Any transaction can be added to the `txsAll` method. Also, you can pass to `txsAll` result of another `txsAll` method.
 
+You can use `txsAll` with unsigned pending transactions too.
 ```ts
-    const txsAllResultPromise = await sdkInstance.txsAll([await sdkInstance.txsAll([trx1, trx2]), transferTxPromise]);
+    const transferTxUnsignedPending1 = sdkInstance.kyve.base.v1beta1.transfer('kyve1qcua....', '1000000000');
+    // when you call `await` the transaction will be signed by sdk.
+    const transferTxSignedPending2 = await sdkInstance.kyve.base.v1beta1.transfer('kyve1qcua....', '1000000000');
+    const txsAllResultSignedPending = await sdkInstance.kyve.base.v1beta1.txsAll([transferTxUnsignedPending1, transferTxSignedPending2]);
+    const receipt = await txsAllResultPromise.execute();
+
+```
+
+Any transaction can be added to the `txsAll` method. Also, you can pass to `txsAll` result of another `txsAll` method.
+```ts
+    const txsAllResultPromise = await sdkInstance.kyve.base.v1beta1.txsAll([await sdkInstance.kyve.base.v1beta1.txsAll([trx1, trx2]), transferTxPending]);
     const receipt = await txsAllResultPromise.execute();
 ```
-The approach is same like you work with JavaScript `Promise` and `Promise.all` methods.
+
+The approach is same like you work with JavaScript `Promise` object and `Promise.all` method.
 
 ## Queries
 To interact with the Kyve blockchain rest api, you can use `lcdClient`.

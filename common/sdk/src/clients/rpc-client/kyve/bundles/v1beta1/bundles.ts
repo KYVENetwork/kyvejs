@@ -5,10 +5,10 @@ import { MsgClaimUploaderRole } from "@kyvejs/types/client/kyve/bundles/v1beta1/
 import { MsgSkipUploaderRole } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
 
 import { withTypeUrl } from "../../../../../registry/tx.registry";
-import { KyveSigning } from "../../../signing";
+import { KyveSigning, PendingTx } from "../../../signing";
 
 export default class KyveBundlesMethods extends KyveSigning {
-  public async submitBundleProposal(
+  public submitBundleProposal(
     value: Omit<MsgSubmitBundleProposal, "creator">,
     options?: {
       fee?: StdFee | "auto" | number;
@@ -19,11 +19,12 @@ export default class KyveBundlesMethods extends KyveSigning {
       ...value,
       creator: this.account.address,
     });
-
-    return await this.getPendingSignedTx(tx, options);
+    return new PendingTx({ tx: [tx] }, () =>
+      this.getPendingSignedTx(tx, options)
+    );
   }
 
-  public async voteBundleProposal(
+  public voteBundleProposal(
     value: Omit<MsgVoteBundleProposal, "creator">,
     options?: {
       fee?: StdFee | "auto" | number;
@@ -35,10 +36,12 @@ export default class KyveBundlesMethods extends KyveSigning {
       creator: this.account.address,
     });
 
-    return await this.getPendingSignedTx(tx, options);
+    return new PendingTx({ tx: [tx] }, () =>
+      this.getPendingSignedTx(tx, options)
+    );
   }
 
-  public async claimUploaderRole(
+  public claimUploaderRole(
     value: Omit<MsgClaimUploaderRole, "creator">,
     options?: {
       fee?: StdFee | "auto" | number;
@@ -50,10 +53,12 @@ export default class KyveBundlesMethods extends KyveSigning {
       creator: this.account.address,
     });
 
-    return await this.getPendingSignedTx(tx, options);
+    return new PendingTx({ tx: [tx] }, () =>
+      this.getPendingSignedTx(tx, options)
+    );
   }
 
-  public async skipUploaderRole(
+  public skipUploaderRole(
     value: Omit<MsgSkipUploaderRole, "creator">,
     options?: {
       fee?: StdFee | "auto" | number;
@@ -65,6 +70,8 @@ export default class KyveBundlesMethods extends KyveSigning {
       creator: this.account.address,
     });
 
-    return await this.getPendingSignedTx(tx, options);
+    return new PendingTx({ tx: [tx] }, () =>
+      this.getPendingSignedTx(tx, options)
+    );
   }
 }
