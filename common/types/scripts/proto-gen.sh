@@ -2,8 +2,8 @@
 rm -rf temp
 mkdir temp
 KYVE_CHAIN_REPO="git@github.com:KYVENetwork/chain.git"
-BRANCH_KYVE="main"
-git -C ./temp clone  -b ${BRANCH_KYVE} --single-branch ${KYVE_CHAIN_REPO}
+KYVE_CHAIN_VERSION="v1.1.0"
+git -C ./temp clone  -b ${KYVE_CHAIN_VERSION} --single-branch ${KYVE_CHAIN_REPO}
 rm -rf ./src/client
 rm -rf ./src/lcd
 mkdir ./src/client
@@ -31,5 +31,7 @@ protoc --plugin="protoc-gen-ts_proto=${PROTOC_GEN_TS_PROTO_PATH}" \
 $(find ${PROTO_DIR}  -path -prune -o -name '*.proto' -print0 | xargs -0) \
 $(find ${KYVE_PROTO}  -path -prune -o -name '*.proto' -print0 | xargs -0)
 rm -rf temp
-git add ./src/client
-git add ./src/lcd
+
+echo "export const version = \"${KYVE_CHAIN_VERSION}\"" > ./src/version.ts
+
+git add ./src
