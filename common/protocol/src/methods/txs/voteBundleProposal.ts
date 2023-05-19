@@ -40,12 +40,19 @@ export async function voteBundleProposal(
         },pool_id: ${this.poolId.toString()},storage_id: ${storageId},vote: ${vote}})`
       );
 
-      const tx = await this.client[c].kyve.bundles.v1beta1.voteBundleProposal({
-        staker: this.staker,
-        pool_id: this.poolId.toString(),
-        storage_id: storageId,
-        vote,
-      });
+      // use a higher gas multiplier of 1.5 because while voting the gas can drastically increase,
+      // making late submitted votes fail due to not enough gas
+      const tx = await this.client[c].kyve.bundles.v1beta1.voteBundleProposal(
+        {
+          staker: this.staker,
+          pool_id: this.poolId.toString(),
+          storage_id: storageId,
+          vote,
+        },
+        {
+          fee: 1.6,
+        }
+      );
 
       this.logger.debug(`VoteProposal = ${tx.txHash}`);
 
@@ -59,7 +66,9 @@ export async function voteBundleProposal(
         this.logger.info(`Voted ${voteMessage} on bundle "${storageId}"`);
 
         this.m.tx_vote_bundle_proposal_successful.inc();
-        this.m.fees_vote_bundle_proposal.inc(parseInt(tx.fee.amount[0].amount));
+        this.m.fees_vote_bundle_proposal.inc(
+          parseInt(tx?.fee?.amount[0]?.amount ?? 0)
+        );
 
         if (vote === 1) {
           this.m.bundles_voted_valid.inc();

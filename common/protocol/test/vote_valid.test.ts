@@ -168,12 +168,17 @@ describe("vote valid tests", () => {
     expect(txs.claimUploaderRole).toHaveBeenCalledTimes(0);
 
     expect(txs.voteBundleProposal).toHaveBeenCalledTimes(1);
-    expect(txs.voteBundleProposal).toHaveBeenLastCalledWith({
-      staker: "test_staker",
-      pool_id: "0",
-      storage_id: "another_test_storage_id",
-      vote: VoteType.VOTE_TYPE_VALID,
-    });
+    expect(txs.voteBundleProposal).toHaveBeenLastCalledWith(
+      {
+        staker: "test_staker",
+        pool_id: "0",
+        storage_id: "another_test_storage_id",
+        vote: VoteType.VOTE_TYPE_VALID,
+      },
+      {
+        fee: 1.6,
+      }
+    );
 
     expect(txs.submitBundleProposal).toHaveBeenCalledTimes(0);
 
@@ -313,18 +318,30 @@ describe("vote valid tests", () => {
     expect(txs.claimUploaderRole).toHaveBeenCalledTimes(0);
 
     expect(txs.voteBundleProposal).toHaveBeenCalledTimes(2);
-    expect(txs.voteBundleProposal).toHaveBeenNthCalledWith(1, {
-      staker: "test_staker",
-      pool_id: "0",
-      storage_id: "another_test_storage_id",
-      vote: VoteType.VOTE_TYPE_ABSTAIN,
-    });
-    expect(txs.voteBundleProposal).toHaveBeenNthCalledWith(2, {
-      staker: "test_staker",
-      pool_id: "0",
-      storage_id: "another_test_storage_id",
-      vote: VoteType.VOTE_TYPE_VALID,
-    });
+    expect(txs.voteBundleProposal).toHaveBeenNthCalledWith(
+      1,
+      {
+        staker: "test_staker",
+        pool_id: "0",
+        storage_id: "another_test_storage_id",
+        vote: VoteType.VOTE_TYPE_ABSTAIN,
+      },
+      {
+        fee: 1.6,
+      }
+    );
+    expect(txs.voteBundleProposal).toHaveBeenNthCalledWith(
+      2,
+      {
+        staker: "test_staker",
+        pool_id: "0",
+        storage_id: "another_test_storage_id",
+        vote: VoteType.VOTE_TYPE_VALID,
+      },
+      {
+        fee: 1.6,
+      }
+    );
 
     expect(txs.submitBundleProposal).toHaveBeenCalledTimes(0);
 
@@ -472,18 +489,30 @@ describe("vote valid tests", () => {
     expect(txs.claimUploaderRole).toHaveBeenCalledTimes(0);
 
     expect(txs.voteBundleProposal).toHaveBeenCalledTimes(2);
-    expect(txs.voteBundleProposal).toHaveBeenNthCalledWith(1, {
-      staker: "test_staker",
-      pool_id: "0",
-      storage_id: "another_test_storage_id",
-      vote: VoteType.VOTE_TYPE_ABSTAIN,
-    });
-    expect(txs.voteBundleProposal).toHaveBeenNthCalledWith(2, {
-      staker: "test_staker",
-      pool_id: "0",
-      storage_id: "another_test_storage_id",
-      vote: VoteType.VOTE_TYPE_VALID,
-    });
+    expect(txs.voteBundleProposal).toHaveBeenNthCalledWith(
+      1,
+      {
+        staker: "test_staker",
+        pool_id: "0",
+        storage_id: "another_test_storage_id",
+        vote: VoteType.VOTE_TYPE_ABSTAIN,
+      },
+      {
+        fee: 1.6,
+      }
+    );
+    expect(txs.voteBundleProposal).toHaveBeenNthCalledWith(
+      2,
+      {
+        staker: "test_staker",
+        pool_id: "0",
+        storage_id: "another_test_storage_id",
+        vote: VoteType.VOTE_TYPE_VALID,
+      },
+      {
+        fee: 1.6,
+      }
+    );
 
     expect(txs.submitBundleProposal).toHaveBeenCalledTimes(0);
 
@@ -629,12 +658,17 @@ describe("vote valid tests", () => {
     expect(txs.claimUploaderRole).toHaveBeenCalledTimes(0);
 
     expect(txs.voteBundleProposal).toHaveBeenCalledTimes(1);
-    expect(txs.voteBundleProposal).toHaveBeenLastCalledWith({
-      staker: "test_staker",
-      pool_id: "0",
-      storage_id: "another_test_storage_id",
-      vote: VoteType.VOTE_TYPE_VALID,
-    });
+    expect(txs.voteBundleProposal).toHaveBeenLastCalledWith(
+      {
+        staker: "test_staker",
+        pool_id: "0",
+        storage_id: "another_test_storage_id",
+        vote: VoteType.VOTE_TYPE_VALID,
+      },
+      {
+        fee: 1.6,
+      }
+    );
 
     expect(txs.submitBundleProposal).toHaveBeenCalledTimes(0);
 
@@ -964,6 +998,12 @@ describe("vote valid tests", () => {
 
   test("try to vote valid where voteBundleProposal fails", async () => {
     // ARRANGE
+    v["continueRound"] = jest
+      .fn()
+      .mockReturnValueOnce(true)
+      .mockReturnValueOnce(true)
+      .mockReturnValue(false);
+
     const bundle = [
       { key: "test_key_1", value: "test_value_1" },
       { key: "test_key_2", value: "test_value_2" },
@@ -976,7 +1016,13 @@ describe("vote valid tests", () => {
 
     v["client"][0].kyve.bundles.v1beta1.voteBundleProposal = jest
       .fn()
-      .mockRejectedValue(new Error());
+      .mockRejectedValueOnce(new Error())
+      .mockResolvedValue({
+        txHash: "vote_bundle_proposal_test_hash",
+        execute: jest.fn().mockResolvedValue({
+          code: 0,
+        }),
+      });
 
     v["syncPoolState"] = jest.fn().mockImplementation(() => {
       v.pool = {
@@ -1007,6 +1053,14 @@ describe("vote valid tests", () => {
       .mockResolvedValueOnce({
         key: "test_key_2",
         value: "test_value_2",
+      })
+      .mockResolvedValueOnce({
+        key: "test_key_1",
+        value: "test_value_1",
+      })
+      .mockResolvedValueOnce({
+        key: "test_key_2",
+        value: "test_value_2",
       });
 
     // ACT
@@ -1024,13 +1078,31 @@ describe("vote valid tests", () => {
 
     expect(txs.claimUploaderRole).toHaveBeenCalledTimes(0);
 
-    expect(txs.voteBundleProposal).toHaveBeenCalledTimes(1);
-    expect(txs.voteBundleProposal).toHaveBeenLastCalledWith({
-      staker: "test_staker",
-      pool_id: "0",
-      storage_id: "another_test_storage_id",
-      vote: VoteType.VOTE_TYPE_VALID,
-    });
+    expect(txs.voteBundleProposal).toHaveBeenCalledTimes(2);
+    expect(txs.voteBundleProposal).toHaveBeenNthCalledWith(
+      1,
+      {
+        staker: "test_staker",
+        pool_id: "0",
+        storage_id: "another_test_storage_id",
+        vote: VoteType.VOTE_TYPE_VALID,
+      },
+      {
+        fee: 1.6,
+      }
+    );
+    expect(txs.voteBundleProposal).toHaveBeenNthCalledWith(
+      2,
+      {
+        staker: "test_staker",
+        pool_id: "0",
+        storage_id: "another_test_storage_id",
+        vote: VoteType.VOTE_TYPE_VALID,
+      },
+      {
+        fee: 1.6,
+      }
+    );
 
     expect(txs.submitBundleProposal).toHaveBeenCalledTimes(0);
 
@@ -1040,8 +1112,14 @@ describe("vote valid tests", () => {
     // ASSERT LCD INTERFACES
     // =====================
 
-    expect(queries.canVote).toHaveBeenCalledTimes(1);
-    expect(queries.canVote).toHaveBeenLastCalledWith({
+    expect(queries.canVote).toHaveBeenCalledTimes(2);
+    expect(queries.canVote).toHaveBeenNthCalledWith(1, {
+      staker: "test_staker",
+      pool_id: "0",
+      voter: "test_valaddress",
+      storage_id: "another_test_storage_id",
+    });
+    expect(queries.canVote).toHaveBeenNthCalledWith(2, {
       staker: "test_staker",
       pool_id: "0",
       voter: "test_valaddress",
@@ -1056,8 +1134,14 @@ describe("vote valid tests", () => {
 
     expect(storageProvider.saveBundle).toHaveBeenCalledTimes(0);
 
-    expect(storageProvider.retrieveBundle).toHaveBeenCalledTimes(1);
-    expect(storageProvider.retrieveBundle).toHaveBeenLastCalledWith(
+    expect(storageProvider.retrieveBundle).toHaveBeenCalledTimes(2);
+    expect(storageProvider.retrieveBundle).toHaveBeenNthCalledWith(
+      1,
+      "another_test_storage_id",
+      (120 - 20) * 1000
+    );
+    expect(storageProvider.retrieveBundle).toHaveBeenNthCalledWith(
+      2,
       "another_test_storage_id",
       (120 - 20) * 1000
     );
@@ -1066,9 +1150,11 @@ describe("vote valid tests", () => {
     // ASSERT CACHE INTERFACES
     // =======================
 
-    expect(cacheProvider.get).toHaveBeenCalledTimes(2);
+    expect(cacheProvider.get).toHaveBeenCalledTimes(4);
     expect(cacheProvider.get).toHaveBeenNthCalledWith(1, "0");
     expect(cacheProvider.get).toHaveBeenNthCalledWith(2, "1");
+    expect(cacheProvider.get).toHaveBeenNthCalledWith(3, "0");
+    expect(cacheProvider.get).toHaveBeenNthCalledWith(4, "1");
 
     // =============================
     // ASSERT COMPRESSION INTERFACES
@@ -1076,27 +1162,34 @@ describe("vote valid tests", () => {
 
     expect(compression.compress).toHaveBeenCalledTimes(0);
 
-    expect(compression.decompress).toHaveBeenCalledTimes(1);
-    expect(compression.decompress).toHaveBeenLastCalledWith(compressedBundle);
+    expect(compression.decompress).toHaveBeenCalledTimes(2);
+    expect(compression.decompress).toHaveBeenNthCalledWith(1, compressedBundle);
+    expect(compression.decompress).toHaveBeenNthCalledWith(2, compressedBundle);
 
     // =============================
     // ASSERT INTEGRATION INTERFACES
     // =============================
 
-    expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
+    expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(2);
+    expect(runtime.summarizeDataBundle).toHaveBeenNthCalledWith(
+      1,
+      expect.any(Validator),
+      bundle
+    );
+    expect(runtime.summarizeDataBundle).toHaveBeenNthCalledWith(
+      2,
       expect.any(Validator),
       bundle
     );
 
-    expect(runtime.validateDataItem).toHaveBeenCalledTimes(bundle.length);
+    expect(runtime.validateDataItem).toHaveBeenCalledTimes(2 * bundle.length);
 
-    for (let i = 0; i < bundle.length; i++) {
+    for (let i = 0; i < 2 * bundle.length; i++) {
       expect(runtime.validateDataItem).toHaveBeenNthCalledWith(
         i + 1,
         expect.any(Validator),
-        standardizeJSON(bundle[i]),
-        standardizeJSON(bundle[i])
+        standardizeJSON(bundle[i % 2]),
+        standardizeJSON(bundle[i % 2])
       );
     }
 
