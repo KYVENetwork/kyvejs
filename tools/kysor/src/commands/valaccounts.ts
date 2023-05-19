@@ -91,7 +91,9 @@ valaccounts
         valaccount = await KyveSDK.generateMnemonic();
       }
       // check if name already exists
-      if(fs.existsSync(path.join(HOME, "valaccounts", `${options.name}.toml`))) {
+      if (
+        fs.existsSync(path.join(HOME, "valaccounts", `${options.name}.toml`))
+      ) {
         console.log(
           `ERROR: Already created a valaccount with name = ${options.name}`
         );
