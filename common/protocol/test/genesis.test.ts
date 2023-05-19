@@ -445,12 +445,17 @@ describe("genesis tests", () => {
     });
 
     expect(txs.voteBundleProposal).toHaveBeenCalledTimes(1);
-    expect(txs.voteBundleProposal).toHaveBeenLastCalledWith({
-      staker: "test_staker",
-      pool_id: "0",
-      storage_id: "another_test_storage_id",
-      vote: VoteType.VOTE_TYPE_VALID,
-    });
+    expect(txs.voteBundleProposal).toHaveBeenLastCalledWith(
+      {
+        staker: "test_staker",
+        pool_id: "0",
+        storage_id: "another_test_storage_id",
+        vote: VoteType.VOTE_TYPE_VALID,
+      },
+      {
+        fee: 1.6,
+      }
+    );
 
     expect(txs.submitBundleProposal).toHaveBeenCalledTimes(0);
 

@@ -179,12 +179,17 @@ describe("invalid votes tests", () => {
     expect(txs.claimUploaderRole).toHaveBeenCalledTimes(0);
 
     expect(txs.voteBundleProposal).toHaveBeenCalledTimes(1);
-    expect(txs.voteBundleProposal).toHaveBeenLastCalledWith({
-      staker: "test_staker",
-      pool_id: "0",
-      storage_id: "another_test_storage_id",
-      vote: VoteType.VOTE_TYPE_INVALID,
-    });
+    expect(txs.voteBundleProposal).toHaveBeenLastCalledWith(
+      {
+        staker: "test_staker",
+        pool_id: "0",
+        storage_id: "another_test_storage_id",
+        vote: VoteType.VOTE_TYPE_INVALID,
+      },
+      {
+        fee: 1.6,
+      }
+    );
 
     expect(txs.submitBundleProposal).toHaveBeenCalledTimes(0);
 
@@ -316,12 +321,17 @@ describe("invalid votes tests", () => {
     expect(txs.claimUploaderRole).toHaveBeenCalledTimes(0);
 
     expect(txs.voteBundleProposal).toHaveBeenCalledTimes(1);
-    expect(txs.voteBundleProposal).toHaveBeenLastCalledWith({
-      staker: "test_staker",
-      pool_id: "0",
-      storage_id: "another_test_storage_id",
-      vote: VoteType.VOTE_TYPE_INVALID,
-    });
+    expect(txs.voteBundleProposal).toHaveBeenLastCalledWith(
+      {
+        staker: "test_staker",
+        pool_id: "0",
+        storage_id: "another_test_storage_id",
+        vote: VoteType.VOTE_TYPE_INVALID,
+      },
+      {
+        fee: 1.6,
+      }
+    );
 
     expect(txs.submitBundleProposal).toHaveBeenCalledTimes(0);
 
@@ -444,12 +454,17 @@ describe("invalid votes tests", () => {
     expect(txs.claimUploaderRole).toHaveBeenCalledTimes(0);
 
     expect(txs.voteBundleProposal).toHaveBeenCalledTimes(1);
-    expect(txs.voteBundleProposal).toHaveBeenLastCalledWith({
-      staker: "test_staker",
-      pool_id: "0",
-      storage_id: "another_test_storage_id",
-      vote: VoteType.VOTE_TYPE_INVALID,
-    });
+    expect(txs.voteBundleProposal).toHaveBeenLastCalledWith(
+      {
+        staker: "test_staker",
+        pool_id: "0",
+        storage_id: "another_test_storage_id",
+        vote: VoteType.VOTE_TYPE_INVALID,
+      },
+      {
+        fee: 1.6,
+      }
+    );
 
     expect(txs.submitBundleProposal).toHaveBeenCalledTimes(0);
 
@@ -574,12 +589,17 @@ describe("invalid votes tests", () => {
     expect(txs.claimUploaderRole).toHaveBeenCalledTimes(0);
 
     expect(txs.voteBundleProposal).toHaveBeenCalledTimes(1);
-    expect(txs.voteBundleProposal).toHaveBeenLastCalledWith({
-      staker: "test_staker",
-      pool_id: "0",
-      storage_id: "another_test_storage_id",
-      vote: VoteType.VOTE_TYPE_INVALID,
-    });
+    expect(txs.voteBundleProposal).toHaveBeenLastCalledWith(
+      {
+        staker: "test_staker",
+        pool_id: "0",
+        storage_id: "another_test_storage_id",
+        vote: VoteType.VOTE_TYPE_INVALID,
+      },
+      {
+        fee: 1.6,
+      }
+    );
 
     expect(txs.submitBundleProposal).toHaveBeenCalledTimes(0);
 
@@ -704,12 +724,17 @@ describe("invalid votes tests", () => {
     expect(txs.claimUploaderRole).toHaveBeenCalledTimes(0);
 
     expect(txs.voteBundleProposal).toHaveBeenCalledTimes(1);
-    expect(txs.voteBundleProposal).toHaveBeenLastCalledWith({
-      staker: "test_staker",
-      pool_id: "0",
-      storage_id: "another_test_storage_id",
-      vote: VoteType.VOTE_TYPE_INVALID,
-    });
+    expect(txs.voteBundleProposal).toHaveBeenLastCalledWith(
+      {
+        staker: "test_staker",
+        pool_id: "0",
+        storage_id: "another_test_storage_id",
+        vote: VoteType.VOTE_TYPE_INVALID,
+      },
+      {
+        fee: 1.6,
+      }
+    );
 
     expect(txs.submitBundleProposal).toHaveBeenCalledTimes(0);
 
@@ -852,12 +877,17 @@ describe("invalid votes tests", () => {
     expect(txs.claimUploaderRole).toHaveBeenCalledTimes(0);
 
     expect(txs.voteBundleProposal).toHaveBeenCalledTimes(1);
-    expect(txs.voteBundleProposal).toHaveBeenLastCalledWith({
-      staker: "test_staker",
-      pool_id: "0",
-      storage_id: "another_test_storage_id",
-      vote: VoteType.VOTE_TYPE_ABSTAIN,
-    });
+    expect(txs.voteBundleProposal).toHaveBeenLastCalledWith(
+      {
+        staker: "test_staker",
+        pool_id: "0",
+        storage_id: "another_test_storage_id",
+        vote: VoteType.VOTE_TYPE_ABSTAIN,
+      },
+      {
+        fee: 1.6,
+      }
+    );
 
     expect(txs.submitBundleProposal).toHaveBeenCalledTimes(0);
 
@@ -985,12 +1015,17 @@ describe("invalid votes tests", () => {
     expect(txs.claimUploaderRole).toHaveBeenCalledTimes(0);
 
     expect(txs.voteBundleProposal).toHaveBeenCalledTimes(1);
-    expect(txs.voteBundleProposal).toHaveBeenLastCalledWith({
-      staker: "test_staker",
-      pool_id: "0",
-      storage_id: "another_test_storage_id",
-      vote: VoteType.VOTE_TYPE_INVALID,
-    });
+    expect(txs.voteBundleProposal).toHaveBeenLastCalledWith(
+      {
+        staker: "test_staker",
+        pool_id: "0",
+        storage_id: "another_test_storage_id",
+        vote: VoteType.VOTE_TYPE_INVALID,
+      },
+      {
+        fee: 1.6,
+      }
+    );
 
     expect(txs.submitBundleProposal).toHaveBeenCalledTimes(0);
 
@@ -1383,18 +1418,30 @@ describe("invalid votes tests", () => {
     expect(txs.claimUploaderRole).toHaveBeenCalledTimes(0);
 
     expect(txs.voteBundleProposal).toHaveBeenCalledTimes(2);
-    expect(txs.voteBundleProposal).toHaveBeenNthCalledWith(1, {
-      staker: "test_staker",
-      pool_id: "0",
-      storage_id: "another_test_storage_id",
-      vote: VoteType.VOTE_TYPE_ABSTAIN,
-    });
-    expect(txs.voteBundleProposal).toHaveBeenNthCalledWith(2, {
-      staker: "test_staker",
-      pool_id: "0",
-      storage_id: "another_test_storage_id",
-      vote: VoteType.VOTE_TYPE_INVALID,
-    });
+    expect(txs.voteBundleProposal).toHaveBeenNthCalledWith(
+      1,
+      {
+        staker: "test_staker",
+        pool_id: "0",
+        storage_id: "another_test_storage_id",
+        vote: VoteType.VOTE_TYPE_ABSTAIN,
+      },
+      {
+        fee: 1.6,
+      }
+    );
+    expect(txs.voteBundleProposal).toHaveBeenNthCalledWith(
+      2,
+      {
+        staker: "test_staker",
+        pool_id: "0",
+        storage_id: "another_test_storage_id",
+        vote: VoteType.VOTE_TYPE_INVALID,
+      },
+      {
+        fee: 1.6,
+      }
+    );
 
     expect(txs.submitBundleProposal).toHaveBeenCalledTimes(0);
 
@@ -1537,18 +1584,30 @@ describe("invalid votes tests", () => {
     expect(txs.claimUploaderRole).toHaveBeenCalledTimes(0);
 
     expect(txs.voteBundleProposal).toHaveBeenCalledTimes(2);
-    expect(txs.voteBundleProposal).toHaveBeenNthCalledWith(1, {
-      staker: "test_staker",
-      pool_id: "0",
-      storage_id: "another_test_storage_id",
-      vote: VoteType.VOTE_TYPE_ABSTAIN,
-    });
-    expect(txs.voteBundleProposal).toHaveBeenNthCalledWith(2, {
-      staker: "test_staker",
-      pool_id: "0",
-      storage_id: "another_test_storage_id",
-      vote: VoteType.VOTE_TYPE_INVALID,
-    });
+    expect(txs.voteBundleProposal).toHaveBeenNthCalledWith(
+      1,
+      {
+        staker: "test_staker",
+        pool_id: "0",
+        storage_id: "another_test_storage_id",
+        vote: VoteType.VOTE_TYPE_ABSTAIN,
+      },
+      {
+        fee: 1.6,
+      }
+    );
+    expect(txs.voteBundleProposal).toHaveBeenNthCalledWith(
+      2,
+      {
+        staker: "test_staker",
+        pool_id: "0",
+        storage_id: "another_test_storage_id",
+        vote: VoteType.VOTE_TYPE_INVALID,
+      },
+      {
+        fee: 1.6,
+      }
+    );
 
     expect(txs.submitBundleProposal).toHaveBeenCalledTimes(0);
 
@@ -1639,7 +1698,7 @@ describe("invalid votes tests", () => {
 
     v["client"][0].kyve.bundles.v1beta1.voteBundleProposal = jest
       .fn()
-      .mockRejectedValue(new Error())
+      .mockRejectedValueOnce(new Error())
       .mockResolvedValue({
         txHash: "vote_bundle_proposal_test_hash",
         execute: jest.fn().mockResolvedValue({
@@ -1712,18 +1771,30 @@ describe("invalid votes tests", () => {
     expect(txs.claimUploaderRole).toHaveBeenCalledTimes(0);
 
     expect(txs.voteBundleProposal).toHaveBeenCalledTimes(2);
-    expect(txs.voteBundleProposal).toHaveBeenNthCalledWith(1, {
-      staker: "test_staker",
-      pool_id: "0",
-      storage_id: "another_test_storage_id",
-      vote: VoteType.VOTE_TYPE_INVALID,
-    });
-    expect(txs.voteBundleProposal).toHaveBeenNthCalledWith(2, {
-      staker: "test_staker",
-      pool_id: "0",
-      storage_id: "another_test_storage_id",
-      vote: VoteType.VOTE_TYPE_INVALID,
-    });
+    expect(txs.voteBundleProposal).toHaveBeenNthCalledWith(
+      1,
+      {
+        staker: "test_staker",
+        pool_id: "0",
+        storage_id: "another_test_storage_id",
+        vote: VoteType.VOTE_TYPE_INVALID,
+      },
+      {
+        fee: 1.6,
+      }
+    );
+    expect(txs.voteBundleProposal).toHaveBeenNthCalledWith(
+      2,
+      {
+        staker: "test_staker",
+        pool_id: "0",
+        storage_id: "another_test_storage_id",
+        vote: VoteType.VOTE_TYPE_INVALID,
+      },
+      {
+        fee: 1.6,
+      }
+    );
 
     expect(txs.submitBundleProposal).toHaveBeenCalledTimes(0);
 
