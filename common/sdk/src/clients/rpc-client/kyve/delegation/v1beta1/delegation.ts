@@ -5,9 +5,9 @@ import { MsgUndelegate } from "@kyvejs/types/client/kyve/delegation/v1beta1/tx";
 import { MsgRedelegate } from "@kyvejs/types/client/kyve/delegation/v1beta1/tx";
 
 import { withTypeUrl } from "../../../../../registry/tx.registry";
-import { KyveSigning } from "../../../signing";
+import { KyveSigning, PendingTx } from "../../../signing";
 export default class KyveDelegationMethods extends KyveSigning {
-  public async delegate(
+  public delegate(
     value: Omit<MsgDelegate, "creator">,
     options?: {
       fee?: StdFee | "auto" | number;
@@ -19,9 +19,11 @@ export default class KyveDelegationMethods extends KyveSigning {
       creator: this.account.address,
     });
 
-    return await this.getPendingSignedTx(tx, options);
+    return new PendingTx({ tx: [tx] }, () =>
+      this.getPendingSignedTx(tx, options)
+    );
   }
-  public async withdrawRewards(
+  public withdrawRewards(
     value: Omit<MsgWithdrawRewards, "creator">,
     options?: {
       fee?: StdFee | "auto" | number;
@@ -33,10 +35,12 @@ export default class KyveDelegationMethods extends KyveSigning {
       creator: this.account.address,
     });
 
-    return await this.getPendingSignedTx(tx, options);
+    return new PendingTx({ tx: [tx] }, () =>
+      this.getPendingSignedTx(tx, options)
+    );
   }
 
-  public async undelegate(
+  public undelegate(
     value: Omit<MsgUndelegate, "creator">,
     options?: {
       fee?: StdFee | "auto" | number;
@@ -48,10 +52,12 @@ export default class KyveDelegationMethods extends KyveSigning {
       creator: this.account.address,
     });
 
-    return await this.getPendingSignedTx(tx, options);
+    return new PendingTx({ tx: [tx] }, () =>
+      this.getPendingSignedTx(tx, options)
+    );
   }
 
-  public async redelegate(
+  public redelegate(
     value: Omit<MsgRedelegate, "creator">,
     options?: {
       fee?: StdFee | "auto" | number;
@@ -63,6 +69,8 @@ export default class KyveDelegationMethods extends KyveSigning {
       creator: this.account.address,
     });
 
-    return await this.getPendingSignedTx(tx, options);
+    return new PendingTx({ tx: [tx] }, () =>
+      this.getPendingSignedTx(tx, options)
+    );
   }
 }

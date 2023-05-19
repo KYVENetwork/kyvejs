@@ -3,10 +3,10 @@ import { MsgDefundPool } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
 import { MsgFundPool } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
 
 import { withTypeUrl } from "../../../../../registry/tx.registry";
-import { KyveSigning } from "../../../signing";
+import { KyveSigning, PendingTx } from "../../../signing";
 
 export default class KyvePoolMethods extends KyveSigning {
-  public async fundPool(
+  public fundPool(
     value: Omit<MsgFundPool, "creator">,
     options?: {
       fee?: StdFee | "auto" | number;
@@ -18,10 +18,12 @@ export default class KyvePoolMethods extends KyveSigning {
       creator: this.account.address,
     });
 
-    return await this.getPendingSignedTx(tx, options);
+    return new PendingTx({ tx: [tx] }, () =>
+      this.getPendingSignedTx(tx, options)
+    );
   }
 
-  public async defundPool(
+  public defundPool(
     value: Omit<MsgDefundPool, "creator">,
     options?: {
       fee?: StdFee | "auto" | number;
@@ -32,6 +34,8 @@ export default class KyvePoolMethods extends KyveSigning {
       ...value,
       creator: this.account.address,
     });
-    return await this.getPendingSignedTx(tx, options);
+    return new PendingTx({ tx: [tx] }, () =>
+      this.getPendingSignedTx(tx, options)
+    );
   }
 }
