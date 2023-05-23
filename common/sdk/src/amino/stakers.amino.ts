@@ -68,7 +68,7 @@ export interface AminoMsgLeavePool extends AminoMsg {
   };
 }
 
-export interface AminoMsgUpdateParams extends AminoMsg {
+export interface AminoMsgUpdateParamsStakers extends AminoMsg {
   readonly type: "kyve/stakers/MsgUpdateParams";
   readonly value: {
     readonly authority: string;
@@ -196,14 +196,14 @@ export const createStakersAminoConverters = (): AminoConverters => {
       toAmino: ({
         authority,
         payload,
-      }: MsgUpdateParams): AminoMsgUpdateParams["value"] => ({
+      }: MsgUpdateParams): AminoMsgUpdateParamsStakers["value"] => ({
         authority,
         payload,
       }),
       fromAmino: ({
         authority,
         payload,
-      }: AminoMsgUpdateParams["value"]): MsgUpdateParams => ({
+      }: AminoMsgUpdateParamsStakers["value"]): MsgUpdateParams => ({
         authority,
         payload,
       }),
