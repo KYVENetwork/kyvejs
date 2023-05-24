@@ -1,4 +1,3 @@
-import { AminoMsg } from "@cosmjs/amino";
 import { AminoConverters } from "@cosmjs/stargate";
 import { Decimal } from "@cosmjs/math";
 import {
@@ -7,7 +6,6 @@ import {
   MsgJoinPool,
   MsgUpdateCommission,
   MsgLeavePool,
-  MsgUpdateParams,
 } from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
 
 function protoDecimalToJson(decimal: string): string {
@@ -21,193 +19,44 @@ function jsonDecimalToProto(decimal: string): string {
   return parsed.atomics;
 }
 
-export interface AminoMsgCreateStaker extends AminoMsg {
-  readonly type: "kyve/stakers/MsgCreateStaker";
-  readonly value: {
-    readonly creator: string;
-    readonly amount: string;
-    readonly commission: string;
-  };
-}
-
-// TODO: errors if a value is empty
-export interface AminoMsgUpdateMetadata extends AminoMsg {
-  readonly type: "kyve/stakers/MsgUpdateMetadata";
-  readonly value: {
-    readonly creator: string;
-    readonly moniker: string;
-    readonly website: string;
-    readonly identity: string;
-    readonly security_contact: string;
-    readonly details: string;
-  };
-}
-
-export interface AminoMsgJoinPool extends AminoMsg {
-  readonly type: "kyve/stakers/MsgJoinPool";
-  readonly value: {
-    readonly creator: string;
-    readonly pool_id: string;
-    readonly valaddress: string;
-    readonly amount: string;
-  };
-}
-
-export interface AminoMsgUpdateCommission extends AminoMsg {
-  readonly type: "kyve/stakers/MsgUpdateCommission";
-  readonly value: {
-    readonly creator: string;
-    readonly commission: string;
-  };
-}
-
-export interface AminoMsgLeavePool extends AminoMsg {
-  readonly type: "kyve/stakers/MsgLeavePool";
-  readonly value: {
-    readonly creator: string;
-    readonly pool_id: string;
-  };
-}
-
-export interface AminoMsgUpdateParamsStakers extends AminoMsg {
-  readonly type: "kyve/stakers/MsgUpdateParams";
-  readonly value: {
-    readonly authority: string;
-    readonly payload: string;
-  };
-}
-
 export const createStakersAminoConverters = (): AminoConverters => {
   return {
     "/kyve.stakers.v1beta1.MsgCreateStaker": {
       aminoType: "kyve/stakers/MsgCreateStaker",
-      toAmino: ({
-        creator,
-        amount,
-        commission,
-      }: MsgCreateStaker): AminoMsgCreateStaker["value"] => ({
-        creator,
-        amount,
-        commission: protoDecimalToJson(commission),
+      toAmino: (msg: MsgCreateStaker) => ({
+        ...(MsgCreateStaker.toJSON(msg) as object),
+        commission: protoDecimalToJson(msg.commission),
       }),
-      fromAmino: ({
-        creator,
-        amount,
-        commission,
-      }: AminoMsgCreateStaker["value"]): MsgCreateStaker => ({
-        creator,
-        amount,
-        commission: jsonDecimalToProto(commission),
+      fromAmino: (msg): MsgCreateStaker => ({
+        ...MsgCreateStaker.fromJSON(msg),
+        commission: jsonDecimalToProto(msg.commission),
       }),
     },
     "/kyve.stakers.v1beta1.MsgUpdateMetadata": {
       aminoType: "kyve/stakers/MsgUpdateMetadata",
-      toAmino: ({
-        creator,
-        moniker,
-        website,
-        identity,
-        security_contact,
-        details,
-      }: MsgUpdateMetadata): AminoMsgUpdateMetadata["value"] => ({
-        creator: creator,
-        moniker: moniker || "",
-        website: website || "",
-        identity: identity || "",
-        security_contact: security_contact || "",
-        details: details || "",
-      }),
-      fromAmino: ({
-        creator,
-        moniker,
-        website,
-        identity,
-        security_contact,
-        details,
-      }: AminoMsgUpdateMetadata["value"]): MsgUpdateMetadata => ({
-        creator: creator,
-        moniker: moniker || "",
-        website: website || "",
-        identity: identity || "",
-        security_contact: security_contact || "",
-        details: details || "",
-      }),
+      toAmino: (msg: MsgUpdateMetadata) => MsgUpdateMetadata.toJSON(msg),
+      fromAmino: (msg): MsgUpdateMetadata => MsgUpdateMetadata.fromJSON(msg),
     },
     "/kyve.stakers.v1beta1.MsgJoinPool": {
       aminoType: "kyve/stakers/MsgJoinPool",
-      toAmino: ({
-        creator,
-        pool_id,
-        valaddress,
-        amount,
-      }: MsgJoinPool): AminoMsgJoinPool["value"] => ({
-        creator,
-        pool_id,
-        valaddress,
-        amount,
-      }),
-      fromAmino: ({
-        creator,
-        pool_id,
-        valaddress,
-        amount,
-      }: AminoMsgJoinPool["value"]): MsgJoinPool => ({
-        creator,
-        pool_id,
-        valaddress,
-        amount,
-      }),
+      toAmino: (msg: MsgJoinPool) => MsgJoinPool.toJSON(msg),
+      fromAmino: (msg): MsgJoinPool => MsgJoinPool.fromJSON(msg),
     },
     "/kyve.stakers.v1beta1.MsgUpdateCommission": {
       aminoType: "kyve/stakers/MsgUpdateCommission",
-      toAmino: ({
-        creator,
-        commission,
-      }: MsgUpdateCommission): AminoMsgUpdateCommission["value"] => ({
-        creator,
-        commission: protoDecimalToJson(commission),
+      toAmino: (msg: MsgUpdateCommission) => ({
+        ...(MsgUpdateCommission.toJSON(msg) as object),
+        commission: protoDecimalToJson(msg.commission),
       }),
-      fromAmino: ({
-        creator,
-        commission,
-      }: AminoMsgUpdateCommission["value"]): MsgUpdateCommission => ({
-        creator,
-        commission: jsonDecimalToProto(commission),
+      fromAmino: (msg): MsgUpdateCommission => ({
+        ...MsgUpdateCommission.fromJSON(msg),
+        commission: jsonDecimalToProto(msg.commission),
       }),
     },
     "/kyve.stakers.v1beta1.MsgLeavePool": {
       aminoType: "kyve/stakers/MsgLeavePool",
-      toAmino: ({
-        creator,
-        pool_id,
-      }: MsgLeavePool): AminoMsgLeavePool["value"] => ({
-        creator,
-        pool_id,
-      }),
-      fromAmino: ({
-        creator,
-        pool_id,
-      }: AminoMsgLeavePool["value"]): MsgLeavePool => ({
-        creator,
-        pool_id,
-      }),
-    },
-    "/kyve.stakers.v1beta1.MsgUpdateParams": {
-      aminoType: "kyve/stakers/MsgUpdateParams",
-      toAmino: ({
-        authority,
-        payload,
-      }: MsgUpdateParams): AminoMsgUpdateParamsStakers["value"] => ({
-        authority,
-        payload,
-      }),
-      fromAmino: ({
-        authority,
-        payload,
-      }: AminoMsgUpdateParamsStakers["value"]): MsgUpdateParams => ({
-        authority,
-        payload,
-      }),
+      toAmino: (msg: MsgLeavePool) => MsgLeavePool.toJSON(msg),
+      fromAmino: (msg): MsgLeavePool => MsgLeavePool.fromJSON(msg),
     },
   };
 };
