@@ -25,7 +25,6 @@ export default class Docker implements IRuntime {
     } else {
       return { key, value: JSON.parse(result.stdout.toString()) };
     }
-
   }
 
   async prevalidateDataItem(_: Validator, item: DataItem): Promise<boolean> {
