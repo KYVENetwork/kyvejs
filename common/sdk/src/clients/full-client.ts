@@ -12,6 +12,7 @@ import {
   createStakersAminoConverters,
   createDelegationAminoConverters,
   createBundlesAminoConverters,
+  createGlobalAminoConverters,
 } from "../amino";
 import { createBankAminoConverters } from "@cosmjs/stargate/build/modules/bank/aminomessages";
 
@@ -50,6 +51,7 @@ export async function getSigningKyveClient(
         ...createStakersAminoConverters(),
         ...createDelegationAminoConverters(),
         ...createBundlesAminoConverters(),
+        ...createGlobalAminoConverters(),
       }),
     });
 

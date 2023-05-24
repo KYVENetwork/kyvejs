@@ -1,8 +1,8 @@
 import { AminoMsg } from "@cosmjs/amino";
 import { AminoConverters } from "@cosmjs/stargate";
 import {
-  MsgDefundPool,
   MsgFundPool,
+  MsgDefundPool,
   MsgCreatePool,
   MsgUpdatePool,
   MsgDisablePool,
@@ -11,6 +11,7 @@ import {
   MsgCancelRuntimeUpgrade,
 } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
 
+// TODO: errors
 export interface AminoMsgFundPool extends AminoMsg {
   readonly type: "kyve/pool/MsgFundPool";
   readonly value: {
@@ -102,20 +103,33 @@ export const createPoolAminoConverters = (): AminoConverters => {
         creator,
         id,
         amount,
-      }: MsgFundPool): AminoMsgFundPool["value"] => ({
-        creator,
-        id,
-        amount,
-      }),
+      }: MsgFundPool): AminoMsgFundPool["value"] => {
+        console.log("toAmino", creator, id, amount);
+        console.log("toAmino types", typeof creator, typeof id, typeof amount);
+        return {
+          creator,
+          id,
+          amount,
+        };
+      },
       fromAmino: ({
         creator,
         id,
         amount,
-      }: AminoMsgFundPool["value"]): MsgFundPool => ({
-        creator,
-        id,
-        amount,
-      }),
+      }: AminoMsgFundPool["value"]): MsgFundPool => {
+        console.log("fromAmino", creator, id, amount);
+        console.log(
+          "fromAmino types",
+          typeof creator,
+          typeof id,
+          typeof amount
+        );
+        return {
+          creator,
+          id,
+          amount,
+        };
+      },
     },
     "/kyve.pool.v1beta1.MsgDefundPool": {
       aminoType: "kyve/pool/MsgDefundPool",

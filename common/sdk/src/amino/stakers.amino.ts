@@ -30,6 +30,7 @@ export interface AminoMsgCreateStaker extends AminoMsg {
   };
 }
 
+// TODO: errors if a value is empty
 export interface AminoMsgUpdateMetadata extends AminoMsg {
   readonly type: "kyve/stakers/MsgUpdateMetadata";
   readonly value: {
@@ -109,12 +110,12 @@ export const createStakersAminoConverters = (): AminoConverters => {
         security_contact,
         details,
       }: MsgUpdateMetadata): AminoMsgUpdateMetadata["value"] => ({
-        creator,
-        moniker,
-        website,
-        identity,
-        security_contact,
-        details,
+        creator: creator,
+        moniker: moniker || "",
+        website: website || "",
+        identity: identity || "",
+        security_contact: security_contact || "",
+        details: details || "",
       }),
       fromAmino: ({
         creator,
@@ -124,12 +125,12 @@ export const createStakersAminoConverters = (): AminoConverters => {
         security_contact,
         details,
       }: AminoMsgUpdateMetadata["value"]): MsgUpdateMetadata => ({
-        creator,
-        moniker,
-        website,
-        identity,
-        security_contact,
-        details,
+        creator: creator,
+        moniker: moniker || "",
+        website: website || "",
+        identity: identity || "",
+        security_contact: security_contact || "",
+        details: details || "",
       }),
     },
     "/kyve.stakers.v1beta1.MsgJoinPool": {
