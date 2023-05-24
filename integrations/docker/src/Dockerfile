@@ -1,5 +1,5 @@
-FROM python:3.9.11-alpine3.15
+FROM python:3.9.11-alpine3.15 as base
 
-COPY script.py ./
+COPY src/script.py ./
 
 ENTRYPOINT ["python", "script.py"]
