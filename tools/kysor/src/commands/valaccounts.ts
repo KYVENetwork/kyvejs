@@ -289,7 +289,9 @@ valaccounts
             `Successfully transferred ${options.amount} ${client.config.coinDenom} to recipient ${options.recipient}`
           );
         } else {
-          `Transfer failed with receipt ${JSON.stringify(receipt)}`;
+          console.log(
+            `Transfer failed with receipt ${JSON.stringify(receipt)}`
+          );
         }
       } else {
         console.log("Aborted transfer");
