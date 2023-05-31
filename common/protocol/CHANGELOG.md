@@ -7,10 +7,6 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 **Note:** Version bump only for package @kyvejs/protocol
 
-
-
-
-
 # [1.0.0-beta.23](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/protocol@1.0.0-beta.22...@kyvejs/protocol@1.0.0-beta.23) (2023-04-24)
 
 **Note:** Version bump only for package @kyvejs/protocol
