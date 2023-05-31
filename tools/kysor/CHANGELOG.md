@@ -3,13 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [1.0.0-beta.21](https://github.com/KYVENetwork/kyvejs/compare/@kyve/kysor@1.0.0-beta.20...@kyve/kysor@1.0.0-beta.21) (2023-05-19)
+# [1.0.0](https://github.com/KYVENetwork/kyvejs/compare/@kyve/kysor@1.0.0-beta.21...@kyve/kysor@1.0.0) (2023-05-31)
 
 **Note:** Version bump only for package @kyve/kysor
 
+# [1.0.0-beta.21](https://github.com/KYVENetwork/kyvejs/compare/@kyve/kysor@1.0.0-beta.20...@kyve/kysor@1.0.0-beta.21) (2023-05-19)
 
-
-
+**Note:** Version bump only for package @kyve/kysor
 
 # [1.0.0-beta.20](https://github.com/KYVENetwork/kyvejs/compare/@kyve/kysor@1.0.0-beta.19...@kyve/kysor@1.0.0-beta.20) (2023-04-21)
 
