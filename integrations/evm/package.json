@@ -27,7 +27,7 @@
     "singleQuote": true
   },
   "dependencies": {
-    "@kyvejs/protocol": "1.0.0-beta.24",
+    "@kyvejs/protocol": "1.0.0",
     "ethers": "^5.6.5"
   },
   "devDependencies": {

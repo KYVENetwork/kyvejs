@@ -24,7 +24,7 @@
     "outputPath": "out"
   },
   "dependencies": {
-    "@kyvejs/protocol": "1.0.0-beta.24",
+    "@kyvejs/protocol": "1.0.0",
     "axios": "^0.26.1",
     "nanoid": "^3.3.3"
   },
