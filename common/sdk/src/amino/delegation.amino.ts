@@ -5,28 +5,61 @@ import {
   MsgRedelegate,
   MsgUndelegate,
 } from "@kyvejs/types/client/kyve/delegation/v1beta1/tx";
+import { isNotEmpty } from "../utils";
 
 export const createDelegationAminoConverters = (): AminoConverters => {
   return {
     "/kyve.delegation.v1beta1.MsgDelegate": {
       aminoType: "kyve/delegation/MsgDelegate",
-      toAmino: (msg: MsgDelegate) => MsgDelegate.toJSON(msg),
-      fromAmino: (msg): MsgDelegate => MsgDelegate.fromJSON(msg),
+      toAmino: (msg: MsgDelegate) => ({
+        creator: msg.creator,
+        staker: msg.staker,
+        ...(isNotEmpty(msg.amount) && { amount: msg.amount }),
+      }),
+      fromAmino: (msg): MsgDelegate => ({
+        creator: msg.creator,
+        staker: msg.staker,
+        amount: msg.amount,
+      }),
     },
     "/kyve.delegation.v1beta1.MsgWithdrawRewards": {
       aminoType: "kyve/delegation/MsgWithdrawRewards",
-      toAmino: (msg: MsgWithdrawRewards) => MsgWithdrawRewards.toJSON(msg),
-      fromAmino: (msg): MsgWithdrawRewards => MsgWithdrawRewards.fromJSON(msg),
+      toAmino: (msg: MsgWithdrawRewards) => ({
+        creator: msg.creator,
+        staker: msg.staker,
+      }),
+      fromAmino: (msg): MsgWithdrawRewards => ({
+        creator: msg.creator,
+        staker: msg.staker,
+      }),
     },
     "/kyve.delegation.v1beta1.MsgRedelegate": {
       aminoType: "kyve/delegation/MsgRedelegate",
-      toAmino: (msg: MsgRedelegate) => MsgRedelegate.toJSON(msg),
-      fromAmino: (msg): MsgRedelegate => MsgRedelegate.fromJSON(msg),
+      toAmino: (msg: MsgRedelegate) => ({
+        creator: msg.creator,
+        from_staker: msg.from_staker,
+        to_staker: msg.to_staker,
+        ...(isNotEmpty(msg.amount) && { amount: msg.amount }),
+      }),
+      fromAmino: (msg): MsgRedelegate => ({
+        creator: msg.creator,
+        from_staker: msg.from_staker,
+        to_staker: msg.to_staker,
+        amount: msg.amount,
+      }),
     },
     "/kyve.delegation.v1beta1.MsgUndelegate": {
       aminoType: "kyve/delegation/MsgUndelegate",
-      toAmino: (msg: MsgUndelegate) => MsgUndelegate.toJSON(msg),
-      fromAmino: (msg): MsgUndelegate => MsgUndelegate.fromJSON(msg),
+      toAmino: (msg: MsgUndelegate) => ({
+        creator: msg.creator,
+        staker: msg.staker,
+        ...(isNotEmpty(msg.amount) && { amount: msg.amount }),
+      }),
+      fromAmino: (msg): MsgUndelegate => ({
+        creator: msg.creator,
+        staker: msg.staker,
+        amount: msg.amount,
+      }),
     },
   };
 };
