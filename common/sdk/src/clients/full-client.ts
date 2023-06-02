@@ -1,11 +1,20 @@
 import { OfflineAminoSigner } from "@cosmjs/amino/build/signer";
 import { OfflineSigner, Registry } from "@cosmjs/proto-signing";
-import { GasPrice, SigningStargateClient } from "@cosmjs/stargate";
+import { AminoTypes, GasPrice, SigningStargateClient } from "@cosmjs/stargate";
 
 import { IConfig } from "../constants";
 import * as KyveRegistryTx from "../registry/tx.registry";
 import KyveClient from "./rpc-client/client";
 import KyveWebClient from "./rpc-client/web.client";
+
+import {
+  createPoolAminoConverters,
+  createStakersAminoConverters,
+  createDelegationAminoConverters,
+  createBundlesAminoConverters,
+  createGovV1AminoConverters,
+} from "../amino";
+import { createDefaultAminoConverters } from "@cosmjs/stargate";
 
 export async function getSigningKyveClient(
   config: IConfig,
@@ -36,6 +45,14 @@ export async function getSigningKyveClient(
     await SigningStargateClient.connectWithSigner(config.rpc, signer, {
       registry,
       gasPrice,
+      aminoTypes: new AminoTypes({
+        ...createDefaultAminoConverters(),
+        ...createGovV1AminoConverters(),
+        ...createPoolAminoConverters(),
+        ...createStakersAminoConverters(),
+        ...createDelegationAminoConverters(),
+        ...createBundlesAminoConverters(),
+      }),
     });
 
   const [account] = await signer.getAccounts();
