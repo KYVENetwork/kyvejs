@@ -13,7 +13,7 @@ export const createBundlesAminoConverters = (): AminoConverters => {
       aminoType: "kyve/bundles/MsgSubmitBundleProposal",
       toAmino: (msg: MsgSubmitBundleProposal) => ({
         creator: msg.creator,
-        ...(isNotEmpty(msg.staker) && { staker: msg.staker }),
+        staker: msg.staker,
         ...(isNotEmpty(msg.pool_id) && { pool_id: msg.pool_id }),
         ...(isNotEmpty(msg.storage_id) && { storage_id: msg.storage_id }),
         ...(isNotEmpty(msg.data_size) && { data_size: msg.data_size }),
@@ -44,7 +44,7 @@ export const createBundlesAminoConverters = (): AminoConverters => {
       aminoType: "kyve/bundles/MsgVoteBundleProposal",
       toAmino: (msg: MsgVoteBundleProposal) => ({
         creator: msg.creator,
-        ...(isNotEmpty(msg.staker) && { staker: msg.staker }),
+        staker: msg.staker,
         ...(isNotEmpty(msg.pool_id) && { pool_id: msg.pool_id }),
         ...(isNotEmpty(msg.storage_id) && { storage_id: msg.storage_id }),
         vote: msg.vote,
@@ -61,7 +61,7 @@ export const createBundlesAminoConverters = (): AminoConverters => {
       aminoType: "kyve/bundles/MsgClaimUploaderRole",
       toAmino: (msg: MsgClaimUploaderRole) => ({
         creator: msg.creator,
-        ...(isNotEmpty(msg.staker) && { staker: msg.staker }),
+        staker: msg.staker,
         ...(isNotEmpty(msg.pool_id) && { pool_id: msg.pool_id }),
       }),
       fromAmino: (msg): MsgClaimUploaderRole => ({
@@ -74,7 +74,7 @@ export const createBundlesAminoConverters = (): AminoConverters => {
       aminoType: "kyve/bundles/MsgSkipUploaderRole",
       toAmino: (msg: MsgSkipUploaderRole) => ({
         creator: msg.creator,
-        ...(isNotEmpty(msg.staker) && { staker: msg.staker }),
+        staker: msg.staker,
         ...(isNotEmpty(msg.pool_id) && { pool_id: msg.pool_id }),
         ...(isNotEmpty(msg.from_index) && { from_index: msg.from_index }),
       }),

@@ -12,8 +12,9 @@ import {
   createStakersAminoConverters,
   createDelegationAminoConverters,
   createBundlesAminoConverters,
+  createGovV1AminoConverters,
 } from "../amino";
-import { createBankAminoConverters } from "@cosmjs/stargate/build/modules/bank/aminomessages";
+import { createDefaultAminoConverters } from "@cosmjs/stargate";
 
 export async function getSigningKyveClient(
   config: IConfig,
@@ -45,7 +46,8 @@ export async function getSigningKyveClient(
       registry,
       gasPrice,
       aminoTypes: new AminoTypes({
-        ...createBankAminoConverters(),
+        ...createDefaultAminoConverters(),
+        ...createGovV1AminoConverters(),
         ...createPoolAminoConverters(),
         ...createStakersAminoConverters(),
         ...createDelegationAminoConverters(),
