@@ -71,7 +71,12 @@ export async function runNode(this: Validator): Promise<void> {
     // by calling a special query from chain
     if (await this.canVote(updatedAt)) {
       // if the node can vote the node validates the current bundle proposal
-      await this.validateBundleProposal(updatedAt);
+      const success = await this.validateBundleProposal(updatedAt);
+
+      if (!success) {
+        this.logger.info(`Retrying to validate bundle proposal`);
+        continue;
+      }
     }
 
     // wait until the upload interval has passed to continue with the proposal

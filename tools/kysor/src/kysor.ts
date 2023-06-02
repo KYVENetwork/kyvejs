@@ -1,11 +1,11 @@
 import TOML from "@iarna/toml";
 import KyveSDK from "@kyvejs/sdk";
 import { PoolResponse } from "@kyvejs/types/lcd/kyve/query/v1beta1/pools";
+import dotenv from "dotenv";
 import download from "download";
 import extract from "extract-zip";
 import fs from "fs";
 import path from "path";
-import dotenv from "dotenv";
 
 import { IConfig, IValaccountConfig } from "./types/interfaces";
 import { getChecksum, setupLogger, startNodeProcess } from "./utils";
