@@ -90,7 +90,15 @@ valaccounts
       } else {
         valaccount = await KyveSDK.generateMnemonic();
       }
-
+      // check if name already exists
+      if (
+        fs.existsSync(path.join(HOME, "valaccounts", `${options.name}.toml`))
+      ) {
+        console.log(
+          `ERROR: Already created a valaccount with name = ${options.name}`
+        );
+        return;
+      }
       // check if same valaccount was already created
       const configs = fs.readdirSync(path.join(HOME, "valaccounts"));
       const valaccounts = [];
@@ -281,7 +289,9 @@ valaccounts
             `Successfully transferred ${options.amount} ${client.config.coinDenom} to recipient ${options.recipient}`
           );
         } else {
-          `Transfer failed with receipt ${JSON.stringify(receipt)}`;
+          console.log(
+            `Transfer failed with receipt ${JSON.stringify(receipt)}`
+          );
         }
       } else {
         console.log("Aborted transfer");
