@@ -21,7 +21,7 @@ export default class Docker implements IRuntime {
   }
 
   async getDataItem(c: any, key: string): Promise<DataItem> {
-    const result = this.run(["getDataItem", c, key]);
+    const result = this.run(["getDataItem", JSON.stringify(c), key]);
 
     if (result.status !== 0) {
       throw new Error(result.stderr.toString());
@@ -31,7 +31,11 @@ export default class Docker implements IRuntime {
   }
 
   async prevalidateDataItem(c: any, item: DataItem): Promise<boolean> {
-    const result = this.run(["prevalidateDataItem", c, item]);
+    const result = this.run([
+      "prevalidateDataItem",
+      JSON.stringify(c),
+      JSON.stringify(item),
+    ]);
 
     if (result.status !== 0) {
       throw new Error(result.stderr.toString());
@@ -41,7 +45,11 @@ export default class Docker implements IRuntime {
   }
 
   async transformDataItem(c: any, item: DataItem): Promise<DataItem> {
-    const result = this.run(["transformDataItem", c, item]);
+    const result = this.run([
+      "transformDataItem",
+      JSON.stringify(c),
+      JSON.stringify(item),
+    ]);
 
     if (result.status !== 0) {
       throw new Error(result.stderr.toString());
@@ -57,9 +65,9 @@ export default class Docker implements IRuntime {
   ): Promise<boolean> {
     const result = this.run([
       "validateDataItem",
-      c,
-      proposedDataItem,
-      validationDataItem,
+      JSON.stringify(c),
+      JSON.stringify(proposedDataItem),
+      JSON.stringify(validationDataItem),
     ]);
 
     if (result.status !== 0) {
@@ -73,7 +81,11 @@ export default class Docker implements IRuntime {
     c: any,
     bundle: DataItem[]
   ): Promise<string> {
-    const result = this.run(["summarizeDataBundle", c, bundle]);
+    const result = this.run([
+      "summarizeDataBundle",
+      JSON.stringify(c),
+      JSON.stringify(bundle),
+    ]);
 
     if (result.status !== 0) {
       throw new Error(result.stderr.toString());
@@ -83,7 +95,7 @@ export default class Docker implements IRuntime {
   }
 
   public async nextKey(c: any, key: string): Promise<string> {
-    const result = this.run(["nextKey", c, key]);
+    const result = this.run(["nextKey", JSON.stringify(c), key]);
 
     if (result.status !== 0) {
       throw new Error(result.stderr.toString());
