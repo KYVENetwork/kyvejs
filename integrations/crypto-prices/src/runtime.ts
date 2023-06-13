@@ -1,4 +1,4 @@
-import { DataItem, IRuntime, Validator } from "@kyvejs/protocol";
+import { DataItem, IRuntime } from "@kyvejs/protocol";
 import axios from "axios";
 
 import { name, version } from "../package.json";
@@ -14,9 +14,8 @@ interface IConfig {
 export default class CryptoPrices implements IRuntime {
   public name = name;
   public version = version;
-  public config!: IConfig;
 
-  async validateSetConfig(rawConfig: string): Promise<void> {
+  async validateGetConfig(rawConfig: string): Promise<any> {
     let url: string;
     // allow ipfs:// or ar:// as external config urls
     if (rawConfig.startsWith("ipfs://")) {
@@ -37,18 +36,18 @@ export default class CryptoPrices implements IRuntime {
       throw new Error(`Config does not have any slippage`);
     }
 
-    this.config = config;
+    return config;
   }
 
-  async getDataItem(v: Validator, key: string): Promise<DataItem> {
+  async getDataItem(c: any, key: string): Promise<DataItem> {
     const prices: Record<string, number[]> = {};
 
-    for (const ticker of this.config.tickers) {
+    for (const ticker of c.tickers) {
       prices[ticker] = [];
     }
 
-    for (const endpoint of this.config.sources) {
-      const priceObjects = await getPrices(endpoint, this.config.tickers);
+    for (const endpoint of c.sources) {
+      const priceObjects = await getPrices(endpoint, c.tickers);
 
       for (const key in priceObjects) {
         if (Object.prototype.hasOwnProperty.call(priceObjects, key)) {
@@ -60,11 +59,11 @@ export default class CryptoPrices implements IRuntime {
     return { key, value: prices };
   }
 
-  async prevalidateDataItem(_: Validator, item: DataItem): Promise<boolean> {
+  async prevalidateDataItem(_: any, item: DataItem): Promise<boolean> {
     return !!item.value;
   }
 
-  async transformDataItem(_: Validator, item: DataItem): Promise<DataItem> {
+  async transformDataItem(_: any, item: DataItem): Promise<DataItem> {
     const result: { [key: string]: number } = {};
 
     for (const key in item.value) {
@@ -77,7 +76,7 @@ export default class CryptoPrices implements IRuntime {
   }
 
   async validateDataItem(
-    v: Validator,
+    c: any,
     proposedDataItem: DataItem,
     validationDataItem: DataItem
   ): Promise<boolean> {
@@ -89,7 +88,7 @@ export default class CryptoPrices implements IRuntime {
         const proposedPrice = proposedPrices[key];
         const validationPrice = validationPrices[key];
 
-        const slippage = proposedPrice * this.config.slippage;
+        const slippage = proposedPrice * c.slippage;
 
         if (proposedPrice > validationPrice) {
           if (proposedPrice - validationPrice >= slippage) return false;
@@ -103,13 +102,13 @@ export default class CryptoPrices implements IRuntime {
   }
 
   public async summarizeDataBundle(
-    _: Validator,
+    _: any,
     bundle: DataItem[]
   ): Promise<string> {
     return JSON.stringify(bundle[bundle.length - 1].value) ?? "";
   }
 
-  public async nextKey(_: Validator, key: string): Promise<string> {
+  public async nextKey(_: any, key: string): Promise<string> {
     return (Number(key) + 1).toString();
   }
 }

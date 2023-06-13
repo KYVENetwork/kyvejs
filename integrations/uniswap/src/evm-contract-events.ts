@@ -1,4 +1,4 @@
-import { DataItem, IRuntime, Validator } from '@kyvejs/protocol';
+import { DataItem, IRuntime } from '@kyvejs/protocol';
 import axios from 'axios';
 import { providers, utils } from 'ethers';
 
@@ -28,9 +28,8 @@ interface IConfig {
 export default class Evm implements IRuntime {
   public name = name;
   public version = version;
-  public config!: IConfig;
 
-  async validateSetConfig(rawConfig: string): Promise<void> {
+  async validateGetConfig(rawConfig: string): Promise<any> {
     let url: string;
 
     // allow ipfs:// or ar:// as external config urls
@@ -61,13 +60,13 @@ export default class Evm implements IRuntime {
       throw new Error(`Env variable API_KEYS not set`);
     }
 
-    this.config = config;
+    return config;
   }
 
-  async getDataItem(_: Validator, key: string): Promise<DataItem> {
+  async getDataItem(c: any, key: string): Promise<DataItem> {
     const results: providers.Log[][] = [];
 
-    for (const source of this.config.sources) {
+    for (const source of c.sources) {
       const apiObj = JSON.parse(process.env.API_KEYS!);
 
       // setup web3 provider
@@ -77,7 +76,7 @@ export default class Evm implements IRuntime {
 
       // try to fetch logs
       const logs = await provider.getLogs({
-        address: this.config.contract.address,
+        address: c.contract.address,
         fromBlock: parseInt(key),
         toBlock: parseInt(key),
       });
@@ -98,14 +97,14 @@ export default class Evm implements IRuntime {
     };
   }
 
-  async prevalidateDataItem(_: Validator, item: DataItem): Promise<boolean> {
+  async prevalidateDataItem(_: any, item: DataItem): Promise<boolean> {
     // check if item value is not null
     return !!item.value;
   }
 
-  async transformDataItem(_: Validator, item: DataItem): Promise<DataItem> {
+  async transformDataItem(c: any, item: DataItem): Promise<DataItem> {
     // interface of contract-ABI for decoding the logs
-    const iface = new utils.Interface(this.config.contract.abi);
+    const iface = new utils.Interface(c.contract.abi);
 
     const result = item.value.map((log: any) => {
       const info = iface.parseLog(log);
@@ -126,7 +125,7 @@ export default class Evm implements IRuntime {
   }
 
   async validateDataItem(
-    _: Validator,
+    _: any,
     proposedDataItem: DataItem,
     validationDataItem: DataItem
   ): Promise<boolean> {
@@ -136,11 +135,11 @@ export default class Evm implements IRuntime {
     );
   }
 
-  async summarizeDataBundle(_: Validator, __: DataItem[]): Promise<string> {
+  async summarizeDataBundle(_: any, __: DataItem[]): Promise<string> {
     return '';
   }
 
-  async nextKey(_: Validator, key: string): Promise<string> {
+  async nextKey(_: any, key: string): Promise<string> {
     return (parseInt(key) + 1).toString();
   }
 }

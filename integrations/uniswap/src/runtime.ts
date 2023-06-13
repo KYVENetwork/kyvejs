@@ -8,7 +8,7 @@ export default class UniswapEvents extends EvmContractEvents {
   public name = name;
   public version = version;
 
-  async summarizeDataBundle(_: Validator, bundle: DataItem[]): Promise<string> {
+  async summarizeDataBundle(_: any, bundle: DataItem[]): Promise<string> {
     let summary = '';
 
     bundle.forEach((item) => {

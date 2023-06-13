@@ -30,7 +30,7 @@ export default class TendermintBSync implements IRuntime {
     return config;
   }
 
-  async getDataItem(c: IConfig, key: string): Promise<DataItem> {
+  async getDataItem(c: any, key: string): Promise<DataItem> {
     // fetch block from rpc at given block height
     const { data } = await axios.get(`${c.rpc}/block?height=${key}`);
     const block = data.result.block;
@@ -38,7 +38,7 @@ export default class TendermintBSync implements IRuntime {
     return { key, value: block };
   }
 
-  async prevalidateDataItem(c: IConfig, item: DataItem): Promise<boolean> {
+  async prevalidateDataItem(c: any, item: DataItem): Promise<boolean> {
     // check if block is defined
     if (!item.value) {
       return false;
@@ -52,13 +52,13 @@ export default class TendermintBSync implements IRuntime {
     return true;
   }
 
-  async transformDataItem(_: IConfig, item: DataItem): Promise<DataItem> {
+  async transformDataItem(_: any, item: DataItem): Promise<DataItem> {
     // don't transform data item
     return item;
   }
 
   async validateDataItem(
-    _: IConfig,
+    _: any,
     proposedDataItem: DataItem,
     validationDataItem: DataItem
   ): Promise<boolean> {
@@ -68,12 +68,12 @@ export default class TendermintBSync implements IRuntime {
     );
   }
 
-  async summarizeDataBundle(_: IConfig, bundle: DataItem[]): Promise<string> {
+  async summarizeDataBundle(_: any, bundle: DataItem[]): Promise<string> {
     // use latest block height as bundle summary
     return bundle.at(-1)?.value?.header?.height ?? '';
   }
 
-  async nextKey(_: IConfig, key: string): Promise<string> {
+  async nextKey(_: any, key: string): Promise<string> {
     // the next key is always current block height + 1
     return (parseInt(key) + 1).toString();
   }

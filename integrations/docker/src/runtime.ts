@@ -1,4 +1,4 @@
-import { DataItem, IRuntime, Validator } from "@kyvejs/protocol";
+import { DataItem, IRuntime } from "@kyvejs/protocol";
 import { spawnSync } from "child_process";
 import { name, version } from "../package.json";
 
@@ -11,9 +11,8 @@ interface IConfig {
 export default class Docker implements IRuntime {
   public name = name;
   public version = version;
-  public config!: IConfig;
 
-  async validateSetConfig(rawConfig: string): Promise<void> {
+  async validateGetConfig(rawConfig: string): Promise<any> {
     const config: IConfig = JSON.parse(rawConfig);
 
     if (!config.network) {
@@ -28,10 +27,10 @@ export default class Docker implements IRuntime {
       config.rpc = process.env.KYVEJS_TENDERMINT_BSYNC_RPC;
     }
 
-    this.config = config;
+    return config;
   }
 
-  async getDataItem(_: Validator, key: string): Promise<DataItem> {
+  async getDataItem(_: any, key: string): Promise<DataItem> {
     const result = spawnSync("docker", ["run", "runtime_test", "read", key]);
     if (result.status !== 0) {
       throw new Error(result.stderr.toString());
@@ -40,16 +39,16 @@ export default class Docker implements IRuntime {
     }
   }
 
-  async prevalidateDataItem(_: Validator, item: DataItem): Promise<boolean> {
+  async prevalidateDataItem(_: any, item: DataItem): Promise<boolean> {
     return true;
   }
 
-  async transformDataItem(_: Validator, item: DataItem): Promise<DataItem> {
+  async transformDataItem(_: any, item: DataItem): Promise<DataItem> {
     return item;
   }
 
   async validateDataItem(
-    _: Validator,
+    _: any,
     proposedDataItem: DataItem,
     validationDataItem: DataItem
   ): Promise<boolean> {
@@ -60,13 +59,13 @@ export default class Docker implements IRuntime {
   }
 
   public async summarizeDataBundle(
-    _: Validator,
+    _: any,
     bundle: DataItem[]
   ): Promise<string> {
     return "";
   }
 
-  public async nextKey(_: Validator, key: string): Promise<string> {
+  public async nextKey(_: any, key: string): Promise<string> {
     return (parseInt(key) + 1).toString();
   }
 }

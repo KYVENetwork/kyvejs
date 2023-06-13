@@ -1,4 +1,4 @@
-import { DataItem, IRuntime, Validator } from "@kyvejs/protocol";
+import { DataItem, IRuntime } from "@kyvejs/protocol";
 
 import { name, version } from "../package.json";
 import { fetchBlock, fetchBlockHash } from "./utils";
@@ -11,27 +11,23 @@ interface IConfig {
 export default class Bitcoin implements IRuntime {
   public name = name;
   public version = version;
-  public config!: IConfig;
 
-  async validateSetConfig(rawConfig: string): Promise<void> {
+  async validateGetConfig(rawConfig: string): Promise<any> {
     const config: IConfig = JSON.parse(rawConfig);
 
     if (!config.sources.length) {
       throw new Error(`Config does not have any sources`);
     }
 
-    this.config = config;
+    return config;
   }
 
-  async getDataItem(v: Validator, key: string): Promise<DataItem> {
+  async getDataItem(c: any, key: string): Promise<DataItem> {
     const results: any[] = [];
 
-    for (const source of this.config.sources) {
-      // get auth headers for proxy endpoints
-      const headers = await v.getProxyAuth();
-
-      const hash = await fetchBlockHash(source, +key, headers);
-      const block = await fetchBlock(source, hash, headers);
+    for (const source of c.sources) {
+      const hash = await fetchBlockHash(source, +key, {});
+      const block = await fetchBlock(source, hash, {});
 
       // remove confirmations to maintain determinism.
       delete block.confirmations;
@@ -49,19 +45,19 @@ export default class Bitcoin implements IRuntime {
     return { key, value: results[0] };
   }
 
-  async prevalidateDataItem(_: Validator, item: DataItem): Promise<boolean> {
+  async prevalidateDataItem(_: any, item: DataItem): Promise<boolean> {
     // TODO: maybe validate if PoW is valid
     // check if item value is not null
     return !!item.value;
   }
 
-  async transformDataItem(_: Validator, item: DataItem): Promise<DataItem> {
+  async transformDataItem(_: any, item: DataItem): Promise<DataItem> {
     // do not transform data item
     return item;
   }
 
   async validateDataItem(
-    _: Validator,
+    _: any,
     proposedDataItem: DataItem,
     validationDataItem: DataItem
   ): Promise<boolean> {
@@ -72,13 +68,13 @@ export default class Bitcoin implements IRuntime {
   }
 
   public async summarizeDataBundle(
-    _: Validator,
+    _: any,
     bundle: DataItem[]
   ): Promise<string> {
     return bundle.at(-1)?.value?.hash ?? "";
   }
 
-  public async nextKey(_: Validator, key: string): Promise<string> {
+  public async nextKey(_: any, key: string): Promise<string> {
     return (parseInt(key) + 1).toString();
   }
 }
