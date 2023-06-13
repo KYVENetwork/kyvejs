@@ -39,16 +39,13 @@ export async function syncPoolState(
           if (prevConfig !== this.pool.data!.config) {
             try {
               this.logger.debug(
-                `this.runtime.validateSetConfig(${this.pool.data!.config})`
+                `this.runtime.validateGetConfig(${this.pool.data!.config})`
               );
 
-              // validate, parse and set config in runtime
-              await this.runtime.validateSetConfig(this.pool.data!.config);
-
-              // error if config was not set on runtime
-              if (!this.runtime.config) {
-                throw new Error(`Config was not set on runtime`);
-              }
+              // validate and get runtime config
+              this.runtimeConfig = await this.runtime.validateGetConfig(
+                this.pool.data!.config
+              );
 
               this.logger.info(`Successfully synced runtime config`);
             } catch (err) {

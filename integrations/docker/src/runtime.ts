@@ -1,11 +1,11 @@
 import { DataItem, IRuntime, Validator } from "@kyvejs/protocol";
 import { spawnSync } from "child_process";
-
 import { name, version } from "../package.json";
 
-// Bitcoin config
+// TendermintBSync config
 interface IConfig {
-  sources: string[];
+  network: string;
+  rpc: string;
 }
 
 export default class Docker implements IRuntime {
@@ -15,6 +15,19 @@ export default class Docker implements IRuntime {
 
   async validateSetConfig(rawConfig: string): Promise<void> {
     const config: IConfig = JSON.parse(rawConfig);
+
+    if (!config.network) {
+      throw new Error(`Config does not have property "network" defined`);
+    }
+
+    if (!config.rpc) {
+      throw new Error(`Config does not have property "rpc" defined`);
+    }
+
+    if (process.env.KYVEJS_TENDERMINT_BSYNC_RPC) {
+      config.rpc = process.env.KYVEJS_TENDERMINT_BSYNC_RPC;
+    }
+
     this.config = config;
   }
 

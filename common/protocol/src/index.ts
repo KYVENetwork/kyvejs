@@ -73,6 +73,7 @@ export class Validator {
   // node attributes
   public protocolVersion!: string;
   public pool!: PoolResponse;
+  public runtimeConfig!: any;
   public name!: string;
 
   // logger attributes
