@@ -1,17 +1,33 @@
-import { DataItem, IRuntime } from "@kyvejs/protocol";
-import { spawnSync } from "child_process";
-import { name, version } from "../package.json";
+import { DataItem, IRuntime } from '@kyvejs/protocol';
+import { spawnSync } from 'child_process';
 
 export default class Docker implements IRuntime {
-  public name = name;
-  public version = version;
-
   private run(args: any[]): any {
-    spawnSync("docker", ["run", "runtime", ...args]);
+    return spawnSync('docker', ['run', '--rm', 'runtime', ...args]);
+  }
+
+  get name() {
+    const result = this.run(['name']);
+
+    if (result.status !== 0) {
+      throw new Error(result.stderr.toString());
+    }
+
+    return result.stdout.toString();
+  }
+
+  get version() {
+    const result = this.run(['version']);
+
+    if (result.status !== 0) {
+      throw new Error(result.stderr.toString());
+    }
+
+    return result.stdout.toString() || '1.0.0';
   }
 
   async validateGetConfig(rawConfig: string): Promise<any> {
-    const result = this.run(["validateGetConfig", rawConfig]);
+    const result = this.run(['validateGetConfig', rawConfig]);
 
     if (result.status !== 0) {
       throw new Error(result.stderr.toString());
@@ -21,7 +37,7 @@ export default class Docker implements IRuntime {
   }
 
   async getDataItem(c: any, key: string): Promise<DataItem> {
-    const result = this.run(["getDataItem", JSON.stringify(c), key]);
+    const result = this.run(['getDataItem', JSON.stringify(c), key]);
 
     if (result.status !== 0) {
       throw new Error(result.stderr.toString());
@@ -32,7 +48,7 @@ export default class Docker implements IRuntime {
 
   async prevalidateDataItem(c: any, item: DataItem): Promise<boolean> {
     const result = this.run([
-      "prevalidateDataItem",
+      'prevalidateDataItem',
       JSON.stringify(c),
       JSON.stringify(item),
     ]);
@@ -46,7 +62,7 @@ export default class Docker implements IRuntime {
 
   async transformDataItem(c: any, item: DataItem): Promise<DataItem> {
     const result = this.run([
-      "transformDataItem",
+      'transformDataItem',
       JSON.stringify(c),
       JSON.stringify(item),
     ]);
@@ -64,7 +80,7 @@ export default class Docker implements IRuntime {
     validationDataItem: DataItem
   ): Promise<boolean> {
     const result = this.run([
-      "validateDataItem",
+      'validateDataItem',
       JSON.stringify(c),
       JSON.stringify(proposedDataItem),
       JSON.stringify(validationDataItem),
@@ -82,7 +98,7 @@ export default class Docker implements IRuntime {
     bundle: DataItem[]
   ): Promise<string> {
     const result = this.run([
-      "summarizeDataBundle",
+      'summarizeDataBundle',
       JSON.stringify(c),
       JSON.stringify(bundle),
     ]);
@@ -95,12 +111,12 @@ export default class Docker implements IRuntime {
   }
 
   public async nextKey(c: any, key: string): Promise<string> {
-    const result = this.run(["nextKey", JSON.stringify(c), key]);
+    const result = this.run(['nextKey', JSON.stringify(c), key]);
 
     if (result.status !== 0) {
       throw new Error(result.stderr.toString());
     }
 
-    return JSON.parse(result.stdout.toString());
+    return result.stdout.toString();
   }
 }
