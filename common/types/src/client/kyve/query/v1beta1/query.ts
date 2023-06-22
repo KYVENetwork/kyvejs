@@ -106,6 +106,8 @@ export interface StakerMetadata {
    * if they not agree with the new commission.
    */
   pending_commission_change?: CommissionChangeEntry;
+  /** commission_rewards are the rewards in $KYVE earned through commission */
+  commission_rewards: string;
 }
 
 /**
@@ -420,6 +422,7 @@ function createBaseStakerMetadata(): StakerMetadata {
     security_contact: "",
     details: "",
     pending_commission_change: undefined,
+    commission_rewards: "0",
   };
 }
 
@@ -445,6 +448,9 @@ export const StakerMetadata = {
     }
     if (message.pending_commission_change !== undefined) {
       CommissionChangeEntry.encode(message.pending_commission_change, writer.uint32(58).fork()).ldelim();
+    }
+    if (message.commission_rewards !== "0") {
+      writer.uint32(64).uint64(message.commission_rewards);
     }
     return writer;
   },
@@ -477,6 +483,9 @@ export const StakerMetadata = {
         case 7:
           message.pending_commission_change = CommissionChangeEntry.decode(reader, reader.uint32());
           break;
+        case 8:
+          message.commission_rewards = longToString(reader.uint64() as Long);
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -496,6 +505,7 @@ export const StakerMetadata = {
       pending_commission_change: isSet(object.pending_commission_change)
         ? CommissionChangeEntry.fromJSON(object.pending_commission_change)
         : undefined,
+      commission_rewards: isSet(object.commission_rewards) ? String(object.commission_rewards) : "0",
     };
   },
 
@@ -511,6 +521,7 @@ export const StakerMetadata = {
       (obj.pending_commission_change = message.pending_commission_change
         ? CommissionChangeEntry.toJSON(message.pending_commission_change)
         : undefined);
+    message.commission_rewards !== undefined && (obj.commission_rewards = message.commission_rewards);
     return obj;
   },
 
@@ -526,6 +537,7 @@ export const StakerMetadata = {
       (object.pending_commission_change !== undefined && object.pending_commission_change !== null)
         ? CommissionChangeEntry.fromPartial(object.pending_commission_change)
         : undefined;
+    message.commission_rewards = object.commission_rewards ?? "0";
     return message;
   },
 };

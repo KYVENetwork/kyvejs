@@ -45,6 +45,10 @@ export interface PoolResponse {
   total_delegation: string;
   /** status ... */
   status: PoolStatus;
+  /** account ... */
+  account: string;
+  /** account_balance ... */
+  account_balance: string;
 }
 
 /** QueryPoolRequest is the request type for the Query/Pool RPC method. */
@@ -221,6 +225,8 @@ function createBasePoolResponse(): PoolResponse {
     total_self_delegation: "0",
     total_delegation: "0",
     status: 0,
+    account: "",
+    account_balance: "0",
   };
 }
 
@@ -246,6 +252,12 @@ export const PoolResponse = {
     }
     if (message.status !== 0) {
       writer.uint32(56).int32(message.status);
+    }
+    if (message.account !== "") {
+      writer.uint32(66).string(message.account);
+    }
+    if (message.account_balance !== "0") {
+      writer.uint32(72).uint64(message.account_balance);
     }
     return writer;
   },
@@ -278,6 +290,12 @@ export const PoolResponse = {
         case 7:
           message.status = reader.int32() as any;
           break;
+        case 8:
+          message.account = reader.string();
+          break;
+        case 9:
+          message.account_balance = longToString(reader.uint64() as Long);
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -295,6 +313,8 @@ export const PoolResponse = {
       total_self_delegation: isSet(object.total_self_delegation) ? String(object.total_self_delegation) : "0",
       total_delegation: isSet(object.total_delegation) ? String(object.total_delegation) : "0",
       status: isSet(object.status) ? poolStatusFromJSON(object.status) : 0,
+      account: isSet(object.account) ? String(object.account) : "",
+      account_balance: isSet(object.account_balance) ? String(object.account_balance) : "0",
     };
   },
 
@@ -312,6 +332,8 @@ export const PoolResponse = {
     message.total_self_delegation !== undefined && (obj.total_self_delegation = message.total_self_delegation);
     message.total_delegation !== undefined && (obj.total_delegation = message.total_delegation);
     message.status !== undefined && (obj.status = poolStatusToJSON(message.status));
+    message.account !== undefined && (obj.account = message.account);
+    message.account_balance !== undefined && (obj.account_balance = message.account_balance);
     return obj;
   },
 
@@ -326,6 +348,8 @@ export const PoolResponse = {
     message.total_self_delegation = object.total_self_delegation ?? "0";
     message.total_delegation = object.total_delegation ?? "0";
     message.status = object.status ?? 0;
+    message.account = object.account ?? "";
+    message.account_balance = object.account_balance ?? "0";
     return message;
   },
 };
