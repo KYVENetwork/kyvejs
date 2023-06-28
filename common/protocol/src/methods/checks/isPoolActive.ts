@@ -15,32 +15,30 @@ export function isPoolActive(this: Validator): boolean {
 
   switch (this.pool.status as PoolStatus) {
     case PoolStatus.POOL_STATUS_ACTIVE:
-      return false;
+      return true;
+    case PoolStatus.POOL_STATUS_NO_FUNDS:
+      this.logger.warn("Pool is out of funds. Rewards may be reduced.");
+      return true;
     case PoolStatus.POOL_STATUS_DISABLED:
       this.logger.info(
         "Pool is disabled. Waiting for pool being enabled. Idling ..."
       );
-      return true;
-    case PoolStatus.POOL_STATUS_NO_FUNDS:
-      this.logger.info(
-        "Pool is out of funds. Waiting for additional funds. Idling ..."
-      );
-      return true;
+      return false;
     case PoolStatus.POOL_STATUS_NOT_ENOUGH_DELEGATION:
       this.logger.info(
         "Not enough delegation in pool. Waiting for additional delegation. Idling ..."
       );
-      return true;
+      return false;
     case PoolStatus.POOL_STATUS_UPGRADING:
       this.logger.info(
         "Pool is currently upgrading. Waiting for upgrade being applied. Idling ..."
       );
-      return true;
+      return false;
     case PoolStatus.POOL_STATUS_UNSPECIFIED:
       this.logger.info("Pool status is currently unspecified. Idling ...");
-      return true;
+      return false;
     default:
       this.logger.info("Pool status is currently unknown. Idling ...");
-      return true;
+      return false;
   }
 }

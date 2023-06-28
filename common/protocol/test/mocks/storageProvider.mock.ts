@@ -3,9 +3,12 @@ import { BundleTag } from "../../src";
 export const TestNormalStorageProvider = jest.fn().mockImplementation(() => {
   return {
     name: "TestNormalStorageProvider",
-    decimals: 12,
-    init: jest.fn(),
+    coinDecimals: 12,
+    getAddress: jest.fn().mockResolvedValue(""),
     getBalance: jest.fn().mockResolvedValue("0"),
+    getPrice: jest
+      .fn()
+      .mockImplementation((bytes: number) => (bytes * 1).toString()),
     saveBundle: jest
       .fn()
       .mockImplementation((bundle: Buffer, tags: BundleTag[]) => ({

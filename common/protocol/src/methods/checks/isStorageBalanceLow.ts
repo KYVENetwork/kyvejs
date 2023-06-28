@@ -25,9 +25,9 @@ export async function isStorageBalanceLow(this: Validator): Promise<void> {
 
     this.logger.debug(`Account "${address}" has "${balance}" balance`);
 
-    // get upload cost of current bundle size
+    // get upload cost of current data size
     const cost = await storageProvider.getPrice(
-      parseInt(this.pool.bundle_proposal?.bundle_size ?? "0")
+      parseInt(this.pool.bundle_proposal?.data_size ?? "0")
     );
 
     // if account can not pay for 10x the current bundle the balance is not sufficient

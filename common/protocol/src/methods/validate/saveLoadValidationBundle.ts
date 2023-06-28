@@ -36,7 +36,7 @@ export async function saveLoadValidationBundle(
       }
 
       // check if pool got inactive in the meantime
-      if (this.isPoolActive()) {
+      if (!this.isPoolActive()) {
         return null;
       }
 

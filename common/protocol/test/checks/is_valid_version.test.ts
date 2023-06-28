@@ -1,13 +1,13 @@
 import { Logger } from "tslog";
-import { Validator } from "../src/index";
-import { setupMetrics, isValidVersion } from "../src/methods";
+import { Validator } from "../../src/index";
+import { setupMetrics, isValidVersion } from "../../src/methods";
 import { register } from "prom-client";
-import { TestRuntime } from "./mocks/runtime.mock";
-import { genesis_pool } from "./mocks/constants";
+import { TestRuntime } from "../mocks/runtime.mock";
+import { genesis_pool } from "../mocks/constants";
 
 /*
 
-TEST CASES - version tests
+TEST CASES - isValidVersion
 
 * assert equal remote and local version
 * assert remote and local with higher patch version
@@ -18,10 +18,11 @@ TEST CASES - version tests
 * assert remote and local with lower major version
 * assert remote and local with different major and minor version
 * assert remote and local with different major, minor and patch version
+* assert unexpected error
 
 */
 
-describe("version tests", () => {
+describe("isValidVersion", () => {
   let v: Validator;
 
   beforeEach(() => {
@@ -57,8 +58,10 @@ describe("version tests", () => {
     // local
     v["runtime"].version = "1.0.0";
 
+    // ACT
     const result = isValidVersion.call(v);
 
+    // ASSERT
     expect(result).toBeTruthy();
   });
 
@@ -71,8 +74,10 @@ describe("version tests", () => {
     // local
     v["runtime"].version = "1.0.1";
 
+    // ACT
     const result = isValidVersion.call(v);
 
+    // ASSERT
     expect(result).toBeTruthy();
   });
 
@@ -85,8 +90,10 @@ describe("version tests", () => {
     // local
     v["runtime"].version = "1.0.1";
 
+    // ACT
     const result = isValidVersion.call(v);
 
+    // ASSERT
     expect(result).toBeTruthy();
   });
 
@@ -99,8 +106,10 @@ describe("version tests", () => {
     // local
     v["runtime"].version = "1.1.0";
 
+    // ACT
     const result = isValidVersion.call(v);
 
+    // ASSERT
     expect(result).toBeFalsy();
   });
 
@@ -113,8 +122,10 @@ describe("version tests", () => {
     // local
     v["runtime"].version = "1.1.0";
 
+    // ACT
     const result = isValidVersion.call(v);
 
+    // ASSERT
     expect(result).toBeFalsy();
   });
 
@@ -127,8 +138,10 @@ describe("version tests", () => {
     // local
     v["runtime"].version = "2.0.0";
 
+    // ACT
     const result = isValidVersion.call(v);
 
+    // ASSERT
     expect(result).toBeFalsy();
   });
 
@@ -141,8 +154,10 @@ describe("version tests", () => {
     // local
     v["runtime"].version = "2.0.0";
 
+    // ACT
     const result = isValidVersion.call(v);
 
+    // ASSERT
     expect(result).toBeFalsy();
   });
 
@@ -155,8 +170,10 @@ describe("version tests", () => {
     // local
     v["runtime"].version = "2.1.0";
 
+    // ACT
     const result = isValidVersion.call(v);
 
+    // ASSERT
     expect(result).toBeFalsy();
   });
 
@@ -169,8 +186,27 @@ describe("version tests", () => {
     // local
     v["runtime"].version = "2.1.1";
 
+    // ACT
     const result = isValidVersion.call(v);
 
+    // ASSERT
     expect(result).toBeFalsy();
+  });
+
+  test("assert unexpected error", async () => {
+    // ARRANGE
+
+    // remote
+    v.pool!.data!.protocol!.version = "1.0.0";
+
+    // local
+    v["runtime"] = null as any;
+
+    // ACT
+    const result = isValidVersion.call(v);
+
+    // ASSERT
+    expect(result).toBeFalsy();
+    expect(v.logger.fatal).toHaveBeenCalled();
   });
 });

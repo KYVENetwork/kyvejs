@@ -47,7 +47,7 @@ export async function runNode(this: Validator): Promise<void> {
 
     // perform basic logic checks if pool is up and running, if it fails
     // idle until pool is active again
-    if (this.isPoolActive()) {
+    if (!this.isPoolActive()) {
       await sleep(IDLE_TIME);
       endTimeRound();
       continue;

@@ -33,20 +33,20 @@ export async function isStorageBalanceZero(this: Validator): Promise<boolean> {
         `Provide some funds to the following account: ${address}`
       );
 
-      return false;
+      return true;
     }
 
     this.logger.info(
       `Account has available funds on StorageProvider:${storageProvider.name}\n`
     );
 
-    return true;
+    return false;
   } catch (err) {
     this.logger.fatal(
       `Error while checking storage provider balance. Exiting ...`
     );
     this.logger.fatal(standardizeJSON(err));
 
-    return false;
+    return true;
   }
 }
