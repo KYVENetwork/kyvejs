@@ -6,10 +6,10 @@ export * from "./setups/setupSDK";
 export * from "./setups/setupValidator";
 
 // checks
-export * from "./checks/validateIsNodeValidator";
+export * from "./checks/isNodeValidator";
 export * from "./checks/validateIsPoolActive";
-export * from "./checks/validateRuntime";
-export * from "./checks/validateVersion";
+export * from "./checks/isValidRuntime";
+export * from "./checks/isValidVersion";
 export * from "./checks/validateStorageBalance";
 export * from "./checks/validateDataAvailability";
 

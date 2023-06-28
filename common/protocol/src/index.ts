@@ -34,11 +34,11 @@ import {
   submitBundleProposal,
   syncPoolState,
   validateBundleProposal,
-  validateIsNodeValidator,
+  isNodeValidator,
   validateIsPoolActive,
-  validateRuntime,
+  isValidRuntime,
   validateStorageBalance,
-  validateVersion,
+  isValidVersion,
   validateDataAvailability,
   voteBundleProposal,
   waitForAuthorization,
@@ -107,9 +107,9 @@ export class Validator {
   protected setupValidator = setupValidator;
 
   // checks
-  protected validateRuntime = validateRuntime;
-  protected validateVersion = validateVersion;
-  protected validateIsNodeValidator = validateIsNodeValidator;
+  protected isValidRuntime = isValidRuntime;
+  protected isValidVersion = isValidVersion;
+  protected isNodeValidator = isNodeValidator;
   protected validateIsPoolActive = validateIsPoolActive;
   protected validateDataAvailability = validateDataAvailability;
 

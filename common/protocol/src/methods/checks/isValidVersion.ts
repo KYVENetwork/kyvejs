@@ -2,21 +2,20 @@ import { Validator, standardizeJSON } from "../..";
 import { valid, major, minor } from "semver";
 
 /**
- * validateVersion checks if the major and minor version of the pool matches
+ * isValidVersion checks if the major and minor version of the pool matches
  * with the runtime version of the node. If it does not match the node will exit.
  *
- * @method validateVersion
+ * @method isValidVersion
  * @param {Validator} this
- * @return {void}
+ * @return {boolean}
  */
-export function validateVersion(this: Validator): void {
+export function isValidVersion(this: Validator): boolean {
   try {
     this.logger.debug(
       `Comparing remote runtime version with local runtime version`
     );
 
     const remoteVersion = valid(this.pool.data!.protocol!.version);
-    const localVersion = valid(this.runtime.version);
 
     // exit if remote version is invalid
     if (remoteVersion === null) {
@@ -25,8 +24,10 @@ export function validateVersion(this: Validator): void {
       );
       this.logger.fatal(`Remote version: ${this.pool.data!.protocol!.version}`);
 
-      process.exit(1);
+      return false;
     }
+
+    const localVersion = valid(this.runtime.version);
 
     // exit if local version is invalid
     if (localVersion === null) {
@@ -35,7 +36,7 @@ export function validateVersion(this: Validator): void {
       );
       this.logger.fatal(`Local version: ${this.pool.data!.protocol!.version}`);
 
-      process.exit(1);
+      return false;
     }
 
     // exit if major version does not match
@@ -46,7 +47,7 @@ export function validateVersion(this: Validator): void {
           this.pool.data!.protocol!.version
         }`
       );
-      process.exit(1);
+      return false;
     }
 
     // exit if minor version does not match
@@ -57,17 +58,19 @@ export function validateVersion(this: Validator): void {
           this.pool.data!.protocol!.version
         }`
       );
-      process.exit(1);
+      return false;
     }
 
     // patch version can be different, continue in this case
     this.logger.info(
       `Validator running on valid runtime version = ${this.runtime.version}`
     );
+
+    return true;
   } catch (err) {
     this.logger.fatal(`Error while validating runtime version. Exiting ...`);
     this.logger.fatal(standardizeJSON(err));
 
-    process.exit(1);
+    return false;
   }
 }

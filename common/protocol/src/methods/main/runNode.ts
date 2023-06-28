@@ -30,9 +30,17 @@ export async function runNode(this: Validator): Promise<void> {
     await this.getBalances();
 
     // perform basic validation checks, if one fails exit
-    this.validateRuntime();
-    this.validateVersion();
-    this.validateIsNodeValidator();
+    if (!this.isValidRuntime()) {
+      process.exit(1);
+    }
+
+    if (!this.isValidVersion()) {
+      process.exit(1);
+    }
+
+    if (!this.isNodeValidator()) {
+      process.exit(1);
+    }
 
     // perform basic logic checks if pool is up and running, if it fails
     // idle until pool is active again

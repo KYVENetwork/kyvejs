@@ -1,15 +1,15 @@
 import { Validator, standardizeJSON } from "../..";
 
 /**
- * validateIsNodeValidator checks if the staker of the node is in the
+ * isNodeValidator checks if the staker of the node is in the
  * active validator set of the pool. If the staker is not a validator
  * the node will exit.
  *
- * @method validateIsNodeValidator
+ * @method isNodeValidator
  * @param {Validator} this
- * @return {void}
+ * @return {boolean}
  */
-export function validateIsNodeValidator(this: Validator): void {
+export function isNodeValidator(this: Validator): boolean {
   try {
     this.logger.debug(
       `Validating if node operator is included in pool stakers`
@@ -19,18 +19,20 @@ export function validateIsNodeValidator(this: Validator): void {
       this.logger.fatal(
         `Validator is not in the active validator set! Exiting ...`
       );
-      process.exit(1);
+      return false;
     }
 
     this.logger.info(
       `Validator running as validator in storage pool = ${this.pool.data!.name}`
     );
+
+    return true;
   } catch (err) {
     this.logger.fatal(
       `Error while validating if node is a validator. Exiting ...`
     );
     this.logger.fatal(standardizeJSON(err));
 
-    process.exit(1);
+    return false;
   }
 }
