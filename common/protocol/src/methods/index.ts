@@ -7,11 +7,12 @@ export * from "./setups/setupValidator";
 
 // checks
 export * from "./checks/isNodeValidator";
-export * from "./checks/validateIsPoolActive";
+export * from "./checks/isPoolActive";
 export * from "./checks/isValidRuntime";
 export * from "./checks/isValidVersion";
-export * from "./checks/validateStorageBalance";
-export * from "./checks/validateDataAvailability";
+export * from "./checks/isStorageBalanceLow";
+export * from "./checks/isStorageBalanceZero";
+export * from "./checks/isDataAvailable";
 
 // timeouts
 export * from "./timeouts/waitForAuthorization";
@@ -33,7 +34,7 @@ export * from "./txs/voteBundleProposal";
 // queries
 export * from "./queries/canPropose";
 export * from "./queries/canVote";
-export * from "./queries/getBalances";
+export * from "./queries/getBalancesForMetrics";
 export * from "./queries/syncPoolState";
 
 // validate

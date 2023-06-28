@@ -26,12 +26,12 @@ export interface IStorageProvider {
   name: string;
 
   /**
-   * How many decimals the native currency of the storage provider has
+   * How many decimals the native coin of the storage provider has
    *
-   * @property decimals
+   * @property coinDecimals
    * @type {number}
    */
-  decimals: number;
+  coinDecimals: number;
 
   /**
    * Gets the public account address of storage provider wallet
@@ -48,6 +48,15 @@ export interface IStorageProvider {
    * @return {Promise<string>}
    */
   getBalance(): Promise<string>;
+
+  /**
+   * Gets the cost to uploader the specified number of bytes
+   *
+   * @method getPrice
+   * @param {number} bytes
+   * @return {Promise<string>}
+   */
+  getPrice(bytes: number): Promise<string>;
 
   /**
    * Saves a bundle on the storage provider and returns a Storage Id

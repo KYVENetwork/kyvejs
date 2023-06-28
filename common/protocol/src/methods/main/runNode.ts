@@ -27,7 +27,7 @@ export async function runNode(this: Validator): Promise<void> {
 
     // get latest state of the chain to start round
     await this.syncPoolState();
-    await this.getBalances();
+    await this.getBalancesForMetrics();
 
     // perform basic validation checks, if one fails exit
     if (!this.isValidRuntime()) {
@@ -42,9 +42,12 @@ export async function runNode(this: Validator): Promise<void> {
       process.exit(1);
     }
 
+    // log warnings if storage provider balance is low
+    await this.isStorageBalanceLow();
+
     // perform basic logic checks if pool is up and running, if it fails
     // idle until pool is active again
-    if (this.validateIsPoolActive()) {
+    if (this.isPoolActive()) {
       await sleep(IDLE_TIME);
       endTimeRound();
       continue;
