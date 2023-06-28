@@ -226,7 +226,7 @@ export async function createBundleProposal(this: Validator): Promise<void> {
 
       if (new BigNumber(balance).lt(cost)) {
         this.logger.warn(
-          `Not enough StorageProvider:${storageProvider.name} balance = ${balance} required = ${cost}`
+          `Not enough balance on StorageProvider:${storageProvider.name}; balance = ${balance} required = ${cost}`
         );
         await this.skipUploaderRole(fromIndex);
         return;
