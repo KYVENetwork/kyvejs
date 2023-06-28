@@ -6,7 +6,7 @@ import { BundleTag, IStorageProvider } from "../../types";
 
 export class Arweave implements IStorageProvider {
   public name = "Arweave";
-  public decimals = 12;
+  public coinDecimals = 12;
 
   private readonly storagePriv: string;
 
@@ -32,6 +32,15 @@ export class Arweave implements IStorageProvider {
   async getBalance() {
     const account = await this.getAddress();
     return await this.arweaveClient.wallets.getBalance(account);
+  }
+
+  async getPrice(bytes: number) {
+    const { data: price } = await axios.get(
+      `${this.arweaveClient.getConfig().api.protocol}://${
+        this.arweaveClient.getConfig().api.host
+      }/price/${bytes}`
+    );
+    return price;
   }
 
   async saveBundle(bundle: Buffer, tags: BundleTag[]) {

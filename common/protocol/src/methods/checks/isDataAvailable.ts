@@ -1,16 +1,16 @@
 import { Validator, standardizeJSON } from "../..";
 
 /**
- * validateDataAvailability checks if the current next data item
+ * isDataAvailable checks if the current next data item
  * is available and therefore check if the node has done the setup correctly.
  * Method exits if data is not available, the prevalidation or the transform
  * fails.
  *
- * @method validateDataAvailability
+ * @method isDataAvailable
  * @param {Validator} this
- * @return {Promise<void>}
+ * @return {Promise<boolean>}
  */
-export async function validateDataAvailability(this: Validator): Promise<void> {
+export async function isDataAvailable(this: Validator): Promise<boolean> {
   try {
     // log debug method
     if (this.pool.data!.current_key) {
@@ -42,10 +42,12 @@ export async function validateDataAvailability(this: Validator): Promise<void> {
     this.logger.info(
       `Data available and valid for next key ${nextKey}. Continuing ...`
     );
+
+    return true;
   } catch (err) {
     this.logger.fatal(`Data not available. Exiting ...`);
     this.logger.fatal(standardizeJSON(err));
 
-    process.exit(1);
+    return false;
   }
 }

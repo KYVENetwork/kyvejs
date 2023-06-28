@@ -3,14 +3,18 @@ import { BundleTag, IStorageProvider } from "../../types";
 
 export class NoStorageProvider implements IStorageProvider {
   public name = "NoStorageProvider";
-  public decimals = 0;
+  public coinDecimals = 0;
 
   async getAddress() {
     return "";
   }
 
   async getBalance() {
-    return "";
+    return "0";
+  }
+
+  async getPrice(bytes: number) {
+    return "0";
   }
 
   async saveBundle(bundle: Buffer, _tags: BundleTag[]) {
