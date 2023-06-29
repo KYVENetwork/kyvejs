@@ -305,9 +305,17 @@ export class Validator {
     this.setupLogger();
     this.setupMetrics();
 
-    // perform async setups
     await this.setupSDK();
     await this.syncPoolState(true);
+
+    // perform validation checks
+    if (!this.isValidRuntime()) {
+      process.exit(1);
+    }
+
+    if (!this.isValidVersion()) {
+      process.exit(1);
+    }
 
     if (await this.isStorageBalanceZero()) {
       process.exit(1);

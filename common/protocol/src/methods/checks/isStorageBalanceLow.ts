@@ -35,11 +35,11 @@ export async function isStorageBalanceLow(this: Validator): Promise<void> {
       );
     } else {
       this.logger.info(
-        `Account has sufficient balance on StorageProvider:${storageProvider.name}\n`
+        `Account has sufficient balance on StorageProvider:${storageProvider.name}`
       );
     }
 
-    this.logger.info(`Account "${address}" has balance of "${balance}"`);
+    this.logger.debug(`Account "${address}" has balance of "${balance}"`);
   } catch (err) {
     this.logger.error(`Checking storage provider balance failed`);
     this.logger.error(standardizeJSON(err));
