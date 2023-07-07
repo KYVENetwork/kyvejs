@@ -3,6 +3,7 @@ import { name, version } from '../package.json';
 import axios from 'axios';
 import Ajv from 'ajv';
 import block_schema from './schemas/block.json';
+import block_results_schema from './schemas/block_result.json';
 
 const ajv = new Ajv();
 
@@ -80,6 +81,14 @@ export default class Tendermint implements IRuntime {
 
     if (!block_validate(item.value.block)) {
       console.log('error', block_validate.errors);
+      return false;
+    }
+
+    // validate block_results schema
+    const block_results_validate = ajv.compile(block_results_schema);
+
+    if (!block_results_validate(item.value.block_results)) {
+      console.log('error', block_results_validate.errors);
       return false;
     }
 
