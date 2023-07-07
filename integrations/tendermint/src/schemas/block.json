@@ -1,0 +1,366 @@
+{
+  "type": "object",
+  "properties": {
+    "block_id": {
+      "type": "object",
+      "properties": {
+        "hash": {
+          "type": "string"
+        },
+        "parts": {
+          "type": "object",
+          "properties": {
+            "total": {
+              "type": "integer"
+            },
+            "hash": {
+              "type": "string"
+            }
+          },
+          "required": ["total", "hash"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["hash", "parts"],
+      "additionalProperties": false
+    },
+    "block": {
+      "type": "object",
+      "properties": {
+        "header": {
+          "type": "object",
+          "properties": {
+            "version": {
+              "type": "object",
+              "properties": {
+                "block": {
+                  "type": "string"
+                }
+              },
+              "required": ["block"],
+              "additionalProperties": false
+            },
+            "chain_id": {
+              "type": "string"
+            },
+            "height": {
+              "type": "string"
+            },
+            "time": {
+              "type": "string"
+            },
+            "last_block_id": {
+              "type": "object",
+              "properties": {
+                "hash": {
+                  "type": "string"
+                },
+                "parts": {
+                  "type": "object",
+                  "properties": {
+                    "total": {
+                      "type": "integer"
+                    },
+                    "hash": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["total", "hash"],
+                  "additionalProperties": false
+                }
+              },
+              "required": ["hash", "parts"],
+              "additionalProperties": false
+            },
+            "last_commit_hash": {
+              "type": "string"
+            },
+            "data_hash": {
+              "type": "string"
+            },
+            "validators_hash": {
+              "type": "string"
+            },
+            "next_validators_hash": {
+              "type": "string"
+            },
+            "consensus_hash": {
+              "type": "string"
+            },
+            "app_hash": {
+              "type": "string"
+            },
+            "last_results_hash": {
+              "type": "string"
+            },
+            "evidence_hash": {
+              "type": "string"
+            },
+            "proposer_address": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "version",
+            "chain_id",
+            "height",
+            "time",
+            "last_block_id",
+            "last_commit_hash",
+            "data_hash",
+            "validators_hash",
+            "next_validators_hash",
+            "consensus_hash",
+            "app_hash",
+            "last_results_hash",
+            "evidence_hash",
+            "proposer_address"
+          ],
+          "additionalProperties": false
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "txs": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": ["txs"],
+          "additionalProperties": false
+        },
+        "evidence": {
+          "type": "object",
+          "properties": {
+            "evidence": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string"
+                  },
+                  "value": {
+                    "type": "object",
+                    "properties": {
+                      "vote_a": {
+                        "type": "object",
+                        "properties": {
+                          "type": {
+                            "type": "integer"
+                          },
+                          "height": {
+                            "type": "string"
+                          },
+                          "round": {
+                            "type": "integer"
+                          },
+                          "block_id": {
+                            "type": "object",
+                            "properties": {
+                              "hash": {
+                                "type": "string"
+                              },
+                              "parts": {
+                                "type": "object",
+                                "properties": {
+                                  "total": {
+                                    "type": "integer"
+                                  },
+                                  "hash": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": ["total", "hash"],
+                                "additionalProperties": false
+                              }
+                            },
+                            "required": ["hash", "parts"],
+                            "additionalProperties": false
+                          },
+                          "timestamp": {
+                            "type": "string"
+                          },
+                          "validator_address": {
+                            "type": "string"
+                          },
+                          "validator_index": {
+                            "type": "integer"
+                          },
+                          "signature": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "type",
+                          "height",
+                          "round",
+                          "block_id",
+                          "timestamp",
+                          "validator_address",
+                          "validator_index",
+                          "signature"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "vote_b": {
+                        "type": "object",
+                        "properties": {
+                          "type": {
+                            "type": "integer"
+                          },
+                          "height": {
+                            "type": "string"
+                          },
+                          "round": {
+                            "type": "integer"
+                          },
+                          "block_id": {
+                            "type": "object",
+                            "properties": {
+                              "hash": {
+                                "type": "string"
+                              },
+                              "parts": {
+                                "type": "object",
+                                "properties": {
+                                  "total": {
+                                    "type": "integer"
+                                  },
+                                  "hash": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": ["total", "hash"],
+                                "additionalProperties": false
+                              }
+                            },
+                            "required": ["hash", "parts"],
+                            "additionalProperties": false
+                          },
+                          "timestamp": {
+                            "type": "string"
+                          },
+                          "validator_address": {
+                            "type": "string"
+                          },
+                          "validator_index": {
+                            "type": "integer"
+                          },
+                          "signature": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "type",
+                          "height",
+                          "round",
+                          "block_id",
+                          "timestamp",
+                          "validator_address",
+                          "validator_index",
+                          "signature"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "TotalVotingPower": {
+                        "type": "string"
+                      },
+                      "ValidatorPower": {
+                        "type": "string"
+                      },
+                      "Timestamp": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "vote_a",
+                      "vote_b",
+                      "TotalVotingPower",
+                      "ValidatorPower",
+                      "Timestamp"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": ["type", "value"],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": ["evidence"],
+          "additionalProperties": false
+        },
+        "last_commit": {
+          "type": "object",
+          "properties": {
+            "height": {
+              "type": "string"
+            },
+            "round": {
+              "type": "integer"
+            },
+            "block_id": {
+              "type": "object",
+              "properties": {
+                "hash": {
+                  "type": "string"
+                },
+                "parts": {
+                  "type": "object",
+                  "properties": {
+                    "total": {
+                      "type": "integer"
+                    },
+                    "hash": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["total", "hash"],
+                  "additionalProperties": false
+                }
+              },
+              "required": ["hash", "parts"],
+              "additionalProperties": false
+            },
+            "signatures": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "block_id_flag": {
+                    "type": "integer"
+                  },
+                  "validator_address": {
+                    "type": "string"
+                  },
+                  "timestamp": {
+                    "type": "string"
+                  },
+                  "signature": {
+                    "type": ["string", "null"]
+                  }
+                },
+                "required": [
+                  "block_id_flag",
+                  "validator_address",
+                  "timestamp",
+                  "signature"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": ["height", "round", "block_id", "signatures"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["header", "data", "evidence", "last_commit"],
+      "additionalProperties": false
+    }
+  },
+  "required": ["block_id", "block"],
+  "additionalProperties": false
+}

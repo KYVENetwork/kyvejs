@@ -1,0 +1,81 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "result": {
+      "type": "object",
+      "properties": {
+        "height": {
+          "type": "string"
+        },
+        "txs_results": {
+          "type": "array",
+          "items": [
+            {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer"
+                },
+                "data": {
+                  "type": "string"
+                },
+                "log": {
+                  "type": "string"
+                },
+                "info": {
+                  "type": "string"
+                },
+                "gas_wanted": {
+                  "type": "string"
+                },
+                "gas_used": {
+                  "type": "string"
+                },
+                "events": {
+                  "type": "array",
+                  "items": {}
+                },
+                "codespace": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "code",
+                "data",
+                "log",
+                "info",
+                "gas_wanted",
+                "gas_used",
+                "events",
+                "codespace"
+              ]
+            }
+          ]
+        },
+        "begin_block_events": {
+          "type": "array",
+          "items": {}
+        },
+        "end_block_events": {
+          "type": "null"
+        },
+        "validator_updates": {
+          "type": "null"
+        },
+        "consensus_param_updates": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "height",
+        "txs_results",
+        "begin_block_events",
+        "end_block_events",
+        "validator_updates",
+        "consensus_param_updates"
+      ]
+    }
+  },
+  "required": ["result"]
+}

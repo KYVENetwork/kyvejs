@@ -1,6 +1,10 @@
 import { DataItem, IRuntime, Validator } from '@kyvejs/protocol';
 import { name, version } from '../package.json';
 import axios from 'axios';
+import Ajv from 'ajv';
+import block_schema from './schemas/block.json';
+
+const ajv = new Ajv();
 
 // Tendermint config
 interface IConfig {
@@ -68,6 +72,14 @@ export default class Tendermint implements IRuntime {
 
     // check if block results height matches
     if (item.key !== item.value.block_results.height) {
+      return false;
+    }
+
+    // validate block schema
+    const block_validate = ajv.compile(block_schema);
+
+    if (!block_validate(item.value.block)) {
+      console.log('error', block_validate.errors);
       return false;
     }
 
