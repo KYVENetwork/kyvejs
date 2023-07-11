@@ -11,19 +11,19 @@
     "tools/*"
   ],
   "devDependencies": {
-    "lerna": "^6.1.0",
-    "nx": "^14.4.3",
-    "prettier": "^2.3.0",
-    "rimraf": "^3.0.2",
     "@typescript-eslint/eslint-plugin": "^5.42.1",
     "@typescript-eslint/parser": "^5.42.1",
     "eslint": "^8.27.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.2.1",
-    "eslint-plugin-simple-import-sort": "^8.0.0"
+    "eslint-plugin-simple-import-sort": "^8.0.0",
+    "lerna": "^7.1.1",
+    "nx": "^14.4.3",
+    "prettier": "^2.3.0",
+    "rimraf": "^3.0.2"
   },
   "scripts": {
-    "setup": "lerna clean && lerna bootstrap --ignore-scripts  && lerna run build",
+    "setup": "yarn install && lerna run build",
     "graph": "yarn nx graph",
     "build": "lerna run build",
     "build:binaries": "lerna run build:binaries --concurrency 1",
