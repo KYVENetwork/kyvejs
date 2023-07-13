@@ -80,7 +80,6 @@ export default class Tendermint implements IRuntime {
     const block_validate = ajv.compile(block_schema);
 
     if (!block_validate(item.value.block)) {
-      console.log('error', block_validate.errors);
       return false;
     }
 
@@ -88,7 +87,6 @@ export default class Tendermint implements IRuntime {
     const block_results_validate = ajv.compile(block_results_schema);
 
     if (!block_results_validate(item.value.block_results)) {
-      console.log('error', block_results_validate.errors);
       return false;
     }
 
@@ -96,7 +94,33 @@ export default class Tendermint implements IRuntime {
   }
 
   async transformDataItem(_: Validator, item: DataItem): Promise<DataItem> {
-    // don't transform data item
+    if (item.value?.block_results?.txs_results) {
+      item.value.block_results.txs_results =
+        item.value.block_results.txs_results.map((tx_result: any) => {
+          // delete log property of transaction results since it is undeterministic and stores duplicate data
+          delete tx_result.log;
+
+          if (tx_result.events) {
+            tx_result.events = tx_result.events.map((event: any) => {
+              // set attribute "acknowledgement" in ibc event "fungible_token_packet" to empty string
+              if (event.type === 'fungible_token_packet') {
+                event.attributes = event.attributes.map((attribute: any) => {
+                  if (attribute === 'YWNrbm93bGVkZ2VtZW50') {
+                    attribute.value = '';
+                  }
+
+                  return attribute;
+                });
+              }
+
+              return event;
+            });
+          }
+
+          return tx_result;
+        });
+    }
+
     return item;
   }
 
