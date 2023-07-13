@@ -105,7 +105,7 @@ export default class Tendermint implements IRuntime {
               // set attribute "acknowledgement" in ibc event "fungible_token_packet" to empty string
               if (event.type === 'fungible_token_packet') {
                 event.attributes = event.attributes.map((attribute: any) => {
-                  if (attribute === 'YWNrbm93bGVkZ2VtZW50') {
+                  if (attribute.key === 'YWNrbm93bGVkZ2VtZW50') {
                     attribute.value = '';
                   }
 
