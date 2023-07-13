@@ -37,8 +37,7 @@
                   "type": "string"
                 }
               },
-              "required": ["block"],
-              "additionalProperties": false
+              "required": ["block"]
             },
             "chain_id": {
               "type": "string"
