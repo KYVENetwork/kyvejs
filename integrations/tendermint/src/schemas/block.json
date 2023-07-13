@@ -17,12 +17,10 @@
               "type": "string"
             }
           },
-          "required": ["total", "hash"],
-          "additionalProperties": false
+          "required": ["total", "hash"]
         }
       },
-      "required": ["hash", "parts"],
-      "additionalProperties": false
+      "required": ["hash", "parts"]
     },
     "block": {
       "type": "object",
@@ -64,12 +62,10 @@
                       "type": "string"
                     }
                   },
-                  "required": ["total", "hash"],
-                  "additionalProperties": false
+                  "required": ["total", "hash"]
                 }
               },
-              "required": ["hash", "parts"],
-              "additionalProperties": false
+              "required": ["hash", "parts"]
             },
             "last_commit_hash": {
               "type": "string"
@@ -114,8 +110,7 @@
             "last_results_hash",
             "evidence_hash",
             "proposer_address"
-          ],
-          "additionalProperties": false
+          ]
         },
         "data": {
           "type": "object",
@@ -127,8 +122,7 @@
               }
             }
           },
-          "required": ["txs"],
-          "additionalProperties": false
+          "required": ["txs"]
         },
         "evidence": {
           "type": "object",
@@ -172,12 +166,10 @@
                                     "type": "string"
                                   }
                                 },
-                                "required": ["total", "hash"],
-                                "additionalProperties": false
+                                "required": ["total", "hash"]
                               }
                             },
-                            "required": ["hash", "parts"],
-                            "additionalProperties": false
+                            "required": ["hash", "parts"]
                           },
                           "timestamp": {
                             "type": "string"
@@ -201,8 +193,7 @@
                           "validator_address",
                           "validator_index",
                           "signature"
-                        ],
-                        "additionalProperties": false
+                        ]
                       },
                       "vote_b": {
                         "type": "object",
@@ -232,12 +223,10 @@
                                     "type": "string"
                                   }
                                 },
-                                "required": ["total", "hash"],
-                                "additionalProperties": false
+                                "required": ["total", "hash"]
                               }
                             },
-                            "required": ["hash", "parts"],
-                            "additionalProperties": false
+                            "required": ["hash", "parts"]
                           },
                           "timestamp": {
                             "type": "string"
@@ -261,8 +250,7 @@
                           "validator_address",
                           "validator_index",
                           "signature"
-                        ],
-                        "additionalProperties": false
+                        ]
                       },
                       "TotalVotingPower": {
                         "type": "string"
@@ -280,17 +268,14 @@
                       "TotalVotingPower",
                       "ValidatorPower",
                       "Timestamp"
-                    ],
-                    "additionalProperties": false
+                    ]
                   }
                 },
-                "required": ["type", "value"],
-                "additionalProperties": false
+                "required": ["type", "value"]
               }
             }
           },
-          "required": ["evidence"],
-          "additionalProperties": false
+          "required": ["evidence"]
         },
         "last_commit": {
           "type": "object",
@@ -317,12 +302,10 @@
                       "type": "string"
                     }
                   },
-                  "required": ["total", "hash"],
-                  "additionalProperties": false
+                  "required": ["total", "hash"]
                 }
               },
-              "required": ["hash", "parts"],
-              "additionalProperties": false
+              "required": ["hash", "parts"]
             },
             "signatures": {
               "type": "array",
@@ -347,17 +330,14 @@
                   "validator_address",
                   "timestamp",
                   "signature"
-                ],
-                "additionalProperties": false
+                ]
               }
             }
           },
-          "required": ["height", "round", "block_id", "signatures"],
-          "additionalProperties": false
+          "required": ["height", "round", "block_id", "signatures"]
         }
       },
-      "required": ["header", "data", "evidence", "last_commit"],
-      "additionalProperties": false
+      "required": ["header", "data", "evidence", "last_commit"]
     }
   },
   "required": ["block_id", "block"],

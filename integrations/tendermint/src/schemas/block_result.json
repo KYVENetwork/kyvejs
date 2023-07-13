@@ -53,14 +53,12 @@
                               "type": "boolean"
                             }
                           },
-                          "required": ["key", "value", "index"],
-                          "additionalProperties": false
+                          "required": ["key", "value", "index"]
                         }
                       ]
                     }
                   },
-                  "required": ["type", "attributes"],
-                  "additionalProperties": false
+                  "required": ["type", "attributes"]
                 }
               ]
             },
@@ -77,8 +75,7 @@
             "gas_used",
             "events",
             "codespace"
-          ],
-          "additionalProperties": false
+          ]
         }
       ]
     },
@@ -107,14 +104,12 @@
                       "type": "boolean"
                     }
                   },
-                  "required": ["key", "value", "index"],
-                  "additionalProperties": false
+                  "required": ["key", "value", "index"]
                 }
               ]
             }
           },
-          "required": ["type", "attributes"],
-          "additionalProperties": false
+          "required": ["type", "attributes"]
         }
       ]
     },
@@ -143,14 +138,12 @@
                       "type": "boolean"
                     }
                   },
-                  "required": ["key", "value", "index"],
-                  "additionalProperties": false
+                  "required": ["key", "value", "index"]
                 }
               ]
             }
           },
-          "required": ["type", "attributes"],
-          "additionalProperties": false
+          "required": ["type", "attributes"]
         }
       ]
     },
@@ -191,8 +184,7 @@
           "required": ["pub_key", "power"]
         }
       ],
-      "required": ["pub_key", "power"],
-      "additionalProperties": false
+      "required": ["pub_key", "power"]
     },
     "consensus_param_updates": {
       "type": "object",
@@ -207,8 +199,7 @@
               "type": "string"
             }
           },
-          "required": ["max_bytes", "max_gas"],
-          "additionalProperties": false
+          "required": ["max_bytes", "max_gas"]
         },
         "evidence": {
           "type": "object",
@@ -223,8 +214,7 @@
               "type": "string"
             }
           },
-          "required": ["max_age_num_blocks", "max_age_duration", "max_bytes"],
-          "additionalProperties": false
+          "required": ["max_age_num_blocks", "max_age_duration", "max_bytes"]
         },
         "validator": {
           "type": "object",
@@ -238,12 +228,10 @@
               ]
             }
           },
-          "required": ["pub_key_types"],
-          "additionalProperties": false
+          "required": ["pub_key_types"]
         }
       },
-      "required": ["block", "evidence", "validator"],
-      "additionalProperties": false
+      "required": ["block", "evidence", "validator"]
     }
   },
   "required": [
