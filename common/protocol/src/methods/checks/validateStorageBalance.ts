@@ -23,6 +23,14 @@ export async function validateStorageBalance(this: Validator): Promise<void> {
     const address = await storageProvider.getAddress();
     const balance = await storageProvider.getBalance();
 
+    // if storage provider has no balance we don't need to validate it
+    if (!balance) {
+      this.logger.info(
+        `StorageProvider:${storageProvider.name} has no balance. Continuing...\n`
+      );
+      return;
+    }
+
     this.logger.debug(`Account "${address}" has "${balance}" balance`);
 
     if (new BigNumber(balance).isZero()) {
