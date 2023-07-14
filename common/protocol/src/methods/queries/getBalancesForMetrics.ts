@@ -3,15 +3,15 @@ import BigNumber from "bignumber.js";
 import { Validator, standardizeJSON } from "../..";
 
 /**
- * getBalances tries to retrieve the $KYVE balance of the staker account, the $KYVE
+ * getBalancesForMetrics tries to retrieve the $KYVE balance of the staker account, the $KYVE
  * balance of the valaccount and the balance of the storage provider which
  * can be of any currency for metrics
  *
- * @method getBalances
+ * @method getBalancesForMetrics
  * @param {Validator} this
  * @return {Promise<void>}
  */
-export async function getBalances(this: Validator): Promise<void> {
+export async function getBalancesForMetrics(this: Validator): Promise<void> {
   for (let c = 0; c < this.client.length; c++) {
     try {
       this.logger.debug(this.rpc[c]);
@@ -87,7 +87,9 @@ export async function getBalances(this: Validator): Promise<void> {
     this.logger.debug(JSON.stringify(storageProviderBalanceRaw));
 
     const storageProviderBalance = new BigNumber(storageProviderBalanceRaw)
-      .dividedBy(new BigNumber(10).exponentiatedBy(storageProvider.decimals))
+      .dividedBy(
+        new BigNumber(10).exponentiatedBy(storageProvider.coinDecimals)
+      )
       .toNumber();
 
     this.m.balance_storage_provider.set(storageProviderBalance);

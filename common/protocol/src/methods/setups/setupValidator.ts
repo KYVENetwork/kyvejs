@@ -5,6 +5,7 @@ import {
   colors,
   uniqueNamesGenerator,
 } from "unique-names-generator";
+import { major, minor } from "semver";
 
 import { Validator, standardizeJSON } from "../..";
 
@@ -29,7 +30,11 @@ export async function setupValidator(this: Validator): Promise<void> {
 
     // generate deterministic valname based on chainId, pool id,
     // runtime, runtime version and valaddress
-    const valnameSeed = `${this.chainId}-${this.poolId}-${this.runtime.name}-${this.runtime.version}-${this.client[0].account.address}`;
+    const valnameSeed = `${this.chainId}-${this.poolId}-${
+      this.runtime.name
+    }-${major(this.runtime.version)}-${minor(this.runtime.version)}-${
+      this.client[0].account.address
+    }`;
 
     this.logger.debug(`Creating seed for valname generation`);
     this.logger.debug(valnameSeed);

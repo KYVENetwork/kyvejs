@@ -101,6 +101,10 @@ export interface EventBundleFinalized {
   total: string;
   /** status of the finalized bundle */
   status: BundleStatus;
+  /** amount which funders provided to the total bundle reward (in ukyve) */
+  funders_payout: string;
+  /** amount which the inflation pool provided to the total reward (in ukyve) */
+  inflation_payout: string;
   /** rewards transferred to treasury (in ukyve) */
   reward_treasury: string;
   /** rewardUploader rewards directly transferred to uploader (in ukyve) */
@@ -511,6 +515,8 @@ function createBaseEventBundleFinalized(): EventBundleFinalized {
     abstain: "0",
     total: "0",
     status: 0,
+    funders_payout: "0",
+    inflation_payout: "0",
     reward_treasury: "0",
     reward_uploader: "0",
     reward_delegation: "0",
@@ -544,26 +550,32 @@ export const EventBundleFinalized = {
     if (message.status !== 0) {
       writer.uint32(56).int32(message.status);
     }
+    if (message.funders_payout !== "0") {
+      writer.uint32(64).uint64(message.funders_payout);
+    }
+    if (message.inflation_payout !== "0") {
+      writer.uint32(72).uint64(message.inflation_payout);
+    }
     if (message.reward_treasury !== "0") {
-      writer.uint32(64).uint64(message.reward_treasury);
+      writer.uint32(80).uint64(message.reward_treasury);
     }
     if (message.reward_uploader !== "0") {
-      writer.uint32(72).uint64(message.reward_uploader);
+      writer.uint32(88).uint64(message.reward_uploader);
     }
     if (message.reward_delegation !== "0") {
-      writer.uint32(80).uint64(message.reward_delegation);
+      writer.uint32(96).uint64(message.reward_delegation);
     }
     if (message.reward_total !== "0") {
-      writer.uint32(88).uint64(message.reward_total);
+      writer.uint32(104).uint64(message.reward_total);
     }
     if (message.finalized_at !== "0") {
-      writer.uint32(96).uint64(message.finalized_at);
+      writer.uint32(112).uint64(message.finalized_at);
     }
     if (message.uploader !== "") {
-      writer.uint32(106).string(message.uploader);
+      writer.uint32(122).string(message.uploader);
     }
     if (message.next_uploader !== "") {
-      writer.uint32(114).string(message.next_uploader);
+      writer.uint32(130).string(message.next_uploader);
     }
     return writer;
   },
@@ -597,24 +609,30 @@ export const EventBundleFinalized = {
           message.status = reader.int32() as any;
           break;
         case 8:
-          message.reward_treasury = longToString(reader.uint64() as Long);
+          message.funders_payout = longToString(reader.uint64() as Long);
           break;
         case 9:
-          message.reward_uploader = longToString(reader.uint64() as Long);
+          message.inflation_payout = longToString(reader.uint64() as Long);
           break;
         case 10:
-          message.reward_delegation = longToString(reader.uint64() as Long);
+          message.reward_treasury = longToString(reader.uint64() as Long);
           break;
         case 11:
-          message.reward_total = longToString(reader.uint64() as Long);
+          message.reward_uploader = longToString(reader.uint64() as Long);
           break;
         case 12:
-          message.finalized_at = longToString(reader.uint64() as Long);
+          message.reward_delegation = longToString(reader.uint64() as Long);
           break;
         case 13:
-          message.uploader = reader.string();
+          message.reward_total = longToString(reader.uint64() as Long);
           break;
         case 14:
+          message.finalized_at = longToString(reader.uint64() as Long);
+          break;
+        case 15:
+          message.uploader = reader.string();
+          break;
+        case 16:
           message.next_uploader = reader.string();
           break;
         default:
@@ -634,6 +652,8 @@ export const EventBundleFinalized = {
       abstain: isSet(object.abstain) ? String(object.abstain) : "0",
       total: isSet(object.total) ? String(object.total) : "0",
       status: isSet(object.status) ? bundleStatusFromJSON(object.status) : 0,
+      funders_payout: isSet(object.funders_payout) ? String(object.funders_payout) : "0",
+      inflation_payout: isSet(object.inflation_payout) ? String(object.inflation_payout) : "0",
       reward_treasury: isSet(object.reward_treasury) ? String(object.reward_treasury) : "0",
       reward_uploader: isSet(object.reward_uploader) ? String(object.reward_uploader) : "0",
       reward_delegation: isSet(object.reward_delegation) ? String(object.reward_delegation) : "0",
@@ -653,6 +673,8 @@ export const EventBundleFinalized = {
     message.abstain !== undefined && (obj.abstain = message.abstain);
     message.total !== undefined && (obj.total = message.total);
     message.status !== undefined && (obj.status = bundleStatusToJSON(message.status));
+    message.funders_payout !== undefined && (obj.funders_payout = message.funders_payout);
+    message.inflation_payout !== undefined && (obj.inflation_payout = message.inflation_payout);
     message.reward_treasury !== undefined && (obj.reward_treasury = message.reward_treasury);
     message.reward_uploader !== undefined && (obj.reward_uploader = message.reward_uploader);
     message.reward_delegation !== undefined && (obj.reward_delegation = message.reward_delegation);
@@ -672,6 +694,8 @@ export const EventBundleFinalized = {
     message.abstain = object.abstain ?? "0";
     message.total = object.total ?? "0";
     message.status = object.status ?? 0;
+    message.funders_payout = object.funders_payout ?? "0";
+    message.inflation_payout = object.inflation_payout ?? "0";
     message.reward_treasury = object.reward_treasury ?? "0";
     message.reward_uploader = object.reward_uploader ?? "0";
     message.reward_delegation = object.reward_delegation ?? "0";

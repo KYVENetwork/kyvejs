@@ -2,7 +2,7 @@
 rm -rf temp
 mkdir temp
 KYVE_CHAIN_REPO="git@github.com:KYVENetwork/chain.git"
-KYVE_CHAIN_VERSION="v1.2.0"
+KYVE_CHAIN_VERSION="v1.3.0"
 git -C ./temp clone  -b ${KYVE_CHAIN_VERSION} --single-branch ${KYVE_CHAIN_REPO}
 rm -rf ./src/client
 rm -rf ./src/lcd

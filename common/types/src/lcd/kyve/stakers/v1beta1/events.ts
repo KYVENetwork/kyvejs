@@ -62,6 +62,17 @@ export interface EventUpdateCommission {
 }
 
 /**
+ * EventClaimCommissionRewards ...
+ * emitted_by: MsgClaimCommissionRewards
+ */
+export interface EventClaimCommissionRewards {
+  /** staker is the account address of the protocol node. */
+  staker: string;
+  /** amount ... */
+  amount: string;
+}
+
+/**
  * EventJoinPool ...
  * emitted_by: MsgJoinPool
  */
@@ -378,6 +389,64 @@ export const EventUpdateCommission = {
     const message = createBaseEventUpdateCommission();
     message.staker = object.staker ?? "";
     message.commission = object.commission ?? "";
+    return message;
+  },
+};
+
+function createBaseEventClaimCommissionRewards(): EventClaimCommissionRewards {
+  return { staker: "", amount: "0" };
+}
+
+export const EventClaimCommissionRewards = {
+  encode(message: EventClaimCommissionRewards, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.staker !== "") {
+      writer.uint32(10).string(message.staker);
+    }
+    if (message.amount !== "0") {
+      writer.uint32(16).uint64(message.amount);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): EventClaimCommissionRewards {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseEventClaimCommissionRewards();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.staker = reader.string();
+          break;
+        case 2:
+          message.amount = longToString(reader.uint64() as Long);
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): EventClaimCommissionRewards {
+    return {
+      staker: isSet(object.staker) ? String(object.staker) : "",
+      amount: isSet(object.amount) ? String(object.amount) : "0",
+    };
+  },
+
+  toJSON(message: EventClaimCommissionRewards): unknown {
+    const obj: any = {};
+    message.staker !== undefined && (obj.staker = message.staker);
+    message.amount !== undefined && (obj.amount = message.amount);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<EventClaimCommissionRewards>, I>>(object: I): EventClaimCommissionRewards {
+    const message = createBaseEventClaimCommissionRewards();
+    message.staker = object.staker ?? "";
+    message.amount = object.amount ?? "0";
     return message;
   },
 };
