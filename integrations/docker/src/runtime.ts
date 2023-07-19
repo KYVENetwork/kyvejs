@@ -2,6 +2,9 @@ import { DataItem, IRuntime, Validator } from "@kyvejs/protocol";
 import { spawnSync } from "child_process";
 
 import { name, version } from "../package.json";
+import http from 'http';
+
+
 
 // Bitcoin config
 interface IConfig {
@@ -18,14 +21,30 @@ export default class Docker implements IRuntime {
     this.config = config;
   }
 
-  async getDataItem(_: Validator, key: string): Promise<DataItem> {
-//     const result = spawnSync('docker', ['exec', 'runtime_test', 'sh', '-c', 'python script.py read ' + key]);
-    const result = spawnSync("docker", ["run", "runtime_test", "read", key]);
-    if (result.status !== 0) {
-      throw new Error(result.stderr.toString());
-    } else {
-      return { key, value: JSON.parse(result.stdout.toString()) };
-    }
+  async getDataItem(_: Validator, key: string): Promise<any> {
+    const options: http.RequestOptions = {
+      host: 'localhost',
+      port: 3000,
+      path: `/?arg1=${key}`, // Pass the arguments in the query string
+    };
+    const req = http.get(options, (res: any) => {
+      let data = '';
+      res.on('data', (chunk: any) => {
+        data += chunk;
+      });
+      res.on('end', () => {
+        console.log('Response from server:', data);
+      });
+    });
+
+    req.on('error', (error: any) => {
+      console.error('Error connecting to server:', error);
+    });
+//     if (result.status !== 0) {
+//       throw new Error(result.stderr);
+//     } else {
+//       return { key, value: JSON.parse(result.stdout.toString()) };
+//     }
   }
 
   async prevalidateDataItem(_: Validator, item: DataItem): Promise<boolean> {
