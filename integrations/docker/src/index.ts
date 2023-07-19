@@ -9,4 +9,11 @@ const read = async (key: string) => {
   console.log(await runtime.getDataItem(v, key));
 };
 
-read("3");
+const start = Date.now();
+
+for (let i = 0; i < 1000; i++) {
+  read(i.toString());
+}
+
+const end = Date.now();
+console.log(`Execution time: ${end - start} ms`);

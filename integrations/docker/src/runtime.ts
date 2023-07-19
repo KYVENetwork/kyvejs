@@ -19,6 +19,7 @@ export default class Docker implements IRuntime {
   }
 
   async getDataItem(_: Validator, key: string): Promise<DataItem> {
+//     const result = spawnSync('docker', ['exec', 'runtime_test', 'sh', '-c', 'python script.py read ' + key]);
     const result = spawnSync("docker", ["run", "runtime_test", "read", key]);
     if (result.status !== 0) {
       throw new Error(result.stderr.toString());
