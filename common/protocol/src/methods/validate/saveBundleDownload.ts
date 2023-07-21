@@ -40,7 +40,7 @@ export async function saveBundleDownload(
       }
 
       // check if pool got inactive in the meantime
-      if (this.validateIsPoolActive()) {
+      if (!this.isPoolActive()) {
         return null;
       }
 

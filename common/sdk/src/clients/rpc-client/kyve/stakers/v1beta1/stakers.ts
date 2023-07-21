@@ -1,5 +1,8 @@
 import { StdFee } from "@cosmjs/amino/build/signdoc";
-import { MsgCreateStaker } from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
+import {
+  MsgClaimCommissionRewards,
+  MsgCreateStaker,
+} from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
 import { MsgUpdateMetadata } from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
 import { MsgUpdateCommission } from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
 import { MsgJoinPool } from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
@@ -51,6 +54,23 @@ export default class KyveStakersMethods extends KyveSigning {
     }
   ) {
     const tx = withTypeUrl.updateCommission({
+      ...value,
+      creator: this.account.address,
+    });
+
+    return new PendingTx({ tx: [tx] }, () =>
+      this.getPendingSignedTx(tx, options)
+    );
+  }
+
+  public claimCommissionRewards(
+    value: Omit<MsgClaimCommissionRewards, "creator">,
+    options?: {
+      fee?: StdFee | "auto" | number;
+      memo?: string;
+    }
+  ) {
+    const tx = withTypeUrl.claimCommissionRewards({
       ...value,
       creator: this.account.address,
     });

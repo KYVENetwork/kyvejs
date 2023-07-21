@@ -1,3 +1,4 @@
+import BigNumber from "bignumber.js";
 import { Validator } from "../..";
 import { BundleTag, DataItem } from "../../types";
 import {
@@ -217,6 +218,19 @@ export async function createBundleProposal(this: Validator): Promise<void> {
         this.pool.data?.current_storage_provider_id ?? 0,
         this.storagePriv
       );
+
+      // if balance is less than the upload cost we skip the uploader
+      // role with a warning
+      const balance = await storageProvider.getBalance();
+      const cost = await storageProvider.getPrice(storageProviderData.length);
+
+      if (new BigNumber(balance).lt(cost)) {
+        this.logger.warn(
+          `Not enough balance on StorageProvider:${storageProvider.name}; balance = ${balance} required = ${cost}`
+        );
+        await this.skipUploaderRole(fromIndex);
+        return;
+      }
 
       // upload the bundle proposal to the storage provider
       // and get a storage id. With that other participants in the

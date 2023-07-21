@@ -8,7 +8,7 @@ import { BundleTag, IStorageProvider } from "../../types";
 
 export class S3 implements IStorageProvider {
   public name = "S3";
-  public decimals = 0;
+  public coinDecimals = 0;
 
   private readonly region: string;
   private readonly bucket: string;
@@ -42,6 +42,10 @@ export class S3 implements IStorageProvider {
 
   async getBalance() {
     return "";
+  }
+
+  async getPrice(_: number) {
+    return "0";
   }
 
   async saveBundle(bundle: Buffer, _: BundleTag[]) {

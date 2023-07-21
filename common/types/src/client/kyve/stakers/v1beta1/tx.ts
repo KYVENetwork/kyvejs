@@ -53,6 +53,18 @@ export interface MsgUpdateCommission {
 export interface MsgUpdateCommissionResponse {
 }
 
+/** MsgClaimCommissionRewards ... */
+export interface MsgClaimCommissionRewards {
+  /** creator ... */
+  creator: string;
+  /** amount ... */
+  amount: string;
+}
+
+/** MsgClaimCommissionRewardsResponse ... */
+export interface MsgClaimCommissionRewardsResponse {
+}
+
 /** MsgJoinPool ... */
 export interface MsgJoinPool {
   /** creator ... */
@@ -429,6 +441,105 @@ export const MsgUpdateCommissionResponse = {
   },
 };
 
+function createBaseMsgClaimCommissionRewards(): MsgClaimCommissionRewards {
+  return { creator: "", amount: "0" };
+}
+
+export const MsgClaimCommissionRewards = {
+  encode(message: MsgClaimCommissionRewards, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.amount !== "0") {
+      writer.uint32(16).uint64(message.amount);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgClaimCommissionRewards {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgClaimCommissionRewards();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.amount = longToString(reader.uint64() as Long);
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgClaimCommissionRewards {
+    return {
+      creator: isSet(object.creator) ? String(object.creator) : "",
+      amount: isSet(object.amount) ? String(object.amount) : "0",
+    };
+  },
+
+  toJSON(message: MsgClaimCommissionRewards): unknown {
+    const obj: any = {};
+    message.creator !== undefined && (obj.creator = message.creator);
+    message.amount !== undefined && (obj.amount = message.amount);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<MsgClaimCommissionRewards>, I>>(object: I): MsgClaimCommissionRewards {
+    const message = createBaseMsgClaimCommissionRewards();
+    message.creator = object.creator ?? "";
+    message.amount = object.amount ?? "0";
+    return message;
+  },
+};
+
+function createBaseMsgClaimCommissionRewardsResponse(): MsgClaimCommissionRewardsResponse {
+  return {};
+}
+
+export const MsgClaimCommissionRewardsResponse = {
+  encode(_: MsgClaimCommissionRewardsResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgClaimCommissionRewardsResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgClaimCommissionRewardsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(_: any): MsgClaimCommissionRewardsResponse {
+    return {};
+  },
+
+  toJSON(_: MsgClaimCommissionRewardsResponse): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<MsgClaimCommissionRewardsResponse>, I>>(
+    _: I,
+  ): MsgClaimCommissionRewardsResponse {
+    const message = createBaseMsgClaimCommissionRewardsResponse();
+    return message;
+  },
+};
+
 function createBaseMsgJoinPool(): MsgJoinPool {
   return { creator: "", pool_id: "0", valaddress: "", amount: "0" };
 }
@@ -746,6 +857,8 @@ export interface Msg {
   UpdateMetadata(request: MsgUpdateMetadata): Promise<MsgUpdateMetadataResponse>;
   /** UpdateCommission ... */
   UpdateCommission(request: MsgUpdateCommission): Promise<MsgUpdateCommissionResponse>;
+  /** ClaimCommissionRewards ... */
+  ClaimCommissionRewards(request: MsgClaimCommissionRewards): Promise<MsgClaimCommissionRewardsResponse>;
   /** JoinPool ... */
   JoinPool(request: MsgJoinPool): Promise<MsgJoinPoolResponse>;
   /** LeavePool ... */
@@ -766,6 +879,7 @@ export class MsgClientImpl implements Msg {
     this.CreateStaker = this.CreateStaker.bind(this);
     this.UpdateMetadata = this.UpdateMetadata.bind(this);
     this.UpdateCommission = this.UpdateCommission.bind(this);
+    this.ClaimCommissionRewards = this.ClaimCommissionRewards.bind(this);
     this.JoinPool = this.JoinPool.bind(this);
     this.LeavePool = this.LeavePool.bind(this);
     this.UpdateParams = this.UpdateParams.bind(this);
@@ -786,6 +900,12 @@ export class MsgClientImpl implements Msg {
     const data = MsgUpdateCommission.encode(request).finish();
     const promise = this.rpc.request(this.service, "UpdateCommission", data);
     return promise.then((data) => MsgUpdateCommissionResponse.decode(new _m0.Reader(data)));
+  }
+
+  ClaimCommissionRewards(request: MsgClaimCommissionRewards): Promise<MsgClaimCommissionRewardsResponse> {
+    const data = MsgClaimCommissionRewards.encode(request).finish();
+    const promise = this.rpc.request(this.service, "ClaimCommissionRewards", data);
+    return promise.then((data) => MsgClaimCommissionRewardsResponse.decode(new _m0.Reader(data)));
   }
 
   JoinPool(request: MsgJoinPool): Promise<MsgJoinPoolResponse> {
