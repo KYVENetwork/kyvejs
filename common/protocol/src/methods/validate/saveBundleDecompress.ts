@@ -1,6 +1,6 @@
 import { Validator } from "../..";
 import { DataItem } from "../../types";
-import { bytesToBundle, standardizeJSON } from "../../utils";
+import { bytesToBundle, standardizeError } from "../../utils";
 
 /**
  * saveBundleDecompress decompresses a bundle with the specified compression.
@@ -34,12 +34,12 @@ export async function saveBundleDecompress(
       `Successfully decompressed bundle with Compression:${compression.name}`
     );
 
-    return standardizeJSON(storageBundle);
+    return standardizeError(storageBundle);
   } catch (err) {
     this.logger.error(
       `Could not decompress bundle with Compression. Continuing ...`
     );
-    this.logger.error(standardizeJSON(err));
+    this.logger.error(standardizeError(err));
 
     return [];
   }

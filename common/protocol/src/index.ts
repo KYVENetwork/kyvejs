@@ -48,7 +48,7 @@ import {
   getProxyAuth,
 } from "./methods";
 import { ICacheProvider, IMetrics, IRuntime } from "./types";
-import { standardizeJSON } from "./utils";
+import { standardizeError } from "./utils";
 import { SupportedChains } from "@kyvejs/sdk/dist/constants";
 import { storageProviderFactory } from "./reactors/storageProviders";
 import { compressionFactory } from "./reactors/compression";
@@ -319,7 +319,7 @@ export class Validator {
       this.runCache();
     } catch (err) {
       this.logger.fatal(`Unexpected runtime error. Exiting ...`);
-      this.logger.fatal(standardizeJSON(err));
+      this.logger.fatal(standardizeError(err));
 
       process.exit(1);
     }

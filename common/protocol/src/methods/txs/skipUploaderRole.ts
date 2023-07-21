@@ -1,4 +1,4 @@
-import { Validator, standardizeJSON } from "../..";
+import { Validator, standardizeError } from "../..";
 
 /**
  * skipUploaderRole is called by the current next uploader of the
@@ -59,7 +59,7 @@ export async function skipUploaderRole(
       }
     } catch (err) {
       this.logger.error(`RPC call to "${this.rpc[c]}" failed`);
-      this.logger.error(standardizeJSON(err));
+      this.logger.error(standardizeError(err));
     }
   }
 

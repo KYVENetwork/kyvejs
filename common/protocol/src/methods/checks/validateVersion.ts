@@ -1,4 +1,4 @@
-import { Validator, standardizeJSON } from "../..";
+import { Validator, standardizeError } from "../..";
 
 /**
  * validateVersion checks if the version of the pool matches with the runtime
@@ -29,7 +29,7 @@ export function validateVersion(this: Validator): void {
     );
   } catch (err) {
     this.logger.fatal(`Error while validating runtime version. Exiting ...`);
-    this.logger.fatal(standardizeJSON(err));
+    this.logger.fatal(standardizeError(err));
 
     process.exit(1);
   }

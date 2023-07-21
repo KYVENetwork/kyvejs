@@ -1,5 +1,5 @@
 import { Validator } from "../..";
-import { callWithBackoffStrategy, sleep, standardizeJSON } from "../../utils";
+import { callWithBackoffStrategy, sleep, standardizeError } from "../../utils";
 
 const INFINITY_LOOP = true;
 
@@ -84,7 +84,7 @@ export async function canPropose(
             }
           } catch (err) {
             this.logger.error(`REST call to "${this.rest[l]}" failed`);
-            this.logger.error(standardizeJSON(err));
+            this.logger.error(standardizeError(err));
           }
         }
 
@@ -97,7 +97,7 @@ export async function canPropose(
             ctx.nextTimeoutInMs / 1000
           ).toFixed(2)}s ...`
         );
-        this.logger.debug(standardizeJSON(err));
+        this.logger.debug(standardizeError(err));
         this.m.query_can_propose_failed.inc();
       }
     );
@@ -116,7 +116,7 @@ export async function canPropose(
     }
   } catch (err) {
     this.logger.error(`Failed to call canPropose`);
-    this.logger.error(standardizeJSON(err));
+    this.logger.error(standardizeError(err));
 
     return false;
   }

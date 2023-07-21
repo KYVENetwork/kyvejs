@@ -1,4 +1,4 @@
-import { Validator, standardizeJSON } from "../..";
+import { Validator, standardizeError } from "../..";
 
 /**
  * submitBundleProposal submits a bundle proposal to the
@@ -81,7 +81,7 @@ export async function submitBundleProposal(
       }
     } catch (err) {
       this.logger.error(`RPC call to "${this.rpc[c]}" failed`);
-      this.logger.error(standardizeJSON(err));
+      this.logger.error(standardizeError(err));
     }
   }
 

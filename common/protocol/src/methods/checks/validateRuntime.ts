@@ -1,4 +1,4 @@
-import { Validator, standardizeJSON } from "../..";
+import { Validator, standardizeError } from "../..";
 
 /**
  * validateRuntime checks if the runtime of the pool matches with the runtime of
@@ -25,7 +25,7 @@ export function validateRuntime(this: Validator): void {
     this.logger.info(`Validator running on runtime = ${this.runtime.name}`);
   } catch (err) {
     this.logger.fatal(`Error while validating runtime. Exiting ...`);
-    this.logger.fatal(standardizeJSON(err));
+    this.logger.fatal(standardizeError(err));
 
     process.exit(1);
   }

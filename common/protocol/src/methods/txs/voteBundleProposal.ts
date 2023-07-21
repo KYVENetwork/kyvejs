@@ -1,4 +1,4 @@
-import { Validator, standardizeJSON, VOTE } from "../..";
+import { Validator, standardizeError, VOTE } from "../..";
 
 /**
  * voteBundleProposal submits a vote on the current bundle proposal.
@@ -87,7 +87,7 @@ export async function voteBundleProposal(
       }
     } catch (err) {
       this.logger.error(`RPC call to "${this.rpc[c]}" failed`);
-      this.logger.error(standardizeJSON(err));
+      this.logger.error(standardizeError(err));
     }
   }
 

@@ -1,5 +1,5 @@
 import { Validator } from "../..";
-import { callWithBackoffStrategy, standardizeJSON } from "../../utils";
+import { callWithBackoffStrategy, standardizeError } from "../../utils";
 
 /**
  * canVote checks if the node is able to vote on the current
@@ -63,7 +63,7 @@ export async function canVote(
             });
           } catch (err) {
             this.logger.error(`REST call to "${this.rest[l]}" failed`);
-            this.logger.error(standardizeJSON(err));
+            this.logger.error(standardizeError(err));
           }
         }
 
@@ -76,7 +76,7 @@ export async function canVote(
             ctx.nextTimeoutInMs / 1000
           ).toFixed(2)}s ...`
         );
-        this.logger.debug(standardizeJSON(err));
+        this.logger.debug(standardizeError(err));
         this.m.query_can_vote_failed.inc();
       }
     );
@@ -93,7 +93,7 @@ export async function canVote(
     }
   } catch (err) {
     this.logger.error(`Failed to call canVote`);
-    this.logger.error(standardizeJSON(err));
+    this.logger.error(standardizeError(err));
 
     return false;
   }

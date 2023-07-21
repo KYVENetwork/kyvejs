@@ -1,5 +1,5 @@
 import BigNumber from "bignumber.js";
-import { Validator, standardizeJSON } from "../..";
+import { Validator, standardizeError } from "../..";
 
 /**
  * validateStorageBalance checks if the account of the storage provider
@@ -50,7 +50,7 @@ export async function validateStorageBalance(this: Validator): Promise<void> {
     this.logger.fatal(
       `Error while validating storage provider funds. Exiting ...`
     );
-    this.logger.fatal(standardizeJSON(err));
+    this.logger.fatal(standardizeError(err));
 
     process.exit(1);
   }

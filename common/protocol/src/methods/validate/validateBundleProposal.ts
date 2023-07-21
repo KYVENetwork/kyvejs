@@ -1,7 +1,7 @@
 import { VoteType } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
 
 import { Validator } from "../..";
-import { sha256, standardizeJSON, VOTE } from "../../utils";
+import { sha256, standardizeError, VOTE } from "../../utils";
 
 /**
  * validateBundleProposal validates a proposed bundle proposal
@@ -195,7 +195,7 @@ export async function validateBundleProposal(
               this.logger.error(
                 `Unexpected error summarizing bundle with runtime. Voting abstain ...`
               );
-              this.logger.error(standardizeJSON(err));
+              this.logger.error(standardizeError(err));
 
               return null;
             });
@@ -247,7 +247,7 @@ export async function validateBundleProposal(
         this.logger.error(
           `Unexpected error validating data items with runtime. Voting abstain ...`
         );
-        this.logger.error(standardizeJSON(err));
+        this.logger.error(standardizeError(err));
 
         const success = await this.voteBundleProposal(
           this.pool.bundle_proposal!.storage_id,
@@ -275,7 +275,7 @@ export async function validateBundleProposal(
     this.logger.error(
       `Unexpected error validating bundle proposal. Skipping validation ...`
     );
-    this.logger.error(standardizeJSON(err));
+    this.logger.error(standardizeError(err));
     return false;
   }
 }
