@@ -180,10 +180,10 @@
             "power": {
               "type": "string"
             }
-          },
-          "required": ["pub_key"]
+          }
         }
-      ]
+      ],
+      "required": ["pub_key"]
     },
     "consensus_param_updates": {
       "type": "object",
