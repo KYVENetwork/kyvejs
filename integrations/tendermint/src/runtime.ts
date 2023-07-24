@@ -102,22 +102,30 @@ export default class Tendermint implements IRuntime {
     // values likely due to a bug
 
     const compareEventAttribute = (a: any, b: any) =>
-      a.key > b.key ? 1 : b.key > a.key ? -1 : 0;
+      a.key.toLowerCase() > b.key.toLowerCase()
+        ? 1
+        : b.key.toLowerCase() > a.key.toLowerCase()
+        ? -1
+        : 0;
 
     // sort attributes in begin_block_events
     if (item.value?.begin_block_events) {
-      item.value.begin_block_events.map((event: any) => {
-        event.attributes.sort(compareEventAttribute);
-        return event;
-      });
+      item.value.begin_block_events = item.value.begin_block_events.map(
+        (event: any) => {
+          event.attributes.sort(compareEventAttribute);
+          return event;
+        }
+      );
     }
 
     // sort attributes in end_block_events
     if (item.value?.end_block_events) {
-      item.value.end_block_events.map((event: any) => {
-        event.attributes.sort(compareEventAttribute);
-        return event;
-      });
+      item.value.end_block_events = item.value.end_block_events.map(
+        (event: any) => {
+          event.attributes.sort(compareEventAttribute);
+          return event;
+        }
+      );
     }
 
     if (item.value?.block_results?.txs_results) {
