@@ -197,6 +197,117 @@ export class Validator {
         console.log(`Arch: ${os.arch()}`);
       });
 
+    // define runtime commands
+    const runtimeCmd = program
+      .command("runtime")
+      .description("Execute runtime methods directly");
+
+    runtimeCmd
+      .command("name")
+      .description("Get the name of the runtime")
+      .action(() => {
+        console.log(this.runtime.name);
+      });
+
+    runtimeCmd
+      .command("version")
+      .description("Get the version of the runtime")
+      .action(() => {
+        console.log(this.runtime.version);
+      });
+
+    runtimeCmd
+      .command("validateGetConfig")
+      .description("Validate and return parsed runtime config")
+      .argument("<rawConfig>", "rawConfig")
+      .action(async (rawConfig: string) => {
+        const response = await this.runtime.validateGetConfig(rawConfig);
+        console.log(JSON.stringify(response));
+      });
+
+    runtimeCmd
+      .command("getDataItem")
+      .description("Get the data item with the config and the key")
+      .argument("<config>", "config (stringified)")
+      .argument("<key>", "key")
+      .action(async (config: string, key: string) => {
+        const response = await this.runtime.getDataItem(
+          JSON.parse(config),
+          key
+        );
+        console.log(JSON.stringify(response));
+      });
+
+    runtimeCmd
+      .command("prevalidateDataItem")
+      .description("Prevalidate the data item with the config and the key")
+      .argument("<config>", "config (stringified)")
+      .argument("<item>", "item (stringified)")
+      .action(async (config: string, item: string) => {
+        const response = await this.runtime.prevalidateDataItem(
+          JSON.parse(config),
+          JSON.parse(item)
+        );
+        console.log(JSON.stringify(response));
+      });
+
+    runtimeCmd
+      .command("transformDataItem")
+      .description("Transform the data item with the config and the key")
+      .argument("<config>", "config (stringified)")
+      .argument("<item>", "item (stringified)")
+      .action(async (config: string, item: string) => {
+        const response = await this.runtime.transformDataItem(
+          JSON.parse(config),
+          JSON.parse(item)
+        );
+        console.log(JSON.stringify(response));
+      });
+
+    runtimeCmd
+      .command("validateDataItem")
+      .description("Validate two data items with the config")
+      .argument("<config>", "config (stringified)")
+      .argument("<proposedDataItem>", "proposedDataItem (stringified)")
+      .argument("<validationDataItem>", "validationDataItem (stringified)")
+      .action(
+        async (
+          config: string,
+          proposedDataItem: string,
+          validationDataItem: string
+        ) => {
+          const response = await this.runtime.validateDataItem(
+            JSON.parse(config),
+            JSON.parse(proposedDataItem),
+            JSON.parse(validationDataItem)
+          );
+          console.log(JSON.stringify(response));
+        }
+      );
+
+    runtimeCmd
+      .command("summarizeDataBundle")
+      .description("Summarize a bundle with the config")
+      .argument("<config>", "config (stringified)")
+      .argument("<bundle>", "bundle (stringified)")
+      .action(async (config: string, bundle: string) => {
+        const response = await this.runtime.summarizeDataBundle(
+          JSON.parse(config),
+          JSON.parse(bundle)
+        );
+        console.log(JSON.stringify(response));
+      });
+
+    runtimeCmd
+      .command("nextKey")
+      .description("Get the next key with the config and the current key")
+      .argument("<config>", "config (stringified)")
+      .argument("<key>", "key")
+      .action(async (config: string, key: string) => {
+        const response = await this.runtime.nextKey(JSON.parse(config), key);
+        console.log(JSON.stringify(response));
+      });
+
     // define start command
     program
       .command("start")
