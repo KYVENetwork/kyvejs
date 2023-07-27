@@ -38,6 +38,7 @@
     "prom-client": "^14.1.0",
     "protobufjs": "^6.11.2",
     "seedrandom": "^3.0.5",
+    "semver": "^7.5.3",
     "tslog": "^3.2.2",
     "unique-names-generator": "^4.6.0"
   },

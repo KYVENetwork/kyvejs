@@ -29,7 +29,7 @@ export async function waitForNextBundleProposal(
       await this.syncPoolState();
 
       // if pool got not active in the meantime abort
-      if (this.validateIsPoolActive()) {
+      if (!this.isPoolActive()) {
         break;
       }
 
