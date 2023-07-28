@@ -1,4 +1,4 @@
-import { Validator, standardizeJSON } from "../..";
+import { Validator, standardizeError } from "../..";
 
 /**
  * isDataAvailable checks if the current next data item
@@ -46,7 +46,7 @@ export async function isDataAvailable(this: Validator): Promise<boolean> {
     return true;
   } catch (err) {
     this.logger.fatal(`Data not available. Exiting ...`);
-    this.logger.fatal(standardizeJSON(err));
+    this.logger.fatal(standardizeError(err));
 
     return false;
   }

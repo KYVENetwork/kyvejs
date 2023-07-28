@@ -1,5 +1,5 @@
 import { Validator } from "../..";
-import { callWithBackoffStrategy, standardizeJSON } from "../../utils";
+import { callWithBackoffStrategy, standardizeError } from "../../utils";
 
 /**
  * syncPoolState fetches the state of the pool the node is running on.
@@ -55,7 +55,7 @@ export async function syncPoolState(
               this.logger.fatal(
                 `Failed to sync runtime config. Either the config could not be parsed or was invalid.`
               );
-              this.logger.fatal(standardizeJSON(err));
+              this.logger.fatal(standardizeError(err));
 
               if (exitOnConfigError) process.exit(1);
             }
@@ -64,7 +64,7 @@ export async function syncPoolState(
           return;
         } catch (err) {
           this.logger.error(`REST call to "${this.rest[l]}" failed`);
-          this.logger.error(standardizeJSON(err));
+          this.logger.error(standardizeError(err));
         }
       }
 
@@ -77,7 +77,7 @@ export async function syncPoolState(
           ctx.nextTimeoutInMs / 1000
         ).toFixed(2)}s ...`
       );
-      this.logger.debug(standardizeJSON(err));
+      this.logger.debug(standardizeError(err));
 
       this.m.query_pool_failed.inc();
     }

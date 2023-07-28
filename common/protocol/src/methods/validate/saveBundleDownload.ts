@@ -1,7 +1,7 @@
 import BigNumber from "bignumber.js";
 
 import { Validator } from "../..";
-import { callWithBackoffStrategy, standardizeJSON, VOTE } from "../../utils";
+import { callWithBackoffStrategy, standardizeError, VOTE } from "../../utils";
 
 /**
  * saveBundleDownload downloads a bundle from the storage provider.
@@ -100,7 +100,7 @@ export async function saveBundleDownload(
           ctx.nextTimeoutInMs / 1000
         ).toFixed(2)}s ...`
       );
-      this.logger.debug(standardizeJSON(err));
+      this.logger.debug(standardizeError(err));
 
       this.m.storage_provider_retrieve_failed.inc();
 

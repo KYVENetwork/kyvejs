@@ -11,6 +11,12 @@ export class Bundlr implements IStorageProvider {
   private readonly storagePriv: string;
 
   constructor(storagePriv: string) {
+    if (!storagePriv) {
+      throw new Error(
+        "Arweave Keyfile is empty. Please provide a valid keyfile!"
+      );
+    }
+
     this.storagePriv = storagePriv;
   }
 

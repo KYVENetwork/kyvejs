@@ -29,12 +29,6 @@ export const parseValaccount = (value: string): string => {
 };
 
 export const parseStoragePriv = (value: string): string => {
-  if (!process.env[value]) {
-    throw new commander.InvalidArgumentError(
-      `Environment variable "${value}" has no value`
-    );
-  }
-
   return process.env[value] || "";
 };
 

@@ -1,4 +1,4 @@
-import { Validator, standardizeJSON } from "../..";
+import { Validator, standardizeError } from "../..";
 
 /**
  * isNodeValidator checks if the staker of the node is in the
@@ -31,7 +31,7 @@ export function isNodeValidator(this: Validator): boolean {
     this.logger.fatal(
       `Error while validating if node is a validator. Exiting ...`
     );
-    this.logger.fatal(standardizeJSON(err));
+    this.logger.fatal(standardizeError(err));
 
     return false;
   }

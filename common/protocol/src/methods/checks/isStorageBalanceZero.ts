@@ -1,5 +1,5 @@
 import BigNumber from "bignumber.js";
-import { Validator, standardizeJSON } from "../..";
+import { Validator, standardizeError } from "../..";
 
 /**
  * isStorageBalanceZero checks if the account of the storage provider
@@ -23,6 +23,14 @@ export async function isStorageBalanceZero(this: Validator): Promise<boolean> {
     const address = await storageProvider.getAddress();
     const balance = await storageProvider.getBalance();
 
+    // if storage provider has no balance we don't need to validate it
+    if (!balance) {
+      this.logger.info(
+        `StorageProvider:${storageProvider.name} has no balance. Continuing...\n`
+      );
+      return false;
+    }
+
     this.logger.debug(`Account "${address}" has "${balance}" balance`);
 
     if (new BigNumber(balance).isZero()) {
@@ -45,7 +53,7 @@ export async function isStorageBalanceZero(this: Validator): Promise<boolean> {
     this.logger.fatal(
       `Error while checking storage provider balance. Exiting ...`
     );
-    this.logger.fatal(standardizeJSON(err));
+    this.logger.fatal(standardizeError(err));
 
     return true;
   }

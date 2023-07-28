@@ -3,7 +3,7 @@ import {
   callWithBackoffStrategy,
   REFRESH_TIME,
   sleep,
-  standardizeJSON,
+  standardizeError,
 } from "../../utils";
 
 const INFINITY_LOOP = true;
@@ -41,7 +41,7 @@ export async function waitForAuthorization(this: Validator): Promise<void> {
             });
           } catch (err) {
             this.logger.error(`REST call to "${this.rest[l]}" failed`);
-            this.logger.error(standardizeJSON(err));
+            this.logger.error(standardizeError(err));
           }
         }
 
@@ -54,7 +54,7 @@ export async function waitForAuthorization(this: Validator): Promise<void> {
             ctx.nextTimeoutInMs / 1000
           ).toFixed(2)}s ...`
         );
-        this.logger.debug(standardizeJSON(err));
+        this.logger.debug(standardizeError(err));
         this.m.query_can_validate_failed.inc();
       }
     );
@@ -102,7 +102,7 @@ export async function waitForAuthorization(this: Validator): Promise<void> {
               });
             } catch (err) {
               this.logger.error(`REST call to "${this.rest[l]}" failed`);
-              this.logger.error(standardizeJSON(err));
+              this.logger.error(standardizeError(err));
             }
           }
 
@@ -115,7 +115,7 @@ export async function waitForAuthorization(this: Validator): Promise<void> {
               ctx.nextTimeoutInMs / 1000
             ).toFixed(2)}s ...`
           );
-          this.logger.debug(standardizeJSON(err));
+          this.logger.debug(standardizeError(err));
           this.m.query_can_validate_failed.inc();
         }
       );
@@ -132,7 +132,7 @@ export async function waitForAuthorization(this: Validator): Promise<void> {
     }
   } catch (err) {
     this.logger.fatal(`Failed to authorize valaccount. Exiting ...`);
-    this.logger.fatal(standardizeJSON(err));
+    this.logger.fatal(standardizeError(err));
 
     process.exit(1);
   }

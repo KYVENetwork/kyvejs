@@ -1,6 +1,6 @@
 import path from "path";
 
-import { Validator, standardizeJSON } from "../..";
+import { Validator, standardizeError } from "../..";
 import fse from "fs-extra";
 
 /**
@@ -31,7 +31,7 @@ export async function setupCacheProvider(this: Validator): Promise<void> {
     this.logger.info(`Using cache provider: ${this.cacheProvider.name}`);
   } catch (err) {
     this.logger.fatal(`Failed to setup cache provider. Exiting ...`);
-    this.logger.fatal(standardizeJSON(err));
+    this.logger.fatal(standardizeError(err));
 
     process.exit(1);
   }

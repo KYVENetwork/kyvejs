@@ -23,7 +23,7 @@
     "rimraf": "^3.0.2"
   },
   "scripts": {
-    "setup": "yarn install && lerna run build",
+    "setup": "lerna clean && yarn install && lerna run build",
     "graph": "yarn nx graph",
     "build": "lerna run build",
     "build:binaries": "lerna run build:binaries --concurrency 1",

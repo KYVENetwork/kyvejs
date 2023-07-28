@@ -1,6 +1,6 @@
 import BigNumber from "bignumber.js";
 
-import { Validator, standardizeJSON } from "../..";
+import { Validator, standardizeError } from "../..";
 
 /**
  * getBalancesForMetrics tries to retrieve the $KYVE balance of the staker account, the $KYVE
@@ -36,7 +36,7 @@ export async function getBalancesForMetrics(this: Validator): Promise<void> {
       break;
     } catch (err) {
       this.logger.error(`Failed to get $KYVE balance of staker`);
-      this.logger.error(standardizeJSON(err));
+      this.logger.error(standardizeError(err));
     }
   }
 
@@ -64,7 +64,7 @@ export async function getBalancesForMetrics(this: Validator): Promise<void> {
       break;
     } catch (err) {
       this.logger.error(`Failed to get $KYVE balance of valaccount`);
-      this.logger.error(standardizeJSON(err));
+      this.logger.error(standardizeError(err));
     }
   }
 
@@ -95,6 +95,6 @@ export async function getBalancesForMetrics(this: Validator): Promise<void> {
     this.m.balance_storage_provider.set(storageProviderBalance);
   } catch (err) {
     this.logger.error(`Failed to get balance of storage provider`);
-    this.logger.error(standardizeJSON(err));
+    this.logger.error(standardizeError(err));
   }
 }

@@ -25,6 +25,21 @@ export const standardizeJSON = (object: any): any =>
   JSON.parse(JSON.stringify(object));
 
 /**
+ * Standardizes any error object
+ *
+ * @method standardizeError
+ * @param {any} error
+ * @return {any}
+ */
+export const standardizeError = (error: any): any => {
+  try {
+    return standardizeJSON(error);
+  } catch {
+    return error;
+  }
+};
+
+/**
  * Transforms a data bundle to raw bytes
  *
  * @method bundleToBytes

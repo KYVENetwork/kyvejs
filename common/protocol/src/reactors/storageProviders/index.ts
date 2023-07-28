@@ -1,6 +1,7 @@
 import { IStorageProvider } from "../..";
 import { Arweave } from "./Arweave";
 import { Bundlr } from "./Bundlr";
+import { S3 } from "./S3";
 import { NoStorageProvider } from "./NoStorageProvider";
 
 /**
@@ -10,6 +11,7 @@ import { NoStorageProvider } from "./NoStorageProvider";
  * 0 - NoStorageProvider
  * 1 - Arweave
  * 2 - Bundlr
+ * 3 - AWS S3
  * x - NoStorageProvider (default)
  *
  * @method storageProviderFactory
@@ -26,6 +28,8 @@ export const storageProviderFactory = (
       return new Arweave(storagePriv);
     case 2:
       return new Bundlr(storagePriv);
+    case 3:
+      return new S3();
     default:
       return new NoStorageProvider();
   }

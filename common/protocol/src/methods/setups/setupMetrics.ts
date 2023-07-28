@@ -2,7 +2,7 @@ import http from "http";
 import prom_client, { register } from "prom-client";
 import url from "url";
 
-import { IMetrics, Validator, standardizeJSON } from "../..";
+import { IMetrics, Validator, standardizeError } from "../..";
 
 /**
  * setupMetrics initiates all metrics and starts if enabled a local prometheus
@@ -413,7 +413,7 @@ export function setupMetrics(this: Validator): void {
     }
   } catch (err) {
     this.logger.fatal(`Failed to setup metrics. Exiting ...`);
-    this.logger.fatal(standardizeJSON(err));
+    this.logger.fatal(standardizeError(err));
 
     process.exit(1);
   }
