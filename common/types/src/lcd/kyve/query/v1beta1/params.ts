@@ -4,6 +4,7 @@ import { QueryParamsResponse as QueryParamsResponse3 } from "../../../cosmos/gov
 import { Params } from "../../bundles/v1beta1/params";
 import { Params as Params1 } from "../../delegation/v1beta1/params";
 import { Params as Params2 } from "../../global/v1beta1/global";
+import { Params as Params5 } from "../../pool/v1beta1/params";
 import { Params as Params4 } from "../../stakers/v1beta1/params";
 
 export const protobufPackage = "kyve.query.v1beta1";
@@ -24,6 +25,8 @@ export interface QueryParamsResponse {
   gov_params?: QueryParamsResponse3;
   /** stakers_params ... */
   stakers_params?: Params4;
+  /** pool_params ... */
+  pool_params?: Params5;
 }
 
 function createBaseQueryParamsRequest(): QueryParamsRequest {
@@ -72,6 +75,7 @@ function createBaseQueryParamsResponse(): QueryParamsResponse {
     global_params: undefined,
     gov_params: undefined,
     stakers_params: undefined,
+    pool_params: undefined,
   };
 }
 
@@ -91,6 +95,9 @@ export const QueryParamsResponse = {
     }
     if (message.stakers_params !== undefined) {
       Params4.encode(message.stakers_params, writer.uint32(42).fork()).ldelim();
+    }
+    if (message.pool_params !== undefined) {
+      Params5.encode(message.pool_params, writer.uint32(50).fork()).ldelim();
     }
     return writer;
   },
@@ -117,6 +124,9 @@ export const QueryParamsResponse = {
         case 5:
           message.stakers_params = Params4.decode(reader, reader.uint32());
           break;
+        case 6:
+          message.pool_params = Params5.decode(reader, reader.uint32());
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -132,6 +142,7 @@ export const QueryParamsResponse = {
       global_params: isSet(object.global_params) ? Params2.fromJSON(object.global_params) : undefined,
       gov_params: isSet(object.gov_params) ? QueryParamsResponse3.fromJSON(object.gov_params) : undefined,
       stakers_params: isSet(object.stakers_params) ? Params4.fromJSON(object.stakers_params) : undefined,
+      pool_params: isSet(object.pool_params) ? Params5.fromJSON(object.pool_params) : undefined,
     };
   },
 
@@ -147,6 +158,8 @@ export const QueryParamsResponse = {
       (obj.gov_params = message.gov_params ? QueryParamsResponse3.toJSON(message.gov_params) : undefined);
     message.stakers_params !== undefined &&
       (obj.stakers_params = message.stakers_params ? Params4.toJSON(message.stakers_params) : undefined);
+    message.pool_params !== undefined &&
+      (obj.pool_params = message.pool_params ? Params5.toJSON(message.pool_params) : undefined);
     return obj;
   },
 
@@ -166,6 +179,9 @@ export const QueryParamsResponse = {
       : undefined;
     message.stakers_params = (object.stakers_params !== undefined && object.stakers_params !== null)
       ? Params4.fromPartial(object.stakers_params)
+      : undefined;
+    message.pool_params = (object.pool_params !== undefined && object.pool_params !== null)
+      ? Params5.fromPartial(object.pool_params)
       : undefined;
     return message;
   },

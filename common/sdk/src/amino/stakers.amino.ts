@@ -6,6 +6,7 @@ import {
   MsgJoinPool,
   MsgUpdateCommission,
   MsgLeavePool,
+  MsgClaimCommissionRewards,
 } from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
 import { isNotEmpty } from "../utils";
 
@@ -56,6 +57,28 @@ export const createStakersAminoConverters = (): AminoConverters => {
         details: msg.details,
       }),
     },
+    "/kyve.stakers.v1beta1.MsgUpdateCommission": {
+      aminoType: "kyve/stakers/MsgUpdateCommission",
+      toAmino: (msg: MsgUpdateCommission) => ({
+        creator: msg.creator,
+        commission: protoDecimalToJson(msg.commission),
+      }),
+      fromAmino: (msg): MsgUpdateCommission => ({
+        creator: msg.creator,
+        commission: jsonDecimalToProto(msg.commission),
+      }),
+    },
+    "/kyve.stakers.v1beta1.MsgClaimCommissionRewards": {
+      aminoType: "kyve/stakers/MsgClaimCommissionRewards",
+      toAmino: (msg: MsgClaimCommissionRewards) => ({
+        creator: msg.creator,
+        ...(isNotEmpty(msg.amount) && { amount: msg.amount }),
+      }),
+      fromAmino: (msg): MsgClaimCommissionRewards => ({
+        creator: msg.creator,
+        amount: msg.amount,
+      }),
+    },
     "/kyve.stakers.v1beta1.MsgJoinPool": {
       aminoType: "kyve/stakers/MsgJoinPool",
       toAmino: (msg: MsgJoinPool) => ({
@@ -69,17 +92,6 @@ export const createStakersAminoConverters = (): AminoConverters => {
         pool_id: msg.pool_id,
         valaddress: msg.valaddress,
         amount: msg.amount,
-      }),
-    },
-    "/kyve.stakers.v1beta1.MsgUpdateCommission": {
-      aminoType: "kyve/stakers/MsgUpdateCommission",
-      toAmino: (msg: MsgUpdateCommission) => ({
-        creator: msg.creator,
-        commission: protoDecimalToJson(msg.commission),
-      }),
-      fromAmino: (msg): MsgUpdateCommission => ({
-        creator: msg.creator,
-        commission: jsonDecimalToProto(msg.commission),
       }),
     },
     "/kyve.stakers.v1beta1.MsgLeavePool": {

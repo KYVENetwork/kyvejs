@@ -138,6 +138,18 @@ export interface MsgCancelRuntimeUpgrade {
 export interface MsgCancelRuntimeUpgradeResponse {
 }
 
+/** MsgUpdateParams defines a SDK message for updating the module parameters. */
+export interface MsgUpdateParams {
+  /** authority is the address of the governance account. */
+  authority: string;
+  /** payload defines the x/stakers parameters to update. */
+  payload: string;
+}
+
+/** MsgUpdateParamsResponse defines the Msg/UpdateParams response type. */
+export interface MsgUpdateParamsResponse {
+}
+
 function createBaseMsgFundPool(): MsgFundPool {
   return { creator: "", id: "0", amount: "0" };
 }
@@ -1102,6 +1114,103 @@ export const MsgCancelRuntimeUpgradeResponse = {
   },
 };
 
+function createBaseMsgUpdateParams(): MsgUpdateParams {
+  return { authority: "", payload: "" };
+}
+
+export const MsgUpdateParams = {
+  encode(message: MsgUpdateParams, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.authority !== "") {
+      writer.uint32(10).string(message.authority);
+    }
+    if (message.payload !== "") {
+      writer.uint32(18).string(message.payload);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgUpdateParams {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgUpdateParams();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.authority = reader.string();
+          break;
+        case 2:
+          message.payload = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgUpdateParams {
+    return {
+      authority: isSet(object.authority) ? String(object.authority) : "",
+      payload: isSet(object.payload) ? String(object.payload) : "",
+    };
+  },
+
+  toJSON(message: MsgUpdateParams): unknown {
+    const obj: any = {};
+    message.authority !== undefined && (obj.authority = message.authority);
+    message.payload !== undefined && (obj.payload = message.payload);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<MsgUpdateParams>, I>>(object: I): MsgUpdateParams {
+    const message = createBaseMsgUpdateParams();
+    message.authority = object.authority ?? "";
+    message.payload = object.payload ?? "";
+    return message;
+  },
+};
+
+function createBaseMsgUpdateParamsResponse(): MsgUpdateParamsResponse {
+  return {};
+}
+
+export const MsgUpdateParamsResponse = {
+  encode(_: MsgUpdateParamsResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgUpdateParamsResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgUpdateParamsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(_: any): MsgUpdateParamsResponse {
+    return {};
+  },
+
+  toJSON(_: MsgUpdateParamsResponse): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<MsgUpdateParamsResponse>, I>>(_: I): MsgUpdateParamsResponse {
+    const message = createBaseMsgUpdateParamsResponse();
+    return message;
+  },
+};
+
 /** Msg defines the Msg service. */
 export interface Msg {
   /** FundPool ... */
@@ -1138,6 +1247,11 @@ export interface Msg {
    * The authority is hard-coded to the x/gov module account.
    */
   CancelRuntimeUpgrade(request: MsgCancelRuntimeUpgrade): Promise<MsgCancelRuntimeUpgradeResponse>;
+  /**
+   * UpdateParams defines a governance operation for updating the x/pool module
+   * parameters. The authority is hard-coded to the x/gov module account.
+   */
+  UpdateParams(request: MsgUpdateParams): Promise<MsgUpdateParamsResponse>;
 }
 
 export class MsgClientImpl implements Msg {
@@ -1154,6 +1268,7 @@ export class MsgClientImpl implements Msg {
     this.EnablePool = this.EnablePool.bind(this);
     this.ScheduleRuntimeUpgrade = this.ScheduleRuntimeUpgrade.bind(this);
     this.CancelRuntimeUpgrade = this.CancelRuntimeUpgrade.bind(this);
+    this.UpdateParams = this.UpdateParams.bind(this);
   }
   FundPool(request: MsgFundPool): Promise<MsgFundPoolResponse> {
     const data = MsgFundPool.encode(request).finish();
@@ -1201,6 +1316,12 @@ export class MsgClientImpl implements Msg {
     const data = MsgCancelRuntimeUpgrade.encode(request).finish();
     const promise = this.rpc.request(this.service, "CancelRuntimeUpgrade", data);
     return promise.then((data) => MsgCancelRuntimeUpgradeResponse.decode(new _m0.Reader(data)));
+  }
+
+  UpdateParams(request: MsgUpdateParams): Promise<MsgUpdateParamsResponse> {
+    const data = MsgUpdateParams.encode(request).finish();
+    const promise = this.rpc.request(this.service, "UpdateParams", data);
+    return promise.then((data) => MsgUpdateParamsResponse.decode(new _m0.Reader(data)));
   }
 }
 

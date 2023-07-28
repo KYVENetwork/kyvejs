@@ -2,14 +2,14 @@ import BigNumber from "bignumber.js";
 import { Validator, standardizeJSON } from "../..";
 
 /**
- * validateStorageBalance checks if the account of the storage provider
+ * isStorageBalanceZero checks if the account of the storage provider
  * has more than 0$ funds available
  *
- * @method validateStorageBalance
+ * @method isStorageBalanceZero
  * @param {Validator} this
- * @return {Promise<void>}
+ * @return {Promise<boolean>}
  */
-export async function validateStorageBalance(this: Validator): Promise<void> {
+export async function isStorageBalanceZero(this: Validator): Promise<boolean> {
   try {
     const storageProvider = Validator.storageProviderFactory(
       this.pool.data?.current_storage_provider_id ?? 0,
@@ -32,18 +32,21 @@ export async function validateStorageBalance(this: Validator): Promise<void> {
       this.logger.fatal(
         `Provide some funds to the following account: ${address}`
       );
-      process.exit(1);
+
+      return true;
     }
 
     this.logger.info(
       `Account has available funds on StorageProvider:${storageProvider.name}\n`
     );
+
+    return false;
   } catch (err) {
     this.logger.fatal(
-      `Error while validating storage provider funds. Exiting ...`
+      `Error while checking storage provider balance. Exiting ...`
     );
     this.logger.fatal(standardizeJSON(err));
 
-    process.exit(1);
+    return true;
   }
 }

@@ -19,7 +19,7 @@ import {
   claimUploaderRole,
   continueRound,
   createBundleProposal,
-  getBalances,
+  getBalancesForMetrics,
   runCache,
   runNode,
   saveBundleDecompress,
@@ -34,18 +34,19 @@ import {
   submitBundleProposal,
   syncPoolState,
   validateBundleProposal,
-  validateIsNodeValidator,
-  validateIsPoolActive,
-  validateRuntime,
-  validateStorageBalance,
-  validateVersion,
-  validateDataAvailability,
+  isNodeValidator,
+  isPoolActive,
+  isValidRuntime,
+  isStorageBalanceZero,
+  isValidVersion,
+  isDataAvailable,
   voteBundleProposal,
   waitForAuthorization,
   waitForCacheContinuation,
   waitForNextBundleProposal,
   waitForUploadInterval,
   getProxyAuth,
+  isStorageBalanceLow,
 } from "./methods";
 import { ICacheProvider, IMetrics, IRuntime } from "./types";
 import { standardizeJSON } from "./utils";
@@ -107,11 +108,13 @@ export class Validator {
   protected setupValidator = setupValidator;
 
   // checks
-  protected validateRuntime = validateRuntime;
-  protected validateVersion = validateVersion;
-  protected validateIsNodeValidator = validateIsNodeValidator;
-  protected validateIsPoolActive = validateIsPoolActive;
-  protected validateDataAvailability = validateDataAvailability;
+  protected isValidRuntime = isValidRuntime;
+  protected isValidVersion = isValidVersion;
+  protected isNodeValidator = isNodeValidator;
+  protected isPoolActive = isPoolActive;
+  protected isStorageBalanceZero = isStorageBalanceZero;
+  protected isStorageBalanceLow = isStorageBalanceLow;
+  protected isDataAvailable = isDataAvailable;
 
   // timeouts
   protected waitForAuthorization = waitForAuthorization;
@@ -132,7 +135,7 @@ export class Validator {
 
   // queries
   protected syncPoolState = syncPoolState;
-  protected getBalances = getBalances;
+  protected getBalancesForMetrics = getBalancesForMetrics;
   protected canVote = canVote;
   protected canPropose = canPropose;
 
@@ -141,7 +144,6 @@ export class Validator {
   protected saveBundleDecompress = saveBundleDecompress;
   protected saveLoadValidationBundle = saveLoadValidationBundle;
   protected validateBundleProposal = validateBundleProposal;
-  protected validateStorageBalance = validateStorageBalance;
 
   // upload
   protected createBundleProposal = createBundleProposal;
@@ -303,11 +305,25 @@ export class Validator {
     this.setupLogger();
     this.setupMetrics();
 
-    // perform async setups
     await this.setupSDK();
     await this.syncPoolState(true);
-    await this.validateStorageBalance();
-    await this.validateDataAvailability();
+
+    // perform validation checks
+    if (!this.isValidRuntime()) {
+      process.exit(1);
+    }
+
+    if (!this.isValidVersion()) {
+      process.exit(1);
+    }
+
+    if (await this.isStorageBalanceZero()) {
+      process.exit(1);
+    }
+
+    if (!(await this.isDataAvailable())) {
+      process.exit(1);
+    }
 
     await this.setupValidator();
     await this.setupCacheProvider();

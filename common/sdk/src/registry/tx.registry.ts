@@ -27,7 +27,10 @@ import { MsgEnablePool } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
 import { MsgScheduleRuntimeUpgrade } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
 import { MsgCancelRuntimeUpgrade } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
 /** stakers **/
-import { MsgCreateStaker } from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
+import {
+  MsgClaimCommissionRewards,
+  MsgCreateStaker,
+} from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
 import { MsgUpdateMetadata } from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
 import { MsgJoinPool } from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
 import { MsgUpdateCommission } from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
@@ -49,6 +52,10 @@ export const registry: ReadonlyArray<[string, GeneratedType]> = [
   ["/kyve.stakers.v1beta1.MsgCreateStaker", MsgCreateStaker],
   ["/kyve.stakers.v1beta1.MsgUpdateMetadata", MsgUpdateMetadata],
   ["/kyve.stakers.v1beta1.MsgUpdateCommission", MsgUpdateCommission],
+  [
+    "/kyve.stakers.v1beta1.MsgClaimCommissionRewards",
+    MsgClaimCommissionRewards,
+  ],
   ["/kyve.stakers.v1beta1.MsgJoinPool", MsgJoinPool],
   ["/kyve.stakers.v1beta1.MsgLeavePool", MsgLeavePool],
   /** delegations  **/
@@ -145,6 +152,13 @@ export const encodeTxMsg = {
     return {
       type_url: "/kyve.stakers.v1beta1.MsgUpdateCommission",
       value: MsgUpdateCommission.encode(value).finish(),
+    };
+  },
+
+  claimCommissionRewards(value: MsgClaimCommissionRewards) {
+    return {
+      type_url: "/kyve.stakers.v1beta1.MsgClaimCommissionRewards",
+      value: MsgClaimCommissionRewards.encode(value).finish(),
     };
   },
 
@@ -312,6 +326,12 @@ export const withTypeUrl = {
   updateCommission(value: MsgUpdateCommission) {
     return {
       typeUrl: "/kyve.stakers.v1beta1.MsgUpdateCommission",
+      value,
+    };
+  },
+  claimCommissionRewards(value: MsgClaimCommissionRewards) {
+    return {
+      typeUrl: "/kyve.stakers.v1beta1.MsgClaimCommissionRewards",
       value,
     };
   },

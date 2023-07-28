@@ -22,6 +22,7 @@ TEST CASES - propose bundle tests
 
 * propose bundle with data
 * propose bundle with no data
+* propose bundle with not enough storage provider funds
 * propose bundle after last bundle has been dropped
 * propose bundle where saveBundle fails
 * propose bundle but saveBundle does not return a storage id
@@ -227,6 +228,170 @@ describe("propose bundle tests", () => {
       Buffer.from(JSON.stringify(bundle)),
       expect.any(Array)
     );
+
+    expect(storageProvider.retrieveBundle).toHaveBeenCalledTimes(0);
+
+    // =======================
+    // ASSERT CACHE INTERFACES
+    // =======================
+
+    expect(cacheProvider.get).toHaveBeenCalledTimes(5);
+    expect(cacheProvider.get).toHaveBeenNthCalledWith(1, "102");
+    expect(cacheProvider.get).toHaveBeenNthCalledWith(2, "103");
+    expect(cacheProvider.get).toHaveBeenNthCalledWith(3, "104");
+    expect(cacheProvider.get).toHaveBeenNthCalledWith(4, "105");
+    expect(cacheProvider.get).toHaveBeenNthCalledWith(5, "106");
+
+    // =============================
+    // ASSERT COMPRESSION INTERFACES
+    // =============================
+
+    expect(compression.compress).toHaveBeenCalledTimes(1);
+    expect(compression.compress).toHaveBeenLastCalledWith(
+      Buffer.from(JSON.stringify(bundle))
+    );
+
+    expect(compression.decompress).toHaveBeenCalledTimes(0);
+
+    // =========================
+    // ASSERT RUNTIME INTERFACES
+    // =========================
+
+    expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
+    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
+      expect.any(Validator),
+      bundle
+    );
+
+    expect(runtime.validateDataItem).toHaveBeenCalledTimes(0);
+
+    expect(runtime.getDataItem).toHaveBeenCalledTimes(0);
+
+    expect(runtime.nextKey).toHaveBeenCalledTimes(0);
+
+    // ========================
+    // ASSERT NODEJS INTERFACES
+    // ========================
+
+    // assert that only one round ran
+    expect(v["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
+
+    // TODO: assert timeouts
+  });
+
+  test("propose bundle with not enough storage provider funds", async () => {
+    // ARRANGE
+    v["lcd"][0].kyve.query.v1beta1.canVote = jest.fn().mockResolvedValue({
+      possible: false,
+      reason: "Already voted",
+    });
+
+    storageProvider = new TestNormalStorageProvider();
+    storageProvider.getBalance = jest.fn().mockResolvedValue("0");
+    jest
+      .spyOn(Validator, "storageProviderFactory")
+      .mockImplementation(() => storageProvider);
+
+    v["syncPoolState"] = jest.fn().mockImplementation(() => {
+      v.pool = {
+        ...genesis_pool,
+        data: {
+          ...genesis_pool.data,
+          current_index: "100",
+          current_key: "99",
+        },
+        bundle_proposal: {
+          ...genesis_pool.bundle_proposal,
+          storage_id: "another_test_storage_id",
+          uploader: "another_test_staker",
+          next_uploader: "test_staker",
+          data_size: "123456789",
+          data_hash: "previous_test_bundle_hash",
+          bundle_size: "2",
+          from_key: "100",
+          to_key: "101",
+          bundle_summary: "previous_test_value",
+          updated_at: "0",
+          voters_valid: ["test_staker"],
+        },
+      } as any;
+    });
+
+    const bundle = [
+      {
+        key: "test_key_1",
+        value: "test_value_1",
+      },
+      {
+        key: "test_key_2",
+        value: "test_value_2",
+      },
+      {
+        key: "test_key_3",
+        value: "test_value_3",
+      },
+      {
+        key: "test_key_4",
+        value: "test_value_4",
+      },
+    ];
+
+    await v["cacheProvider"].put("102", bundle[0]);
+    await v["cacheProvider"].put("103", bundle[1]);
+    await v["cacheProvider"].put("104", bundle[2]);
+    await v["cacheProvider"].put("105", bundle[3]);
+
+    // ACT
+    await runNode.call(v);
+
+    // ASSERT
+    const txs = v["client"][0].kyve.bundles.v1beta1;
+    const queries = v["lcd"][0].kyve.query.v1beta1;
+    const cacheProvider = v["cacheProvider"];
+    const runtime = v["runtime"];
+
+    // ========================
+    // ASSERT CLIENT INTERFACES
+    // ========================
+
+    expect(txs.claimUploaderRole).toHaveBeenCalledTimes(0);
+
+    expect(txs.voteBundleProposal).toHaveBeenCalledTimes(0);
+
+    expect(txs.submitBundleProposal).toHaveBeenCalledTimes(0);
+
+    expect(txs.skipUploaderRole).toHaveBeenCalledTimes(1);
+    expect(txs.skipUploaderRole).toHaveBeenCalledWith({
+      from_index: "102",
+      pool_id: "0",
+      staker: "test_staker",
+    });
+
+    // =====================
+    // ASSERT LCD INTERFACES
+    // =====================
+
+    expect(queries.canVote).toHaveBeenCalledTimes(1);
+    expect(queries.canVote).toHaveBeenLastCalledWith({
+      staker: "test_staker",
+      pool_id: "0",
+      voter: "test_valaddress",
+      storage_id: "another_test_storage_id",
+    });
+
+    expect(queries.canPropose).toHaveBeenCalledTimes(1);
+    expect(queries.canPropose).toHaveBeenLastCalledWith({
+      staker: "test_staker",
+      pool_id: "0",
+      proposer: "test_valaddress",
+      from_index: "102",
+    });
+
+    // =========================
+    // ASSERT STORAGE INTERFACES
+    // =========================
+
+    expect(storageProvider.saveBundle).toHaveBeenCalledTimes(0);
 
     expect(storageProvider.retrieveBundle).toHaveBeenCalledTimes(0);
 

@@ -6,7 +6,7 @@ import { BundleTag, IStorageProvider } from "../../types";
 
 export class Bundlr implements IStorageProvider {
   public name = "Bundlr";
-  public decimals = 12;
+  public coinDecimals = 12;
 
   private readonly storagePriv: string;
 
@@ -33,6 +33,11 @@ export class Bundlr implements IStorageProvider {
   async getBalance() {
     const atomicUnits = await this.bundlrClient.getLoadedBalance();
     return atomicUnits.toString();
+  }
+
+  async getPrice(bytes: number) {
+    const price = await this.bundlrClient.getPrice(bytes);
+    return price.toString();
   }
 
   async saveBundle(bundle: Buffer, tags: BundleTag[]) {

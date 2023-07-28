@@ -1,14 +1,14 @@
 import { Validator, standardizeJSON } from "../..";
 
 /**
- * validateRuntime checks if the runtime of the pool matches with the runtime of
+ * isValidRuntime checks if the runtime of the pool matches with the runtime of
  * the node. If it does not match the node will exit.
  *
- * @method validateRuntime
+ * @method isValidRuntime
  * @param {Validator} this
- * @return {void}
+ * @return {boolean}
  */
-export function validateRuntime(this: Validator): void {
+export function isValidRuntime(this: Validator): boolean {
   try {
     this.logger.debug(`Comparing pool runtime with protocol node runtime`);
 
@@ -19,14 +19,17 @@ export function validateRuntime(this: Validator): void {
       this.logger.fatal(
         `Found = ${this.runtime.name} required = ${this.pool.data!.runtime}`
       );
-      process.exit(1);
+
+      return false;
     }
 
     this.logger.info(`Validator running on runtime = ${this.runtime.name}`);
+
+    return true;
   } catch (err) {
     this.logger.fatal(`Error while validating runtime. Exiting ...`);
     this.logger.fatal(standardizeJSON(err));
 
-    process.exit(1);
+    return false;
   }
 }
