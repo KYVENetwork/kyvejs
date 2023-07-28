@@ -28,16 +28,6 @@ export const parseValaccount = (value: string): string => {
   return process.env[value] || "";
 };
 
-export const parseStoragePriv = (value: string): string => {
-  if (!process.env[value]) {
-    throw new commander.InvalidArgumentError(
-      `Environment variable "${value}" has no value`
-    );
-  }
-
-  return process.env[value] || "";
-};
-
 export const parseKeyfile = (value: string): string => {
   if (!existsSync(value)) {
     throw new commander.InvalidArgumentError(

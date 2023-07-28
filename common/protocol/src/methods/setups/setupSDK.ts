@@ -1,5 +1,5 @@
 import KyveSDK from "@kyvejs/sdk";
-import { Validator, standardizeJSON } from "../..";
+import { Validator, standardizeError } from "../..";
 
 /**
  * setupSDK creates the main KYVE SDK and the client which is used for transactions
@@ -41,7 +41,7 @@ export async function setupSDK(this: Validator): Promise<void> {
     this.lcd = this.sdk.map((sdk) => sdk.createLCDClient());
   } catch (err) {
     this.logger.fatal(`Failed to init KYVE SDK. Exiting ...`);
-    this.logger.fatal(standardizeJSON(err));
+    this.logger.fatal(standardizeError(err));
 
     process.exit(1);
   }

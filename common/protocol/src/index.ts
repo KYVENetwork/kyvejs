@@ -10,7 +10,6 @@ import {
   parseEndpoints,
   parseValaccount,
   parsePoolId,
-  parseStoragePriv,
 } from "./commander";
 import {
   archiveDebugBundle,
@@ -49,7 +48,7 @@ import {
   isStorageBalanceLow,
 } from "./methods";
 import { ICacheProvider, IMetrics, IRuntime } from "./types";
-import { standardizeJSON } from "./utils";
+import { standardizeError } from "./utils";
 import { SupportedChains } from "@kyvejs/sdk/dist/constants";
 import { storageProviderFactory } from "./reactors/storageProviders";
 import { compressionFactory } from "./reactors/compression";
@@ -210,11 +209,6 @@ export class Validator {
         "The environment variable pointing to the valaccount mnemonic",
         parseValaccount
       )
-      .requiredOption(
-        "--storage-priv <string>",
-        "The environment variable pointing to the private key of the storage provider",
-        parseStoragePriv
-      )
       .requiredOption("--chain-id <string>", "The chain ID of the network")
       .requiredOption(
         "--rpc <string>",
@@ -225,6 +219,10 @@ export class Validator {
         "--rest <string>",
         "Comma separated list of rest endpoints. If the first fails the next endpoint will be used as fallback.",
         parseEndpoints
+      )
+      .option(
+        "--storage-priv <string>",
+        "The environment variable pointing to the private key of the storage provider. Only required when using storage providers Arweave or Bundlr."
       )
       .option(
         "--coin-denom <string>",
@@ -287,7 +285,7 @@ export class Validator {
     // assign program options to node instance
     this.poolId = options.pool;
     this.valaccount = options.valaccount;
-    this.storagePriv = options.storagePriv;
+    this.storagePriv = process.env[options.storagePriv] || "";
     this.chainId = options.chainId;
     this.rpc = options.rpc;
     this.rest = options.rest;
@@ -335,7 +333,7 @@ export class Validator {
       this.runCache();
     } catch (err) {
       this.logger.fatal(`Unexpected runtime error. Exiting ...`);
-      this.logger.fatal(standardizeJSON(err));
+      this.logger.fatal(standardizeError(err));
 
       process.exit(1);
     }

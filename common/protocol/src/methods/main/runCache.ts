@@ -1,5 +1,5 @@
 import { DataItem, Validator } from "../..";
-import { callWithBackoffStrategy, sleep, standardizeJSON } from "../../utils";
+import { callWithBackoffStrategy, sleep, standardizeError } from "../../utils";
 import clone from "clone";
 
 /**
@@ -111,7 +111,7 @@ export async function runCache(this: Validator): Promise<void> {
           this.logger.error(
             `Unexpected error deleting data item ${i.toString()} from local cache. Continuing ...`
           );
-          this.logger.error(standardizeJSON(err));
+          this.logger.error(standardizeError(err));
           continue;
         }
       }
@@ -172,7 +172,7 @@ export async function runCache(this: Validator): Promise<void> {
                   ctx.nextTimeoutInMs / 1000
                 ).toFixed(2)}s ...`
               );
-              this.logger.debug(standardizeJSON(err));
+              this.logger.debug(standardizeError(err));
 
               this.m.runtime_get_data_item_failed.inc();
             }
@@ -207,7 +207,7 @@ export async function runCache(this: Validator): Promise<void> {
       this.logger.error(
         `Unexpected error collecting data items to local cache. Continuing ...`
       );
-      this.logger.error(standardizeJSON(err));
+      this.logger.error(standardizeError(err));
 
       try {
         // drop cache if an unexpected error occurs during caching
@@ -219,7 +219,7 @@ export async function runCache(this: Validator): Promise<void> {
         this.logger.error(
           `Unexpected error dropping local cache. Continuing ...`
         );
-        this.logger.error(standardizeJSON(dropError));
+        this.logger.error(standardizeError(dropError));
       }
     }
   }

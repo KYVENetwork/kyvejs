@@ -1,4 +1,4 @@
-import { Validator, standardizeJSON } from "../..";
+import { Validator, standardizeError } from "../..";
 
 /**
  * claimUploaderRole tries to claim the uploader role for the next bundle proposal
@@ -53,7 +53,7 @@ export async function claimUploaderRole(this: Validator): Promise<boolean> {
       }
     } catch (err) {
       this.logger.error(`RPC call to "${this.rpc[c]}" failed`);
-      this.logger.error(standardizeJSON(err));
+      this.logger.error(standardizeError(err));
     }
   }
 

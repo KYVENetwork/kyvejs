@@ -5,7 +5,7 @@ import {
   bundleToBytes,
   MAX_BUNDLE_BYTE_SIZE,
   sha256,
-  standardizeJSON,
+  standardizeError,
 } from "../../utils";
 
 /**
@@ -92,7 +92,7 @@ export async function createBundleProposal(this: Validator): Promise<void> {
         this.logger.error(
           `Unexpected error summarizing bundle. Skipping Uploader Role ...`
         );
-        this.logger.error(standardizeJSON(err));
+        this.logger.error(standardizeError(err));
 
         return null;
       });
@@ -132,7 +132,7 @@ export async function createBundleProposal(this: Validator): Promise<void> {
         this.logger.error(
           `Unexpected error compressing bundle. Skipping Uploader Role ...`
         );
-        this.logger.error(standardizeJSON(err));
+        this.logger.error(standardizeError(err));
 
         return null;
       });
@@ -284,7 +284,7 @@ export async function createBundleProposal(this: Validator): Promise<void> {
       this.logger.info(
         `Saving bundle proposal on StorageProvider was unsuccessful`
       );
-      this.logger.debug(standardizeJSON(err));
+      this.logger.debug(standardizeError(err));
 
       this.m.storage_provider_save_failed.inc();
 
@@ -296,6 +296,6 @@ export async function createBundleProposal(this: Validator): Promise<void> {
     this.logger.error(
       `Unexpected error creating bundle proposal. Skipping proposal ...`
     );
-    this.logger.error(standardizeJSON(err));
+    this.logger.error(standardizeError(err));
   }
 }

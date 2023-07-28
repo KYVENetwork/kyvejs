@@ -7,7 +7,7 @@ import {
 } from "unique-names-generator";
 import { major, minor } from "semver";
 
-import { Validator, standardizeJSON } from "../..";
+import { Validator, standardizeError } from "../..";
 
 /**
  * setupValidator ensures the node starts as a valid validator
@@ -62,7 +62,7 @@ export async function setupValidator(this: Validator): Promise<void> {
     this.m.cache_current_items.set(0);
   } catch (err) {
     this.logger.fatal(`Failed to setup validator. Exiting ...`);
-    this.logger.fatal(standardizeJSON(err));
+    this.logger.fatal(standardizeError(err));
 
     process.exit(1);
   }

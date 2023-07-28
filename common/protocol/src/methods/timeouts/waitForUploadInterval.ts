@@ -1,7 +1,7 @@
 import BigNumber from "bignumber.js";
 
 import { Validator } from "../..";
-import { sleep, standardizeJSON } from "../../utils";
+import { sleep, standardizeError } from "../../utils";
 
 /**
  * waitForUploadInterval waits until the upload interval of the current
@@ -46,6 +46,6 @@ export async function waitForUploadInterval(this: Validator): Promise<void> {
     this.logger.info(`Reached upload interval of current bundle proposal`);
   } catch (err) {
     this.logger.error(`Failed to wait for upload interval. Continuing ...`);
-    this.logger.error(standardizeJSON(err));
+    this.logger.error(standardizeError(err));
   }
 }
