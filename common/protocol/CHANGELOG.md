@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.0.3](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/protocol@1.0.2...@kyvejs/protocol@1.0.3) (2023-07-28)
+
+### Bug Fixes
+
+- remove duplicate Content-Type tag ([#50](https://github.com/KYVENetwork/kyvejs/issues/50)) ([7a4b05d](https://github.com/KYVENetwork/kyvejs/commit/7a4b05d34b0a8bb1ba838d67fb5b2c0dfaac85f0))
+
 ## [1.0.2](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/protocol@1.0.1...@kyvejs/protocol@1.0.2) (2023-07-14)
 
 **Note:** Version bump only for package @kyvejs/protocol
