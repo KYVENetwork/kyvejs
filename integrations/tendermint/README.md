@@ -48,10 +48,16 @@ The following integrations are running on this runtime and are currently live.
 
 ### Devnet
 
-- **Evmos**
-  - Pool ID: 27
-  - Chain ID: _evmos_9001-2_
-  - Base Height: _5200791_
+- **Osmosis**
+
+  - Pool ID: 30
+  - Chain ID: _osmosis-1_
+  - Base Height: _1_
+
+- **Archway**
+  - Pool ID: 31
+  - Chain ID: _archway-1_
+  - Base Height: _1_
 
 ## Binary Installation
 
@@ -165,29 +171,29 @@ export KYVEJS_TENDERMINT_RPC="https://my-custom-rpc-endpoint:26657"
 
 In order to create a pool it has to go through the Governance process (more on that can be found [here](https://docs.kyve.network/token_holders/governance)). An example proposal with which a storage pool with this runtime could be created can be found below:
 
-```json
+```json5
 {
-  "messages": [
+  messages: [
     {
-      "@type": "/kyve.pool.v1beta1.MsgCreatePool",
-      "authority": "kyve10d07y265gmmuvt4z0w9aw880jnsr700jdv7nah",
-      "name": "<your pool name>",
-      "runtime": "@kyvejs/tendermint",
-      "logo": "ar://<your logo stored on arweave>",
-      "config": "<your config like described above>",
-      "start_key": "<the initial height of the tendermint chain>",
-      "upload_interval": "120", // 120s is the recommended value
-      "operating_cost": "<your base bundle reward>", // for example 1000000 if the base reward per bundle should be 1 $KYVE
-      "min_delegation": "<your required min delegation", // for example 1000000000 if the pool should only run if more than 1000 $KYVE are bonded in this pool
-      "max_bundle_size": "100", // 100 blocks per bundle is the recommended value
-      "version": "<runtime version>", // the current version of this runtime
-      "binaries": "{\"kyve-linux-arm64\":\"<linux-arm64 binary download URL>\",\"kyve-linux-x64\":\"<linux-x64 binary download URL>\",\"kyve-macos-x64\":\"<macos-x64 binary download URL>\"}", // download URLs of binaries for KYSOR
-      "storageProviderId": "1", // Arweave is the recommended storage provider
-      "compressionId": "1" // Gzip is the recommended bundle compression
-    }
+      '@type': '/kyve.pool.v1beta1.MsgCreatePool',
+      authority: 'kyve10d07y265gmmuvt4z0w9aw880jnsr700jdv7nah',
+      name: '<your pool name>',
+      runtime: '@kyvejs/tendermint',
+      logo: 'ar://<your logo stored on arweave>',
+      config: '<your config like described above>',
+      start_key: '<the initial height of the tendermint chain>',
+      upload_interval: '120', // 120s is the recommended value
+      operating_cost: '<your base bundle reward>', // for example 1000000 if the base reward per bundle should be 1 $KYVE
+      min_delegation: '<your required min delegation', // for example 1000000000 if the pool should only run if more than 1000 $KYVE are bonded in this pool
+      max_bundle_size: '100', // 100 blocks per bundle is the recommended value
+      version: '<runtime version>', // the current version of this runtime
+      binaries: '{"kyve-linux-arm64":"<linux-arm64 binary download URL>","kyve-linux-x64":"<linux-x64 binary download URL>","kyve-macos-x64":"<macos-x64 binary download URL>"}', // download URLs of binaries for KYSOR
+      storageProviderId: '1', // Arweave is the recommended storage provider
+      compressionId: '1', // Gzip is the recommended bundle compression
+    },
   ],
-  "metadata": "<your ipfs metadata info>", // gov proposal metadata
-  "deposit": "<your deposit>ukyve" // proposal deposit, check the required min deposit
+  metadata: '<your ipfs metadata info>', // gov proposal metadata
+  deposit: '<your deposit>ukyve', // proposal deposit, check the required min deposit
 }
 ```
 
