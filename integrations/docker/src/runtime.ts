@@ -1,79 +1,114 @@
-import { DataItem, IRuntime, Validator } from "@kyvejs/protocol";
-import { spawnSync } from "child_process";
+const grpc = require("@grpc/grpc-js");
+var protoLoader = require("@grpc/proto-loader");
+const PROTO_PATH = "./password.proto";
+const bcrypt = require('bcrypt');
+const options = {
+    keepCase: true,
+    longs: String,
+    enums: String,
+    defaults: true,
+    oneofs: true,
+};
+var grpcObj = protoLoader.loadSync(PROTO_PATH, options);
+const PasswordService = grpc.loadPackageDefinition(grpcObj).PasswordService;
 
-import { name, version } from "../package.json";
-import http from 'http';
+const clientStubTS = new PasswordService(
+    "localhost:50051",
+    grpc.credentials.createInsecure()
+);
 
+const clientStubPY = new PasswordService(
+    "localhost:50052",
+    grpc.credentials.createInsecure()
+);
 
+clientStubTS.retrievePasswords({}, (error, passwords) => {
+    //implement your error logic here
+    console.log('clientStubTS', passwords);
+});
+clientStubPY.retrievePasswords({}, (error, passwords) => {
+    //implement your error logic here
+    console.log('clientStubPY', passwords);
+});
 
-// Bitcoin config
-interface IConfig {
-  sources: string[];
-}
-
-export default class Docker implements IRuntime {
-  public name = name;
-  public version = version;
-  public config!: IConfig;
-
-  async validateSetConfig(rawConfig: string): Promise<void> {
-    const config: IConfig = JSON.parse(rawConfig);
-    this.config = config;
-  }
-
-  async getDataItem(_: Validator, key: string): Promise<any> {
-    const options: http.RequestOptions = {
-      host: 'localhost',
-      port: 3000,
-      path: `/?arg1=${key}`, // Pass the arguments in the query string
-    };
-    const req = http.get(options, (res: any) => {
-      let data = '';
-      res.on('data', (chunk: any) => {
-        data += chunk;
-      });
-      res.on('end', () => {
-        console.log('Response from server:', data);
-      });
+const saltRounds = 10;
+let passwordToken = "5TgU76W&eRee!";
+let updatePasswordToken = "H7hG%$Yh33"
+bcrypt.genSalt(saltRounds, function (error, salt) {
+    bcrypt.hash(passwordToken, salt, function (error, hash) {
+        clientStubTS.addNewDetails(
+            {
+                id: Date.now(),
+                password: passwordToken,
+                hashValue: hash,
+                saltValue: salt,
+            },
+            (error, passwordDetails) => {
+                //implement your error logic here
+                console.log('clientStubTS', passwordDetails);
+            }
+        );
     });
+});
 
-    req.on('error', (error: any) => {
-      console.error('Error connecting to server:', error);
+bcrypt.genSalt(saltRounds, function (error, salt) {
+    bcrypt.hash(passwordToken, salt, function (error, hash) {
+        clientStubPY.addNewDetails(
+            {
+                id: Date.now(),
+                password: passwordToken,
+                hashValue: hash,
+                saltValue: salt,
+            },
+            (error, passwordDetails) => {
+                //implement your error logic here
+                console.log('clientStubPY', passwordDetails);
+            }
+        );
     });
-//     if (result.status !== 0) {
-//       throw new Error(result.stderr);
-//     } else {
-//       return { key, value: JSON.parse(result.stdout.toString()) };
-//     }
-  }
+});
 
-  async prevalidateDataItem(_: Validator, item: DataItem): Promise<boolean> {
-    return true;
-  }
-
-  async transformDataItem(_: Validator, item: DataItem): Promise<DataItem> {
-    return item;
-  }
-
-  async validateDataItem(
-    _: Validator,
-    proposedDataItem: DataItem,
-    validationDataItem: DataItem
-  ): Promise<boolean> {
-    // apply equal comparison
-    return (
-      JSON.stringify(proposedDataItem) === JSON.stringify(validationDataItem)
-    );
-  }
-
-  public async summarizeDataBundle(
-    _: Validator,
-    bundle: DataItem[]
-  ): Promise<string> {
-    return "";
-  }
-
-  public async nextKey(_: Validator, key: string): Promise<string> {
-    return (parseInt(key) + 1).toString();
-  }
-}
+bcrypt.genSalt(saltRounds, function (error, salt) {
+    //implement your error logic here
+    bcrypt.hash(updatePasswordToken, salt, function (error, hash) {
+        //implement your error logic here
+        clientStubTS.updatePasswordDetails(
+            {
+                /*
+                This is one of the defaultIDs of our dummy object's values.
+                You can change it to suit your needs
+                */
+                id: 153642,
+                password: updatePasswordToken,
+                hashValue: hash,
+                saltValue: salt,
+            },
+            (error, passwordDetails) => {
+                //implement your error logic here
+                console.log('clientStubTS', passwordDetails);
+            }
+        );
+    });
+});
+bcrypt.genSalt(saltRounds, function (error, salt) {
+    //implement your error logic here
+    bcrypt.hash(updatePasswordToken, salt, function (error, hash) {
+        //implement your error logic here
+        clientStubPY.updatePasswordDetails(
+            {
+                /*
+                This is one of the defaultIDs of our dummy object's values.
+                You can change it to suit your needs
+                */
+                id: 153642,
+                password: updatePasswordToken,
+                hashValue: hash,
+                saltValue: salt,
+            },
+            (error, passwordDetails) => {
+                //implement your error logic here
+                console.log('clientStubPY', passwordDetails);
+            }
+        );
+    });
+});
