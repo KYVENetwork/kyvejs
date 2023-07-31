@@ -50,12 +50,8 @@ KYVE, the Web3 data lake solution, is a protocol that enables data providers to 
 
 **Integrations:**
 
+- [@kyvejs/tendermint](integrations/tendermint/README.md) - The official KYVE Tendermint sync integration
 - [@kyvejs/tendermint-bsync](integrations/tendermint-bsync/README.md) - The official KYVE Tendermint block sync integration
-- [@kyvejs/bitcoin](integrations/bitcoin/README.md) - The official KYVE Bitcoin integration
-- [@kyvejs/celo](integrations/celo/README.md) - The official KYVE Celo integration
-- [@kyvejs/cosmos](integrations/cosmos/README.md) - The official KYVE Cosmos integration
-- [@kyvejs/evm](integrations/evm/README.md) - The official KYVE EVM integration
-- [@kyvejs/uniswap](integrations/uniswap/README.md) - The official KYVE Uniswap integration
 
 ## How to contribute
 
