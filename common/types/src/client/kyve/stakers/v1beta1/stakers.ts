@@ -17,8 +17,14 @@ export interface Staker {
   moniker: string;
   /** website ... */
   website: string;
-  /** logo ... */
-  logo: string;
+  /** identity is the 64 bit keybase.io identity string */
+  identity: string;
+  /** security_contact ... */
+  security_contact: string;
+  /** details are some additional notes the staker finds important */
+  details: string;
+  /** commission_rewards are the rewards in $KYVE earned through commission */
+  commission_rewards: string;
 }
 
 /**
@@ -82,13 +88,19 @@ export interface CommissionChangeEntry {
  * in the UI to the delegators.
  */
 export interface LeavePoolEntry {
-  /** index ... */
+  /**
+   * index is needed for the queue-algorithm which
+   * processes the commission changes
+   */
   index: string;
-  /** staker ... */
+  /** staker is the address of the affected staker */
   staker: string;
-  /** pool_id ... */
+  /** pool_id indicates the pool the staker wants to leave */
   pool_id: string;
-  /** creation_date ... */
+  /**
+   * creation_date is the UNIX-timestamp in seconds
+   * when the entry was created.
+   */
   creation_date: string;
 }
 
@@ -108,7 +120,16 @@ export interface QueueState {
 }
 
 function createBaseStaker(): Staker {
-  return { address: "", commission: "", moniker: "", website: "", logo: "" };
+  return {
+    address: "",
+    commission: "",
+    moniker: "",
+    website: "",
+    identity: "",
+    security_contact: "",
+    details: "",
+    commission_rewards: "0",
+  };
 }
 
 export const Staker = {
@@ -125,8 +146,17 @@ export const Staker = {
     if (message.website !== "") {
       writer.uint32(34).string(message.website);
     }
-    if (message.logo !== "") {
-      writer.uint32(42).string(message.logo);
+    if (message.identity !== "") {
+      writer.uint32(42).string(message.identity);
+    }
+    if (message.security_contact !== "") {
+      writer.uint32(50).string(message.security_contact);
+    }
+    if (message.details !== "") {
+      writer.uint32(58).string(message.details);
+    }
+    if (message.commission_rewards !== "0") {
+      writer.uint32(64).uint64(message.commission_rewards);
     }
     return writer;
   },
@@ -151,7 +181,16 @@ export const Staker = {
           message.website = reader.string();
           break;
         case 5:
-          message.logo = reader.string();
+          message.identity = reader.string();
+          break;
+        case 6:
+          message.security_contact = reader.string();
+          break;
+        case 7:
+          message.details = reader.string();
+          break;
+        case 8:
+          message.commission_rewards = longToString(reader.uint64() as Long);
           break;
         default:
           reader.skipType(tag & 7);
@@ -167,7 +206,10 @@ export const Staker = {
       commission: isSet(object.commission) ? String(object.commission) : "",
       moniker: isSet(object.moniker) ? String(object.moniker) : "",
       website: isSet(object.website) ? String(object.website) : "",
-      logo: isSet(object.logo) ? String(object.logo) : "",
+      identity: isSet(object.identity) ? String(object.identity) : "",
+      security_contact: isSet(object.security_contact) ? String(object.security_contact) : "",
+      details: isSet(object.details) ? String(object.details) : "",
+      commission_rewards: isSet(object.commission_rewards) ? String(object.commission_rewards) : "0",
     };
   },
 
@@ -177,7 +219,10 @@ export const Staker = {
     message.commission !== undefined && (obj.commission = message.commission);
     message.moniker !== undefined && (obj.moniker = message.moniker);
     message.website !== undefined && (obj.website = message.website);
-    message.logo !== undefined && (obj.logo = message.logo);
+    message.identity !== undefined && (obj.identity = message.identity);
+    message.security_contact !== undefined && (obj.security_contact = message.security_contact);
+    message.details !== undefined && (obj.details = message.details);
+    message.commission_rewards !== undefined && (obj.commission_rewards = message.commission_rewards);
     return obj;
   },
 
@@ -187,7 +232,10 @@ export const Staker = {
     message.commission = object.commission ?? "";
     message.moniker = object.moniker ?? "";
     message.website = object.website ?? "";
-    message.logo = object.logo ?? "";
+    message.identity = object.identity ?? "";
+    message.security_contact = object.security_contact ?? "";
+    message.details = object.details ?? "";
+    message.commission_rewards = object.commission_rewards ?? "0";
     return message;
   },
 };

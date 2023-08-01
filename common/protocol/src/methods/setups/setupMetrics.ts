@@ -2,7 +2,7 @@ import http from "http";
 import prom_client, { register } from "prom-client";
 import url from "url";
 
-import { IMetrics, Validator, standardizeJSON } from "../..";
+import { IMetrics, Validator, standardizeError } from "../..";
 
 /**
  * setupMetrics initiates all metrics and starts if enabled a local prometheus
@@ -360,33 +360,33 @@ export function setupMetrics(this: Validator): void {
       help: "The current index of the first data item in the cache.",
     });
 
-    // GAS METRICS
+    // FEE METRICS
 
-    this.logger.debug(`Initializing metrics: gas_claim_uploader_role`);
+    this.logger.debug(`Initializing metrics: fees_claim_uploader_role`);
 
-    this.m.gas_claim_uploader_role = new prom_client.Gauge({
-      name: "gas_claim_uploader_role",
+    this.m.fees_claim_uploader_role = new prom_client.Counter({
+      name: "fees_claim_uploader_role",
       help: "The current gas costs of tx claim uploader role metrics",
     });
 
-    this.logger.debug(`Initializing metrics: gas_vote_bundle_proposal`);
+    this.logger.debug(`Initializing metrics: fees_vote_bundle_proposal`);
 
-    this.m.gas_vote_bundle_proposal = new prom_client.Gauge({
-      name: "gas_vote_bundle_proposal",
+    this.m.fees_vote_bundle_proposal = new prom_client.Counter({
+      name: "fees_vote_bundle_proposal",
       help: "The current gas costs of tx vote bundle proposal metrics",
     });
 
-    this.logger.debug(`Initializing metrics: gas_submit_bundle_proposal`);
+    this.logger.debug(`Initializing metrics: fees_submit_bundle_proposal`);
 
-    this.m.gas_submit_bundle_proposal = new prom_client.Gauge({
-      name: "gas_submit_bundle_proposal",
+    this.m.fees_submit_bundle_proposal = new prom_client.Counter({
+      name: "fees_submit_bundle_proposal",
       help: "The current gas costs of tx submit bundle proposal metrics",
     });
 
-    this.logger.debug(`Initializing metrics: gas_skip_uploader_role`);
+    this.logger.debug(`Initializing metrics: fees_skip_uploader_role`);
 
-    this.m.gas_skip_uploader_role = new prom_client.Gauge({
-      name: "gas_skip_uploader_role",
+    this.m.fees_skip_uploader_role = new prom_client.Counter({
+      name: "fees_skip_uploader_role",
       help: "The current gas costs of tx skip uploader role metrics",
     });
 
@@ -413,7 +413,7 @@ export function setupMetrics(this: Validator): void {
     }
   } catch (err) {
     this.logger.fatal(`Failed to setup metrics. Exiting ...`);
-    this.logger.fatal(standardizeJSON(err));
+    this.logger.fatal(standardizeError(err));
 
     process.exit(1);
   }

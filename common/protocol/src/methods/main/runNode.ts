@@ -27,16 +27,27 @@ export async function runNode(this: Validator): Promise<void> {
 
     // get latest state of the chain to start round
     await this.syncPoolState();
-    await this.getBalances();
+    await this.getBalancesForMetrics();
 
     // perform basic validation checks, if one fails exit
-    this.validateRuntime();
-    this.validateVersion();
-    this.validateIsNodeValidator();
+    if (!this.isValidRuntime()) {
+      process.exit(1);
+    }
+
+    if (!this.isValidVersion()) {
+      process.exit(1);
+    }
+
+    if (!this.isNodeValidator()) {
+      process.exit(1);
+    }
+
+    // log warnings if storage provider balance is low
+    await this.isStorageBalanceLow();
 
     // perform basic logic checks if pool is up and running, if it fails
     // idle until pool is active again
-    if (this.validateIsPoolActive()) {
+    if (!this.isPoolActive()) {
       await sleep(IDLE_TIME);
       endTimeRound();
       continue;
@@ -71,7 +82,12 @@ export async function runNode(this: Validator): Promise<void> {
     // by calling a special query from chain
     if (await this.canVote(updatedAt)) {
       // if the node can vote the node validates the current bundle proposal
-      await this.validateBundleProposal(updatedAt);
+      const success = await this.validateBundleProposal(updatedAt);
+
+      if (!success) {
+        this.logger.info(`Retrying to validate bundle proposal`);
+        continue;
+      }
     }
 
     // wait until the upload interval has passed to continue with the proposal

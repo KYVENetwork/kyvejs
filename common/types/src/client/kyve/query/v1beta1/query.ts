@@ -92,8 +92,12 @@ export interface StakerMetadata {
   moniker: string;
   /** website is a https-link to the website of the staker */
   website: string;
-  /** logo is a link to an image file (like jpg or png) */
-  logo: string;
+  /** identity from keybase.io */
+  identity: string;
+  /** security_contact ... */
+  security_contact: string;
+  /** details ... */
+  details: string;
   /**
    * pending_commission_change shows if the staker plans
    * to change its commission. Delegators will see a warning in
@@ -102,6 +106,8 @@ export interface StakerMetadata {
    * if they not agree with the new commission.
    */
   pending_commission_change?: CommissionChangeEntry;
+  /** commission_rewards are the rewards in $KYVE earned through commission */
+  commission_rewards: string;
 }
 
 /**
@@ -408,7 +414,16 @@ export const FullStaker = {
 };
 
 function createBaseStakerMetadata(): StakerMetadata {
-  return { commission: "", moniker: "", website: "", logo: "", pending_commission_change: undefined };
+  return {
+    commission: "",
+    moniker: "",
+    website: "",
+    identity: "",
+    security_contact: "",
+    details: "",
+    pending_commission_change: undefined,
+    commission_rewards: "0",
+  };
 }
 
 export const StakerMetadata = {
@@ -422,11 +437,20 @@ export const StakerMetadata = {
     if (message.website !== "") {
       writer.uint32(26).string(message.website);
     }
-    if (message.logo !== "") {
-      writer.uint32(34).string(message.logo);
+    if (message.identity !== "") {
+      writer.uint32(34).string(message.identity);
+    }
+    if (message.security_contact !== "") {
+      writer.uint32(42).string(message.security_contact);
+    }
+    if (message.details !== "") {
+      writer.uint32(50).string(message.details);
     }
     if (message.pending_commission_change !== undefined) {
-      CommissionChangeEntry.encode(message.pending_commission_change, writer.uint32(42).fork()).ldelim();
+      CommissionChangeEntry.encode(message.pending_commission_change, writer.uint32(58).fork()).ldelim();
+    }
+    if (message.commission_rewards !== "0") {
+      writer.uint32(64).uint64(message.commission_rewards);
     }
     return writer;
   },
@@ -448,10 +472,19 @@ export const StakerMetadata = {
           message.website = reader.string();
           break;
         case 4:
-          message.logo = reader.string();
+          message.identity = reader.string();
           break;
         case 5:
+          message.security_contact = reader.string();
+          break;
+        case 6:
+          message.details = reader.string();
+          break;
+        case 7:
           message.pending_commission_change = CommissionChangeEntry.decode(reader, reader.uint32());
+          break;
+        case 8:
+          message.commission_rewards = longToString(reader.uint64() as Long);
           break;
         default:
           reader.skipType(tag & 7);
@@ -466,10 +499,13 @@ export const StakerMetadata = {
       commission: isSet(object.commission) ? String(object.commission) : "",
       moniker: isSet(object.moniker) ? String(object.moniker) : "",
       website: isSet(object.website) ? String(object.website) : "",
-      logo: isSet(object.logo) ? String(object.logo) : "",
+      identity: isSet(object.identity) ? String(object.identity) : "",
+      security_contact: isSet(object.security_contact) ? String(object.security_contact) : "",
+      details: isSet(object.details) ? String(object.details) : "",
       pending_commission_change: isSet(object.pending_commission_change)
         ? CommissionChangeEntry.fromJSON(object.pending_commission_change)
         : undefined,
+      commission_rewards: isSet(object.commission_rewards) ? String(object.commission_rewards) : "0",
     };
   },
 
@@ -478,11 +514,14 @@ export const StakerMetadata = {
     message.commission !== undefined && (obj.commission = message.commission);
     message.moniker !== undefined && (obj.moniker = message.moniker);
     message.website !== undefined && (obj.website = message.website);
-    message.logo !== undefined && (obj.logo = message.logo);
+    message.identity !== undefined && (obj.identity = message.identity);
+    message.security_contact !== undefined && (obj.security_contact = message.security_contact);
+    message.details !== undefined && (obj.details = message.details);
     message.pending_commission_change !== undefined &&
       (obj.pending_commission_change = message.pending_commission_change
         ? CommissionChangeEntry.toJSON(message.pending_commission_change)
         : undefined);
+    message.commission_rewards !== undefined && (obj.commission_rewards = message.commission_rewards);
     return obj;
   },
 
@@ -491,11 +530,14 @@ export const StakerMetadata = {
     message.commission = object.commission ?? "";
     message.moniker = object.moniker ?? "";
     message.website = object.website ?? "";
-    message.logo = object.logo ?? "";
+    message.identity = object.identity ?? "";
+    message.security_contact = object.security_contact ?? "";
+    message.details = object.details ?? "";
     message.pending_commission_change =
       (object.pending_commission_change !== undefined && object.pending_commission_change !== null)
         ? CommissionChangeEntry.fromPartial(object.pending_commission_change)
         : undefined;
+    message.commission_rewards = object.commission_rewards ?? "0";
     return message;
   },
 };

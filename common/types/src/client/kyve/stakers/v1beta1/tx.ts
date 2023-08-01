@@ -4,12 +4,17 @@ import _m0 from "protobufjs/minimal";
 
 export const protobufPackage = "kyve.stakers.v1beta1";
 
-/** MsgStakePool defines a SDK message for staking in a pool. */
+/** MsgCreateStaker defines a SDK message for creating a staker. */
 export interface MsgCreateStaker {
-  /** creator ... */
+  /** creator is the address of the staker. */
   creator: string;
-  /** amount ... */
+  /** amount is the initial self-stake of the staker. */
   amount: string;
+  /**
+   * commission is the percentage that is deducted from rewards before
+   * distributing the staker's delegators.
+   */
+  commission: string;
 }
 
 /** MsgStakePoolResponse defines the Msg/StakePool response type. */
@@ -24,8 +29,12 @@ export interface MsgUpdateMetadata {
   moniker: string;
   /** website ... */
   website: string;
-  /** logo */
-  logo: string;
+  /** identity from keybase.io */
+  identity: string;
+  /** security_contact ... */
+  security_contact: string;
+  /** details ... */
+  details: string;
 }
 
 /** MsgUpdateMetadataResponse defines the Msg/MsgUpdateMetadata response type. */
@@ -42,6 +51,18 @@ export interface MsgUpdateCommission {
 
 /** MsgUpdateCommissionResponse ... */
 export interface MsgUpdateCommissionResponse {
+}
+
+/** MsgClaimCommissionRewards ... */
+export interface MsgClaimCommissionRewards {
+  /** creator ... */
+  creator: string;
+  /** amount ... */
+  amount: string;
+}
+
+/** MsgClaimCommissionRewardsResponse ... */
+export interface MsgClaimCommissionRewardsResponse {
 }
 
 /** MsgJoinPool ... */
@@ -85,7 +106,7 @@ export interface MsgUpdateParamsResponse {
 }
 
 function createBaseMsgCreateStaker(): MsgCreateStaker {
-  return { creator: "", amount: "0" };
+  return { creator: "", amount: "0", commission: "" };
 }
 
 export const MsgCreateStaker = {
@@ -95,6 +116,9 @@ export const MsgCreateStaker = {
     }
     if (message.amount !== "0") {
       writer.uint32(16).uint64(message.amount);
+    }
+    if (message.commission !== "") {
+      writer.uint32(26).string(message.commission);
     }
     return writer;
   },
@@ -112,6 +136,9 @@ export const MsgCreateStaker = {
         case 2:
           message.amount = longToString(reader.uint64() as Long);
           break;
+        case 3:
+          message.commission = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -124,6 +151,7 @@ export const MsgCreateStaker = {
     return {
       creator: isSet(object.creator) ? String(object.creator) : "",
       amount: isSet(object.amount) ? String(object.amount) : "0",
+      commission: isSet(object.commission) ? String(object.commission) : "",
     };
   },
 
@@ -131,6 +159,7 @@ export const MsgCreateStaker = {
     const obj: any = {};
     message.creator !== undefined && (obj.creator = message.creator);
     message.amount !== undefined && (obj.amount = message.amount);
+    message.commission !== undefined && (obj.commission = message.commission);
     return obj;
   },
 
@@ -138,6 +167,7 @@ export const MsgCreateStaker = {
     const message = createBaseMsgCreateStaker();
     message.creator = object.creator ?? "";
     message.amount = object.amount ?? "0";
+    message.commission = object.commission ?? "";
     return message;
   },
 };
@@ -182,7 +212,7 @@ export const MsgCreateStakerResponse = {
 };
 
 function createBaseMsgUpdateMetadata(): MsgUpdateMetadata {
-  return { creator: "", moniker: "", website: "", logo: "" };
+  return { creator: "", moniker: "", website: "", identity: "", security_contact: "", details: "" };
 }
 
 export const MsgUpdateMetadata = {
@@ -196,8 +226,14 @@ export const MsgUpdateMetadata = {
     if (message.website !== "") {
       writer.uint32(26).string(message.website);
     }
-    if (message.logo !== "") {
-      writer.uint32(34).string(message.logo);
+    if (message.identity !== "") {
+      writer.uint32(34).string(message.identity);
+    }
+    if (message.security_contact !== "") {
+      writer.uint32(42).string(message.security_contact);
+    }
+    if (message.details !== "") {
+      writer.uint32(50).string(message.details);
     }
     return writer;
   },
@@ -219,7 +255,13 @@ export const MsgUpdateMetadata = {
           message.website = reader.string();
           break;
         case 4:
-          message.logo = reader.string();
+          message.identity = reader.string();
+          break;
+        case 5:
+          message.security_contact = reader.string();
+          break;
+        case 6:
+          message.details = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -234,7 +276,9 @@ export const MsgUpdateMetadata = {
       creator: isSet(object.creator) ? String(object.creator) : "",
       moniker: isSet(object.moniker) ? String(object.moniker) : "",
       website: isSet(object.website) ? String(object.website) : "",
-      logo: isSet(object.logo) ? String(object.logo) : "",
+      identity: isSet(object.identity) ? String(object.identity) : "",
+      security_contact: isSet(object.security_contact) ? String(object.security_contact) : "",
+      details: isSet(object.details) ? String(object.details) : "",
     };
   },
 
@@ -243,7 +287,9 @@ export const MsgUpdateMetadata = {
     message.creator !== undefined && (obj.creator = message.creator);
     message.moniker !== undefined && (obj.moniker = message.moniker);
     message.website !== undefined && (obj.website = message.website);
-    message.logo !== undefined && (obj.logo = message.logo);
+    message.identity !== undefined && (obj.identity = message.identity);
+    message.security_contact !== undefined && (obj.security_contact = message.security_contact);
+    message.details !== undefined && (obj.details = message.details);
     return obj;
   },
 
@@ -252,7 +298,9 @@ export const MsgUpdateMetadata = {
     message.creator = object.creator ?? "";
     message.moniker = object.moniker ?? "";
     message.website = object.website ?? "";
-    message.logo = object.logo ?? "";
+    message.identity = object.identity ?? "";
+    message.security_contact = object.security_contact ?? "";
+    message.details = object.details ?? "";
     return message;
   },
 };
@@ -389,6 +437,105 @@ export const MsgUpdateCommissionResponse = {
 
   fromPartial<I extends Exact<DeepPartial<MsgUpdateCommissionResponse>, I>>(_: I): MsgUpdateCommissionResponse {
     const message = createBaseMsgUpdateCommissionResponse();
+    return message;
+  },
+};
+
+function createBaseMsgClaimCommissionRewards(): MsgClaimCommissionRewards {
+  return { creator: "", amount: "0" };
+}
+
+export const MsgClaimCommissionRewards = {
+  encode(message: MsgClaimCommissionRewards, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.amount !== "0") {
+      writer.uint32(16).uint64(message.amount);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgClaimCommissionRewards {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgClaimCommissionRewards();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.amount = longToString(reader.uint64() as Long);
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgClaimCommissionRewards {
+    return {
+      creator: isSet(object.creator) ? String(object.creator) : "",
+      amount: isSet(object.amount) ? String(object.amount) : "0",
+    };
+  },
+
+  toJSON(message: MsgClaimCommissionRewards): unknown {
+    const obj: any = {};
+    message.creator !== undefined && (obj.creator = message.creator);
+    message.amount !== undefined && (obj.amount = message.amount);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<MsgClaimCommissionRewards>, I>>(object: I): MsgClaimCommissionRewards {
+    const message = createBaseMsgClaimCommissionRewards();
+    message.creator = object.creator ?? "";
+    message.amount = object.amount ?? "0";
+    return message;
+  },
+};
+
+function createBaseMsgClaimCommissionRewardsResponse(): MsgClaimCommissionRewardsResponse {
+  return {};
+}
+
+export const MsgClaimCommissionRewardsResponse = {
+  encode(_: MsgClaimCommissionRewardsResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgClaimCommissionRewardsResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgClaimCommissionRewardsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(_: any): MsgClaimCommissionRewardsResponse {
+    return {};
+  },
+
+  toJSON(_: MsgClaimCommissionRewardsResponse): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<MsgClaimCommissionRewardsResponse>, I>>(
+    _: I,
+  ): MsgClaimCommissionRewardsResponse {
+    const message = createBaseMsgClaimCommissionRewardsResponse();
     return message;
   },
 };
@@ -710,6 +857,8 @@ export interface Msg {
   UpdateMetadata(request: MsgUpdateMetadata): Promise<MsgUpdateMetadataResponse>;
   /** UpdateCommission ... */
   UpdateCommission(request: MsgUpdateCommission): Promise<MsgUpdateCommissionResponse>;
+  /** ClaimCommissionRewards ... */
+  ClaimCommissionRewards(request: MsgClaimCommissionRewards): Promise<MsgClaimCommissionRewardsResponse>;
   /** JoinPool ... */
   JoinPool(request: MsgJoinPool): Promise<MsgJoinPoolResponse>;
   /** LeavePool ... */
@@ -730,6 +879,7 @@ export class MsgClientImpl implements Msg {
     this.CreateStaker = this.CreateStaker.bind(this);
     this.UpdateMetadata = this.UpdateMetadata.bind(this);
     this.UpdateCommission = this.UpdateCommission.bind(this);
+    this.ClaimCommissionRewards = this.ClaimCommissionRewards.bind(this);
     this.JoinPool = this.JoinPool.bind(this);
     this.LeavePool = this.LeavePool.bind(this);
     this.UpdateParams = this.UpdateParams.bind(this);
@@ -750,6 +900,12 @@ export class MsgClientImpl implements Msg {
     const data = MsgUpdateCommission.encode(request).finish();
     const promise = this.rpc.request(this.service, "UpdateCommission", data);
     return promise.then((data) => MsgUpdateCommissionResponse.decode(new _m0.Reader(data)));
+  }
+
+  ClaimCommissionRewards(request: MsgClaimCommissionRewards): Promise<MsgClaimCommissionRewardsResponse> {
+    const data = MsgClaimCommissionRewards.encode(request).finish();
+    const promise = this.rpc.request(this.service, "ClaimCommissionRewards", data);
+    return promise.then((data) => MsgClaimCommissionRewardsResponse.decode(new _m0.Reader(data)));
   }
 
   JoinPool(request: MsgJoinPool): Promise<MsgJoinPoolResponse> {

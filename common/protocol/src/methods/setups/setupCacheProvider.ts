@@ -1,7 +1,6 @@
 import path from "path";
 
-import { Validator, standardizeJSON } from "../..";
-import * as cacheProvider from "../../reactors/cacheProvider";
+import { Validator, standardizeError } from "../..";
 import fse from "fs-extra";
 
 /**
@@ -19,18 +18,8 @@ export async function setupCacheProvider(this: Validator): Promise<void> {
 
     this.logger.debug(`Initializing cache provider with path ${cachePath}`);
 
-    // create cache provider depending on chosen cache type.
-    // Default is leveldb cache
-    switch (this.cache) {
-      case "memory":
-        this.cacheProvider = new cacheProvider.MemoryCache();
-        break;
-      case "jsonfile":
-        this.cacheProvider = new cacheProvider.JsonFileCache();
-        break;
-      default:
-        this.cacheProvider = new cacheProvider.JsonFileCache();
-    }
+    // create cache provider depending on chosen cache type
+    this.cacheProvider = Validator.cacheProviderFactory(this.cache);
 
     // delete all contents of cache directory
     await fse.emptyDir(`${cachePath}/`);
@@ -42,7 +31,7 @@ export async function setupCacheProvider(this: Validator): Promise<void> {
     this.logger.info(`Using cache provider: ${this.cacheProvider.name}`);
   } catch (err) {
     this.logger.fatal(`Failed to setup cache provider. Exiting ...`);
-    this.logger.fatal(standardizeJSON(err));
+    this.logger.fatal(standardizeError(err));
 
     process.exit(1);
   }

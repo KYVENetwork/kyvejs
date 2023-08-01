@@ -12,7 +12,7 @@ import {
 } from "@cosmostation/extension-client/types/message";
 import { SignDoc } from "cosmjs-types/cosmos/tx/v1beta1/tx";
 
-import { Network } from "../constants";
+import { IConfig } from "../constants";
 
 export const cosmostationMethods = {
   getSupportedChains() {
@@ -40,7 +40,6 @@ export const cosmostationMethods = {
         doc,
         isEditMemo: !!options?.memo,
         isEditFee: !!options?.fee,
-        gasRate: options?.gasRate,
       },
     });
   },
@@ -59,16 +58,16 @@ export const cosmostationMethods = {
 };
 
 export class CosmostationSigner implements OfflineDirectSigner {
-  private network: Network;
+  private config: IConfig;
   private cosmostationAccount: RequestAccountResponse;
   private cosmostationOption: SignOptions | undefined;
 
   constructor(
     cosmostationAccount: RequestAccountResponse,
-    network: Network,
+    config: IConfig,
     cosmostationOption?: SignOptions
   ) {
-    this.network = network;
+    this.config = config;
     this.cosmostationAccount = cosmostationAccount;
     this.cosmostationOption = cosmostationOption;
   }
@@ -86,7 +85,7 @@ export class CosmostationSigner implements OfflineDirectSigner {
 
   async signDirect(signerAddress: string, signDoc: SignDoc) {
     const signedResult = await cosmostationMethods.signDirect(
-      this.network.chainId,
+      this.config.chainId,
       {
         chain_id: signDoc.chainId,
         body_bytes: signDoc.bodyBytes,
@@ -96,7 +95,7 @@ export class CosmostationSigner implements OfflineDirectSigner {
       this.cosmostationOption
     );
     const currentAccountAddress = await cosmostationMethods.requestAccount(
-      this.network.chainId
+      this.config.chainId
     );
     if (this.cosmostationAccount.address !== currentAccountAddress.address) {
       throw new Error("Unknown signer address");

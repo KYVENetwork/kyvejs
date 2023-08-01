@@ -7,23 +7,22 @@ import { Logger } from "tslog";
 import { version as protocolVersion } from "../package.json";
 import {
   parseCache,
-  parseMnemonic,
-  parseNetwork,
+  parseEndpoints,
+  parseValaccount,
   parsePoolId,
 } from "./commander";
 import {
+  archiveDebugBundle,
   canPropose,
   canVote,
   claimUploaderRole,
-  compressionFactory,
   continueRound,
   createBundleProposal,
-  getBalances,
+  getBalancesForMetrics,
   runCache,
   runNode,
   saveBundleDecompress,
   saveBundleDownload,
-  saveGetTransformDataItem,
   saveLoadValidationBundle,
   setupCacheProvider,
   setupLogger,
@@ -31,25 +30,29 @@ import {
   setupSDK,
   setupValidator,
   skipUploaderRole,
-  storageProviderFactory,
   submitBundleProposal,
-  syncPoolConfig,
   syncPoolState,
   validateBundleProposal,
-  validateIsNodeValidator,
-  validateIsPoolActive,
-  validateRuntime,
-  validateStorageBalance,
-  validateVersion,
+  isNodeValidator,
+  isPoolActive,
+  isValidRuntime,
+  isStorageBalanceZero,
+  isValidVersion,
+  isDataAvailable,
   voteBundleProposal,
   waitForAuthorization,
   waitForCacheContinuation,
   waitForNextBundleProposal,
   waitForUploadInterval,
   getProxyAuth,
+  isStorageBalanceLow,
 } from "./methods";
 import { ICacheProvider, IMetrics, IRuntime } from "./types";
-import { standardizeJSON } from "./utils";
+import { standardizeError } from "./utils";
+import { SupportedChains } from "@kyvejs/sdk/dist/constants";
+import { storageProviderFactory } from "./reactors/storageProviders";
+import { compressionFactory } from "./reactors/compression";
+import { cacheProviderFactory } from "./reactors/cacheProvider";
 
 /**
  * Main class of KYVE protocol nodes representing a validator node.
@@ -63,14 +66,13 @@ export class Validator {
   protected cacheProvider!: ICacheProvider;
 
   // sdk attributes
-  public sdk!: KyveSDK;
-  public client!: KyveClient;
-  public lcd!: KyveLCDClientType;
+  public sdk!: KyveSDK[];
+  public client!: KyveClient[];
+  public lcd!: KyveLCDClientType[];
 
   // node attributes
   public protocolVersion!: string;
   public pool!: PoolResponse;
-  public poolConfig!: any;
   public name!: string;
 
   // logger attributes
@@ -84,9 +86,13 @@ export class Validator {
   protected staker!: string;
   protected valaccount!: string;
   protected storagePriv!: string;
-  protected network!: string;
-  protected rpc!: string;
-  protected rest!: string;
+  protected chainId!: SupportedChains;
+  protected rpc!: string[];
+  protected rest!: string[];
+  protected coinDenom!: string;
+  protected coinDecimals!: number;
+  protected gasPrice!: number;
+  protected requestBackoff!: number;
   protected cache!: string;
   protected debug!: boolean;
   protected metrics!: boolean;
@@ -101,10 +107,13 @@ export class Validator {
   protected setupValidator = setupValidator;
 
   // checks
-  protected validateRuntime = validateRuntime;
-  protected validateVersion = validateVersion;
-  protected validateIsNodeValidator = validateIsNodeValidator;
-  protected validateIsPoolActive = validateIsPoolActive;
+  protected isValidRuntime = isValidRuntime;
+  protected isValidVersion = isValidVersion;
+  protected isNodeValidator = isNodeValidator;
+  protected isPoolActive = isPoolActive;
+  protected isStorageBalanceZero = isStorageBalanceZero;
+  protected isStorageBalanceLow = isStorageBalanceLow;
+  protected isDataAvailable = isDataAvailable;
 
   // timeouts
   protected waitForAuthorization = waitForAuthorization;
@@ -113,13 +122,9 @@ export class Validator {
   protected waitForCacheContinuation = waitForCacheContinuation;
 
   // helpers
+  protected archiveDebugBundle = archiveDebugBundle;
   protected continueRound = continueRound;
-  protected saveGetTransformDataItem = saveGetTransformDataItem;
   public getProxyAuth = getProxyAuth;
-
-  // factories
-  protected storageProviderFactory = storageProviderFactory;
-  protected compressionFactory = compressionFactory;
 
   // txs
   protected claimUploaderRole = claimUploaderRole;
@@ -129,8 +134,7 @@ export class Validator {
 
   // queries
   protected syncPoolState = syncPoolState;
-  protected syncPoolConfig = syncPoolConfig;
-  protected getBalances = getBalances;
+  protected getBalancesForMetrics = getBalancesForMetrics;
   protected canVote = canVote;
   protected canPropose = canPropose;
 
@@ -139,7 +143,6 @@ export class Validator {
   protected saveBundleDecompress = saveBundleDecompress;
   protected saveLoadValidationBundle = saveLoadValidationBundle;
   protected validateBundleProposal = validateBundleProposal;
-  protected validateStorageBalance = validateStorageBalance;
 
   // upload
   protected createBundleProposal = createBundleProposal;
@@ -147,6 +150,11 @@ export class Validator {
   // main
   protected runNode = runNode;
   protected runCache = runCache;
+
+  // factories
+  public static cacheProviderFactory = cacheProviderFactory;
+  public static storageProviderFactory = storageProviderFactory;
+  public static compressionFactory = compressionFactory;
 
   /**
    * Constructor for the validator class. It is required to provide the
@@ -198,25 +206,40 @@ export class Validator {
       )
       .requiredOption(
         "--valaccount <string>",
-        "The mnemonic of the valaccount",
-        parseMnemonic
+        "The environment variable pointing to the valaccount mnemonic",
+        parseValaccount
+      )
+      .requiredOption("--chain-id <string>", "The chain ID of the network")
+      .requiredOption(
+        "--rpc <string>",
+        "Comma seperated list of rpc endpoints. If the first fails the next endpoint will be used as fallback.",
+        parseEndpoints
       )
       .requiredOption(
+        "--rest <string>",
+        "Comma separated list of rest endpoints. If the first fails the next endpoint will be used as fallback.",
+        parseEndpoints
+      )
+      .option(
         "--storage-priv <string>",
-        "The private key of the storage provider"
-      )
-      .requiredOption(
-        "--network <local|alpha|beta|korellia>",
-        "The network of the KYVE chain",
-        parseNetwork
+        "The environment variable pointing to the private key of the storage provider. Only required when using storage providers Arweave or Bundlr."
       )
       .option(
-        "--rpc",
-        "Custom rpc endpoint the node uses for submitting transactions to chain"
+        "--coin-denom <string>",
+        "The denom of the coin, this value will be loaded by default based on the chain id"
       )
       .option(
-        "--rest",
-        "Custom rest api endpoint the node uses for querying from chain"
+        "--coin-decimals <number>",
+        "The decimals of the coin, this value will be loaded by default based on the chain id"
+      )
+      .option(
+        "--gas-price <number>",
+        "The gas price the node should use to calculate transaction fees, this value will be loaded by default based on the chain id"
+      )
+      .option(
+        "--request-backoff <number>",
+        "The time in milliseconds between each getDataItem request where the node sleeps [default = 50]",
+        "50"
       )
       .option(
         "--cache <jsonfile|memory>",
@@ -225,10 +248,6 @@ export class Validator {
         "jsonfile"
       )
       .option("--debug", "Run the validator node in debug mode")
-      .option(
-        "--verbose",
-        "[DEPRECATED] Run the validator node in verbose logging mode"
-      )
       .option(
         "--metrics",
         "Start a prometheus metrics server on http://localhost:8080/metrics"
@@ -263,28 +282,47 @@ export class Validator {
    * @return {Promise<void>}
    */
   private async start(options: OptionValues): Promise<void> {
-    // assign program options
-    // to node instance
+    // assign program options to node instance
     this.poolId = options.pool;
     this.valaccount = options.valaccount;
-    this.storagePriv = options.storagePriv;
-    this.network = options.network;
+    this.storagePriv = process.env[options.storagePriv] || "";
+    this.chainId = options.chainId;
     this.rpc = options.rpc;
     this.rest = options.rest;
+    this.coinDenom = options.coinDenom;
+    this.coinDecimals = options.coinDecimals;
+    this.gasPrice = options.gasPrice;
+    this.requestBackoff = parseInt(options.requestBackoff);
     this.cache = options.cache;
     this.debug = options.debug;
     this.metrics = options.metrics;
-    this.metricsPort = options.metricsPort;
+    this.metricsPort = parseInt(options.metricsPort);
     this.home = options.home;
 
     // perform setups
     this.setupLogger();
     this.setupMetrics();
 
-    // perform async setups
     await this.setupSDK();
-    await this.syncPoolState();
-    await this.validateStorageBalance();
+    await this.syncPoolState(true);
+
+    // perform validation checks
+    if (!this.isValidRuntime()) {
+      process.exit(1);
+    }
+
+    if (!this.isValidVersion()) {
+      process.exit(1);
+    }
+
+    if (await this.isStorageBalanceZero()) {
+      process.exit(1);
+    }
+
+    if (!(await this.isDataAvailable())) {
+      process.exit(1);
+    }
+
     await this.setupValidator();
     await this.setupCacheProvider();
 
@@ -295,7 +333,7 @@ export class Validator {
       this.runCache();
     } catch (err) {
       this.logger.fatal(`Unexpected runtime error. Exiting ...`);
-      this.logger.fatal(standardizeJSON(err));
+      this.logger.fatal(standardizeError(err));
 
       process.exit(1);
     }

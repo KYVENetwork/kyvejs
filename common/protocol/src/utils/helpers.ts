@@ -25,6 +25,21 @@ export const standardizeJSON = (object: any): any =>
   JSON.parse(JSON.stringify(object));
 
 /**
+ * Standardizes any error object
+ *
+ * @method standardizeError
+ * @param {any} error
+ * @return {any}
+ */
+export const standardizeError = (error: any): any => {
+  try {
+    return standardizeJSON(error);
+  } catch {
+    return error;
+  }
+};
+
+/**
  * Transforms a data bundle to raw bytes
  *
  * @method bundleToBytes
@@ -60,6 +75,17 @@ export const sha256 = (data: Buffer): string => {
 };
 
 /**
+ * Creates a sha256 hash of a JSON object
+ *
+ * @method sha256FromJson
+ * @param {any} data
+ * @return {string}
+ */
+export const sha256FromJson = (data: any): string => {
+  return sha256(Buffer.from(JSON.stringify(data)));
+};
+
+/**
  * Formats any bignumber into a human readable format
  *
  * @method toHumanReadable
@@ -77,28 +103,6 @@ export const toHumanReadable = (amount: string, precision = 4): string => {
   }
 
   return fmt.split(".")[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-};
-
-/**
- * Generates every index pair of an array length n. Note that this
- * method is O(n^2)
- *
- * @method generateIndexPairs
- * @param {number} n length of array
- * @return {[number, number][]}
- */
-export const generateIndexPairs = (n: number): [number, number][] => {
-  const pairs: [number, number][] = [];
-
-  for (let i = 0; i < n; i++) {
-    for (let j = 0; j < n; j++) {
-      if (i !== j && !pairs.some((pair) => pair[0] === j && pair[1] === i)) {
-        pairs.push([i, j]);
-      }
-    }
-  }
-
-  return pairs;
 };
 
 type OptionsRetryerType = {

@@ -1,6 +1,12 @@
+import BigNumber from "bignumber.js";
 import { Validator } from "../..";
 import { BundleTag, DataItem } from "../../types";
-import { bundleToBytes, sha256, standardizeJSON } from "../../utils";
+import {
+  bundleToBytes,
+  MAX_BUNDLE_BYTE_SIZE,
+  sha256,
+  standardizeError,
+} from "../../utils";
 
 /**
  * createBundleProposal assembles a bundle proposal by loading
@@ -86,7 +92,7 @@ export async function createBundleProposal(this: Validator): Promise<void> {
         this.logger.error(
           `Unexpected error summarizing bundle. Skipping Uploader Role ...`
         );
-        this.logger.error(standardizeJSON(err));
+        this.logger.error(standardizeError(err));
 
         return null;
       });
@@ -101,20 +107,32 @@ export async function createBundleProposal(this: Validator): Promise<void> {
     this.logger.debug(
       `compressionFactory(${this.pool.data?.current_compression_id ?? 0})`
     );
-    const compression = this.compressionFactory(
+    const compression = Validator.compressionFactory(
       this.pool.data?.current_compression_id ?? 0
     );
+
+    const uploadBundle = bundleToBytes(bundleProposal);
+
+    // check if raw bundle size is below the max limit
+    if (uploadBundle.byteLength > MAX_BUNDLE_BYTE_SIZE) {
+      this.logger.info(
+        `Bundle with byte size ${uploadBundle.byteLength} is too big (MAX_BUNDLE_BYTE_SIZE=${MAX_BUNDLE_BYTE_SIZE})`
+      );
+
+      await this.skipUploaderRole(fromIndex);
+      return;
+    }
 
     // if data was found on the cache proceed with compressing the
     // bundle for the upload to the storage provider
     this.logger.debug(`this.compression.compress($RAW_BUNDLE_PROPOSAL)`);
     const storageProviderData = await compression
-      .compress(bundleToBytes(bundleProposal))
+      .compress(uploadBundle)
       .catch((err) => {
         this.logger.error(
           `Unexpected error compressing bundle. Skipping Uploader Role ...`
         );
-        this.logger.error(standardizeJSON(err));
+        this.logger.error(standardizeError(err));
 
         return null;
       });
@@ -142,7 +160,7 @@ export async function createBundleProposal(this: Validator): Promise<void> {
       },
       {
         name: "ChainId",
-        value: await this.client.nativeClient.getChainId(),
+        value: this.chainId,
       },
       {
         name: "@kyvejs/protocol",
@@ -158,7 +176,7 @@ export async function createBundleProposal(this: Validator): Promise<void> {
       },
       {
         name: "Uploader",
-        value: this.client.account.address,
+        value: this.client[0].account.address,
       },
       {
         name: "FromIndex",
@@ -196,9 +214,23 @@ export async function createBundleProposal(this: Validator): Promise<void> {
           this.pool.data?.current_storage_provider_id ?? 0
         }, $STORAGE_PRIV)`
       );
-      const storageProvider = await this.storageProviderFactory(
-        this.pool.data?.current_storage_provider_id ?? 0
+      const storageProvider = Validator.storageProviderFactory(
+        this.pool.data?.current_storage_provider_id ?? 0,
+        this.storagePriv
       );
+
+      // if balance is less than the upload cost we skip the uploader
+      // role with a warning
+      const balance = await storageProvider.getBalance();
+      const cost = await storageProvider.getPrice(storageProviderData.length);
+
+      if (new BigNumber(balance).lt(cost)) {
+        this.logger.warn(
+          `Not enough balance on StorageProvider:${storageProvider.name}; balance = ${balance} required = ${cost}`
+        );
+        await this.skipUploaderRole(fromIndex);
+        return;
+      }
 
       // upload the bundle proposal to the storage provider
       // and get a storage id. With that other participants in the
@@ -234,7 +266,7 @@ export async function createBundleProposal(this: Validator): Promise<void> {
       // if the bundle was successfully uploaded to the storage provider
       // the node can finally submit the actual bundle proposal to
       // the network
-      await this.submitBundleProposal(
+      const success = await this.submitBundleProposal(
         storageId,
         dataSize,
         dataHash,
@@ -245,12 +277,14 @@ export async function createBundleProposal(this: Validator): Promise<void> {
         bundleSummary
       );
 
-      this.logger.info(`Successfully submitted BundleProposal:${storageId}`);
+      if (success) {
+        this.logger.info(`Successfully submitted BundleProposal:${storageId}`);
+      }
     } catch (err) {
       this.logger.info(
-        `Saving bundle proposal on StorageProvider was unsucessful`
+        `Saving bundle proposal on StorageProvider was unsuccessful`
       );
-      this.logger.debug(standardizeJSON(err));
+      this.logger.debug(standardizeError(err));
 
       this.m.storage_provider_save_failed.inc();
 
@@ -262,6 +296,6 @@ export async function createBundleProposal(this: Validator): Promise<void> {
     this.logger.error(
       `Unexpected error creating bundle proposal. Skipping proposal ...`
     );
-    this.logger.error(standardizeJSON(err));
+    this.logger.error(standardizeError(err));
   }
 }

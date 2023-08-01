@@ -1,33 +1,24 @@
 import { StdFee } from "@cosmjs/amino/build/signdoc";
-import { AccountData } from "@cosmjs/amino/build/signer";
-import { coins, SigningStargateClient } from "@cosmjs/stargate";
+import { coins } from "@cosmjs/stargate";
 import { VoteOption } from "@kyvejs/types/client/cosmos/gov/v1/gov";
 import { MsgUpdateParams as MsgUpdateParamsBundles } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
 import { MsgUpdateParams as MsgUpdateParamsDelegation } from "@kyvejs/types/client/kyve/delegation/v1beta1/tx";
-import { MsgUpdateParams as MsgUpdateParamsFees } from "@kyvejs/types/client/kyve/fees/v1beta1/tx";
+import { MsgUpdateParams as MsgUpdateParamsGlobal } from "@kyvejs/types/client/kyve/global/v1beta1/tx";
 import {
   MsgCancelRuntimeUpgrade,
   MsgCreatePool,
-  MsgPausePool,
+  MsgDisablePool,
+  MsgEnablePool,
   MsgScheduleRuntimeUpgrade,
-  MsgUnpausePool,
   MsgUpdatePool,
 } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
 import { MsgUpdateParams as MsgUpdateParamsStakers } from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
 
-import { DENOM, GOV_AUTHORITY } from "../../../../../constants";
+import { GOV_AUTHORITY } from "../../../../../constants";
 import { encodeTxMsg } from "../../../../../registry/tx.registry";
-import { signTx, TxPromise } from "../../../../../utils/helper";
+import { KyveSigning, PendingTx } from "../../../signing";
 
-export default class KyveGovMsg {
-  protected nativeClient: SigningStargateClient;
-  public readonly account: AccountData;
-
-  constructor(client: SigningStargateClient, account: AccountData) {
-    this.account = account;
-    this.nativeClient = client;
-  }
-
+export default class KyveGovMsg extends KyveSigning {
   private createGovTx(
     content: { type_url: string; value: unknown },
     deposit: string,
@@ -37,14 +28,14 @@ export default class KyveGovMsg {
       typeUrl: "/cosmos.gov.v1.MsgSubmitProposal",
       value: {
         messages: [content],
-        initial_deposit: coins(deposit.toString(), DENOM),
+        initial_deposit: coins(deposit.toString(), this.config.coinDenom),
         proposer: this.account.address,
         metadata,
       },
     };
   }
 
-  public async createPool(
+  public createPool(
     value: Omit<MsgCreatePool, "authority">,
     deposit: string,
     metadata?: string,
@@ -62,13 +53,12 @@ export default class KyveGovMsg {
       metadata
     );
 
-    return new TxPromise(
-      this.nativeClient,
-      await signTx(this.nativeClient, this.account.address, tx, options)
+    return new PendingTx({ tx: [tx] }, () =>
+      this.getPendingSignedTx(tx, options)
     );
   }
 
-  public async updatePool(
+  public updatePool(
     value: Omit<MsgUpdatePool, "authority">,
     deposit: string,
     metadata?: string,
@@ -86,14 +76,13 @@ export default class KyveGovMsg {
       metadata
     );
 
-    return new TxPromise(
-      this.nativeClient,
-      await signTx(this.nativeClient, this.account.address, tx, options)
+    return new PendingTx({ tx: [tx] }, () =>
+      this.getPendingSignedTx(tx, options)
     );
   }
 
-  public async pausePool(
-    value: Omit<MsgPausePool, "authority">,
+  public disablePool(
+    value: Omit<MsgDisablePool, "authority">,
     deposit: string,
     metadata?: string,
     options?: {
@@ -102,7 +91,7 @@ export default class KyveGovMsg {
     }
   ) {
     const tx = this.createGovTx(
-      encodeTxMsg.pausePool({
+      encodeTxMsg.disablePool({
         ...value,
         authority: GOV_AUTHORITY,
       }),
@@ -110,14 +99,13 @@ export default class KyveGovMsg {
       metadata
     );
 
-    return new TxPromise(
-      this.nativeClient,
-      await signTx(this.nativeClient, this.account.address, tx, options)
+    return new PendingTx({ tx: [tx] }, () =>
+      this.getPendingSignedTx(tx, options)
     );
   }
 
-  public async unpausePool(
-    value: Omit<MsgUnpausePool, "authority">,
+  public enablePool(
+    value: Omit<MsgEnablePool, "authority">,
     deposit: string,
     metadata?: string,
     options?: {
@@ -126,7 +114,7 @@ export default class KyveGovMsg {
     }
   ) {
     const tx = this.createGovTx(
-      encodeTxMsg.unpausePool({
+      encodeTxMsg.enablePool({
         ...value,
         authority: GOV_AUTHORITY,
       }),
@@ -134,13 +122,12 @@ export default class KyveGovMsg {
       metadata
     );
 
-    return new TxPromise(
-      this.nativeClient,
-      await signTx(this.nativeClient, this.account.address, tx, options)
+    return new PendingTx({ tx: [tx] }, () =>
+      this.getPendingSignedTx(tx, options)
     );
   }
 
-  public async scheduleRuntimeUpgrade(
+  public scheduleRuntimeUpgrade(
     value: Omit<MsgScheduleRuntimeUpgrade, "authority">,
     deposit: string,
     metadata?: string,
@@ -158,13 +145,12 @@ export default class KyveGovMsg {
       metadata
     );
 
-    return new TxPromise(
-      this.nativeClient,
-      await signTx(this.nativeClient, this.account.address, tx, options)
+    return new PendingTx({ tx: [tx] }, () =>
+      this.getPendingSignedTx(tx, options)
     );
   }
 
-  public async cancelRuntimeUpgrade(
+  public cancelRuntimeUpgrade(
     value: Omit<MsgCancelRuntimeUpgrade, "authority">,
     deposit: string,
     metadata?: string,
@@ -182,13 +168,12 @@ export default class KyveGovMsg {
       metadata
     );
 
-    return new TxPromise(
-      this.nativeClient,
-      await signTx(this.nativeClient, this.account.address, tx, options)
+    return new PendingTx({ tx: [tx] }, () =>
+      this.getPendingSignedTx(tx, options)
     );
   }
 
-  public async updateParamsStakers(
+  public updateParamsStakers(
     value: Omit<MsgUpdateParamsStakers, "authority">,
     deposit: string,
     metadata?: string,
@@ -206,13 +191,12 @@ export default class KyveGovMsg {
       metadata
     );
 
-    return new TxPromise(
-      this.nativeClient,
-      await signTx(this.nativeClient, this.account.address, tx, options)
+    return new PendingTx({ tx: [tx] }, () =>
+      this.getPendingSignedTx(tx, options)
     );
   }
 
-  public async updateParamsDelegation(
+  public updateParamsDelegation(
     value: Omit<MsgUpdateParamsDelegation, "authority">,
     deposit: string,
     metadata?: string,
@@ -230,13 +214,12 @@ export default class KyveGovMsg {
       metadata
     );
 
-    return new TxPromise(
-      this.nativeClient,
-      await signTx(this.nativeClient, this.account.address, tx, options)
+    return new PendingTx({ tx: [tx] }, () =>
+      this.getPendingSignedTx(tx, options)
     );
   }
 
-  public async updateParamsBundles(
+  public updateParamsBundles(
     value: Omit<MsgUpdateParamsBundles, "authority">,
     deposit: string,
     metadata?: string,
@@ -254,14 +237,13 @@ export default class KyveGovMsg {
       metadata
     );
 
-    return new TxPromise(
-      this.nativeClient,
-      await signTx(this.nativeClient, this.account.address, tx, options)
+    return new PendingTx({ tx: [tx] }, () =>
+      this.getPendingSignedTx(tx, options)
     );
   }
 
-  public async updateParamsFees(
-    value: Omit<MsgUpdateParamsFees, "authority">,
+  public updateParamsGlobal(
+    value: Omit<MsgUpdateParamsGlobal, "authority">,
     deposit: string,
     metadata?: string,
     options?: {
@@ -270,7 +252,7 @@ export default class KyveGovMsg {
     }
   ) {
     const tx = this.createGovTx(
-      encodeTxMsg.updateParamsFees({
+      encodeTxMsg.updateParamsGlobal({
         ...value,
         authority: GOV_AUTHORITY,
       }),
@@ -278,13 +260,12 @@ export default class KyveGovMsg {
       metadata
     );
 
-    return new TxPromise(
-      this.nativeClient,
-      await signTx(this.nativeClient, this.account.address, tx, options)
+    return new PendingTx({ tx: [tx] }, () =>
+      this.getPendingSignedTx(tx, options)
     );
   }
 
-  public async vote(
+  public vote(
     id: string,
     voteOption: "Yes" | "Abstain" | "No" | "NoWithVeto",
     options?: {
@@ -318,9 +299,8 @@ export default class KyveGovMsg {
       },
     };
 
-    return new TxPromise(
-      this.nativeClient,
-      await signTx(this.nativeClient, this.account.address, tx, options)
+    return new PendingTx({ tx: [tx] }, () =>
+      this.getPendingSignedTx(tx, options)
     );
   }
 }

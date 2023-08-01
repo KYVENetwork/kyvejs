@@ -17,7 +17,11 @@ interface WindowCosmostation {
   };
 }
 
+interface WindowLeap {
+  leap: any;
+}
+
 declare global {
-  interface Window extends KeplrWindow, WindowCosmostation {}
+  interface Window extends KeplrWindow, WindowCosmostation, WindowLeap {}
 }
 export {};

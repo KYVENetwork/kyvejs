@@ -17,7 +17,7 @@ export interface Params {
 }
 
 function createBaseParams(): Params {
-  return { upload_timeout: "0", storage_cost: "0", network_fee: "", max_points: "0" };
+  return { upload_timeout: "0", storage_cost: "", network_fee: "", max_points: "0" };
 }
 
 export const Params = {
@@ -25,8 +25,8 @@ export const Params = {
     if (message.upload_timeout !== "0") {
       writer.uint32(8).uint64(message.upload_timeout);
     }
-    if (message.storage_cost !== "0") {
-      writer.uint32(16).uint64(message.storage_cost);
+    if (message.storage_cost !== "") {
+      writer.uint32(18).string(message.storage_cost);
     }
     if (message.network_fee !== "") {
       writer.uint32(26).string(message.network_fee);
@@ -48,7 +48,7 @@ export const Params = {
           message.upload_timeout = longToString(reader.uint64() as Long);
           break;
         case 2:
-          message.storage_cost = longToString(reader.uint64() as Long);
+          message.storage_cost = reader.string();
           break;
         case 3:
           message.network_fee = reader.string();
@@ -67,7 +67,7 @@ export const Params = {
   fromJSON(object: any): Params {
     return {
       upload_timeout: isSet(object.upload_timeout) ? String(object.upload_timeout) : "0",
-      storage_cost: isSet(object.storage_cost) ? String(object.storage_cost) : "0",
+      storage_cost: isSet(object.storage_cost) ? String(object.storage_cost) : "",
       network_fee: isSet(object.network_fee) ? String(object.network_fee) : "",
       max_points: isSet(object.max_points) ? String(object.max_points) : "0",
     };
@@ -85,7 +85,7 @@ export const Params = {
   fromPartial<I extends Exact<DeepPartial<Params>, I>>(object: I): Params {
     const message = createBaseParams();
     message.upload_timeout = object.upload_timeout ?? "0";
-    message.storage_cost = object.storage_cost ?? "0";
+    message.storage_cost = object.storage_cost ?? "";
     message.network_fee = object.network_fee ?? "";
     message.max_points = object.max_points ?? "0";
     return message;

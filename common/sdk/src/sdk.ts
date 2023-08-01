@@ -8,29 +8,22 @@ import {
   DirectSecp256k1HdWallet,
   DirectSecp256k1Wallet,
 } from "@cosmjs/proto-signing";
-import {
-  RequestAccountResponse,
-  SignOptions,
-} from "@cosmostation/extension-client/types/message";
+import { RequestAccountResponse } from "@cosmostation/extension-client/types/message";
 import { verifyADR36Amino } from "@keplr-wallet/cosmos";
-import { BigNumber } from "bignumber.js";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import humanize from "humanize-number";
 
 import { getSigningKyveClient } from "./clients/full-client";
 import { createKyveLCDClient } from "./clients/lcd-client/client";
 import KyveClient from "./clients/rpc-client/client";
 import KyveWebClient from "./clients/rpc-client/web.client";
 import {
+  IConfig,
   KYVE_COSMOSTATION_CONFIG,
-  KYVE_DECIMALS,
-  KYVE_ENDPOINTS,
   KYVE_KEPLR_CONFIG,
-  KYVE_NETWORK,
-  Network,
+  KYVE_LEAP_CONFIG,
   PREFIX,
+  SUPPORTED_CHAIN_CONFIGS,
   SUPPORTED_WALLETS,
+  SupportedChains,
 } from "./constants";
 import {
   cosmostationMethods,
@@ -40,19 +33,58 @@ import { KeplrAminoSigner } from "./utils/keplr-helper";
 
 /** Class representing a KyveSDK. */
 export class KyveSDK {
-  public readonly network: Network;
-  private walletSupports: Set<keyof typeof SUPPORTED_WALLETS>;
+  public readonly config: IConfig;
+  private walletSupports = new Set<keyof typeof SUPPORTED_WALLETS>();
 
   /**
    * Create sdk instance.
-   * @param network - The network type, e.g mainnet, testnet, etc
+   * @param chainId - The chainId of the chain the sdk should connect to [default = kyve-1]
+   * @param options - The default config of the sdk can be overwritten here
    */
-  constructor(network: KYVE_NETWORK | Network) {
-    this.walletSupports = new Set<keyof typeof SUPPORTED_WALLETS>();
-    if (typeof network === "string") {
-      this.network = KYVE_ENDPOINTS[network];
-    } else {
-      this.network = network;
+  constructor(
+    chainId: SupportedChains = "kyve-1",
+    options?: {
+      chainName?: string;
+      rpc?: string;
+      rest?: string;
+      coin?: string;
+      coinDenom?: string;
+      coinDecimals?: number;
+      gasPrice?: number;
+    }
+  ) {
+    if (!SUPPORTED_CHAIN_CONFIGS[chainId]) {
+      throw new Error(`ChainId "${chainId}" not supported.`);
+    }
+
+    this.config = { ...SUPPORTED_CHAIN_CONFIGS[chainId] };
+
+    if (options?.chainName) {
+      this.config = { ...this.config, chainName: options.chainName };
+    }
+
+    if (options?.rpc) {
+      this.config = { ...this.config, rpc: options.rpc };
+    }
+
+    if (options?.rest) {
+      this.config = { ...this.config, rest: options.rest };
+    }
+
+    if (options?.coin) {
+      this.config = { ...this.config, coin: options.coin };
+    }
+
+    if (options?.coinDenom) {
+      this.config = { ...this.config, coinDenom: options.coinDenom };
+    }
+
+    if (options?.coinDecimals) {
+      this.config = { ...this.config, coinDecimals: options.coinDecimals };
+    }
+
+    if (options?.gasPrice) {
+      this.config = { ...this.config, gasPrice: options.gasPrice };
     }
   }
 
@@ -68,7 +100,7 @@ export class KyveSDK {
     const signedClient = await DirectSecp256k1HdWallet.fromMnemonic(mnemonic, {
       prefix: PREFIX,
     });
-    return getSigningKyveClient(this.network.rpc, signedClient, aminoSigner);
+    return getSigningKyveClient(this.config, signedClient, aminoSigner);
   }
 
   /**
@@ -85,81 +117,162 @@ export class KyveSDK {
       PREFIX
     );
     const aminoSigner = await Secp256k1Wallet.fromKey(formattedKey, PREFIX);
-    return getSigningKyveClient(this.network.rpc, signedClient, aminoSigner);
+    return getSigningKyveClient(this.config, signedClient, aminoSigner);
   }
 
   /**
-   * Crate a client from Keplr wallet if installed
+   * Create a client from Keplr wallet if installed
    * @return Promise<KyveWebClient>
    */
   async fromKeplr(): Promise<KyveWebClient> {
     if (typeof window === "undefined") throw new Error("Unsupported.");
     if (!window.keplr) throw new Error("Please install Keplr.");
+
+    const KYVE_COIN = {
+      coinDenom: this.config.coin,
+      coinMinimalDenom: this.config.coinDenom,
+      coinDecimals: this.config.coinDecimals,
+    };
+
     await window.keplr.experimentalSuggestChain({
       ...KYVE_KEPLR_CONFIG,
-      rpc: this.network.rpc,
-      rest: this.network.rest,
-      chainId: this.network.chainId,
-      chainName: this.network.chainName,
+      chainName: this.config.chainName,
+      chainId: this.config.chainId,
+      rpc: this.config.rpc,
+      rest: this.config.rest,
+      stakeCurrency: KYVE_COIN,
+      currencies: [KYVE_COIN],
+      feeCurrencies: [
+        {
+          ...KYVE_COIN,
+          gasPriceStep: {
+            low: this.config.gasPrice,
+            average: this.config.gasPrice * 1.5,
+            high: this.config.gasPrice * 3,
+          },
+        },
+      ],
     });
-    await window.keplr.enable(this.network.chainId);
-    window.keplr.defaultOptions = {
-      sign: {
-        preferNoSetFee: true,
-      },
-    };
-    const signer = window.keplr.getOfflineSigner(this.network.chainId);
-    const walletName = (await window.keplr.getKey(this.network.chainId)).name;
+
+    await window.keplr.enable(this.config.chainId);
+
+    const signer = await window.keplr.getOfflineSignerAuto(this.config.chainId);
+    const walletName = (await window.keplr.getKey(this.config.chainId)).name;
     const keplr = window.keplr;
-    const keplrAminoSigner = new KeplrAminoSigner(keplr, this.network);
+    const keplrAminoSigner = new KeplrAminoSigner(keplr, this.config);
     const client = await getSigningKyveClient(
-      this.network.rpc,
+      this.config,
       signer,
       keplrAminoSigner,
       walletName
     );
-    this.walletSupports.add(SUPPORTED_WALLETS.KEPLER);
+    this.walletSupports.add(SUPPORTED_WALLETS.KEPLR);
     return client;
   }
 
   /**
-   * Crate a client from Cosmostaion wallet if installed
+   * Create a client from Cosmostaion wallet if installed
    * @return Promise<KyveWebClient>
    */
-  async fromCosmostation(config?: SignOptions): Promise<KyveWebClient> {
+  async fromCosmostation(): Promise<KyveWebClient> {
     if (typeof window === "undefined") throw new Error("Unsupported.");
     if (!window.cosmostation) throw new Error("Please install cosmostation.");
+
     const chain = await cosmostationMethods.getSupportedChains();
     let cosmostationAccount: RequestAccountResponse;
-    if (
-      chain.unofficial.includes(this.network.chainName.toLowerCase().trim())
-    ) {
+
+    if (chain.unofficial.includes(this.config.chainName.toLowerCase().trim())) {
       cosmostationAccount = await cosmostationMethods.requestAccount(
-        this.network.chainName
+        this.config.chainName
       );
     } else {
       await cosmostationMethods.addChain({
         ...KYVE_COSMOSTATION_CONFIG,
-        restURL: this.network.rest,
-        chainId: this.network.chainId,
-        chainName: this.network.chainName,
+        restURL: this.config.rest,
+        chainId: this.config.chainId,
+        chainName: this.config.chainName,
+        displayDenom: this.config.coin,
+        baseDenom: this.config.coinDenom,
+        decimals: this.config.coinDecimals,
+        gasRate: {
+          tiny: this.config.gasPrice.toString(),
+          low: (this.config.gasPrice * 1.5).toString(),
+          average: (this.config.gasPrice * 3).toString(),
+        },
       });
       cosmostationAccount = await cosmostationMethods.requestAccount(
-        this.network.chainName
+        this.config.chainName
       );
     }
+
     const cosmostationSigner = new CosmostationSigner(
       cosmostationAccount,
-      this.network,
-      config ? config : {}
+      this.config,
+      {
+        memo: true,
+        fee: true,
+      }
     );
+
     const client = await getSigningKyveClient(
-      this.network.rpc,
+      this.config,
       cosmostationSigner,
       null,
       cosmostationAccount.name
     );
+
     this.walletSupports.add(SUPPORTED_WALLETS.COSMOSTATION);
+    return client;
+  }
+
+  /**
+   * Create a client from Leap wallet if installed
+   * @return Promise<KyveWebClient>
+   */
+  async fromLeap(): Promise<KyveWebClient> {
+    if (typeof window === "undefined") throw new Error("Unsupported.");
+    if (!window.leap) throw new Error("Please install Leap.");
+
+    const KYVE_COIN = {
+      coinDenom: this.config.coin,
+      coinMinimalDenom: this.config.coinDenom,
+      coinDecimals: this.config.coinDecimals,
+    };
+
+    await window.leap.experimentalSuggestChain({
+      ...KYVE_LEAP_CONFIG,
+      chainName: this.config.chainName,
+      chainId: this.config.chainId,
+      rpc: this.config.rpc,
+      rest: this.config.rest,
+      stakeCurrency: KYVE_COIN,
+      currencies: [KYVE_COIN],
+      feeCurrencies: [
+        {
+          ...KYVE_COIN,
+          gasPriceStep: {
+            low: this.config.gasPrice,
+            average: this.config.gasPrice * 1.5,
+            high: this.config.gasPrice * 3,
+          },
+        },
+      ],
+    });
+
+    await window.leap.enable(this.config.chainId);
+
+    const signer = await window.leap.getOfflineSigner(this.config.chainId);
+    const walletName = (await window.leap.getKey(this.config.chainId))
+      .name as string;
+    const leap = window.leap;
+    const keplrAminoSigner = new KeplrAminoSigner(leap, this.config);
+    const client = await getSigningKyveClient(
+      this.config,
+      signer,
+      keplrAminoSigner,
+      walletName
+    );
+    this.walletSupports.add(SUPPORTED_WALLETS.LEAP);
     return client;
   }
 
@@ -168,10 +281,18 @@ export class KyveSDK {
    * @param cb
    */
   async onAccountChange(cb: () => void) {
-    if (this.walletSupports.has(SUPPORTED_WALLETS.COSMOSTATION))
-      return window.cosmostation.tendermint.on("accountChanged", cb);
-    if (this.walletSupports.has(SUPPORTED_WALLETS.KEPLER))
+    if (this.walletSupports.has(SUPPORTED_WALLETS.KEPLR)) {
       return window.addEventListener("keplr_keystorechange", cb);
+    }
+
+    if (this.walletSupports.has(SUPPORTED_WALLETS.COSMOSTATION)) {
+      return window.cosmostation.tendermint.on("accountChanged", cb);
+    }
+
+    if (this.walletSupports.has(SUPPORTED_WALLETS.LEAP)) {
+      return window.addEventListener("leap_keystorechange", cb);
+    }
+
     throw new Error("Need to initiate from wallet");
   }
 
@@ -179,7 +300,7 @@ export class KyveSDK {
    * create LCD client to get data from Rest api
    */
   createLCDClient() {
-    return createKyveLCDClient(this.network.rest);
+    return createKyveLCDClient(this.config.rest);
   }
 
   /**
@@ -192,7 +313,7 @@ export class KyveSDK {
     const aminoSigner = await Secp256k1HdWallet.fromMnemonic(signer.mnemonic, {
       prefix: PREFIX,
     });
-    return getSigningKyveClient(this.network.rpc, signer, aminoSigner);
+    return getSigningKyveClient(this.config, signer, aminoSigner);
   }
 
   static async generateMnemonic(): Promise<string> {
@@ -201,14 +322,6 @@ export class KyveSDK {
     });
 
     return signer.mnemonic;
-  }
-
-  static formatBalance(balance: string, decimals = 2): string {
-    return humanize(
-      new BigNumber(balance)
-        .dividedBy(new BigNumber(10).exponentiatedBy(KYVE_DECIMALS))
-        .toFixed(decimals)
-    );
   }
 
   static getAddressFromPubKey(pubKey: string) {
@@ -227,11 +340,11 @@ export class KyveSDK {
     return account.address;
   }
 
-  static async verifyString(
+  static verifyString(
     signature: string,
     data: string,
     pubKey: string
-  ): Promise<boolean> {
+  ): boolean {
     return verifyADR36Amino(
       PREFIX,
       KyveSDK.getAddressFromPubKey(pubKey),

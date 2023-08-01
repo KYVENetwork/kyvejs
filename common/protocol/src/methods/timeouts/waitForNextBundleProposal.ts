@@ -1,5 +1,5 @@
 import { Validator } from "../..";
-import { REFRESH_TIME, sleep, standardizeJSON } from "../../utils";
+import { REFRESH_TIME, sleep, standardizeError } from "../../utils";
 
 /**
  * waitForNextBundleProposal waits until the the next bundle proposal has
@@ -29,7 +29,7 @@ export async function waitForNextBundleProposal(
       await this.syncPoolState();
 
       // if pool got not active in the meantime abort
-      if (this.validateIsPoolActive()) {
+      if (!this.isPoolActive()) {
         break;
       }
 
@@ -43,6 +43,6 @@ export async function waitForNextBundleProposal(
     this.logger.error(
       `Failed to wait for next bundle proposal. Continuing ...`
     );
-    this.logger.error(standardizeJSON(err));
+    this.logger.error(standardizeError(err));
   }
 }

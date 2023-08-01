@@ -19,6 +19,8 @@ export enum BundleStatus {
   BUNDLE_STATUS_NO_FUNDS = "BUNDLE_STATUS_NO_FUNDS",
   /** BUNDLE_STATUS_NO_QUORUM - BUNDLE_STATUS_NO_QUORUM ... */
   BUNDLE_STATUS_NO_QUORUM = "BUNDLE_STATUS_NO_QUORUM",
+  /** BUNDLE_STATUS_DISABLED - BUNDLE_STATUS_DISABLED  ... */
+  BUNDLE_STATUS_DISABLED = "BUNDLE_STATUS_DISABLED",
   UNRECOGNIZED = "UNRECOGNIZED",
 }
 
@@ -39,6 +41,9 @@ export function bundleStatusFromJSON(object: any): BundleStatus {
     case 4:
     case "BUNDLE_STATUS_NO_QUORUM":
       return BundleStatus.BUNDLE_STATUS_NO_QUORUM;
+    case 5:
+    case "BUNDLE_STATUS_DISABLED":
+      return BundleStatus.BUNDLE_STATUS_DISABLED;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -58,6 +63,8 @@ export function bundleStatusToJSON(object: BundleStatus): string {
       return "BUNDLE_STATUS_NO_FUNDS";
     case BundleStatus.BUNDLE_STATUS_NO_QUORUM:
       return "BUNDLE_STATUS_NO_QUORUM";
+    case BundleStatus.BUNDLE_STATUS_DISABLED:
+      return "BUNDLE_STATUS_DISABLED";
     case BundleStatus.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";
@@ -76,6 +83,8 @@ export function bundleStatusToNumber(object: BundleStatus): number {
       return 3;
     case BundleStatus.BUNDLE_STATUS_NO_QUORUM:
       return 4;
+    case BundleStatus.BUNDLE_STATUS_DISABLED:
+      return 5;
     case BundleStatus.UNRECOGNIZED:
     default:
       return -1;
@@ -144,14 +153,22 @@ export interface FinalizedBundle {
   bundle_summary: string;
   /** data_hash a sha256 hash of the raw compressed data */
   data_hash: string;
-  /** finalized_at is the block height at which this bundle got finalized */
-  finalized_at: string;
+  /** finalized_at contains details of the block that finalized this bundle. */
+  finalized_at?: FinalizedAt;
   /** from_key the key of the first data item in the bundle proposal */
   from_key: string;
   /** storage_provider_id the id of the storage provider where the bundle is stored */
   storage_provider_id: number;
   /** compression_id the id of the compression type with which the data was compressed */
   compression_id: number;
+}
+
+/** FinalizedAt ... */
+export interface FinalizedAt {
+  /** height ... */
+  height: string;
+  /** timestamp ... */
+  timestamp: string;
 }
 
 function createBaseBundleProposal(): BundleProposal {
@@ -378,7 +395,7 @@ function createBaseFinalizedBundle(): FinalizedBundle {
     to_key: "",
     bundle_summary: "",
     data_hash: "",
-    finalized_at: "0",
+    finalized_at: undefined,
     from_key: "",
     storage_provider_id: 0,
     compression_id: 0,
@@ -414,8 +431,8 @@ export const FinalizedBundle = {
     if (message.data_hash !== "") {
       writer.uint32(74).string(message.data_hash);
     }
-    if (message.finalized_at !== "0") {
-      writer.uint32(80).uint64(message.finalized_at);
+    if (message.finalized_at !== undefined) {
+      FinalizedAt.encode(message.finalized_at, writer.uint32(82).fork()).ldelim();
     }
     if (message.from_key !== "") {
       writer.uint32(90).string(message.from_key);
@@ -464,7 +481,7 @@ export const FinalizedBundle = {
           message.data_hash = reader.string();
           break;
         case 10:
-          message.finalized_at = longToString(reader.uint64() as Long);
+          message.finalized_at = FinalizedAt.decode(reader, reader.uint32());
           break;
         case 11:
           message.from_key = reader.string();
@@ -494,7 +511,7 @@ export const FinalizedBundle = {
       to_key: isSet(object.to_key) ? String(object.to_key) : "",
       bundle_summary: isSet(object.bundle_summary) ? String(object.bundle_summary) : "",
       data_hash: isSet(object.data_hash) ? String(object.data_hash) : "",
-      finalized_at: isSet(object.finalized_at) ? String(object.finalized_at) : "0",
+      finalized_at: isSet(object.finalized_at) ? FinalizedAt.fromJSON(object.finalized_at) : undefined,
       from_key: isSet(object.from_key) ? String(object.from_key) : "",
       storage_provider_id: isSet(object.storage_provider_id) ? Number(object.storage_provider_id) : 0,
       compression_id: isSet(object.compression_id) ? Number(object.compression_id) : 0,
@@ -512,7 +529,8 @@ export const FinalizedBundle = {
     message.to_key !== undefined && (obj.to_key = message.to_key);
     message.bundle_summary !== undefined && (obj.bundle_summary = message.bundle_summary);
     message.data_hash !== undefined && (obj.data_hash = message.data_hash);
-    message.finalized_at !== undefined && (obj.finalized_at = message.finalized_at);
+    message.finalized_at !== undefined &&
+      (obj.finalized_at = message.finalized_at ? FinalizedAt.toJSON(message.finalized_at) : undefined);
     message.from_key !== undefined && (obj.from_key = message.from_key);
     message.storage_provider_id !== undefined && (obj.storage_provider_id = Math.round(message.storage_provider_id));
     message.compression_id !== undefined && (obj.compression_id = Math.round(message.compression_id));
@@ -530,10 +548,70 @@ export const FinalizedBundle = {
     message.to_key = object.to_key ?? "";
     message.bundle_summary = object.bundle_summary ?? "";
     message.data_hash = object.data_hash ?? "";
-    message.finalized_at = object.finalized_at ?? "0";
+    message.finalized_at = (object.finalized_at !== undefined && object.finalized_at !== null)
+      ? FinalizedAt.fromPartial(object.finalized_at)
+      : undefined;
     message.from_key = object.from_key ?? "";
     message.storage_provider_id = object.storage_provider_id ?? 0;
     message.compression_id = object.compression_id ?? 0;
+    return message;
+  },
+};
+
+function createBaseFinalizedAt(): FinalizedAt {
+  return { height: "0", timestamp: "0" };
+}
+
+export const FinalizedAt = {
+  encode(message: FinalizedAt, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.height !== "0") {
+      writer.uint32(8).uint64(message.height);
+    }
+    if (message.timestamp !== "0") {
+      writer.uint32(16).uint64(message.timestamp);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): FinalizedAt {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseFinalizedAt();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.height = longToString(reader.uint64() as Long);
+          break;
+        case 2:
+          message.timestamp = longToString(reader.uint64() as Long);
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): FinalizedAt {
+    return {
+      height: isSet(object.height) ? String(object.height) : "0",
+      timestamp: isSet(object.timestamp) ? String(object.timestamp) : "0",
+    };
+  },
+
+  toJSON(message: FinalizedAt): unknown {
+    const obj: any = {};
+    message.height !== undefined && (obj.height = message.height);
+    message.timestamp !== undefined && (obj.timestamp = message.timestamp);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<FinalizedAt>, I>>(object: I): FinalizedAt {
+    const message = createBaseFinalizedAt();
+    message.height = object.height ?? "0";
+    message.timestamp = object.timestamp ?? "0";
     return message;
   },
 };

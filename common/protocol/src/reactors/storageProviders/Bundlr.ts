@@ -6,46 +6,50 @@ import { BundleTag, IStorageProvider } from "../../types";
 
 export class Bundlr implements IStorageProvider {
   public name = "Bundlr";
-  public decimals = 12;
+  public coinDecimals = 12;
 
-  private jwk!: JWKInterface;
-  private client!: BundlrClient;
+  private readonly storagePriv: string;
 
-  async init(storagePriv: string) {
-    this.jwk = JSON.parse(storagePriv);
+  constructor(storagePriv: string) {
+    if (!storagePriv) {
+      throw new Error(
+        "Arweave Keyfile is empty. Please provide a valid keyfile!"
+      );
+    }
 
-    this.client = new BundlrClient(
+    this.storagePriv = storagePriv;
+  }
+
+  private get bundlrKeyfile(): JWKInterface {
+    return JSON.parse(this.storagePriv);
+  }
+
+  private get bundlrClient(): BundlrClient {
+    return new BundlrClient(
       "http://node1.bundlr.network",
       "arweave",
-      this.jwk
+      this.bundlrKeyfile
     );
-
-    return this;
   }
 
   async getAddress() {
-    return this.client.address;
+    return this.bundlrClient.address;
   }
 
   async getBalance() {
-    const atomicUnits = await this.client.getLoadedBalance();
+    const atomicUnits = await this.bundlrClient.getLoadedBalance();
     return atomicUnits.toString();
   }
 
-  async saveBundle(bundle: Buffer, tags: BundleTag[]) {
-    const transactionOptions = {
-      tags: [
-        {
-          name: "Content-Type",
-          value: "text/plain",
-        },
-        ...tags,
-      ],
-    };
+  async getPrice(bytes: number) {
+    const price = await this.bundlrClient.getPrice(bytes);
+    return price.toString();
+  }
 
-    const transaction = this.client.createTransaction(
+  async saveBundle(bundle: Buffer, tags: BundleTag[]) {
+    const transaction = this.bundlrClient.createTransaction(
       bundle,
-      transactionOptions
+      { tags }
     );
 
     await transaction.sign();

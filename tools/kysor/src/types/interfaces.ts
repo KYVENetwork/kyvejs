@@ -1,7 +1,12 @@
-import { KYVE_NETWORK } from "@kyvejs/sdk/dist/constants";
+import { SupportedChains } from "@kyvejs/sdk/dist/constants";
 
 export interface IConfig {
-  network: KYVE_NETWORK;
+  chainId: SupportedChains;
+  rpc: string;
+  rest: string;
+  coinDenom: string;
+  coinDecimals: number;
+  gasPrice: number;
   autoDownloadBinaries: boolean;
 }
 
@@ -9,7 +14,8 @@ export interface IValaccountConfig {
   pool: number;
   valaccount: string;
   storagePriv: string;
-  verbose: boolean;
+  requestBackoff: number;
+  cache: string;
   metrics: boolean;
   metricsPort: string;
 }

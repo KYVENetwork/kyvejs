@@ -5,5 +5,20 @@
     "ecmaVersion": 2018,
     "sourceType": "module"
   },
+  "overrides": [
+    {
+      "files": ["src/clients/rpc-client/kyve/**/*.ts"],
+      "rules": {
+        "no-restricted-syntax": [
+          "error",
+          {
+            // disallow to use async func in RPC methods, beacuse async func will return Promise<PendingTx<PendingSignedTx>>, but we expect PendingTx<PendingSignedTx> PromiseLike object
+            "selector": "[async=true]",
+            "message": "Async function are not allowed in RPC methods use PendingTx (PromiseLike) instead"
+          }
+        ]
+      }
+    }
+  ],
   "ignorePatterns": ["test/**/*", "test.ts", "jest.config.js"]
 }

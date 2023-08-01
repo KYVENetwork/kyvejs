@@ -1,7 +1,6 @@
-import seedrandom from "seedrandom";
-
 import { DataItem, Validator } from "../..";
-import { generateIndexPairs, sleep, standardizeJSON } from "../../utils";
+import { callWithBackoffStrategy, sleep, standardizeError } from "../../utils";
+import clone from "clone";
 
 /**
  * runCache is the other main execution thread for collecting data items
@@ -34,10 +33,14 @@ export async function runCache(this: Validator): Promise<void> {
   // rounds by mocking it
   while (this.continueRound()) {
     try {
+      // temp save current pool state because the runNode thread could
+      // overwrite this value during runtime
+      const poolRound = clone(this.pool);
+
       // if there is no storage id we can assume that the last
       // bundle has been dropped or invalidated. In that case we
       // reset the cache
-      if (!this.pool.bundle_proposal!.storage_id) {
+      if (!poolRound.bundle_proposal!.storage_id) {
         this.logger.debug(`this.cacheProvider.drop()`);
         await this.cacheProvider.drop();
 
@@ -47,13 +50,13 @@ export async function runCache(this: Validator): Promise<void> {
       // determine the creation time of the current bundle proposal
       // if the creation time ever increases this means a new bundle
       // proposal is available
-      const updatedAt = parseInt(this.pool.bundle_proposal!.updated_at);
+      const updatedAt = parseInt(poolRound.bundle_proposal!.updated_at);
 
       // determine the current index of the pool. All data items
       // before the current index can be deleted since they are already
       // finalized. Data items should always be cached from this index
       // and not before
-      const currentIndex = parseInt(this.pool.data!.current_index);
+      const currentIndex = parseInt(poolRound.data!.current_index);
 
       // determine the target index. Here the target index is the
       // index the cache should collect data in this particular round.
@@ -63,22 +66,33 @@ export async function runCache(this: Validator): Promise<void> {
       // we further index to the maximum possible bundle size ahead
       const targetIndex =
         currentIndex +
-        parseInt(this.pool.bundle_proposal!.bundle_size) +
-        parseInt(this.pool.data!.max_bundle_size);
+        parseInt(poolRound.bundle_proposal!.bundle_size) +
+        parseInt(poolRound.data!.max_bundle_size);
+
+      // determine the start key for the current caching round
+      // this key gets increased overtime to temp save the
+      // current key while collecting the data items
+      let key = poolRound.data!.current_key;
+
+      // collect all data items from current pool index to
+      // the target index starting with current key
+      this.logger.debug(
+        `Starting cache round from current index ${currentIndex} to target index ${targetIndex} with current key ${key}`
+      );
 
       // delete all data items which came before the current index
       // because they got finalized and are not needed anymore
       this.logger.debug(
         `Deleting data from index ${Math.max(
           0,
-          currentIndex - parseInt(this.pool.data!.max_bundle_size)
+          currentIndex - parseInt(poolRound.data!.max_bundle_size)
         )} to index ${currentIndex}`
       );
 
       for (
         let i = Math.max(
           0,
-          currentIndex - parseInt(this.pool.data!.max_bundle_size)
+          currentIndex - parseInt(poolRound.data!.max_bundle_size)
         );
         i < currentIndex;
         i++
@@ -97,33 +111,14 @@ export async function runCache(this: Validator): Promise<void> {
           this.logger.error(
             `Unexpected error deleting data item ${i.toString()} from local cache. Continuing ...`
           );
-          this.logger.error(standardizeJSON(err));
+          this.logger.error(standardizeError(err));
           continue;
         }
       }
 
       this.m.cache_index_tail.set(Math.max(0, currentIndex - 1));
 
-      // determine the start key for the current caching round
-      // this key gets increased overtime to temp save the
-      // current key while collecting the data items
-      let key = this.pool.data!.current_key;
-
-      // collect all data items from current pool index to
-      // the target index
-      this.logger.debug(
-        `Caching from index ${currentIndex} to index ${targetIndex}`
-      );
-
       for (let i = currentIndex; i < targetIndex; i++) {
-        // if there are no sources abort
-        if ((this.poolConfig?.sources ?? []).length === 0) {
-          this.logger.info(
-            `Abort collecting data items. No sources found on pool config`
-          );
-          break;
-        }
-
         // check if data item was already collected. If it was
         // already collected we don't need to retrieve it again
         this.logger.debug(`this.cacheProvider.exists(${i.toString()})`);
@@ -139,90 +134,70 @@ export async function runCache(this: Validator): Promise<void> {
 
         const nextKey = key
           ? await this.runtime.nextKey(this, key)
-          : this.pool.data!.start_key;
+          : poolRound.data!.start_key;
 
         if (!itemFound) {
-          // collect and transform data from every source at once
-          const results: DataItem[] = await Promise.all(
-            (this.poolConfig?.sources ?? []).map((source: string) =>
-              this.saveGetTransformDataItem(source, nextKey)
-            )
-          );
+          // collect data item for next key
+          const dataItem: DataItem = await callWithBackoffStrategy(
+            async () => {
+              // get the data item from the runtime by key
+              this.logger.debug(`this.runtime.getDataItem($THIS,${nextKey})`);
+              const data = await this.runtime.getDataItem(this, nextKey);
 
-          // validate if data items from those multiple sources are
-          // valid against each other
-          let valid = true;
+              this.m.runtime_get_data_item_successful.inc();
 
-          // we generate all possible index pairs so we can cross-validate
-          // each data item with every other data item to ensure that
-          // everything is correct
-          const indexPairs = generateIndexPairs(results.length);
-
-          // validate every data item for each possible index pair
-          for (const pair of indexPairs) {
-            try {
-              // validate pair of data items
-              valid = await this.runtime.validateDataItem(
-                this,
-                results[pair[0]],
-                results[pair[1]]
+              // prevalidate data item and reject if it fails
+              this.logger.debug(
+                `this.runtime.prevalidateDataItem($THIS,$ITEM)`
               );
+              const valid = await this.runtime.prevalidateDataItem(this, data);
 
-              // if an invalid data item pair was found abort and don't save
-              // to cache
               if (!valid) {
-                this.logger.info(
-                  `Found mismatching data item between sources ${
-                    this.poolConfig.sources[pair[0]]
-                  } and ${this.poolConfig.sources[pair[1]]}`
+                throw new Error(
+                  `Prevalidation of data item with key ${nextKey} failed.`
                 );
-                break;
               }
-            } catch (err) {
-              this.logger.error(
-                `Unexpected error validating data items between sources ${
-                  this.poolConfig.sources[pair[0]]
-                } and ${this.poolConfig.sources[pair[1]]}`
+
+              // transform data item
+              this.logger.debug(`this.runtime.transformDataItem($ITEM)`);
+              return await this.runtime.transformDataItem(this, data);
+            },
+            {
+              limitTimeoutMs: 5 * 60 * 1000,
+              increaseByMs: 10 * 1000,
+            },
+            (err, ctx) => {
+              this.logger.info(
+                `Requesting getDataItem with key ${nextKey} was unsuccessful. Retrying in ${(
+                  ctx.nextTimeoutInMs / 1000
+                ).toFixed(2)}s ...`
               );
-              this.logger.error(standardizeJSON(err));
+              this.logger.debug(standardizeError(err));
 
-              // if data item validation fails abort and don't save to cache
-              valid = false;
-              break;
+              this.m.runtime_get_data_item_failed.inc();
             }
-          }
-
-          // if validation between sources fails we abort further data collection
-          if (!valid) {
-            break;
-          }
-
-          // a random item from the result gets chosen. seed is the current item key
-          const seed = i.toString();
-          // calculate randIndex in results range
-          const randIndex = Math.floor(
-            seedrandom(seed).quick() * results.length
-          );
-
-          this.logger.debug(
-            `Choosing item from seed:${seed} index:${randIndex} source:${this.poolConfig.sources[randIndex]}`
           );
 
           // add this data item to the cache
           this.logger.debug(`this.cacheProvider.put(${i.toString()},$ITEM)`);
-          await this.cacheProvider.put(i.toString(), results[randIndex]);
+          await this.cacheProvider.put(i.toString(), dataItem);
 
           this.m.cache_current_items.inc();
           this.m.cache_index_head.set(i);
 
           // add a timeout so that the runtime data source
-          // is not overloaded with requests
-          await sleep(500);
+          // is not overloaded with requests, 50ms by default
+          await sleep(this.requestBackoff);
         }
 
         // assign the next key for the next round
         key = nextKey;
       }
+
+      // indicate that current caching round is done
+      this.logger.debug(
+        `Finished caching from index ${currentIndex} to ${targetIndex}. Waiting for next round ...`
+      );
 
       // wait until a new bundle proposal is available. We don't need
       // to sync the pool here because the pool state already gets
@@ -232,7 +207,7 @@ export async function runCache(this: Validator): Promise<void> {
       this.logger.error(
         `Unexpected error collecting data items to local cache. Continuing ...`
       );
-      this.logger.error(standardizeJSON(err));
+      this.logger.error(standardizeError(err));
 
       try {
         // drop cache if an unexpected error occurs during caching
@@ -244,7 +219,7 @@ export async function runCache(this: Validator): Promise<void> {
         this.logger.error(
           `Unexpected error dropping local cache. Continuing ...`
         );
-        this.logger.error(standardizeJSON(dropError));
+        this.logger.error(standardizeError(dropError));
       }
     }
   }

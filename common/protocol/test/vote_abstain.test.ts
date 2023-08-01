@@ -6,6 +6,7 @@ import {
   Validator,
   sha256,
   standardizeJSON,
+  ICacheProvider,
 } from "../src/index";
 import { runNode } from "../src/methods/main/runNode";
 import { genesis_pool } from "./mocks/constants";
@@ -46,21 +47,32 @@ describe("vote abstain tests", () => {
   let processExit: jest.Mock<never, never>;
   let setTimeoutMock: jest.Mock;
 
+  let cacheProvider: ICacheProvider;
   let storageProvider: IStorageProvider;
   let compression: ICompression;
 
   beforeEach(() => {
     v = new Validator(new TestRuntime());
 
-    v["cacheProvider"] = new TestCacheProvider();
+    // mock cache provider
+    cacheProvider = new TestCacheProvider();
+    jest
+      .spyOn(Validator, "cacheProviderFactory")
+      .mockImplementation(() => cacheProvider);
+
+    v["cacheProvider"] = cacheProvider;
 
     // mock storage provider
     storageProvider = new TestNormalStorageProvider();
-    v["storageProviderFactory"] = jest.fn().mockResolvedValue(storageProvider);
+    jest
+      .spyOn(Validator, "storageProviderFactory")
+      .mockImplementation(() => storageProvider);
 
     // mock compression
     compression = new TestNormalCompression();
-    v["compressionFactory"] = jest.fn().mockReturnValue(compression);
+    jest
+      .spyOn(Validator, "compressionFactory")
+      .mockImplementation(() => compression);
 
     // mock process.exit
     processExit = jest.fn<never, never>();
@@ -91,8 +103,11 @@ describe("vote abstain tests", () => {
     v["poolId"] = 0;
     v["staker"] = "test_staker";
 
-    v.client = client();
-    v.lcd = lcd();
+    v["rpc"] = ["http://0.0.0.0:26657"];
+    v.client = [client()];
+
+    v["rest"] = ["http://0.0.0.0:1317"];
+    v.lcd = [lcd()];
 
     v["waitForNextBundleProposal"] = jest.fn();
 
@@ -157,8 +172,8 @@ describe("vote abstain tests", () => {
     await runNode.call(v);
 
     // ASSERT
-    const txs = v["client"].kyve.bundles.v1beta1;
-    const queries = v["lcd"].kyve.query.v1beta1;
+    const txs = v["client"][0].kyve.bundles.v1beta1;
+    const queries = v["lcd"][0].kyve.query.v1beta1;
     const cacheProvider = v["cacheProvider"];
     const runtime = v["runtime"];
 
@@ -169,18 +184,30 @@ describe("vote abstain tests", () => {
     expect(txs.claimUploaderRole).toHaveBeenCalledTimes(0);
 
     expect(txs.voteBundleProposal).toHaveBeenCalledTimes(2);
-    expect(txs.voteBundleProposal).toHaveBeenNthCalledWith(1, {
-      staker: "test_staker",
-      pool_id: "0",
-      storage_id: "another_test_storage_id",
-      vote: VoteType.VOTE_TYPE_ABSTAIN,
-    });
-    expect(txs.voteBundleProposal).toHaveBeenNthCalledWith(2, {
-      staker: "test_staker",
-      pool_id: "0",
-      storage_id: "another_test_storage_id",
-      vote: VoteType.VOTE_TYPE_VALID,
-    });
+    expect(txs.voteBundleProposal).toHaveBeenNthCalledWith(
+      1,
+      {
+        staker: "test_staker",
+        pool_id: "0",
+        storage_id: "another_test_storage_id",
+        vote: VoteType.VOTE_TYPE_ABSTAIN,
+      },
+      {
+        fee: 1.6,
+      }
+    );
+    expect(txs.voteBundleProposal).toHaveBeenNthCalledWith(
+      2,
+      {
+        staker: "test_staker",
+        pool_id: "0",
+        storage_id: "another_test_storage_id",
+        vote: VoteType.VOTE_TYPE_VALID,
+      },
+      {
+        fee: 1.6,
+      }
+    );
 
     expect(txs.submitBundleProposal).toHaveBeenCalledTimes(0);
 
@@ -313,8 +340,8 @@ describe("vote abstain tests", () => {
     await runNode.call(v);
 
     // ASSERT
-    const txs = v["client"].kyve.bundles.v1beta1;
-    const queries = v["lcd"].kyve.query.v1beta1;
+    const txs = v["client"][0].kyve.bundles.v1beta1;
+    const queries = v["lcd"][0].kyve.query.v1beta1;
     const cacheProvider = v["cacheProvider"];
     const runtime = v["runtime"];
 
@@ -325,18 +352,30 @@ describe("vote abstain tests", () => {
     expect(txs.claimUploaderRole).toHaveBeenCalledTimes(0);
 
     expect(txs.voteBundleProposal).toHaveBeenCalledTimes(2);
-    expect(txs.voteBundleProposal).toHaveBeenNthCalledWith(1, {
-      staker: "test_staker",
-      pool_id: "0",
-      storage_id: "another_test_storage_id",
-      vote: VoteType.VOTE_TYPE_ABSTAIN,
-    });
-    expect(txs.voteBundleProposal).toHaveBeenNthCalledWith(2, {
-      staker: "test_staker",
-      pool_id: "0",
-      storage_id: "another_test_storage_id",
-      vote: VoteType.VOTE_TYPE_VALID,
-    });
+    expect(txs.voteBundleProposal).toHaveBeenNthCalledWith(
+      1,
+      {
+        staker: "test_staker",
+        pool_id: "0",
+        storage_id: "another_test_storage_id",
+        vote: VoteType.VOTE_TYPE_ABSTAIN,
+      },
+      {
+        fee: 1.6,
+      }
+    );
+    expect(txs.voteBundleProposal).toHaveBeenNthCalledWith(
+      2,
+      {
+        staker: "test_staker",
+        pool_id: "0",
+        storage_id: "another_test_storage_id",
+        vote: VoteType.VOTE_TYPE_VALID,
+      },
+      {
+        fee: 1.6,
+      }
+    );
 
     expect(txs.submitBundleProposal).toHaveBeenCalledTimes(0);
 
@@ -472,8 +511,8 @@ describe("vote abstain tests", () => {
     await runNode.call(v);
 
     // ASSERT
-    const txs = v["client"].kyve.bundles.v1beta1;
-    const queries = v["lcd"].kyve.query.v1beta1;
+    const txs = v["client"][0].kyve.bundles.v1beta1;
+    const queries = v["lcd"][0].kyve.query.v1beta1;
     const cacheProvider = v["cacheProvider"];
     const runtime = v["runtime"];
 
@@ -485,18 +524,29 @@ describe("vote abstain tests", () => {
 
     // TODO: find out how to properly mock voteBundleProposal result
     // expect(txs.voteBundleProposal).toHaveBeenCalledTimes(2);
-    expect(txs.voteBundleProposal).toHaveBeenNthCalledWith(1, {
-      staker: "test_staker",
-      pool_id: "0",
-      storage_id: "another_test_storage_id",
-      vote: VoteType.VOTE_TYPE_ABSTAIN,
-    });
-    expect(txs.voteBundleProposal).toHaveBeenLastCalledWith({
-      staker: "test_staker",
-      pool_id: "0",
-      storage_id: "another_test_storage_id",
-      vote: VoteType.VOTE_TYPE_VALID,
-    });
+    expect(txs.voteBundleProposal).toHaveBeenNthCalledWith(
+      1,
+      {
+        staker: "test_staker",
+        pool_id: "0",
+        storage_id: "another_test_storage_id",
+        vote: VoteType.VOTE_TYPE_ABSTAIN,
+      },
+      {
+        fee: 1.6,
+      }
+    );
+    expect(txs.voteBundleProposal).toHaveBeenLastCalledWith(
+      {
+        staker: "test_staker",
+        pool_id: "0",
+        storage_id: "another_test_storage_id",
+        vote: VoteType.VOTE_TYPE_VALID,
+      },
+      {
+        fee: 1.6,
+      }
+    );
 
     expect(txs.submitBundleProposal).toHaveBeenCalledTimes(0);
 
@@ -634,8 +684,8 @@ describe("vote abstain tests", () => {
     await runNode.call(v);
 
     // ASSERT
-    const txs = v["client"].kyve.bundles.v1beta1;
-    const queries = v["lcd"].kyve.query.v1beta1;
+    const txs = v["client"][0].kyve.bundles.v1beta1;
+    const queries = v["lcd"][0].kyve.query.v1beta1;
     const cacheProvider = v["cacheProvider"];
     const runtime = v["runtime"];
 
@@ -646,18 +696,30 @@ describe("vote abstain tests", () => {
     expect(txs.claimUploaderRole).toHaveBeenCalledTimes(0);
 
     expect(txs.voteBundleProposal).toHaveBeenCalledTimes(2);
-    expect(txs.voteBundleProposal).toHaveBeenNthCalledWith(1, {
-      staker: "test_staker",
-      pool_id: "0",
-      storage_id: "another_test_storage_id",
-      vote: VoteType.VOTE_TYPE_ABSTAIN,
-    });
-    expect(txs.voteBundleProposal).toHaveBeenNthCalledWith(2, {
-      staker: "test_staker",
-      pool_id: "0",
-      storage_id: "another_test_storage_id",
-      vote: VoteType.VOTE_TYPE_VALID,
-    });
+    expect(txs.voteBundleProposal).toHaveBeenNthCalledWith(
+      1,
+      {
+        staker: "test_staker",
+        pool_id: "0",
+        storage_id: "another_test_storage_id",
+        vote: VoteType.VOTE_TYPE_ABSTAIN,
+      },
+      {
+        fee: 1.6,
+      }
+    );
+    expect(txs.voteBundleProposal).toHaveBeenNthCalledWith(
+      2,
+      {
+        staker: "test_staker",
+        pool_id: "0",
+        storage_id: "another_test_storage_id",
+        vote: VoteType.VOTE_TYPE_VALID,
+      },
+      {
+        fee: 1.6,
+      }
+    );
 
     expect(txs.submitBundleProposal).toHaveBeenCalledTimes(0);
 
@@ -800,8 +862,8 @@ describe("vote abstain tests", () => {
     await runNode.call(v);
 
     // ASSERT
-    const txs = v["client"].kyve.bundles.v1beta1;
-    const queries = v["lcd"].kyve.query.v1beta1;
+    const txs = v["client"][0].kyve.bundles.v1beta1;
+    const queries = v["lcd"][0].kyve.query.v1beta1;
     const cacheProvider = v["cacheProvider"];
     const runtime = v["runtime"];
 
@@ -813,18 +875,29 @@ describe("vote abstain tests", () => {
 
     // TODO: find out how to properly mock voteBundleProposal result
     // expect(txs.voteBundleProposal).toHaveBeenCalledTimes(2);
-    expect(txs.voteBundleProposal).toHaveBeenNthCalledWith(1, {
-      staker: "test_staker",
-      pool_id: "0",
-      storage_id: "another_test_storage_id",
-      vote: VoteType.VOTE_TYPE_ABSTAIN,
-    });
-    expect(txs.voteBundleProposal).toHaveBeenLastCalledWith({
-      staker: "test_staker",
-      pool_id: "0",
-      storage_id: "another_test_storage_id",
-      vote: VoteType.VOTE_TYPE_VALID,
-    });
+    expect(txs.voteBundleProposal).toHaveBeenNthCalledWith(
+      1,
+      {
+        staker: "test_staker",
+        pool_id: "0",
+        storage_id: "another_test_storage_id",
+        vote: VoteType.VOTE_TYPE_ABSTAIN,
+      },
+      {
+        fee: 1.6,
+      }
+    );
+    expect(txs.voteBundleProposal).toHaveBeenLastCalledWith(
+      {
+        staker: "test_staker",
+        pool_id: "0",
+        storage_id: "another_test_storage_id",
+        vote: VoteType.VOTE_TYPE_VALID,
+      },
+      {
+        fee: 1.6,
+      }
+    );
 
     expect(txs.submitBundleProposal).toHaveBeenCalledTimes(0);
 
@@ -971,8 +1044,8 @@ describe("vote abstain tests", () => {
     await runNode.call(v);
 
     // ASSERT
-    const txs = v["client"].kyve.bundles.v1beta1;
-    const queries = v["lcd"].kyve.query.v1beta1;
+    const txs = v["client"][0].kyve.bundles.v1beta1;
+    const queries = v["lcd"][0].kyve.query.v1beta1;
     const cacheProvider = v["cacheProvider"];
     const runtime = v["runtime"];
 
@@ -984,18 +1057,29 @@ describe("vote abstain tests", () => {
 
     // TODO: find out how to properly mock voteBundleProposal result
     // expect(txs.voteBundleProposal).toHaveBeenCalledTimes(2);
-    expect(txs.voteBundleProposal).toHaveBeenNthCalledWith(1, {
-      staker: "test_staker",
-      pool_id: "0",
-      storage_id: "another_test_storage_id",
-      vote: VoteType.VOTE_TYPE_ABSTAIN,
-    });
-    expect(txs.voteBundleProposal).toHaveBeenLastCalledWith({
-      staker: "test_staker",
-      pool_id: "0",
-      storage_id: "another_test_storage_id",
-      vote: VoteType.VOTE_TYPE_VALID,
-    });
+    expect(txs.voteBundleProposal).toHaveBeenNthCalledWith(
+      1,
+      {
+        staker: "test_staker",
+        pool_id: "0",
+        storage_id: "another_test_storage_id",
+        vote: VoteType.VOTE_TYPE_ABSTAIN,
+      },
+      {
+        fee: 1.6,
+      }
+    );
+    expect(txs.voteBundleProposal).toHaveBeenLastCalledWith(
+      {
+        staker: "test_staker",
+        pool_id: "0",
+        storage_id: "another_test_storage_id",
+        vote: VoteType.VOTE_TYPE_VALID,
+      },
+      {
+        fee: 1.6,
+      }
+    );
 
     expect(txs.submitBundleProposal).toHaveBeenCalledTimes(0);
 
@@ -1131,8 +1215,8 @@ describe("vote abstain tests", () => {
     await runNode.call(v);
 
     // ASSERT
-    const txs = v["client"].kyve.bundles.v1beta1;
-    const queries = v["lcd"].kyve.query.v1beta1;
+    const txs = v["client"][0].kyve.bundles.v1beta1;
+    const queries = v["lcd"][0].kyve.query.v1beta1;
     const cacheProvider = v["cacheProvider"];
     const runtime = v["runtime"];
 
@@ -1143,12 +1227,17 @@ describe("vote abstain tests", () => {
     expect(txs.claimUploaderRole).toHaveBeenCalledTimes(0);
 
     expect(txs.voteBundleProposal).toHaveBeenCalledTimes(1);
-    expect(txs.voteBundleProposal).toHaveBeenLastCalledWith({
-      staker: "test_staker",
-      pool_id: "0",
-      storage_id: "another_test_storage_id",
-      vote: VoteType.VOTE_TYPE_VALID,
-    });
+    expect(txs.voteBundleProposal).toHaveBeenLastCalledWith(
+      {
+        staker: "test_staker",
+        pool_id: "0",
+        storage_id: "another_test_storage_id",
+        vote: VoteType.VOTE_TYPE_VALID,
+      },
+      {
+        fee: 1.6,
+      }
+    );
 
     expect(txs.submitBundleProposal).toHaveBeenCalledTimes(0);
 
@@ -1236,7 +1325,7 @@ describe("vote abstain tests", () => {
       reaseon: "already voted valid",
     });
 
-    v.lcd.kyve.query.v1beta1.canVote = canVoteMock;
+    v["lcd"][0].kyve.query.v1beta1.canVote = canVoteMock;
 
     const bundle = [
       { key: "test_key_1", value: "test_value_1" },
@@ -1284,8 +1373,8 @@ describe("vote abstain tests", () => {
     await runNode.call(v);
 
     // ASSERT
-    const txs = v["client"].kyve.bundles.v1beta1;
-    const queries = v["lcd"].kyve.query.v1beta1;
+    const txs = v["client"][0].kyve.bundles.v1beta1;
+    const queries = v["lcd"][0].kyve.query.v1beta1;
     const cacheProvider = v["cacheProvider"];
     const runtime = v["runtime"];
 
@@ -1362,7 +1451,7 @@ describe("vote abstain tests", () => {
       reaseon: "already voted invalid",
     });
 
-    v.lcd.kyve.query.v1beta1.canVote = canVoteMock;
+    v["lcd"][0].kyve.query.v1beta1.canVote = canVoteMock;
 
     const bundle = [
       { key: "test_key_1", value: "test_value_1" },
@@ -1411,8 +1500,8 @@ describe("vote abstain tests", () => {
     await runNode.call(v);
 
     // ASSERT
-    const txs = v["client"].kyve.bundles.v1beta1;
-    const queries = v["lcd"].kyve.query.v1beta1;
+    const txs = v["client"][0].kyve.bundles.v1beta1;
+    const queries = v["lcd"][0].kyve.query.v1beta1;
     const cacheProvider = v["cacheProvider"];
     const runtime = v["runtime"];
 
@@ -1494,9 +1583,15 @@ describe("vote abstain tests", () => {
     const dataSize = compressedBundle.byteLength.toString();
     const dataHash = sha256(bundleBytes);
 
-    v["client"].kyve.bundles.v1beta1.voteBundleProposal = jest
+    v["client"][0].kyve.bundles.v1beta1.voteBundleProposal = jest
       .fn()
-      .mockRejectedValue(new Error());
+      .mockRejectedValueOnce(new Error())
+      .mockResolvedValue({
+        txHash: "vote_bundle_proposal_test_hash",
+        execute: jest.fn().mockResolvedValue({
+          code: 0,
+        }),
+      });
 
     v["syncPoolState"] = jest.fn().mockImplementation(() => {
       v.pool = {
@@ -1534,8 +1629,8 @@ describe("vote abstain tests", () => {
     await runNode.call(v);
 
     // ASSERT
-    const txs = v["client"].kyve.bundles.v1beta1;
-    const queries = v["lcd"].kyve.query.v1beta1;
+    const txs = v["client"][0].kyve.bundles.v1beta1;
+    const queries = v["lcd"][0].kyve.query.v1beta1;
     const cacheProvider = v["cacheProvider"];
     const runtime = v["runtime"];
 
@@ -1546,18 +1641,30 @@ describe("vote abstain tests", () => {
     expect(txs.claimUploaderRole).toHaveBeenCalledTimes(0);
 
     expect(txs.voteBundleProposal).toHaveBeenCalledTimes(2);
-    expect(txs.voteBundleProposal).toHaveBeenNthCalledWith(1, {
-      staker: "test_staker",
-      pool_id: "0",
-      storage_id: "another_test_storage_id",
-      vote: VoteType.VOTE_TYPE_ABSTAIN,
-    });
-    expect(txs.voteBundleProposal).toHaveBeenNthCalledWith(2, {
-      staker: "test_staker",
-      pool_id: "0",
-      storage_id: "another_test_storage_id",
-      vote: VoteType.VOTE_TYPE_VALID,
-    });
+    expect(txs.voteBundleProposal).toHaveBeenNthCalledWith(
+      1,
+      {
+        staker: "test_staker",
+        pool_id: "0",
+        storage_id: "another_test_storage_id",
+        vote: VoteType.VOTE_TYPE_ABSTAIN,
+      },
+      {
+        fee: 1.6,
+      }
+    );
+    expect(txs.voteBundleProposal).toHaveBeenNthCalledWith(
+      2,
+      {
+        staker: "test_staker",
+        pool_id: "0",
+        storage_id: "another_test_storage_id",
+        vote: VoteType.VOTE_TYPE_VALID,
+      },
+      {
+        fee: 1.6,
+      }
+    );
 
     expect(txs.submitBundleProposal).toHaveBeenCalledTimes(0);
 
@@ -1687,8 +1794,8 @@ describe("vote abstain tests", () => {
     await runNode.call(v);
 
     // ASSERT
-    const txs = v["client"].kyve.bundles.v1beta1;
-    const queries = v["lcd"].kyve.query.v1beta1;
+    const txs = v["client"][0].kyve.bundles.v1beta1;
+    const queries = v["lcd"][0].kyve.query.v1beta1;
     const cacheProvider = v["cacheProvider"];
     const runtime = v["runtime"];
 
@@ -1699,12 +1806,17 @@ describe("vote abstain tests", () => {
     expect(txs.claimUploaderRole).toHaveBeenCalledTimes(0);
 
     expect(txs.voteBundleProposal).toHaveBeenCalledTimes(1);
-    expect(txs.voteBundleProposal).toHaveBeenLastCalledWith({
-      staker: "test_staker",
-      pool_id: "0",
-      storage_id: "another_test_storage_id",
-      vote: VoteType.VOTE_TYPE_ABSTAIN,
-    });
+    expect(txs.voteBundleProposal).toHaveBeenLastCalledWith(
+      {
+        staker: "test_staker",
+        pool_id: "0",
+        storage_id: "another_test_storage_id",
+        vote: VoteType.VOTE_TYPE_ABSTAIN,
+      },
+      {
+        fee: 1.6,
+      }
+    );
 
     expect(txs.submitBundleProposal).toHaveBeenCalledTimes(0);
 
@@ -1750,7 +1862,8 @@ describe("vote abstain tests", () => {
 
     expect(compression.compress).toHaveBeenCalledTimes(0);
 
-    expect(compression.decompress).toHaveBeenCalledTimes(0);
+    expect(compression.decompress).toHaveBeenCalledTimes(1);
+    expect(compression.decompress).toHaveBeenLastCalledWith(compressedBundle);
 
     // =============================
     // ASSERT INTEGRATION INTERFACES
@@ -1762,7 +1875,20 @@ describe("vote abstain tests", () => {
       bundle
     );
 
-    expect(runtime.validateDataItem).toHaveBeenCalledTimes(0);
+    expect(runtime.validateDataItem).toHaveBeenCalledTimes(2);
+
+    expect(runtime.validateDataItem).toHaveBeenNthCalledWith(
+      1,
+      expect.any(Validator),
+      standardizeJSON(bundle[0]),
+      standardizeJSON(bundle[0])
+    );
+    expect(runtime.validateDataItem).toHaveBeenNthCalledWith(
+      2,
+      expect.any(Validator),
+      standardizeJSON(bundle[1]),
+      standardizeJSON(bundle[1])
+    );
 
     // ========================
     // ASSERT NODEJS INTERFACES
@@ -1823,8 +1949,8 @@ describe("vote abstain tests", () => {
     await runNode.call(v);
 
     // ASSERT
-    const txs = v["client"].kyve.bundles.v1beta1;
-    const queries = v["lcd"].kyve.query.v1beta1;
+    const txs = v["client"][0].kyve.bundles.v1beta1;
+    const queries = v["lcd"][0].kyve.query.v1beta1;
     const cacheProvider = v["cacheProvider"];
     const runtime = v["runtime"];
 
@@ -1835,12 +1961,17 @@ describe("vote abstain tests", () => {
     expect(txs.claimUploaderRole).toHaveBeenCalledTimes(0);
 
     expect(txs.voteBundleProposal).toHaveBeenCalledTimes(1);
-    expect(txs.voteBundleProposal).toHaveBeenLastCalledWith({
-      staker: "test_staker",
-      pool_id: "0",
-      storage_id: "another_test_storage_id",
-      vote: VoteType.VOTE_TYPE_ABSTAIN,
-    });
+    expect(txs.voteBundleProposal).toHaveBeenLastCalledWith(
+      {
+        staker: "test_staker",
+        pool_id: "0",
+        storage_id: "another_test_storage_id",
+        vote: VoteType.VOTE_TYPE_ABSTAIN,
+      },
+      {
+        fee: 1.6,
+      }
+    );
 
     expect(txs.submitBundleProposal).toHaveBeenCalledTimes(0);
 
@@ -1893,11 +2024,7 @@ describe("vote abstain tests", () => {
     // ASSERT INTEGRATION INTERFACES
     // =============================
 
-    expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
-      expect.any(Validator),
-      bundle
-    );
+    expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(0);
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(1);
     expect(runtime.validateDataItem).toHaveBeenLastCalledWith(

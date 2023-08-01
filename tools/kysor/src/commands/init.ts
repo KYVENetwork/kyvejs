@@ -4,14 +4,31 @@ import { Command } from "commander";
 import fs from "fs";
 import path from "path";
 
-const home = path.join(process.env.HOME!, ".kysor");
+import { HOME } from "../utils/constants";
 
 const init = new Command("init").description("Init KYSOR");
 
 init
+  .requiredOption("--chain-id <string>", "The chain ID of the network")
   .requiredOption(
-    "-n, --network <local|alpha|beta|korellia>",
-    "The network the KYSOR should run on"
+    "--rpc <string>",
+    "Comma seperated list of rpc endpoints. If the first fails the next endpoint will be used as fallback."
+  )
+  .requiredOption(
+    "--rest <string>",
+    "Comma separated list of rest endpoints. If the first fails the next endpoint will be used as fallback. "
+  )
+  .option(
+    "--coin-denom <string>",
+    "The denom of the coin, this value will be loaded by default based on the chain id"
+  )
+  .option(
+    "--coin-decimals <number>",
+    "The decimals of the coin, this value will be loaded by default based on the chain id"
+  )
+  .option(
+    "--gas-price <number>",
+    "The gas price the node should use to calculate transaction fees"
   )
   .option(
     "-d, --auto-download-binaries",
@@ -19,38 +36,69 @@ init
   )
   .action(async (options) => {
     try {
-      if (fs.existsSync(path.join(home, `config.toml`))) {
+      if (fs.existsSync(path.join(HOME, `config.toml`))) {
         console.log(
           `KYSOR was already initialized. You can directly edit the config file under ${path.join(
-            home,
+            HOME,
             `config.toml`
           )}`
         );
       } else {
         // create KYSOR home directory
-        fs.mkdirSync(home, {
+        fs.mkdirSync(HOME, {
           recursive: true,
         });
 
+        let rpc;
+        let rest;
+
+        // verify that rpc and rest endpoints are valid
         try {
-          new KyveSDK(options.network);
+          rpc = options.rpc.split(",").map((r: string) => r.trim());
+          rest = options.rest.split(",").map((r: string) => r.trim());
+
+          if (!rpc.length || !rest.length) {
+            throw new Error("rpc and rest endpoints must be specified");
+          }
+
+          if (rpc.length !== rest.length) {
+            throw new Error("rpc and rest endpoints must have same lengths");
+          }
         } catch (err) {
-          console.log(`ERROR: network ${options.network} was not recognized`);
+          console.log(`ERROR: Could parse provided rpc and rest endpoints`);
+          console.log(JSON.parse(JSON.stringify(err)));
+          return;
+        }
+
+        try {
+          new KyveSDK(options.chainId, {
+            rpc: rpc[0],
+            rest: rest[0],
+            gasPrice: options.gasPrice,
+          });
+        } catch (err) {
+          console.log(
+            `ERROR: Could not init KYVE SDK with provided network options`
+          );
+          console.log(JSON.parse(JSON.stringify(err)));
           return;
         }
 
         const config = {
-          network: options.network,
+          chainId: options.chainId,
+          rpc: options.rpc,
+          rest: options.rest,
+          gasPrice: options.gasPrice,
           autoDownloadBinaries: options.autoDownloadBinaries,
         };
 
         fs.writeFileSync(
-          path.join(home, `config.toml`),
+          path.join(HOME, `config.toml`),
           TOML.stringify(config as any)
         );
 
         console.log(
-          `Successfully initialized KYSOR in the following home directory: ${home}`
+          `Successfully initialized KYSOR in the following home directory: ${HOME}`
         );
       }
     } catch (err) {

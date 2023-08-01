@@ -6,6 +6,7 @@ import {
   Validator,
   sha256,
   standardizeJSON,
+  ICacheProvider,
 } from "../src/index";
 import { runNode } from "../src/methods/main/runNode";
 import { genesis_pool } from "./mocks/constants";
@@ -35,21 +36,32 @@ describe("genesis tests", () => {
   let processExit: jest.Mock<never, never>;
   let setTimeoutMock: jest.Mock;
 
+  let cacheProvider: ICacheProvider;
   let storageProvider: IStorageProvider;
   let compression: ICompression;
 
   beforeEach(() => {
     v = new Validator(new TestRuntime());
 
-    v["cacheProvider"] = new TestCacheProvider();
+    // mock cache provider
+    cacheProvider = new TestCacheProvider();
+    jest
+      .spyOn(Validator, "cacheProviderFactory")
+      .mockImplementation(() => cacheProvider);
+
+    v["cacheProvider"] = cacheProvider;
 
     // mock storage provider
     storageProvider = new TestNormalStorageProvider();
-    v["storageProviderFactory"] = jest.fn().mockResolvedValue(storageProvider);
+    jest
+      .spyOn(Validator, "storageProviderFactory")
+      .mockImplementation(() => storageProvider);
 
     // mock compression
     compression = new TestNormalCompression();
-    v["compressionFactory"] = jest.fn().mockReturnValue(compression);
+    jest
+      .spyOn(Validator, "compressionFactory")
+      .mockImplementation(() => compression);
 
     // mock process.exit
     processExit = jest.fn<never, never>();
@@ -80,8 +92,11 @@ describe("genesis tests", () => {
     v["poolId"] = 0;
     v["staker"] = "test_staker";
 
-    v.client = client();
-    v.lcd = lcd();
+    v["rpc"] = ["http://0.0.0.0:26657"];
+    v.client = [client()];
+
+    v["rest"] = ["http://0.0.0.0:1317"];
+    v.lcd = [lcd()];
 
     v["continueRound"] = jest
       .fn()
@@ -135,8 +150,8 @@ describe("genesis tests", () => {
     await runNode.call(v);
 
     // ASSERT
-    const txs = v["client"].kyve.bundles.v1beta1;
-    const queries = v["lcd"].kyve.query.v1beta1;
+    const txs = v["client"][0].kyve.bundles.v1beta1;
+    const queries = v["lcd"][0].kyve.query.v1beta1;
     const cacheProvider = v["cacheProvider"];
     const runtime = v["runtime"];
 
@@ -264,8 +279,8 @@ describe("genesis tests", () => {
     await runNode.call(v);
 
     // ASSERT
-    const txs = v["client"].kyve.bundles.v1beta1;
-    const queries = v["lcd"].kyve.query.v1beta1;
+    const txs = v["client"][0].kyve.bundles.v1beta1;
+    const queries = v["lcd"][0].kyve.query.v1beta1;
     const cacheProvider = v["cacheProvider"];
     const runtime = v["runtime"];
 
@@ -347,7 +362,7 @@ describe("genesis tests", () => {
 
   test("be too late to claim uploader role and instead validate", async () => {
     // ARRANGE
-    v["client"].kyve.bundles.v1beta1.claimUploaderRole = jest
+    v["client"][0].kyve.bundles.v1beta1.claimUploaderRole = jest
       .fn()
       .mockResolvedValue({
         txHash: "test_hash",
@@ -414,8 +429,8 @@ describe("genesis tests", () => {
     await runNode.call(v);
 
     // ASSERT
-    const txs = v["client"].kyve.bundles.v1beta1;
-    const queries = v["lcd"].kyve.query.v1beta1;
+    const txs = v["client"][0].kyve.bundles.v1beta1;
+    const queries = v["lcd"][0].kyve.query.v1beta1;
     const cacheProvider = v["cacheProvider"];
     const runtime = v["runtime"];
 
@@ -430,12 +445,17 @@ describe("genesis tests", () => {
     });
 
     expect(txs.voteBundleProposal).toHaveBeenCalledTimes(1);
-    expect(txs.voteBundleProposal).toHaveBeenLastCalledWith({
-      staker: "test_staker",
-      pool_id: "0",
-      storage_id: "another_test_storage_id",
-      vote: VoteType.VOTE_TYPE_VALID,
-    });
+    expect(txs.voteBundleProposal).toHaveBeenLastCalledWith(
+      {
+        staker: "test_staker",
+        pool_id: "0",
+        storage_id: "another_test_storage_id",
+        vote: VoteType.VOTE_TYPE_VALID,
+      },
+      {
+        fee: 1.6,
+      }
+    );
 
     expect(txs.submitBundleProposal).toHaveBeenCalledTimes(0);
 

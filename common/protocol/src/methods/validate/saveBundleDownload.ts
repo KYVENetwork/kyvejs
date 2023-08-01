@@ -1,7 +1,7 @@
 import BigNumber from "bignumber.js";
 
 import { Validator } from "../..";
-import { callWithBackoffStrategy, standardizeJSON, VOTE } from "../../utils";
+import { callWithBackoffStrategy, standardizeError, VOTE } from "../../utils";
 
 /**
  * saveBundleDownload downloads a bundle from the storage provider.
@@ -40,7 +40,7 @@ export async function saveBundleDownload(
       }
 
       // check if pool got inactive in the meantime
-      if (this.validateIsPoolActive()) {
+      if (!this.isPoolActive()) {
         return null;
       }
 
@@ -58,8 +58,9 @@ export async function saveBundleDownload(
           this.pool.bundle_proposal?.storage_provider_id ?? 0
         }, $STORAGE_PRIV)`
       );
-      const storageProvider = await this.storageProviderFactory(
-        this.pool.bundle_proposal?.storage_provider_id ?? 0
+      const storageProvider = Validator.storageProviderFactory(
+        this.pool.bundle_proposal?.storage_provider_id ?? 0,
+        this.storagePriv
       );
 
       // calculate download timeout for storage provider
@@ -99,7 +100,7 @@ export async function saveBundleDownload(
           ctx.nextTimeoutInMs / 1000
         ).toFixed(2)}s ...`
       );
-      this.logger.debug(standardizeJSON(err));
+      this.logger.debug(standardizeError(err));
 
       this.m.storage_provider_retrieve_failed.inc();
 

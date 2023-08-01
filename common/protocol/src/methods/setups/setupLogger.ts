@@ -2,7 +2,7 @@ import { appendFileSync, existsSync, mkdirSync } from "fs";
 import path from "path";
 import { ILogObject, Logger } from "tslog";
 
-import { Validator, standardizeJSON } from "../..";
+import { Validator, standardizeError } from "../..";
 
 /**
  * setupLogger creates the logger instance and defines the home and file
@@ -79,9 +79,11 @@ export function setupLogger(this: Validator): void {
     });
 
     this.logger = logger;
+
+    this.logger.info("Starting node ...\n");
   } catch (err) {
     this.logger.fatal(`Failed to init logger. Exiting ...`);
-    this.logger.fatal(standardizeJSON(err));
+    this.logger.fatal(standardizeError(err));
 
     process.exit(1);
   }

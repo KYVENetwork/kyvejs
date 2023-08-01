@@ -29,17 +29,41 @@ export interface IRuntime {
   version: string;
 
   /**
+   * Config of the runtime. This config is derived and parsed from the raw config
+   * found on the pool. A raw config could be an ipfs link to the actual config or
+   * a stringified yaml or json config. The runtime method "parseConfig" should act
+   * as a setter and further validate if the configuration is correct.
+   *
+   * @property config
+   * @type {any}
+   */
+  config: any;
+
+  /**
+   * Parses the raw runtime config found on pool, validates it and finally sets
+   * the property "config" in the runtime. A raw config could be an ipfs link to the
+   * actual config or a stringified yaml or json string. This method should error if
+   * the specific runtime config is not parsable or invalid.
+   *
+   * Deterministic behavior is required
+   *
+   * @method validateSetConfig
+   * @param {string} rawConfig
+   * @return {Promise<any>}
+   */
+  validateSetConfig(rawConfig: string): Promise<void>;
+
+  /**
    * Gets the data item from a specific key and returns both key and the value.
    *
    * Deterministic behavior is required
    *
    * @method getDataItem
    * @param {Validator} v the class of @kyvejs/protocol
-   * @param {string} source the source from which to get the data item from. usually an api or rpc endpoint
    * @param {string} key the key of the data item
    * @return {Promise<DataItem>}
    */
-  getDataItem(v: Validator, source: string, key: string): Promise<DataItem>;
+  getDataItem(v: Validator, key: string): Promise<DataItem>;
 
   /**
    * Prevalidates a data item right after is was retrieved from source.
@@ -72,6 +96,8 @@ export interface IRuntime {
 
   /**
    * Validates a single data item of a bundle proposal
+   *
+   * Deterministic behavior is required
    *
    * @method validateDataItem
    * @param {Validator} v the class of @kyvejs/protocol
@@ -107,7 +133,7 @@ export interface IRuntime {
    *
    * @method nextKey
    * @param {Validator} v the class of @kyvejs/protocol
-   * @param {string} key which gets inserted by @kyvejs/protocol
+   * @param {string} key the key from which the next key should be derived from
    * @return {Promise<string>}
    */
   nextKey(v: Validator, key: string): Promise<string>;
