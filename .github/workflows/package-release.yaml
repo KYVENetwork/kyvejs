@@ -6,6 +6,7 @@ on:
       - '*'
 jobs:
   prepare:
+    name: 'Check packages for release'
     runs-on: ubuntu-latest
     outputs:
       output: ${{ steps.set_env.outputs.test }}
@@ -40,6 +41,7 @@ jobs:
         id: set_env
         run: echo "::set-output name=test::${{steps.output-tags.outputs.result}}"
   release:
+    name: 'Packages release'
     if: needs.prepare.outputs.output != '[]'
     runs-on: ubuntu-latest
     needs: prepare
