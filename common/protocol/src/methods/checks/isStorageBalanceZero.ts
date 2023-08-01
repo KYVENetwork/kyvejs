@@ -11,10 +11,8 @@ import { Validator, standardizeError } from "../..";
  */
 export async function isStorageBalanceZero(this: Validator): Promise<boolean> {
   try {
-    const storageProvider = Validator.storageProviderFactory(
-      this.pool.data?.current_storage_provider_id ?? 0,
-      this.storagePriv
-    );
+    this.logger.debug(`this.storageProviderFactory()`);
+    const storageProvider = this.storageProviderFactory();
 
     this.logger.info(
       `Checking account balance on StorageProvider:${storageProvider.name}`

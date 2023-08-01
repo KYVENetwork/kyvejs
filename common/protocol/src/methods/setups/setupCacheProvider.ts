@@ -19,7 +19,7 @@ export async function setupCacheProvider(this: Validator): Promise<void> {
     this.logger.debug(`Initializing cache provider with path ${cachePath}`);
 
     // create cache provider depending on chosen cache type
-    this.cacheProvider = Validator.cacheProviderFactory(this.cache);
+    this.cacheProvider = this.cacheProviderFactory();
 
     // delete all contents of cache directory
     await fse.emptyDir(`${cachePath}/`);

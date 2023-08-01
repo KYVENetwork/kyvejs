@@ -44,7 +44,6 @@ import {
   waitForCacheContinuation,
   waitForNextBundleProposal,
   waitForUploadInterval,
-  getProxyAuth,
   isStorageBalanceLow,
 } from "./methods";
 import { ICacheProvider, IMetrics, IRuntime } from "./types";
@@ -124,7 +123,6 @@ export class Validator {
   // helpers
   protected archiveDebugBundle = archiveDebugBundle;
   protected continueRound = continueRound;
-  public getProxyAuth = getProxyAuth;
 
   // txs
   protected claimUploaderRole = claimUploaderRole;
@@ -152,9 +150,9 @@ export class Validator {
   protected runCache = runCache;
 
   // factories
-  public static cacheProviderFactory = cacheProviderFactory;
-  public static storageProviderFactory = storageProviderFactory;
-  public static compressionFactory = compressionFactory;
+  protected cacheProviderFactory = cacheProviderFactory;
+  protected storageProviderFactory = storageProviderFactory;
+  protected compressionFactory = compressionFactory;
 
   /**
    * Constructor for the validator class. It is required to provide the

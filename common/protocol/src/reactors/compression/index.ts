@@ -1,4 +1,4 @@
-import { ICompression } from "../..";
+import { ICompression, Validator } from "../..";
 import { Gzip } from "./Gzip";
 import { NoCompression } from "./NoCompression";
 
@@ -11,14 +11,13 @@ import { NoCompression } from "./NoCompression";
  * x - NoCompression (default)
  *
  * @method compressionFactory
- * @param {number} compressionId the id of the compression
  * @return {ICompression}
  */
-export const compressionFactory = (compressionId: number): ICompression => {
-  switch (compressionId) {
+export function compressionFactory(this: Validator): ICompression {
+  switch (this.pool.data?.current_compression_id ?? 0) {
     case 1:
       return new Gzip();
     default:
       return new NoCompression();
   }
-};
+}
