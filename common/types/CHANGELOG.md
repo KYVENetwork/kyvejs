@@ -5,28 +5,16 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ## [1.0.2](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/types@1.0.1...@kyvejs/types@1.0.2) (2023-07-14)
 
-**Note:** Version bump only for package @kyvejs/types
+### Features
+
+- generated types for chain version v1.3.0 ([#52](https://github.com/KYVENetwork/kyvejs/issues/52))
 
 ## [1.0.1](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/types@1.0.0...@kyvejs/types@1.0.1) (2023-06-02)
 
-**Note:** Version bump only for package @kyvejs/types
+### Features
 
-# [1.0.0](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/types@1.0.0-beta.4...@kyvejs/types@1.0.0) (2023-05-31)
+- generated types for chain version v1.2.0 ([#49](https://github.com/KYVENetwork/kyvejs/issues/49))
 
-**Note:** Version bump only for package @kyvejs/types
+## [1.0.0](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/types@1.0.0-beta.4...@kyvejs/types@1.0.0) (2023-05-31)
 
-# [1.0.0-beta.4](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/types@1.0.0-beta.3...@kyvejs/types@1.0.0-beta.4) (2023-05-19)
-
-**Note:** Version bump only for package @kyvejs/types
-
-# [1.0.0-beta.3](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/types@1.0.0-beta.2...@kyvejs/types@1.0.0-beta.3) (2023-04-13)
-
-**Note:** Version bump only for package @kyvejs/types
-
-# [1.0.0-beta.2](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/types@1.0.0-beta.1...@kyvejs/types@1.0.0-beta.2) (2023-01-27)
-
-**Note:** Version bump only for package @kyvejs/types
-
-# 1.0.0-beta.1 (2022-12-07)
-
-**Note:** Version bump only for package @kyvejs/types
+**Note:** Release for the KYVE protocol launch.

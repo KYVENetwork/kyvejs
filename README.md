@@ -53,19 +53,39 @@ KYVE, the Web3 data lake solution, is a protocol that enables data providers to 
 - [@kyvejs/tendermint](integrations/tendermint/README.md) - The official KYVE Tendermint sync integration
 - [@kyvejs/tendermint-bsync](integrations/tendermint-bsync/README.md) - The official KYVE Tendermint block sync integration
 
-## How to contribute
+## Build Integration Binaries
 
-Clone the repository:
+Clone and checkout repository:
 
 ```bash
 git clone git@github.com:KYVENetwork/kyvejs.git
-```
-
-Checkout repository:
-
-```bash
 cd kyvejs
 ```
+
+Checkout desired version:
+
+```
+git checkout tags/@kyvejs/<integration>@x.x.x -b @kyvejs/<integration>@x.x.x
+```
+
+Example: `git checkout tags/@kyvejs/tendermint-bsync@1.0.0 -b @kyvejs/tendermint-bsync@1.0.0`
+
+Install dependencies and setup project:
+
+```
+yarn setup
+```
+
+Checkout integration and build binaries:
+
+```
+cd integrations/<integration>
+yarn build:binaries
+```
+
+The binaries can then be found in the `/out` folder
+
+## How to contribute
 
 Checkout new branch to implement new features/fixes there
 
@@ -73,17 +93,23 @@ Checkout new branch to implement new features/fixes there
 git checkout -b [feat/fix]/[my-branch-name]
 ```
 
-Install dependencies with yarn:
+Install dependencies and setup project:
 
 ```bash
-yarn install
-```
-
-Bootstrap and build project:
-
-```
 yarn setup
 ```
 
 Apply your changes and create a Pull Request to `main`. Once the team has
 reviewed and approved your PR it can be merged and used.
+
+**NOTE**: The usage of [Conventional Commits](https://conventionalcommits.org) is required when creating PRs and committing to this repository
+
+## How to release
+
+In order to release new changes which got merged into `main` lerna can be used. Lerna will look into every change and create a new release tag if necessary. After the user has approved the new version tags (bumped according to [Semantic Versioning](https://semver.org/)) lerna will push those new tags to `main`, starting the CI/CD pipeline and creating the releases.
+
+Release with lerna:
+
+```
+yarn lerna version
+```
