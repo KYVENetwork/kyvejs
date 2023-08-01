@@ -17,4 +17,4 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ## [1.0.0](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/types@1.0.0-beta.4...@kyvejs/types@1.0.0) (2023-05-31)
 
-Release for the KYVE protocol launch.
+**Note:** Release for the KYVE protocol launch.
