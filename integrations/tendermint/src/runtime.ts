@@ -118,7 +118,7 @@ export default class Tendermint implements IRuntime {
     if (item.value?.begin_block_events) {
       item.value.begin_block_events = item.value.begin_block_events.map(
         (event: any) => {
-          event.attributes
+          event.attributes = event.attributes
             .sort(compareEventAttribute)
             .map(({ index, ...attribute }: IAttribute) => attribute);
           return event;
@@ -130,7 +130,7 @@ export default class Tendermint implements IRuntime {
     if (item.value?.end_block_events) {
       item.value.end_block_events = item.value.end_block_events.map(
         (event: any) => {
-          event.attributes
+          event.attributes = event.attributes
             .sort(compareEventAttribute)
             .map(({ index, ...attribute }: IAttribute) => attribute);
           return event;
@@ -147,7 +147,7 @@ export default class Tendermint implements IRuntime {
           if (tx_result.events) {
             tx_result.events = tx_result.events.map((event: any) => {
               // sort attributes in txs_results
-              event.attributes
+              event.attributes = event.attributes
                 .sort(compareEventAttribute)
                 .map(({ index, ...attribute }: IAttribute) => attribute);
 
