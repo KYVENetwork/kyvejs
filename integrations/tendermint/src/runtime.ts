@@ -16,7 +16,12 @@ interface IConfig {
 interface IAttribute {
   key: string;
   value: string;
-  index: boolean;
+  index?: boolean;
+}
+
+interface IEvent {
+  type: string;
+  attributes: IAttribute[];
 }
 
 export default class Tendermint implements IRuntime {
@@ -115,37 +120,35 @@ export default class Tendermint implements IRuntime {
         : 0;
 
     // sort attributes and remove index in begin_block_events
-    if (item.value?.begin_block_events) {
-      item.value.begin_block_events = item.value.begin_block_events.map(
-        (event: any) => {
+    if (item.value.block_results.begin_block_events) {
+      item.value.block_results.begin_block_events =
+        item.value.block_results.begin_block_events.map((event: IEvent) => {
           event.attributes = event.attributes
             .sort(compareEventAttribute)
             .map(({ index, ...attribute }: IAttribute) => attribute);
           return event;
-        }
-      );
+        });
     }
 
     // sort attributes and remove index in end_block_events
-    if (item.value?.end_block_events) {
-      item.value.end_block_events = item.value.end_block_events.map(
-        (event: any) => {
+    if (item.value.block_results.end_block_events) {
+      item.value.block_results.end_block_events =
+        item.value.block_results.end_block_events.map((event: IEvent) => {
           event.attributes = event.attributes
             .sort(compareEventAttribute)
             .map(({ index, ...attribute }: IAttribute) => attribute);
           return event;
-        }
-      );
+        });
     }
 
-    if (item.value?.block_results?.txs_results) {
+    if (item.value.block_results.txs_results) {
       item.value.block_results.txs_results =
         item.value.block_results.txs_results.map((tx_result: any) => {
           // delete log property of transaction results since it stores duplicate data
           delete tx_result.log;
 
           if (tx_result.events) {
-            tx_result.events = tx_result.events.map((event: any) => {
+            tx_result.events = tx_result.events.map((event: IEvent) => {
               // sort attributes in txs_results
               event.attributes = event.attributes
                 .sort(compareEventAttribute)
