@@ -22,7 +22,7 @@ export class Kyve implements IStorageProvider {
       throw new Error("ChainId is empty.");
     }
 
-    if (!poolId) {
+    if (poolId === null || poolId === undefined) {
       throw new Error("PoolId is empty.");
     }
 
@@ -61,7 +61,7 @@ export class Kyve implements IStorageProvider {
     const { signature, pub_key } = await sdk.signString(
       JSON.stringify({
         chainId: this.chainId,
-        poolId: this.poolId,
+        poolId: this.poolId.toString(),
         staker: this.staker,
         valaccount: address,
         timestamp,
@@ -69,14 +69,13 @@ export class Kyve implements IStorageProvider {
     );
 
     await axios.post(
-      "https://storage-provider.kyve.network/upload",
+      "http://localhost:3000/upload",
       {
         name: storageId,
-        data: bundle,
+        data: bundle.toString("base64"),
       },
       {
         headers: {
-          "Content-Type": "application/json",
           "chain-id": this.chainId,
           "pool-id": this.poolId.toString(),
           staker: this.staker,

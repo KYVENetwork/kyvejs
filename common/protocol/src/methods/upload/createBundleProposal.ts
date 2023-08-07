@@ -104,9 +104,7 @@ export async function createBundleProposal(this: Validator): Promise<void> {
     }
 
     // get current compression defined on pool
-    this.logger.debug(
-      `compressionFactory(${this.pool.data?.current_compression_id ?? 0})`
-    );
+    this.logger.debug(`this.compressionFactory()`);
     const compression = this.compressionFactory();
 
     const uploadBundle = bundleToBytes(bundleProposal);
