@@ -80,7 +80,7 @@ export class Kyve implements IStorageProvider {
         headers: {
           "kyve-api-key": process.env.KYVE_STORAGE_PROVIDER_API_KEY || "",
           "kyve-chain-id": this.chainId,
-          "kyve-pool-dd": this.poolId.toString(),
+          "kyve-pool-id": this.poolId.toString(),
           "kyve-staker": this.staker,
           "kyve-public-key": pub_key.value,
           "kyve-timestamp": timestamp,
