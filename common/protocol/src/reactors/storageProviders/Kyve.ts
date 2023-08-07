@@ -3,6 +3,8 @@ import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 import { BundleTag, IStorageProvider } from "../../types";
 
+require("dotenv").config();
+
 export class Kyve implements IStorageProvider {
   public name = "Kyve";
   public coinDecimals = 0;
@@ -69,19 +71,20 @@ export class Kyve implements IStorageProvider {
     );
 
     await axios.post(
-      "http://localhost:3000/upload",
+      "https://kyve-storage-provider-04cf3373643a.herokuapp.com/upload",
       {
         name: storageId,
         data: bundle.toString("base64"),
       },
       {
         headers: {
-          "chain-id": this.chainId,
-          "pool-id": this.poolId.toString(),
-          staker: this.staker,
-          "public-key": pub_key.value,
-          timestamp: timestamp,
-          signature: signature,
+          "kyve-api-key": process.env.KYVE_STORAGE_PROVIDER_API_KEY || "",
+          "kyve-chain-id": this.chainId,
+          "kyve-pool-dd": this.poolId.toString(),
+          "kyve-staker": this.staker,
+          "kyve-public-key": pub_key.value,
+          "kyve-timestamp": timestamp,
+          "kyve-signature": signature,
         },
       }
     );
@@ -92,12 +95,15 @@ export class Kyve implements IStorageProvider {
     };
   }
 
-  async retrieveBundle(storageId: string, _: number) {
-    // TODO: fetch from KYVE
+  async retrieveBundle(storageId: string, timeout: number) {
+    const { data: storageData } = await axios.get(
+      `https://storage.kyve.network/${storageId}`,
+      { responseType: "arraybuffer", timeout }
+    );
 
     return {
       storageId,
-      storageData: Buffer.from(""),
+      storageData,
     };
   }
 }
