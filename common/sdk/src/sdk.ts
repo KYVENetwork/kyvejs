@@ -64,11 +64,11 @@ export class KyveSDK {
     }
 
     if (options?.rpc) {
-      this.config = { ...this.config, rpc: options.rpc };
+      this.config = { ...this.config, rpc: options.rpc.replace(/\/$/, "") };
     }
 
     if (options?.rest) {
-      this.config = { ...this.config, rest: options.rest };
+      this.config = { ...this.config, rest: options.rest.replace(/\/$/, "") };
     }
 
     if (options?.coin) {
