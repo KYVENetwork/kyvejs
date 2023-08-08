@@ -13,6 +13,17 @@ interface IConfig {
   rpc: string;
 }
 
+interface IAttribute {
+  key: string;
+  value: string;
+  index?: boolean;
+}
+
+interface IEvent {
+  type: string;
+  attributes: IAttribute[];
+}
+
 export default class Tendermint implements IRuntime {
   public name = name;
   public version = version;
@@ -101,53 +112,59 @@ export default class Tendermint implements IRuntime {
     // event "fungible_token_packet" since it is producing non-deterministic
     // values likely due to a bug
 
-    const compareEventAttribute = (a: any, b: any) =>
+    const compareEventAttribute = (a: IAttribute, b: IAttribute) =>
       a.key.toLowerCase() > b.key.toLowerCase()
         ? 1
         : b.key.toLowerCase() > a.key.toLowerCase()
         ? -1
         : 0;
 
-    // sort attributes in begin_block_events
-    if (item.value?.begin_block_events) {
-      item.value.begin_block_events = item.value.begin_block_events.map(
-        (event: any) => {
-          event.attributes.sort(compareEventAttribute);
+    // sort attributes and remove index in begin_block_events
+    if (item.value.block_results.begin_block_events) {
+      item.value.block_results.begin_block_events =
+        item.value.block_results.begin_block_events.map((event: IEvent) => {
+          event.attributes = event.attributes
+            .sort(compareEventAttribute)
+            .map(({ index, ...attribute }: IAttribute) => attribute);
           return event;
-        }
-      );
+        });
     }
 
-    // sort attributes in end_block_events
-    if (item.value?.end_block_events) {
-      item.value.end_block_events = item.value.end_block_events.map(
-        (event: any) => {
-          event.attributes.sort(compareEventAttribute);
+    // sort attributes and remove index in end_block_events
+    if (item.value.block_results.end_block_events) {
+      item.value.block_results.end_block_events =
+        item.value.block_results.end_block_events.map((event: IEvent) => {
+          event.attributes = event.attributes
+            .sort(compareEventAttribute)
+            .map(({ index, ...attribute }: IAttribute) => attribute);
           return event;
-        }
-      );
+        });
     }
 
-    if (item.value?.block_results?.txs_results) {
+    if (item.value.block_results.txs_results) {
       item.value.block_results.txs_results =
         item.value.block_results.txs_results.map((tx_result: any) => {
           // delete log property of transaction results since it stores duplicate data
           delete tx_result.log;
 
           if (tx_result.events) {
-            tx_result.events = tx_result.events.map((event: any) => {
+            tx_result.events = tx_result.events.map((event: IEvent) => {
               // sort attributes in txs_results
-              event.attributes.sort(compareEventAttribute);
+              event.attributes = event.attributes
+                .sort(compareEventAttribute)
+                .map(({ index, ...attribute }: IAttribute) => attribute);
 
               // set attribute "acknowledgement" in ibc event "fungible_token_packet" to empty string
               if (event.type === 'fungible_token_packet') {
-                event.attributes = event.attributes.map((attribute: any) => {
-                  if (attribute.key === 'YWNrbm93bGVkZ2VtZW50') {
-                    attribute.value = '';
-                  }
+                event.attributes = event.attributes.map(
+                  (attribute: IAttribute) => {
+                    if (attribute.key === 'YWNrbm93bGVkZ2VtZW50') {
+                      attribute.value = '';
+                    }
 
-                  return attribute;
-                });
+                    return attribute;
+                  }
+                );
               }
 
               return event;

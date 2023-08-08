@@ -47,10 +47,7 @@ export class Bundlr implements IStorageProvider {
   }
 
   async saveBundle(bundle: Buffer, tags: BundleTag[]) {
-    const transaction = this.bundlrClient.createTransaction(
-      bundle,
-      { tags }
-    );
+    const transaction = this.bundlrClient.createTransaction(bundle, { tags });
 
     await transaction.sign();
     await transaction.upload();
