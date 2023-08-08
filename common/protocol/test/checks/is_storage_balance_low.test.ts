@@ -53,9 +53,7 @@ describe("isStorageBalanceLow", () => {
     // ARRANGE
     storageProvider = new TestNormalStorageProvider();
     storageProvider.getBalance = jest.fn().mockResolvedValue("0");
-    jest
-      .spyOn(Validator, "storageProviderFactory")
-      .mockImplementation(() => storageProvider);
+    v["storageProviderFactory"] = jest.fn().mockReturnValue(storageProvider);
 
     v.pool.bundle_proposal!.data_size = "0";
 
@@ -70,9 +68,7 @@ describe("isStorageBalanceLow", () => {
     // ARRANGE
     storageProvider = new TestNormalStorageProvider();
     storageProvider.getBalance = jest.fn().mockResolvedValue("100");
-    jest
-      .spyOn(Validator, "storageProviderFactory")
-      .mockImplementation(() => storageProvider);
+    v["storageProviderFactory"] = jest.fn().mockReturnValue(storageProvider);
 
     v.pool.bundle_proposal!.data_size = "0";
 
@@ -87,9 +83,7 @@ describe("isStorageBalanceLow", () => {
     // ARRANGE
     storageProvider = new TestNormalStorageProvider();
     storageProvider.getBalance = jest.fn().mockResolvedValue("0");
-    jest
-      .spyOn(Validator, "storageProviderFactory")
-      .mockImplementation(() => storageProvider);
+    v["storageProviderFactory"] = jest.fn().mockReturnValue(storageProvider);
 
     v.pool.bundle_proposal!.data_size = "100";
 
@@ -104,9 +98,7 @@ describe("isStorageBalanceLow", () => {
     // ARRANGE
     storageProvider = new TestNormalStorageProvider();
     storageProvider.getBalance = jest.fn().mockResolvedValue("100");
-    jest
-      .spyOn(Validator, "storageProviderFactory")
-      .mockImplementation(() => storageProvider);
+    v["storageProviderFactory"] = jest.fn().mockReturnValue(storageProvider);
 
     v.pool.bundle_proposal!.data_size = "100";
 
@@ -121,9 +113,7 @@ describe("isStorageBalanceLow", () => {
     // ARRANGE
     storageProvider = new TestNormalStorageProvider();
     storageProvider.getBalance = jest.fn().mockResolvedValue("5000");
-    jest
-      .spyOn(Validator, "storageProviderFactory")
-      .mockImplementation(() => storageProvider);
+    v["storageProviderFactory"] = jest.fn().mockReturnValue(storageProvider);
 
     v.pool.bundle_proposal!.data_size = "100";
 
@@ -139,9 +129,7 @@ describe("isStorageBalanceLow", () => {
     storageProvider = new TestNormalStorageProvider();
     storageProvider.getAddress = jest.fn().mockRejectedValue(new Error());
     storageProvider.getBalance = jest.fn().mockResolvedValue("100");
-    jest
-      .spyOn(Validator, "storageProviderFactory")
-      .mockImplementation(() => storageProvider);
+    v["storageProviderFactory"] = jest.fn().mockReturnValue(storageProvider);
 
     // ACT
     await isStorageBalanceLow.call(v);
@@ -154,9 +142,7 @@ describe("isStorageBalanceLow", () => {
     // ARRANGE
     storageProvider = new TestNormalStorageProvider();
     storageProvider.getBalance = jest.fn().mockRejectedValue(new Error());
-    jest
-      .spyOn(Validator, "storageProviderFactory")
-      .mockImplementation(() => storageProvider);
+    v["storageProviderFactory"] = jest.fn().mockReturnValue(storageProvider);
 
     // ACT
     await isStorageBalanceLow.call(v);

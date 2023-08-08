@@ -1,7 +1,7 @@
-import { IStorageProvider } from "../..";
+import { IStorageProvider, Validator } from "../..";
 import { Arweave } from "./Arweave";
 import { Bundlr } from "./Bundlr";
-import { S3 } from "./S3";
+import { Kyve } from "./Kyve";
 import { NoStorageProvider } from "./NoStorageProvider";
 
 /**
@@ -11,26 +11,21 @@ import { NoStorageProvider } from "./NoStorageProvider";
  * 0 - NoStorageProvider
  * 1 - Arweave
  * 2 - Bundlr
- * 3 - AWS S3
+ * 3 - Kyve
  * x - NoStorageProvider (default)
  *
  * @method storageProviderFactory
- * @param {number} storageProviderId the id of the storage provider
- * @param {string} storagePriv the secret used for the storage provider
  * @return {IStorageProvider}
  */
-export const storageProviderFactory = (
-  storageProviderId: number,
-  storagePriv: string
-): IStorageProvider => {
-  switch (storageProviderId) {
+export function storageProviderFactory(this: Validator): IStorageProvider {
+  switch (this.pool.data?.current_storage_provider_id ?? 0) {
     case 1:
-      return new Arweave(storagePriv);
+      return new Arweave(this.storagePriv);
     case 2:
-      return new Bundlr(storagePriv);
+      return new Bundlr(this.storagePriv);
     case 3:
-      return new S3();
+      return new Kyve(this.chainId, this.poolId, this.staker, this.valaccount);
     default:
       return new NoStorageProvider();
   }
-};
+}

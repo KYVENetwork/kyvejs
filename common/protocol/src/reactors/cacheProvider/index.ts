@@ -1,4 +1,4 @@
-import { ICacheProvider } from "../..";
+import { ICacheProvider, Validator } from "../..";
 import { JsonFileCache } from "./JsonFileCache";
 import { MemoryCache } from "./MemoryCache";
 
@@ -10,14 +10,13 @@ import { MemoryCache } from "./MemoryCache";
  * x - Memory (default)
  *
  * @method cacheProviderFactory
- * @param {string} cacheId the id of the compression
  * @return {ICacheProvider}
  */
-export const cacheProviderFactory = (cacheId: string): ICacheProvider => {
-  switch (cacheId) {
+export function cacheProviderFactory(this: Validator): ICacheProvider {
+  switch (this.cache) {
     case "jsonfile":
       return new JsonFileCache();
     default:
       return new MemoryCache();
   }
-};
+}

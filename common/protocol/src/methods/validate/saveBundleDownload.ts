@@ -53,15 +53,8 @@ export async function saveBundleDownload(
       }
 
       // get storage provider the proposed bundle was saved to
-      this.logger.debug(
-        `storageProviderFactory(${
-          this.pool.bundle_proposal?.storage_provider_id ?? 0
-        }, $STORAGE_PRIV)`
-      );
-      const storageProvider = Validator.storageProviderFactory(
-        this.pool.bundle_proposal?.storage_provider_id ?? 0,
-        this.storagePriv
-      );
+      this.logger.debug(`this.storageProviderFactory()`);
+      const storageProvider = this.storageProviderFactory();
 
       // calculate download timeout for storage provider
       // the timeout should always be 20 seconds less than the upload interval

@@ -17,12 +17,8 @@ export async function saveBundleDecompress(
 ): Promise<DataItem[]> {
   try {
     // get compression the proposed bundle was compressed with
-    this.logger.debug(
-      `compressionFactory(${this.pool.bundle_proposal?.compression_id ?? 0})`
-    );
-    const compression = Validator.compressionFactory(
-      this.pool.bundle_proposal?.compression_id ?? 0
-    );
+    this.logger.debug(`this.compressionFactory()`);
+    const compression = this.compressionFactory();
 
     this.logger.debug(`this.compression.decompress($RAW_STORAGE_DATA)`);
 

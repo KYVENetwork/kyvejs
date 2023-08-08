@@ -104,12 +104,8 @@ export async function createBundleProposal(this: Validator): Promise<void> {
     }
 
     // get current compression defined on pool
-    this.logger.debug(
-      `compressionFactory(${this.pool.data?.current_compression_id ?? 0})`
-    );
-    const compression = Validator.compressionFactory(
-      this.pool.data?.current_compression_id ?? 0
-    );
+    this.logger.debug(`this.compressionFactory()`);
+    const compression = this.compressionFactory();
 
     const uploadBundle = bundleToBytes(bundleProposal);
 
@@ -209,15 +205,8 @@ export async function createBundleProposal(this: Validator): Promise<void> {
     // uploader role to prevent upload slashes
     try {
       // get current storage provider defined on pool
-      this.logger.debug(
-        `storageProviderFactory(${
-          this.pool.data?.current_storage_provider_id ?? 0
-        }, $STORAGE_PRIV)`
-      );
-      const storageProvider = Validator.storageProviderFactory(
-        this.pool.data?.current_storage_provider_id ?? 0,
-        this.storagePriv
-      );
+      this.logger.debug(`this.storageProviderFactory()`);
+      const storageProvider = this.storageProviderFactory();
 
       // if balance is less than the upload cost we skip the uploader
       // role with a warning

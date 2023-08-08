@@ -44,7 +44,6 @@ import {
   waitForCacheContinuation,
   waitForNextBundleProposal,
   waitForUploadInterval,
-  getProxyAuth,
   isStorageBalanceLow,
 } from "./methods";
 import { ICacheProvider, IMetrics, IRuntime } from "./types";
@@ -124,7 +123,6 @@ export class Validator {
   // helpers
   protected archiveDebugBundle = archiveDebugBundle;
   protected continueRound = continueRound;
-  public getProxyAuth = getProxyAuth;
 
   // txs
   protected claimUploaderRole = claimUploaderRole;
@@ -152,9 +150,9 @@ export class Validator {
   protected runCache = runCache;
 
   // factories
-  public static cacheProviderFactory = cacheProviderFactory;
-  public static storageProviderFactory = storageProviderFactory;
-  public static compressionFactory = compressionFactory;
+  protected cacheProviderFactory = cacheProviderFactory;
+  protected storageProviderFactory = storageProviderFactory;
+  protected compressionFactory = compressionFactory;
 
   /**
    * Constructor for the validator class. It is required to provide the
@@ -315,6 +313,9 @@ export class Validator {
       process.exit(1);
     }
 
+    await this.setupValidator();
+    await this.setupCacheProvider();
+
     if (await this.isStorageBalanceZero()) {
       process.exit(1);
     }
@@ -322,9 +323,6 @@ export class Validator {
     if (!(await this.isDataAvailable())) {
       process.exit(1);
     }
-
-    await this.setupValidator();
-    await this.setupCacheProvider();
 
     // start the node process. Validator and cache should run at the same time.
     // Thats why, although they are async they are called synchronously

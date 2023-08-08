@@ -70,15 +70,8 @@ export async function getBalancesForMetrics(this: Validator): Promise<void> {
 
   try {
     // get current storage provider defined on pool
-    this.logger.debug(
-      `storageProviderFactory(${
-        this.pool.data?.current_storage_provider_id ?? 0
-      }, $STORAGE_PRIV)`
-    );
-    const storageProvider = Validator.storageProviderFactory(
-      this.pool.data?.current_storage_provider_id ?? 0,
-      this.storagePriv
-    );
+    this.logger.debug(`this.storageProviderFactory()`);
+    const storageProvider = this.storageProviderFactory();
 
     this.logger.debug(`this.storageProvider.getBalance()`);
 

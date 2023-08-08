@@ -56,23 +56,17 @@ describe("vote abstain tests", () => {
 
     // mock cache provider
     cacheProvider = new TestCacheProvider();
-    jest
-      .spyOn(Validator, "cacheProviderFactory")
-      .mockImplementation(() => cacheProvider);
+    v["cacheProviderFactory"] = jest.fn().mockReturnValue(cacheProvider);
 
     v["cacheProvider"] = cacheProvider;
 
     // mock storage provider
     storageProvider = new TestNormalStorageProvider();
-    jest
-      .spyOn(Validator, "storageProviderFactory")
-      .mockImplementation(() => storageProvider);
+    v["storageProviderFactory"] = jest.fn().mockReturnValue(storageProvider);
 
     // mock compression
     compression = new TestNormalCompression();
-    jest
-      .spyOn(Validator, "compressionFactory")
-      .mockImplementation(() => compression);
+    v["compressionFactory"] = jest.fn().mockReturnValue(compression);
 
     // mock process.exit
     processExit = jest.fn<never, never>();

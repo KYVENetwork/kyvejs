@@ -23,7 +23,6 @@ export * from "./timeouts/waitForUploadInterval";
 // helpers
 export * from "./helpers/archiveDebugBundle";
 export * from "./helpers/continueRound";
-export * from "./helpers/getProxyAuth";
 
 // txs
 export * from "./txs/claimUploaderRole";
