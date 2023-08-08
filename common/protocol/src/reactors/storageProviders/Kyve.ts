@@ -71,7 +71,7 @@ export class Kyve implements IStorageProvider {
     );
 
     await axios.post(
-      "https://kyve-storage-provider-04cf3373643a.herokuapp.com/upload",
+      "https://upload.storage.kyve.network/upload",
       {
         name: storageId,
         data: bundle.toString("base64"),
