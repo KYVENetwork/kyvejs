@@ -5,7 +5,7 @@ import {
   colors,
   uniqueNamesGenerator,
 } from "unique-names-generator";
-import { major, minor } from "semver";
+import { major, minor, prerelease } from "semver";
 
 import { Validator, standardizeError } from "../..";
 
@@ -32,7 +32,9 @@ export async function setupValidator(this: Validator): Promise<void> {
     // runtime, runtime version and valaddress
     const valnameSeed = `${this.chainId}-${this.poolId}-${
       this.runtime.name
-    }-${major(this.runtime.version)}-${minor(this.runtime.version)}-${
+    }-${major(this.runtime.version)}-${minor(
+      this.runtime.version
+    )}-${JSON.stringify(prerelease(this.runtime.version))}-${
       this.client[0].account.address
     }`;
 
