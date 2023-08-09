@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.0.4](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/protocol@1.0.3...@kyvejs/protocol@1.0.4) (2023-08-09)
+
+### Bug Fixes
+
+- runtime tendermint ([#58](https://github.com/KYVENetwork/kyvejs/issues/58)) ([38e0b17](https://github.com/KYVENetwork/kyvejs/commit/38e0b17d0832afc9a0cbc1834c5b380ef4dfb9f5))
+- treat prereleases as different versions ([#61](https://github.com/KYVENetwork/kyvejs/issues/61)) ([a16afab](https://github.com/KYVENetwork/kyvejs/commit/a16afab42a0ccd194d1ffecdd3829f70784f2b19))
+
 ## [1.0.3](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/protocol@1.0.2...@kyvejs/protocol@1.0.3) (2023-07-28)
 
 ### Features
