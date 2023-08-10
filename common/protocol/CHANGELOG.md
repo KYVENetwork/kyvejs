@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.0.5](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/protocol@1.0.4...@kyvejs/protocol@1.0.5) (2023-08-10)
+
+### Bug Fixes
+
+- moved all checks before validator initialization ([#62](https://github.com/KYVENetwork/kyvejs/issues/62)) ([8822cbe](https://github.com/KYVENetwork/kyvejs/commit/8822cbee270f3468ae3d2e66d4f0c6fcc374cd9c))
+
 ## [1.0.4](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/protocol@1.0.3...@kyvejs/protocol@1.0.4) (2023-08-09)
 
 ### Bug Fixes

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.0.1](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint@1.0.0...@kyvejs/tendermint@1.0.1) (2023-08-10)
+
+### Bug Fixes
+
+- reset version ([a9289b7](https://github.com/KYVENetwork/kyvejs/commit/a9289b76b6d3dfa98edc2a4c5403be238ee5dddb))
+
 # [1.0.0-beta.2](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint@1.0.0-beta.1...@kyvejs/tendermint@1.0.0-beta.2) (2023-08-09)
 
 ### Bug Fixes
