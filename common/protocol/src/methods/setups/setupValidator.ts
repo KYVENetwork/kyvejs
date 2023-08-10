@@ -5,7 +5,7 @@ import {
   colors,
   uniqueNamesGenerator,
 } from "unique-names-generator";
-import { major, minor, prerelease } from "semver";
+import { major, minor, patch, prerelease } from "semver";
 
 import { Validator, standardizeError } from "../..";
 
@@ -28,12 +28,20 @@ export async function setupValidator(this: Validator): Promise<void> {
     this.logger.info(`${this.runtime.name} = v${this.runtime.version}`);
     this.logger.info(`@kyvejs/protocol = v${this.protocolVersion}\n`);
 
-    // generate deterministic valname based on chainId, pool id,
-    // runtime, runtime version and valaddress
+    // A Valname is likea human readable hash  based on chainId, pool id,
+    // runtime, runtime version and valaddress.
+
+    // for the version we take the major, minor and prerelease version,
+    // because if one of those changes the valname should not match anymore,
+    // with the patch version it is different, here the remote version dictates
+    // the min patch version, the valname should only differ, if the local patch
+    // version is smaller, therefore we take the min out of remote and local
+    // patch version
     const valnameSeed = `${this.chainId}-${this.poolId}-${
       this.runtime.name
-    }-${major(this.runtime.version)}-${minor(
-      this.runtime.version
+    }-${major(this.runtime.version)}-${minor(this.runtime.version)}-${Math.min(
+      patch(this.runtime.version),
+      patch(this.pool.data!.protocol!.version)
     )}-${JSON.stringify(prerelease(this.runtime.version))}-${
       this.client[0].account.address
     }`;

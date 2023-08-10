@@ -1,5 +1,5 @@
 import { Validator, standardizeJSON } from "../..";
-import { valid, major, minor, prerelease } from "semver";
+import { valid, major, minor, patch, prerelease } from "semver";
 
 /**
  * isValidVersion checks if the major and minor version of the pool matches
@@ -52,6 +52,17 @@ export function isValidVersion(this: Validator): boolean {
 
     // exit if minor version does not match
     if (minor(remoteVersion) !== minor(localVersion)) {
+      this.logger.fatal(`Running an invalid version. Exiting ...`);
+      this.logger.fatal(
+        `Found Runtime version = ${this.runtime.version} required = ${
+          this.pool.data!.protocol!.version
+        }`
+      );
+      return false;
+    }
+
+    // exit if local patch version is behind remote
+    if (patch(remoteVersion) > patch(localVersion)) {
       this.logger.fatal(`Running an invalid version. Exiting ...`);
       this.logger.fatal(
         `Found Runtime version = ${this.runtime.version} required = ${

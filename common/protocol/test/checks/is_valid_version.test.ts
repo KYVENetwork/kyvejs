@@ -114,7 +114,7 @@ describe("isValidVersion", () => {
     const result = isValidVersion.call(v);
 
     // ASSERT
-    expect(result).toBeTruthy();
+    expect(result).toBeFalsy();
   });
 
   test("assert remote and local with higher minor version", async () => {
