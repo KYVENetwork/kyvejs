@@ -28,10 +28,6 @@ export class Kyve implements IStorageProvider {
       throw new Error("PoolId is empty.");
     }
 
-    if (!staker) {
-      throw new Error("Staker is empty.");
-    }
-
     if (!valaccount) {
       throw new Error("Valaccount mnemonic is empty.");
     }
