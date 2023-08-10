@@ -313,9 +313,6 @@ export class Validator {
       process.exit(1);
     }
 
-    await this.setupValidator();
-    await this.setupCacheProvider();
-
     if (await this.isStorageBalanceZero()) {
       process.exit(1);
     }
@@ -323,6 +320,9 @@ export class Validator {
     if (!(await this.isDataAvailable())) {
       process.exit(1);
     }
+
+    await this.setupValidator();
+    await this.setupCacheProvider();
 
     // start the node process. Validator and cache should run at the same time.
     // Thats why, although they are async they are called synchronously
