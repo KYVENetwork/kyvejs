@@ -1,0 +1,93 @@
+syntax = "proto3";
+
+package kyve.tendermint;
+
+import "google/protobuf/empty.proto";
+
+
+message DataItem {
+    string key = 1;
+    google.protobuf.Any value = 2;
+}
+
+/* validateSetConfig */
+message ValidateSetConfigRequest {
+    string raw_config = 1;
+}
+
+message ValidateSetConfigResponse {
+    google.protobuf.Empty response = 1;
+}
+
+
+/* getDataItem */
+message GetDataItemRequest {
+    string validator = 1;
+    string key = 2;
+}
+
+message GetDataItemResponse {
+    DataItem data_item = 1;
+}
+
+/* prevalidateDataItem */
+message PrevalidateDataItemRequest {
+    string validator = 1;
+    DataItem data_item = 2;
+}
+
+message PrevalidateDataItemResponse {
+    bool is_valid = 1;
+}
+
+/* transformDataItem */
+message TransformDataItemRequest {
+    string validator = 1;
+    DataItem data_item = 2;
+}
+
+message TransformDataItemResponse {
+    DataItem transformed_data_item = 1;
+}
+
+
+/* validateDataItem */
+message ValidateDataItemRequest {
+    string validator = 1;
+    DataItem proposed_data_item = 2;
+    DataItem validation_data_item = 3;
+}
+
+message ValidateDataItemResponse {
+    bool is_valid = 1;
+}
+
+/* summarizeDataBundle */
+message SummarizeDataBundleRequest {
+    string validator = 1;
+    repeated DataItem bundle = 2;
+}
+
+message SummarizeDataBundleResponse {
+    string summary = 1;
+}
+
+/* nextKey */
+message NextKeyRequest {
+    string validator = 1;
+    string key = 2;
+}
+
+message NextKeyResponse {
+    string next_key = 1;
+}
+
+service RuntimeService {
+    rpc ValidateSetConfig (ValidateSetConfigRequest) returns (ValidateSetConfigResponse);
+    rpc GetDataItem (GetDataItemRequest) returns (GetDataItemResponse);
+    rpc PrevalidateDataItem (PrevalidateDataItemRequest) returns (PrevalidateDataItemResponse);
+    rpc TransformDataItem (TransformDataItemRequest) returns (TransformDataItemResponse);
+    rpc ValidateDataItem (ValidateDataItemRequest) returns (ValidateDataItemResponse);
+    rpc SummarizeDataBundle (SummarizeDataBundleRequest) returns (SummarizeDataBundleResponse);
+    rpc NextKey (NextKeyRequest) returns (NextKeyResponse);
+}
