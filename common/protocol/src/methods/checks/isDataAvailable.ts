@@ -19,17 +19,29 @@ export async function isDataAvailable(this: Validator): Promise<boolean> {
 
     // get the next key to node has to fetch
     const nextKey = this.pool.data!.current_key
-      ? await this.runtime.nextKey(this, this.pool.data!.current_key)
+      ? await this.runtime.nextKey({
+          serializedConfig: this.runtime.serializedConfig,
+          key: this.pool.data!.current_key,
+        })
       : this.pool.data!.start_key;
 
     this.logger.info(`Checking data availability for key ${nextKey}`);
 
     // collect data item for next key
-    const dataItem = await this.runtime.getDataItem(this, nextKey);
+    const dataItem = await this.runtime.getDataItem({
+      serializedConfig: this.runtime.serializedConfig,
+      key: nextKey,
+    });
 
     // prevalidate data item and reject if it fails
-    this.logger.debug(`this.runtime.prevalidateDataItem($THIS,$ITEM)`);
-    const valid = await this.runtime.prevalidateDataItem(this, dataItem);
+    this.logger.debug(
+      `this.runtime.prevalidateDataItem($this.runtime.serializedConfig,$ITEM)`
+    );
+
+    const valid = await this.runtime.prevalidateDataItem({
+      serializedConfig: this.runtime.serializedConfig,
+      data_item: dataItem,
+    });
 
     if (!valid) {
       throw new Error(`Prevalidation of data item with key ${nextKey} failed.`);
@@ -37,7 +49,10 @@ export async function isDataAvailable(this: Validator): Promise<boolean> {
 
     // transform data item
     this.logger.debug(`this.runtime.transformDataItem($ITEM)`);
-    await this.runtime.transformDataItem(this, dataItem);
+    await this.runtime.transformDataItem({
+      serializedConfig: this.runtime.serializedConfig,
+      data_item: dataItem,
+    });
 
     this.logger.info(
       `Data available and valid for next key ${nextKey}. Continuing ...`
