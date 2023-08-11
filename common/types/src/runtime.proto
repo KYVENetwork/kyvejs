@@ -1,0 +1,114 @@
+syntax = "proto3";
+
+package kyve;
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/any.proto";
+
+
+message DataItem {
+    string key = 1;
+    google.protobuf.Any value = 2;
+}
+
+message RuntimeConfig {
+    string serializedConfig = 1;
+}
+
+/* getRuntimeName */
+message GetRuntimeNameRequest {}
+
+message GetRuntimeNameResponse {
+  string name = 1;
+}
+
+/* getRuntimeVersion */
+message GetRuntimeVersionRequest {}
+
+message GetRuntimeVersionResponse {
+  string version = 1;
+}
+
+/* validateSetConfig */
+message ValidateSetConfigRequest {
+    string raw_config = 1;
+}
+
+message ValidateSetConfigResponse {
+    google.protobuf.Empty response = 1;
+}
+
+
+/* getDataItem */
+message GetDataItemRequest {
+    RuntimeConfig config = 1;
+    string key = 2;
+}
+
+message GetDataItemResponse {
+    DataItem data_item = 1;
+}
+
+/* prevalidateDataItem */
+message PrevalidateDataItemRequest {
+    RuntimeConfig config = 1;
+    DataItem data_item = 2;
+}
+
+message PrevalidateDataItemResponse {
+    bool is_valid = 1;
+}
+
+/* transformDataItem */
+message TransformDataItemRequest {
+    RuntimeConfig config = 1;
+    DataItem data_item = 2;
+}
+
+message TransformDataItemResponse {
+    DataItem transformed_data_item = 1;
+}
+
+
+/* validateDataItem */
+message ValidateDataItemRequest {
+    RuntimeConfig config = 1;
+    DataItem proposed_data_item = 2;
+    DataItem validation_data_item = 3;
+}
+
+message ValidateDataItemResponse {
+    bool is_valid = 1;
+}
+
+/* summarizeDataBundle */
+message SummarizeDataBundleRequest {
+    RuntimeConfig config = 1;
+    repeated DataItem bundle = 2;
+}
+
+message SummarizeDataBundleResponse {
+    string summary = 1;
+}
+
+/* nextKey */
+message NextKeyRequest {
+    RuntimeConfig config = 1;
+    string key = 2;
+}
+
+message NextKeyResponse {
+    string next_key = 1;
+}
+
+service RuntimeService {
+    rpc GetRuntimeName(GetRuntimeNameRequest) returns (GetRuntimeNameResponse);
+    rpc GetRuntimeVersion(GetRuntimeVersionRequest) returns (GetRuntimeVersionResponse);
+    rpc ValidateSetConfig (ValidateSetConfigRequest) returns (ValidateSetConfigResponse);
+    rpc GetDataItem (GetDataItemRequest) returns (GetDataItemResponse);
+    rpc PrevalidateDataItem (PrevalidateDataItemRequest) returns (PrevalidateDataItemResponse);
+    rpc TransformDataItem (TransformDataItemRequest) returns (TransformDataItemResponse);
+    rpc ValidateDataItem (ValidateDataItemRequest) returns (ValidateDataItemResponse);
+    rpc SummarizeDataBundle (SummarizeDataBundleRequest) returns (SummarizeDataBundleResponse);
+    rpc NextKey (NextKeyRequest) returns (NextKeyResponse);
+}

@@ -213,6 +213,11 @@ export async function validateBundleProposal(
               proposedBundle[i],
               validationBundle[i]
             );
+            valid = await this.runtime.validateDataItem({
+              serializedConfig: this.runtime.serializedConfig,
+              proposed_data_item: proposedBundle[i],
+              validation_data_item: validationBundle[i],
+            });
 
             // vote abstain if data item validation returned abstain
             if (vote === VOTE.ABSTAIN) {
@@ -255,7 +260,10 @@ export async function validateBundleProposal(
           );
 
           const bundleSummary = await this.runtime
-            .summarizeDataBundle(this, proposedBundle)
+            .summarizeDataBundle({
+              serializedConfig: this.runtime.serializedConfig,
+              bundle: proposedBundle,
+            })
             .catch((err) => {
               this.logger.error(
                 `Unexpected error summarizing bundle with runtime. Voting abstain ...`
