@@ -10,6 +10,29 @@ message DataItem {
     google.protobuf.Any value = 2;
 }
 
+message RuntimeConfig {
+  // Define fields for the runtime configuration
+  // ...
+}
+
+/* getName */
+message GetNameRequest {
+  RuntimeConfig config = 1;
+}
+
+message GetNameResponse {
+  string name = 1;
+}
+
+/* getVersion */
+message GetVersionRequest {
+  RuntimeConfig config = 1;
+}
+
+message GetVersionResponse {
+  string version = 1;
+}
+
 /* validateSetConfig */
 message ValidateSetConfigRequest {
     string raw_config = 1;
@@ -22,7 +45,7 @@ message ValidateSetConfigResponse {
 
 /* getDataItem */
 message GetDataItemRequest {
-    string validator = 1;
+    RuntimeConfig config = 1;
     string key = 2;
 }
 
@@ -32,7 +55,7 @@ message GetDataItemResponse {
 
 /* prevalidateDataItem */
 message PrevalidateDataItemRequest {
-    string validator = 1;
+    RuntimeConfig config = 1;
     DataItem data_item = 2;
 }
 
@@ -42,7 +65,7 @@ message PrevalidateDataItemResponse {
 
 /* transformDataItem */
 message TransformDataItemRequest {
-    string validator = 1;
+    RuntimeConfig config = 1;
     DataItem data_item = 2;
 }
 
@@ -53,7 +76,7 @@ message TransformDataItemResponse {
 
 /* validateDataItem */
 message ValidateDataItemRequest {
-    string validator = 1;
+    RuntimeConfig config = 1;
     DataItem proposed_data_item = 2;
     DataItem validation_data_item = 3;
 }
@@ -64,7 +87,7 @@ message ValidateDataItemResponse {
 
 /* summarizeDataBundle */
 message SummarizeDataBundleRequest {
-    string validator = 1;
+    RuntimeConfig config = 1;
     repeated DataItem bundle = 2;
 }
 
@@ -74,7 +97,7 @@ message SummarizeDataBundleResponse {
 
 /* nextKey */
 message NextKeyRequest {
-    string validator = 1;
+    RuntimeConfig config = 1;
     string key = 2;
 }
 
@@ -83,6 +106,8 @@ message NextKeyResponse {
 }
 
 service RuntimeService {
+    rpc GetName(GetNameRequest) returns (GetNameResponse);
+    rpc GetVersion(GetVersionRequest) returns (GetVersionResponse);
     rpc ValidateSetConfig (ValidateSetConfigRequest) returns (ValidateSetConfigResponse);
     rpc GetDataItem (GetDataItemRequest) returns (GetDataItemResponse);
     rpc PrevalidateDataItem (PrevalidateDataItemRequest) returns (PrevalidateDataItemResponse);
