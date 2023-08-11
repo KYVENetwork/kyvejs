@@ -87,7 +87,10 @@ export async function createBundleProposal(this: Validator): Promise<void> {
     // saved on chain
     this.logger.debug(`this.runtime.summarizeDataBundle($BUNDLE_PROPOSAL)`);
     const bundleSummary = await this.runtime
-      .summarizeDataBundle(this, bundleProposal)
+      .summarizeDataBundle({
+        serializedConfig: this.runtime.serializedConfig,
+        bundle: bundleProposal,
+      })
       .catch((err) => {
         this.logger.error(
           `Unexpected error summarizing bundle. Skipping Uploader Role ...`

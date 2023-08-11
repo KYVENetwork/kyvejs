@@ -156,13 +156,13 @@ export async function validateBundleProposal(
         for (let i = 0; i < proposedBundle.length; i++) {
           if (valid) {
             this.logger.debug(
-              `this.runtime.validateDataItem($THIS, $PROPOSED_DATA_ITEM, $VALIDATION_DATA_ITEM)`
+              `this.runtime.validateDataItem($this.runtime.serializedConfig, $PROPOSED_DATA_ITEM, $VALIDATION_DATA_ITEM)`
             );
-            valid = await this.runtime.validateDataItem(
-              this,
-              proposedBundle[i],
-              validationBundle[i]
-            );
+            valid = await this.runtime.validateDataItem({
+              serializedConfig: this.runtime.serializedConfig,
+              proposed_data_item: proposedBundle[i],
+              validation_data_item: validationBundle[i],
+            });
 
             // only log if data item validation returned invalid
             if (!valid) {
@@ -190,7 +190,10 @@ export async function validateBundleProposal(
           );
 
           const bundleSummary = await this.runtime
-            .summarizeDataBundle(this, proposedBundle)
+            .summarizeDataBundle({
+              serializedConfig: this.runtime.serializedConfig,
+              bundle: proposedBundle,
+            })
             .catch((err) => {
               this.logger.error(
                 `Unexpected error summarizing bundle with runtime. Voting abstain ...`

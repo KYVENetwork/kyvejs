@@ -46,12 +46,29 @@ import {
   waitForUploadInterval,
   isStorageBalanceLow,
 } from "./methods";
-import { ICacheProvider, IMetrics, IRuntime } from "./types";
+import { ICacheProvider, IMetrics, IgRPCRuntime } from "./types";
 import { standardizeError } from "./utils";
 import { SupportedChains } from "@kyvejs/sdk/dist/constants";
 import { storageProviderFactory } from "./reactors/storageProviders";
 import { compressionFactory } from "./reactors/compression";
 import { cacheProviderFactory } from "./reactors/cacheProvider";
+const grpc = require("@grpc/grpc-js");
+var protoLoader = require("@grpc/proto-loader");
+const PROTO_PATH = "../../types/src/runtime.proto";
+const options = {
+  keepCase: true,
+  longs: String,
+  enums: String,
+  defaults: true,
+  oneofs: true,
+};
+var grpcObj = protoLoader.loadSync(PROTO_PATH, options);
+const RuntimeService = grpc.loadPackageDefinition(grpcObj).RuntimeService;
+
+const clientStub = new RuntimeService(
+  "localhost:50051",
+  grpc.credentials.createInsecure()
+);
 
 /**
  * Main class of KYVE protocol nodes representing a validator node.
@@ -61,7 +78,7 @@ import { cacheProviderFactory } from "./reactors/cacheProvider";
  */
 export class Validator {
   // reactor attributes
-  protected runtime!: IRuntime;
+  protected runtime!: IgRPCRuntime;
   protected cacheProvider!: ICacheProvider;
 
   // sdk attributes
@@ -159,14 +176,31 @@ export class Validator {
    * runtime class here in order to run the
    *
    * @method constructor
-   * @param {IRuntime} runtime which implements the interface IRuntime
+   * @param {IgRPCRuntime} runtime which implements the interface IgRPCRuntime
    */
-  constructor(runtime: IRuntime) {
+  constructor() {
     // set provided runtime
-    this.runtime = runtime;
+    this.runtime = clientStub;
 
     // set @kyvejs/protocol version
     this.protocolVersion = protocolVersion;
+
+    // Call the getName method and assign the result
+    clientStub.getName({}, (nameError: any, nameResponse: any) => {
+      if (nameError) {
+        console.error("Error getting name:", nameError);
+        return;
+      }
+      this.runtime.name = nameResponse.name;
+    });
+    // Call the getName method and assign the result
+    clientStub.getVersion({}, (versionError: any, versionResponse: any) => {
+      if (versionError) {
+        console.error("Error getting version:", versionError);
+        return;
+      }
+      this.runtime.version = versionResponse.version;
+    });
   }
 
   /**
