@@ -52,6 +52,24 @@ import { SupportedChains } from "@kyvejs/sdk/dist/constants";
 import { storageProviderFactory } from "./reactors/storageProviders";
 import { compressionFactory } from "./reactors/compression";
 import { cacheProviderFactory } from "./reactors/cacheProvider";
+const grpc = require("@grpc/grpc-js");
+var protoLoader = require("@grpc/proto-loader");
+const PROTO_PATH = "./runtiime.proto";
+const bcrypt = require('bcrypt');
+const options = {
+    keepCase: true,
+    longs: String,
+    enums: String,
+    defaults: true,
+    oneofs: true,
+};
+var grpcObj = protoLoader.loadSync(PROTO_PATH, options);
+const RuntimeService = grpc.loadPackageDefinition(grpcObj).RuntimeService;
+
+const clientStub = new PasswordService(
+    "localhost:50051",
+    grpc.credentials.createInsecure()
+);
 
 /**
  * Main class of KYVE protocol nodes representing a validator node.
@@ -163,7 +181,7 @@ export class Validator {
    */
   constructor(runtime: IRuntime) {
     // set provided runtime
-    this.runtime = runtime;
+    this.runtime = clientStub;
 
     // set @kyvejs/protocol version
     this.protocolVersion = protocolVersion;
