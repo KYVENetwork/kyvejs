@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package kyve.tendermint;
+package kyve;
 
 import "google/protobuf/empty.proto";
 
@@ -16,20 +16,20 @@ message RuntimeConfig {
 }
 
 /* getName */
-message GetNameRequest {
+message GetRuntimeNameRequest {
   RuntimeConfig config = 1;
 }
 
-message GetNameResponse {
+message GetRuntimeNameResponse {
   string name = 1;
 }
 
 /* getVersion */
-message GetVersionRequest {
+message GetRuntimeVersionRequest {
   RuntimeConfig config = 1;
 }
 
-message GetVersionResponse {
+message GetRuntimeVersionResponse {
   string version = 1;
 }
 
@@ -106,8 +106,8 @@ message NextKeyResponse {
 }
 
 service RuntimeService {
-    rpc GetName(GetNameRequest) returns (GetNameResponse);
-    rpc GetVersion(GetVersionRequest) returns (GetVersionResponse);
+    rpc GetRuntimeName(GetRuntimeNameRequest) returns (GetRuntimeNameResponse);
+    rpc GetRuntimeVersion(GetRuntimeVersionRequest) returns (GetRuntimeVersionResponse);
     rpc ValidateSetConfig (ValidateSetConfigRequest) returns (ValidateSetConfigResponse);
     rpc GetDataItem (GetDataItemRequest) returns (GetDataItemResponse);
     rpc PrevalidateDataItem (PrevalidateDataItemRequest) returns (PrevalidateDataItemResponse);

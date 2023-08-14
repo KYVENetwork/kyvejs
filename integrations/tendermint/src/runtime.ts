@@ -28,14 +28,14 @@ const ajv = new Ajv();
 
 
 class TendermintServer {
-    async getName: (call, callback) => {
+    async getRuntimeName: (call, callback) => {
       const config = call.request.config;
 
       const name = "Runtime Name";
 
       callback(null, { name });
     },
-    async getVersion: (call, callback) => {
+    async getRuntimeVersion: (call, callback) => {
       const config = call.request.config;
 
       const version = "Runtime Version";
@@ -258,6 +258,8 @@ class TendermintServer {
 
 const runtimeService = new TendermintServer();
 server.addService(runtimeProto.RuntimeService.service, {
+  getRuntimeName: runtimeService.getRuntimeName,
+  getRuntimeVersion: runtimeService.getRuntimeVersion,
   validateSetConfig: runtimeService.validateSetConfig,
   getDataItem: runtimeService.getDataItem,
   prevalidateDataItem: runtimeService.PrevalidateDataItem,
