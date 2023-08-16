@@ -64,6 +64,7 @@ export default class TendermintSSync implements IRuntime {
       key,
       value: {
         snapshot,
+        index: chunk,
         chunk: data,
       },
     };
