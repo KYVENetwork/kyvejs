@@ -29,14 +29,14 @@ const ajv = new Ajv();
 
 class TendermintServer {
     async getRuntimeName: (call, callback) => {
-      const config = call.request.config;
+      const config = JSON.parse(call.request.serialized_config);
 
       const name = "Runtime Name";
 
       callback(null, { name });
     },
     async getRuntimeVersion: (call, callback) => {
-      const config = call.request.config;
+      const config = JSON.parse(call.request.serialized_config);
 
       const version = "Runtime Version";
 
@@ -67,10 +67,7 @@ class TendermintServer {
           config.rpc = process.env.KYVEJS_TENDERMINT_RPC;
         }
 
-        // Store the validated config
-        this.config = config;
-
-        callback(null, {});
+        callback(null, { JSON.stringify(config) });
       } catch (error) {
         callback({
           code: grpc.status.INVALID_ARGUMENT,
@@ -80,14 +77,15 @@ class TendermintServer {
     },
     async getDataItem(call, callback) {
       try {
+        const config = JSON.parse(call.request.serialized_config);
         const key = call.request.key;
 
         // Fetch block from rpc at the given block height
-        const blockResponse = await axios.get(`${this.config.rpc}/block?height=${key}`);
+        const blockResponse = await axios.get(`${config.rpc}/block?height=${key}`);
         const block = blockResponse.data.result.block;
 
         // Fetch block results from rpc at the given block height
-        const blockResultsResponse = await axios.get(`${this.config.rpc}/block_results?height=${key}`);
+        const blockResultsResponse = await axios.get(`${config.rpc}/block_results?height=${key}`);
         const blockResults = blockResultsResponse.data.result.block_results;
 
         // Construct the Value message
@@ -112,6 +110,7 @@ class TendermintServer {
     },
     async prevalidateDataItem(call, callback) {
       try {
+        const config = JSON.parse(call.request.serialized_config);
         const item = call.request.item;
 
         // Check if data item is defined
@@ -127,7 +126,7 @@ class TendermintServer {
         }
 
         // Check if network matches
-        if (this.config.network !== item.value.block.block.header.chain_id) {
+        if (config.network !== item.value.block.block.header.chain_id) {
           callback(null, { valid: false });
           return;
         }
@@ -151,6 +150,7 @@ class TendermintServer {
     },
     async transformDataItem(call, callback) {
       try {
+        const config = JSON.parse(call.request.serialized_config);
         const item = call.request.item;
 
         // Sort attributes of events and remove unnecessary properties
@@ -209,6 +209,7 @@ class TendermintServer {
     },
     async validateDataItem(call, callback) {
       try {
+        const config = JSON.parse(call.request.serialized_config);
         const proposedDataItem = call.request.proposed_item;
         const validationDataItem = call.request.validation_item;
 
@@ -225,6 +226,7 @@ class TendermintServer {
     },
     async summarizeDataBundle(call, callback) {
       try {
+        const config = JSON.parse(call.request.serialized_config);
         const bundle = call.request.bundle;
 
         // Get the latest block height from the last item in the bundle
@@ -240,6 +242,7 @@ class TendermintServer {
     },
     async nextKey(call, callback) {
       try {
+        const config = JSON.parse(call.request.serialized_config);
         const key = call.request.key;
 
         // Calculate the next key (current block height + 1)
