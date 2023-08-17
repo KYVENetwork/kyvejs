@@ -73,6 +73,8 @@ export class Kyve implements IStorageProvider {
         data: bundle.toString("base64"),
       },
       {
+        maxBodyLength: Infinity,
+        maxContentLength: Infinity,
         headers: {
           "kyve-api-key": process.env.KYVE_STORAGE_PROVIDER_API_KEY || "",
           "kyve-chain-id": this.chainId,

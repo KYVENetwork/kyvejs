@@ -47,6 +47,10 @@ export default class TendermintSSync implements IRuntime {
       `${this.config.api}/list_snapshots`
     );
 
+    if (!snapshots) {
+      throw new Error(`404: Snapshot with height ${height} not found`);
+    }
+
     const snapshot: ISnapshot = snapshots.find(
       (s: ISnapshot) => s.height === height
     );
@@ -95,8 +99,11 @@ export default class TendermintSSync implements IRuntime {
     );
   }
 
-  async summarizeDataBundle(_: Validator, __: DataItem[]): Promise<string> {
-    return 'maybe app hash or snapshot hash?';
+  async summarizeDataBundle(_: Validator, bundle: DataItem[]): Promise<string> {
+    // TODO: maybe app hash or snapshot hash?
+    return `${bundle.at(-1)?.value?.snapshot?.height ?? '0'}/${
+      bundle.at(-1)?.value?.index
+    }`;
   }
 
   async nextKey(_: Validator, key: string): Promise<string> {
@@ -108,9 +115,17 @@ export default class TendermintSSync implements IRuntime {
       `${this.config.api}/list_snapshots`
     );
 
+    if (!snapshots) {
+      throw new Error(`404: Snapshot with height ${height} not found`);
+    }
+
     const snapshot: ISnapshot = snapshots.find(
       (s: ISnapshot) => s.height === height
     );
+
+    if (!snapshot) {
+      throw new Error(`404: Snapshot with height ${height} not found`);
+    }
 
     // move on to next snapshot and start at first chunk
     // if we have already reached all chunks in current snapshot
