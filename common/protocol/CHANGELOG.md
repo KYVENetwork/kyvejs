@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.0.6](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/protocol@1.0.5...@kyvejs/protocol@1.0.6) (2023-08-17)
+
+### Bug Fixes
+
+- set max body and content length to infinity ([#67](https://github.com/KYVENetwork/kyvejs/issues/67)) ([05484f8](https://github.com/KYVENetwork/kyvejs/commit/05484f89fb81ba41128191ec46c54c454d494508))
+
 ## [1.0.5](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/protocol@1.0.4...@kyvejs/protocol@1.0.5) (2023-08-10)
 
 ### Bug Fixes
