@@ -64,10 +64,12 @@ export class KyveSDK {
     }
 
     if (options?.rpc) {
+      // remove trailing slash
       this.config = { ...this.config, rpc: options.rpc.replace(/\/$/, "") };
     }
 
     if (options?.rest) {
+      // remove trailing slash
       this.config = { ...this.config, rest: options.rest.replace(/\/$/, "") };
     }
 
