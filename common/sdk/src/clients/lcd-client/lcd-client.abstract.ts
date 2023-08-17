@@ -20,9 +20,10 @@ export class AbstractKyveLCDClient {
 
   constructor(restEndpoint: string) {
     this.restEndpoint = restEndpoint;
-    this.request = (url: string, params?: Record<string, any>) =>
-      axios
-        .get(`${this.restEndpoint}${url}`, { params })
-        .then((res) => res.data);
+
+    this.request = (url: string, params?: Record<string, any>) => {
+      const path = `${this.restEndpoint}${url}`;
+      return axios.get(path, { params }).then((res) => res.data);
+    };
   }
 }
