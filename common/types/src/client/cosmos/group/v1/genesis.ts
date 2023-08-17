@@ -77,40 +77,73 @@ export const GenesisState = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): GenesisState {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseGenesisState();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.group_seq = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.groups.push(GroupInfo.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.group_members.push(GroupMember.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 4:
+          if (tag !== 32) {
+            break;
+          }
+
           message.group_policy_seq = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 5:
+          if (tag !== 42) {
+            break;
+          }
+
           message.group_policies.push(GroupPolicyInfo.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 6:
+          if (tag !== 48) {
+            break;
+          }
+
           message.proposal_seq = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 7:
+          if (tag !== 58) {
+            break;
+          }
+
           message.proposals.push(Proposal.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 8:
+          if (tag !== 66) {
+            break;
+          }
+
           message.votes.push(Vote.decode(reader, reader.uint32()));
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -134,35 +167,35 @@ export const GenesisState = {
 
   toJSON(message: GenesisState): unknown {
     const obj: any = {};
-    message.group_seq !== undefined && (obj.group_seq = message.group_seq);
-    if (message.groups) {
-      obj.groups = message.groups.map((e) => e ? GroupInfo.toJSON(e) : undefined);
-    } else {
-      obj.groups = [];
+    if (message.group_seq !== "0") {
+      obj.group_seq = message.group_seq;
     }
-    if (message.group_members) {
-      obj.group_members = message.group_members.map((e) => e ? GroupMember.toJSON(e) : undefined);
-    } else {
-      obj.group_members = [];
+    if (message.groups?.length) {
+      obj.groups = message.groups.map((e) => GroupInfo.toJSON(e));
     }
-    message.group_policy_seq !== undefined && (obj.group_policy_seq = message.group_policy_seq);
-    if (message.group_policies) {
-      obj.group_policies = message.group_policies.map((e) => e ? GroupPolicyInfo.toJSON(e) : undefined);
-    } else {
-      obj.group_policies = [];
+    if (message.group_members?.length) {
+      obj.group_members = message.group_members.map((e) => GroupMember.toJSON(e));
     }
-    message.proposal_seq !== undefined && (obj.proposal_seq = message.proposal_seq);
-    if (message.proposals) {
-      obj.proposals = message.proposals.map((e) => e ? Proposal.toJSON(e) : undefined);
-    } else {
-      obj.proposals = [];
+    if (message.group_policy_seq !== "0") {
+      obj.group_policy_seq = message.group_policy_seq;
     }
-    if (message.votes) {
-      obj.votes = message.votes.map((e) => e ? Vote.toJSON(e) : undefined);
-    } else {
-      obj.votes = [];
+    if (message.group_policies?.length) {
+      obj.group_policies = message.group_policies.map((e) => GroupPolicyInfo.toJSON(e));
+    }
+    if (message.proposal_seq !== "0") {
+      obj.proposal_seq = message.proposal_seq;
+    }
+    if (message.proposals?.length) {
+      obj.proposals = message.proposals.map((e) => Proposal.toJSON(e));
+    }
+    if (message.votes?.length) {
+      obj.votes = message.votes.map((e) => Vote.toJSON(e));
     }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<GenesisState>, I>>(base?: I): GenesisState {
+    return GenesisState.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<GenesisState>, I>>(object: I): GenesisState {

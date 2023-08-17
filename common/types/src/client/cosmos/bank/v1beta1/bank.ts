@@ -120,22 +120,31 @@ export const Params = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Params {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseParams();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.send_enabled.push(SendEnabled.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.default_send_enabled = reader.bool();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -151,13 +160,17 @@ export const Params = {
 
   toJSON(message: Params): unknown {
     const obj: any = {};
-    if (message.send_enabled) {
-      obj.send_enabled = message.send_enabled.map((e) => e ? SendEnabled.toJSON(e) : undefined);
-    } else {
-      obj.send_enabled = [];
+    if (message.send_enabled?.length) {
+      obj.send_enabled = message.send_enabled.map((e) => SendEnabled.toJSON(e));
     }
-    message.default_send_enabled !== undefined && (obj.default_send_enabled = message.default_send_enabled);
+    if (message.default_send_enabled === true) {
+      obj.default_send_enabled = message.default_send_enabled;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<Params>, I>>(base?: I): Params {
+    return Params.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<Params>, I>>(object: I): Params {
@@ -184,22 +197,31 @@ export const SendEnabled = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): SendEnabled {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseSendEnabled();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.denom = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.enabled = reader.bool();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -213,9 +235,17 @@ export const SendEnabled = {
 
   toJSON(message: SendEnabled): unknown {
     const obj: any = {};
-    message.denom !== undefined && (obj.denom = message.denom);
-    message.enabled !== undefined && (obj.enabled = message.enabled);
+    if (message.denom !== "") {
+      obj.denom = message.denom;
+    }
+    if (message.enabled === true) {
+      obj.enabled = message.enabled;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<SendEnabled>, I>>(base?: I): SendEnabled {
+    return SendEnabled.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<SendEnabled>, I>>(object: I): SendEnabled {
@@ -242,22 +272,31 @@ export const Input = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Input {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseInput();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.address = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.coins.push(Coin.decode(reader, reader.uint32()));
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -271,13 +310,17 @@ export const Input = {
 
   toJSON(message: Input): unknown {
     const obj: any = {};
-    message.address !== undefined && (obj.address = message.address);
-    if (message.coins) {
-      obj.coins = message.coins.map((e) => e ? Coin.toJSON(e) : undefined);
-    } else {
-      obj.coins = [];
+    if (message.address !== "") {
+      obj.address = message.address;
+    }
+    if (message.coins?.length) {
+      obj.coins = message.coins.map((e) => Coin.toJSON(e));
     }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<Input>, I>>(base?: I): Input {
+    return Input.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<Input>, I>>(object: I): Input {
@@ -304,22 +347,31 @@ export const Output = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Output {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseOutput();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.address = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.coins.push(Coin.decode(reader, reader.uint32()));
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -333,13 +385,17 @@ export const Output = {
 
   toJSON(message: Output): unknown {
     const obj: any = {};
-    message.address !== undefined && (obj.address = message.address);
-    if (message.coins) {
-      obj.coins = message.coins.map((e) => e ? Coin.toJSON(e) : undefined);
-    } else {
-      obj.coins = [];
+    if (message.address !== "") {
+      obj.address = message.address;
+    }
+    if (message.coins?.length) {
+      obj.coins = message.coins.map((e) => Coin.toJSON(e));
     }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<Output>, I>>(base?: I): Output {
+    return Output.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<Output>, I>>(object: I): Output {
@@ -363,19 +419,24 @@ export const Supply = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Supply {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseSupply();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.total.push(Coin.decode(reader, reader.uint32()));
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -386,12 +447,14 @@ export const Supply = {
 
   toJSON(message: Supply): unknown {
     const obj: any = {};
-    if (message.total) {
-      obj.total = message.total.map((e) => e ? Coin.toJSON(e) : undefined);
-    } else {
-      obj.total = [];
+    if (message.total?.length) {
+      obj.total = message.total.map((e) => Coin.toJSON(e));
     }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<Supply>, I>>(base?: I): Supply {
+    return Supply.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<Supply>, I>>(object: I): Supply {
@@ -420,25 +483,38 @@ export const DenomUnit = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): DenomUnit {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseDenomUnit();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.denom = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.exponent = reader.uint32();
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.aliases.push(reader.string());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -453,14 +529,20 @@ export const DenomUnit = {
 
   toJSON(message: DenomUnit): unknown {
     const obj: any = {};
-    message.denom !== undefined && (obj.denom = message.denom);
-    message.exponent !== undefined && (obj.exponent = Math.round(message.exponent));
-    if (message.aliases) {
-      obj.aliases = message.aliases.map((e) => e);
-    } else {
-      obj.aliases = [];
+    if (message.denom !== "") {
+      obj.denom = message.denom;
+    }
+    if (message.exponent !== 0) {
+      obj.exponent = Math.round(message.exponent);
+    }
+    if (message.aliases?.length) {
+      obj.aliases = message.aliases;
     }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<DenomUnit>, I>>(base?: I): DenomUnit {
+    return DenomUnit.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<DenomUnit>, I>>(object: I): DenomUnit {
@@ -506,40 +588,73 @@ export const Metadata = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Metadata {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMetadata();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.description = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.denom_units.push(DenomUnit.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.base = reader.string();
-          break;
+          continue;
         case 4:
+          if (tag !== 34) {
+            break;
+          }
+
           message.display = reader.string();
-          break;
+          continue;
         case 5:
+          if (tag !== 42) {
+            break;
+          }
+
           message.name = reader.string();
-          break;
+          continue;
         case 6:
+          if (tag !== 50) {
+            break;
+          }
+
           message.symbol = reader.string();
-          break;
+          continue;
         case 7:
+          if (tag !== 58) {
+            break;
+          }
+
           message.uri = reader.string();
-          break;
+          continue;
         case 8:
+          if (tag !== 66) {
+            break;
+          }
+
           message.uri_hash = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -559,19 +674,35 @@ export const Metadata = {
 
   toJSON(message: Metadata): unknown {
     const obj: any = {};
-    message.description !== undefined && (obj.description = message.description);
-    if (message.denom_units) {
-      obj.denom_units = message.denom_units.map((e) => e ? DenomUnit.toJSON(e) : undefined);
-    } else {
-      obj.denom_units = [];
+    if (message.description !== "") {
+      obj.description = message.description;
     }
-    message.base !== undefined && (obj.base = message.base);
-    message.display !== undefined && (obj.display = message.display);
-    message.name !== undefined && (obj.name = message.name);
-    message.symbol !== undefined && (obj.symbol = message.symbol);
-    message.uri !== undefined && (obj.uri = message.uri);
-    message.uri_hash !== undefined && (obj.uri_hash = message.uri_hash);
+    if (message.denom_units?.length) {
+      obj.denom_units = message.denom_units.map((e) => DenomUnit.toJSON(e));
+    }
+    if (message.base !== "") {
+      obj.base = message.base;
+    }
+    if (message.display !== "") {
+      obj.display = message.display;
+    }
+    if (message.name !== "") {
+      obj.name = message.name;
+    }
+    if (message.symbol !== "") {
+      obj.symbol = message.symbol;
+    }
+    if (message.uri !== "") {
+      obj.uri = message.uri;
+    }
+    if (message.uri_hash !== "") {
+      obj.uri_hash = message.uri_hash;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<Metadata>, I>>(base?: I): Metadata {
+    return Metadata.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<Metadata>, I>>(object: I): Metadata {

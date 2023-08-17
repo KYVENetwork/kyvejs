@@ -11,7 +11,7 @@ export const protobufPackage = "cosmos.vesting.v1beta1";
  * the necessary fields needed for any vesting account implementation.
  */
 export interface BaseVestingAccount {
-  base_account?: BaseAccount;
+  base_account?: BaseAccount | undefined;
   original_vesting: Coin[];
   delegated_free: Coin[];
   delegated_vesting: Coin[];
@@ -23,7 +23,7 @@ export interface BaseVestingAccount {
  * continuously vests by unlocking coins linearly with respect to time.
  */
 export interface ContinuousVestingAccount {
-  base_vesting_account?: BaseVestingAccount;
+  base_vesting_account?: BaseVestingAccount | undefined;
   start_time: string;
 }
 
@@ -33,7 +33,7 @@ export interface ContinuousVestingAccount {
  * locked until a specified time.
  */
 export interface DelayedVestingAccount {
-  base_vesting_account?: BaseVestingAccount;
+  base_vesting_account?: BaseVestingAccount | undefined;
 }
 
 /** Period defines a length of time and amount of coins that will vest. */
@@ -47,7 +47,7 @@ export interface Period {
  * periodically vests by unlocking coins during each specified period.
  */
 export interface PeriodicVestingAccount {
-  base_vesting_account?: BaseVestingAccount;
+  base_vesting_account?: BaseVestingAccount | undefined;
   start_time: string;
   vesting_periods: Period[];
 }
@@ -60,7 +60,7 @@ export interface PeriodicVestingAccount {
  * Since: cosmos-sdk 0.43
  */
 export interface PermanentLockedAccount {
-  base_vesting_account?: BaseVestingAccount;
+  base_vesting_account?: BaseVestingAccount | undefined;
 }
 
 function createBaseBaseVestingAccount(): BaseVestingAccount {
@@ -88,31 +88,52 @@ export const BaseVestingAccount = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): BaseVestingAccount {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseBaseVestingAccount();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.base_account = BaseAccount.decode(reader, reader.uint32());
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.original_vesting.push(Coin.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.delegated_free.push(Coin.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 4:
+          if (tag !== 34) {
+            break;
+          }
+
           message.delegated_vesting.push(Coin.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 5:
+          if (tag !== 40) {
+            break;
+          }
+
           message.end_time = longToString(reader.int64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -135,25 +156,26 @@ export const BaseVestingAccount = {
 
   toJSON(message: BaseVestingAccount): unknown {
     const obj: any = {};
-    message.base_account !== undefined &&
-      (obj.base_account = message.base_account ? BaseAccount.toJSON(message.base_account) : undefined);
-    if (message.original_vesting) {
-      obj.original_vesting = message.original_vesting.map((e) => e ? Coin.toJSON(e) : undefined);
-    } else {
-      obj.original_vesting = [];
+    if (message.base_account !== undefined) {
+      obj.base_account = BaseAccount.toJSON(message.base_account);
     }
-    if (message.delegated_free) {
-      obj.delegated_free = message.delegated_free.map((e) => e ? Coin.toJSON(e) : undefined);
-    } else {
-      obj.delegated_free = [];
+    if (message.original_vesting?.length) {
+      obj.original_vesting = message.original_vesting.map((e) => Coin.toJSON(e));
     }
-    if (message.delegated_vesting) {
-      obj.delegated_vesting = message.delegated_vesting.map((e) => e ? Coin.toJSON(e) : undefined);
-    } else {
-      obj.delegated_vesting = [];
+    if (message.delegated_free?.length) {
+      obj.delegated_free = message.delegated_free.map((e) => Coin.toJSON(e));
     }
-    message.end_time !== undefined && (obj.end_time = message.end_time);
+    if (message.delegated_vesting?.length) {
+      obj.delegated_vesting = message.delegated_vesting.map((e) => Coin.toJSON(e));
+    }
+    if (message.end_time !== "0") {
+      obj.end_time = message.end_time;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<BaseVestingAccount>, I>>(base?: I): BaseVestingAccount {
+    return BaseVestingAccount.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<BaseVestingAccount>, I>>(object: I): BaseVestingAccount {
@@ -185,22 +207,31 @@ export const ContinuousVestingAccount = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): ContinuousVestingAccount {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseContinuousVestingAccount();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.base_vesting_account = BaseVestingAccount.decode(reader, reader.uint32());
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.start_time = longToString(reader.int64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -216,11 +247,17 @@ export const ContinuousVestingAccount = {
 
   toJSON(message: ContinuousVestingAccount): unknown {
     const obj: any = {};
-    message.base_vesting_account !== undefined && (obj.base_vesting_account = message.base_vesting_account
-      ? BaseVestingAccount.toJSON(message.base_vesting_account)
-      : undefined);
-    message.start_time !== undefined && (obj.start_time = message.start_time);
+    if (message.base_vesting_account !== undefined) {
+      obj.base_vesting_account = BaseVestingAccount.toJSON(message.base_vesting_account);
+    }
+    if (message.start_time !== "0") {
+      obj.start_time = message.start_time;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ContinuousVestingAccount>, I>>(base?: I): ContinuousVestingAccount {
+    return ContinuousVestingAccount.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<ContinuousVestingAccount>, I>>(object: I): ContinuousVestingAccount {
@@ -246,19 +283,24 @@ export const DelayedVestingAccount = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): DelayedVestingAccount {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseDelayedVestingAccount();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.base_vesting_account = BaseVestingAccount.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -273,10 +315,14 @@ export const DelayedVestingAccount = {
 
   toJSON(message: DelayedVestingAccount): unknown {
     const obj: any = {};
-    message.base_vesting_account !== undefined && (obj.base_vesting_account = message.base_vesting_account
-      ? BaseVestingAccount.toJSON(message.base_vesting_account)
-      : undefined);
+    if (message.base_vesting_account !== undefined) {
+      obj.base_vesting_account = BaseVestingAccount.toJSON(message.base_vesting_account);
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<DelayedVestingAccount>, I>>(base?: I): DelayedVestingAccount {
+    return DelayedVestingAccount.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<DelayedVestingAccount>, I>>(object: I): DelayedVestingAccount {
@@ -304,22 +350,31 @@ export const Period = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Period {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBasePeriod();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.length = longToString(reader.int64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.amount.push(Coin.decode(reader, reader.uint32()));
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -333,13 +388,17 @@ export const Period = {
 
   toJSON(message: Period): unknown {
     const obj: any = {};
-    message.length !== undefined && (obj.length = message.length);
-    if (message.amount) {
-      obj.amount = message.amount.map((e) => e ? Coin.toJSON(e) : undefined);
-    } else {
-      obj.amount = [];
+    if (message.length !== "0") {
+      obj.length = message.length;
+    }
+    if (message.amount?.length) {
+      obj.amount = message.amount.map((e) => Coin.toJSON(e));
     }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<Period>, I>>(base?: I): Period {
+    return Period.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<Period>, I>>(object: I): Period {
@@ -369,25 +428,38 @@ export const PeriodicVestingAccount = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): PeriodicVestingAccount {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBasePeriodicVestingAccount();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.base_vesting_account = BaseVestingAccount.decode(reader, reader.uint32());
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.start_time = longToString(reader.int64() as Long);
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.vesting_periods.push(Period.decode(reader, reader.uint32()));
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -406,16 +478,20 @@ export const PeriodicVestingAccount = {
 
   toJSON(message: PeriodicVestingAccount): unknown {
     const obj: any = {};
-    message.base_vesting_account !== undefined && (obj.base_vesting_account = message.base_vesting_account
-      ? BaseVestingAccount.toJSON(message.base_vesting_account)
-      : undefined);
-    message.start_time !== undefined && (obj.start_time = message.start_time);
-    if (message.vesting_periods) {
-      obj.vesting_periods = message.vesting_periods.map((e) => e ? Period.toJSON(e) : undefined);
-    } else {
-      obj.vesting_periods = [];
+    if (message.base_vesting_account !== undefined) {
+      obj.base_vesting_account = BaseVestingAccount.toJSON(message.base_vesting_account);
+    }
+    if (message.start_time !== "0") {
+      obj.start_time = message.start_time;
+    }
+    if (message.vesting_periods?.length) {
+      obj.vesting_periods = message.vesting_periods.map((e) => Period.toJSON(e));
     }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<PeriodicVestingAccount>, I>>(base?: I): PeriodicVestingAccount {
+    return PeriodicVestingAccount.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<PeriodicVestingAccount>, I>>(object: I): PeriodicVestingAccount {
@@ -442,19 +518,24 @@ export const PermanentLockedAccount = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): PermanentLockedAccount {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBasePermanentLockedAccount();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.base_vesting_account = BaseVestingAccount.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -469,10 +550,14 @@ export const PermanentLockedAccount = {
 
   toJSON(message: PermanentLockedAccount): unknown {
     const obj: any = {};
-    message.base_vesting_account !== undefined && (obj.base_vesting_account = message.base_vesting_account
-      ? BaseVestingAccount.toJSON(message.base_vesting_account)
-      : undefined);
+    if (message.base_vesting_account !== undefined) {
+      obj.base_vesting_account = BaseVestingAccount.toJSON(message.base_vesting_account);
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<PermanentLockedAccount>, I>>(base?: I): PermanentLockedAccount {
+    return PermanentLockedAccount.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<PermanentLockedAccount>, I>>(object: I): PermanentLockedAccount {

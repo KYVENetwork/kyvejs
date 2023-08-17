@@ -119,7 +119,7 @@ export interface GetTxsEventRequest {
   /** events is the list of transaction event type. */
   events: string[];
   /** pagination defines a pagination for the request. */
-  pagination?: PageRequest;
+  pagination?: PageRequest | undefined;
   order_by: OrderBy;
 }
 
@@ -133,7 +133,7 @@ export interface GetTxsEventResponse {
   /** tx_responses is the list of queried TxResponses. */
   tx_responses: TxResponse[];
   /** pagination defines a pagination for the response. */
-  pagination?: PageResponse;
+  pagination?: PageResponse | undefined;
 }
 
 /**
@@ -152,7 +152,7 @@ export interface BroadcastTxRequest {
  */
 export interface BroadcastTxResponse {
   /** tx_response is the queried TxResponses. */
-  tx_response?: TxResponse;
+  tx_response?: TxResponse | undefined;
 }
 
 /**
@@ -166,7 +166,9 @@ export interface SimulateRequest {
    *
    * @deprecated
    */
-  tx?: Tx;
+  tx?:
+    | Tx
+    | undefined;
   /**
    * tx_bytes is the raw transaction.
    *
@@ -181,9 +183,11 @@ export interface SimulateRequest {
  */
 export interface SimulateResponse {
   /** gas_info is the information about gas used in the simulation. */
-  gas_info?: GasInfo;
+  gas_info?:
+    | GasInfo
+    | undefined;
   /** result is the result of the simulation. */
-  result?: Result;
+  result?: Result | undefined;
 }
 
 /**
@@ -198,9 +202,11 @@ export interface GetTxRequest {
 /** GetTxResponse is the response type for the Service.GetTx method. */
 export interface GetTxResponse {
   /** tx is the queried transaction. */
-  tx?: Tx;
+  tx?:
+    | Tx
+    | undefined;
   /** tx_response is the queried TxResponses. */
-  tx_response?: TxResponse;
+  tx_response?: TxResponse | undefined;
 }
 
 /**
@@ -213,7 +219,7 @@ export interface GetBlockWithTxsRequest {
   /** height is the height of the block to query. */
   height: string;
   /** pagination defines a pagination for the request. */
-  pagination?: PageRequest;
+  pagination?: PageRequest | undefined;
 }
 
 /**
@@ -224,10 +230,12 @@ export interface GetBlockWithTxsRequest {
 export interface GetBlockWithTxsResponse {
   /** txs are the transactions in the block. */
   txs: Tx[];
-  block_id?: BlockID;
-  block?: Block;
+  block_id?: BlockID | undefined;
+  block?:
+    | Block
+    | undefined;
   /** pagination defines a pagination for the response. */
-  pagination?: PageResponse;
+  pagination?: PageResponse | undefined;
 }
 
 function createBaseGetTxsEventRequest(): GetTxsEventRequest {
@@ -249,25 +257,38 @@ export const GetTxsEventRequest = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): GetTxsEventRequest {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseGetTxsEventRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.events.push(reader.string());
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.pagination = PageRequest.decode(reader, reader.uint32());
-          break;
+          continue;
         case 3:
+          if (tag !== 24) {
+            break;
+          }
+
           message.order_by = reader.int32() as any;
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -282,15 +303,20 @@ export const GetTxsEventRequest = {
 
   toJSON(message: GetTxsEventRequest): unknown {
     const obj: any = {};
-    if (message.events) {
-      obj.events = message.events.map((e) => e);
-    } else {
-      obj.events = [];
+    if (message.events?.length) {
+      obj.events = message.events;
     }
-    message.pagination !== undefined &&
-      (obj.pagination = message.pagination ? PageRequest.toJSON(message.pagination) : undefined);
-    message.order_by !== undefined && (obj.order_by = orderByToJSON(message.order_by));
+    if (message.pagination !== undefined) {
+      obj.pagination = PageRequest.toJSON(message.pagination);
+    }
+    if (message.order_by !== 0) {
+      obj.order_by = orderByToJSON(message.order_by);
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<GetTxsEventRequest>, I>>(base?: I): GetTxsEventRequest {
+    return GetTxsEventRequest.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<GetTxsEventRequest>, I>>(object: I): GetTxsEventRequest {
@@ -323,25 +349,38 @@ export const GetTxsEventResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): GetTxsEventResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseGetTxsEventResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.txs.push(Tx.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.tx_responses.push(TxResponse.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.pagination = PageResponse.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -358,19 +397,20 @@ export const GetTxsEventResponse = {
 
   toJSON(message: GetTxsEventResponse): unknown {
     const obj: any = {};
-    if (message.txs) {
-      obj.txs = message.txs.map((e) => e ? Tx.toJSON(e) : undefined);
-    } else {
-      obj.txs = [];
+    if (message.txs?.length) {
+      obj.txs = message.txs.map((e) => Tx.toJSON(e));
     }
-    if (message.tx_responses) {
-      obj.tx_responses = message.tx_responses.map((e) => e ? TxResponse.toJSON(e) : undefined);
-    } else {
-      obj.tx_responses = [];
+    if (message.tx_responses?.length) {
+      obj.tx_responses = message.tx_responses.map((e) => TxResponse.toJSON(e));
     }
-    message.pagination !== undefined &&
-      (obj.pagination = message.pagination ? PageResponse.toJSON(message.pagination) : undefined);
+    if (message.pagination !== undefined) {
+      obj.pagination = PageResponse.toJSON(message.pagination);
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<GetTxsEventResponse>, I>>(base?: I): GetTxsEventResponse {
+    return GetTxsEventResponse.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<GetTxsEventResponse>, I>>(object: I): GetTxsEventResponse {
@@ -385,7 +425,7 @@ export const GetTxsEventResponse = {
 };
 
 function createBaseBroadcastTxRequest(): BroadcastTxRequest {
-  return { tx_bytes: new Uint8Array(), mode: 0 };
+  return { tx_bytes: new Uint8Array(0), mode: 0 };
 }
 
 export const BroadcastTxRequest = {
@@ -400,44 +440,60 @@ export const BroadcastTxRequest = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): BroadcastTxRequest {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseBroadcastTxRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.tx_bytes = reader.bytes();
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.mode = reader.int32() as any;
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): BroadcastTxRequest {
     return {
-      tx_bytes: isSet(object.tx_bytes) ? bytesFromBase64(object.tx_bytes) : new Uint8Array(),
+      tx_bytes: isSet(object.tx_bytes) ? bytesFromBase64(object.tx_bytes) : new Uint8Array(0),
       mode: isSet(object.mode) ? broadcastModeFromJSON(object.mode) : 0,
     };
   },
 
   toJSON(message: BroadcastTxRequest): unknown {
     const obj: any = {};
-    message.tx_bytes !== undefined &&
-      (obj.tx_bytes = base64FromBytes(message.tx_bytes !== undefined ? message.tx_bytes : new Uint8Array()));
-    message.mode !== undefined && (obj.mode = broadcastModeToJSON(message.mode));
+    if (message.tx_bytes.length !== 0) {
+      obj.tx_bytes = base64FromBytes(message.tx_bytes);
+    }
+    if (message.mode !== 0) {
+      obj.mode = broadcastModeToJSON(message.mode);
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<BroadcastTxRequest>, I>>(base?: I): BroadcastTxRequest {
+    return BroadcastTxRequest.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<BroadcastTxRequest>, I>>(object: I): BroadcastTxRequest {
     const message = createBaseBroadcastTxRequest();
-    message.tx_bytes = object.tx_bytes ?? new Uint8Array();
+    message.tx_bytes = object.tx_bytes ?? new Uint8Array(0);
     message.mode = object.mode ?? 0;
     return message;
   },
@@ -456,19 +512,24 @@ export const BroadcastTxResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): BroadcastTxResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseBroadcastTxResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.tx_response = TxResponse.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -479,9 +540,14 @@ export const BroadcastTxResponse = {
 
   toJSON(message: BroadcastTxResponse): unknown {
     const obj: any = {};
-    message.tx_response !== undefined &&
-      (obj.tx_response = message.tx_response ? TxResponse.toJSON(message.tx_response) : undefined);
+    if (message.tx_response !== undefined) {
+      obj.tx_response = TxResponse.toJSON(message.tx_response);
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<BroadcastTxResponse>, I>>(base?: I): BroadcastTxResponse {
+    return BroadcastTxResponse.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<BroadcastTxResponse>, I>>(object: I): BroadcastTxResponse {
@@ -494,7 +560,7 @@ export const BroadcastTxResponse = {
 };
 
 function createBaseSimulateRequest(): SimulateRequest {
-  return { tx: undefined, tx_bytes: new Uint8Array() };
+  return { tx: undefined, tx_bytes: new Uint8Array(0) };
 }
 
 export const SimulateRequest = {
@@ -509,22 +575,31 @@ export const SimulateRequest = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): SimulateRequest {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseSimulateRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.tx = Tx.decode(reader, reader.uint32());
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.tx_bytes = reader.bytes();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -532,22 +607,29 @@ export const SimulateRequest = {
   fromJSON(object: any): SimulateRequest {
     return {
       tx: isSet(object.tx) ? Tx.fromJSON(object.tx) : undefined,
-      tx_bytes: isSet(object.tx_bytes) ? bytesFromBase64(object.tx_bytes) : new Uint8Array(),
+      tx_bytes: isSet(object.tx_bytes) ? bytesFromBase64(object.tx_bytes) : new Uint8Array(0),
     };
   },
 
   toJSON(message: SimulateRequest): unknown {
     const obj: any = {};
-    message.tx !== undefined && (obj.tx = message.tx ? Tx.toJSON(message.tx) : undefined);
-    message.tx_bytes !== undefined &&
-      (obj.tx_bytes = base64FromBytes(message.tx_bytes !== undefined ? message.tx_bytes : new Uint8Array()));
+    if (message.tx !== undefined) {
+      obj.tx = Tx.toJSON(message.tx);
+    }
+    if (message.tx_bytes.length !== 0) {
+      obj.tx_bytes = base64FromBytes(message.tx_bytes);
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<SimulateRequest>, I>>(base?: I): SimulateRequest {
+    return SimulateRequest.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<SimulateRequest>, I>>(object: I): SimulateRequest {
     const message = createBaseSimulateRequest();
     message.tx = (object.tx !== undefined && object.tx !== null) ? Tx.fromPartial(object.tx) : undefined;
-    message.tx_bytes = object.tx_bytes ?? new Uint8Array();
+    message.tx_bytes = object.tx_bytes ?? new Uint8Array(0);
     return message;
   },
 };
@@ -568,22 +650,31 @@ export const SimulateResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): SimulateResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseSimulateResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.gas_info = GasInfo.decode(reader, reader.uint32());
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.result = Result.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -597,9 +688,17 @@ export const SimulateResponse = {
 
   toJSON(message: SimulateResponse): unknown {
     const obj: any = {};
-    message.gas_info !== undefined && (obj.gas_info = message.gas_info ? GasInfo.toJSON(message.gas_info) : undefined);
-    message.result !== undefined && (obj.result = message.result ? Result.toJSON(message.result) : undefined);
+    if (message.gas_info !== undefined) {
+      obj.gas_info = GasInfo.toJSON(message.gas_info);
+    }
+    if (message.result !== undefined) {
+      obj.result = Result.toJSON(message.result);
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<SimulateResponse>, I>>(base?: I): SimulateResponse {
+    return SimulateResponse.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<SimulateResponse>, I>>(object: I): SimulateResponse {
@@ -627,19 +726,24 @@ export const GetTxRequest = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): GetTxRequest {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseGetTxRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.hash = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -650,8 +754,14 @@ export const GetTxRequest = {
 
   toJSON(message: GetTxRequest): unknown {
     const obj: any = {};
-    message.hash !== undefined && (obj.hash = message.hash);
+    if (message.hash !== "") {
+      obj.hash = message.hash;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<GetTxRequest>, I>>(base?: I): GetTxRequest {
+    return GetTxRequest.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<GetTxRequest>, I>>(object: I): GetTxRequest {
@@ -677,22 +787,31 @@ export const GetTxResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): GetTxResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseGetTxResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.tx = Tx.decode(reader, reader.uint32());
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.tx_response = TxResponse.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -706,10 +825,17 @@ export const GetTxResponse = {
 
   toJSON(message: GetTxResponse): unknown {
     const obj: any = {};
-    message.tx !== undefined && (obj.tx = message.tx ? Tx.toJSON(message.tx) : undefined);
-    message.tx_response !== undefined &&
-      (obj.tx_response = message.tx_response ? TxResponse.toJSON(message.tx_response) : undefined);
+    if (message.tx !== undefined) {
+      obj.tx = Tx.toJSON(message.tx);
+    }
+    if (message.tx_response !== undefined) {
+      obj.tx_response = TxResponse.toJSON(message.tx_response);
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<GetTxResponse>, I>>(base?: I): GetTxResponse {
+    return GetTxResponse.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<GetTxResponse>, I>>(object: I): GetTxResponse {
@@ -738,22 +864,31 @@ export const GetBlockWithTxsRequest = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): GetBlockWithTxsRequest {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseGetBlockWithTxsRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.height = longToString(reader.int64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.pagination = PageRequest.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -767,10 +902,17 @@ export const GetBlockWithTxsRequest = {
 
   toJSON(message: GetBlockWithTxsRequest): unknown {
     const obj: any = {};
-    message.height !== undefined && (obj.height = message.height);
-    message.pagination !== undefined &&
-      (obj.pagination = message.pagination ? PageRequest.toJSON(message.pagination) : undefined);
+    if (message.height !== "0") {
+      obj.height = message.height;
+    }
+    if (message.pagination !== undefined) {
+      obj.pagination = PageRequest.toJSON(message.pagination);
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<GetBlockWithTxsRequest>, I>>(base?: I): GetBlockWithTxsRequest {
+    return GetBlockWithTxsRequest.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<GetBlockWithTxsRequest>, I>>(object: I): GetBlockWithTxsRequest {
@@ -805,28 +947,45 @@ export const GetBlockWithTxsResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): GetBlockWithTxsResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseGetBlockWithTxsResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.txs.push(Tx.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.block_id = BlockID.decode(reader, reader.uint32());
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.block = Block.decode(reader, reader.uint32());
-          break;
+          continue;
         case 4:
+          if (tag !== 34) {
+            break;
+          }
+
           message.pagination = PageResponse.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -842,16 +1001,23 @@ export const GetBlockWithTxsResponse = {
 
   toJSON(message: GetBlockWithTxsResponse): unknown {
     const obj: any = {};
-    if (message.txs) {
-      obj.txs = message.txs.map((e) => e ? Tx.toJSON(e) : undefined);
-    } else {
-      obj.txs = [];
+    if (message.txs?.length) {
+      obj.txs = message.txs.map((e) => Tx.toJSON(e));
     }
-    message.block_id !== undefined && (obj.block_id = message.block_id ? BlockID.toJSON(message.block_id) : undefined);
-    message.block !== undefined && (obj.block = message.block ? Block.toJSON(message.block) : undefined);
-    message.pagination !== undefined &&
-      (obj.pagination = message.pagination ? PageResponse.toJSON(message.pagination) : undefined);
+    if (message.block_id !== undefined) {
+      obj.block_id = BlockID.toJSON(message.block_id);
+    }
+    if (message.block !== undefined) {
+      obj.block = Block.toJSON(message.block);
+    }
+    if (message.pagination !== undefined) {
+      obj.pagination = PageResponse.toJSON(message.pagination);
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<GetBlockWithTxsResponse>, I>>(base?: I): GetBlockWithTxsResponse {
+    return GetBlockWithTxsResponse.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<GetBlockWithTxsResponse>, I>>(object: I): GetBlockWithTxsResponse {
@@ -886,11 +1052,12 @@ export interface Service {
   GetBlockWithTxs(request: GetBlockWithTxsRequest): Promise<GetBlockWithTxsResponse>;
 }
 
+export const ServiceServiceName = "cosmos.tx.v1beta1.Service";
 export class ServiceClientImpl implements Service {
   private readonly rpc: Rpc;
   private readonly service: string;
   constructor(rpc: Rpc, opts?: { service?: string }) {
-    this.service = opts?.service || "cosmos.tx.v1beta1.Service";
+    this.service = opts?.service || ServiceServiceName;
     this.rpc = rpc;
     this.Simulate = this.Simulate.bind(this);
     this.GetTx = this.GetTx.bind(this);
@@ -901,31 +1068,31 @@ export class ServiceClientImpl implements Service {
   Simulate(request: SimulateRequest): Promise<SimulateResponse> {
     const data = SimulateRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "Simulate", data);
-    return promise.then((data) => SimulateResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) => SimulateResponse.decode(_m0.Reader.create(data)));
   }
 
   GetTx(request: GetTxRequest): Promise<GetTxResponse> {
     const data = GetTxRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "GetTx", data);
-    return promise.then((data) => GetTxResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) => GetTxResponse.decode(_m0.Reader.create(data)));
   }
 
   BroadcastTx(request: BroadcastTxRequest): Promise<BroadcastTxResponse> {
     const data = BroadcastTxRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "BroadcastTx", data);
-    return promise.then((data) => BroadcastTxResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) => BroadcastTxResponse.decode(_m0.Reader.create(data)));
   }
 
   GetTxsEvent(request: GetTxsEventRequest): Promise<GetTxsEventResponse> {
     const data = GetTxsEventRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "GetTxsEvent", data);
-    return promise.then((data) => GetTxsEventResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) => GetTxsEventResponse.decode(_m0.Reader.create(data)));
   }
 
   GetBlockWithTxs(request: GetBlockWithTxsRequest): Promise<GetBlockWithTxsResponse> {
     const data = GetBlockWithTxsRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "GetBlockWithTxs", data);
-    return promise.then((data) => GetBlockWithTxsResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) => GetBlockWithTxsResponse.decode(_m0.Reader.create(data)));
   }
 }
 
@@ -933,10 +1100,10 @@ interface Rpc {
   request(service: string, method: string, data: Uint8Array): Promise<Uint8Array>;
 }
 
-declare var self: any | undefined;
-declare var window: any | undefined;
-declare var global: any | undefined;
-var globalThis: any = (() => {
+declare const self: any | undefined;
+declare const window: any | undefined;
+declare const global: any | undefined;
+const tsProtoGlobalThis: any = (() => {
   if (typeof globalThis !== "undefined") {
     return globalThis;
   }
@@ -953,10 +1120,10 @@ var globalThis: any = (() => {
 })();
 
 function bytesFromBase64(b64: string): Uint8Array {
-  if (globalThis.Buffer) {
-    return Uint8Array.from(globalThis.Buffer.from(b64, "base64"));
+  if (tsProtoGlobalThis.Buffer) {
+    return Uint8Array.from(tsProtoGlobalThis.Buffer.from(b64, "base64"));
   } else {
-    const bin = globalThis.atob(b64);
+    const bin = tsProtoGlobalThis.atob(b64);
     const arr = new Uint8Array(bin.length);
     for (let i = 0; i < bin.length; ++i) {
       arr[i] = bin.charCodeAt(i);
@@ -966,14 +1133,14 @@ function bytesFromBase64(b64: string): Uint8Array {
 }
 
 function base64FromBytes(arr: Uint8Array): string {
-  if (globalThis.Buffer) {
-    return globalThis.Buffer.from(arr).toString("base64");
+  if (tsProtoGlobalThis.Buffer) {
+    return tsProtoGlobalThis.Buffer.from(arr).toString("base64");
   } else {
     const bin: string[] = [];
     arr.forEach((byte) => {
       bin.push(String.fromCharCode(byte));
     });
-    return globalThis.btoa(bin.join(""));
+    return tsProtoGlobalThis.btoa(bin.join(""));
   }
 }
 

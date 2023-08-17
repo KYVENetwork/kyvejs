@@ -11,9 +11,13 @@ export const protobufPackage = "kyve.pool.v1beta1";
  */
 export interface EventUpdateParams {
   /** old_params is the module's old parameters. */
-  old_params?: Params;
+  old_params?:
+    | Params
+    | undefined;
   /** new_params is the module's new parameters. */
-  new_params?: Params;
+  new_params?:
+    | Params
+    | undefined;
   /** payload is the parameter updates that were performed. */
   payload: string;
 }
@@ -251,25 +255,38 @@ export const EventUpdateParams = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EventUpdateParams {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventUpdateParams();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.old_params = Params.decode(reader, reader.uint32());
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.new_params = Params.decode(reader, reader.uint32());
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.payload = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -284,12 +301,20 @@ export const EventUpdateParams = {
 
   toJSON(message: EventUpdateParams): unknown {
     const obj: any = {};
-    message.old_params !== undefined &&
-      (obj.old_params = message.old_params ? Params.toJSON(message.old_params) : undefined);
-    message.new_params !== undefined &&
-      (obj.new_params = message.new_params ? Params.toJSON(message.new_params) : undefined);
-    message.payload !== undefined && (obj.payload = message.payload);
+    if (message.old_params !== undefined) {
+      obj.old_params = Params.toJSON(message.old_params);
+    }
+    if (message.new_params !== undefined) {
+      obj.new_params = Params.toJSON(message.new_params);
+    }
+    if (message.payload !== "") {
+      obj.payload = message.payload;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<EventUpdateParams>, I>>(base?: I): EventUpdateParams {
+    return EventUpdateParams.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<EventUpdateParams>, I>>(object: I): EventUpdateParams {
@@ -372,58 +397,115 @@ export const EventCreatePool = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EventCreatePool {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventCreatePool();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.name = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.runtime = reader.string();
-          break;
+          continue;
         case 4:
+          if (tag !== 34) {
+            break;
+          }
+
           message.logo = reader.string();
-          break;
+          continue;
         case 5:
+          if (tag !== 42) {
+            break;
+          }
+
           message.config = reader.string();
-          break;
+          continue;
         case 6:
+          if (tag !== 50) {
+            break;
+          }
+
           message.start_key = reader.string();
-          break;
+          continue;
         case 7:
+          if (tag !== 56) {
+            break;
+          }
+
           message.upload_interval = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 8:
+          if (tag !== 64) {
+            break;
+          }
+
           message.operating_cost = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 9:
+          if (tag !== 72) {
+            break;
+          }
+
           message.min_delegation = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 10:
+          if (tag !== 80) {
+            break;
+          }
+
           message.max_bundle_size = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 11:
+          if (tag !== 90) {
+            break;
+          }
+
           message.version = reader.string();
-          break;
+          continue;
         case 12:
+          if (tag !== 98) {
+            break;
+          }
+
           message.binaries = reader.string();
-          break;
+          continue;
         case 13:
+          if (tag !== 104) {
+            break;
+          }
+
           message.storage_provider_id = reader.uint32();
-          break;
+          continue;
         case 14:
+          if (tag !== 112) {
+            break;
+          }
+
           message.compression_id = reader.uint32();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -449,21 +531,53 @@ export const EventCreatePool = {
 
   toJSON(message: EventCreatePool): unknown {
     const obj: any = {};
-    message.id !== undefined && (obj.id = message.id);
-    message.name !== undefined && (obj.name = message.name);
-    message.runtime !== undefined && (obj.runtime = message.runtime);
-    message.logo !== undefined && (obj.logo = message.logo);
-    message.config !== undefined && (obj.config = message.config);
-    message.start_key !== undefined && (obj.start_key = message.start_key);
-    message.upload_interval !== undefined && (obj.upload_interval = message.upload_interval);
-    message.operating_cost !== undefined && (obj.operating_cost = message.operating_cost);
-    message.min_delegation !== undefined && (obj.min_delegation = message.min_delegation);
-    message.max_bundle_size !== undefined && (obj.max_bundle_size = message.max_bundle_size);
-    message.version !== undefined && (obj.version = message.version);
-    message.binaries !== undefined && (obj.binaries = message.binaries);
-    message.storage_provider_id !== undefined && (obj.storage_provider_id = Math.round(message.storage_provider_id));
-    message.compression_id !== undefined && (obj.compression_id = Math.round(message.compression_id));
+    if (message.id !== "0") {
+      obj.id = message.id;
+    }
+    if (message.name !== "") {
+      obj.name = message.name;
+    }
+    if (message.runtime !== "") {
+      obj.runtime = message.runtime;
+    }
+    if (message.logo !== "") {
+      obj.logo = message.logo;
+    }
+    if (message.config !== "") {
+      obj.config = message.config;
+    }
+    if (message.start_key !== "") {
+      obj.start_key = message.start_key;
+    }
+    if (message.upload_interval !== "0") {
+      obj.upload_interval = message.upload_interval;
+    }
+    if (message.operating_cost !== "0") {
+      obj.operating_cost = message.operating_cost;
+    }
+    if (message.min_delegation !== "0") {
+      obj.min_delegation = message.min_delegation;
+    }
+    if (message.max_bundle_size !== "0") {
+      obj.max_bundle_size = message.max_bundle_size;
+    }
+    if (message.version !== "") {
+      obj.version = message.version;
+    }
+    if (message.binaries !== "") {
+      obj.binaries = message.binaries;
+    }
+    if (message.storage_provider_id !== 0) {
+      obj.storage_provider_id = Math.round(message.storage_provider_id);
+    }
+    if (message.compression_id !== 0) {
+      obj.compression_id = Math.round(message.compression_id);
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<EventCreatePool>, I>>(base?: I): EventCreatePool {
+    return EventCreatePool.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<EventCreatePool>, I>>(object: I): EventCreatePool {
@@ -499,19 +613,24 @@ export const EventPoolEnabled = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EventPoolEnabled {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventPoolEnabled();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.id = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -522,8 +641,14 @@ export const EventPoolEnabled = {
 
   toJSON(message: EventPoolEnabled): unknown {
     const obj: any = {};
-    message.id !== undefined && (obj.id = message.id);
+    if (message.id !== "0") {
+      obj.id = message.id;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<EventPoolEnabled>, I>>(base?: I): EventPoolEnabled {
+    return EventPoolEnabled.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<EventPoolEnabled>, I>>(object: I): EventPoolEnabled {
@@ -546,19 +671,24 @@ export const EventPoolDisabled = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EventPoolDisabled {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventPoolDisabled();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.id = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -569,8 +699,14 @@ export const EventPoolDisabled = {
 
   toJSON(message: EventPoolDisabled): unknown {
     const obj: any = {};
-    message.id !== undefined && (obj.id = message.id);
+    if (message.id !== "0") {
+      obj.id = message.id;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<EventPoolDisabled>, I>>(base?: I): EventPoolDisabled {
+    return EventPoolDisabled.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<EventPoolDisabled>, I>>(object: I): EventPoolDisabled {
@@ -610,41 +746,69 @@ export const EventRuntimeUpgradeScheduled = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EventRuntimeUpgradeScheduled {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventRuntimeUpgradeScheduled();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.runtime = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.version = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag !== 24) {
+            break;
+          }
+
           message.scheduled_at = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 4:
+          if (tag !== 32) {
+            break;
+          }
+
           message.duration = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 5:
+          if (tag !== 42) {
+            break;
+          }
+
           message.binaries = reader.string();
-          break;
+          continue;
         case 6:
-          if ((tag & 7) === 2) {
+          if (tag === 48) {
+            message.affected_pools.push(longToString(reader.uint64() as Long));
+
+            continue;
+          }
+
+          if (tag === 50) {
             const end2 = reader.uint32() + reader.pos;
             while (reader.pos < end2) {
               message.affected_pools.push(longToString(reader.uint64() as Long));
             }
-          } else {
-            message.affected_pools.push(longToString(reader.uint64() as Long));
+
+            continue;
           }
-          break;
-        default:
-          reader.skipType(tag & 7);
+
           break;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -662,17 +826,29 @@ export const EventRuntimeUpgradeScheduled = {
 
   toJSON(message: EventRuntimeUpgradeScheduled): unknown {
     const obj: any = {};
-    message.runtime !== undefined && (obj.runtime = message.runtime);
-    message.version !== undefined && (obj.version = message.version);
-    message.scheduled_at !== undefined && (obj.scheduled_at = message.scheduled_at);
-    message.duration !== undefined && (obj.duration = message.duration);
-    message.binaries !== undefined && (obj.binaries = message.binaries);
-    if (message.affected_pools) {
-      obj.affected_pools = message.affected_pools.map((e) => e);
-    } else {
-      obj.affected_pools = [];
+    if (message.runtime !== "") {
+      obj.runtime = message.runtime;
+    }
+    if (message.version !== "") {
+      obj.version = message.version;
+    }
+    if (message.scheduled_at !== "0") {
+      obj.scheduled_at = message.scheduled_at;
+    }
+    if (message.duration !== "0") {
+      obj.duration = message.duration;
+    }
+    if (message.binaries !== "") {
+      obj.binaries = message.binaries;
+    }
+    if (message.affected_pools?.length) {
+      obj.affected_pools = message.affected_pools;
     }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<EventRuntimeUpgradeScheduled>, I>>(base?: I): EventRuntimeUpgradeScheduled {
+    return EventRuntimeUpgradeScheduled.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<EventRuntimeUpgradeScheduled>, I>>(object: I): EventRuntimeUpgradeScheduled {
@@ -705,29 +881,41 @@ export const EventRuntimeUpgradeCancelled = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EventRuntimeUpgradeCancelled {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventRuntimeUpgradeCancelled();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.runtime = reader.string();
-          break;
+          continue;
         case 2:
-          if ((tag & 7) === 2) {
+          if (tag === 16) {
+            message.affected_pools.push(longToString(reader.uint64() as Long));
+
+            continue;
+          }
+
+          if (tag === 18) {
             const end2 = reader.uint32() + reader.pos;
             while (reader.pos < end2) {
               message.affected_pools.push(longToString(reader.uint64() as Long));
             }
-          } else {
-            message.affected_pools.push(longToString(reader.uint64() as Long));
+
+            continue;
           }
-          break;
-        default:
-          reader.skipType(tag & 7);
+
           break;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -741,13 +929,17 @@ export const EventRuntimeUpgradeCancelled = {
 
   toJSON(message: EventRuntimeUpgradeCancelled): unknown {
     const obj: any = {};
-    message.runtime !== undefined && (obj.runtime = message.runtime);
-    if (message.affected_pools) {
-      obj.affected_pools = message.affected_pools.map((e) => e);
-    } else {
-      obj.affected_pools = [];
+    if (message.runtime !== "") {
+      obj.runtime = message.runtime;
+    }
+    if (message.affected_pools?.length) {
+      obj.affected_pools = message.affected_pools;
     }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<EventRuntimeUpgradeCancelled>, I>>(base?: I): EventRuntimeUpgradeCancelled {
+    return EventRuntimeUpgradeCancelled.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<EventRuntimeUpgradeCancelled>, I>>(object: I): EventRuntimeUpgradeCancelled {
@@ -817,52 +1009,101 @@ export const EventPoolUpdated = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EventPoolUpdated {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventPoolUpdated();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.raw_update_string = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.name = reader.string();
-          break;
+          continue;
         case 4:
+          if (tag !== 34) {
+            break;
+          }
+
           message.runtime = reader.string();
-          break;
+          continue;
         case 5:
+          if (tag !== 42) {
+            break;
+          }
+
           message.logo = reader.string();
-          break;
+          continue;
         case 6:
+          if (tag !== 50) {
+            break;
+          }
+
           message.config = reader.string();
-          break;
+          continue;
         case 7:
+          if (tag !== 56) {
+            break;
+          }
+
           message.upload_interval = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 8:
+          if (tag !== 64) {
+            break;
+          }
+
           message.operating_cost = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 9:
+          if (tag !== 72) {
+            break;
+          }
+
           message.min_delegation = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 10:
+          if (tag !== 80) {
+            break;
+          }
+
           message.max_bundle_size = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 11:
+          if (tag !== 88) {
+            break;
+          }
+
           message.storage_provider_id = reader.uint32();
-          break;
+          continue;
         case 12:
+          if (tag !== 96) {
+            break;
+          }
+
           message.compression_id = reader.uint32();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -886,19 +1127,47 @@ export const EventPoolUpdated = {
 
   toJSON(message: EventPoolUpdated): unknown {
     const obj: any = {};
-    message.id !== undefined && (obj.id = message.id);
-    message.raw_update_string !== undefined && (obj.raw_update_string = message.raw_update_string);
-    message.name !== undefined && (obj.name = message.name);
-    message.runtime !== undefined && (obj.runtime = message.runtime);
-    message.logo !== undefined && (obj.logo = message.logo);
-    message.config !== undefined && (obj.config = message.config);
-    message.upload_interval !== undefined && (obj.upload_interval = message.upload_interval);
-    message.operating_cost !== undefined && (obj.operating_cost = message.operating_cost);
-    message.min_delegation !== undefined && (obj.min_delegation = message.min_delegation);
-    message.max_bundle_size !== undefined && (obj.max_bundle_size = message.max_bundle_size);
-    message.storage_provider_id !== undefined && (obj.storage_provider_id = Math.round(message.storage_provider_id));
-    message.compression_id !== undefined && (obj.compression_id = Math.round(message.compression_id));
+    if (message.id !== "0") {
+      obj.id = message.id;
+    }
+    if (message.raw_update_string !== "") {
+      obj.raw_update_string = message.raw_update_string;
+    }
+    if (message.name !== "") {
+      obj.name = message.name;
+    }
+    if (message.runtime !== "") {
+      obj.runtime = message.runtime;
+    }
+    if (message.logo !== "") {
+      obj.logo = message.logo;
+    }
+    if (message.config !== "") {
+      obj.config = message.config;
+    }
+    if (message.upload_interval !== "0") {
+      obj.upload_interval = message.upload_interval;
+    }
+    if (message.operating_cost !== "0") {
+      obj.operating_cost = message.operating_cost;
+    }
+    if (message.min_delegation !== "0") {
+      obj.min_delegation = message.min_delegation;
+    }
+    if (message.max_bundle_size !== "0") {
+      obj.max_bundle_size = message.max_bundle_size;
+    }
+    if (message.storage_provider_id !== 0) {
+      obj.storage_provider_id = Math.round(message.storage_provider_id);
+    }
+    if (message.compression_id !== 0) {
+      obj.compression_id = Math.round(message.compression_id);
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<EventPoolUpdated>, I>>(base?: I): EventPoolUpdated {
+    return EventPoolUpdated.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<EventPoolUpdated>, I>>(object: I): EventPoolUpdated {
@@ -938,25 +1207,38 @@ export const EventFundPool = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EventFundPool {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventFundPool();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.pool_id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.address = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag !== 24) {
+            break;
+          }
+
           message.amount = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -971,10 +1253,20 @@ export const EventFundPool = {
 
   toJSON(message: EventFundPool): unknown {
     const obj: any = {};
-    message.pool_id !== undefined && (obj.pool_id = message.pool_id);
-    message.address !== undefined && (obj.address = message.address);
-    message.amount !== undefined && (obj.amount = message.amount);
+    if (message.pool_id !== "0") {
+      obj.pool_id = message.pool_id;
+    }
+    if (message.address !== "") {
+      obj.address = message.address;
+    }
+    if (message.amount !== "0") {
+      obj.amount = message.amount;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<EventFundPool>, I>>(base?: I): EventFundPool {
+    return EventFundPool.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<EventFundPool>, I>>(object: I): EventFundPool {
@@ -1005,25 +1297,38 @@ export const EventDefundPool = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EventDefundPool {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventDefundPool();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.pool_id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.address = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag !== 24) {
+            break;
+          }
+
           message.amount = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -1038,10 +1343,20 @@ export const EventDefundPool = {
 
   toJSON(message: EventDefundPool): unknown {
     const obj: any = {};
-    message.pool_id !== undefined && (obj.pool_id = message.pool_id);
-    message.address !== undefined && (obj.address = message.address);
-    message.amount !== undefined && (obj.amount = message.amount);
+    if (message.pool_id !== "0") {
+      obj.pool_id = message.pool_id;
+    }
+    if (message.address !== "") {
+      obj.address = message.address;
+    }
+    if (message.amount !== "0") {
+      obj.amount = message.amount;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<EventDefundPool>, I>>(base?: I): EventDefundPool {
+    return EventDefundPool.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<EventDefundPool>, I>>(object: I): EventDefundPool {
@@ -1072,25 +1387,38 @@ export const EventPoolFundsSlashed = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EventPoolFundsSlashed {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventPoolFundsSlashed();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.pool_id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.address = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag !== 24) {
+            break;
+          }
+
           message.amount = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -1105,10 +1433,20 @@ export const EventPoolFundsSlashed = {
 
   toJSON(message: EventPoolFundsSlashed): unknown {
     const obj: any = {};
-    message.pool_id !== undefined && (obj.pool_id = message.pool_id);
-    message.address !== undefined && (obj.address = message.address);
-    message.amount !== undefined && (obj.amount = message.amount);
+    if (message.pool_id !== "0") {
+      obj.pool_id = message.pool_id;
+    }
+    if (message.address !== "") {
+      obj.address = message.address;
+    }
+    if (message.amount !== "0") {
+      obj.amount = message.amount;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<EventPoolFundsSlashed>, I>>(base?: I): EventPoolFundsSlashed {
+    return EventPoolFundsSlashed.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<EventPoolFundsSlashed>, I>>(object: I): EventPoolFundsSlashed {
@@ -1133,19 +1471,24 @@ export const EventPoolOutOfFunds = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EventPoolOutOfFunds {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventPoolOutOfFunds();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.pool_id = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -1156,8 +1499,14 @@ export const EventPoolOutOfFunds = {
 
   toJSON(message: EventPoolOutOfFunds): unknown {
     const obj: any = {};
-    message.pool_id !== undefined && (obj.pool_id = message.pool_id);
+    if (message.pool_id !== "0") {
+      obj.pool_id = message.pool_id;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<EventPoolOutOfFunds>, I>>(base?: I): EventPoolOutOfFunds {
+    return EventPoolOutOfFunds.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<EventPoolOutOfFunds>, I>>(object: I): EventPoolOutOfFunds {

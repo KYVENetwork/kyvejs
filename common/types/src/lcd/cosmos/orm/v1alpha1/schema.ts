@@ -139,7 +139,7 @@ export interface ModuleSchemaDescriptor_FileEntry {
 }
 
 function createBaseModuleSchemaDescriptor(): ModuleSchemaDescriptor {
-  return { schema_file: [], prefix: new Uint8Array() };
+  return { schema_file: [], prefix: new Uint8Array(0) };
 }
 
 export const ModuleSchemaDescriptor = {
@@ -154,22 +154,31 @@ export const ModuleSchemaDescriptor = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): ModuleSchemaDescriptor {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseModuleSchemaDescriptor();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.schema_file.push(ModuleSchemaDescriptor_FileEntry.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.prefix = reader.bytes();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -179,26 +188,29 @@ export const ModuleSchemaDescriptor = {
       schema_file: Array.isArray(object?.schema_file)
         ? object.schema_file.map((e: any) => ModuleSchemaDescriptor_FileEntry.fromJSON(e))
         : [],
-      prefix: isSet(object.prefix) ? bytesFromBase64(object.prefix) : new Uint8Array(),
+      prefix: isSet(object.prefix) ? bytesFromBase64(object.prefix) : new Uint8Array(0),
     };
   },
 
   toJSON(message: ModuleSchemaDescriptor): unknown {
     const obj: any = {};
-    if (message.schema_file) {
-      obj.schema_file = message.schema_file.map((e) => e ? ModuleSchemaDescriptor_FileEntry.toJSON(e) : undefined);
-    } else {
-      obj.schema_file = [];
+    if (message.schema_file?.length) {
+      obj.schema_file = message.schema_file.map((e) => ModuleSchemaDescriptor_FileEntry.toJSON(e));
     }
-    message.prefix !== undefined &&
-      (obj.prefix = base64FromBytes(message.prefix !== undefined ? message.prefix : new Uint8Array()));
+    if (message.prefix.length !== 0) {
+      obj.prefix = base64FromBytes(message.prefix);
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ModuleSchemaDescriptor>, I>>(base?: I): ModuleSchemaDescriptor {
+    return ModuleSchemaDescriptor.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<ModuleSchemaDescriptor>, I>>(object: I): ModuleSchemaDescriptor {
     const message = createBaseModuleSchemaDescriptor();
     message.schema_file = object.schema_file?.map((e) => ModuleSchemaDescriptor_FileEntry.fromPartial(e)) || [];
-    message.prefix = object.prefix ?? new Uint8Array();
+    message.prefix = object.prefix ?? new Uint8Array(0);
     return message;
   },
 };
@@ -222,25 +234,38 @@ export const ModuleSchemaDescriptor_FileEntry = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): ModuleSchemaDescriptor_FileEntry {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseModuleSchemaDescriptor_FileEntry();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.id = reader.uint32();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.proto_file_name = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag !== 24) {
+            break;
+          }
+
           message.storage_type = storageTypeFromJSON(reader.int32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -257,10 +282,22 @@ export const ModuleSchemaDescriptor_FileEntry = {
 
   toJSON(message: ModuleSchemaDescriptor_FileEntry): unknown {
     const obj: any = {};
-    message.id !== undefined && (obj.id = Math.round(message.id));
-    message.proto_file_name !== undefined && (obj.proto_file_name = message.proto_file_name);
-    message.storage_type !== undefined && (obj.storage_type = storageTypeToJSON(message.storage_type));
+    if (message.id !== 0) {
+      obj.id = Math.round(message.id);
+    }
+    if (message.proto_file_name !== "") {
+      obj.proto_file_name = message.proto_file_name;
+    }
+    if (message.storage_type !== StorageType.STORAGE_TYPE_DEFAULT_UNSPECIFIED) {
+      obj.storage_type = storageTypeToJSON(message.storage_type);
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ModuleSchemaDescriptor_FileEntry>, I>>(
+    base?: I,
+  ): ModuleSchemaDescriptor_FileEntry {
+    return ModuleSchemaDescriptor_FileEntry.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<ModuleSchemaDescriptor_FileEntry>, I>>(
@@ -274,10 +311,10 @@ export const ModuleSchemaDescriptor_FileEntry = {
   },
 };
 
-declare var self: any | undefined;
-declare var window: any | undefined;
-declare var global: any | undefined;
-var globalThis: any = (() => {
+declare const self: any | undefined;
+declare const window: any | undefined;
+declare const global: any | undefined;
+const tsProtoGlobalThis: any = (() => {
   if (typeof globalThis !== "undefined") {
     return globalThis;
   }
@@ -294,10 +331,10 @@ var globalThis: any = (() => {
 })();
 
 function bytesFromBase64(b64: string): Uint8Array {
-  if (globalThis.Buffer) {
-    return Uint8Array.from(globalThis.Buffer.from(b64, "base64"));
+  if (tsProtoGlobalThis.Buffer) {
+    return Uint8Array.from(tsProtoGlobalThis.Buffer.from(b64, "base64"));
   } else {
-    const bin = globalThis.atob(b64);
+    const bin = tsProtoGlobalThis.atob(b64);
     const arr = new Uint8Array(bin.length);
     for (let i = 0; i < bin.length; ++i) {
       arr[i] = bin.charCodeAt(i);
@@ -307,14 +344,14 @@ function bytesFromBase64(b64: string): Uint8Array {
 }
 
 function base64FromBytes(arr: Uint8Array): string {
-  if (globalThis.Buffer) {
-    return globalThis.Buffer.from(arr).toString("base64");
+  if (tsProtoGlobalThis.Buffer) {
+    return tsProtoGlobalThis.Buffer.from(arr).toString("base64");
   } else {
     const bin: string[] = [];
     arr.forEach((byte) => {
       bin.push(String.fromCharCode(byte));
     });
-    return globalThis.btoa(bin.join(""));
+    return tsProtoGlobalThis.btoa(bin.join(""));
   }
 }
 

@@ -37,7 +37,7 @@ export interface ModuleConfig {
    * config is the config object for the module. Module config messages should
    * define a ModuleDescriptor using the cosmos.app.v1alpha1.is_module extension.
    */
-  config?: Any;
+  config?: Any | undefined;
 }
 
 function createBaseConfig(): Config {
@@ -53,19 +53,24 @@ export const Config = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Config {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseConfig();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.modules.push(ModuleConfig.decode(reader, reader.uint32()));
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -76,12 +81,14 @@ export const Config = {
 
   toJSON(message: Config): unknown {
     const obj: any = {};
-    if (message.modules) {
-      obj.modules = message.modules.map((e) => e ? ModuleConfig.toJSON(e) : undefined);
-    } else {
-      obj.modules = [];
+    if (message.modules?.length) {
+      obj.modules = message.modules.map((e) => ModuleConfig.toJSON(e));
     }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<Config>, I>>(base?: I): Config {
+    return Config.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<Config>, I>>(object: I): Config {
@@ -107,22 +114,31 @@ export const ModuleConfig = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): ModuleConfig {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseModuleConfig();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.name = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.config = Any.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -136,9 +152,17 @@ export const ModuleConfig = {
 
   toJSON(message: ModuleConfig): unknown {
     const obj: any = {};
-    message.name !== undefined && (obj.name = message.name);
-    message.config !== undefined && (obj.config = message.config ? Any.toJSON(message.config) : undefined);
+    if (message.name !== "") {
+      obj.name = message.name;
+    }
+    if (message.config !== undefined) {
+      obj.config = Any.toJSON(message.config);
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ModuleConfig>, I>>(base?: I): ModuleConfig {
+    return ModuleConfig.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<ModuleConfig>, I>>(object: I): ModuleConfig {

@@ -27,19 +27,24 @@ export const SendAuthorization = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): SendAuthorization {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseSendAuthorization();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.spend_limit.push(Coin.decode(reader, reader.uint32()));
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -52,12 +57,14 @@ export const SendAuthorization = {
 
   toJSON(message: SendAuthorization): unknown {
     const obj: any = {};
-    if (message.spend_limit) {
-      obj.spend_limit = message.spend_limit.map((e) => e ? Coin.toJSON(e) : undefined);
-    } else {
-      obj.spend_limit = [];
+    if (message.spend_limit?.length) {
+      obj.spend_limit = message.spend_limit.map((e) => Coin.toJSON(e));
     }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<SendAuthorization>, I>>(base?: I): SendAuthorization {
+    return SendAuthorization.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<SendAuthorization>, I>>(object: I): SendAuthorization {

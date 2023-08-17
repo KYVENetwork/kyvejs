@@ -81,19 +81,24 @@ export const EventCreateGroup = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EventCreateGroup {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventCreateGroup();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.group_id = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -104,8 +109,14 @@ export const EventCreateGroup = {
 
   toJSON(message: EventCreateGroup): unknown {
     const obj: any = {};
-    message.group_id !== undefined && (obj.group_id = message.group_id);
+    if (message.group_id !== "0") {
+      obj.group_id = message.group_id;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<EventCreateGroup>, I>>(base?: I): EventCreateGroup {
+    return EventCreateGroup.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<EventCreateGroup>, I>>(object: I): EventCreateGroup {
@@ -128,19 +139,24 @@ export const EventUpdateGroup = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EventUpdateGroup {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventUpdateGroup();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.group_id = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -151,8 +167,14 @@ export const EventUpdateGroup = {
 
   toJSON(message: EventUpdateGroup): unknown {
     const obj: any = {};
-    message.group_id !== undefined && (obj.group_id = message.group_id);
+    if (message.group_id !== "0") {
+      obj.group_id = message.group_id;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<EventUpdateGroup>, I>>(base?: I): EventUpdateGroup {
+    return EventUpdateGroup.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<EventUpdateGroup>, I>>(object: I): EventUpdateGroup {
@@ -175,19 +197,24 @@ export const EventCreateGroupPolicy = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EventCreateGroupPolicy {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventCreateGroupPolicy();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.address = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -198,8 +225,14 @@ export const EventCreateGroupPolicy = {
 
   toJSON(message: EventCreateGroupPolicy): unknown {
     const obj: any = {};
-    message.address !== undefined && (obj.address = message.address);
+    if (message.address !== "") {
+      obj.address = message.address;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<EventCreateGroupPolicy>, I>>(base?: I): EventCreateGroupPolicy {
+    return EventCreateGroupPolicy.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<EventCreateGroupPolicy>, I>>(object: I): EventCreateGroupPolicy {
@@ -222,19 +255,24 @@ export const EventUpdateGroupPolicy = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EventUpdateGroupPolicy {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventUpdateGroupPolicy();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.address = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -245,8 +283,14 @@ export const EventUpdateGroupPolicy = {
 
   toJSON(message: EventUpdateGroupPolicy): unknown {
     const obj: any = {};
-    message.address !== undefined && (obj.address = message.address);
+    if (message.address !== "") {
+      obj.address = message.address;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<EventUpdateGroupPolicy>, I>>(base?: I): EventUpdateGroupPolicy {
+    return EventUpdateGroupPolicy.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<EventUpdateGroupPolicy>, I>>(object: I): EventUpdateGroupPolicy {
@@ -269,19 +313,24 @@ export const EventSubmitProposal = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EventSubmitProposal {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventSubmitProposal();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.proposal_id = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -292,8 +341,14 @@ export const EventSubmitProposal = {
 
   toJSON(message: EventSubmitProposal): unknown {
     const obj: any = {};
-    message.proposal_id !== undefined && (obj.proposal_id = message.proposal_id);
+    if (message.proposal_id !== "0") {
+      obj.proposal_id = message.proposal_id;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<EventSubmitProposal>, I>>(base?: I): EventSubmitProposal {
+    return EventSubmitProposal.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<EventSubmitProposal>, I>>(object: I): EventSubmitProposal {
@@ -316,19 +371,24 @@ export const EventWithdrawProposal = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EventWithdrawProposal {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventWithdrawProposal();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.proposal_id = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -339,8 +399,14 @@ export const EventWithdrawProposal = {
 
   toJSON(message: EventWithdrawProposal): unknown {
     const obj: any = {};
-    message.proposal_id !== undefined && (obj.proposal_id = message.proposal_id);
+    if (message.proposal_id !== "0") {
+      obj.proposal_id = message.proposal_id;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<EventWithdrawProposal>, I>>(base?: I): EventWithdrawProposal {
+    return EventWithdrawProposal.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<EventWithdrawProposal>, I>>(object: I): EventWithdrawProposal {
@@ -363,19 +429,24 @@ export const EventVote = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EventVote {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventVote();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.proposal_id = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -386,8 +457,14 @@ export const EventVote = {
 
   toJSON(message: EventVote): unknown {
     const obj: any = {};
-    message.proposal_id !== undefined && (obj.proposal_id = message.proposal_id);
+    if (message.proposal_id !== "0") {
+      obj.proposal_id = message.proposal_id;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<EventVote>, I>>(base?: I): EventVote {
+    return EventVote.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<EventVote>, I>>(object: I): EventVote {
@@ -413,22 +490,31 @@ export const EventExec = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EventExec {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventExec();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.proposal_id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.result = proposalExecutorResultFromJSON(reader.int32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -444,9 +530,17 @@ export const EventExec = {
 
   toJSON(message: EventExec): unknown {
     const obj: any = {};
-    message.proposal_id !== undefined && (obj.proposal_id = message.proposal_id);
-    message.result !== undefined && (obj.result = proposalExecutorResultToJSON(message.result));
+    if (message.proposal_id !== "0") {
+      obj.proposal_id = message.proposal_id;
+    }
+    if (message.result !== ProposalExecutorResult.PROPOSAL_EXECUTOR_RESULT_UNSPECIFIED) {
+      obj.result = proposalExecutorResultToJSON(message.result);
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<EventExec>, I>>(base?: I): EventExec {
+    return EventExec.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<EventExec>, I>>(object: I): EventExec {
@@ -473,22 +567,31 @@ export const EventLeaveGroup = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EventLeaveGroup {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventLeaveGroup();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.group_id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.address = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -502,9 +605,17 @@ export const EventLeaveGroup = {
 
   toJSON(message: EventLeaveGroup): unknown {
     const obj: any = {};
-    message.group_id !== undefined && (obj.group_id = message.group_id);
-    message.address !== undefined && (obj.address = message.address);
+    if (message.group_id !== "0") {
+      obj.group_id = message.group_id;
+    }
+    if (message.address !== "") {
+      obj.address = message.address;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<EventLeaveGroup>, I>>(base?: I): EventLeaveGroup {
+    return EventLeaveGroup.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<EventLeaveGroup>, I>>(object: I): EventLeaveGroup {

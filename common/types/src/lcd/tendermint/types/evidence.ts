@@ -14,20 +14,20 @@ export interface Evidence {
 
 /** DuplicateVoteEvidence contains evidence of a validator signed two conflicting votes. */
 export interface DuplicateVoteEvidence {
-  vote_a?: Vote;
-  vote_b?: Vote;
+  vote_a?: Vote | undefined;
+  vote_b?: Vote | undefined;
   total_voting_power: string;
   validator_power: string;
-  timestamp?: Date;
+  timestamp?: Date | undefined;
 }
 
 /** LightClientAttackEvidence contains evidence of a set of validators attempting to mislead a light client. */
 export interface LightClientAttackEvidence {
-  conflicting_block?: LightBlock;
+  conflicting_block?: LightBlock | undefined;
   common_height: string;
   byzantine_validators: Validator[];
   total_voting_power: string;
-  timestamp?: Date;
+  timestamp?: Date | undefined;
 }
 
 export interface EvidenceList {
@@ -50,22 +50,31 @@ export const Evidence = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Evidence {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEvidence();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.duplicate_vote_evidence = DuplicateVoteEvidence.decode(reader, reader.uint32());
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.light_client_attack_evidence = LightClientAttackEvidence.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -83,14 +92,17 @@ export const Evidence = {
 
   toJSON(message: Evidence): unknown {
     const obj: any = {};
-    message.duplicate_vote_evidence !== undefined && (obj.duplicate_vote_evidence = message.duplicate_vote_evidence
-      ? DuplicateVoteEvidence.toJSON(message.duplicate_vote_evidence)
-      : undefined);
-    message.light_client_attack_evidence !== undefined &&
-      (obj.light_client_attack_evidence = message.light_client_attack_evidence
-        ? LightClientAttackEvidence.toJSON(message.light_client_attack_evidence)
-        : undefined);
+    if (message.duplicate_vote_evidence !== undefined) {
+      obj.duplicate_vote_evidence = DuplicateVoteEvidence.toJSON(message.duplicate_vote_evidence);
+    }
+    if (message.light_client_attack_evidence !== undefined) {
+      obj.light_client_attack_evidence = LightClientAttackEvidence.toJSON(message.light_client_attack_evidence);
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<Evidence>, I>>(base?: I): Evidence {
+    return Evidence.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<Evidence>, I>>(object: I): Evidence {
@@ -132,31 +144,52 @@ export const DuplicateVoteEvidence = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): DuplicateVoteEvidence {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseDuplicateVoteEvidence();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.vote_a = Vote.decode(reader, reader.uint32());
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.vote_b = Vote.decode(reader, reader.uint32());
-          break;
+          continue;
         case 3:
+          if (tag !== 24) {
+            break;
+          }
+
           message.total_voting_power = longToString(reader.int64() as Long);
-          break;
+          continue;
         case 4:
+          if (tag !== 32) {
+            break;
+          }
+
           message.validator_power = longToString(reader.int64() as Long);
-          break;
+          continue;
         case 5:
+          if (tag !== 42) {
+            break;
+          }
+
           message.timestamp = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -173,12 +206,26 @@ export const DuplicateVoteEvidence = {
 
   toJSON(message: DuplicateVoteEvidence): unknown {
     const obj: any = {};
-    message.vote_a !== undefined && (obj.vote_a = message.vote_a ? Vote.toJSON(message.vote_a) : undefined);
-    message.vote_b !== undefined && (obj.vote_b = message.vote_b ? Vote.toJSON(message.vote_b) : undefined);
-    message.total_voting_power !== undefined && (obj.total_voting_power = message.total_voting_power);
-    message.validator_power !== undefined && (obj.validator_power = message.validator_power);
-    message.timestamp !== undefined && (obj.timestamp = message.timestamp.toISOString());
+    if (message.vote_a !== undefined) {
+      obj.vote_a = Vote.toJSON(message.vote_a);
+    }
+    if (message.vote_b !== undefined) {
+      obj.vote_b = Vote.toJSON(message.vote_b);
+    }
+    if (message.total_voting_power !== "0") {
+      obj.total_voting_power = message.total_voting_power;
+    }
+    if (message.validator_power !== "0") {
+      obj.validator_power = message.validator_power;
+    }
+    if (message.timestamp !== undefined) {
+      obj.timestamp = message.timestamp.toISOString();
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<DuplicateVoteEvidence>, I>>(base?: I): DuplicateVoteEvidence {
+    return DuplicateVoteEvidence.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<DuplicateVoteEvidence>, I>>(object: I): DuplicateVoteEvidence {
@@ -227,31 +274,52 @@ export const LightClientAttackEvidence = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): LightClientAttackEvidence {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseLightClientAttackEvidence();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.conflicting_block = LightBlock.decode(reader, reader.uint32());
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.common_height = longToString(reader.int64() as Long);
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.byzantine_validators.push(Validator.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 4:
+          if (tag !== 32) {
+            break;
+          }
+
           message.total_voting_power = longToString(reader.int64() as Long);
-          break;
+          continue;
         case 5:
+          if (tag !== 42) {
+            break;
+          }
+
           message.timestamp = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -270,17 +338,26 @@ export const LightClientAttackEvidence = {
 
   toJSON(message: LightClientAttackEvidence): unknown {
     const obj: any = {};
-    message.conflicting_block !== undefined &&
-      (obj.conflicting_block = message.conflicting_block ? LightBlock.toJSON(message.conflicting_block) : undefined);
-    message.common_height !== undefined && (obj.common_height = message.common_height);
-    if (message.byzantine_validators) {
-      obj.byzantine_validators = message.byzantine_validators.map((e) => e ? Validator.toJSON(e) : undefined);
-    } else {
-      obj.byzantine_validators = [];
+    if (message.conflicting_block !== undefined) {
+      obj.conflicting_block = LightBlock.toJSON(message.conflicting_block);
     }
-    message.total_voting_power !== undefined && (obj.total_voting_power = message.total_voting_power);
-    message.timestamp !== undefined && (obj.timestamp = message.timestamp.toISOString());
+    if (message.common_height !== "0") {
+      obj.common_height = message.common_height;
+    }
+    if (message.byzantine_validators?.length) {
+      obj.byzantine_validators = message.byzantine_validators.map((e) => Validator.toJSON(e));
+    }
+    if (message.total_voting_power !== "0") {
+      obj.total_voting_power = message.total_voting_power;
+    }
+    if (message.timestamp !== undefined) {
+      obj.timestamp = message.timestamp.toISOString();
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<LightClientAttackEvidence>, I>>(base?: I): LightClientAttackEvidence {
+    return LightClientAttackEvidence.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<LightClientAttackEvidence>, I>>(object: I): LightClientAttackEvidence {
@@ -309,19 +386,24 @@ export const EvidenceList = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EvidenceList {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEvidenceList();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.evidence.push(Evidence.decode(reader, reader.uint32()));
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -332,12 +414,14 @@ export const EvidenceList = {
 
   toJSON(message: EvidenceList): unknown {
     const obj: any = {};
-    if (message.evidence) {
-      obj.evidence = message.evidence.map((e) => e ? Evidence.toJSON(e) : undefined);
-    } else {
-      obj.evidence = [];
+    if (message.evidence?.length) {
+      obj.evidence = message.evidence.map((e) => Evidence.toJSON(e));
     }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<EvidenceList>, I>>(base?: I): EvidenceList {
+    return EvidenceList.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<EvidenceList>, I>>(object: I): EvidenceList {
@@ -365,8 +449,8 @@ function toTimestamp(date: Date): Timestamp {
 }
 
 function fromTimestamp(t: Timestamp): Date {
-  let millis = Number(t.seconds) * 1_000;
-  millis += t.nanos / 1_000_000;
+  let millis = (Number(t.seconds) || 0) * 1_000;
+  millis += (t.nanos || 0) / 1_000_000;
   return new Date(millis);
 }
 

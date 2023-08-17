@@ -132,7 +132,7 @@ export interface MsgCreateGroupPolicy {
   /** metadata is any arbitrary metadata attached to the group policy. */
   metadata: string;
   /** decision_policy specifies the group policy's decision policy. */
-  decision_policy?: Any;
+  decision_policy?: Any | undefined;
 }
 
 /** MsgCreateGroupPolicyResponse is the Msg/CreateGroupPolicy response type. */
@@ -164,7 +164,7 @@ export interface MsgCreateGroupWithPolicy {
   /** group_policy_as_admin is a boolean field, if set to true, the group policy account address will be used as group and group policy admin. */
   group_policy_as_admin: boolean;
   /** decision_policy specifies the group policy's decision policy. */
-  decision_policy?: Any;
+  decision_policy?: Any | undefined;
 }
 
 /** MsgCreateGroupWithPolicyResponse is the Msg/CreateGroupWithPolicy response type. */
@@ -186,7 +186,7 @@ export interface MsgUpdateGroupPolicyDecisionPolicy {
   /** address is the account address of group policy. */
   address: string;
   /** decision_policy is the updated group policy's decision policy. */
-  decision_policy?: Any;
+  decision_policy?: Any | undefined;
 }
 
 /** MsgUpdateGroupPolicyDecisionPolicyResponse is the Msg/UpdateGroupPolicyDecisionPolicy response type. */
@@ -310,25 +310,38 @@ export const MsgCreateGroup = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgCreateGroup {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgCreateGroup();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.admin = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.members.push(Member.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.metadata = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -343,14 +356,20 @@ export const MsgCreateGroup = {
 
   toJSON(message: MsgCreateGroup): unknown {
     const obj: any = {};
-    message.admin !== undefined && (obj.admin = message.admin);
-    if (message.members) {
-      obj.members = message.members.map((e) => e ? Member.toJSON(e) : undefined);
-    } else {
-      obj.members = [];
+    if (message.admin !== "") {
+      obj.admin = message.admin;
     }
-    message.metadata !== undefined && (obj.metadata = message.metadata);
+    if (message.members?.length) {
+      obj.members = message.members.map((e) => Member.toJSON(e));
+    }
+    if (message.metadata !== "") {
+      obj.metadata = message.metadata;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MsgCreateGroup>, I>>(base?: I): MsgCreateGroup {
+    return MsgCreateGroup.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<MsgCreateGroup>, I>>(object: I): MsgCreateGroup {
@@ -375,19 +394,24 @@ export const MsgCreateGroupResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgCreateGroupResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgCreateGroupResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.group_id = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -398,8 +422,14 @@ export const MsgCreateGroupResponse = {
 
   toJSON(message: MsgCreateGroupResponse): unknown {
     const obj: any = {};
-    message.group_id !== undefined && (obj.group_id = message.group_id);
+    if (message.group_id !== "0") {
+      obj.group_id = message.group_id;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MsgCreateGroupResponse>, I>>(base?: I): MsgCreateGroupResponse {
+    return MsgCreateGroupResponse.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<MsgCreateGroupResponse>, I>>(object: I): MsgCreateGroupResponse {
@@ -428,25 +458,38 @@ export const MsgUpdateGroupMembers = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgUpdateGroupMembers {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgUpdateGroupMembers();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.admin = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.group_id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.member_updates.push(Member.decode(reader, reader.uint32()));
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -463,14 +506,20 @@ export const MsgUpdateGroupMembers = {
 
   toJSON(message: MsgUpdateGroupMembers): unknown {
     const obj: any = {};
-    message.admin !== undefined && (obj.admin = message.admin);
-    message.group_id !== undefined && (obj.group_id = message.group_id);
-    if (message.member_updates) {
-      obj.member_updates = message.member_updates.map((e) => e ? Member.toJSON(e) : undefined);
-    } else {
-      obj.member_updates = [];
+    if (message.admin !== "") {
+      obj.admin = message.admin;
+    }
+    if (message.group_id !== "0") {
+      obj.group_id = message.group_id;
+    }
+    if (message.member_updates?.length) {
+      obj.member_updates = message.member_updates.map((e) => Member.toJSON(e));
     }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MsgUpdateGroupMembers>, I>>(base?: I): MsgUpdateGroupMembers {
+    return MsgUpdateGroupMembers.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<MsgUpdateGroupMembers>, I>>(object: I): MsgUpdateGroupMembers {
@@ -492,16 +541,17 @@ export const MsgUpdateGroupMembersResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgUpdateGroupMembersResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgUpdateGroupMembersResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        default:
-          reader.skipType(tag & 7);
-          break;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -513,6 +563,10 @@ export const MsgUpdateGroupMembersResponse = {
   toJSON(_: MsgUpdateGroupMembersResponse): unknown {
     const obj: any = {};
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MsgUpdateGroupMembersResponse>, I>>(base?: I): MsgUpdateGroupMembersResponse {
+    return MsgUpdateGroupMembersResponse.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<MsgUpdateGroupMembersResponse>, I>>(_: I): MsgUpdateGroupMembersResponse {
@@ -540,25 +594,38 @@ export const MsgUpdateGroupAdmin = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgUpdateGroupAdmin {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgUpdateGroupAdmin();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.admin = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.group_id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.new_admin = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -573,10 +640,20 @@ export const MsgUpdateGroupAdmin = {
 
   toJSON(message: MsgUpdateGroupAdmin): unknown {
     const obj: any = {};
-    message.admin !== undefined && (obj.admin = message.admin);
-    message.group_id !== undefined && (obj.group_id = message.group_id);
-    message.new_admin !== undefined && (obj.new_admin = message.new_admin);
+    if (message.admin !== "") {
+      obj.admin = message.admin;
+    }
+    if (message.group_id !== "0") {
+      obj.group_id = message.group_id;
+    }
+    if (message.new_admin !== "") {
+      obj.new_admin = message.new_admin;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MsgUpdateGroupAdmin>, I>>(base?: I): MsgUpdateGroupAdmin {
+    return MsgUpdateGroupAdmin.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<MsgUpdateGroupAdmin>, I>>(object: I): MsgUpdateGroupAdmin {
@@ -598,16 +675,17 @@ export const MsgUpdateGroupAdminResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgUpdateGroupAdminResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgUpdateGroupAdminResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        default:
-          reader.skipType(tag & 7);
-          break;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -619,6 +697,10 @@ export const MsgUpdateGroupAdminResponse = {
   toJSON(_: MsgUpdateGroupAdminResponse): unknown {
     const obj: any = {};
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MsgUpdateGroupAdminResponse>, I>>(base?: I): MsgUpdateGroupAdminResponse {
+    return MsgUpdateGroupAdminResponse.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<MsgUpdateGroupAdminResponse>, I>>(_: I): MsgUpdateGroupAdminResponse {
@@ -646,25 +728,38 @@ export const MsgUpdateGroupMetadata = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgUpdateGroupMetadata {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgUpdateGroupMetadata();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.admin = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.group_id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.metadata = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -679,10 +774,20 @@ export const MsgUpdateGroupMetadata = {
 
   toJSON(message: MsgUpdateGroupMetadata): unknown {
     const obj: any = {};
-    message.admin !== undefined && (obj.admin = message.admin);
-    message.group_id !== undefined && (obj.group_id = message.group_id);
-    message.metadata !== undefined && (obj.metadata = message.metadata);
+    if (message.admin !== "") {
+      obj.admin = message.admin;
+    }
+    if (message.group_id !== "0") {
+      obj.group_id = message.group_id;
+    }
+    if (message.metadata !== "") {
+      obj.metadata = message.metadata;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MsgUpdateGroupMetadata>, I>>(base?: I): MsgUpdateGroupMetadata {
+    return MsgUpdateGroupMetadata.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<MsgUpdateGroupMetadata>, I>>(object: I): MsgUpdateGroupMetadata {
@@ -704,16 +809,17 @@ export const MsgUpdateGroupMetadataResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgUpdateGroupMetadataResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgUpdateGroupMetadataResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        default:
-          reader.skipType(tag & 7);
-          break;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -725,6 +831,10 @@ export const MsgUpdateGroupMetadataResponse = {
   toJSON(_: MsgUpdateGroupMetadataResponse): unknown {
     const obj: any = {};
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MsgUpdateGroupMetadataResponse>, I>>(base?: I): MsgUpdateGroupMetadataResponse {
+    return MsgUpdateGroupMetadataResponse.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<MsgUpdateGroupMetadataResponse>, I>>(_: I): MsgUpdateGroupMetadataResponse {
@@ -755,28 +865,45 @@ export const MsgCreateGroupPolicy = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgCreateGroupPolicy {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgCreateGroupPolicy();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.admin = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.group_id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.metadata = reader.string();
-          break;
+          continue;
         case 4:
+          if (tag !== 34) {
+            break;
+          }
+
           message.decision_policy = Any.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -792,12 +919,23 @@ export const MsgCreateGroupPolicy = {
 
   toJSON(message: MsgCreateGroupPolicy): unknown {
     const obj: any = {};
-    message.admin !== undefined && (obj.admin = message.admin);
-    message.group_id !== undefined && (obj.group_id = message.group_id);
-    message.metadata !== undefined && (obj.metadata = message.metadata);
-    message.decision_policy !== undefined &&
-      (obj.decision_policy = message.decision_policy ? Any.toJSON(message.decision_policy) : undefined);
+    if (message.admin !== "") {
+      obj.admin = message.admin;
+    }
+    if (message.group_id !== "0") {
+      obj.group_id = message.group_id;
+    }
+    if (message.metadata !== "") {
+      obj.metadata = message.metadata;
+    }
+    if (message.decision_policy !== undefined) {
+      obj.decision_policy = Any.toJSON(message.decision_policy);
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MsgCreateGroupPolicy>, I>>(base?: I): MsgCreateGroupPolicy {
+    return MsgCreateGroupPolicy.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<MsgCreateGroupPolicy>, I>>(object: I): MsgCreateGroupPolicy {
@@ -825,19 +963,24 @@ export const MsgCreateGroupPolicyResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgCreateGroupPolicyResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgCreateGroupPolicyResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.address = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -848,8 +991,14 @@ export const MsgCreateGroupPolicyResponse = {
 
   toJSON(message: MsgCreateGroupPolicyResponse): unknown {
     const obj: any = {};
-    message.address !== undefined && (obj.address = message.address);
+    if (message.address !== "") {
+      obj.address = message.address;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MsgCreateGroupPolicyResponse>, I>>(base?: I): MsgCreateGroupPolicyResponse {
+    return MsgCreateGroupPolicyResponse.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<MsgCreateGroupPolicyResponse>, I>>(object: I): MsgCreateGroupPolicyResponse {
@@ -878,25 +1027,38 @@ export const MsgUpdateGroupPolicyAdmin = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgUpdateGroupPolicyAdmin {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgUpdateGroupPolicyAdmin();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.admin = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.address = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.new_admin = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -911,10 +1073,20 @@ export const MsgUpdateGroupPolicyAdmin = {
 
   toJSON(message: MsgUpdateGroupPolicyAdmin): unknown {
     const obj: any = {};
-    message.admin !== undefined && (obj.admin = message.admin);
-    message.address !== undefined && (obj.address = message.address);
-    message.new_admin !== undefined && (obj.new_admin = message.new_admin);
+    if (message.admin !== "") {
+      obj.admin = message.admin;
+    }
+    if (message.address !== "") {
+      obj.address = message.address;
+    }
+    if (message.new_admin !== "") {
+      obj.new_admin = message.new_admin;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MsgUpdateGroupPolicyAdmin>, I>>(base?: I): MsgUpdateGroupPolicyAdmin {
+    return MsgUpdateGroupPolicyAdmin.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<MsgUpdateGroupPolicyAdmin>, I>>(object: I): MsgUpdateGroupPolicyAdmin {
@@ -961,34 +1133,59 @@ export const MsgCreateGroupWithPolicy = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgCreateGroupWithPolicy {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgCreateGroupWithPolicy();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.admin = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.members.push(Member.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.group_metadata = reader.string();
-          break;
+          continue;
         case 4:
+          if (tag !== 34) {
+            break;
+          }
+
           message.group_policy_metadata = reader.string();
-          break;
+          continue;
         case 5:
+          if (tag !== 40) {
+            break;
+          }
+
           message.group_policy_as_admin = reader.bool();
-          break;
+          continue;
         case 6:
+          if (tag !== 50) {
+            break;
+          }
+
           message.decision_policy = Any.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -1006,18 +1203,29 @@ export const MsgCreateGroupWithPolicy = {
 
   toJSON(message: MsgCreateGroupWithPolicy): unknown {
     const obj: any = {};
-    message.admin !== undefined && (obj.admin = message.admin);
-    if (message.members) {
-      obj.members = message.members.map((e) => e ? Member.toJSON(e) : undefined);
-    } else {
-      obj.members = [];
+    if (message.admin !== "") {
+      obj.admin = message.admin;
     }
-    message.group_metadata !== undefined && (obj.group_metadata = message.group_metadata);
-    message.group_policy_metadata !== undefined && (obj.group_policy_metadata = message.group_policy_metadata);
-    message.group_policy_as_admin !== undefined && (obj.group_policy_as_admin = message.group_policy_as_admin);
-    message.decision_policy !== undefined &&
-      (obj.decision_policy = message.decision_policy ? Any.toJSON(message.decision_policy) : undefined);
+    if (message.members?.length) {
+      obj.members = message.members.map((e) => Member.toJSON(e));
+    }
+    if (message.group_metadata !== "") {
+      obj.group_metadata = message.group_metadata;
+    }
+    if (message.group_policy_metadata !== "") {
+      obj.group_policy_metadata = message.group_policy_metadata;
+    }
+    if (message.group_policy_as_admin === true) {
+      obj.group_policy_as_admin = message.group_policy_as_admin;
+    }
+    if (message.decision_policy !== undefined) {
+      obj.decision_policy = Any.toJSON(message.decision_policy);
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MsgCreateGroupWithPolicy>, I>>(base?: I): MsgCreateGroupWithPolicy {
+    return MsgCreateGroupWithPolicy.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<MsgCreateGroupWithPolicy>, I>>(object: I): MsgCreateGroupWithPolicy {
@@ -1050,22 +1258,31 @@ export const MsgCreateGroupWithPolicyResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgCreateGroupWithPolicyResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgCreateGroupWithPolicyResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.group_id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.group_policy_address = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -1079,9 +1296,19 @@ export const MsgCreateGroupWithPolicyResponse = {
 
   toJSON(message: MsgCreateGroupWithPolicyResponse): unknown {
     const obj: any = {};
-    message.group_id !== undefined && (obj.group_id = message.group_id);
-    message.group_policy_address !== undefined && (obj.group_policy_address = message.group_policy_address);
+    if (message.group_id !== "0") {
+      obj.group_id = message.group_id;
+    }
+    if (message.group_policy_address !== "") {
+      obj.group_policy_address = message.group_policy_address;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MsgCreateGroupWithPolicyResponse>, I>>(
+    base?: I,
+  ): MsgCreateGroupWithPolicyResponse {
+    return MsgCreateGroupWithPolicyResponse.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<MsgCreateGroupWithPolicyResponse>, I>>(
@@ -1104,16 +1331,17 @@ export const MsgUpdateGroupPolicyAdminResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgUpdateGroupPolicyAdminResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgUpdateGroupPolicyAdminResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        default:
-          reader.skipType(tag & 7);
-          break;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -1125,6 +1353,12 @@ export const MsgUpdateGroupPolicyAdminResponse = {
   toJSON(_: MsgUpdateGroupPolicyAdminResponse): unknown {
     const obj: any = {};
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MsgUpdateGroupPolicyAdminResponse>, I>>(
+    base?: I,
+  ): MsgUpdateGroupPolicyAdminResponse {
+    return MsgUpdateGroupPolicyAdminResponse.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<MsgUpdateGroupPolicyAdminResponse>, I>>(
@@ -1154,25 +1388,38 @@ export const MsgUpdateGroupPolicyDecisionPolicy = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgUpdateGroupPolicyDecisionPolicy {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgUpdateGroupPolicyDecisionPolicy();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.admin = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.address = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.decision_policy = Any.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -1187,11 +1434,22 @@ export const MsgUpdateGroupPolicyDecisionPolicy = {
 
   toJSON(message: MsgUpdateGroupPolicyDecisionPolicy): unknown {
     const obj: any = {};
-    message.admin !== undefined && (obj.admin = message.admin);
-    message.address !== undefined && (obj.address = message.address);
-    message.decision_policy !== undefined &&
-      (obj.decision_policy = message.decision_policy ? Any.toJSON(message.decision_policy) : undefined);
+    if (message.admin !== "") {
+      obj.admin = message.admin;
+    }
+    if (message.address !== "") {
+      obj.address = message.address;
+    }
+    if (message.decision_policy !== undefined) {
+      obj.decision_policy = Any.toJSON(message.decision_policy);
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MsgUpdateGroupPolicyDecisionPolicy>, I>>(
+    base?: I,
+  ): MsgUpdateGroupPolicyDecisionPolicy {
+    return MsgUpdateGroupPolicyDecisionPolicy.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<MsgUpdateGroupPolicyDecisionPolicy>, I>>(
@@ -1217,16 +1475,17 @@ export const MsgUpdateGroupPolicyDecisionPolicyResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgUpdateGroupPolicyDecisionPolicyResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgUpdateGroupPolicyDecisionPolicyResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        default:
-          reader.skipType(tag & 7);
-          break;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -1238,6 +1497,12 @@ export const MsgUpdateGroupPolicyDecisionPolicyResponse = {
   toJSON(_: MsgUpdateGroupPolicyDecisionPolicyResponse): unknown {
     const obj: any = {};
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MsgUpdateGroupPolicyDecisionPolicyResponse>, I>>(
+    base?: I,
+  ): MsgUpdateGroupPolicyDecisionPolicyResponse {
+    return MsgUpdateGroupPolicyDecisionPolicyResponse.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<MsgUpdateGroupPolicyDecisionPolicyResponse>, I>>(
@@ -1267,25 +1532,38 @@ export const MsgUpdateGroupPolicyMetadata = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgUpdateGroupPolicyMetadata {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgUpdateGroupPolicyMetadata();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.admin = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.address = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.metadata = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -1300,10 +1578,20 @@ export const MsgUpdateGroupPolicyMetadata = {
 
   toJSON(message: MsgUpdateGroupPolicyMetadata): unknown {
     const obj: any = {};
-    message.admin !== undefined && (obj.admin = message.admin);
-    message.address !== undefined && (obj.address = message.address);
-    message.metadata !== undefined && (obj.metadata = message.metadata);
+    if (message.admin !== "") {
+      obj.admin = message.admin;
+    }
+    if (message.address !== "") {
+      obj.address = message.address;
+    }
+    if (message.metadata !== "") {
+      obj.metadata = message.metadata;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MsgUpdateGroupPolicyMetadata>, I>>(base?: I): MsgUpdateGroupPolicyMetadata {
+    return MsgUpdateGroupPolicyMetadata.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<MsgUpdateGroupPolicyMetadata>, I>>(object: I): MsgUpdateGroupPolicyMetadata {
@@ -1325,16 +1613,17 @@ export const MsgUpdateGroupPolicyMetadataResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgUpdateGroupPolicyMetadataResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgUpdateGroupPolicyMetadataResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        default:
-          reader.skipType(tag & 7);
-          break;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -1346,6 +1635,12 @@ export const MsgUpdateGroupPolicyMetadataResponse = {
   toJSON(_: MsgUpdateGroupPolicyMetadataResponse): unknown {
     const obj: any = {};
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MsgUpdateGroupPolicyMetadataResponse>, I>>(
+    base?: I,
+  ): MsgUpdateGroupPolicyMetadataResponse {
+    return MsgUpdateGroupPolicyMetadataResponse.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<MsgUpdateGroupPolicyMetadataResponse>, I>>(
@@ -1381,31 +1676,52 @@ export const MsgSubmitProposal = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgSubmitProposal {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgSubmitProposal();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.address = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.proposers.push(reader.string());
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.metadata = reader.string();
-          break;
+          continue;
         case 4:
+          if (tag !== 34) {
+            break;
+          }
+
           message.messages.push(Any.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 5:
+          if (tag !== 40) {
+            break;
+          }
+
           message.exec = execFromJSON(reader.int32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -1422,20 +1738,26 @@ export const MsgSubmitProposal = {
 
   toJSON(message: MsgSubmitProposal): unknown {
     const obj: any = {};
-    message.address !== undefined && (obj.address = message.address);
-    if (message.proposers) {
-      obj.proposers = message.proposers.map((e) => e);
-    } else {
-      obj.proposers = [];
+    if (message.address !== "") {
+      obj.address = message.address;
     }
-    message.metadata !== undefined && (obj.metadata = message.metadata);
-    if (message.messages) {
-      obj.messages = message.messages.map((e) => e ? Any.toJSON(e) : undefined);
-    } else {
-      obj.messages = [];
+    if (message.proposers?.length) {
+      obj.proposers = message.proposers;
     }
-    message.exec !== undefined && (obj.exec = execToJSON(message.exec));
+    if (message.metadata !== "") {
+      obj.metadata = message.metadata;
+    }
+    if (message.messages?.length) {
+      obj.messages = message.messages.map((e) => Any.toJSON(e));
+    }
+    if (message.exec !== Exec.EXEC_UNSPECIFIED) {
+      obj.exec = execToJSON(message.exec);
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MsgSubmitProposal>, I>>(base?: I): MsgSubmitProposal {
+    return MsgSubmitProposal.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<MsgSubmitProposal>, I>>(object: I): MsgSubmitProposal {
@@ -1462,19 +1784,24 @@ export const MsgSubmitProposalResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgSubmitProposalResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgSubmitProposalResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.proposal_id = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -1485,8 +1812,14 @@ export const MsgSubmitProposalResponse = {
 
   toJSON(message: MsgSubmitProposalResponse): unknown {
     const obj: any = {};
-    message.proposal_id !== undefined && (obj.proposal_id = message.proposal_id);
+    if (message.proposal_id !== "0") {
+      obj.proposal_id = message.proposal_id;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MsgSubmitProposalResponse>, I>>(base?: I): MsgSubmitProposalResponse {
+    return MsgSubmitProposalResponse.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<MsgSubmitProposalResponse>, I>>(object: I): MsgSubmitProposalResponse {
@@ -1512,22 +1845,31 @@ export const MsgWithdrawProposal = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgWithdrawProposal {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgWithdrawProposal();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.proposal_id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.address = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -1541,9 +1883,17 @@ export const MsgWithdrawProposal = {
 
   toJSON(message: MsgWithdrawProposal): unknown {
     const obj: any = {};
-    message.proposal_id !== undefined && (obj.proposal_id = message.proposal_id);
-    message.address !== undefined && (obj.address = message.address);
+    if (message.proposal_id !== "0") {
+      obj.proposal_id = message.proposal_id;
+    }
+    if (message.address !== "") {
+      obj.address = message.address;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MsgWithdrawProposal>, I>>(base?: I): MsgWithdrawProposal {
+    return MsgWithdrawProposal.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<MsgWithdrawProposal>, I>>(object: I): MsgWithdrawProposal {
@@ -1564,16 +1914,17 @@ export const MsgWithdrawProposalResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgWithdrawProposalResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgWithdrawProposalResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        default:
-          reader.skipType(tag & 7);
-          break;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -1585,6 +1936,10 @@ export const MsgWithdrawProposalResponse = {
   toJSON(_: MsgWithdrawProposalResponse): unknown {
     const obj: any = {};
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MsgWithdrawProposalResponse>, I>>(base?: I): MsgWithdrawProposalResponse {
+    return MsgWithdrawProposalResponse.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<MsgWithdrawProposalResponse>, I>>(_: I): MsgWithdrawProposalResponse {
@@ -1624,31 +1979,52 @@ export const MsgVote = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgVote {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgVote();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.proposal_id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.voter = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag !== 24) {
+            break;
+          }
+
           message.option = voteOptionFromJSON(reader.int32());
-          break;
+          continue;
         case 4:
+          if (tag !== 34) {
+            break;
+          }
+
           message.metadata = reader.string();
-          break;
+          continue;
         case 5:
+          if (tag !== 40) {
+            break;
+          }
+
           message.exec = execFromJSON(reader.int32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -1665,12 +2041,26 @@ export const MsgVote = {
 
   toJSON(message: MsgVote): unknown {
     const obj: any = {};
-    message.proposal_id !== undefined && (obj.proposal_id = message.proposal_id);
-    message.voter !== undefined && (obj.voter = message.voter);
-    message.option !== undefined && (obj.option = voteOptionToJSON(message.option));
-    message.metadata !== undefined && (obj.metadata = message.metadata);
-    message.exec !== undefined && (obj.exec = execToJSON(message.exec));
+    if (message.proposal_id !== "0") {
+      obj.proposal_id = message.proposal_id;
+    }
+    if (message.voter !== "") {
+      obj.voter = message.voter;
+    }
+    if (message.option !== VoteOption.VOTE_OPTION_UNSPECIFIED) {
+      obj.option = voteOptionToJSON(message.option);
+    }
+    if (message.metadata !== "") {
+      obj.metadata = message.metadata;
+    }
+    if (message.exec !== Exec.EXEC_UNSPECIFIED) {
+      obj.exec = execToJSON(message.exec);
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MsgVote>, I>>(base?: I): MsgVote {
+    return MsgVote.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<MsgVote>, I>>(object: I): MsgVote {
@@ -1694,16 +2084,17 @@ export const MsgVoteResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgVoteResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgVoteResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        default:
-          reader.skipType(tag & 7);
-          break;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -1715,6 +2106,10 @@ export const MsgVoteResponse = {
   toJSON(_: MsgVoteResponse): unknown {
     const obj: any = {};
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MsgVoteResponse>, I>>(base?: I): MsgVoteResponse {
+    return MsgVoteResponse.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<MsgVoteResponse>, I>>(_: I): MsgVoteResponse {
@@ -1739,22 +2134,31 @@ export const MsgExec = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgExec {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgExec();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.proposal_id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.signer = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -1768,9 +2172,17 @@ export const MsgExec = {
 
   toJSON(message: MsgExec): unknown {
     const obj: any = {};
-    message.proposal_id !== undefined && (obj.proposal_id = message.proposal_id);
-    message.signer !== undefined && (obj.signer = message.signer);
+    if (message.proposal_id !== "0") {
+      obj.proposal_id = message.proposal_id;
+    }
+    if (message.signer !== "") {
+      obj.signer = message.signer;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MsgExec>, I>>(base?: I): MsgExec {
+    return MsgExec.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<MsgExec>, I>>(object: I): MsgExec {
@@ -1791,16 +2203,17 @@ export const MsgExecResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgExecResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgExecResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        default:
-          reader.skipType(tag & 7);
-          break;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -1812,6 +2225,10 @@ export const MsgExecResponse = {
   toJSON(_: MsgExecResponse): unknown {
     const obj: any = {};
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MsgExecResponse>, I>>(base?: I): MsgExecResponse {
+    return MsgExecResponse.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<MsgExecResponse>, I>>(_: I): MsgExecResponse {
@@ -1836,22 +2253,31 @@ export const MsgLeaveGroup = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgLeaveGroup {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgLeaveGroup();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.address = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.group_id = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -1865,9 +2291,17 @@ export const MsgLeaveGroup = {
 
   toJSON(message: MsgLeaveGroup): unknown {
     const obj: any = {};
-    message.address !== undefined && (obj.address = message.address);
-    message.group_id !== undefined && (obj.group_id = message.group_id);
+    if (message.address !== "") {
+      obj.address = message.address;
+    }
+    if (message.group_id !== "0") {
+      obj.group_id = message.group_id;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MsgLeaveGroup>, I>>(base?: I): MsgLeaveGroup {
+    return MsgLeaveGroup.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<MsgLeaveGroup>, I>>(object: I): MsgLeaveGroup {
@@ -1888,16 +2322,17 @@ export const MsgLeaveGroupResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgLeaveGroupResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgLeaveGroupResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        default:
-          reader.skipType(tag & 7);
-          break;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -1909,6 +2344,10 @@ export const MsgLeaveGroupResponse = {
   toJSON(_: MsgLeaveGroupResponse): unknown {
     const obj: any = {};
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MsgLeaveGroupResponse>, I>>(base?: I): MsgLeaveGroupResponse {
+    return MsgLeaveGroupResponse.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<MsgLeaveGroupResponse>, I>>(_: I): MsgLeaveGroupResponse {
@@ -1951,11 +2390,12 @@ export interface Msg {
   LeaveGroup(request: MsgLeaveGroup): Promise<MsgLeaveGroupResponse>;
 }
 
+export const MsgServiceName = "cosmos.group.v1.Msg";
 export class MsgClientImpl implements Msg {
   private readonly rpc: Rpc;
   private readonly service: string;
   constructor(rpc: Rpc, opts?: { service?: string }) {
-    this.service = opts?.service || "cosmos.group.v1.Msg";
+    this.service = opts?.service || MsgServiceName;
     this.rpc = rpc;
     this.CreateGroup = this.CreateGroup.bind(this);
     this.UpdateGroupMembers = this.UpdateGroupMembers.bind(this);
@@ -1975,43 +2415,43 @@ export class MsgClientImpl implements Msg {
   CreateGroup(request: MsgCreateGroup): Promise<MsgCreateGroupResponse> {
     const data = MsgCreateGroup.encode(request).finish();
     const promise = this.rpc.request(this.service, "CreateGroup", data);
-    return promise.then((data) => MsgCreateGroupResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) => MsgCreateGroupResponse.decode(_m0.Reader.create(data)));
   }
 
   UpdateGroupMembers(request: MsgUpdateGroupMembers): Promise<MsgUpdateGroupMembersResponse> {
     const data = MsgUpdateGroupMembers.encode(request).finish();
     const promise = this.rpc.request(this.service, "UpdateGroupMembers", data);
-    return promise.then((data) => MsgUpdateGroupMembersResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) => MsgUpdateGroupMembersResponse.decode(_m0.Reader.create(data)));
   }
 
   UpdateGroupAdmin(request: MsgUpdateGroupAdmin): Promise<MsgUpdateGroupAdminResponse> {
     const data = MsgUpdateGroupAdmin.encode(request).finish();
     const promise = this.rpc.request(this.service, "UpdateGroupAdmin", data);
-    return promise.then((data) => MsgUpdateGroupAdminResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) => MsgUpdateGroupAdminResponse.decode(_m0.Reader.create(data)));
   }
 
   UpdateGroupMetadata(request: MsgUpdateGroupMetadata): Promise<MsgUpdateGroupMetadataResponse> {
     const data = MsgUpdateGroupMetadata.encode(request).finish();
     const promise = this.rpc.request(this.service, "UpdateGroupMetadata", data);
-    return promise.then((data) => MsgUpdateGroupMetadataResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) => MsgUpdateGroupMetadataResponse.decode(_m0.Reader.create(data)));
   }
 
   CreateGroupPolicy(request: MsgCreateGroupPolicy): Promise<MsgCreateGroupPolicyResponse> {
     const data = MsgCreateGroupPolicy.encode(request).finish();
     const promise = this.rpc.request(this.service, "CreateGroupPolicy", data);
-    return promise.then((data) => MsgCreateGroupPolicyResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) => MsgCreateGroupPolicyResponse.decode(_m0.Reader.create(data)));
   }
 
   CreateGroupWithPolicy(request: MsgCreateGroupWithPolicy): Promise<MsgCreateGroupWithPolicyResponse> {
     const data = MsgCreateGroupWithPolicy.encode(request).finish();
     const promise = this.rpc.request(this.service, "CreateGroupWithPolicy", data);
-    return promise.then((data) => MsgCreateGroupWithPolicyResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) => MsgCreateGroupWithPolicyResponse.decode(_m0.Reader.create(data)));
   }
 
   UpdateGroupPolicyAdmin(request: MsgUpdateGroupPolicyAdmin): Promise<MsgUpdateGroupPolicyAdminResponse> {
     const data = MsgUpdateGroupPolicyAdmin.encode(request).finish();
     const promise = this.rpc.request(this.service, "UpdateGroupPolicyAdmin", data);
-    return promise.then((data) => MsgUpdateGroupPolicyAdminResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) => MsgUpdateGroupPolicyAdminResponse.decode(_m0.Reader.create(data)));
   }
 
   UpdateGroupPolicyDecisionPolicy(
@@ -2019,43 +2459,43 @@ export class MsgClientImpl implements Msg {
   ): Promise<MsgUpdateGroupPolicyDecisionPolicyResponse> {
     const data = MsgUpdateGroupPolicyDecisionPolicy.encode(request).finish();
     const promise = this.rpc.request(this.service, "UpdateGroupPolicyDecisionPolicy", data);
-    return promise.then((data) => MsgUpdateGroupPolicyDecisionPolicyResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) => MsgUpdateGroupPolicyDecisionPolicyResponse.decode(_m0.Reader.create(data)));
   }
 
   UpdateGroupPolicyMetadata(request: MsgUpdateGroupPolicyMetadata): Promise<MsgUpdateGroupPolicyMetadataResponse> {
     const data = MsgUpdateGroupPolicyMetadata.encode(request).finish();
     const promise = this.rpc.request(this.service, "UpdateGroupPolicyMetadata", data);
-    return promise.then((data) => MsgUpdateGroupPolicyMetadataResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) => MsgUpdateGroupPolicyMetadataResponse.decode(_m0.Reader.create(data)));
   }
 
   SubmitProposal(request: MsgSubmitProposal): Promise<MsgSubmitProposalResponse> {
     const data = MsgSubmitProposal.encode(request).finish();
     const promise = this.rpc.request(this.service, "SubmitProposal", data);
-    return promise.then((data) => MsgSubmitProposalResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) => MsgSubmitProposalResponse.decode(_m0.Reader.create(data)));
   }
 
   WithdrawProposal(request: MsgWithdrawProposal): Promise<MsgWithdrawProposalResponse> {
     const data = MsgWithdrawProposal.encode(request).finish();
     const promise = this.rpc.request(this.service, "WithdrawProposal", data);
-    return promise.then((data) => MsgWithdrawProposalResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) => MsgWithdrawProposalResponse.decode(_m0.Reader.create(data)));
   }
 
   Vote(request: MsgVote): Promise<MsgVoteResponse> {
     const data = MsgVote.encode(request).finish();
     const promise = this.rpc.request(this.service, "Vote", data);
-    return promise.then((data) => MsgVoteResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) => MsgVoteResponse.decode(_m0.Reader.create(data)));
   }
 
   Exec(request: MsgExec): Promise<MsgExecResponse> {
     const data = MsgExec.encode(request).finish();
     const promise = this.rpc.request(this.service, "Exec", data);
-    return promise.then((data) => MsgExecResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) => MsgExecResponse.decode(_m0.Reader.create(data)));
   }
 
   LeaveGroup(request: MsgLeaveGroup): Promise<MsgLeaveGroupResponse> {
     const data = MsgLeaveGroup.encode(request).finish();
     const promise = this.rpc.request(this.service, "LeaveGroup", data);
-    return promise.then((data) => MsgLeaveGroupResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) => MsgLeaveGroupResponse.decode(_m0.Reader.create(data)));
   }
 }
 

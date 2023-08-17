@@ -12,14 +12,14 @@ export interface ProtocolVersion {
 }
 
 export interface NodeInfo {
-  protocol_version?: ProtocolVersion;
+  protocol_version?: ProtocolVersion | undefined;
   node_id: string;
   listen_addr: string;
   network: string;
   version: string;
   channels: Uint8Array;
   moniker: string;
-  other?: NodeInfoOther;
+  other?: NodeInfoOther | undefined;
 }
 
 export interface NodeInfoOther {
@@ -30,13 +30,13 @@ export interface NodeInfoOther {
 export interface PeerInfo {
   id: string;
   address_info: PeerAddressInfo[];
-  last_connected?: Date;
+  last_connected?: Date | undefined;
 }
 
 export interface PeerAddressInfo {
   address: string;
-  last_dial_success?: Date;
-  last_dial_failure?: Date;
+  last_dial_success?: Date | undefined;
+  last_dial_failure?: Date | undefined;
   dial_failures: number;
 }
 
@@ -59,25 +59,38 @@ export const ProtocolVersion = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): ProtocolVersion {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseProtocolVersion();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.p2p = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.block = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 3:
+          if (tag !== 24) {
+            break;
+          }
+
           message.app = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -92,10 +105,20 @@ export const ProtocolVersion = {
 
   toJSON(message: ProtocolVersion): unknown {
     const obj: any = {};
-    message.p2p !== undefined && (obj.p2p = message.p2p);
-    message.block !== undefined && (obj.block = message.block);
-    message.app !== undefined && (obj.app = message.app);
+    if (message.p2p !== "0") {
+      obj.p2p = message.p2p;
+    }
+    if (message.block !== "0") {
+      obj.block = message.block;
+    }
+    if (message.app !== "0") {
+      obj.app = message.app;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ProtocolVersion>, I>>(base?: I): ProtocolVersion {
+    return ProtocolVersion.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<ProtocolVersion>, I>>(object: I): ProtocolVersion {
@@ -114,7 +137,7 @@ function createBaseNodeInfo(): NodeInfo {
     listen_addr: "",
     network: "",
     version: "",
-    channels: new Uint8Array(),
+    channels: new Uint8Array(0),
     moniker: "",
     other: undefined,
   };
@@ -150,40 +173,73 @@ export const NodeInfo = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): NodeInfo {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseNodeInfo();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.protocol_version = ProtocolVersion.decode(reader, reader.uint32());
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.node_id = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.listen_addr = reader.string();
-          break;
+          continue;
         case 4:
+          if (tag !== 34) {
+            break;
+          }
+
           message.network = reader.string();
-          break;
+          continue;
         case 5:
+          if (tag !== 42) {
+            break;
+          }
+
           message.version = reader.string();
-          break;
+          continue;
         case 6:
+          if (tag !== 50) {
+            break;
+          }
+
           message.channels = reader.bytes();
-          break;
+          continue;
         case 7:
+          if (tag !== 58) {
+            break;
+          }
+
           message.moniker = reader.string();
-          break;
+          continue;
         case 8:
+          if (tag !== 66) {
+            break;
+          }
+
           message.other = NodeInfoOther.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -195,7 +251,7 @@ export const NodeInfo = {
       listen_addr: isSet(object.listen_addr) ? String(object.listen_addr) : "",
       network: isSet(object.network) ? String(object.network) : "",
       version: isSet(object.version) ? String(object.version) : "",
-      channels: isSet(object.channels) ? bytesFromBase64(object.channels) : new Uint8Array(),
+      channels: isSet(object.channels) ? bytesFromBase64(object.channels) : new Uint8Array(0),
       moniker: isSet(object.moniker) ? String(object.moniker) : "",
       other: isSet(object.other) ? NodeInfoOther.fromJSON(object.other) : undefined,
     };
@@ -203,17 +259,35 @@ export const NodeInfo = {
 
   toJSON(message: NodeInfo): unknown {
     const obj: any = {};
-    message.protocol_version !== undefined &&
-      (obj.protocol_version = message.protocol_version ? ProtocolVersion.toJSON(message.protocol_version) : undefined);
-    message.node_id !== undefined && (obj.node_id = message.node_id);
-    message.listen_addr !== undefined && (obj.listen_addr = message.listen_addr);
-    message.network !== undefined && (obj.network = message.network);
-    message.version !== undefined && (obj.version = message.version);
-    message.channels !== undefined &&
-      (obj.channels = base64FromBytes(message.channels !== undefined ? message.channels : new Uint8Array()));
-    message.moniker !== undefined && (obj.moniker = message.moniker);
-    message.other !== undefined && (obj.other = message.other ? NodeInfoOther.toJSON(message.other) : undefined);
+    if (message.protocol_version !== undefined) {
+      obj.protocol_version = ProtocolVersion.toJSON(message.protocol_version);
+    }
+    if (message.node_id !== "") {
+      obj.node_id = message.node_id;
+    }
+    if (message.listen_addr !== "") {
+      obj.listen_addr = message.listen_addr;
+    }
+    if (message.network !== "") {
+      obj.network = message.network;
+    }
+    if (message.version !== "") {
+      obj.version = message.version;
+    }
+    if (message.channels.length !== 0) {
+      obj.channels = base64FromBytes(message.channels);
+    }
+    if (message.moniker !== "") {
+      obj.moniker = message.moniker;
+    }
+    if (message.other !== undefined) {
+      obj.other = NodeInfoOther.toJSON(message.other);
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<NodeInfo>, I>>(base?: I): NodeInfo {
+    return NodeInfo.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<NodeInfo>, I>>(object: I): NodeInfo {
@@ -225,7 +299,7 @@ export const NodeInfo = {
     message.listen_addr = object.listen_addr ?? "";
     message.network = object.network ?? "";
     message.version = object.version ?? "";
-    message.channels = object.channels ?? new Uint8Array();
+    message.channels = object.channels ?? new Uint8Array(0);
     message.moniker = object.moniker ?? "";
     message.other = (object.other !== undefined && object.other !== null)
       ? NodeInfoOther.fromPartial(object.other)
@@ -250,22 +324,31 @@ export const NodeInfoOther = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): NodeInfoOther {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseNodeInfoOther();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.tx_index = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.rpc_address = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -279,9 +362,17 @@ export const NodeInfoOther = {
 
   toJSON(message: NodeInfoOther): unknown {
     const obj: any = {};
-    message.tx_index !== undefined && (obj.tx_index = message.tx_index);
-    message.rpc_address !== undefined && (obj.rpc_address = message.rpc_address);
+    if (message.tx_index !== "") {
+      obj.tx_index = message.tx_index;
+    }
+    if (message.rpc_address !== "") {
+      obj.rpc_address = message.rpc_address;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<NodeInfoOther>, I>>(base?: I): NodeInfoOther {
+    return NodeInfoOther.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<NodeInfoOther>, I>>(object: I): NodeInfoOther {
@@ -311,25 +402,38 @@ export const PeerInfo = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): PeerInfo {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBasePeerInfo();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.id = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.address_info.push(PeerAddressInfo.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.last_connected = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -346,14 +450,20 @@ export const PeerInfo = {
 
   toJSON(message: PeerInfo): unknown {
     const obj: any = {};
-    message.id !== undefined && (obj.id = message.id);
-    if (message.address_info) {
-      obj.address_info = message.address_info.map((e) => e ? PeerAddressInfo.toJSON(e) : undefined);
-    } else {
-      obj.address_info = [];
+    if (message.id !== "") {
+      obj.id = message.id;
     }
-    message.last_connected !== undefined && (obj.last_connected = message.last_connected.toISOString());
+    if (message.address_info?.length) {
+      obj.address_info = message.address_info.map((e) => PeerAddressInfo.toJSON(e));
+    }
+    if (message.last_connected !== undefined) {
+      obj.last_connected = message.last_connected.toISOString();
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<PeerInfo>, I>>(base?: I): PeerInfo {
+    return PeerInfo.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<PeerInfo>, I>>(object: I): PeerInfo {
@@ -387,28 +497,45 @@ export const PeerAddressInfo = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): PeerAddressInfo {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBasePeerAddressInfo();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.address = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.last_dial_success = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.last_dial_failure = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 4:
+          if (tag !== 32) {
+            break;
+          }
+
           message.dial_failures = reader.uint32();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -424,11 +551,23 @@ export const PeerAddressInfo = {
 
   toJSON(message: PeerAddressInfo): unknown {
     const obj: any = {};
-    message.address !== undefined && (obj.address = message.address);
-    message.last_dial_success !== undefined && (obj.last_dial_success = message.last_dial_success.toISOString());
-    message.last_dial_failure !== undefined && (obj.last_dial_failure = message.last_dial_failure.toISOString());
-    message.dial_failures !== undefined && (obj.dial_failures = Math.round(message.dial_failures));
+    if (message.address !== "") {
+      obj.address = message.address;
+    }
+    if (message.last_dial_success !== undefined) {
+      obj.last_dial_success = message.last_dial_success.toISOString();
+    }
+    if (message.last_dial_failure !== undefined) {
+      obj.last_dial_failure = message.last_dial_failure.toISOString();
+    }
+    if (message.dial_failures !== 0) {
+      obj.dial_failures = Math.round(message.dial_failures);
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<PeerAddressInfo>, I>>(base?: I): PeerAddressInfo {
+    return PeerAddressInfo.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<PeerAddressInfo>, I>>(object: I): PeerAddressInfo {
@@ -441,10 +580,10 @@ export const PeerAddressInfo = {
   },
 };
 
-declare var self: any | undefined;
-declare var window: any | undefined;
-declare var global: any | undefined;
-var globalThis: any = (() => {
+declare const self: any | undefined;
+declare const window: any | undefined;
+declare const global: any | undefined;
+const tsProtoGlobalThis: any = (() => {
   if (typeof globalThis !== "undefined") {
     return globalThis;
   }
@@ -461,10 +600,10 @@ var globalThis: any = (() => {
 })();
 
 function bytesFromBase64(b64: string): Uint8Array {
-  if (globalThis.Buffer) {
-    return Uint8Array.from(globalThis.Buffer.from(b64, "base64"));
+  if (tsProtoGlobalThis.Buffer) {
+    return Uint8Array.from(tsProtoGlobalThis.Buffer.from(b64, "base64"));
   } else {
-    const bin = globalThis.atob(b64);
+    const bin = tsProtoGlobalThis.atob(b64);
     const arr = new Uint8Array(bin.length);
     for (let i = 0; i < bin.length; ++i) {
       arr[i] = bin.charCodeAt(i);
@@ -474,14 +613,14 @@ function bytesFromBase64(b64: string): Uint8Array {
 }
 
 function base64FromBytes(arr: Uint8Array): string {
-  if (globalThis.Buffer) {
-    return globalThis.Buffer.from(arr).toString("base64");
+  if (tsProtoGlobalThis.Buffer) {
+    return tsProtoGlobalThis.Buffer.from(arr).toString("base64");
   } else {
     const bin: string[] = [];
     arr.forEach((byte) => {
       bin.push(String.fromCharCode(byte));
     });
-    return globalThis.btoa(bin.join(""));
+    return tsProtoGlobalThis.btoa(bin.join(""));
   }
 }
 
@@ -503,8 +642,8 @@ function toTimestamp(date: Date): Timestamp {
 }
 
 function fromTimestamp(t: Timestamp): Date {
-  let millis = Number(t.seconds) * 1_000;
-  millis += t.nanos / 1_000_000;
+  let millis = (Number(t.seconds) || 0) * 1_000;
+  millis += (t.nanos || 0) / 1_000_000;
   return new Date(millis);
 }
 

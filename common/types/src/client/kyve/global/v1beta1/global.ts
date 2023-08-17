@@ -79,31 +79,52 @@ export const Params = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Params {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseParams();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.min_gas_price = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.burn_ratio = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.gas_adjustments.push(GasAdjustment.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 4:
+          if (tag !== 34) {
+            break;
+          }
+
           message.gas_refunds.push(GasRefund.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 5:
+          if (tag !== 42) {
+            break;
+          }
+
           message.min_initial_deposit_ratio = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -124,21 +145,26 @@ export const Params = {
 
   toJSON(message: Params): unknown {
     const obj: any = {};
-    message.min_gas_price !== undefined && (obj.min_gas_price = message.min_gas_price);
-    message.burn_ratio !== undefined && (obj.burn_ratio = message.burn_ratio);
-    if (message.gas_adjustments) {
-      obj.gas_adjustments = message.gas_adjustments.map((e) => e ? GasAdjustment.toJSON(e) : undefined);
-    } else {
-      obj.gas_adjustments = [];
+    if (message.min_gas_price !== "") {
+      obj.min_gas_price = message.min_gas_price;
     }
-    if (message.gas_refunds) {
-      obj.gas_refunds = message.gas_refunds.map((e) => e ? GasRefund.toJSON(e) : undefined);
-    } else {
-      obj.gas_refunds = [];
+    if (message.burn_ratio !== "") {
+      obj.burn_ratio = message.burn_ratio;
     }
-    message.min_initial_deposit_ratio !== undefined &&
-      (obj.min_initial_deposit_ratio = message.min_initial_deposit_ratio);
+    if (message.gas_adjustments?.length) {
+      obj.gas_adjustments = message.gas_adjustments.map((e) => GasAdjustment.toJSON(e));
+    }
+    if (message.gas_refunds?.length) {
+      obj.gas_refunds = message.gas_refunds.map((e) => GasRefund.toJSON(e));
+    }
+    if (message.min_initial_deposit_ratio !== "") {
+      obj.min_initial_deposit_ratio = message.min_initial_deposit_ratio;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<Params>, I>>(base?: I): Params {
+    return Params.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<Params>, I>>(object: I): Params {
@@ -168,22 +194,31 @@ export const GasAdjustment = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): GasAdjustment {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseGasAdjustment();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.type = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.amount = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -197,9 +232,17 @@ export const GasAdjustment = {
 
   toJSON(message: GasAdjustment): unknown {
     const obj: any = {};
-    message.type !== undefined && (obj.type = message.type);
-    message.amount !== undefined && (obj.amount = message.amount);
+    if (message.type !== "") {
+      obj.type = message.type;
+    }
+    if (message.amount !== "0") {
+      obj.amount = message.amount;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<GasAdjustment>, I>>(base?: I): GasAdjustment {
+    return GasAdjustment.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<GasAdjustment>, I>>(object: I): GasAdjustment {
@@ -226,22 +269,31 @@ export const GasRefund = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): GasRefund {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseGasRefund();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.type = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.fraction = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -255,9 +307,17 @@ export const GasRefund = {
 
   toJSON(message: GasRefund): unknown {
     const obj: any = {};
-    message.type !== undefined && (obj.type = message.type);
-    message.fraction !== undefined && (obj.fraction = message.fraction);
+    if (message.type !== "") {
+      obj.type = message.type;
+    }
+    if (message.fraction !== "") {
+      obj.fraction = message.fraction;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<GasRefund>, I>>(base?: I): GasRefund {
+    return GasRefund.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<GasRefund>, I>>(object: I): GasRefund {

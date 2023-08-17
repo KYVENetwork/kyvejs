@@ -84,7 +84,9 @@ export interface StakeAuthorization {
    * max_tokens specifies the maximum amount of tokens can be delegate to a validator. If it is
    * empty, there is no spend limit and any amount of coins can be delegated.
    */
-  max_tokens?: Coin;
+  max_tokens?:
+    | Coin
+    | undefined;
   /**
    * allow_list specifies list of validator addresses to whom grantee can delegate tokens on behalf of granter's
    * account.
@@ -132,28 +134,45 @@ export const StakeAuthorization = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): StakeAuthorization {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseStakeAuthorization();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.max_tokens = Coin.decode(reader, reader.uint32());
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.allow_list = StakeAuthorization_Validators.decode(reader, reader.uint32());
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.deny_list = StakeAuthorization_Validators.decode(reader, reader.uint32());
-          break;
+          continue;
         case 4:
+          if (tag !== 32) {
+            break;
+          }
+
           message.authorization_type = authorizationTypeFromJSON(reader.int32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -171,15 +190,23 @@ export const StakeAuthorization = {
 
   toJSON(message: StakeAuthorization): unknown {
     const obj: any = {};
-    message.max_tokens !== undefined &&
-      (obj.max_tokens = message.max_tokens ? Coin.toJSON(message.max_tokens) : undefined);
-    message.allow_list !== undefined &&
-      (obj.allow_list = message.allow_list ? StakeAuthorization_Validators.toJSON(message.allow_list) : undefined);
-    message.deny_list !== undefined &&
-      (obj.deny_list = message.deny_list ? StakeAuthorization_Validators.toJSON(message.deny_list) : undefined);
-    message.authorization_type !== undefined &&
-      (obj.authorization_type = authorizationTypeToJSON(message.authorization_type));
+    if (message.max_tokens !== undefined) {
+      obj.max_tokens = Coin.toJSON(message.max_tokens);
+    }
+    if (message.allow_list !== undefined) {
+      obj.allow_list = StakeAuthorization_Validators.toJSON(message.allow_list);
+    }
+    if (message.deny_list !== undefined) {
+      obj.deny_list = StakeAuthorization_Validators.toJSON(message.deny_list);
+    }
+    if (message.authorization_type !== AuthorizationType.AUTHORIZATION_TYPE_UNSPECIFIED) {
+      obj.authorization_type = authorizationTypeToJSON(message.authorization_type);
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<StakeAuthorization>, I>>(base?: I): StakeAuthorization {
+    return StakeAuthorization.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<StakeAuthorization>, I>>(object: I): StakeAuthorization {
@@ -211,19 +238,24 @@ export const StakeAuthorization_Validators = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): StakeAuthorization_Validators {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseStakeAuthorization_Validators();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.address.push(reader.string());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -234,12 +266,14 @@ export const StakeAuthorization_Validators = {
 
   toJSON(message: StakeAuthorization_Validators): unknown {
     const obj: any = {};
-    if (message.address) {
-      obj.address = message.address.map((e) => e);
-    } else {
-      obj.address = [];
+    if (message.address?.length) {
+      obj.address = message.address;
     }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<StakeAuthorization_Validators>, I>>(base?: I): StakeAuthorization_Validators {
+    return StakeAuthorization_Validators.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<StakeAuthorization_Validators>, I>>(

@@ -67,7 +67,7 @@ export interface QueryTeamVestingAccountRequest {
 /** QueryTeamVestingAccountResponse is the response type for the Query/TeamVestingAccount RPC method. */
 export interface QueryTeamVestingAccountResponse {
   /** account holds the requested team vesting account */
-  account?: TeamVestingAccount;
+  account?: TeamVestingAccount | undefined;
 }
 
 /** QueryTeamCurrentVestingStatusRequest is request type for the Query/TeamCurrentVestingStatus RPC method. */
@@ -81,9 +81,11 @@ export interface QueryTeamVestingStatusResponse {
   /** request_date .. */
   request_date: string;
   /** plan ... */
-  plan?: QueryVestingPlan;
+  plan?:
+    | QueryVestingPlan
+    | undefined;
   /** status .. */
-  status?: QueryVestingStatus;
+  status?: QueryVestingStatus | undefined;
 }
 
 /** QueryTeamVestingStatusByTimeRequest is request type for the Query/TeamCurrentVestingByTimeStatus RPC method. */
@@ -99,9 +101,11 @@ export interface QueryTeamVestingStatusByTimeResponse {
   /** request_date .. */
   request_date: string;
   /** plan ... */
-  plan?: QueryVestingPlan;
+  plan?:
+    | QueryVestingPlan
+    | undefined;
   /** status .. */
-  status?: QueryVestingStatus;
+  status?: QueryVestingStatus | undefined;
 }
 
 /** QueryVestingStatus is a type holding information about the account's vesting progress */
@@ -156,16 +160,17 @@ export const QueryTeamInfoRequest = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): QueryTeamInfoRequest {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseQueryTeamInfoRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        default:
-          reader.skipType(tag & 7);
-          break;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -177,6 +182,10 @@ export const QueryTeamInfoRequest = {
   toJSON(_: QueryTeamInfoRequest): unknown {
     const obj: any = {};
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<QueryTeamInfoRequest>, I>>(base?: I): QueryTeamInfoRequest {
+    return QueryTeamInfoRequest.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<QueryTeamInfoRequest>, I>>(_: I): QueryTeamInfoRequest {
@@ -248,55 +257,108 @@ export const QueryTeamInfoResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): QueryTeamInfoResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseQueryTeamInfoResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.foundation_authority = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.bcp_authority = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag !== 24) {
+            break;
+          }
+
           message.total_team_allocation = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 4:
+          if (tag !== 32) {
+            break;
+          }
+
           message.issued_team_allocation = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 5:
+          if (tag !== 40) {
+            break;
+          }
+
           message.available_team_allocation = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 6:
+          if (tag !== 48) {
+            break;
+          }
+
           message.total_authority_rewards = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 7:
+          if (tag !== 56) {
+            break;
+          }
+
           message.claimed_authority_rewards = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 8:
+          if (tag !== 64) {
+            break;
+          }
+
           message.available_authority_rewards = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 9:
+          if (tag !== 72) {
+            break;
+          }
+
           message.total_account_rewards = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 10:
+          if (tag !== 80) {
+            break;
+          }
+
           message.claimed_account_rewards = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 11:
+          if (tag !== 88) {
+            break;
+          }
+
           message.available_account_rewards = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 12:
+          if (tag !== 96) {
+            break;
+          }
+
           message.required_module_balance = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 13:
+          if (tag !== 104) {
+            break;
+          }
+
           message.team_module_balance = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -329,24 +391,50 @@ export const QueryTeamInfoResponse = {
 
   toJSON(message: QueryTeamInfoResponse): unknown {
     const obj: any = {};
-    message.foundation_authority !== undefined && (obj.foundation_authority = message.foundation_authority);
-    message.bcp_authority !== undefined && (obj.bcp_authority = message.bcp_authority);
-    message.total_team_allocation !== undefined && (obj.total_team_allocation = message.total_team_allocation);
-    message.issued_team_allocation !== undefined && (obj.issued_team_allocation = message.issued_team_allocation);
-    message.available_team_allocation !== undefined &&
-      (obj.available_team_allocation = message.available_team_allocation);
-    message.total_authority_rewards !== undefined && (obj.total_authority_rewards = message.total_authority_rewards);
-    message.claimed_authority_rewards !== undefined &&
-      (obj.claimed_authority_rewards = message.claimed_authority_rewards);
-    message.available_authority_rewards !== undefined &&
-      (obj.available_authority_rewards = message.available_authority_rewards);
-    message.total_account_rewards !== undefined && (obj.total_account_rewards = message.total_account_rewards);
-    message.claimed_account_rewards !== undefined && (obj.claimed_account_rewards = message.claimed_account_rewards);
-    message.available_account_rewards !== undefined &&
-      (obj.available_account_rewards = message.available_account_rewards);
-    message.required_module_balance !== undefined && (obj.required_module_balance = message.required_module_balance);
-    message.team_module_balance !== undefined && (obj.team_module_balance = message.team_module_balance);
+    if (message.foundation_authority !== "") {
+      obj.foundation_authority = message.foundation_authority;
+    }
+    if (message.bcp_authority !== "") {
+      obj.bcp_authority = message.bcp_authority;
+    }
+    if (message.total_team_allocation !== "0") {
+      obj.total_team_allocation = message.total_team_allocation;
+    }
+    if (message.issued_team_allocation !== "0") {
+      obj.issued_team_allocation = message.issued_team_allocation;
+    }
+    if (message.available_team_allocation !== "0") {
+      obj.available_team_allocation = message.available_team_allocation;
+    }
+    if (message.total_authority_rewards !== "0") {
+      obj.total_authority_rewards = message.total_authority_rewards;
+    }
+    if (message.claimed_authority_rewards !== "0") {
+      obj.claimed_authority_rewards = message.claimed_authority_rewards;
+    }
+    if (message.available_authority_rewards !== "0") {
+      obj.available_authority_rewards = message.available_authority_rewards;
+    }
+    if (message.total_account_rewards !== "0") {
+      obj.total_account_rewards = message.total_account_rewards;
+    }
+    if (message.claimed_account_rewards !== "0") {
+      obj.claimed_account_rewards = message.claimed_account_rewards;
+    }
+    if (message.available_account_rewards !== "0") {
+      obj.available_account_rewards = message.available_account_rewards;
+    }
+    if (message.required_module_balance !== "0") {
+      obj.required_module_balance = message.required_module_balance;
+    }
+    if (message.team_module_balance !== "0") {
+      obj.team_module_balance = message.team_module_balance;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<QueryTeamInfoResponse>, I>>(base?: I): QueryTeamInfoResponse {
+    return QueryTeamInfoResponse.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<QueryTeamInfoResponse>, I>>(object: I): QueryTeamInfoResponse {
@@ -378,16 +466,17 @@ export const QueryTeamVestingAccountsRequest = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): QueryTeamVestingAccountsRequest {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseQueryTeamVestingAccountsRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        default:
-          reader.skipType(tag & 7);
-          break;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -399,6 +488,10 @@ export const QueryTeamVestingAccountsRequest = {
   toJSON(_: QueryTeamVestingAccountsRequest): unknown {
     const obj: any = {};
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<QueryTeamVestingAccountsRequest>, I>>(base?: I): QueryTeamVestingAccountsRequest {
+    return QueryTeamVestingAccountsRequest.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<QueryTeamVestingAccountsRequest>, I>>(_: I): QueryTeamVestingAccountsRequest {
@@ -420,19 +513,24 @@ export const QueryTeamVestingAccountsResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): QueryTeamVestingAccountsResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseQueryTeamVestingAccountsResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.accounts.push(TeamVestingAccount.decode(reader, reader.uint32()));
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -445,12 +543,16 @@ export const QueryTeamVestingAccountsResponse = {
 
   toJSON(message: QueryTeamVestingAccountsResponse): unknown {
     const obj: any = {};
-    if (message.accounts) {
-      obj.accounts = message.accounts.map((e) => e ? TeamVestingAccount.toJSON(e) : undefined);
-    } else {
-      obj.accounts = [];
+    if (message.accounts?.length) {
+      obj.accounts = message.accounts.map((e) => TeamVestingAccount.toJSON(e));
     }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<QueryTeamVestingAccountsResponse>, I>>(
+    base?: I,
+  ): QueryTeamVestingAccountsResponse {
+    return QueryTeamVestingAccountsResponse.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<QueryTeamVestingAccountsResponse>, I>>(
@@ -475,19 +577,24 @@ export const QueryTeamVestingAccountRequest = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): QueryTeamVestingAccountRequest {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseQueryTeamVestingAccountRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.id = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -498,8 +605,14 @@ export const QueryTeamVestingAccountRequest = {
 
   toJSON(message: QueryTeamVestingAccountRequest): unknown {
     const obj: any = {};
-    message.id !== undefined && (obj.id = message.id);
+    if (message.id !== "0") {
+      obj.id = message.id;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<QueryTeamVestingAccountRequest>, I>>(base?: I): QueryTeamVestingAccountRequest {
+    return QueryTeamVestingAccountRequest.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<QueryTeamVestingAccountRequest>, I>>(
@@ -524,19 +637,24 @@ export const QueryTeamVestingAccountResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): QueryTeamVestingAccountResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseQueryTeamVestingAccountResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.account = TeamVestingAccount.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -547,9 +665,14 @@ export const QueryTeamVestingAccountResponse = {
 
   toJSON(message: QueryTeamVestingAccountResponse): unknown {
     const obj: any = {};
-    message.account !== undefined &&
-      (obj.account = message.account ? TeamVestingAccount.toJSON(message.account) : undefined);
+    if (message.account !== undefined) {
+      obj.account = TeamVestingAccount.toJSON(message.account);
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<QueryTeamVestingAccountResponse>, I>>(base?: I): QueryTeamVestingAccountResponse {
+    return QueryTeamVestingAccountResponse.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<QueryTeamVestingAccountResponse>, I>>(
@@ -576,19 +699,24 @@ export const QueryTeamVestingStatusRequest = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): QueryTeamVestingStatusRequest {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseQueryTeamVestingStatusRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.id = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -599,8 +727,14 @@ export const QueryTeamVestingStatusRequest = {
 
   toJSON(message: QueryTeamVestingStatusRequest): unknown {
     const obj: any = {};
-    message.id !== undefined && (obj.id = message.id);
+    if (message.id !== "0") {
+      obj.id = message.id;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<QueryTeamVestingStatusRequest>, I>>(base?: I): QueryTeamVestingStatusRequest {
+    return QueryTeamVestingStatusRequest.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<QueryTeamVestingStatusRequest>, I>>(
@@ -631,25 +765,38 @@ export const QueryTeamVestingStatusResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): QueryTeamVestingStatusResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseQueryTeamVestingStatusResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.request_date = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.plan = QueryVestingPlan.decode(reader, reader.uint32());
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.status = QueryVestingStatus.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -664,11 +811,20 @@ export const QueryTeamVestingStatusResponse = {
 
   toJSON(message: QueryTeamVestingStatusResponse): unknown {
     const obj: any = {};
-    message.request_date !== undefined && (obj.request_date = message.request_date);
-    message.plan !== undefined && (obj.plan = message.plan ? QueryVestingPlan.toJSON(message.plan) : undefined);
-    message.status !== undefined &&
-      (obj.status = message.status ? QueryVestingStatus.toJSON(message.status) : undefined);
+    if (message.request_date !== "") {
+      obj.request_date = message.request_date;
+    }
+    if (message.plan !== undefined) {
+      obj.plan = QueryVestingPlan.toJSON(message.plan);
+    }
+    if (message.status !== undefined) {
+      obj.status = QueryVestingStatus.toJSON(message.status);
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<QueryTeamVestingStatusResponse>, I>>(base?: I): QueryTeamVestingStatusResponse {
+    return QueryTeamVestingStatusResponse.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<QueryTeamVestingStatusResponse>, I>>(
@@ -702,22 +858,31 @@ export const QueryTeamVestingStatusByTimeRequest = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): QueryTeamVestingStatusByTimeRequest {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseQueryTeamVestingStatusByTimeRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.time = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -728,9 +893,19 @@ export const QueryTeamVestingStatusByTimeRequest = {
 
   toJSON(message: QueryTeamVestingStatusByTimeRequest): unknown {
     const obj: any = {};
-    message.id !== undefined && (obj.id = message.id);
-    message.time !== undefined && (obj.time = message.time);
+    if (message.id !== "0") {
+      obj.id = message.id;
+    }
+    if (message.time !== "0") {
+      obj.time = message.time;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<QueryTeamVestingStatusByTimeRequest>, I>>(
+    base?: I,
+  ): QueryTeamVestingStatusByTimeRequest {
+    return QueryTeamVestingStatusByTimeRequest.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<QueryTeamVestingStatusByTimeRequest>, I>>(
@@ -762,25 +937,38 @@ export const QueryTeamVestingStatusByTimeResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): QueryTeamVestingStatusByTimeResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseQueryTeamVestingStatusByTimeResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.request_date = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.plan = QueryVestingPlan.decode(reader, reader.uint32());
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.status = QueryVestingStatus.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -795,11 +983,22 @@ export const QueryTeamVestingStatusByTimeResponse = {
 
   toJSON(message: QueryTeamVestingStatusByTimeResponse): unknown {
     const obj: any = {};
-    message.request_date !== undefined && (obj.request_date = message.request_date);
-    message.plan !== undefined && (obj.plan = message.plan ? QueryVestingPlan.toJSON(message.plan) : undefined);
-    message.status !== undefined &&
-      (obj.status = message.status ? QueryVestingStatus.toJSON(message.status) : undefined);
+    if (message.request_date !== "") {
+      obj.request_date = message.request_date;
+    }
+    if (message.plan !== undefined) {
+      obj.plan = QueryVestingPlan.toJSON(message.plan);
+    }
+    if (message.status !== undefined) {
+      obj.status = QueryVestingStatus.toJSON(message.status);
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<QueryTeamVestingStatusByTimeResponse>, I>>(
+    base?: I,
+  ): QueryTeamVestingStatusByTimeResponse {
+    return QueryTeamVestingStatusByTimeResponse.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<QueryTeamVestingStatusByTimeResponse>, I>>(
@@ -864,43 +1063,80 @@ export const QueryVestingStatus = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): QueryVestingStatus {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseQueryVestingStatus();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.total_vested_amount = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.total_unlocked_amount = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 3:
+          if (tag !== 24) {
+            break;
+          }
+
           message.current_claimable_amount = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 4:
+          if (tag !== 32) {
+            break;
+          }
+
           message.locked_vested_amount = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 5:
+          if (tag !== 40) {
+            break;
+          }
+
           message.remaining_unvested_amount = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 6:
+          if (tag !== 48) {
+            break;
+          }
+
           message.claimed_amount = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 7:
+          if (tag !== 56) {
+            break;
+          }
+
           message.total_rewards = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 8:
+          if (tag !== 64) {
+            break;
+          }
+
           message.claimed_rewards = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 9:
+          if (tag !== 72) {
+            break;
+          }
+
           message.available_rewards = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -923,17 +1159,38 @@ export const QueryVestingStatus = {
 
   toJSON(message: QueryVestingStatus): unknown {
     const obj: any = {};
-    message.total_vested_amount !== undefined && (obj.total_vested_amount = message.total_vested_amount);
-    message.total_unlocked_amount !== undefined && (obj.total_unlocked_amount = message.total_unlocked_amount);
-    message.current_claimable_amount !== undefined && (obj.current_claimable_amount = message.current_claimable_amount);
-    message.locked_vested_amount !== undefined && (obj.locked_vested_amount = message.locked_vested_amount);
-    message.remaining_unvested_amount !== undefined &&
-      (obj.remaining_unvested_amount = message.remaining_unvested_amount);
-    message.claimed_amount !== undefined && (obj.claimed_amount = message.claimed_amount);
-    message.total_rewards !== undefined && (obj.total_rewards = message.total_rewards);
-    message.claimed_rewards !== undefined && (obj.claimed_rewards = message.claimed_rewards);
-    message.available_rewards !== undefined && (obj.available_rewards = message.available_rewards);
+    if (message.total_vested_amount !== "0") {
+      obj.total_vested_amount = message.total_vested_amount;
+    }
+    if (message.total_unlocked_amount !== "0") {
+      obj.total_unlocked_amount = message.total_unlocked_amount;
+    }
+    if (message.current_claimable_amount !== "0") {
+      obj.current_claimable_amount = message.current_claimable_amount;
+    }
+    if (message.locked_vested_amount !== "0") {
+      obj.locked_vested_amount = message.locked_vested_amount;
+    }
+    if (message.remaining_unvested_amount !== "0") {
+      obj.remaining_unvested_amount = message.remaining_unvested_amount;
+    }
+    if (message.claimed_amount !== "0") {
+      obj.claimed_amount = message.claimed_amount;
+    }
+    if (message.total_rewards !== "0") {
+      obj.total_rewards = message.total_rewards;
+    }
+    if (message.claimed_rewards !== "0") {
+      obj.claimed_rewards = message.claimed_rewards;
+    }
+    if (message.available_rewards !== "0") {
+      obj.available_rewards = message.available_rewards;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<QueryVestingStatus>, I>>(base?: I): QueryVestingStatus {
+    return QueryVestingStatus.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<QueryVestingStatus>, I>>(object: I): QueryVestingStatus {
@@ -994,40 +1251,73 @@ export const QueryVestingPlan = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): QueryVestingPlan {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseQueryVestingPlan();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.commencement = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.token_vesting_start = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.token_vesting_finished = reader.string();
-          break;
+          continue;
         case 4:
+          if (tag !== 34) {
+            break;
+          }
+
           message.token_unlock_start = reader.string();
-          break;
+          continue;
         case 5:
+          if (tag !== 42) {
+            break;
+          }
+
           message.token_unlock_finished = reader.string();
-          break;
+          continue;
         case 6:
+          if (tag !== 48) {
+            break;
+          }
+
           message.clawback = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 7:
+          if (tag !== 56) {
+            break;
+          }
+
           message.clawback_amount = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 8:
+          if (tag !== 64) {
+            break;
+          }
+
           message.maximum_vesting_amount = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -1047,15 +1337,35 @@ export const QueryVestingPlan = {
 
   toJSON(message: QueryVestingPlan): unknown {
     const obj: any = {};
-    message.commencement !== undefined && (obj.commencement = message.commencement);
-    message.token_vesting_start !== undefined && (obj.token_vesting_start = message.token_vesting_start);
-    message.token_vesting_finished !== undefined && (obj.token_vesting_finished = message.token_vesting_finished);
-    message.token_unlock_start !== undefined && (obj.token_unlock_start = message.token_unlock_start);
-    message.token_unlock_finished !== undefined && (obj.token_unlock_finished = message.token_unlock_finished);
-    message.clawback !== undefined && (obj.clawback = message.clawback);
-    message.clawback_amount !== undefined && (obj.clawback_amount = message.clawback_amount);
-    message.maximum_vesting_amount !== undefined && (obj.maximum_vesting_amount = message.maximum_vesting_amount);
+    if (message.commencement !== "") {
+      obj.commencement = message.commencement;
+    }
+    if (message.token_vesting_start !== "") {
+      obj.token_vesting_start = message.token_vesting_start;
+    }
+    if (message.token_vesting_finished !== "") {
+      obj.token_vesting_finished = message.token_vesting_finished;
+    }
+    if (message.token_unlock_start !== "") {
+      obj.token_unlock_start = message.token_unlock_start;
+    }
+    if (message.token_unlock_finished !== "") {
+      obj.token_unlock_finished = message.token_unlock_finished;
+    }
+    if (message.clawback !== "0") {
+      obj.clawback = message.clawback;
+    }
+    if (message.clawback_amount !== "0") {
+      obj.clawback_amount = message.clawback_amount;
+    }
+    if (message.maximum_vesting_amount !== "0") {
+      obj.maximum_vesting_amount = message.maximum_vesting_amount;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<QueryVestingPlan>, I>>(base?: I): QueryVestingPlan {
+    return QueryVestingPlan.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<QueryVestingPlan>, I>>(object: I): QueryVestingPlan {
@@ -1086,11 +1396,12 @@ export interface Query {
   TeamVestingStatusByTime(request: QueryTeamVestingStatusByTimeRequest): Promise<QueryTeamVestingStatusByTimeResponse>;
 }
 
+export const QueryServiceName = "kyve.team.v1beta1.Query";
 export class QueryClientImpl implements Query {
   private readonly rpc: Rpc;
   private readonly service: string;
   constructor(rpc: Rpc, opts?: { service?: string }) {
-    this.service = opts?.service || "kyve.team.v1beta1.Query";
+    this.service = opts?.service || QueryServiceName;
     this.rpc = rpc;
     this.TeamInfo = this.TeamInfo.bind(this);
     this.TeamVestingAccounts = this.TeamVestingAccounts.bind(this);
@@ -1101,31 +1412,31 @@ export class QueryClientImpl implements Query {
   TeamInfo(request: QueryTeamInfoRequest): Promise<QueryTeamInfoResponse> {
     const data = QueryTeamInfoRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "TeamInfo", data);
-    return promise.then((data) => QueryTeamInfoResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) => QueryTeamInfoResponse.decode(_m0.Reader.create(data)));
   }
 
   TeamVestingAccounts(request: QueryTeamVestingAccountsRequest): Promise<QueryTeamVestingAccountsResponse> {
     const data = QueryTeamVestingAccountsRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "TeamVestingAccounts", data);
-    return promise.then((data) => QueryTeamVestingAccountsResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) => QueryTeamVestingAccountsResponse.decode(_m0.Reader.create(data)));
   }
 
   TeamVestingAccount(request: QueryTeamVestingAccountRequest): Promise<QueryTeamVestingAccountResponse> {
     const data = QueryTeamVestingAccountRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "TeamVestingAccount", data);
-    return promise.then((data) => QueryTeamVestingAccountResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) => QueryTeamVestingAccountResponse.decode(_m0.Reader.create(data)));
   }
 
   TeamVestingStatus(request: QueryTeamVestingStatusRequest): Promise<QueryTeamVestingStatusResponse> {
     const data = QueryTeamVestingStatusRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "TeamVestingStatus", data);
-    return promise.then((data) => QueryTeamVestingStatusResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) => QueryTeamVestingStatusResponse.decode(_m0.Reader.create(data)));
   }
 
   TeamVestingStatusByTime(request: QueryTeamVestingStatusByTimeRequest): Promise<QueryTeamVestingStatusByTimeResponse> {
     const data = QueryTeamVestingStatusByTimeRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "TeamVestingStatusByTime", data);
-    return promise.then((data) => QueryTeamVestingStatusByTimeResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) => QueryTeamVestingStatusByTimeResponse.decode(_m0.Reader.create(data)));
   }
 }
 

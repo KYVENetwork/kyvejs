@@ -42,19 +42,24 @@ export const Capability = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Capability {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseCapability();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.index = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -65,8 +70,14 @@ export const Capability = {
 
   toJSON(message: Capability): unknown {
     const obj: any = {};
-    message.index !== undefined && (obj.index = message.index);
+    if (message.index !== "0") {
+      obj.index = message.index;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<Capability>, I>>(base?: I): Capability {
+    return Capability.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<Capability>, I>>(object: I): Capability {
@@ -92,22 +103,31 @@ export const Owner = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Owner {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseOwner();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.module = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.name = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -121,9 +141,17 @@ export const Owner = {
 
   toJSON(message: Owner): unknown {
     const obj: any = {};
-    message.module !== undefined && (obj.module = message.module);
-    message.name !== undefined && (obj.name = message.name);
+    if (message.module !== "") {
+      obj.module = message.module;
+    }
+    if (message.name !== "") {
+      obj.name = message.name;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<Owner>, I>>(base?: I): Owner {
+    return Owner.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<Owner>, I>>(object: I): Owner {
@@ -147,19 +175,24 @@ export const CapabilityOwners = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): CapabilityOwners {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseCapabilityOwners();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.owners.push(Owner.decode(reader, reader.uint32()));
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -170,12 +203,14 @@ export const CapabilityOwners = {
 
   toJSON(message: CapabilityOwners): unknown {
     const obj: any = {};
-    if (message.owners) {
-      obj.owners = message.owners.map((e) => e ? Owner.toJSON(e) : undefined);
-    } else {
-      obj.owners = [];
+    if (message.owners?.length) {
+      obj.owners = message.owners.map((e) => Owner.toJSON(e));
     }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<CapabilityOwners>, I>>(base?: I): CapabilityOwners {
+    return CapabilityOwners.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<CapabilityOwners>, I>>(object: I): CapabilityOwners {

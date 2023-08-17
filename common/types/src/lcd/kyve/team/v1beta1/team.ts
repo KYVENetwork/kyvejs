@@ -51,22 +51,31 @@ export const Authority = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Authority {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseAuthority();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.total_rewards = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.rewards_claimed = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -80,9 +89,17 @@ export const Authority = {
 
   toJSON(message: Authority): unknown {
     const obj: any = {};
-    message.total_rewards !== undefined && (obj.total_rewards = message.total_rewards);
-    message.rewards_claimed !== undefined && (obj.rewards_claimed = message.rewards_claimed);
+    if (message.total_rewards !== "0") {
+      obj.total_rewards = message.total_rewards;
+    }
+    if (message.rewards_claimed !== "0") {
+      obj.rewards_claimed = message.rewards_claimed;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<Authority>, I>>(base?: I): Authority {
+    return Authority.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<Authority>, I>>(object: I): Authority {
@@ -136,40 +153,73 @@ export const TeamVestingAccount = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): TeamVestingAccount {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseTeamVestingAccount();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.total_allocation = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 3:
+          if (tag !== 24) {
+            break;
+          }
+
           message.commencement = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 4:
+          if (tag !== 32) {
+            break;
+          }
+
           message.clawback = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 5:
+          if (tag !== 40) {
+            break;
+          }
+
           message.unlocked_claimed = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 6:
+          if (tag !== 48) {
+            break;
+          }
+
           message.last_claimed_time = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 7:
+          if (tag !== 56) {
+            break;
+          }
+
           message.total_rewards = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 8:
+          if (tag !== 64) {
+            break;
+          }
+
           message.rewards_claimed = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -189,15 +239,35 @@ export const TeamVestingAccount = {
 
   toJSON(message: TeamVestingAccount): unknown {
     const obj: any = {};
-    message.id !== undefined && (obj.id = message.id);
-    message.total_allocation !== undefined && (obj.total_allocation = message.total_allocation);
-    message.commencement !== undefined && (obj.commencement = message.commencement);
-    message.clawback !== undefined && (obj.clawback = message.clawback);
-    message.unlocked_claimed !== undefined && (obj.unlocked_claimed = message.unlocked_claimed);
-    message.last_claimed_time !== undefined && (obj.last_claimed_time = message.last_claimed_time);
-    message.total_rewards !== undefined && (obj.total_rewards = message.total_rewards);
-    message.rewards_claimed !== undefined && (obj.rewards_claimed = message.rewards_claimed);
+    if (message.id !== "0") {
+      obj.id = message.id;
+    }
+    if (message.total_allocation !== "0") {
+      obj.total_allocation = message.total_allocation;
+    }
+    if (message.commencement !== "0") {
+      obj.commencement = message.commencement;
+    }
+    if (message.clawback !== "0") {
+      obj.clawback = message.clawback;
+    }
+    if (message.unlocked_claimed !== "0") {
+      obj.unlocked_claimed = message.unlocked_claimed;
+    }
+    if (message.last_claimed_time !== "0") {
+      obj.last_claimed_time = message.last_claimed_time;
+    }
+    if (message.total_rewards !== "0") {
+      obj.total_rewards = message.total_rewards;
+    }
+    if (message.rewards_claimed !== "0") {
+      obj.rewards_claimed = message.rewards_claimed;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<TeamVestingAccount>, I>>(base?: I): TeamVestingAccount {
+    return TeamVestingAccount.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<TeamVestingAccount>, I>>(object: I): TeamVestingAccount {

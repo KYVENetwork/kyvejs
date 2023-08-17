@@ -25,19 +25,24 @@ export const MsgUnjail = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgUnjail {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgUnjail();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.validator_addr = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -48,8 +53,14 @@ export const MsgUnjail = {
 
   toJSON(message: MsgUnjail): unknown {
     const obj: any = {};
-    message.validator_addr !== undefined && (obj.validator_addr = message.validator_addr);
+    if (message.validator_addr !== "") {
+      obj.validator_addr = message.validator_addr;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MsgUnjail>, I>>(base?: I): MsgUnjail {
+    return MsgUnjail.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<MsgUnjail>, I>>(object: I): MsgUnjail {
@@ -69,16 +80,17 @@ export const MsgUnjailResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgUnjailResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgUnjailResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        default:
-          reader.skipType(tag & 7);
-          break;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -90,6 +102,10 @@ export const MsgUnjailResponse = {
   toJSON(_: MsgUnjailResponse): unknown {
     const obj: any = {};
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MsgUnjailResponse>, I>>(base?: I): MsgUnjailResponse {
+    return MsgUnjailResponse.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<MsgUnjailResponse>, I>>(_: I): MsgUnjailResponse {
@@ -108,18 +124,19 @@ export interface Msg {
   Unjail(request: MsgUnjail): Promise<MsgUnjailResponse>;
 }
 
+export const MsgServiceName = "cosmos.slashing.v1beta1.Msg";
 export class MsgClientImpl implements Msg {
   private readonly rpc: Rpc;
   private readonly service: string;
   constructor(rpc: Rpc, opts?: { service?: string }) {
-    this.service = opts?.service || "cosmos.slashing.v1beta1.Msg";
+    this.service = opts?.service || MsgServiceName;
     this.rpc = rpc;
     this.Unjail = this.Unjail.bind(this);
   }
   Unjail(request: MsgUnjail): Promise<MsgUnjailResponse> {
     const data = MsgUnjail.encode(request).finish();
     const promise = this.rpc.request(this.service, "Unjail", data);
-    return promise.then((data) => MsgUnjailResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) => MsgUnjailResponse.decode(_m0.Reader.create(data)));
   }
 }
 

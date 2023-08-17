@@ -11,7 +11,7 @@ export const protobufPackage = "cosmos.evidence.v1beta1";
  */
 export interface Equivocation {
   height: string;
-  time?: Date;
+  time?: Date | undefined;
   power: string;
   consensus_address: string;
 }
@@ -38,28 +38,45 @@ export const Equivocation = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Equivocation {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEquivocation();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.height = longToString(reader.int64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.time = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 3:
+          if (tag !== 24) {
+            break;
+          }
+
           message.power = longToString(reader.int64() as Long);
-          break;
+          continue;
         case 4:
+          if (tag !== 34) {
+            break;
+          }
+
           message.consensus_address = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -75,11 +92,23 @@ export const Equivocation = {
 
   toJSON(message: Equivocation): unknown {
     const obj: any = {};
-    message.height !== undefined && (obj.height = message.height);
-    message.time !== undefined && (obj.time = message.time.toISOString());
-    message.power !== undefined && (obj.power = message.power);
-    message.consensus_address !== undefined && (obj.consensus_address = message.consensus_address);
+    if (message.height !== "0") {
+      obj.height = message.height;
+    }
+    if (message.time !== undefined) {
+      obj.time = message.time.toISOString();
+    }
+    if (message.power !== "0") {
+      obj.power = message.power;
+    }
+    if (message.consensus_address !== "") {
+      obj.consensus_address = message.consensus_address;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<Equivocation>, I>>(base?: I): Equivocation {
+    return Equivocation.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<Equivocation>, I>>(object: I): Equivocation {
@@ -110,8 +139,8 @@ function toTimestamp(date: Date): Timestamp {
 }
 
 function fromTimestamp(t: Timestamp): Date {
-  let millis = Number(t.seconds) * 1_000;
-  millis += t.nanos / 1_000_000;
+  let millis = (Number(t.seconds) || 0) * 1_000;
+  millis += (t.nanos || 0) / 1_000_000;
   return new Date(millis);
 }
 

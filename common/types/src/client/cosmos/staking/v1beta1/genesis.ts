@@ -8,7 +8,9 @@ export const protobufPackage = "cosmos.staking.v1beta1";
 /** GenesisState defines the staking module's genesis state. */
 export interface GenesisState {
   /** params defines all the paramaters of related to deposit. */
-  params?: Params;
+  params?:
+    | Params
+    | undefined;
   /**
    * last_total_power tracks the total amounts of bonded tokens recorded during
    * the previous end block.
@@ -41,7 +43,7 @@ export interface LastValidatorPower {
 function createBaseGenesisState(): GenesisState {
   return {
     params: undefined,
-    last_total_power: new Uint8Array(),
+    last_total_power: new Uint8Array(0),
     last_validator_powers: [],
     validators: [],
     delegations: [],
@@ -81,40 +83,73 @@ export const GenesisState = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): GenesisState {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseGenesisState();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.params = Params.decode(reader, reader.uint32());
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.last_total_power = reader.bytes();
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.last_validator_powers.push(LastValidatorPower.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 4:
+          if (tag !== 34) {
+            break;
+          }
+
           message.validators.push(Validator.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 5:
+          if (tag !== 42) {
+            break;
+          }
+
           message.delegations.push(Delegation.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 6:
+          if (tag !== 50) {
+            break;
+          }
+
           message.unbonding_delegations.push(UnbondingDelegation.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 7:
+          if (tag !== 58) {
+            break;
+          }
+
           message.redelegations.push(Redelegation.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 8:
+          if (tag !== 64) {
+            break;
+          }
+
           message.exported = reader.bool();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -122,7 +157,7 @@ export const GenesisState = {
   fromJSON(object: any): GenesisState {
     return {
       params: isSet(object.params) ? Params.fromJSON(object.params) : undefined,
-      last_total_power: isSet(object.last_total_power) ? bytesFromBase64(object.last_total_power) : new Uint8Array(),
+      last_total_power: isSet(object.last_total_power) ? bytesFromBase64(object.last_total_power) : new Uint8Array(0),
       last_validator_powers: Array.isArray(object?.last_validator_powers)
         ? object.last_validator_powers.map((e: any) => LastValidatorPower.fromJSON(e))
         : [],
@@ -140,42 +175,35 @@ export const GenesisState = {
 
   toJSON(message: GenesisState): unknown {
     const obj: any = {};
-    message.params !== undefined && (obj.params = message.params ? Params.toJSON(message.params) : undefined);
-    message.last_total_power !== undefined &&
-      (obj.last_total_power = base64FromBytes(
-        message.last_total_power !== undefined ? message.last_total_power : new Uint8Array(),
-      ));
-    if (message.last_validator_powers) {
-      obj.last_validator_powers = message.last_validator_powers.map((e) =>
-        e ? LastValidatorPower.toJSON(e) : undefined
-      );
-    } else {
-      obj.last_validator_powers = [];
+    if (message.params !== undefined) {
+      obj.params = Params.toJSON(message.params);
     }
-    if (message.validators) {
-      obj.validators = message.validators.map((e) => e ? Validator.toJSON(e) : undefined);
-    } else {
-      obj.validators = [];
+    if (message.last_total_power.length !== 0) {
+      obj.last_total_power = base64FromBytes(message.last_total_power);
     }
-    if (message.delegations) {
-      obj.delegations = message.delegations.map((e) => e ? Delegation.toJSON(e) : undefined);
-    } else {
-      obj.delegations = [];
+    if (message.last_validator_powers?.length) {
+      obj.last_validator_powers = message.last_validator_powers.map((e) => LastValidatorPower.toJSON(e));
     }
-    if (message.unbonding_delegations) {
-      obj.unbonding_delegations = message.unbonding_delegations.map((e) =>
-        e ? UnbondingDelegation.toJSON(e) : undefined
-      );
-    } else {
-      obj.unbonding_delegations = [];
+    if (message.validators?.length) {
+      obj.validators = message.validators.map((e) => Validator.toJSON(e));
     }
-    if (message.redelegations) {
-      obj.redelegations = message.redelegations.map((e) => e ? Redelegation.toJSON(e) : undefined);
-    } else {
-      obj.redelegations = [];
+    if (message.delegations?.length) {
+      obj.delegations = message.delegations.map((e) => Delegation.toJSON(e));
     }
-    message.exported !== undefined && (obj.exported = message.exported);
+    if (message.unbonding_delegations?.length) {
+      obj.unbonding_delegations = message.unbonding_delegations.map((e) => UnbondingDelegation.toJSON(e));
+    }
+    if (message.redelegations?.length) {
+      obj.redelegations = message.redelegations.map((e) => Redelegation.toJSON(e));
+    }
+    if (message.exported === true) {
+      obj.exported = message.exported;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<GenesisState>, I>>(base?: I): GenesisState {
+    return GenesisState.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<GenesisState>, I>>(object: I): GenesisState {
@@ -183,7 +211,7 @@ export const GenesisState = {
     message.params = (object.params !== undefined && object.params !== null)
       ? Params.fromPartial(object.params)
       : undefined;
-    message.last_total_power = object.last_total_power ?? new Uint8Array();
+    message.last_total_power = object.last_total_power ?? new Uint8Array(0);
     message.last_validator_powers = object.last_validator_powers?.map((e) => LastValidatorPower.fromPartial(e)) || [];
     message.validators = object.validators?.map((e) => Validator.fromPartial(e)) || [];
     message.delegations = object.delegations?.map((e) => Delegation.fromPartial(e)) || [];
@@ -210,22 +238,31 @@ export const LastValidatorPower = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): LastValidatorPower {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseLastValidatorPower();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.address = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.power = longToString(reader.int64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -239,9 +276,17 @@ export const LastValidatorPower = {
 
   toJSON(message: LastValidatorPower): unknown {
     const obj: any = {};
-    message.address !== undefined && (obj.address = message.address);
-    message.power !== undefined && (obj.power = message.power);
+    if (message.address !== "") {
+      obj.address = message.address;
+    }
+    if (message.power !== "0") {
+      obj.power = message.power;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<LastValidatorPower>, I>>(base?: I): LastValidatorPower {
+    return LastValidatorPower.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<LastValidatorPower>, I>>(object: I): LastValidatorPower {
@@ -252,10 +297,10 @@ export const LastValidatorPower = {
   },
 };
 
-declare var self: any | undefined;
-declare var window: any | undefined;
-declare var global: any | undefined;
-var globalThis: any = (() => {
+declare const self: any | undefined;
+declare const window: any | undefined;
+declare const global: any | undefined;
+const tsProtoGlobalThis: any = (() => {
   if (typeof globalThis !== "undefined") {
     return globalThis;
   }
@@ -272,10 +317,10 @@ var globalThis: any = (() => {
 })();
 
 function bytesFromBase64(b64: string): Uint8Array {
-  if (globalThis.Buffer) {
-    return Uint8Array.from(globalThis.Buffer.from(b64, "base64"));
+  if (tsProtoGlobalThis.Buffer) {
+    return Uint8Array.from(tsProtoGlobalThis.Buffer.from(b64, "base64"));
   } else {
-    const bin = globalThis.atob(b64);
+    const bin = tsProtoGlobalThis.atob(b64);
     const arr = new Uint8Array(bin.length);
     for (let i = 0; i < bin.length; ++i) {
       arr[i] = bin.charCodeAt(i);
@@ -285,14 +330,14 @@ function bytesFromBase64(b64: string): Uint8Array {
 }
 
 function base64FromBytes(arr: Uint8Array): string {
-  if (globalThis.Buffer) {
-    return globalThis.Buffer.from(arr).toString("base64");
+  if (tsProtoGlobalThis.Buffer) {
+    return tsProtoGlobalThis.Buffer.from(arr).toString("base64");
   } else {
     const bin: string[] = [];
     arr.forEach((byte) => {
       bin.push(String.fromCharCode(byte));
     });
-    return globalThis.btoa(bin.join(""));
+    return tsProtoGlobalThis.btoa(bin.join(""));
   }
 }
 

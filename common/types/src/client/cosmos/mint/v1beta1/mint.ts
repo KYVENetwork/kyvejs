@@ -44,22 +44,31 @@ export const Minter = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Minter {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMinter();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.inflation = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.annual_provisions = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -73,9 +82,17 @@ export const Minter = {
 
   toJSON(message: Minter): unknown {
     const obj: any = {};
-    message.inflation !== undefined && (obj.inflation = message.inflation);
-    message.annual_provisions !== undefined && (obj.annual_provisions = message.annual_provisions);
+    if (message.inflation !== "") {
+      obj.inflation = message.inflation;
+    }
+    if (message.annual_provisions !== "") {
+      obj.annual_provisions = message.annual_provisions;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<Minter>, I>>(base?: I): Minter {
+    return Minter.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<Minter>, I>>(object: I): Minter {
@@ -121,34 +138,59 @@ export const Params = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Params {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseParams();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.mint_denom = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.inflation_rate_change = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.inflation_max = reader.string();
-          break;
+          continue;
         case 4:
+          if (tag !== 34) {
+            break;
+          }
+
           message.inflation_min = reader.string();
-          break;
+          continue;
         case 5:
+          if (tag !== 42) {
+            break;
+          }
+
           message.goal_bonded = reader.string();
-          break;
+          continue;
         case 6:
+          if (tag !== 48) {
+            break;
+          }
+
           message.blocks_per_year = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -166,13 +208,29 @@ export const Params = {
 
   toJSON(message: Params): unknown {
     const obj: any = {};
-    message.mint_denom !== undefined && (obj.mint_denom = message.mint_denom);
-    message.inflation_rate_change !== undefined && (obj.inflation_rate_change = message.inflation_rate_change);
-    message.inflation_max !== undefined && (obj.inflation_max = message.inflation_max);
-    message.inflation_min !== undefined && (obj.inflation_min = message.inflation_min);
-    message.goal_bonded !== undefined && (obj.goal_bonded = message.goal_bonded);
-    message.blocks_per_year !== undefined && (obj.blocks_per_year = message.blocks_per_year);
+    if (message.mint_denom !== "") {
+      obj.mint_denom = message.mint_denom;
+    }
+    if (message.inflation_rate_change !== "") {
+      obj.inflation_rate_change = message.inflation_rate_change;
+    }
+    if (message.inflation_max !== "") {
+      obj.inflation_max = message.inflation_max;
+    }
+    if (message.inflation_min !== "") {
+      obj.inflation_min = message.inflation_min;
+    }
+    if (message.goal_bonded !== "") {
+      obj.goal_bonded = message.goal_bonded;
+    }
+    if (message.blocks_per_year !== "0") {
+      obj.blocks_per_year = message.blocks_per_year;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<Params>, I>>(base?: I): Params {
+    return Params.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<Params>, I>>(object: I): Params {

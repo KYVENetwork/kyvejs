@@ -11,7 +11,7 @@ export interface QueryConfigRequest {
 /** QueryConfigRequest is the Query/Config response type. */
 export interface QueryConfigResponse {
   /** config is the current app config. */
-  config?: Config;
+  config?: Config | undefined;
 }
 
 function createBaseQueryConfigRequest(): QueryConfigRequest {
@@ -24,16 +24,17 @@ export const QueryConfigRequest = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): QueryConfigRequest {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseQueryConfigRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        default:
-          reader.skipType(tag & 7);
-          break;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -45,6 +46,10 @@ export const QueryConfigRequest = {
   toJSON(_: QueryConfigRequest): unknown {
     const obj: any = {};
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<QueryConfigRequest>, I>>(base?: I): QueryConfigRequest {
+    return QueryConfigRequest.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<QueryConfigRequest>, I>>(_: I): QueryConfigRequest {
@@ -66,19 +71,24 @@ export const QueryConfigResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): QueryConfigResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseQueryConfigResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.config = Config.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -89,8 +99,14 @@ export const QueryConfigResponse = {
 
   toJSON(message: QueryConfigResponse): unknown {
     const obj: any = {};
-    message.config !== undefined && (obj.config = message.config ? Config.toJSON(message.config) : undefined);
+    if (message.config !== undefined) {
+      obj.config = Config.toJSON(message.config);
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<QueryConfigResponse>, I>>(base?: I): QueryConfigResponse {
+    return QueryConfigResponse.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<QueryConfigResponse>, I>>(object: I): QueryConfigResponse {
@@ -108,18 +124,19 @@ export interface Query {
   Config(request: QueryConfigRequest): Promise<QueryConfigResponse>;
 }
 
+export const QueryServiceName = "cosmos.app.v1alpha1.Query";
 export class QueryClientImpl implements Query {
   private readonly rpc: Rpc;
   private readonly service: string;
   constructor(rpc: Rpc, opts?: { service?: string }) {
-    this.service = opts?.service || "cosmos.app.v1alpha1.Query";
+    this.service = opts?.service || QueryServiceName;
     this.rpc = rpc;
     this.Config = this.Config.bind(this);
   }
   Config(request: QueryConfigRequest): Promise<QueryConfigResponse> {
     const data = QueryConfigRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "Config", data);
-    return promise.then((data) => QueryConfigResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) => QueryConfigResponse.decode(_m0.Reader.create(data)));
   }
 }
 
