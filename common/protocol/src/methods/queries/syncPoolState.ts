@@ -43,7 +43,9 @@ export async function syncPoolState(
               );
 
               // validate, parse and set config in runtime
-              await this.runtime.validateSetConfig(this.pool.data!.config);
+              this.runtime.serializedConfig = await this.runtime.validateSetConfig({
+                raw_config: this.pool.data!.config
+              });
 
               // error if config was not set on runtime
               if (!this.runtime.config) {

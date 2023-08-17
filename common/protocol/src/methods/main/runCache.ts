@@ -142,7 +142,10 @@ export async function runCache(this: Validator): Promise<void> {
             async () => {
               // get the data item from the runtime by key
               this.logger.debug(`this.runtime.getDataItem($THIS,${nextKey})`);
-              const data = await this.runtime.getDataItem(this, nextKey);
+              const data = await this.runtime.getDataItem({
+                serializedConfig: this.runtime.serializedConfig,
+                key: nextKey
+              });
 
               this.m.runtime_get_data_item_successful.inc();
 

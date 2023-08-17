@@ -11,22 +11,18 @@ message DataItem {
 }
 
 message RuntimeConfig {
-    string serialized_config = 1;
+    string serializedConfig = 1;
 }
 
 /* getRuntimeName */
-message GetRuntimeNameRequest {
-  RuntimeConfig config = 1;
-}
+message GetRuntimeNameRequest {}
 
 message GetRuntimeNameResponse {
   string name = 1;
 }
 
 /* getRuntimeVersion */
-message GetRuntimeVersionRequest {
-  RuntimeConfig config = 1;
-}
+message GetRuntimeVersionRequest {}
 
 message GetRuntimeVersionResponse {
   string version = 1;

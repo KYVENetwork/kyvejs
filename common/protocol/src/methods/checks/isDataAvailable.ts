@@ -25,7 +25,10 @@ export async function isDataAvailable(this: Validator): Promise<boolean> {
     this.logger.info(`Checking data availability for key ${nextKey}`);
 
     // collect data item for next key
-    const dataItem = await this.runtime.getDataItem(this, nextKey);
+    const dataItem = await this.runtime.getDataItem({
+      serializedConfig: this.runtime.serializedConfig,
+      key: nextKey
+    });
 
     // prevalidate data item and reject if it fails
     this.logger.debug(`this.runtime.prevalidateDataItem($THIS,$ITEM)`);

@@ -185,6 +185,24 @@ export class Validator {
 
     // set @kyvejs/protocol version
     this.protocolVersion = protocolVersion;
+
+
+    // Call the getName method and assign the result
+    this.runtime.getName({}, (nameError, nameResponse) => {
+      if (nameError) {
+        console.error('Error getting name:', nameError);
+        return;
+      }
+      this.runtime_name = nameResponse.name;
+    });
+    // Call the getName method and assign the result
+    this.runtime.getVersion({}, (versionError, versionResponse) => {
+      if (versionError) {
+        console.error('Error getting version:', versionError);
+        return;
+      }
+      this.runtime_version = versionResponse.version;
+    });
   }
 
   /**
@@ -203,7 +221,7 @@ export class Validator {
       .command("version")
       .description("Print runtime and protocol version")
       .action(() => {
-        console.log(`${this.runtime.name} version: ${this.runtime.version}`);
+        console.log(`${this.runtime_name} version: ${this.runtime_version}`);
         console.log(`@kyvejs/protocol version: ${this.protocolVersion}`);
         console.log(`Node version: ${process.version}`);
         console.log();
