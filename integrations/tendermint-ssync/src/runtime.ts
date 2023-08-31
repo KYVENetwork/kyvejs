@@ -41,7 +41,7 @@ export default class TendermintSSync implements IRuntime {
 
   async getDataItem(_: Validator, key: string): Promise<DataItem> {
     // fetch snapshot chunk from given height, format and chunk derived from key
-    const [height, __, chunkIndex] = key.split('/').map((k) => +k);
+    const [height, chunkIndex] = key.split('/').map((k) => +k);
 
     const { data: snapshots } = await axios.get(
       `${this.config.api}/list_snapshots`
@@ -107,35 +107,32 @@ export default class TendermintSSync implements IRuntime {
   }
 
   async nextKey(_: Validator, key: string): Promise<string> {
-    const [height, chunks, chunkIndex] = key.split('/').map((k) => +k);
+    // since we only need to fetch if we continue with the next snapshot
+    const [height, chunkIndex] = key.split('/').map((k) => +k);
+
+    const { data: snapshots } = await axios.get(
+      `${this.config.api}/list_snapshots`
+    );
+
+    if (!snapshots) {
+      throw new Error(`404: Snapshot with height ${height} not found`);
+    }
+
+    const snapshot: ISnapshot = snapshots.find(
+      (s: ISnapshot) => s.height === height
+    );
+
+    if (!snapshot) {
+      throw new Error(`404: Snapshot with height ${height} not found`);
+    }
 
     // move on to next snapshot and start at first chunk
     // if we have already reached all chunks in current snapshot
-    if (chunks - 1 === chunkIndex) {
-      const { data: snapshots } = await axios.get(
-        `${this.config.api}/list_snapshots`
-      );
-
-      const nextHeight = height + this.config.interval;
-
-      if (!snapshots) {
-        throw new Error(`404: Snapshot with height ${nextHeight} not found`);
-      }
-
-      const snapshot: ISnapshot = snapshots.find(
-        (s: ISnapshot) => s.height === height
-      );
-
-      if (!snapshot) {
-        throw new Error(`404: Snapshot with height ${nextHeight} not found`);
-      }
-
-      // continue with new snapshot height and start at chunk index zero
-      return `${snapshot.height}/${snapshot.chunks}/0`;
+    if (snapshot.chunks - 1 === chunkIndex) {
+      return `${height + this.config.interval}/0`;
     }
 
-    // if there are still chunks left in the snapshot we increase
-    // the chunk index
-    return `${height}/${chunks}/${chunkIndex + 1}`;
+    // stay on current snapshot and continue with next snapshot chunk
+    return `${height}/${chunkIndex + 1}`;
   }
 }
