@@ -59,15 +59,21 @@ export default class TendermintSSync implements IRuntime {
       throw new Error(`404: Snapshot with height ${height} not found`);
     }
 
+    // fetch app hash
+    const {
+      data: { AppHash },
+    } = await axios.get(`${this.config.api}/get_app_hash/${height}`);
+
+    // fetch snapshot chunk
     const { data: chunk } = await axios.get(
       `${this.config.api}/load_snapshot_chunk/${height}/${snapshot.format}/${chunkIndex}`
     );
 
-    // TODO: include trusted app_hash
     return {
       key,
       value: {
         snapshot,
+        appHash: AppHash,
         chunkIndex,
         chunk,
       },
