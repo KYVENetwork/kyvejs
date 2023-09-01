@@ -52,7 +52,7 @@ export default class TendermintSSync implements IRuntime {
     }
 
     const snapshot: ISnapshot = snapshots.find(
-      (s: ISnapshot) => s.height === height
+      (s: ISnapshot) => +s.height === height
     );
 
     if (!snapshot) {
@@ -86,6 +86,11 @@ export default class TendermintSSync implements IRuntime {
       data: { AppHash: appHash },
     } = await axios.get(`${this.config.api}/get_app_hash/${height + 1}`);
 
+    // fetch consensus params
+    const { data: consensusParams } = await axios.get(
+      `${this.config.api}/get_consensus_params/${height + 1}`
+    );
+
     // fetch light blocks
     const { data: lastLightBlock } = await axios.get(
       `${this.config.api}/get_light_block/${height}`
@@ -103,10 +108,11 @@ export default class TendermintSSync implements IRuntime {
       key,
       value: {
         snapshot,
+        appHash,
+        consensusParams,
         lastLightBlock,
         currentLightBlock,
         nextLightBlock,
-        appHash,
         chunkIndex,
         chunk,
       },
@@ -158,7 +164,7 @@ export default class TendermintSSync implements IRuntime {
     }
 
     const snapshot: ISnapshot = snapshots.find(
-      (s: ISnapshot) => s.height === height
+      (s: ISnapshot) => +s.height === height
     );
 
     if (!snapshot) {
