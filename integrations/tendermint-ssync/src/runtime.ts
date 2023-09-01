@@ -59,21 +59,54 @@ export default class TendermintSSync implements IRuntime {
       throw new Error(`404: Snapshot with height ${height} not found`);
     }
 
-    // fetch app hash
-    const {
-      data: { AppHash },
-    } = await axios.get(`${this.config.api}/get_app_hash/${height}`);
-
     // fetch snapshot chunk
     const { data: chunk } = await axios.get(
       `${this.config.api}/load_snapshot_chunk/${height}/${snapshot.format}/${chunkIndex}`
+    );
+
+    // if we are not at the first chunk we skip all the metadata to prevent
+    // storing information repeatedly
+    if (chunkIndex != 0) {
+      return {
+        key,
+        value: {
+          snapshot,
+          lastLightBlock: null,
+          currentLightBlock: null,
+          nextLightBlock: null,
+          appHash: null,
+          chunkIndex,
+          chunk,
+        },
+      };
+    }
+
+    // fetch app hash
+    const {
+      data: { AppHash: appHash },
+    } = await axios.get(`${this.config.api}/get_app_hash/${height + 1}`);
+
+    // fetch light blocks
+    const { data: lastLightBlock } = await axios.get(
+      `${this.config.api}/get_light_block/${height}`
+    );
+
+    const { data: currentLightBlock } = await axios.get(
+      `${this.config.api}/get_light_block/${height + 1}`
+    );
+
+    const { data: nextLightBlock } = await axios.get(
+      `${this.config.api}/get_light_block/${height + 2}`
     );
 
     return {
       key,
       value: {
         snapshot,
-        appHash: AppHash,
+        lastLightBlock,
+        currentLightBlock,
+        nextLightBlock,
+        appHash,
         chunkIndex,
         chunk,
       },
