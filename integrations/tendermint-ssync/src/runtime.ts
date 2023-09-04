@@ -72,6 +72,7 @@ export default class TendermintSSync implements IRuntime {
         value: {
           snapshot,
           block: null,
+          seenCommit: null,
           state: null,
           chunkIndex,
           chunk,
@@ -84,6 +85,11 @@ export default class TendermintSSync implements IRuntime {
       `${this.config.api}/get_block/${height}`
     );
 
+    // fetch seen commit
+    const { data: seenCommit } = await axios.get(
+      `${this.config.api}/get_seen_commit/${height}`
+    );
+
     // fetch state
     const { data: state } = await axios.get(
       `${this.config.api}/get_state/${height}`
@@ -94,6 +100,7 @@ export default class TendermintSSync implements IRuntime {
       value: {
         snapshot,
         block,
+        seenCommit,
         state,
         chunkIndex,
         chunk,
