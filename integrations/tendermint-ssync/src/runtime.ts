@@ -71,48 +71,30 @@ export default class TendermintSSync implements IRuntime {
         key,
         value: {
           snapshot,
-          lastLightBlock: null,
-          currentLightBlock: null,
-          nextLightBlock: null,
-          appHash: null,
+          block: null,
+          state: null,
           chunkIndex,
           chunk,
         },
       };
     }
 
-    // fetch app hash
-    const {
-      data: { AppHash: appHash },
-    } = await axios.get(`${this.config.api}/get_app_hash/${height + 1}`);
-
-    // fetch consensus params
-    const { data: consensusParams } = await axios.get(
-      `${this.config.api}/get_consensus_params/${height + 1}`
+    // fetch block
+    const { data: block } = await axios.get(
+      `${this.config.api}/get_block/${height}`
     );
 
-    // fetch light blocks
-    const { data: lastLightBlock } = await axios.get(
-      `${this.config.api}/get_light_block/${height}`
-    );
-
-    const { data: currentLightBlock } = await axios.get(
-      `${this.config.api}/get_light_block/${height + 1}`
-    );
-
-    const { data: nextLightBlock } = await axios.get(
-      `${this.config.api}/get_light_block/${height + 2}`
+    // fetch state
+    const { data: state } = await axios.get(
+      `${this.config.api}/get_state/${height}`
     );
 
     return {
       key,
       value: {
         snapshot,
-        appHash,
-        consensusParams,
-        lastLightBlock,
-        currentLightBlock,
-        nextLightBlock,
+        block,
+        state,
         chunkIndex,
         chunk,
       },
