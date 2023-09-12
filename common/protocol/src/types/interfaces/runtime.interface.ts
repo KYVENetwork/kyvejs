@@ -11,33 +11,31 @@ import { DataItem } from "..";
  */
 export interface IRuntime {
   /**
-   * Name of the runtime. This should be unique for every runtime and should
-   * later match the runtime of the pool
-   *
-   * @property name
-   * @type {string}
-   */
-  name: string;
-
-  /**
-   * Version of the runtime. This is used for checking if the node runs the correct
-   * runtime version specified by the pool
-   *
-   * @property version
-   * @type {string}
-   */
-  version: string;
-
-  /**
-   * Config of the runtime. This config is derived and parsed from the raw config
-   * found on the pool. A raw config could be an ipfs link to the actual config or
-   * a stringified yaml or json config. The runtime method "parseConfig" should act
-   * as a setter and further validate if the configuration is correct.
+   * Config of the runtime. This config is set by calling the method
+   * "validateSetConfig" which takes the raw config found on the pool,
+   * parses it and sets the parsed value in this variable so it can
+   * be reused in all other methods which need access to the config.
    *
    * @property config
    * @type {any}
    */
   config: any;
+
+  /**
+   * Returns the name of the runtime. Example "@kyvejs/tendermint"
+   *
+   * @method getName
+   * @return {Promise<string>}
+   */
+  getName(): Promise<string>;
+
+  /**
+   * Returns the version of the runtime. Example "1.2.0"
+   *
+   * @method getVersion
+   * @return {Promise<string>}
+   */
+  getVersion(): Promise<string>;
 
   /**
    * Parses the raw runtime config found on pool, validates it and finally sets
@@ -49,7 +47,7 @@ export interface IRuntime {
    *
    * @method validateSetConfig
    * @param {string} rawConfig
-   * @return {Promise<any>}
+   * @return {Promise<void>}
    */
   validateSetConfig(rawConfig: string): Promise<void>;
 
@@ -59,11 +57,10 @@ export interface IRuntime {
    * Deterministic behavior is required
    *
    * @method getDataItem
-   * @param {Validator} v the class of @kyvejs/protocol
    * @param {string} key the key of the data item
    * @return {Promise<DataItem>}
    */
-  getDataItem(v: Validator, key: string): Promise<DataItem>;
+  getDataItem(key: string): Promise<DataItem>;
 
   /**
    * Prevalidates a data item right after is was retrieved from source.
@@ -75,11 +72,10 @@ export interface IRuntime {
    * Deterministic behavior is required
    *
    * @method preValidateDataItem
-   * @param {Validator} v the class of @kyvejs/protocol
    * @param {DataItem} item data item which gets prevalidated
    * @return {Promise<boolean>}
    */
-  prevalidateDataItem(v: Validator, item: DataItem): Promise<boolean>;
+  prevalidateDataItem(item: DataItem): Promise<boolean>;
 
   /**
    * Transforms a single data item and return it. Used for example
@@ -88,11 +84,10 @@ export interface IRuntime {
    * Deterministic behavior is required
    *
    * @method transformDataItem
-   * @param {Validator} v the class of @kyvejs/protocol
    * @param {DataItem} item data item which gets transformed
    * @return {Promise<DataItem>}
    */
-  transformDataItem(v: Validator, item: DataItem): Promise<DataItem>;
+  transformDataItem(item: DataItem): Promise<DataItem>;
 
   /**
    * Validates a single data item of a bundle proposal
@@ -100,13 +95,11 @@ export interface IRuntime {
    * Deterministic behavior is required
    *
    * @method validateDataItem
-   * @param {Validator} v the class of @kyvejs/protocol
    * @param {DataItem} proposedDataItem the data item proposed by the uploader
    * @param {DataItem} validationDataItem the data item which the validator created himself for validation again the proposed data item
    * @return {Promise<boolean>} returns whether the proposed data item is valid compared to the validation data item
    */
   validateDataItem(
-    v: Validator,
     proposedDataItem: DataItem,
     validationDataItem: DataItem
   ): Promise<boolean>;
@@ -120,11 +113,10 @@ export interface IRuntime {
    * Deterministic behavior is required
    *
    * @method summarizeDataBundle
-   * @param {Validator} v the class of @kyvejs/protocol
    * @param {DataItem[]} bundle is the bundle which needs to be summarized
    * @return {Promise<string>} returns a formatted value string
    */
-  summarizeDataBundle(v: Validator, bundle: DataItem[]): Promise<string>;
+  summarizeDataBundle(bundle: DataItem[]): Promise<string>;
 
   /**
    * Gets the next key from the current key so that the data archived has an order.
@@ -132,9 +124,8 @@ export interface IRuntime {
    * Deterministic behavior is required
    *
    * @method nextKey
-   * @param {Validator} v the class of @kyvejs/protocol
    * @param {string} key the key from which the next key should be derived from
    * @return {Promise<string>}
    */
-  nextKey(v: Validator, key: string): Promise<string>;
+  nextKey(key: string): Promise<string>;
 }
