@@ -5,12 +5,12 @@
   "scripts": {
     "build": "rimraf dist && tsc",
     "build:binaries": "yarn build && rimraf out && pkg --no-bytecode --public-packages '*' --output out/kyve package.json && node ../../common/protocol/dist/src/scripts/checksum.js",
-    "start": "node ./dist/src/index.js",
+    "start": "node ./dist/index.js",
     "format": "prettier --write ."
   },
-  "bin": "./dist/src/index.js",
+  "bin": "./dist/index.js",
   "pkg": {
-    "scripts": "./dist/src/index.js",
+    "scripts": "./dist/index.js",
     "targets": [
       "latest-linux-x64",
       "latest-linux-arm64",
