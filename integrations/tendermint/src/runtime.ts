@@ -1,4 +1,4 @@
-import { DataItem, IRuntime, Validator } from '@kyvejs/protocol';
+import { DataItem, IRuntime } from '@kyvejs/protocol';
 import { name, version } from '../package.json';
 import axios from 'axios';
 import Ajv from 'ajv';

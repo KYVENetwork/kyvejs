@@ -1,4 +1,4 @@
-import { DataItem, IRuntime, Validator } from '@kyvejs/protocol';
+import { DataItem, IRuntime } from '@kyvejs/protocol';
 import grpc from '@grpc/grpc-js';
 import protoLoader from '@grpc/proto-loader';
 

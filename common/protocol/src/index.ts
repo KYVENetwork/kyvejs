@@ -196,6 +196,123 @@ export class Validator {
         console.log(`Arch: ${os.arch()}`);
       });
 
+    // define runtime commands
+    const runtimeCmd = program
+      .command("runtime")
+      .description("Execute runtime methods directly");
+
+    runtimeCmd
+      .command("getName")
+      .description("Get the name of the runtime")
+      .action(async () => {
+        console.log(await this.runtime.getName());
+      });
+
+    runtimeCmd
+      .command("getVersion")
+      .description("Get the version of the runtime")
+      .action(async () => {
+        console.log(await this.runtime.getVersion());
+      });
+
+    runtimeCmd
+      .command("getDataItem")
+      .description("Get the data item with the config and the key")
+      .argument("<raw_config>", "raw config from pool")
+      .argument("<key>", "key")
+      .action(async (rawConfig: string, key: string) => {
+        // set config first
+        await this.runtime.validateSetConfig(rawConfig);
+
+        // call runtime method
+        const response = await this.runtime.getDataItem(key);
+        console.log(JSON.stringify(response));
+      });
+
+    runtimeCmd
+      .command("prevalidateDataItem")
+      .description("Prevalidate the data item with the config and the key")
+      .argument("<raw_config>", "raw config from pool")
+      .argument("<item>", "item (stringified)")
+      .action(async (rawConfig: string, item: string) => {
+        // set config first
+        await this.runtime.validateSetConfig(rawConfig);
+
+        // call runtime method
+        const response = await this.runtime.prevalidateDataItem(
+          JSON.parse(item)
+        );
+        console.log(JSON.stringify(response));
+      });
+
+    runtimeCmd
+      .command("transformDataItem")
+      .description("Transform the data item with the config and the key")
+      .argument("<raw_config>", "raw config from pool")
+      .argument("<item>", "item (stringified)")
+      .action(async (rawConfig: string, item: string) => {
+        // set config first
+        await this.runtime.validateSetConfig(rawConfig);
+
+        // call runtime method
+        const response = await this.runtime.transformDataItem(JSON.parse(item));
+        console.log(JSON.stringify(response));
+      });
+
+    runtimeCmd
+      .command("validateDataItem")
+      .description("Validate two data items with the config")
+      .argument("<raw_config>", "raw config from pool")
+      .argument("<proposedDataItem>", "proposedDataItem (stringified)")
+      .argument("<validationDataItem>", "validationDataItem (stringified)")
+      .action(
+        async (
+          rawConfig: string,
+          proposedDataItem: string,
+          validationDataItem: string
+        ) => {
+          // set config first
+          await this.runtime.validateSetConfig(rawConfig);
+
+          // call runtime method
+          const response = await this.runtime.validateDataItem(
+            JSON.parse(proposedDataItem),
+            JSON.parse(validationDataItem)
+          );
+          console.log(JSON.stringify(response));
+        }
+      );
+
+    runtimeCmd
+      .command("summarizeDataBundle")
+      .description("Summarize a bundle with the config")
+      .argument("<raw_config>", "raw config from pool")
+      .argument("<bundle>", "bundle (stringified)")
+      .action(async (rawConfig: string, bundle: string) => {
+        // set config first
+        await this.runtime.validateSetConfig(rawConfig);
+
+        // call runtime method
+        const response = await this.runtime.summarizeDataBundle(
+          JSON.parse(bundle)
+        );
+        console.log(JSON.stringify(response));
+      });
+
+    runtimeCmd
+      .command("nextKey")
+      .description("Get the next key with the config and the current key")
+      .argument("<raw_config>", "raw config from pool")
+      .argument("<key>", "key")
+      .action(async (rawConfig: string, key: string) => {
+        // set config first
+        await this.runtime.validateSetConfig(rawConfig);
+
+        // call runtime method
+        const response = await this.runtime.nextKey(key);
+        console.log(JSON.stringify(response));
+      });
+
     // define start command
     program
       .command("start")
