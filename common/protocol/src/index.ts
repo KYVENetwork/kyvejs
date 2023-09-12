@@ -46,30 +46,13 @@ import {
   isStorageBalanceLow,
 } from "./methods";
 
-import { ICacheProvider, IMetrics, IRuntime, IgRPCRuntime } from "./types";
+import { ICacheProvider, IMetrics, IRuntime } from "./types";
 import { IDLE_TIME, sleep, standardizeError } from "./utils";
+
 import { SupportedChains } from "@kyvejs/sdk/dist/constants";
 import { storageProviderFactory } from "./reactors/storageProviders";
 import { compressionFactory } from "./reactors/compression";
 import { cacheProviderFactory } from "./reactors/cacheProvider";
-const grpc = require("@grpc/grpc-js");
-var protoLoader = require("@grpc/proto-loader");
-const PROTO_PATH = "./runtime.proto";
-const bcrypt = require("bcrypt");
-const options = {
-  keepCase: true,
-  longs: String,
-  enums: String,
-  defaults: true,
-  oneofs: true,
-};
-var grpcObj = protoLoader.loadSync(PROTO_PATH, options);
-const RuntimeService = grpc.loadPackageDefinition(grpcObj).RuntimeService;
-
-const clientStub = new RuntimeService(
-  "localhost:50051",
-  grpc.credentials.createInsecure()
-);
 
 /**
  * Main class of KYVE protocol nodes representing a validator node.
@@ -79,7 +62,7 @@ const clientStub = new RuntimeService(
  */
 export class Validator {
   // reactor attributes
-  protected runtime!: IgRPCRuntime;
+  protected runtime!: IRuntime;
   protected cacheProvider!: ICacheProvider;
 
   // sdk attributes
@@ -176,31 +159,14 @@ export class Validator {
    * runtime class here in order to run the
    *
    * @method constructor
-   * @param {IgRPCRuntime} runtime which implements the interface IgRPCRuntime
+   * @param {IRuntime} runtime which implements the interface IRuntime
    */
-  constructor(runtime: IgRPCRuntime) {
+  constructor(runtime: IRuntime) {
     // set provided runtime
-    this.runtime = clientStub;
+    this.runtime = runtime;
 
     // set @kyvejs/protocol version
     this.protocolVersion = protocolVersion;
-
-    // Call the getName method and assign the result
-    clientStub.getName({}, (nameError: any, nameResponse: any) => {
-      if (nameError) {
-        console.error("Error getting name:", nameError);
-        return;
-      }
-      this.runtime.name = nameResponse.name;
-    });
-    // Call the getName method and assign the result
-    clientStub.getVersion({}, (versionError: any, versionResponse: any) => {
-      if (versionError) {
-        console.error("Error getting version:", versionError);
-        return;
-      }
-      this.runtime.version = versionResponse.version;
-    });
   }
 
   /**
@@ -218,13 +184,133 @@ export class Validator {
     program
       .command("version")
       .description("Print runtime and protocol version")
-      .action(() => {
-        console.log(`${this.runtime.name} version: ${this.runtime.version}`);
+      .action(async () => {
+        const name = await this.runtime.getName();
+        const version = await this.runtime.getVersion();
+
+        console.log(`${name} version: ${version}`);
         console.log(`@kyvejs/protocol version: ${this.protocolVersion}`);
         console.log(`Node version: ${process.version}`);
         console.log();
         console.log(`Platform: ${os.platform()}`);
         console.log(`Arch: ${os.arch()}`);
+      });
+
+    // define runtime commands
+    const runtimeCmd = program
+      .command("runtime")
+      .description("Execute runtime methods directly");
+
+    runtimeCmd
+      .command("getName")
+      .description("Get the name of the runtime")
+      .action(async () => {
+        console.log(await this.runtime.getName());
+      });
+
+    runtimeCmd
+      .command("getVersion")
+      .description("Get the version of the runtime")
+      .action(async () => {
+        console.log(await this.runtime.getVersion());
+      });
+
+    runtimeCmd
+      .command("getDataItem")
+      .description("Get the data item with the config and the key")
+      .argument("<raw_config>", "raw config from pool")
+      .argument("<key>", "key")
+      .action(async (rawConfig: string, key: string) => {
+        // set config first
+        await this.runtime.validateSetConfig(rawConfig);
+
+        // call runtime method
+        const response = await this.runtime.getDataItem(key);
+        console.log(JSON.stringify(response));
+      });
+
+    runtimeCmd
+      .command("prevalidateDataItem")
+      .description("Prevalidate the data item with the config and the key")
+      .argument("<raw_config>", "raw config from pool")
+      .argument("<item>", "item (stringified)")
+      .action(async (rawConfig: string, item: string) => {
+        // set config first
+        await this.runtime.validateSetConfig(rawConfig);
+
+        // call runtime method
+        const response = await this.runtime.prevalidateDataItem(
+          JSON.parse(item)
+        );
+        console.log(JSON.stringify(response));
+      });
+
+    runtimeCmd
+      .command("transformDataItem")
+      .description("Transform the data item with the config and the key")
+      .argument("<raw_config>", "raw config from pool")
+      .argument("<item>", "item (stringified)")
+      .action(async (rawConfig: string, item: string) => {
+        // set config first
+        await this.runtime.validateSetConfig(rawConfig);
+
+        // call runtime method
+        const response = await this.runtime.transformDataItem(JSON.parse(item));
+        console.log(JSON.stringify(response));
+      });
+
+    runtimeCmd
+      .command("validateDataItem")
+      .description("Validate two data items with the config")
+      .argument("<raw_config>", "raw config from pool")
+      .argument("<proposedDataItem>", "proposedDataItem (stringified)")
+      .argument("<validationDataItem>", "validationDataItem (stringified)")
+      .action(
+        async (
+          rawConfig: string,
+          proposedDataItem: string,
+          validationDataItem: string
+        ) => {
+          // set config first
+          await this.runtime.validateSetConfig(rawConfig);
+
+          // call runtime method
+          const response = await this.runtime.validateDataItem(
+            JSON.parse(proposedDataItem),
+            JSON.parse(validationDataItem)
+          );
+          console.log(JSON.stringify(response));
+        }
+      );
+
+    runtimeCmd
+      .command("summarizeDataBundle")
+      .description("Summarize a bundle with the config")
+      .argument("<raw_config>", "raw config from pool")
+      .argument("<bundle>", "bundle (stringified)")
+      .action(async (rawConfig: string, bundle: string) => {
+        // set config first
+        await this.runtime.validateSetConfig(rawConfig);
+
+        // call runtime method
+        const response = await this.runtime.summarizeDataBundle(
+          JSON.parse(bundle)
+        );
+        console.log(JSON.stringify(response));
+      });
+
+    runtimeCmd
+      .command("nextKey")
+      .description("Get the next key with the config and the current key")
+      .argument("<raw_config>", "raw config from pool")
+      .argument("<key>", "key")
+      .action(async (rawConfig: string, key: string) => {
+        // set config first
+        await this.runtime.validateSetConfig(rawConfig);
+
+        // call runtime method
+        const response = await this.runtime.nextKey(key);
+        console.log(JSON.stringify(response));
       });
 
     // define start command

@@ -30,11 +30,11 @@ export async function runNode(this: Validator): Promise<void> {
     await this.getBalancesForMetrics();
 
     // perform basic validation checks, if one fails exit
-    if (!this.isValidRuntime()) {
+    if (!(await this.isValidRuntime())) {
       process.exit(1);
     }
 
-    if (!this.isValidVersion()) {
+    if (!(await this.isValidVersion())) {
       process.exit(1);
     }
 
