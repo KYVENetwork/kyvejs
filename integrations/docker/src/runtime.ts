@@ -2,12 +2,14 @@ import { DataItem, IRuntime } from '@kyvejs/protocol';
 import grpc from '@grpc/grpc-js';
 import protoLoader from '@grpc/proto-loader';
 
+//var protoLoader = require("@grpc/proto-loader");
+
 // config is a serialized string
 type IConfig = string;
 
 export default class Docker implements IRuntime {
   private static readonly GRPC_URL = 'localhost:50051';
-  private static readonly RUNTIME_PROTO_PATH = './proto/runtime.proto';
+  private static readonly RUNTIME_PROTO_PATH = './src/proto/runtime.proto';
 
   private grpcClient: any;
 
@@ -31,112 +33,208 @@ export default class Docker implements IRuntime {
     );
   }
 
-  async getName() {
-    // TODO: call grpc client like this?
-    const name = await this.grpcClient.GetRuntimeName({});
-    return name;
-  }
-
-  async getVersion() {
-    // TODO: call grpc client like this?
-    const version = await this.grpcClient.GetRuntimeVersion({});
-    return version;
-  }
-
-  async validateSetConfig(rawConfig: string): Promise<void> {
-    // TODO: call grpc client like this?
-    // TODO: how to pass method args?
-    // TODO: does "ValidateSetConfig" return the serialized config all
-    // other methods takes as "RuntimeConfig"
-    const serializedConfig = await this.grpcClient.ValidateSetConfig({
-      raw_config: rawConfig,
+  async getName(): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+      this.grpcClient.GetRuntimeName({}, (error: Error | null, runtimeResponse: any) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(runtimeResponse.name);
+        }
+      });
     });
-    return serializedConfig;
+  }
+
+  async getVersion(): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+      this.grpcClient.GetRuntimeVersion({}, (error: Error | null, runtimeResponse: any) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(runtimeResponse.version);
+        }
+      });
+    });
+  }
+
+  async validateSetConfig(rawConfig: string): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+      this.grpcClient.ValidateSetConfig(
+        {
+          raw_config: rawConfig,
+        },
+        (error: grpc.ServiceError | null, runtimeResponse: any) => {
+          if (error) {
+            // Handle the error here if needed
+            reject(error);
+          } else {
+            // Assuming you have a valid serialized JSON string
+            this.config = runtimeResponse.serialized_config;
+  
+            // Resolve with the correct response
+            resolve(runtimeResponse.serialized_config);
+          }
+        }
+      );
+    });
   }
 
   async getDataItem(key: string): Promise<DataItem> {
-    // TODO: call grpc client like this?
-    // TODO: how to pass method args?
-    const dataItem = await this.grpcClient.GetDataItem({
-      config: {
-        serialized_config: this.config,
-      },
-      key,
+    return new Promise<DataItem>((resolve, reject) => {
+      this.grpcClient.GetDataItem(
+        {
+          config: {
+            serialized_config: this.config,
+          },
+          key: key, // Use the provided 'key' parameter
+        },
+        (error: grpc.ServiceError | null, runtimeResponse: any) => {
+          if (error) {
+            // Handle the error here if needed
+            reject(error);
+          } else {
+            const responseDataItem: DataItem = {
+              key: runtimeResponse.data_item.key,
+              value: JSON.parse(runtimeResponse.data_item.value)
+            };
+            resolve(responseDataItem);
+          }
+        }
+      );
     });
-    // TODO: what does the grpc service return? we want to return the data item
-    // defined by the runtime interface
-    return JSON.parse(dataItem);
   }
 
+
   async prevalidateDataItem(item: DataItem): Promise<boolean> {
-    // TODO: call grpc client like this?
-    // TODO: how to pass method args?
-    const valid = await this.grpcClient.PrevalidateDataItem({
-      config: {
-        serialized_config: this.config,
-      },
-      data_item: JSON.stringify(item), // TODO: how to serialize js args?
+    const request_item = {
+      key: item.key,
+      value: JSON.stringify(item.value)
+  };
+    return new Promise<boolean>((resolve, reject) => {
+      this.grpcClient.prevalidateDataItem(
+        {
+          config: {
+            serialized_config: this.config,
+          },
+          data_item: request_item,
+        },
+        (error: grpc.ServiceError | null, runtimeResponse: any) => {
+          if (error) {
+            // Handle the error here if needed
+            reject(error);
+          } else {
+            resolve(runtimeResponse.valid);
+          }
+        }
+      );
     });
-    // TODO: what does the grpc service return? we want to return a boolean here
-    return JSON.parse(valid);
   }
 
   async transformDataItem(item: DataItem): Promise<DataItem> {
-    // TODO: call grpc client like this?
-    // TODO: how to pass method args?
-    const dataItem = await this.grpcClient.TransformDataItem({
-      config: {
-        serialized_config: this.config,
-      },
-      data_item: JSON.stringify(item), // TODO: how to serialize js args?
+    const request_item = {
+      key: item.key,
+      value: JSON.stringify(item.value)
+  };
+    return new Promise<DataItem>((resolve, reject) => {
+      this.grpcClient.transformDataItem(
+        {
+          config: {
+            serialized_config: this.config,
+          },
+          data_item: request_item,
+        },
+        (error: grpc.ServiceError | null, runtimeResponse: any) => {
+          if (error) {
+            // Handle the error here if needed
+            reject(error);
+          } else {
+            const responseDataItem: DataItem = {
+              key: runtimeResponse.transformed_data_item.key,
+              value: JSON.parse(runtimeResponse.transformed_data_item.value)
+            };
+            resolve(responseDataItem);
+          }
+        }
+      );
     });
-    // TODO: what does the grpc service return? we want to return the data item
-    // defined by the runtime interface
-    return JSON.parse(dataItem);
   }
 
   async validateDataItem(
     proposedDataItem: DataItem,
     validationDataItem: DataItem
   ): Promise<boolean> {
-    // TODO: call grpc client like this?
-    // TODO: how to pass method args?
-    const valid = await this.grpcClient.ValidateDataItem({
-      config: {
-        serialized_config: this.config,
-      },
-      proposed_data_item: JSON.stringify(proposedDataItem), // TODO: how to serialize js args?
-      validation_data_item: JSON.stringify(validationDataItem), // TODO: how to serialize js args?
+    const request_proposed_data_item = {
+      key: proposedDataItem.key,
+      value: JSON.stringify(proposedDataItem.value)
+    };
+    const request_validation_data_item = {
+        key: validationDataItem.key,
+        value: JSON.stringify(validationDataItem.value)
+    };
+    return new Promise<boolean>((resolve, reject) => {
+      this.grpcClient.validateDataItem(
+        {
+          config: {
+            serialized_config: this.config,
+          },
+          proposed_data_item: request_proposed_data_item,
+          validation_data_item: request_validation_data_item
+        },
+        (error: grpc.ServiceError | null, runtimeResponse: any) => {
+          if (error) {
+            // Handle the error here if needed
+            reject(error);
+          } else {
+            resolve(runtimeResponse.valid);
+          }
+        }
+      );
     });
-    // TODO: what does the grpc service return? // we want to return a boolean here
-    return JSON.parse(valid);
   }
 
   async summarizeDataBundle(bundle: DataItem[]): Promise<string> {
-    // TODO: call grpc client like this?
-    // TODO: how to pass method args?
-    const summary = await this.grpcClient.SummarizeDataBundle({
-      config: {
-        serialized_config: this.config,
-      },
-      bundle: JSON.stringify(bundle),
+    const grpcBundle = bundle.map((item) => ({
+      key: item.key,
+      value: JSON.stringify(item.value),
+    }));
+    return new Promise<string>((resolve, reject) => {
+      this.grpcClient.summarizeDataBundle(
+        {
+          config: {
+            serialized_config: this.config,
+          },
+          bundle: grpcBundle,
+        },
+        (error: grpc.ServiceError | null, runtimeResponse: any) => {
+          if (error) {
+            // Handle the error here if needed
+            reject(error);
+          } else {
+            resolve(runtimeResponse.summary);
+          }
+        }
+      );
     });
-    // TODO: what does the grpc service return? // we want to return the data item
-    // defined by the runtime interface
-    return summary;
   }
 
   async nextKey(key: string): Promise<string> {
-    // TODO: call grpc client like this?
-    // TODO: how to pass method args?
-    const nextKey = await this.grpcClient.NextKey({
-      config: {
-        serialized_config: this.config,
-      },
-      key,
+    return new Promise<string>((resolve, reject) => {
+      this.grpcClient.nextKey(
+        {
+          config: {
+            serialized_config: this.config,
+          },
+          key: key,
+        },
+        (error: grpc.ServiceError | null, runtimeResponse: any) => {
+          if (error) {
+            // Handle the error here if needed
+            reject(error);
+          } else {
+            resolve(runtimeResponse.next_key);
+          }
+        }
+      );
     });
-    // TODO: what does the grpc service return? // we want to return the data item
-    // defined by the runtime interface
-    return nextKey;
   }
 }
