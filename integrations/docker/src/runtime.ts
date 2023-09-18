@@ -1,19 +1,23 @@
 import { DataItem, IRuntime } from '@kyvejs/protocol';
 import grpc from '@grpc/grpc-js';
-import protoLoader from '@grpc/proto-loader';
+var protoLoader = require("@grpc/proto-loader");
+
 
 // config is a serialized string
 type IConfig = string;
 
 export default class Docker implements IRuntime {
   private static readonly GRPC_URL = 'localhost:50051';
-  private static readonly RUNTIME_PROTO_PATH = './proto/runtime.proto';
+  private static readonly RUNTIME_PROTO_PATH = './src/proto/runtime.proto';
 
   private grpcClient: any;
 
   public config!: IConfig;
 
   constructor() {
+    console.log(Docker.RUNTIME_PROTO_PATH);
+    console.log("Current directory:", __dirname);
+
     // TODO: how to properly start grpc server?
     const runtimeDef = protoLoader.loadSync(Docker.RUNTIME_PROTO_PATH, {
       keepCase: true,
@@ -33,8 +37,14 @@ export default class Docker implements IRuntime {
 
   async getName() {
     // TODO: call grpc client like this?
-    const name = await this.grpcClient.GetRuntimeName({});
-    return name;
+    this.grpcClient.GetRuntimeName(
+        {},
+        (error: any, runtimeResponse: any) => {
+            //implement your error logic here
+            return runtimeResponse; 
+        }
+    );
+
   }
 
   async getVersion() {
