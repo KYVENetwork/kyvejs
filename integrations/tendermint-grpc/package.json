@@ -5,12 +5,12 @@
   "scripts": {
     "build": "rimraf dist && tsc",
     "build:binaries": "yarn build && rimraf out && pkg --no-bytecode --public-packages '*' --output out/kyve package.json",
-    "start": "node ./dist/src/index.js",
+    "start": "node ./src/runtime.js",
     "format": "prettier --write ."
   },
-  "bin": "./dist/src/index.js",
+  "bin": "./src/runtime.js",
   "pkg": {
-    "scripts": "./dist/src/index.js",
+    "scripts": "./src/runtime.js",
     "targets": [
       "latest-linux-x64",
       "latest-linux-arm64",

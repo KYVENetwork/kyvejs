@@ -17,6 +17,6 @@ WORKDIR /usr/src/app
 # COPY package.json ./
 # COPY tsconfig.json ./
 # RUN yarn install
-COPY --from=appbuild /usr/src/app/out/kyve ./
+COPY --from=appbuild /usr/src/app/out/kyve-linux-x64 ./
 EXPOSE 50051
-CMD ["node", "./kyve"]
+CMD ["node", "./kyve-linux-x64"]
