@@ -3,7 +3,7 @@ const Ajv = require('ajv');
 
 const grpc = require("@grpc/grpc-js");
 const protoLoader = require("@grpc/proto-loader");
-const PROTO_PATH = "../../../integrations/docker/src/proto/runtime.proto";
+const PROTO_PATH = "./runtime.proto";
 
 const loaderOptions = {
     keepCase: true,
