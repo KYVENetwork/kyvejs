@@ -3,7 +3,7 @@ const Ajv = require('ajv');
 
 const grpc = require("@grpc/grpc-js");
 const protoLoader = require("@grpc/proto-loader");
-const PROTO_PATH = "../../../common/types/src/runtime.proto";
+const PROTO_PATH = "../../../integrations/docker/src/proto/runtime.proto";
 
 const loaderOptions = {
     keepCase: true,
@@ -24,16 +24,12 @@ const ajv = new Ajv();
 
 class TendermintServer {
     async getRuntimeName(call, callback) {
-        const config = JSON.parse(call.request.serialized_config);
 
         const name = "Runtime Name";
-
         callback(null, { name });
     }
 
     async getRuntimeVersion(call, callback) {
-        const config = JSON.parse(call.request.serialized_config);
-
         const version = "Runtime Version";
 
         callback(null, { version });
@@ -51,7 +47,6 @@ class TendermintServer {
                 });
                 return;
             }
-
             if (!config.rpc) {
                 callback({
                     code: grpc.status.INVALID_ARGUMENT,
@@ -64,7 +59,8 @@ class TendermintServer {
                 config.rpc = process.env.KYVEJS_TENDERMINT_RPC;
             }
 
-            callback(null, { config: JSON.stringify(config) }); // Fix JSON.stringify here
+            const serialized_config = JSON.stringify(config);
+            callback(null, { serialized_config });
         } catch (error) {
             callback({
                 code: grpc.status.INVALID_ARGUMENT,
@@ -75,7 +71,8 @@ class TendermintServer {
 
     async getDataItem(call, callback) {
         try {
-            const config = JSON.parse(call.request.serialized_config);
+            console.log('call.request.args', call.request.config, call.request.key);
+            const config = JSON.parse(call.request.config.serialized_config);
             const key = call.request.key;
 
             // Fetch block from rpc at the given block height
@@ -93,12 +90,13 @@ class TendermintServer {
             };
 
             // Construct the DataItem message
-            const dataItem = {
+            const data_item = {
                 key: key,
-                value: value,
+                value: JSON.stringify(value),
             };
-
-            callback(null, dataItem);
+            
+            console.log({ data_item });
+            callback(null, { data_item });
         } catch (error) {
             callback({
                 code: grpc.status.INTERNAL,
