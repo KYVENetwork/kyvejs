@@ -1,8 +1,8 @@
 import { DataItem, IRuntime } from '@kyvejs/protocol';
 import grpc from '@grpc/grpc-js';
-var protoLoader = require("@grpc/proto-loader");
+import protoLoader from '@grpc/proto-loader';
 
-
+//var protoLoader = require("@grpc/proto-loader");
 
 // config is a serialized string
 type IConfig = string;
@@ -16,9 +16,6 @@ export default class Docker implements IRuntime {
   public config!: IConfig;
 
   constructor() {
-    console.log(Docker.RUNTIME_PROTO_PATH);
-    console.log("Current directory:", __dirname);
-
     // TODO: how to properly start grpc server?
     const runtimeDef = protoLoader.loadSync(Docker.RUNTIME_PROTO_PATH, {
       keepCase: true,
@@ -27,7 +24,8 @@ export default class Docker implements IRuntime {
       defaults: true,
       oneofs: true,
     });
-    const RuntimeService = grpc.loadPackageDefinition(runtimeDef).RuntimeService as any;
+    const RuntimeService = grpc.loadPackageDefinition(runtimeDef)
+      .RuntimeService as any;
 
     this.grpcClient = new RuntimeService(
       Docker.GRPC_URL,
@@ -37,7 +35,7 @@ export default class Docker implements IRuntime {
 
   async getName(): Promise<string> {
     return new Promise<string>((resolve, reject) => {
-      this.grpcClient.GetRuntimeName({}, (error: Error | null, runtimeResponse: any) => {  // TODO  CHECK IF ANY IS OF THE CORRECT TYPE
+      this.grpcClient.GetRuntimeName({}, (error: Error | null, runtimeResponse: any) => {
         if (error) {
           reject(error);
         } else {
@@ -81,126 +79,162 @@ export default class Docker implements IRuntime {
     });
   }
 
-  async getDataItem(key) {
-    // TODO: call grpc client like this?
-    // TODO: how to pass method args?
-    return new Promise((resolve, reject) => {
+  async getDataItem(key: string): Promise<DataItem> {
+    return new Promise<DataItem>((resolve, reject) => {
       this.grpcClient.GetDataItem(
         {
           config: {
             serialized_config: this.config,
           },
-          key: "2",
-        }, (error, runtimeResponse) => {
-        if (error) {
-          // Handle the error here if needed
-          reject(error);
-        } else {
-          resolve(runtimeResponse);
+          key: key, // Use the provided 'key' parameter
+        },
+        (error: grpc.ServiceError | null, runtimeResponse: any) => {
+          if (error) {
+            // Handle the error here if needed
+            reject(error);
+          } else {
+            const responseDataItem: DataItem = {
+              key: runtimeResponse.data_item.key,
+              value: JSON.parse(runtimeResponse.data_item.value)
+            };
+            resolve(responseDataItem);
+          }
         }
-      });
+      );
     });
-    // TODO: what does the grpc service return? we want to return the data item
-    // defined by the runtime interface
   }
 
-  async prevalidateDataItem(item) {
-    // TODO: call grpc client like this?
-    // TODO: how to pass method args?
-    return new Promise((resolve, reject) => {
+
+  async prevalidateDataItem(item: DataItem): Promise<boolean> {
+    const request_item = {
+      key: item.key,
+      value: JSON.stringify(item.value)
+  };
+    return new Promise<boolean>((resolve, reject) => {
       this.grpcClient.prevalidateDataItem(
         {
           config: {
-              serialized_config: this.config,
+            serialized_config: this.config,
           },
-          key: "2",
-        }, (error, runtimeResponse) => {
-        if (error) {
-          // Handle the error here if needed
-          reject(error);
-        } else {
-          resolve(runtimeResponse);
+          data_item: request_item,
+        },
+        (error: grpc.ServiceError | null, runtimeResponse: any) => {
+          if (error) {
+            // Handle the error here if needed
+            reject(error);
+          } else {
+            resolve(runtimeResponse.valid);
+          }
         }
-      });
+      );
     });
   }
 
-  async transformDataItem(item) {
-    // TODO: call grpc client like this?
-    // TODO: how to pass method args?
-    return new Promise((resolve, reject) => {
+  async transformDataItem(item: DataItem): Promise<DataItem> {
+    const request_item = {
+      key: item.key,
+      value: JSON.stringify(item.value)
+  };
+    return new Promise<DataItem>((resolve, reject) => {
       this.grpcClient.transformDataItem(
         {
           config: {
-              serialized_config: this.config,
+            serialized_config: this.config,
           },
-          key: "2",
-        }, (error, runtimeResponse) => {
-        if (error) {
-          // Handle the error here if needed
-          reject(error);
-        } else {
-          resolve(runtimeResponse);
+          data_item: request_item,
+        },
+        (error: grpc.ServiceError | null, runtimeResponse: any) => {
+          if (error) {
+            // Handle the error here if needed
+            reject(error);
+          } else {
+            const responseDataItem: DataItem = {
+              key: runtimeResponse.transformed_data_item.key,
+              value: JSON.parse(runtimeResponse.transformed_data_item.value)
+            };
+            resolve(responseDataItem);
+          }
         }
-      });
+      );
     });
   }
 
-  async validateDataItem(proposedDataItem, validationDataItem) {
-    return new Promise((resolve, reject) => {
+  async validateDataItem(
+    proposedDataItem: DataItem,
+    validationDataItem: DataItem
+  ): Promise<boolean> {
+    const request_proposed_data_item = {
+      key: proposedDataItem.key,
+      value: JSON.stringify(proposedDataItem.value)
+    };
+    const request_validation_data_item = {
+        key: validationDataItem.key,
+        value: JSON.stringify(validationDataItem.value)
+    };
+    return new Promise<boolean>((resolve, reject) => {
       this.grpcClient.validateDataItem(
         {
           config: {
-              serialized_config: this.config,
+            serialized_config: this.config,
           },
-          key: "2",
-        }, (error, runtimeResponse) => {
-        if (error) {
-          // Handle the error here if needed
-          reject(error);
-        } else {
-          resolve(runtimeResponse);
+          proposed_data_item: request_proposed_data_item,
+          validation_data_item: request_validation_data_item
+        },
+        (error: grpc.ServiceError | null, runtimeResponse: any) => {
+          if (error) {
+            // Handle the error here if needed
+            reject(error);
+          } else {
+            resolve(runtimeResponse.valid);
+          }
         }
-      });
+      );
     });
   }
 
-  async summarizeDataBundle(bundle) {
-    return new Promise((resolve, reject) => {
+  async summarizeDataBundle(bundle: DataItem[]): Promise<string> {
+    const grpcBundle = bundle.map((item) => ({
+      key: item.key,
+      value: JSON.stringify(item.value),
+    }));
+    return new Promise<string>((resolve, reject) => {
       this.grpcClient.summarizeDataBundle(
         {
           config: {
-              serialized_config: this.config,
+            serialized_config: this.config,
           },
-          key: "2",
-        }, (error, runtimeResponse) => {
-        if (error) {
-          // Handle the error here if needed
-          reject(error);
-        } else {
-          resolve(runtimeResponse);
+          bundle: grpcBundle,
+        },
+        (error: grpc.ServiceError | null, runtimeResponse: any) => {
+          if (error) {
+            // Handle the error here if needed
+            reject(error);
+          } else {
+            resolve(runtimeResponse.summary);
+          }
         }
-      });
+      );
     });
   }
 
-  async nextKey(key) {
-    return new Promise((resolve, reject) => {
+  async nextKey(key: string): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
       this.grpcClient.nextKey(
         {
           config: {
-              serialized_config: this.config,
+            serialized_config: this.config,
           },
-          key: "2",
-        }, (error, runtimeResponse) => {
-        if (error) {
-          // Handle the error here if needed
-          reject(error);
-        } else {
-          resolve(runtimeResponse);
+          key: key,
+        },
+        (error: grpc.ServiceError | null, runtimeResponse: any) => {
+          if (error) {
+            // Handle the error here if needed
+            reject(error);
+          } else {
+            resolve(runtimeResponse.next_key);
+          }
         }
-      });
+      );
     });
   }
-
 }

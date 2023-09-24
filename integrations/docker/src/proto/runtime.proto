@@ -55,7 +55,7 @@ message PrevalidateDataItemRequest {
 }
 
 message PrevalidateDataItemResponse {
-  bool is_valid = 1;
+  bool valid = 1;
 }
 
 /* transformDataItem */
@@ -77,7 +77,7 @@ message ValidateDataItemRequest {
 }
 
 message ValidateDataItemResponse {
-  bool is_valid = 1;
+  bool valid = 1;
 }
 
 /* summarizeDataBundle */

@@ -35,7 +35,7 @@ export default class Tendermint implements IRuntime {
     return version;
   }
 
-  async validateSetConfig(rawConfig: string): Promise<void> {
+  async validateSetConfig(rawConfig: string): Promise<string> {
     const config: IConfig = JSON.parse(rawConfig);
 
     if (!config.network) {
@@ -51,6 +51,7 @@ export default class Tendermint implements IRuntime {
     }
 
     this.config = config;
+    return JSON.stringify(config);
   }
 
   async getDataItem(key: string): Promise<DataItem> {

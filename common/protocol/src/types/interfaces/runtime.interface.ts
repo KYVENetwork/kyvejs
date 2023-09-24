@@ -47,9 +47,9 @@ export interface IRuntime {
    *
    * @method validateSetConfig
    * @param {string} rawConfig
-   * @return {Promise<void>}
+   * @return {Promise<string>}
    */
-  validateSetConfig(rawConfig: string): Promise<void>;
+  validateSetConfig(rawConfig: string): Promise<string>;
 
   /**
    * Gets the data item from a specific key and returns both key and the value.

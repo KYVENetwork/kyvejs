@@ -3,7 +3,7 @@ const Ajv = require('ajv');
 
 const grpc = require("@grpc/grpc-js");
 const protoLoader = require("@grpc/proto-loader");
-const PROTO_PATH = "./runtime.proto";
+const PROTO_PATH = "./proto/runtime.proto";
 
 const loaderOptions = {
     keepCase: true,
@@ -24,14 +24,12 @@ const ajv = new Ajv();
 
 class TendermintServer {
     async getRuntimeName(call, callback) {
-
         const name = "Runtime Name";
         callback(null, { name });
     }
 
     async getRuntimeVersion(call, callback) {
         const version = "Runtime Version";
-
         callback(null, { version });
     }
 
@@ -71,7 +69,6 @@ class TendermintServer {
 
     async getDataItem(call, callback) {
         try {
-            console.log('call.request.args', call.request.config, call.request.key);
             const config = JSON.parse(call.request.config.serialized_config);
             const key = call.request.key;
 
@@ -95,7 +92,6 @@ class TendermintServer {
                 value: JSON.stringify(value),
             };
             
-            console.log({ data_item });
             callback(null, { data_item });
         } catch (error) {
             callback({
@@ -106,8 +102,12 @@ class TendermintServer {
     }
     async prevalidateDataItem(call, callback) {
       try {
-        const config = JSON.parse(call.request.serialized_config);
-        const item = call.request.item;
+        const config = JSON.parse(call.request.config.serialized_config);
+        const request_item = call.request.data_item;
+        const item = {
+          key: request_item.key,
+          value: JSON.parse(request_item.value)
+        };
 
         // Check if data item is defined
         if (!item.value) {
@@ -146,43 +146,57 @@ class TendermintServer {
     }
     async transformDataItem(call, callback) {
       try {
-        const config = JSON.parse(call.request.serialized_config);
-        const item = call.request.item;
+        const config = JSON.parse(call.request.config.serialized_config);
+        const request_item = call.request.data_item;
+        const item = {
+          key: request_item.key,
+          value: JSON.parse(request_item.value)
+        };
+        
+        const compareEventAttribute = (a, b) =>
+        a.key.toLowerCase() > b.key.toLowerCase()
+          ? 1
+          : b.key.toLowerCase() > a.key.toLowerCase()
+          ? -1
+          : 0;
 
-        // Sort attributes of events and remove unnecessary properties
-        if (item.value.block_results.begin_block_events) {
-          item.value.block_results.begin_block_events = item.value.block_results.begin_block_events.map((event) => {
-            event.attributes = event.attributes.sort((a, b) => a.key.localeCompare(b.key));
-            return {
-              ...event,
-              attributes: event.attributes.map(({ index, ...attribute }) => attribute),
-            };
+      if (item.value.block_results.begin_block_events) {
+        item.value.block_results.begin_block_events =
+          item.value.block_results.begin_block_events.map((event) => {
+            event.attributes = event.attributes
+              .sort(compareEventAttribute)
+              .map(({ index, ...attribute }) => attribute);
+            return event;
           });
-        }
+      }
 
-        if (item.value.block_results.end_block_events) {
-          item.value.block_results.end_block_events = item.value.block_results.end_block_events.map((event) => {
-            event.attributes = event.attributes.sort((a, b) => a.key.localeCompare(b.key));
-            return {
-              ...event,
-              attributes: event.attributes.map(({ index, ...attribute }) => attribute),
-            };
+      if (item.value.block_results.end_block_events) {
+        item.value.block_results.end_block_events =
+          item.value.block_results.end_block_events.map((event) => {
+            event.attributes = event.attributes
+              .sort(compareEventAttribute)
+              .map(({ index, ...attribute }) => attribute);
+            return event;
           });
-        }
+      }
 
-        if (item.value.block_results.txs_results) {
-          item.value.block_results.txs_results = item.value.block_results.txs_results.map((tx_result) => {
+      if (item.value.block_results.txs_results) {
+        item.value.block_results.txs_results =
+          item.value.block_results.txs_results.map((tx_result) => {
             delete tx_result.log;
 
             if (tx_result.events) {
               tx_result.events = tx_result.events.map((event) => {
-                event.attributes = event.attributes.sort((a, b) => a.key.localeCompare(b.key));
+                event.attributes = event.attributes
+                  .sort(compareEventAttribute)
+                  .map(({ index, ...attribute }) => attribute);
 
                 if (event.type === 'fungible_token_packet') {
                   event.attributes = event.attributes.map((attribute) => {
                     if (attribute.key === 'YWNrbm93bGVkZ2VtZW50') {
                       attribute.value = '';
                     }
+
                     return attribute;
                   });
                 }
@@ -193,9 +207,15 @@ class TendermintServer {
 
             return tx_result;
           });
-        }
+      }
 
-        callback(null, item);
+      // Construct the data_item to return
+      const transformed_data_item = {
+        key: item.key,
+        value: JSON.stringify(item.value),
+      };
+
+        callback(null, { transformed_data_item });
       } catch (error) {
         callback({
           code: grpc.status.INTERNAL,
@@ -203,11 +223,20 @@ class TendermintServer {
         });
       }
     }
+    
     async validateDataItem(call, callback) {
       try {
-        const config = JSON.parse(call.request.serialized_config);
-        const proposedDataItem = call.request.proposed_item;
-        const validationDataItem = call.request.validation_item;
+        const config = JSON.parse(call.request.config.serialized_config);
+        const request_proposed_data_item = call.request.proposed_data_item;
+        const request_validation_data_item = call.request.validation_data_item;
+        const proposedDataItem = {
+          key: request_proposed_data_item.key,
+          value: JSON.parse(request_proposed_data_item.value)
+        };
+        const validationDataItem = {
+          key: request_validation_data_item.key,
+          value: JSON.parse(request_validation_data_item.value)
+        };
 
         // Apply equal comparison
         const isValid = JSON.stringify(proposedDataItem) === JSON.stringify(validationDataItem);
@@ -222,8 +251,13 @@ class TendermintServer {
     }
     async summarizeDataBundle(call, callback) {
       try {
-        const config = JSON.parse(call.request.serialized_config);
-        const bundle = call.request.bundle;
+        const config = JSON.parse(call.request.config.serialized_config);
+        const grpcBundle = call.request.bundle;
+
+        const bundle = grpcBundle.map((item) => ({
+          key: item.key,
+          value: JSON.parse(item.value),
+        }));
 
         // Get the latest block height from the last item in the bundle
         const latestBlockHeight = bundle[bundle.length - 1]?.value?.block?.block?.header?.height || '';
@@ -238,7 +272,7 @@ class TendermintServer {
     }
     async nextKey(call, callback) {
       try {
-        const config = JSON.parse(call.request.serialized_config);
+        const config = JSON.parse(call.request.config.serialized_config);
         const key = call.request.key;
 
         // Calculate the next key (current block height + 1)
@@ -256,7 +290,6 @@ class TendermintServer {
 
 
 const runtimeService = new TendermintServer();
-console.log(grpcObj);
 runtimeServer.addService(grpcObj.kyve.RuntimeService.service, {
     getRuntimeName: runtimeService.getRuntimeName,
     getRuntimeVersion: runtimeService.getRuntimeVersion,
