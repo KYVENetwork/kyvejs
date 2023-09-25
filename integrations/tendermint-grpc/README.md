@@ -39,7 +39,11 @@ on which tendermint chain gets archived the minimum hardware requirements are at
 
 ## Docker Setup
 
-This integration includes a Dockerfile which can be used to build a docker image. This Dockerfile uses multiple stages to separate the build time from the runtime requirements. The final image bundles all the architecture specific binaries and can be used to run the runtime on any architecture. The image can be run for a specific architecture with the following command:
+This integration includes a Dockerfile which can be used to build a docker image. This Dockerfile uses multiple stages to separate the build time from the runtime requirements. The final image bundles all the architecture specific binaries and can be used to run the runtime on any architecture. 
+
+The image can be built with the following command:
+`cd ../ && docker build -t tendermint-grpc:v0.3 -f tendermint-grpc/Dockerfile .`
+The image can be run for a specific architecture with the following command:
 
 `docker run --rm -p 50051:50051 tendermint-grpc:v0.2 ./kyve-linux-arm64`
 
