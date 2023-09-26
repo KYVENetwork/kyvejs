@@ -1,8 +1,6 @@
 import { DataItem, IRuntime } from '@kyvejs/protocol';
-import grpc from '@grpc/grpc-js';
-import protoLoader from '@grpc/proto-loader';
-
-//var protoLoader = require("@grpc/proto-loader");
+const grpc = require("@grpc/grpc-js");
+var protoLoader = require("@grpc/proto-loader");
 
 // config is a serialized string
 type IConfig = string;
@@ -63,7 +61,7 @@ export default class Docker implements IRuntime {
         {
           raw_config: rawConfig,
         },
-        (error: grpc.ServiceError | null, runtimeResponse: any) => {
+        (error: Error | null, runtimeResponse: any) => {
           if (error) {
             // Handle the error here if needed
             reject(error);
@@ -88,7 +86,7 @@ export default class Docker implements IRuntime {
           },
           key: key, // Use the provided 'key' parameter
         },
-        (error: grpc.ServiceError | null, runtimeResponse: any) => {
+        (error: Error | null, runtimeResponse: any) => {
           if (error) {
             // Handle the error here if needed
             reject(error);
@@ -118,7 +116,7 @@ export default class Docker implements IRuntime {
           },
           data_item: request_item,
         },
-        (error: grpc.ServiceError | null, runtimeResponse: any) => {
+        (error: Error | null, runtimeResponse: any) => {
           if (error) {
             // Handle the error here if needed
             reject(error);
@@ -143,7 +141,7 @@ export default class Docker implements IRuntime {
           },
           data_item: request_item,
         },
-        (error: grpc.ServiceError | null, runtimeResponse: any) => {
+        (error: Error | null, runtimeResponse: any) => {
           if (error) {
             // Handle the error here if needed
             reject(error);
@@ -180,7 +178,7 @@ export default class Docker implements IRuntime {
           proposed_data_item: request_proposed_data_item,
           validation_data_item: request_validation_data_item
         },
-        (error: grpc.ServiceError | null, runtimeResponse: any) => {
+        (error: Error | null, runtimeResponse: any) => {
           if (error) {
             // Handle the error here if needed
             reject(error);
@@ -205,7 +203,7 @@ export default class Docker implements IRuntime {
           },
           bundle: grpcBundle,
         },
-        (error: grpc.ServiceError | null, runtimeResponse: any) => {
+        (error: Error | null, runtimeResponse: any) => {
           if (error) {
             // Handle the error here if needed
             reject(error);
@@ -226,7 +224,7 @@ export default class Docker implements IRuntime {
           },
           key: key,
         },
-        (error: grpc.ServiceError | null, runtimeResponse: any) => {
+        (error: Error | null, runtimeResponse: any) => {
           if (error) {
             // Handle the error here if needed
             reject(error);

@@ -1,7 +1,5 @@
 syntax = "proto3";
 
-package kyve;
-
 import "google/protobuf/empty.proto";
 import "google/protobuf/any.proto";
 

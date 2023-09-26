@@ -290,7 +290,7 @@ class TendermintServer {
 
 
 const runtimeService = new TendermintServer();
-runtimeServer.addService(grpcObj.kyve.RuntimeService.service, {
+runtimeServer.addService(grpcObj.RuntimeService.service, {
     getRuntimeName: runtimeService.getRuntimeName,
     getRuntimeVersion: runtimeService.getRuntimeVersion,
     validateSetConfig: runtimeService.validateSetConfig,
