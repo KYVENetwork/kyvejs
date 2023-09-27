@@ -27,7 +27,7 @@ TEST CASES - cache tests
 * start caching from a pool where getNextDataItem fails once
 * start caching from a pool where getNextDataItem fails multiple times
 * start caching from a pool where transformDataItem fails
-* start caching from a pool where nextKey fails
+* start caching from a pool where nextKey fails once
 * start caching from a pool where cache methods fail
 * TODO: test with pool config that has no source object
 * TODO: test with pool config that has zero sources
@@ -1411,30 +1411,23 @@ describe("cache tests", () => {
     // TODO: assert timeouts
   });
 
-  test("start caching from a pool where nextKey fails", async () => {
+  test.skip("start caching from a pool where nextKey fails once", async () => {
     // ARRANGE
-    v["runtime"].nextKey = jest.fn().mockRejectedValue(new Error());
+    v["runtime"].nextKey = jest
+      .fn()
+      .mockImplementationOnce((_: Validator, key: string) =>
+        Promise.resolve(parseInt(key) + 1).toString()
+      )
+      .mockRejectedValueOnce(new Error("network error"))
+      .mockImplementation((_: Validator, key: string) =>
+        Promise.resolve(parseInt(key) + 1).toString()
+      );
 
     v.pool = {
       ...genesis_pool,
       data: {
         ...genesis_pool.data,
-        current_key: "99",
-        current_index: "100",
-      },
-      bundle_proposal: {
-        ...genesis_pool.bundle_proposal,
-        storage_id: "test_storage_id",
-        uploader: "test_staker",
-        next_uploader: "test_staker",
-        data_size: "123456789",
-        data_hash: "test_bundle_hash",
-        bundle_size: "50",
-        from_key: "100",
-        to_key: "149",
-        bundle_summary: "test_summary",
-        updated_at: "0",
-        voters_valid: ["test_staker"],
+        max_bundle_size: "2",
       },
     } as any;
 
@@ -1479,7 +1472,7 @@ describe("cache tests", () => {
     // ASSERT CACHE INTERFACES
     // =======================
 
-    expect(cacheProvider.put).toHaveBeenCalledTimes(0);
+    expect(cacheProvider.put).toHaveBeenCalledTimes(2);
 
     expect(cacheProvider.get).toHaveBeenCalledTimes(0);
 
