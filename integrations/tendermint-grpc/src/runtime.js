@@ -74,11 +74,11 @@ class TendermintServer {
 
             // Fetch block from rpc at the given block height
             const blockResponse = await axios.get(`${config.rpc}/block?height=${key}`);
-            const block = blockResponse.data.result.block;
+            const block = blockResponse.data.result;
 
             // Fetch block results from rpc at the given block height
             const blockResultsResponse = await axios.get(`${config.rpc}/block_results?height=${key}`);
-            const blockResults = blockResultsResponse.data.result.block_results;
+            const blockResults = blockResultsResponse.data.result;
 
             // Construct the Value message
             const value = {

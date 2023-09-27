@@ -1,6 +1,6 @@
 import { DataItem, IRuntime } from '@kyvejs/protocol';
-const grpc = require("@grpc/grpc-js");
-var protoLoader = require("@grpc/proto-loader");
+import * as grpc from '@grpc/grpc-js';
+import * as protoLoader from '@grpc/proto-loader';
 
 // config is a serialized string
 type IConfig = string;
