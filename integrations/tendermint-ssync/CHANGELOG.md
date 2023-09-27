@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.0.0-beta.2](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint-ssync@1.0.0-beta.1...@kyvejs/tendermint-ssync@1.0.0-beta.2) (2023-09-27)
+
+### Bug Fixes
+
+- use latest protocol version ([#72](https://github.com/KYVENetwork/kyvejs/issues/72)) ([f6eb8e4](https://github.com/KYVENetwork/kyvejs/commit/f6eb8e438c83007000d3051c4764555d508d72f8))
+
 # 1.0.0-beta.1 (2023-09-27)
 
 ### Features
