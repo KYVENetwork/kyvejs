@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.0.7](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/protocol@1.0.6...@kyvejs/protocol@1.0.7) (2023-09-27)
+
+### Bug Fixes
+
+- wrap runtime nextKey in backoff strategy ([407d9e3](https://github.com/KYVENetwork/kyvejs/commit/407d9e323144ecc160dd2d9ac25e7370f7bce40d))
+
 ## [1.0.6](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/protocol@1.0.5...@kyvejs/protocol@1.0.6) (2023-08-17)
 
 ### Bug Fixes
