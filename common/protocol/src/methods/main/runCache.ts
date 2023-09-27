@@ -132,8 +132,25 @@ export async function runCache(this: Validator): Promise<void> {
           this.logger.debug(`this.runtime.nextKey(${key})`);
         }
 
+        // if nextKey fails we call with backoff strategy
         const nextKey = key
-          ? await this.runtime.nextKey(this, key)
+          ? await callWithBackoffStrategy(
+              async () => {
+                return await this.runtime.nextKey(this, key);
+              },
+              {
+                limitTimeoutMs: 5 * 60 * 1000,
+                increaseByMs: 10 * 1000,
+              },
+              (err, ctx) => {
+                this.logger.info(
+                  `Getting nextKey with key ${key} was unsuccessful. Retrying in ${(
+                    ctx.nextTimeoutInMs / 1000
+                  ).toFixed(2)}s ...`
+                );
+                this.logger.debug(standardizeError(err));
+              }
+            )
           : poolRound.data!.start_key;
 
         if (!itemFound) {
