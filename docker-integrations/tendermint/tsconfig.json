@@ -7,6 +7,5 @@
     "esModuleInterop": true,
     "resolveJsonModule": true
   },
-  "files": ["src/index.ts"],
-  "assets": ["src/runtime.proto"]
+  "include": ["src/**/*"]
 }
