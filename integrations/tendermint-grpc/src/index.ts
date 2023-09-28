@@ -3,7 +3,8 @@ const Ajv = require('ajv');
 
 const grpc = require('@grpc/grpc-js');
 const protoLoader = require('@grpc/proto-loader');
-const PROTO_PATH = './runtime.proto';
+// TODO: build project with webpack to do this automatically
+const PROTO_PATH = './dist/runtime.proto';
 
 const loaderOptions = {
   keepCase: true,

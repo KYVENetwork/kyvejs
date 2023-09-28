@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "license": "MIT",
   "scripts": {
-    "build": "rimraf dist && tsc",
+    "build": "rimraf dist && tsc && cp ./src/runtime.proto ./dist",
     "start": "node ./dist/index.js",
     "format": "prettier --write ."
   },
