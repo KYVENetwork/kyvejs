@@ -1,10 +1,13 @@
+// TODO: migrate imports to typescript import ... from ... syntax
 const axios = require('axios');
 const Ajv = require('ajv');
 
 const grpc = require('@grpc/grpc-js');
 const protoLoader = require('@grpc/proto-loader');
-// TODO: build project with webpack to do this automatically
+// TODO: build project with webpack resolve path correctly and not hardcode dist here
 const PROTO_PATH = './dist/runtime.proto';
+
+import { name, version } from '../package.json';
 
 const loaderOptions = {
   keepCase: true,
@@ -25,12 +28,10 @@ const ajv = new Ajv();
 
 class TendermintServer {
   async getRuntimeName(call: any, callback: any) {
-    const name = 'Runtime Name';
     callback(null, { name });
   }
 
   async getRuntimeVersion(call: any, callback: any) {
-    const version = 'Runtime Version';
     callback(null, { version });
   }
 
@@ -231,7 +232,7 @@ class TendermintServer {
 
   async validateDataItem(call: any, callback: any) {
     try {
-      const config = JSON.parse(call.request.config.serialized_config);
+      const config = JSON.parse(call.request.config.serialized_config); // TODO: if a config is not needed in a method don't declare it
       const request_proposed_data_item = call.request.proposed_data_item;
       const request_validation_data_item = call.request.validation_data_item;
       const proposedDataItem = {
@@ -295,6 +296,9 @@ class TendermintServer {
   }
 }
 
+// TODO: clean up this part. server init should be done in index.ts file (here)
+// and server implementation should be moved to another file (server.ts) for example
+// to keep code clean
 const runtimeService = new TendermintServer();
 runtimeServer.addService(grpcObj.RuntimeService.service, {
   getRuntimeName: runtimeService.getRuntimeName,
