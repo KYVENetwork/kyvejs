@@ -10,5 +10,7 @@ COPY ./src ./src
 RUN yarn install
 RUN yarn build
 
+EXPOSE 50051
+
 # start runtime
 CMD ["yarn", "start"]
