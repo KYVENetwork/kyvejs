@@ -8,6 +8,7 @@
   "workspaces": [
     "common/*",
     "integrations/*",
+    "proxies/*",
     "tools/*"
   ],
   "devDependencies": {
