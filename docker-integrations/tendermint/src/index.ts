@@ -1,41 +1,48 @@
-// TODO: migrate imports to typescript import ... from ... syntax
-const axios = require('axios');
-const Ajv = require('ajv');
+import axios from 'axios';
+import Ajv from 'ajv';
+import * as grpc from '@grpc/grpc-js';
+import * as protoLoader from '@grpc/proto-loader';
 
-const grpc = require('@grpc/grpc-js');
-const protoLoader = require('@grpc/proto-loader');
+
 // TODO: build project with webpack resolve path correctly and not hardcode dist here
-const PROTO_PATH = './dist/runtime.proto';
+const PROTO_PATH = './proto/runtime.proto';
 
-import { name, version } from '../package.json';
+// import { name, version } from '../package.json';
+import { DataItem } from './proto/runtime';
 
-const loaderOptions = {
+const packageDefinition = protoLoader.loadSync(PROTO_PATH, {
   keepCase: true,
   longs: String,
   enums: String,
   defaults: true,
   oneofs: true,
-};
+});
 
-// Initializing the package definition
-var packageDef = protoLoader.loadSync(PROTO_PATH, loaderOptions);
+const runtimePackage = grpc.loadPackageDefinition(packageDefinition) as any;
+const runtimeServer: grpc.Server = new grpc.Server();
 
-const grpcObj = grpc.loadPackageDefinition(packageDef);
-
-const runtimeServer = new grpc.Server();
-
-const ajv = new Ajv();
+// TODO: check ajv use
+const ajv: Ajv = new Ajv();
 
 class TendermintServer {
-  async getRuntimeName(call: any, callback: any) {
-    callback(null, { name });
+  async getRuntimeName(
+    call: grpc.ServerUnaryCall<{}, { name: string }>, 
+    callback: grpc.sendUnaryData<{ name: string }>
+  ) {
+    callback(null, { name: "name" });
   }
 
-  async getRuntimeVersion(call: any, callback: any) {
-    callback(null, { version });
+  async getRuntimeVersion(
+    call: grpc.ServerUnaryCall<{}, { version: string }>, 
+    callback: grpc.sendUnaryData<{ version: string }>
+  ) {
+    callback(null, { version: "version" });
   }
 
-  async validateSetConfig(call: any, callback: any) {
+  async validateSetConfig(
+    call: grpc.ServerUnaryCall<{ raw_config: string }, { serialized_config: string }>, 
+    callback: grpc.sendUnaryData<{ serialized_config: string }>
+  ) {
     try {
       const rawConfig = call.request.raw_config;
       const config = JSON.parse(rawConfig);
@@ -69,8 +76,12 @@ class TendermintServer {
     }
   }
 
-  async getDataItem(call: any, callback: any) {
+  async getDataItem(
+    call: grpc.ServerUnaryCall<{ config: { serialized_config: string }, key: string }, { data_item: DataItem }>, 
+    callback: grpc.sendUnaryData<{ data_item: DataItem }>
+  ) {
     try {
+      console.log(call.request);
       const config = JSON.parse(call.request.config.serialized_config);
       const key = call.request.key;
 
@@ -97,7 +108,8 @@ class TendermintServer {
         key: key,
         value: JSON.stringify(value),
       };
-
+      
+      console.log(data_item);
       callback(null, { data_item });
     } catch (error: any) {
       callback({
@@ -106,7 +118,10 @@ class TendermintServer {
       });
     }
   }
-  async prevalidateDataItem(call: any, callback: any) {
+  async prevalidateDataItem(
+    call: grpc.ServerUnaryCall<{ config: { serialized_config: string }, data_item: DataItem }, { valid: boolean }>, 
+    callback: grpc.sendUnaryData<{ valid: boolean }>
+  ) {
     try {
       const config = JSON.parse(call.request.config.serialized_config);
       const request_item = call.request.data_item;
@@ -150,7 +165,10 @@ class TendermintServer {
       });
     }
   }
-  async transformDataItem(call: any, callback: any) {
+  async transformDataItem(
+    call: grpc.ServerUnaryCall<{ config: { serialized_config: string }, data_item: DataItem }, { transformed_data_item: DataItem }>, 
+    callback: grpc.sendUnaryData<{ transformed_data_item: DataItem }>
+  ) {
     try {
       const config = JSON.parse(call.request.config.serialized_config);
       const request_item = call.request.data_item;
@@ -230,7 +248,10 @@ class TendermintServer {
     }
   }
 
-  async validateDataItem(call: any, callback: any) {
+  async validateDataItem(
+    call: grpc.ServerUnaryCall<{ config: { serialized_config: string }, proposed_data_item: DataItem,  validation_data_item: DataItem}, { valid: boolean }>, 
+    callback: grpc.sendUnaryData<{ valid: boolean }>
+  ) {
     try {
       const config = JSON.parse(call.request.config.serialized_config); // TODO: if a config is not needed in a method don't declare it
       const request_proposed_data_item = call.request.proposed_data_item;
@@ -256,7 +277,10 @@ class TendermintServer {
       });
     }
   }
-  async summarizeDataBundle(call: any, callback: any) {
+  async summarizeDataBundle(
+    call: grpc.ServerUnaryCall<{ config: { serialized_config: string }, bundle: Array<DataItem>}, { summary: string }>, 
+    callback: grpc.sendUnaryData<{ summary: string }>
+  ) {
     try {
       const config = JSON.parse(call.request.config.serialized_config);
       const grpcBundle = call.request.bundle;
@@ -278,7 +302,11 @@ class TendermintServer {
       });
     }
   }
-  async nextKey(call: any, callback: any) {
+  
+  async nextKey(
+    call: grpc.ServerUnaryCall<{ config: { serialized_config: string }, key: string }, { next_key: string }>, 
+    callback: grpc.sendUnaryData<{ next_key: string }>
+  ) {
     try {
       const config = JSON.parse(call.request.config.serialized_config);
       const key = call.request.key;
@@ -300,7 +328,7 @@ class TendermintServer {
 // and server implementation should be moved to another file (server.ts) for example
 // to keep code clean
 const runtimeService = new TendermintServer();
-runtimeServer.addService(grpcObj.RuntimeService.service, {
+runtimeServer.addService(runtimePackage.RuntimeService.service, {
   getRuntimeName: runtimeService.getRuntimeName,
   getRuntimeVersion: runtimeService.getRuntimeVersion,
   validateSetConfig: runtimeService.validateSetConfig,
@@ -313,10 +341,14 @@ runtimeServer.addService(grpcObj.RuntimeService.service, {
 });
 
 runtimeServer.bindAsync(
-  '0.0.0.0:50051',
+  "0.0.0.0:50051",
   grpc.ServerCredentials.createInsecure(),
-  (error: any, port: any) => {
-    console.log('Server running at http://0.0.0.0:50051');
-    runtimeServer.start();
+  (error: Error | null, port: number) => {
+      if (error) {
+          console.error("Error binding server:", error);
+      } else {
+          console.log(`Server running at http://0.0.0.0:${port}`);
+          runtimeServer.start();
+      }
   }
 );

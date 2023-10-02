@@ -1,16 +1,22 @@
-FROM node:lts
-
+# Build Stage 1
+# This build created a staging docker image
+#
+FROM node:lts AS appbuild
 WORKDIR /usr/src/app
-
-# install runtime
 COPY ./package.json ./
 COPY ./tsconfig.json ./
-COPY ./src ./src
-
 RUN yarn install
-RUN yarn build
+COPY ./src ./src
+COPY ./src/proto/runtime.proto ./src/proto/runtime.proto
 
+RUN yarn run build:binaries
+
+# Build Stage 2
+# This build takes the production build from staging build
+#
+FROM node:slim AS runtime
+WORKDIR /usr/src/app
+COPY --from=appbuild /usr/src/app/out/kyve* ./
+COPY --from=appbuild ./src/proto/runtime.proto ./src/proto/runtime.proto
 EXPOSE 50051
-
-# start runtime
-CMD ["yarn", "start"]
+CMD ["./kyve-linux-x64"]
