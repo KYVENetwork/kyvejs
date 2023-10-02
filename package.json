@@ -14,6 +14,7 @@
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.42.1",
     "@typescript-eslint/parser": "^5.42.1",
+    "@protobuf-ts/protoc": "2.9.1",
     "eslint": "^8.27.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.2.1",
@@ -21,10 +22,12 @@
     "lerna": "^7.1.1",
     "nx": "^14.4.3",
     "prettier": "^2.3.0",
-    "rimraf": "^3.0.2"
+    "rimraf": "^3.0.2",
+    "protobufjs": "^6.8.6",
+    "ts-proto": "^1.159.2"
   },
   "scripts": {
-    "setup": "lerna clean && yarn install && lerna run build",
+    "setup": "lerna clean && yarn install && yarn export-grpc-stubs && lerna run build",
     "graph": "yarn nx graph",
     "build": "lerna run build",
     "build:binaries": "lerna run build:binaries --concurrency 1",
@@ -36,7 +39,9 @@
     "clean": "lerna run clean",
     "lint": "lerna run lint",
     "lint:fix": "lerna run lint:fix",
-    "custom-version": "yarn lerna version --conventional-commits=false"
+    "custom-version": "yarn lerna version --conventional-commits=false",
+    "export-grpc-stubs": "protoc --plugin=./node_modules/.bin/protoc-gen-ts_proto --ts_proto_opt=snakeToCamel=false --ts_proto_out=. ./proxies/docker/src/proto/runtime.proto"
   },
+
   "version": "0.0.0"
 }
