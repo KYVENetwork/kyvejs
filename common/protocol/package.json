@@ -60,5 +60,6 @@
     "ts-jest": "^28.0.8",
     "typedoc": "^0.22.17",
     "typescript": "^4.4.3"
-  }
+  },
+  "gitHead": "9d09ae4ebd7695e93cc9b8184e5e557575cfd3b4"
 }
