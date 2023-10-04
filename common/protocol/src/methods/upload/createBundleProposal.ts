@@ -48,12 +48,20 @@ export async function createBundleProposal(this: Validator): Promise<void> {
       `Loading bundle from index ${fromIndex} to index ${toIndex}`
     );
 
+    let bundleSize = 0;
     for (let i = fromIndex; i < toIndex; i++) {
       try {
         // try to get the data item from local cache
         this.logger.debug(`this.cacheProvider.get(${i.toString()})`);
         const item = await this.cacheProvider.get(i.toString());
         bundleProposal.push(item);
+        // calculate the size of the data item and add it to the total bundle size
+        const itemSize = Buffer.from(JSON.stringify(item)).byteLength;
+        bundleSize += itemSize;
+        // break if bundle size exceeds limit
+        if (bundleSize >= MAX_BUNDLE_BYTE_SIZE) {
+          break;
+        }
       } catch {
         // if the data item was not found simply abort
         // and submit what we just have now
