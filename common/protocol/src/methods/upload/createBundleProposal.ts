@@ -59,7 +59,7 @@ export async function createBundleProposal(this: Validator): Promise<void> {
         const itemSize = Buffer.from(JSON.stringify(item)).byteLength;
         bundleSize += itemSize;
         // break if bundle size exceeds limit
-        if (bundleSize >= MAX_BUNDLE_BYTE_SIZE) {
+        if (bundleSize > MAX_BUNDLE_BYTE_SIZE) {
           break;
         }
       } catch {
