@@ -8,7 +8,7 @@ export const REFRESH_TIME = 10 * 1000;
 export const ERROR_IDLE_TIME = 10 * 1000;
 
 // the max bundle size allowed to upload - currently 100MB
-export const MAX_BUNDLE_BYTE_SIZE = 100 * 1024 * 1024;
+export const MAX_BUNDLE_BYTE_SIZE = 200 * 1024 * 1024;
 
 // a vote map to allow human readable votes
 export const VOTE = {
