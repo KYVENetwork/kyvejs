@@ -117,16 +117,6 @@ export async function createBundleProposal(this: Validator): Promise<void> {
 
     const uploadBundle = bundleToBytes(bundleProposal);
 
-    // check if raw bundle size is below the max limit
-    if (uploadBundle.byteLength > MAX_BUNDLE_BYTE_SIZE) {
-      this.logger.info(
-        `Bundle with byte size ${uploadBundle.byteLength} is too big (MAX_BUNDLE_BYTE_SIZE=${MAX_BUNDLE_BYTE_SIZE})`
-      );
-
-      await this.skipUploaderRole(fromIndex);
-      return;
-    }
-
     // if data was found on the cache proceed with compressing the
     // bundle for the upload to the storage provider
     this.logger.debug(`this.compression.compress($RAW_BUNDLE_PROPOSAL)`);
