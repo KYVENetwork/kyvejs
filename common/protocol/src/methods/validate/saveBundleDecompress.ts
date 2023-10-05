@@ -22,21 +22,21 @@ export async function saveBundleDecompress(
 
     this.logger.debug(`this.compression.decompress($RAW_STORAGE_DATA)`);
 
-    const storageBundle = bytesToBundle(
-      await compression.decompress(rawStorageData)
-    );
+    const decompressed: Buffer = await compression.decompress(rawStorageData);
+
+    const storageBundle: DataItem[] = bytesToBundle(decompressed);
 
     this.logger.info(
       `Successfully decompressed bundle with Compression:${compression.name}`
     );
 
-    return standardizeError(storageBundle);
+    return storageBundle;
   } catch (err) {
     this.logger.error(
       `Could not decompress bundle with Compression. Continuing ...`
     );
-    this.logger.error(standardizeError(err));
+    this.logger.error(err);
 
-    return [];
+    throw err;
   }
 }
