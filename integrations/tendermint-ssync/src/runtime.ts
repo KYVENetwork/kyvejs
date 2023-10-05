@@ -1,4 +1,4 @@
-import { DataItem, IRuntime, Validator } from '@kyvejs/protocol';
+import { DataItem, IRuntime, Validator, VOTE } from "@kyvejs/protocol";
 import { name, version } from '../package.json';
 import axios from 'axios';
 
@@ -126,11 +126,12 @@ export default class TendermintSSync implements IRuntime {
     _: Validator,
     proposedDataItem: DataItem,
     validationDataItem: DataItem
-  ): Promise<boolean> {
+  ): Promise<number> {
     // apply equal comparison
-    return (
-      JSON.stringify(proposedDataItem) === JSON.stringify(validationDataItem)
-    );
+    if (JSON.stringify(proposedDataItem) === JSON.stringify(validationDataItem)) {
+      return VOTE.VALID
+    }
+    return VOTE.INVALID
   }
 
   async summarizeDataBundle(_: Validator, bundle: DataItem[]): Promise<string> {

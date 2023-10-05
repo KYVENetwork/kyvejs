@@ -6,6 +6,7 @@ import {
   Validator,
   sha256,
   standardizeJSON,
+  VOTE,
 } from "../src/index";
 import { runNode } from "../src/methods/main/runNode";
 import { genesis_pool } from "./mocks/constants";
@@ -115,7 +116,7 @@ describe("invalid votes tests", () => {
 
   test("vote invalid because runtime validate function returns false", async () => {
     // ARRANGE
-    const validateBundleMock = jest.fn().mockResolvedValue(false);
+    const validateBundleMock = jest.fn().mockResolvedValue(VOTE.INVALID);
     v["runtime"].validateDataItem = validateBundleMock;
 
     const bundle = [
@@ -949,7 +950,7 @@ describe("invalid votes tests", () => {
 
   test("try to vote invalid after validator has voted abstain bebore", async () => {
     // ARRANGE
-    const validateBundleMock = jest.fn().mockResolvedValue(false);
+    const validateBundleMock = jest.fn().mockResolvedValue(VOTE.INVALID);
 
     v["runtime"].validateDataItem = validateBundleMock;
 
@@ -1096,7 +1097,7 @@ describe("invalid votes tests", () => {
 
   test("try to vote invalid after validator has voted invalid before", async () => {
     // ARRANGE
-    const validateBundleMock = jest.fn().mockResolvedValue(false);
+    const validateBundleMock = jest.fn().mockResolvedValue(VOTE.INVALID);
 
     v["runtime"].validateDataItem = validateBundleMock;
 
@@ -1226,7 +1227,7 @@ describe("invalid votes tests", () => {
 
   test("try to vote invalid after validator has voted valid before", async () => {
     // ARRANGE
-    const validateBundleMock = jest.fn().mockResolvedValue(false);
+    const validateBundleMock = jest.fn().mockResolvedValue(VOTE.INVALID);
 
     v["runtime"].validateDataItem = validateBundleMock;
 
@@ -1354,7 +1355,7 @@ describe("invalid votes tests", () => {
 
   test("vote invalid but local bundle could not be loaded in the first try", async () => {
     // ARRANGE
-    v["runtime"].validateDataItem = jest.fn().mockResolvedValue(false);
+    v["runtime"].validateDataItem = jest.fn().mockResolvedValue(VOTE.INVALID);
 
     const bundle = [
       { key: "test_key_1", value: "test_value_1" },
@@ -1513,7 +1514,7 @@ describe("invalid votes tests", () => {
 
   test("vote invalid but bundle from storage provider could not be loaded in the first try", async () => {
     // ARRANGE
-    v["runtime"].validateDataItem = jest.fn().mockResolvedValue(false);
+    v["runtime"].validateDataItem = jest.fn().mockResolvedValue(VOTE.INVALID);
 
     const bundle = [
       { key: "test_key_1", value: "test_value_1" },
@@ -1690,7 +1691,7 @@ describe("invalid votes tests", () => {
       .mockReturnValueOnce(true)
       .mockReturnValue(false);
 
-    v["runtime"].validateDataItem = jest.fn().mockResolvedValue(false);
+    v["runtime"].validateDataItem = jest.fn().mockResolvedValue(VOTE.INVALID);
 
     v["client"][0].kyve.bundles.v1beta1.voteBundleProposal = jest
       .fn()
