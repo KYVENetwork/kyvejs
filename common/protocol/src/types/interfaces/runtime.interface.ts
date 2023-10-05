@@ -103,13 +103,13 @@ export interface IRuntime {
    * @param {Validator} v the class of @kyvejs/protocol
    * @param {DataItem} proposedDataItem the data item proposed by the uploader
    * @param {DataItem} validationDataItem the data item which the validator created himself for validation again the proposed data item
-   * @return {Promise<boolean>} returns whether the proposed data item is valid compared to the validation data item
+   * @return {Promise<number>} returns whether the vote is valid, invalid or abstain compared against the proposed data item
    */
   validateDataItem(
     v: Validator,
     proposedDataItem: DataItem,
     validationDataItem: DataItem
-  ): Promise<boolean>;
+  ): Promise<number>;
 
   /**
    * Gets a formatted value string from a bundle. This produces a "summary" of

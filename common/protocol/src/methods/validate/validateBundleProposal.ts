@@ -158,11 +158,26 @@ export async function validateBundleProposal(
             this.logger.debug(
               `this.runtime.validateDataItem($THIS, $PROPOSED_DATA_ITEM, $VALIDATION_DATA_ITEM)`
             );
-            valid = await this.runtime.validateDataItem(
+            const vote = await this.runtime.validateDataItem(
               this,
               proposedBundle[i],
               validationBundle[i]
             );
+
+            // vote abstain if data item validation returned abstain
+            if (vote === VOTE.ABSTAIN) {
+              const success = await this.voteBundleProposal(
+                this.pool.bundle_proposal!.storage_id,
+                VOTE.ABSTAIN
+              );
+              return success;
+            }
+
+            if (vote === VOTE.VALID) {
+              valid = true;
+            } else if (vote === VOTE.INVALID) {
+              valid = false;
+            }
 
             // only log if data item validation returned invalid
             if (!valid) {
