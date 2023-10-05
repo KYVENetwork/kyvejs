@@ -6,7 +6,7 @@ import {
   Validator,
   sha256,
   standardizeJSON,
-  VOTE
+  VOTE,
 } from "../src/index";
 import { runNode } from "../src/methods/main/runNode";
 import { genesis_pool } from "./mocks/constants";
@@ -83,7 +83,12 @@ describe("invalid votes tests", () => {
     global.setTimeout = setTimeoutMock as any;
 
     // mock logger
-    v.logger = new Logger({minLevel: "warn"});
+    v.logger = new Logger();
+
+    v.logger.info = jest.fn();
+    v.logger.debug = jest.fn();
+    v.logger.warn = jest.fn();
+    v.logger.error = jest.fn();
 
     v["poolId"] = 0;
     v["staker"] = "test_staker";

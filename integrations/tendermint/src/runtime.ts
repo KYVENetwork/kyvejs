@@ -183,15 +183,24 @@ export default class Tendermint implements IRuntime {
     proposedDataItem: DataItem,
     validationDataItem: DataItem
   ): Promise<number> {
-    if (proposedDataItem.value.block_results.begin_block_events === validationDataItem.value.block_results.begin_block_events) {
-      // apply equal comparison
-      if (JSON.stringify(proposedDataItem) === JSON.stringify(validationDataItem)) {
-        return VOTE.VALID
-      }
-      return VOTE.INVALID
+    if (JSON.stringify(proposedDataItem) === JSON.stringify(validationDataItem)) {
+      return VOTE.VALID
     }
-    // vote abstain if begin_block_events are not equal
-    return VOTE.ABSTAIN
+    // prevent nondeterministic misbehaviour due to osmosis-1 specific problems
+    if (validationDataItem.value.block.block.header.chain_id === "osmosis-1") {
+      _.logger.info("Removing begin_block_events: osmosis-1 identified")
+      // remove nondeterministic begin_block_events to prevent incorrect invalid vote
+      delete validationDataItem.value.block_results.begin_block_events;
+      delete proposedDataItem.value.block_results.begin_block_events;
+
+      if (JSON.stringify(proposedDataItem) === JSON.stringify(validationDataItem)) {
+        _.logger.warn("Voting abstain: value.block_results.begin_block_events don't match")
+        // vote abstain if begin_block_events are not equal
+        return VOTE.ABSTAIN
+      }
+    }
+    // vote invalid if data does not match
+    return VOTE.INVALID
   }
 
   async summarizeDataBundle(_: Validator, bundle: DataItem[]): Promise<string> {
