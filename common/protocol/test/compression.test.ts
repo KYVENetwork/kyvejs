@@ -12,13 +12,15 @@ import { Gzip } from "../src/reactors/compression/Gzip";
 
 /*
 
-TEST CASES - cache tests
+TEST CASES - compression tests
 
-* start caching from a pool which is in genesis state
+* Valid parsing
+* Invalid parsing
+* Valid gzip compression and decompression
 
 */
 
-describe("cache tests", () => {
+describe("compression tests", () => {
   let v: Validator;
 
   let processExit: jest.Mock<never, never>;
@@ -87,7 +89,7 @@ describe("cache tests", () => {
 
   test("Valid parsing", async () => {
     const fill =
-      '[{"key": "key1","value": "value1"}, {"key": "key2","value": "value2"}]';
+      "[{\"key\": \"key1\",\"value\": \"value1\"}, {\"key\": \"key2\",\"value\": \"value2\"}]";
     // using array call for function as it is protected
     const parsed = await v["saveBundleDecompress"](
       Buffer.alloc(fill.length, fill)
@@ -110,7 +112,7 @@ describe("cache tests", () => {
 
   test("Valid gzip compression and decompression", async () => {
     const fill =
-      '[{"key": "key1","value": "value1"}, {"key": "key2","value": "value2"}]';
+      "[{\"key\": \"key1\",\"value\": \"value1\"}, {\"key\": \"key2\",\"value\": \"value2\"}]";
 
     const gzipper = new Gzip();
     const zipped = await gzipper.compress(Buffer.alloc(fill.length, fill));
