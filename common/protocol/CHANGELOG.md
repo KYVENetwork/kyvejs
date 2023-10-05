@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.0.11](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/protocol@1.0.10...@kyvejs/protocol@1.0.11) (2023-10-05)
+
+### Bug Fixes
+
+- compression errror returns empty array ([#76](https://github.com/KYVENetwork/kyvejs/issues/76)) ([b11a925](https://github.com/KYVENetwork/kyvejs/commit/b11a9252f7084b80779203613d1d76256a2ec790))
+
 ## [1.0.10](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/protocol@1.0.9...@kyvejs/protocol@1.0.10) (2023-10-04)
 
 **Note:** Version bump only for package @kyvejs/protocol
