@@ -137,13 +137,13 @@ export async function validateBundleProposal(
 
     // if storage provider result is empty skip runtime validation
     if (storageProviderResult.byteLength) {
-      // decompress the bundle with the specified compression type
-      // and convert the bytes into a JSON format
-      const proposedBundle = await this.saveBundleDecompress(
-        storageProviderResult
-      );
-
       try {
+        // decompress the bundle with the specified compression type
+        // and convert the bytes into a JSON format
+        const proposedBundle = await this.saveBundleDecompress(
+          storageProviderResult
+        );
+
         // perform custom runtime bundle validation
         this.logger.debug(
           `Validating bundle proposal by custom runtime validation`
