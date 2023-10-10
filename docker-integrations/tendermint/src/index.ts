@@ -1,23 +1,12 @@
 import * as grpc from '@grpc/grpc-js';
-import * as protoLoader from '@grpc/proto-loader';
-import { DataItem } from './proto/runtime';
-import { TendermintServer } from './server'; // Import the TendermintServer class
+import { TendermintServer } from './server';
+import { RuntimeService } from './protos/runtime';
 
-const PROTO_PATH = './src/proto/runtime.proto';
-
-const packageDefinition = protoLoader.loadSync(PROTO_PATH, {
-  keepCase: true,
-  longs: String,
-  enums: String,
-  defaults: true,
-  oneofs: true,
-});
-
-const runtimePackage = grpc.loadPackageDefinition(packageDefinition) as any;
 const runtimeServer: grpc.Server = new grpc.Server();
 
 const runtimeService = new TendermintServer();
-runtimeServer.addService(runtimePackage.RuntimeService.service, {
+
+runtimeServer.addService(RuntimeService, {
   getRuntimeName: runtimeService.getRuntimeName,
   getRuntimeVersion: runtimeService.getRuntimeVersion,
   validateSetConfig: runtimeService.validateSetConfig,
