@@ -116,7 +116,7 @@ message NextKeyResponse {
   string next_key = 1;
 }
 
-service RuntimeService {
+service Runtime {
   rpc GetRuntimeName(GetRuntimeNameRequest) returns (GetRuntimeNameResponse);
   rpc GetRuntimeVersion(GetRuntimeVersionRequest) returns (GetRuntimeVersionResponse);
   rpc ValidateSetConfig (ValidateSetConfigRequest) returns (ValidateSetConfigResponse);

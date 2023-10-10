@@ -1,18 +1,31 @@
 /* eslint-disable */
+import { ChannelCredentials, Client, makeGenericClientConstructor, Metadata } from "@grpc/grpc-js";
+import type {
+  CallOptions,
+  ClientOptions,
+  ClientUnaryCall,
+  handleUnaryCall,
+  ServiceError,
+  UntypedServiceImplementation,
+} from "@grpc/grpc-js";
 import * as _m0 from "protobufjs/minimal";
 
 export const protobufPackage = "";
 
+/**
+ * The main data entity served by the gRPC service
+ * Contains the block key and the block value as a serialized value
+ */
 export interface DataItem {
   key: string;
   value: string;
 }
 
+/** Configuration entity containing serialized info about connection to the respective chain */
 export interface RuntimeConfig {
   serialized_config: string;
 }
 
-/** getRuntimeName */
 export interface GetRuntimeNameRequest {
 }
 
@@ -20,7 +33,11 @@ export interface GetRuntimeNameResponse {
   name: string;
 }
 
-/** getRuntimeVersion */
+/**
+ * getRuntimeName
+ * Request returning the version of the runtime
+ * returns the runtime version as a string
+ */
 export interface GetRuntimeVersionRequest {
 }
 
@@ -28,7 +45,11 @@ export interface GetRuntimeVersionResponse {
   version: string;
 }
 
-/** validateSetConfig */
+/**
+ * validateSetConfig
+ * Request validating a configuration string to connect to the respective chain
+ * returns a validated serialized configuration object
+ */
 export interface ValidateSetConfigRequest {
   raw_config: string;
 }
@@ -37,7 +58,11 @@ export interface ValidateSetConfigResponse {
   serialized_config: string;
 }
 
-/** getDataItem */
+/**
+ * getDataItem
+ * Request retrieving and returning a block from the respective chain
+ * Returns the requested block as a dataItem
+ */
 export interface GetDataItemRequest {
   config: RuntimeConfig | undefined;
   key: string;
@@ -47,7 +72,11 @@ export interface GetDataItemResponse {
   data_item: DataItem | undefined;
 }
 
-/** prevalidateDataItem */
+/**
+ * prevalidateDataItem
+ * Request pre-validating a dataItem that is about to be validated
+ * returns the pre-validation result as a boolean
+ */
 export interface PrevalidateDataItemRequest {
   config: RuntimeConfig | undefined;
   data_item: DataItem | undefined;
@@ -57,7 +86,11 @@ export interface PrevalidateDataItemResponse {
   valid: boolean;
 }
 
-/** transformDataItem */
+/**
+ * transformDataItem
+ * Request transforming the given data item into a preferred format
+ * returns the transformed dataItem
+ */
 export interface TransformDataItemRequest {
   config: RuntimeConfig | undefined;
   data_item: DataItem | undefined;
@@ -67,7 +100,11 @@ export interface TransformDataItemResponse {
   transformed_data_item: DataItem | undefined;
 }
 
-/** validateDataItem */
+/**
+ * validateDataItem
+ * Request validating a dataItem
+ * returns the validation result as a boolean
+ */
 export interface ValidateDataItemRequest {
   config: RuntimeConfig | undefined;
   proposed_data_item: DataItem | undefined;
@@ -78,7 +115,11 @@ export interface ValidateDataItemResponse {
   valid: boolean;
 }
 
-/** summarizeDataBundle */
+/**
+ * summarizeDataBundle
+ * Request summarizing a dataBundle
+ * returns the bundle summary as a string
+ */
 export interface SummarizeDataBundleRequest {
   config: RuntimeConfig | undefined;
   bundle: DataItem[];
@@ -88,7 +129,11 @@ export interface SummarizeDataBundleResponse {
   summary: string;
 }
 
-/** nextKey */
+/**
+ * nextKey
+ * Request retrieving the next key on the chain
+ * returns the key as a string
+ */
 export interface NextKeyRequest {
   config: RuntimeConfig | undefined;
   key: string;
@@ -144,7 +189,10 @@ export const DataItem = {
   },
 
   fromJSON(object: any): DataItem {
-    return { key: isSet(object.key) ? String(object.key) : "", value: isSet(object.value) ? String(object.value) : "" };
+    return {
+      key: isSet(object.key) ? globalThis.String(object.key) : "",
+      value: isSet(object.value) ? globalThis.String(object.value) : "",
+    };
   },
 
   toJSON(message: DataItem): unknown {
@@ -159,9 +207,8 @@ export const DataItem = {
   },
 
   create<I extends Exact<DeepPartial<DataItem>, I>>(base?: I): DataItem {
-    return DataItem.fromPartial(base ?? {});
+    return DataItem.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<DataItem>, I>>(object: I): DataItem {
     const message = createBaseDataItem();
     message.key = object.key ?? "";
@@ -206,7 +253,7 @@ export const RuntimeConfig = {
   },
 
   fromJSON(object: any): RuntimeConfig {
-    return { serialized_config: isSet(object.serialized_config) ? String(object.serialized_config) : "" };
+    return { serialized_config: isSet(object.serialized_config) ? globalThis.String(object.serialized_config) : "" };
   },
 
   toJSON(message: RuntimeConfig): unknown {
@@ -218,9 +265,8 @@ export const RuntimeConfig = {
   },
 
   create<I extends Exact<DeepPartial<RuntimeConfig>, I>>(base?: I): RuntimeConfig {
-    return RuntimeConfig.fromPartial(base ?? {});
+    return RuntimeConfig.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<RuntimeConfig>, I>>(object: I): RuntimeConfig {
     const message = createBaseRuntimeConfig();
     message.serialized_config = object.serialized_config ?? "";
@@ -263,9 +309,8 @@ export const GetRuntimeNameRequest = {
   },
 
   create<I extends Exact<DeepPartial<GetRuntimeNameRequest>, I>>(base?: I): GetRuntimeNameRequest {
-    return GetRuntimeNameRequest.fromPartial(base ?? {});
+    return GetRuntimeNameRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<GetRuntimeNameRequest>, I>>(_: I): GetRuntimeNameRequest {
     const message = createBaseGetRuntimeNameRequest();
     return message;
@@ -308,7 +353,7 @@ export const GetRuntimeNameResponse = {
   },
 
   fromJSON(object: any): GetRuntimeNameResponse {
-    return { name: isSet(object.name) ? String(object.name) : "" };
+    return { name: isSet(object.name) ? globalThis.String(object.name) : "" };
   },
 
   toJSON(message: GetRuntimeNameResponse): unknown {
@@ -320,9 +365,8 @@ export const GetRuntimeNameResponse = {
   },
 
   create<I extends Exact<DeepPartial<GetRuntimeNameResponse>, I>>(base?: I): GetRuntimeNameResponse {
-    return GetRuntimeNameResponse.fromPartial(base ?? {});
+    return GetRuntimeNameResponse.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<GetRuntimeNameResponse>, I>>(object: I): GetRuntimeNameResponse {
     const message = createBaseGetRuntimeNameResponse();
     message.name = object.name ?? "";
@@ -365,9 +409,8 @@ export const GetRuntimeVersionRequest = {
   },
 
   create<I extends Exact<DeepPartial<GetRuntimeVersionRequest>, I>>(base?: I): GetRuntimeVersionRequest {
-    return GetRuntimeVersionRequest.fromPartial(base ?? {});
+    return GetRuntimeVersionRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<GetRuntimeVersionRequest>, I>>(_: I): GetRuntimeVersionRequest {
     const message = createBaseGetRuntimeVersionRequest();
     return message;
@@ -410,7 +453,7 @@ export const GetRuntimeVersionResponse = {
   },
 
   fromJSON(object: any): GetRuntimeVersionResponse {
-    return { version: isSet(object.version) ? String(object.version) : "" };
+    return { version: isSet(object.version) ? globalThis.String(object.version) : "" };
   },
 
   toJSON(message: GetRuntimeVersionResponse): unknown {
@@ -422,9 +465,8 @@ export const GetRuntimeVersionResponse = {
   },
 
   create<I extends Exact<DeepPartial<GetRuntimeVersionResponse>, I>>(base?: I): GetRuntimeVersionResponse {
-    return GetRuntimeVersionResponse.fromPartial(base ?? {});
+    return GetRuntimeVersionResponse.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<GetRuntimeVersionResponse>, I>>(object: I): GetRuntimeVersionResponse {
     const message = createBaseGetRuntimeVersionResponse();
     message.version = object.version ?? "";
@@ -468,7 +510,7 @@ export const ValidateSetConfigRequest = {
   },
 
   fromJSON(object: any): ValidateSetConfigRequest {
-    return { raw_config: isSet(object.raw_config) ? String(object.raw_config) : "" };
+    return { raw_config: isSet(object.raw_config) ? globalThis.String(object.raw_config) : "" };
   },
 
   toJSON(message: ValidateSetConfigRequest): unknown {
@@ -480,9 +522,8 @@ export const ValidateSetConfigRequest = {
   },
 
   create<I extends Exact<DeepPartial<ValidateSetConfigRequest>, I>>(base?: I): ValidateSetConfigRequest {
-    return ValidateSetConfigRequest.fromPartial(base ?? {});
+    return ValidateSetConfigRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<ValidateSetConfigRequest>, I>>(object: I): ValidateSetConfigRequest {
     const message = createBaseValidateSetConfigRequest();
     message.raw_config = object.raw_config ?? "";
@@ -526,7 +567,7 @@ export const ValidateSetConfigResponse = {
   },
 
   fromJSON(object: any): ValidateSetConfigResponse {
-    return { serialized_config: isSet(object.serialized_config) ? String(object.serialized_config) : "" };
+    return { serialized_config: isSet(object.serialized_config) ? globalThis.String(object.serialized_config) : "" };
   },
 
   toJSON(message: ValidateSetConfigResponse): unknown {
@@ -538,9 +579,8 @@ export const ValidateSetConfigResponse = {
   },
 
   create<I extends Exact<DeepPartial<ValidateSetConfigResponse>, I>>(base?: I): ValidateSetConfigResponse {
-    return ValidateSetConfigResponse.fromPartial(base ?? {});
+    return ValidateSetConfigResponse.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<ValidateSetConfigResponse>, I>>(object: I): ValidateSetConfigResponse {
     const message = createBaseValidateSetConfigResponse();
     message.serialized_config = object.serialized_config ?? "";
@@ -596,7 +636,7 @@ export const GetDataItemRequest = {
   fromJSON(object: any): GetDataItemRequest {
     return {
       config: isSet(object.config) ? RuntimeConfig.fromJSON(object.config) : undefined,
-      key: isSet(object.key) ? String(object.key) : "",
+      key: isSet(object.key) ? globalThis.String(object.key) : "",
     };
   },
 
@@ -612,9 +652,8 @@ export const GetDataItemRequest = {
   },
 
   create<I extends Exact<DeepPartial<GetDataItemRequest>, I>>(base?: I): GetDataItemRequest {
-    return GetDataItemRequest.fromPartial(base ?? {});
+    return GetDataItemRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<GetDataItemRequest>, I>>(object: I): GetDataItemRequest {
     const message = createBaseGetDataItemRequest();
     message.config = (object.config !== undefined && object.config !== null)
@@ -673,9 +712,8 @@ export const GetDataItemResponse = {
   },
 
   create<I extends Exact<DeepPartial<GetDataItemResponse>, I>>(base?: I): GetDataItemResponse {
-    return GetDataItemResponse.fromPartial(base ?? {});
+    return GetDataItemResponse.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<GetDataItemResponse>, I>>(object: I): GetDataItemResponse {
     const message = createBaseGetDataItemResponse();
     message.data_item = (object.data_item !== undefined && object.data_item !== null)
@@ -749,9 +787,8 @@ export const PrevalidateDataItemRequest = {
   },
 
   create<I extends Exact<DeepPartial<PrevalidateDataItemRequest>, I>>(base?: I): PrevalidateDataItemRequest {
-    return PrevalidateDataItemRequest.fromPartial(base ?? {});
+    return PrevalidateDataItemRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<PrevalidateDataItemRequest>, I>>(object: I): PrevalidateDataItemRequest {
     const message = createBasePrevalidateDataItemRequest();
     message.config = (object.config !== undefined && object.config !== null)
@@ -800,7 +837,7 @@ export const PrevalidateDataItemResponse = {
   },
 
   fromJSON(object: any): PrevalidateDataItemResponse {
-    return { valid: isSet(object.valid) ? Boolean(object.valid) : false };
+    return { valid: isSet(object.valid) ? globalThis.Boolean(object.valid) : false };
   },
 
   toJSON(message: PrevalidateDataItemResponse): unknown {
@@ -812,9 +849,8 @@ export const PrevalidateDataItemResponse = {
   },
 
   create<I extends Exact<DeepPartial<PrevalidateDataItemResponse>, I>>(base?: I): PrevalidateDataItemResponse {
-    return PrevalidateDataItemResponse.fromPartial(base ?? {});
+    return PrevalidateDataItemResponse.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<PrevalidateDataItemResponse>, I>>(object: I): PrevalidateDataItemResponse {
     const message = createBasePrevalidateDataItemResponse();
     message.valid = object.valid ?? false;
@@ -886,9 +922,8 @@ export const TransformDataItemRequest = {
   },
 
   create<I extends Exact<DeepPartial<TransformDataItemRequest>, I>>(base?: I): TransformDataItemRequest {
-    return TransformDataItemRequest.fromPartial(base ?? {});
+    return TransformDataItemRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<TransformDataItemRequest>, I>>(object: I): TransformDataItemRequest {
     const message = createBaseTransformDataItemRequest();
     message.config = (object.config !== undefined && object.config !== null)
@@ -953,9 +988,8 @@ export const TransformDataItemResponse = {
   },
 
   create<I extends Exact<DeepPartial<TransformDataItemResponse>, I>>(base?: I): TransformDataItemResponse {
-    return TransformDataItemResponse.fromPartial(base ?? {});
+    return TransformDataItemResponse.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<TransformDataItemResponse>, I>>(object: I): TransformDataItemResponse {
     const message = createBaseTransformDataItemResponse();
     message.transformed_data_item =
@@ -1046,9 +1080,8 @@ export const ValidateDataItemRequest = {
   },
 
   create<I extends Exact<DeepPartial<ValidateDataItemRequest>, I>>(base?: I): ValidateDataItemRequest {
-    return ValidateDataItemRequest.fromPartial(base ?? {});
+    return ValidateDataItemRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<ValidateDataItemRequest>, I>>(object: I): ValidateDataItemRequest {
     const message = createBaseValidateDataItemRequest();
     message.config = (object.config !== undefined && object.config !== null)
@@ -1100,7 +1133,7 @@ export const ValidateDataItemResponse = {
   },
 
   fromJSON(object: any): ValidateDataItemResponse {
-    return { valid: isSet(object.valid) ? Boolean(object.valid) : false };
+    return { valid: isSet(object.valid) ? globalThis.Boolean(object.valid) : false };
   },
 
   toJSON(message: ValidateDataItemResponse): unknown {
@@ -1112,9 +1145,8 @@ export const ValidateDataItemResponse = {
   },
 
   create<I extends Exact<DeepPartial<ValidateDataItemResponse>, I>>(base?: I): ValidateDataItemResponse {
-    return ValidateDataItemResponse.fromPartial(base ?? {});
+    return ValidateDataItemResponse.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<ValidateDataItemResponse>, I>>(object: I): ValidateDataItemResponse {
     const message = createBaseValidateDataItemResponse();
     message.valid = object.valid ?? false;
@@ -1170,7 +1202,7 @@ export const SummarizeDataBundleRequest = {
   fromJSON(object: any): SummarizeDataBundleRequest {
     return {
       config: isSet(object.config) ? RuntimeConfig.fromJSON(object.config) : undefined,
-      bundle: Array.isArray(object?.bundle) ? object.bundle.map((e: any) => DataItem.fromJSON(e)) : [],
+      bundle: globalThis.Array.isArray(object?.bundle) ? object.bundle.map((e: any) => DataItem.fromJSON(e)) : [],
     };
   },
 
@@ -1186,9 +1218,8 @@ export const SummarizeDataBundleRequest = {
   },
 
   create<I extends Exact<DeepPartial<SummarizeDataBundleRequest>, I>>(base?: I): SummarizeDataBundleRequest {
-    return SummarizeDataBundleRequest.fromPartial(base ?? {});
+    return SummarizeDataBundleRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<SummarizeDataBundleRequest>, I>>(object: I): SummarizeDataBundleRequest {
     const message = createBaseSummarizeDataBundleRequest();
     message.config = (object.config !== undefined && object.config !== null)
@@ -1235,7 +1266,7 @@ export const SummarizeDataBundleResponse = {
   },
 
   fromJSON(object: any): SummarizeDataBundleResponse {
-    return { summary: isSet(object.summary) ? String(object.summary) : "" };
+    return { summary: isSet(object.summary) ? globalThis.String(object.summary) : "" };
   },
 
   toJSON(message: SummarizeDataBundleResponse): unknown {
@@ -1247,9 +1278,8 @@ export const SummarizeDataBundleResponse = {
   },
 
   create<I extends Exact<DeepPartial<SummarizeDataBundleResponse>, I>>(base?: I): SummarizeDataBundleResponse {
-    return SummarizeDataBundleResponse.fromPartial(base ?? {});
+    return SummarizeDataBundleResponse.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<SummarizeDataBundleResponse>, I>>(object: I): SummarizeDataBundleResponse {
     const message = createBaseSummarizeDataBundleResponse();
     message.summary = object.summary ?? "";
@@ -1305,7 +1335,7 @@ export const NextKeyRequest = {
   fromJSON(object: any): NextKeyRequest {
     return {
       config: isSet(object.config) ? RuntimeConfig.fromJSON(object.config) : undefined,
-      key: isSet(object.key) ? String(object.key) : "",
+      key: isSet(object.key) ? globalThis.String(object.key) : "",
     };
   },
 
@@ -1321,9 +1351,8 @@ export const NextKeyRequest = {
   },
 
   create<I extends Exact<DeepPartial<NextKeyRequest>, I>>(base?: I): NextKeyRequest {
-    return NextKeyRequest.fromPartial(base ?? {});
+    return NextKeyRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<NextKeyRequest>, I>>(object: I): NextKeyRequest {
     const message = createBaseNextKeyRequest();
     message.config = (object.config !== undefined && object.config !== null)
@@ -1370,7 +1399,7 @@ export const NextKeyResponse = {
   },
 
   fromJSON(object: any): NextKeyResponse {
-    return { next_key: isSet(object.next_key) ? String(object.next_key) : "" };
+    return { next_key: isSet(object.next_key) ? globalThis.String(object.next_key) : "" };
   },
 
   toJSON(message: NextKeyResponse): unknown {
@@ -1382,9 +1411,8 @@ export const NextKeyResponse = {
   },
 
   create<I extends Exact<DeepPartial<NextKeyResponse>, I>>(base?: I): NextKeyResponse {
-    return NextKeyResponse.fromPartial(base ?? {});
+    return NextKeyResponse.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<NextKeyResponse>, I>>(object: I): NextKeyResponse {
     const message = createBaseNextKeyResponse();
     message.next_key = object.next_key ?? "";
@@ -1392,98 +1420,259 @@ export const NextKeyResponse = {
   },
 };
 
-export interface RuntimeService {
-  GetRuntimeName(request: GetRuntimeNameRequest): Promise<GetRuntimeNameResponse>;
-  GetRuntimeVersion(request: GetRuntimeVersionRequest): Promise<GetRuntimeVersionResponse>;
-  ValidateSetConfig(request: ValidateSetConfigRequest): Promise<ValidateSetConfigResponse>;
-  GetDataItem(request: GetDataItemRequest): Promise<GetDataItemResponse>;
-  PrevalidateDataItem(request: PrevalidateDataItemRequest): Promise<PrevalidateDataItemResponse>;
-  TransformDataItem(request: TransformDataItemRequest): Promise<TransformDataItemResponse>;
-  ValidateDataItem(request: ValidateDataItemRequest): Promise<ValidateDataItemResponse>;
-  SummarizeDataBundle(request: SummarizeDataBundleRequest): Promise<SummarizeDataBundleResponse>;
-  NextKey(request: NextKeyRequest): Promise<NextKeyResponse>;
+export type RuntimeService = typeof RuntimeService;
+export const RuntimeService = {
+  getRuntimeName: {
+    path: "/Runtime/GetRuntimeName",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: GetRuntimeNameRequest) => Buffer.from(GetRuntimeNameRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer) => GetRuntimeNameRequest.decode(value),
+    responseSerialize: (value: GetRuntimeNameResponse) => Buffer.from(GetRuntimeNameResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer) => GetRuntimeNameResponse.decode(value),
+  },
+  getRuntimeVersion: {
+    path: "/Runtime/GetRuntimeVersion",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: GetRuntimeVersionRequest) => Buffer.from(GetRuntimeVersionRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer) => GetRuntimeVersionRequest.decode(value),
+    responseSerialize: (value: GetRuntimeVersionResponse) =>
+      Buffer.from(GetRuntimeVersionResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer) => GetRuntimeVersionResponse.decode(value),
+  },
+  validateSetConfig: {
+    path: "/Runtime/ValidateSetConfig",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: ValidateSetConfigRequest) => Buffer.from(ValidateSetConfigRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer) => ValidateSetConfigRequest.decode(value),
+    responseSerialize: (value: ValidateSetConfigResponse) =>
+      Buffer.from(ValidateSetConfigResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer) => ValidateSetConfigResponse.decode(value),
+  },
+  getDataItem: {
+    path: "/Runtime/GetDataItem",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: GetDataItemRequest) => Buffer.from(GetDataItemRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer) => GetDataItemRequest.decode(value),
+    responseSerialize: (value: GetDataItemResponse) => Buffer.from(GetDataItemResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer) => GetDataItemResponse.decode(value),
+  },
+  prevalidateDataItem: {
+    path: "/Runtime/PrevalidateDataItem",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: PrevalidateDataItemRequest) =>
+      Buffer.from(PrevalidateDataItemRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer) => PrevalidateDataItemRequest.decode(value),
+    responseSerialize: (value: PrevalidateDataItemResponse) =>
+      Buffer.from(PrevalidateDataItemResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer) => PrevalidateDataItemResponse.decode(value),
+  },
+  transformDataItem: {
+    path: "/Runtime/TransformDataItem",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: TransformDataItemRequest) => Buffer.from(TransformDataItemRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer) => TransformDataItemRequest.decode(value),
+    responseSerialize: (value: TransformDataItemResponse) =>
+      Buffer.from(TransformDataItemResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer) => TransformDataItemResponse.decode(value),
+  },
+  validateDataItem: {
+    path: "/Runtime/ValidateDataItem",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: ValidateDataItemRequest) => Buffer.from(ValidateDataItemRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer) => ValidateDataItemRequest.decode(value),
+    responseSerialize: (value: ValidateDataItemResponse) =>
+      Buffer.from(ValidateDataItemResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer) => ValidateDataItemResponse.decode(value),
+  },
+  summarizeDataBundle: {
+    path: "/Runtime/SummarizeDataBundle",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: SummarizeDataBundleRequest) =>
+      Buffer.from(SummarizeDataBundleRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer) => SummarizeDataBundleRequest.decode(value),
+    responseSerialize: (value: SummarizeDataBundleResponse) =>
+      Buffer.from(SummarizeDataBundleResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer) => SummarizeDataBundleResponse.decode(value),
+  },
+  nextKey: {
+    path: "/Runtime/NextKey",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: NextKeyRequest) => Buffer.from(NextKeyRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer) => NextKeyRequest.decode(value),
+    responseSerialize: (value: NextKeyResponse) => Buffer.from(NextKeyResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer) => NextKeyResponse.decode(value),
+  },
+} as const;
+
+export interface RuntimeServer extends UntypedServiceImplementation {
+  getRuntimeName: handleUnaryCall<GetRuntimeNameRequest, GetRuntimeNameResponse>;
+  getRuntimeVersion: handleUnaryCall<GetRuntimeVersionRequest, GetRuntimeVersionResponse>;
+  validateSetConfig: handleUnaryCall<ValidateSetConfigRequest, ValidateSetConfigResponse>;
+  getDataItem: handleUnaryCall<GetDataItemRequest, GetDataItemResponse>;
+  prevalidateDataItem: handleUnaryCall<PrevalidateDataItemRequest, PrevalidateDataItemResponse>;
+  transformDataItem: handleUnaryCall<TransformDataItemRequest, TransformDataItemResponse>;
+  validateDataItem: handleUnaryCall<ValidateDataItemRequest, ValidateDataItemResponse>;
+  summarizeDataBundle: handleUnaryCall<SummarizeDataBundleRequest, SummarizeDataBundleResponse>;
+  nextKey: handleUnaryCall<NextKeyRequest, NextKeyResponse>;
 }
 
-export const RuntimeServiceServiceName = "RuntimeService";
-export class RuntimeServiceClientImpl implements RuntimeService {
-  private readonly rpc: Rpc;
-  private readonly service: string;
-  constructor(rpc: Rpc, opts?: { service?: string }) {
-    this.service = opts?.service || RuntimeServiceServiceName;
-    this.rpc = rpc;
-    this.GetRuntimeName = this.GetRuntimeName.bind(this);
-    this.GetRuntimeVersion = this.GetRuntimeVersion.bind(this);
-    this.ValidateSetConfig = this.ValidateSetConfig.bind(this);
-    this.GetDataItem = this.GetDataItem.bind(this);
-    this.PrevalidateDataItem = this.PrevalidateDataItem.bind(this);
-    this.TransformDataItem = this.TransformDataItem.bind(this);
-    this.ValidateDataItem = this.ValidateDataItem.bind(this);
-    this.SummarizeDataBundle = this.SummarizeDataBundle.bind(this);
-    this.NextKey = this.NextKey.bind(this);
-  }
-  GetRuntimeName(request: GetRuntimeNameRequest): Promise<GetRuntimeNameResponse> {
-    const data = GetRuntimeNameRequest.encode(request).finish();
-    const promise = this.rpc.request(this.service, "GetRuntimeName", data);
-    return promise.then((data) => GetRuntimeNameResponse.decode(_m0.Reader.create(data)));
-  }
-
-  GetRuntimeVersion(request: GetRuntimeVersionRequest): Promise<GetRuntimeVersionResponse> {
-    const data = GetRuntimeVersionRequest.encode(request).finish();
-    const promise = this.rpc.request(this.service, "GetRuntimeVersion", data);
-    return promise.then((data) => GetRuntimeVersionResponse.decode(_m0.Reader.create(data)));
-  }
-
-  ValidateSetConfig(request: ValidateSetConfigRequest): Promise<ValidateSetConfigResponse> {
-    const data = ValidateSetConfigRequest.encode(request).finish();
-    const promise = this.rpc.request(this.service, "ValidateSetConfig", data);
-    return promise.then((data) => ValidateSetConfigResponse.decode(_m0.Reader.create(data)));
-  }
-
-  GetDataItem(request: GetDataItemRequest): Promise<GetDataItemResponse> {
-    const data = GetDataItemRequest.encode(request).finish();
-    const promise = this.rpc.request(this.service, "GetDataItem", data);
-    return promise.then((data) => GetDataItemResponse.decode(_m0.Reader.create(data)));
-  }
-
-  PrevalidateDataItem(request: PrevalidateDataItemRequest): Promise<PrevalidateDataItemResponse> {
-    const data = PrevalidateDataItemRequest.encode(request).finish();
-    const promise = this.rpc.request(this.service, "PrevalidateDataItem", data);
-    return promise.then((data) => PrevalidateDataItemResponse.decode(_m0.Reader.create(data)));
-  }
-
-  TransformDataItem(request: TransformDataItemRequest): Promise<TransformDataItemResponse> {
-    const data = TransformDataItemRequest.encode(request).finish();
-    const promise = this.rpc.request(this.service, "TransformDataItem", data);
-    return promise.then((data) => TransformDataItemResponse.decode(_m0.Reader.create(data)));
-  }
-
-  ValidateDataItem(request: ValidateDataItemRequest): Promise<ValidateDataItemResponse> {
-    const data = ValidateDataItemRequest.encode(request).finish();
-    const promise = this.rpc.request(this.service, "ValidateDataItem", data);
-    return promise.then((data) => ValidateDataItemResponse.decode(_m0.Reader.create(data)));
-  }
-
-  SummarizeDataBundle(request: SummarizeDataBundleRequest): Promise<SummarizeDataBundleResponse> {
-    const data = SummarizeDataBundleRequest.encode(request).finish();
-    const promise = this.rpc.request(this.service, "SummarizeDataBundle", data);
-    return promise.then((data) => SummarizeDataBundleResponse.decode(_m0.Reader.create(data)));
-  }
-
-  NextKey(request: NextKeyRequest): Promise<NextKeyResponse> {
-    const data = NextKeyRequest.encode(request).finish();
-    const promise = this.rpc.request(this.service, "NextKey", data);
-    return promise.then((data) => NextKeyResponse.decode(_m0.Reader.create(data)));
-  }
+export interface RuntimeClient extends Client {
+  getRuntimeName(
+    request: GetRuntimeNameRequest,
+    callback: (error: ServiceError | null, response: GetRuntimeNameResponse) => void,
+  ): ClientUnaryCall;
+  getRuntimeName(
+    request: GetRuntimeNameRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: GetRuntimeNameResponse) => void,
+  ): ClientUnaryCall;
+  getRuntimeName(
+    request: GetRuntimeNameRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: GetRuntimeNameResponse) => void,
+  ): ClientUnaryCall;
+  getRuntimeVersion(
+    request: GetRuntimeVersionRequest,
+    callback: (error: ServiceError | null, response: GetRuntimeVersionResponse) => void,
+  ): ClientUnaryCall;
+  getRuntimeVersion(
+    request: GetRuntimeVersionRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: GetRuntimeVersionResponse) => void,
+  ): ClientUnaryCall;
+  getRuntimeVersion(
+    request: GetRuntimeVersionRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: GetRuntimeVersionResponse) => void,
+  ): ClientUnaryCall;
+  validateSetConfig(
+    request: ValidateSetConfigRequest,
+    callback: (error: ServiceError | null, response: ValidateSetConfigResponse) => void,
+  ): ClientUnaryCall;
+  validateSetConfig(
+    request: ValidateSetConfigRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: ValidateSetConfigResponse) => void,
+  ): ClientUnaryCall;
+  validateSetConfig(
+    request: ValidateSetConfigRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: ValidateSetConfigResponse) => void,
+  ): ClientUnaryCall;
+  getDataItem(
+    request: GetDataItemRequest,
+    callback: (error: ServiceError | null, response: GetDataItemResponse) => void,
+  ): ClientUnaryCall;
+  getDataItem(
+    request: GetDataItemRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: GetDataItemResponse) => void,
+  ): ClientUnaryCall;
+  getDataItem(
+    request: GetDataItemRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: GetDataItemResponse) => void,
+  ): ClientUnaryCall;
+  prevalidateDataItem(
+    request: PrevalidateDataItemRequest,
+    callback: (error: ServiceError | null, response: PrevalidateDataItemResponse) => void,
+  ): ClientUnaryCall;
+  prevalidateDataItem(
+    request: PrevalidateDataItemRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: PrevalidateDataItemResponse) => void,
+  ): ClientUnaryCall;
+  prevalidateDataItem(
+    request: PrevalidateDataItemRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: PrevalidateDataItemResponse) => void,
+  ): ClientUnaryCall;
+  transformDataItem(
+    request: TransformDataItemRequest,
+    callback: (error: ServiceError | null, response: TransformDataItemResponse) => void,
+  ): ClientUnaryCall;
+  transformDataItem(
+    request: TransformDataItemRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: TransformDataItemResponse) => void,
+  ): ClientUnaryCall;
+  transformDataItem(
+    request: TransformDataItemRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: TransformDataItemResponse) => void,
+  ): ClientUnaryCall;
+  validateDataItem(
+    request: ValidateDataItemRequest,
+    callback: (error: ServiceError | null, response: ValidateDataItemResponse) => void,
+  ): ClientUnaryCall;
+  validateDataItem(
+    request: ValidateDataItemRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: ValidateDataItemResponse) => void,
+  ): ClientUnaryCall;
+  validateDataItem(
+    request: ValidateDataItemRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: ValidateDataItemResponse) => void,
+  ): ClientUnaryCall;
+  summarizeDataBundle(
+    request: SummarizeDataBundleRequest,
+    callback: (error: ServiceError | null, response: SummarizeDataBundleResponse) => void,
+  ): ClientUnaryCall;
+  summarizeDataBundle(
+    request: SummarizeDataBundleRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: SummarizeDataBundleResponse) => void,
+  ): ClientUnaryCall;
+  summarizeDataBundle(
+    request: SummarizeDataBundleRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: SummarizeDataBundleResponse) => void,
+  ): ClientUnaryCall;
+  nextKey(
+    request: NextKeyRequest,
+    callback: (error: ServiceError | null, response: NextKeyResponse) => void,
+  ): ClientUnaryCall;
+  nextKey(
+    request: NextKeyRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: NextKeyResponse) => void,
+  ): ClientUnaryCall;
+  nextKey(
+    request: NextKeyRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: NextKeyResponse) => void,
+  ): ClientUnaryCall;
 }
 
-interface Rpc {
-  request(service: string, method: string, data: Uint8Array): Promise<Uint8Array>;
-}
+export const RuntimeClient = makeGenericClientConstructor(RuntimeService, "Runtime") as unknown as {
+  new (address: string, credentials: ChannelCredentials, options?: Partial<ClientOptions>): RuntimeClient;
+  service: typeof RuntimeService;
+};
 
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
 export type DeepPartial<T> = T extends Builtin ? T
-  : T extends Array<infer U> ? Array<DeepPartial<U>> : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
+  : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
+  : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
   : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 

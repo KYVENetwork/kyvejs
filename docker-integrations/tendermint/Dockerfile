@@ -15,6 +15,5 @@ RUN yarn run build:binaries
 FROM node:slim AS runtime
 WORKDIR /usr/src/app
 COPY --from=appbuild /usr/src/app/out/kyve* ./
-COPY ./tendermint/src/proto/runtime.proto ./src/proto/runtime.proto
 EXPOSE 50051
 CMD ["./kyve-linux-x64"]

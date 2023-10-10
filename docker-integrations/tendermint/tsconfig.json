@@ -7,5 +7,6 @@
     "esModuleInterop": true,
     "resolveJsonModule": true
   },
-  "include": ["src/index.ts", "src/server.ts", "src/proto/*.ts"]
+  "include": ["src/index.ts",
+    "src/server", "src/proto/*.ts"]
 }

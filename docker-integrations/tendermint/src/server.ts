@@ -1,19 +1,6 @@
 import axios from 'axios';
 import * as grpc from '@grpc/grpc-js';
-import * as protoLoader from '@grpc/proto-loader';
-import { DataItem } from './proto/runtime';
-
-const PROTO_PATH = './src/proto/runtime.proto';
-
-const packageDefinition = protoLoader.loadSync(PROTO_PATH, {
-  keepCase: true,
-  longs: String,
-  enums: String,
-  defaults: true,
-  oneofs: true,
-});
-
-const runtimePackage = grpc.loadPackageDefinition(packageDefinition) as any;
+import { DataItem  } from './protos/runtime';
 
 export class TendermintServer {
     async getRuntimeName(

@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "license": "MIT",
   "scripts": {
-    "build": "rimraf dist && yarn export-grpc-stubs && tsc && cp ./src/proto/runtime.proto ./dist",
+    "build": "rimraf dist && tsc",
     "build:binaries": "yarn build && rimraf out && pkg --no-bytecode --public-packages '*' --output out/kyve package.json",
     "start": "node ./dist/src/index.js",
     "format": "prettier --write .",
