@@ -72,7 +72,6 @@ export class TendermintServer {
       callback: grpc.sendUnaryData<{ data_item: DataItem }>
     ) {
       try {
-        console.log(call.request);
         const config = JSON.parse(call.request.config.serialized_config);
         const key = call.request.key;
   
@@ -100,7 +99,6 @@ export class TendermintServer {
           value: JSON.stringify(value),
         };
         
-        console.log(data_item);
         callback(null, { data_item });
       } catch (error: any) {
         callback({

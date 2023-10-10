@@ -40,7 +40,7 @@
     "lint": "lerna run lint",
     "lint:fix": "lerna run lint:fix",
     "custom-version": "yarn lerna version --conventional-commits=false",
-    "export-grpc-stubs": "protoc --plugin=./node_modules/.bin/protoc-gen-ts_proto --ts_proto_opt=snakeToCamel=false --ts_proto_out=. ./proxies/docker/src/proto/runtime.proto"
+    "export-grpc-stubs": "protoc --plugin=./node_modules/.bin/protoc-gen-ts_proto --ts_proto_opt=snakeToCamel=false --ts_proto_opt=outputServices=grpc-js --ts_proto_out=. ./proxies/docker/src/proto/runtime.proto"
   },
 
   "version": "0.0.0"

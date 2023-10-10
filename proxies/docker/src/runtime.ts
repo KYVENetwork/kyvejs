@@ -4,9 +4,10 @@ import * as protoLoader from '@grpc/proto-loader';
 import { 
   GetRuntimeNameResponse, GetRuntimeVersionResponse, ValidateSetConfigResponse,
   GetDataItemResponse, PrevalidateDataItemResponse, TransformDataItemResponse,
-  ValidateDataItemResponse, SummarizeDataBundleResponse, NextKeyResponse
-
+  ValidateDataItemResponse, SummarizeDataBundleResponse, NextKeyResponse,
+  RuntimeServiceClient
  } from './proto/runtime';
+
 
 // config is a serialized string
 type IConfig = string;
@@ -15,7 +16,7 @@ export default class Docker implements IRuntime {
   private static readonly GRPC_URL = 'localhost:50051';
   private static readonly RUNTIME_PROTO_PATH = './src/proto/runtime.proto';
 
-  private grpcClient: any;
+  private grpcClient: RuntimeServiceClient;
 
   public config!: IConfig;
 
@@ -39,7 +40,7 @@ export default class Docker implements IRuntime {
 
   async getName(): Promise<string> {
     return new Promise<string>((resolve, reject) => {
-      this.grpcClient.GetRuntimeName({}, (error: Error | null, runtimeResponse: GetRuntimeNameResponse) => {
+      this.grpcClient.getRuntimeName({}, (error: Error | null, runtimeResponse: GetRuntimeNameResponse) => {
         if (error) {
           reject(error);
         } else {
@@ -51,7 +52,7 @@ export default class Docker implements IRuntime {
 
   async getVersion(): Promise<string> {
     return new Promise<string>((resolve, reject) => {
-      this.grpcClient.GetRuntimeVersion({}, (error: Error | null, runtimeResponse: GetRuntimeVersionResponse) => {
+      this.grpcClient.getRuntimeVersion({}, (error: Error | null, runtimeResponse: GetRuntimeVersionResponse) => {
         if (error) {
           reject(error);
         } else {
@@ -64,7 +65,7 @@ export default class Docker implements IRuntime {
   async validateSetConfig(rawConfig: string): Promise<string> {
     return new Promise<string>((resolve, reject) => {
       console.log(rawConfig);
-      this.grpcClient.ValidateSetConfig(
+      this.grpcClient.validateSetConfig(
         {
           raw_config: rawConfig,
         },
@@ -86,7 +87,7 @@ export default class Docker implements IRuntime {
   async getDataItem(key: string): Promise<DataItem> {
     return new Promise<DataItem>((resolve, reject) => {
       console.log(this.config);
-      this.grpcClient.GetDataItem(
+      this.grpcClient.getDataItem(
         {
           config: {
             serialized_config: this.config,
