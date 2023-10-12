@@ -7,6 +7,8 @@
     "build:binaries": "yarn build && rimraf out && pkg --no-bytecode --public-packages '*' --output out/kyve package.json",
     "start": "node ./dist/src/index.js",
     "format": "prettier --write .",
+    "lint": "eslint . --ignore-path ../../.eslintignore --ext ts --ext tsx --ext js --ext jsx",
+    "lint:fix": "eslint --fix . --ignore-path ../../.eslintignore --ext ts --ext tsx --ext js --ext jsx",
     "export-grpc-stubs": "protoc --plugin=./node_modules/.bin/protoc-gen-ts_proto --ts_proto_opt=snakeToCamel=false --ts_proto_opt=outputServices=grpc-js --ts_proto_out=./src/proto --proto_path=./src/proto runtime.proto",
     "test-build": "yarn build && rimraf out"
   },
