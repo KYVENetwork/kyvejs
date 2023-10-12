@@ -1,12 +1,11 @@
 import { DataItem, IRuntime } from '@kyvejs/protocol';
 import * as grpc from '@grpc/grpc-js';
-import * as protoLoader from '@grpc/proto-loader';
-import { 
+import {
   GetRuntimeNameResponse, GetRuntimeVersionResponse, ValidateSetConfigResponse,
   GetDataItemResponse, PrevalidateDataItemResponse, TransformDataItemResponse,
   ValidateDataItemResponse, SummarizeDataBundleResponse, NextKeyResponse,
-  RuntimeServiceClient
- } from './proto/runtime';
+  RuntimeClient
+ } from './protos/runtime';
 
 
 // config is a serialized string
@@ -14,25 +13,13 @@ type IConfig = string;
 
 export default class Docker implements IRuntime {
   private static readonly GRPC_URL = 'localhost:50051';
-  private static readonly RUNTIME_PROTO_PATH = './src/proto/runtime.proto';
 
-  private grpcClient: RuntimeServiceClient;
+  private grpcClient: RuntimeClient;
 
   public config!: IConfig;
 
   constructor() {
-    // TODO: how to properly start grpc server?
-    const runtimeDef = protoLoader.loadSync(Docker.RUNTIME_PROTO_PATH, {
-      keepCase: true,
-      longs: String,
-      enums: String,
-      defaults: true,
-      oneofs: true,
-    });
-    const RuntimeService = grpc.loadPackageDefinition(runtimeDef)
-      .RuntimeService as any;
-
-    this.grpcClient = new RuntimeService(
+    this.grpcClient = new RuntimeClient(
       Docker.GRPC_URL,
       grpc.credentials.createInsecure()
     );
@@ -75,7 +62,7 @@ export default class Docker implements IRuntime {
             reject(error);
           } else {
             this.config = runtimeResponse.serialized_config;
-  
+
             // Resolve with the correct response
             resolve(runtimeResponse.serialized_config);
           }
@@ -256,10 +243,5 @@ export default class Docker implements IRuntime {
       );
     });
   }
-}
-​function getAllMethods(object:any) {
-  return Object.getOwnPropertyNames(object).filter(function(property) {
-      return typeof object[property] == 'function';
-  });
 }
 
