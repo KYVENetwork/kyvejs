@@ -133,11 +133,6 @@ dist
 .pnp.*
 .DS_Store/
 
-# proto generated code
-.google/
-./**/proto/*.ts
-./**/proto/*.js
-
 ### Node Patch ###
 # Serverless Webpack directories
 .webpack/
