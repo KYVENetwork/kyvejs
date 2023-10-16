@@ -18,6 +18,19 @@ runtimeServer.addService(RuntimeService, {
   nextKey: runtimeService.nextKey,
 });
 
+// Function to handle graceful server shutdown
+const shutdown = () => {
+  console.log('Received shutdown signal. Gracefully stopping server.');
+  runtimeServer.tryShutdown(() => {
+    console.log('Server has been shut down.');
+    process.exit(0);
+  });
+};
+
+// Attach event listeners for SIGINT and SIGTERM
+process.on('SIGINT', shutdown);
+process.on('SIGTERM', shutdown);
+
 runtimeServer.bindAsync(
   "0.0.0.0:50051",
   grpc.ServerCredentials.createInsecure(),
