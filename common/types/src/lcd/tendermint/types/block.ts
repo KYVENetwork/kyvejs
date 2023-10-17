@@ -6,10 +6,10 @@ import { Commit, Data, Header } from "./types";
 export const protobufPackage = "tendermint.types";
 
 export interface Block {
-  header?: Header;
-  data?: Data;
-  evidence?: EvidenceList;
-  last_commit?: Commit;
+  header?: Header | undefined;
+  data?: Data | undefined;
+  evidence?: EvidenceList | undefined;
+  last_commit?: Commit | undefined;
 }
 
 function createBaseBlock(): Block {
@@ -34,28 +34,45 @@ export const Block = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Block {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseBlock();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.header = Header.decode(reader, reader.uint32());
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.data = Data.decode(reader, reader.uint32());
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.evidence = EvidenceList.decode(reader, reader.uint32());
-          break;
+          continue;
         case 4:
+          if (tag !== 34) {
+            break;
+          }
+
           message.last_commit = Commit.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -71,13 +88,23 @@ export const Block = {
 
   toJSON(message: Block): unknown {
     const obj: any = {};
-    message.header !== undefined && (obj.header = message.header ? Header.toJSON(message.header) : undefined);
-    message.data !== undefined && (obj.data = message.data ? Data.toJSON(message.data) : undefined);
-    message.evidence !== undefined &&
-      (obj.evidence = message.evidence ? EvidenceList.toJSON(message.evidence) : undefined);
-    message.last_commit !== undefined &&
-      (obj.last_commit = message.last_commit ? Commit.toJSON(message.last_commit) : undefined);
+    if (message.header !== undefined) {
+      obj.header = Header.toJSON(message.header);
+    }
+    if (message.data !== undefined) {
+      obj.data = Data.toJSON(message.data);
+    }
+    if (message.evidence !== undefined) {
+      obj.evidence = EvidenceList.toJSON(message.evidence);
+    }
+    if (message.last_commit !== undefined) {
+      obj.last_commit = Commit.toJSON(message.last_commit);
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<Block>, I>>(base?: I): Block {
+    return Block.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<Block>, I>>(object: I): Block {

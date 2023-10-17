@@ -32,14 +32,18 @@ export interface FileDescriptorProto {
   enum_type: EnumDescriptorProto[];
   service: ServiceDescriptorProto[];
   extension: FieldDescriptorProto[];
-  options?: FileOptions;
+  options?:
+    | FileOptions
+    | undefined;
   /**
    * This field contains optional information about the original source code.
    * You may safely remove this entire field without harming runtime
    * functionality of the descriptors -- the information is needed only by
    * development tools.
    */
-  source_code_info?: SourceCodeInfo;
+  source_code_info?:
+    | SourceCodeInfo
+    | undefined;
   /**
    * The syntax of the proto file.
    * The supported values are "proto2" and "proto3".
@@ -56,7 +60,7 @@ export interface DescriptorProto {
   enum_type: EnumDescriptorProto[];
   extension_range: DescriptorProto_ExtensionRange[];
   oneof_decl: OneofDescriptorProto[];
-  options?: MessageOptions;
+  options?: MessageOptions | undefined;
   reserved_range: DescriptorProto_ReservedRange[];
   /**
    * Reserved field names, which may not be used by fields in the same message.
@@ -70,7 +74,7 @@ export interface DescriptorProto_ExtensionRange {
   start: number;
   /** Exclusive. */
   end: number;
-  options?: ExtensionRangeOptions;
+  options?: ExtensionRangeOptions | undefined;
 }
 
 /**
@@ -133,7 +137,7 @@ export interface FieldDescriptorProto {
    * it to camelCase.
    */
   json_name: string;
-  options?: FieldOptions;
+  options?: FieldOptions | undefined;
 }
 
 export enum FieldDescriptorProto_Type {
@@ -388,14 +392,16 @@ export function fieldDescriptorProto_LabelToNumber(object: FieldDescriptorProto_
 /** Describes a oneof. */
 export interface OneofDescriptorProto {
   name: string;
-  options?: OneofOptions;
+  options?: OneofOptions | undefined;
 }
 
 /** Describes an enum type. */
 export interface EnumDescriptorProto {
   name: string;
   value: EnumValueDescriptorProto[];
-  options?: EnumOptions;
+  options?:
+    | EnumOptions
+    | undefined;
   /**
    * Range of reserved numeric values. Reserved numeric values may not be used
    * by enum values in the same enum declaration. Reserved ranges may not
@@ -428,14 +434,14 @@ export interface EnumDescriptorProto_EnumReservedRange {
 export interface EnumValueDescriptorProto {
   name: string;
   number: number;
-  options?: EnumValueOptions;
+  options?: EnumValueOptions | undefined;
 }
 
 /** Describes a service. */
 export interface ServiceDescriptorProto {
   name: string;
   method: MethodDescriptorProto[];
-  options?: ServiceOptions;
+  options?: ServiceOptions | undefined;
 }
 
 /** Describes a method of a service. */
@@ -447,7 +453,9 @@ export interface MethodDescriptorProto {
    */
   input_type: string;
   output_type: string;
-  options?: MethodOptions;
+  options?:
+    | MethodOptions
+    | undefined;
   /** Identifies if client streams multiple client messages */
   client_streaming: boolean;
   /** Identifies if server streams multiple server messages */
@@ -1220,19 +1228,24 @@ export const FileDescriptorSet = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): FileDescriptorSet {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseFileDescriptorSet();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.file.push(FileDescriptorProto.decode(reader, reader.uint32()));
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -1243,12 +1256,14 @@ export const FileDescriptorSet = {
 
   toJSON(message: FileDescriptorSet): unknown {
     const obj: any = {};
-    if (message.file) {
-      obj.file = message.file.map((e) => e ? FileDescriptorProto.toJSON(e) : undefined);
-    } else {
-      obj.file = [];
+    if (message.file?.length) {
+      obj.file = message.file.map((e) => FileDescriptorProto.toJSON(e));
     }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<FileDescriptorSet>, I>>(base?: I): FileDescriptorSet {
+    return FileDescriptorSet.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<FileDescriptorSet>, I>>(object: I): FileDescriptorSet {
@@ -1321,66 +1336,121 @@ export const FileDescriptorProto = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): FileDescriptorProto {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseFileDescriptorProto();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.name = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.package = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.dependency.push(reader.string());
-          break;
+          continue;
         case 10:
-          if ((tag & 7) === 2) {
+          if (tag === 80) {
+            message.public_dependency.push(reader.int32());
+
+            continue;
+          }
+
+          if (tag === 82) {
             const end2 = reader.uint32() + reader.pos;
             while (reader.pos < end2) {
               message.public_dependency.push(reader.int32());
             }
-          } else {
-            message.public_dependency.push(reader.int32());
+
+            continue;
           }
+
           break;
         case 11:
-          if ((tag & 7) === 2) {
+          if (tag === 88) {
+            message.weak_dependency.push(reader.int32());
+
+            continue;
+          }
+
+          if (tag === 90) {
             const end2 = reader.uint32() + reader.pos;
             while (reader.pos < end2) {
               message.weak_dependency.push(reader.int32());
             }
-          } else {
-            message.weak_dependency.push(reader.int32());
+
+            continue;
           }
+
           break;
         case 4:
+          if (tag !== 34) {
+            break;
+          }
+
           message.message_type.push(DescriptorProto.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 5:
+          if (tag !== 42) {
+            break;
+          }
+
           message.enum_type.push(EnumDescriptorProto.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 6:
+          if (tag !== 50) {
+            break;
+          }
+
           message.service.push(ServiceDescriptorProto.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 7:
+          if (tag !== 58) {
+            break;
+          }
+
           message.extension.push(FieldDescriptorProto.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 8:
+          if (tag !== 66) {
+            break;
+          }
+
           message.options = FileOptions.decode(reader, reader.uint32());
-          break;
+          continue;
         case 9:
+          if (tag !== 74) {
+            break;
+          }
+
           message.source_code_info = SourceCodeInfo.decode(reader, reader.uint32());
-          break;
+          continue;
         case 12:
+          if (tag !== 98) {
+            break;
+          }
+
           message.syntax = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -1412,48 +1482,47 @@ export const FileDescriptorProto = {
 
   toJSON(message: FileDescriptorProto): unknown {
     const obj: any = {};
-    message.name !== undefined && (obj.name = message.name);
-    message.package !== undefined && (obj.package = message.package);
-    if (message.dependency) {
-      obj.dependency = message.dependency.map((e) => e);
-    } else {
-      obj.dependency = [];
+    if (message.name !== "") {
+      obj.name = message.name;
     }
-    if (message.public_dependency) {
+    if (message.package !== "") {
+      obj.package = message.package;
+    }
+    if (message.dependency?.length) {
+      obj.dependency = message.dependency;
+    }
+    if (message.public_dependency?.length) {
       obj.public_dependency = message.public_dependency.map((e) => Math.round(e));
-    } else {
-      obj.public_dependency = [];
     }
-    if (message.weak_dependency) {
+    if (message.weak_dependency?.length) {
       obj.weak_dependency = message.weak_dependency.map((e) => Math.round(e));
-    } else {
-      obj.weak_dependency = [];
     }
-    if (message.message_type) {
-      obj.message_type = message.message_type.map((e) => e ? DescriptorProto.toJSON(e) : undefined);
-    } else {
-      obj.message_type = [];
+    if (message.message_type?.length) {
+      obj.message_type = message.message_type.map((e) => DescriptorProto.toJSON(e));
     }
-    if (message.enum_type) {
-      obj.enum_type = message.enum_type.map((e) => e ? EnumDescriptorProto.toJSON(e) : undefined);
-    } else {
-      obj.enum_type = [];
+    if (message.enum_type?.length) {
+      obj.enum_type = message.enum_type.map((e) => EnumDescriptorProto.toJSON(e));
     }
-    if (message.service) {
-      obj.service = message.service.map((e) => e ? ServiceDescriptorProto.toJSON(e) : undefined);
-    } else {
-      obj.service = [];
+    if (message.service?.length) {
+      obj.service = message.service.map((e) => ServiceDescriptorProto.toJSON(e));
     }
-    if (message.extension) {
-      obj.extension = message.extension.map((e) => e ? FieldDescriptorProto.toJSON(e) : undefined);
-    } else {
-      obj.extension = [];
+    if (message.extension?.length) {
+      obj.extension = message.extension.map((e) => FieldDescriptorProto.toJSON(e));
     }
-    message.options !== undefined && (obj.options = message.options ? FileOptions.toJSON(message.options) : undefined);
-    message.source_code_info !== undefined &&
-      (obj.source_code_info = message.source_code_info ? SourceCodeInfo.toJSON(message.source_code_info) : undefined);
-    message.syntax !== undefined && (obj.syntax = message.syntax);
+    if (message.options !== undefined) {
+      obj.options = FileOptions.toJSON(message.options);
+    }
+    if (message.source_code_info !== undefined) {
+      obj.source_code_info = SourceCodeInfo.toJSON(message.source_code_info);
+    }
+    if (message.syntax !== "") {
+      obj.syntax = message.syntax;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<FileDescriptorProto>, I>>(base?: I): FileDescriptorProto {
+    return FileDescriptorProto.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<FileDescriptorProto>, I>>(object: I): FileDescriptorProto {
@@ -1529,46 +1598,87 @@ export const DescriptorProto = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): DescriptorProto {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseDescriptorProto();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.name = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.field.push(FieldDescriptorProto.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 6:
+          if (tag !== 50) {
+            break;
+          }
+
           message.extension.push(FieldDescriptorProto.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.nested_type.push(DescriptorProto.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 4:
+          if (tag !== 34) {
+            break;
+          }
+
           message.enum_type.push(EnumDescriptorProto.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 5:
+          if (tag !== 42) {
+            break;
+          }
+
           message.extension_range.push(DescriptorProto_ExtensionRange.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 8:
+          if (tag !== 66) {
+            break;
+          }
+
           message.oneof_decl.push(OneofDescriptorProto.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 7:
+          if (tag !== 58) {
+            break;
+          }
+
           message.options = MessageOptions.decode(reader, reader.uint32());
-          break;
+          continue;
         case 9:
+          if (tag !== 74) {
+            break;
+          }
+
           message.reserved_range.push(DescriptorProto_ReservedRange.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 10:
+          if (tag !== 82) {
+            break;
+          }
+
           message.reserved_name.push(reader.string());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -1604,52 +1714,41 @@ export const DescriptorProto = {
 
   toJSON(message: DescriptorProto): unknown {
     const obj: any = {};
-    message.name !== undefined && (obj.name = message.name);
-    if (message.field) {
-      obj.field = message.field.map((e) => e ? FieldDescriptorProto.toJSON(e) : undefined);
-    } else {
-      obj.field = [];
+    if (message.name !== "") {
+      obj.name = message.name;
     }
-    if (message.extension) {
-      obj.extension = message.extension.map((e) => e ? FieldDescriptorProto.toJSON(e) : undefined);
-    } else {
-      obj.extension = [];
+    if (message.field?.length) {
+      obj.field = message.field.map((e) => FieldDescriptorProto.toJSON(e));
     }
-    if (message.nested_type) {
-      obj.nested_type = message.nested_type.map((e) => e ? DescriptorProto.toJSON(e) : undefined);
-    } else {
-      obj.nested_type = [];
+    if (message.extension?.length) {
+      obj.extension = message.extension.map((e) => FieldDescriptorProto.toJSON(e));
     }
-    if (message.enum_type) {
-      obj.enum_type = message.enum_type.map((e) => e ? EnumDescriptorProto.toJSON(e) : undefined);
-    } else {
-      obj.enum_type = [];
+    if (message.nested_type?.length) {
+      obj.nested_type = message.nested_type.map((e) => DescriptorProto.toJSON(e));
     }
-    if (message.extension_range) {
-      obj.extension_range = message.extension_range.map((e) =>
-        e ? DescriptorProto_ExtensionRange.toJSON(e) : undefined
-      );
-    } else {
-      obj.extension_range = [];
+    if (message.enum_type?.length) {
+      obj.enum_type = message.enum_type.map((e) => EnumDescriptorProto.toJSON(e));
     }
-    if (message.oneof_decl) {
-      obj.oneof_decl = message.oneof_decl.map((e) => e ? OneofDescriptorProto.toJSON(e) : undefined);
-    } else {
-      obj.oneof_decl = [];
+    if (message.extension_range?.length) {
+      obj.extension_range = message.extension_range.map((e) => DescriptorProto_ExtensionRange.toJSON(e));
     }
-    message.options !== undefined &&
-      (obj.options = message.options ? MessageOptions.toJSON(message.options) : undefined);
-    if (message.reserved_range) {
-      obj.reserved_range = message.reserved_range.map((e) => e ? DescriptorProto_ReservedRange.toJSON(e) : undefined);
-    } else {
-      obj.reserved_range = [];
+    if (message.oneof_decl?.length) {
+      obj.oneof_decl = message.oneof_decl.map((e) => OneofDescriptorProto.toJSON(e));
     }
-    if (message.reserved_name) {
-      obj.reserved_name = message.reserved_name.map((e) => e);
-    } else {
-      obj.reserved_name = [];
+    if (message.options !== undefined) {
+      obj.options = MessageOptions.toJSON(message.options);
+    }
+    if (message.reserved_range?.length) {
+      obj.reserved_range = message.reserved_range.map((e) => DescriptorProto_ReservedRange.toJSON(e));
+    }
+    if (message.reserved_name?.length) {
+      obj.reserved_name = message.reserved_name;
     }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<DescriptorProto>, I>>(base?: I): DescriptorProto {
+    return DescriptorProto.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<DescriptorProto>, I>>(object: I): DescriptorProto {
@@ -1689,25 +1788,38 @@ export const DescriptorProto_ExtensionRange = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): DescriptorProto_ExtensionRange {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseDescriptorProto_ExtensionRange();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.start = reader.int32();
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.end = reader.int32();
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.options = ExtensionRangeOptions.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -1722,11 +1834,20 @@ export const DescriptorProto_ExtensionRange = {
 
   toJSON(message: DescriptorProto_ExtensionRange): unknown {
     const obj: any = {};
-    message.start !== undefined && (obj.start = Math.round(message.start));
-    message.end !== undefined && (obj.end = Math.round(message.end));
-    message.options !== undefined &&
-      (obj.options = message.options ? ExtensionRangeOptions.toJSON(message.options) : undefined);
+    if (message.start !== 0) {
+      obj.start = Math.round(message.start);
+    }
+    if (message.end !== 0) {
+      obj.end = Math.round(message.end);
+    }
+    if (message.options !== undefined) {
+      obj.options = ExtensionRangeOptions.toJSON(message.options);
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<DescriptorProto_ExtensionRange>, I>>(base?: I): DescriptorProto_ExtensionRange {
+    return DescriptorProto_ExtensionRange.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<DescriptorProto_ExtensionRange>, I>>(
@@ -1758,22 +1879,31 @@ export const DescriptorProto_ReservedRange = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): DescriptorProto_ReservedRange {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseDescriptorProto_ReservedRange();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.start = reader.int32();
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.end = reader.int32();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -1784,9 +1914,17 @@ export const DescriptorProto_ReservedRange = {
 
   toJSON(message: DescriptorProto_ReservedRange): unknown {
     const obj: any = {};
-    message.start !== undefined && (obj.start = Math.round(message.start));
-    message.end !== undefined && (obj.end = Math.round(message.end));
+    if (message.start !== 0) {
+      obj.start = Math.round(message.start);
+    }
+    if (message.end !== 0) {
+      obj.end = Math.round(message.end);
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<DescriptorProto_ReservedRange>, I>>(base?: I): DescriptorProto_ReservedRange {
+    return DescriptorProto_ReservedRange.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<DescriptorProto_ReservedRange>, I>>(
@@ -1812,19 +1950,24 @@ export const ExtensionRangeOptions = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): ExtensionRangeOptions {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseExtensionRangeOptions();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 999:
+          if (tag !== 7994) {
+            break;
+          }
+
           message.uninterpreted_option.push(UninterpretedOption.decode(reader, reader.uint32()));
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -1839,12 +1982,14 @@ export const ExtensionRangeOptions = {
 
   toJSON(message: ExtensionRangeOptions): unknown {
     const obj: any = {};
-    if (message.uninterpreted_option) {
-      obj.uninterpreted_option = message.uninterpreted_option.map((e) => e ? UninterpretedOption.toJSON(e) : undefined);
-    } else {
-      obj.uninterpreted_option = [];
+    if (message.uninterpreted_option?.length) {
+      obj.uninterpreted_option = message.uninterpreted_option.map((e) => UninterpretedOption.toJSON(e));
     }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ExtensionRangeOptions>, I>>(base?: I): ExtensionRangeOptions {
+    return ExtensionRangeOptions.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<ExtensionRangeOptions>, I>>(object: I): ExtensionRangeOptions {
@@ -1905,46 +2050,87 @@ export const FieldDescriptorProto = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): FieldDescriptorProto {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseFieldDescriptorProto();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.name = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag !== 24) {
+            break;
+          }
+
           message.number = reader.int32();
-          break;
+          continue;
         case 4:
+          if (tag !== 32) {
+            break;
+          }
+
           message.label = fieldDescriptorProto_LabelFromJSON(reader.int32());
-          break;
+          continue;
         case 5:
+          if (tag !== 40) {
+            break;
+          }
+
           message.type = fieldDescriptorProto_TypeFromJSON(reader.int32());
-          break;
+          continue;
         case 6:
+          if (tag !== 50) {
+            break;
+          }
+
           message.type_name = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.extendee = reader.string();
-          break;
+          continue;
         case 7:
+          if (tag !== 58) {
+            break;
+          }
+
           message.default_value = reader.string();
-          break;
+          continue;
         case 9:
+          if (tag !== 72) {
+            break;
+          }
+
           message.oneof_index = reader.int32();
-          break;
+          continue;
         case 10:
+          if (tag !== 82) {
+            break;
+          }
+
           message.json_name = reader.string();
-          break;
+          continue;
         case 8:
+          if (tag !== 66) {
+            break;
+          }
+
           message.options = FieldOptions.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -1968,17 +2154,41 @@ export const FieldDescriptorProto = {
 
   toJSON(message: FieldDescriptorProto): unknown {
     const obj: any = {};
-    message.name !== undefined && (obj.name = message.name);
-    message.number !== undefined && (obj.number = Math.round(message.number));
-    message.label !== undefined && (obj.label = fieldDescriptorProto_LabelToJSON(message.label));
-    message.type !== undefined && (obj.type = fieldDescriptorProto_TypeToJSON(message.type));
-    message.type_name !== undefined && (obj.type_name = message.type_name);
-    message.extendee !== undefined && (obj.extendee = message.extendee);
-    message.default_value !== undefined && (obj.default_value = message.default_value);
-    message.oneof_index !== undefined && (obj.oneof_index = Math.round(message.oneof_index));
-    message.json_name !== undefined && (obj.json_name = message.json_name);
-    message.options !== undefined && (obj.options = message.options ? FieldOptions.toJSON(message.options) : undefined);
+    if (message.name !== "") {
+      obj.name = message.name;
+    }
+    if (message.number !== 0) {
+      obj.number = Math.round(message.number);
+    }
+    if (message.label !== FieldDescriptorProto_Label.LABEL_OPTIONAL) {
+      obj.label = fieldDescriptorProto_LabelToJSON(message.label);
+    }
+    if (message.type !== FieldDescriptorProto_Type.TYPE_DOUBLE) {
+      obj.type = fieldDescriptorProto_TypeToJSON(message.type);
+    }
+    if (message.type_name !== "") {
+      obj.type_name = message.type_name;
+    }
+    if (message.extendee !== "") {
+      obj.extendee = message.extendee;
+    }
+    if (message.default_value !== "") {
+      obj.default_value = message.default_value;
+    }
+    if (message.oneof_index !== 0) {
+      obj.oneof_index = Math.round(message.oneof_index);
+    }
+    if (message.json_name !== "") {
+      obj.json_name = message.json_name;
+    }
+    if (message.options !== undefined) {
+      obj.options = FieldOptions.toJSON(message.options);
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<FieldDescriptorProto>, I>>(base?: I): FieldDescriptorProto {
+    return FieldDescriptorProto.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<FieldDescriptorProto>, I>>(object: I): FieldDescriptorProto {
@@ -2015,22 +2225,31 @@ export const OneofDescriptorProto = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): OneofDescriptorProto {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseOneofDescriptorProto();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.name = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.options = OneofOptions.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -2044,9 +2263,17 @@ export const OneofDescriptorProto = {
 
   toJSON(message: OneofDescriptorProto): unknown {
     const obj: any = {};
-    message.name !== undefined && (obj.name = message.name);
-    message.options !== undefined && (obj.options = message.options ? OneofOptions.toJSON(message.options) : undefined);
+    if (message.name !== "") {
+      obj.name = message.name;
+    }
+    if (message.options !== undefined) {
+      obj.options = OneofOptions.toJSON(message.options);
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<OneofDescriptorProto>, I>>(base?: I): OneofDescriptorProto {
+    return OneofDescriptorProto.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<OneofDescriptorProto>, I>>(object: I): OneofDescriptorProto {
@@ -2084,31 +2311,52 @@ export const EnumDescriptorProto = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EnumDescriptorProto {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEnumDescriptorProto();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.name = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.value.push(EnumValueDescriptorProto.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.options = EnumOptions.decode(reader, reader.uint32());
-          break;
+          continue;
         case 4:
+          if (tag !== 34) {
+            break;
+          }
+
           message.reserved_range.push(EnumDescriptorProto_EnumReservedRange.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 5:
+          if (tag !== 42) {
+            break;
+          }
+
           message.reserved_name.push(reader.string());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -2127,26 +2375,26 @@ export const EnumDescriptorProto = {
 
   toJSON(message: EnumDescriptorProto): unknown {
     const obj: any = {};
-    message.name !== undefined && (obj.name = message.name);
-    if (message.value) {
-      obj.value = message.value.map((e) => e ? EnumValueDescriptorProto.toJSON(e) : undefined);
-    } else {
-      obj.value = [];
+    if (message.name !== "") {
+      obj.name = message.name;
     }
-    message.options !== undefined && (obj.options = message.options ? EnumOptions.toJSON(message.options) : undefined);
-    if (message.reserved_range) {
-      obj.reserved_range = message.reserved_range.map((e) =>
-        e ? EnumDescriptorProto_EnumReservedRange.toJSON(e) : undefined
-      );
-    } else {
-      obj.reserved_range = [];
+    if (message.value?.length) {
+      obj.value = message.value.map((e) => EnumValueDescriptorProto.toJSON(e));
     }
-    if (message.reserved_name) {
-      obj.reserved_name = message.reserved_name.map((e) => e);
-    } else {
-      obj.reserved_name = [];
+    if (message.options !== undefined) {
+      obj.options = EnumOptions.toJSON(message.options);
+    }
+    if (message.reserved_range?.length) {
+      obj.reserved_range = message.reserved_range.map((e) => EnumDescriptorProto_EnumReservedRange.toJSON(e));
+    }
+    if (message.reserved_name?.length) {
+      obj.reserved_name = message.reserved_name;
     }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<EnumDescriptorProto>, I>>(base?: I): EnumDescriptorProto {
+    return EnumDescriptorProto.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<EnumDescriptorProto>, I>>(object: I): EnumDescriptorProto {
@@ -2179,22 +2427,31 @@ export const EnumDescriptorProto_EnumReservedRange = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EnumDescriptorProto_EnumReservedRange {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEnumDescriptorProto_EnumReservedRange();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.start = reader.int32();
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.end = reader.int32();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -2205,9 +2462,19 @@ export const EnumDescriptorProto_EnumReservedRange = {
 
   toJSON(message: EnumDescriptorProto_EnumReservedRange): unknown {
     const obj: any = {};
-    message.start !== undefined && (obj.start = Math.round(message.start));
-    message.end !== undefined && (obj.end = Math.round(message.end));
+    if (message.start !== 0) {
+      obj.start = Math.round(message.start);
+    }
+    if (message.end !== 0) {
+      obj.end = Math.round(message.end);
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<EnumDescriptorProto_EnumReservedRange>, I>>(
+    base?: I,
+  ): EnumDescriptorProto_EnumReservedRange {
+    return EnumDescriptorProto_EnumReservedRange.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<EnumDescriptorProto_EnumReservedRange>, I>>(
@@ -2239,25 +2506,38 @@ export const EnumValueDescriptorProto = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EnumValueDescriptorProto {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEnumValueDescriptorProto();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.name = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.number = reader.int32();
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.options = EnumValueOptions.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -2272,11 +2552,20 @@ export const EnumValueDescriptorProto = {
 
   toJSON(message: EnumValueDescriptorProto): unknown {
     const obj: any = {};
-    message.name !== undefined && (obj.name = message.name);
-    message.number !== undefined && (obj.number = Math.round(message.number));
-    message.options !== undefined &&
-      (obj.options = message.options ? EnumValueOptions.toJSON(message.options) : undefined);
+    if (message.name !== "") {
+      obj.name = message.name;
+    }
+    if (message.number !== 0) {
+      obj.number = Math.round(message.number);
+    }
+    if (message.options !== undefined) {
+      obj.options = EnumValueOptions.toJSON(message.options);
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<EnumValueDescriptorProto>, I>>(base?: I): EnumValueDescriptorProto {
+    return EnumValueDescriptorProto.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<EnumValueDescriptorProto>, I>>(object: I): EnumValueDescriptorProto {
@@ -2309,25 +2598,38 @@ export const ServiceDescriptorProto = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): ServiceDescriptorProto {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseServiceDescriptorProto();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.name = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.method.push(MethodDescriptorProto.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.options = ServiceOptions.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -2342,15 +2644,20 @@ export const ServiceDescriptorProto = {
 
   toJSON(message: ServiceDescriptorProto): unknown {
     const obj: any = {};
-    message.name !== undefined && (obj.name = message.name);
-    if (message.method) {
-      obj.method = message.method.map((e) => e ? MethodDescriptorProto.toJSON(e) : undefined);
-    } else {
-      obj.method = [];
+    if (message.name !== "") {
+      obj.name = message.name;
     }
-    message.options !== undefined &&
-      (obj.options = message.options ? ServiceOptions.toJSON(message.options) : undefined);
+    if (message.method?.length) {
+      obj.method = message.method.map((e) => MethodDescriptorProto.toJSON(e));
+    }
+    if (message.options !== undefined) {
+      obj.options = ServiceOptions.toJSON(message.options);
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ServiceDescriptorProto>, I>>(base?: I): ServiceDescriptorProto {
+    return ServiceDescriptorProto.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<ServiceDescriptorProto>, I>>(object: I): ServiceDescriptorProto {
@@ -2399,34 +2706,59 @@ export const MethodDescriptorProto = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MethodDescriptorProto {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMethodDescriptorProto();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.name = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.input_type = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.output_type = reader.string();
-          break;
+          continue;
         case 4:
+          if (tag !== 34) {
+            break;
+          }
+
           message.options = MethodOptions.decode(reader, reader.uint32());
-          break;
+          continue;
         case 5:
+          if (tag !== 40) {
+            break;
+          }
+
           message.client_streaming = reader.bool();
-          break;
+          continue;
         case 6:
+          if (tag !== 48) {
+            break;
+          }
+
           message.server_streaming = reader.bool();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -2444,14 +2776,29 @@ export const MethodDescriptorProto = {
 
   toJSON(message: MethodDescriptorProto): unknown {
     const obj: any = {};
-    message.name !== undefined && (obj.name = message.name);
-    message.input_type !== undefined && (obj.input_type = message.input_type);
-    message.output_type !== undefined && (obj.output_type = message.output_type);
-    message.options !== undefined &&
-      (obj.options = message.options ? MethodOptions.toJSON(message.options) : undefined);
-    message.client_streaming !== undefined && (obj.client_streaming = message.client_streaming);
-    message.server_streaming !== undefined && (obj.server_streaming = message.server_streaming);
+    if (message.name !== "") {
+      obj.name = message.name;
+    }
+    if (message.input_type !== "") {
+      obj.input_type = message.input_type;
+    }
+    if (message.output_type !== "") {
+      obj.output_type = message.output_type;
+    }
+    if (message.options !== undefined) {
+      obj.options = MethodOptions.toJSON(message.options);
+    }
+    if (message.client_streaming === true) {
+      obj.client_streaming = message.client_streaming;
+    }
+    if (message.server_streaming === true) {
+      obj.server_streaming = message.server_streaming;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MethodDescriptorProto>, I>>(base?: I): MethodDescriptorProto {
+    return MethodDescriptorProto.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<MethodDescriptorProto>, I>>(object: I): MethodDescriptorProto {
@@ -2563,79 +2910,164 @@ export const FileOptions = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): FileOptions {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseFileOptions();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.java_package = reader.string();
-          break;
+          continue;
         case 8:
+          if (tag !== 66) {
+            break;
+          }
+
           message.java_outer_classname = reader.string();
-          break;
+          continue;
         case 10:
+          if (tag !== 80) {
+            break;
+          }
+
           message.java_multiple_files = reader.bool();
-          break;
+          continue;
         case 20:
+          if (tag !== 160) {
+            break;
+          }
+
           message.java_generate_equals_and_hash = reader.bool();
-          break;
+          continue;
         case 27:
+          if (tag !== 216) {
+            break;
+          }
+
           message.java_string_check_utf8 = reader.bool();
-          break;
+          continue;
         case 9:
+          if (tag !== 72) {
+            break;
+          }
+
           message.optimize_for = fileOptions_OptimizeModeFromJSON(reader.int32());
-          break;
+          continue;
         case 11:
+          if (tag !== 90) {
+            break;
+          }
+
           message.go_package = reader.string();
-          break;
+          continue;
         case 16:
+          if (tag !== 128) {
+            break;
+          }
+
           message.cc_generic_services = reader.bool();
-          break;
+          continue;
         case 17:
+          if (tag !== 136) {
+            break;
+          }
+
           message.java_generic_services = reader.bool();
-          break;
+          continue;
         case 18:
+          if (tag !== 144) {
+            break;
+          }
+
           message.py_generic_services = reader.bool();
-          break;
+          continue;
         case 42:
+          if (tag !== 336) {
+            break;
+          }
+
           message.php_generic_services = reader.bool();
-          break;
+          continue;
         case 23:
+          if (tag !== 184) {
+            break;
+          }
+
           message.deprecated = reader.bool();
-          break;
+          continue;
         case 31:
+          if (tag !== 248) {
+            break;
+          }
+
           message.cc_enable_arenas = reader.bool();
-          break;
+          continue;
         case 36:
+          if (tag !== 290) {
+            break;
+          }
+
           message.objc_class_prefix = reader.string();
-          break;
+          continue;
         case 37:
+          if (tag !== 298) {
+            break;
+          }
+
           message.csharp_namespace = reader.string();
-          break;
+          continue;
         case 39:
+          if (tag !== 314) {
+            break;
+          }
+
           message.swift_prefix = reader.string();
-          break;
+          continue;
         case 40:
+          if (tag !== 322) {
+            break;
+          }
+
           message.php_class_prefix = reader.string();
-          break;
+          continue;
         case 41:
+          if (tag !== 330) {
+            break;
+          }
+
           message.php_namespace = reader.string();
-          break;
+          continue;
         case 44:
+          if (tag !== 354) {
+            break;
+          }
+
           message.php_metadata_namespace = reader.string();
-          break;
+          continue;
         case 45:
+          if (tag !== 362) {
+            break;
+          }
+
           message.ruby_package = reader.string();
-          break;
+          continue;
         case 999:
+          if (tag !== 7994) {
+            break;
+          }
+
           message.uninterpreted_option.push(UninterpretedOption.decode(reader, reader.uint32()));
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -2674,33 +3106,74 @@ export const FileOptions = {
 
   toJSON(message: FileOptions): unknown {
     const obj: any = {};
-    message.java_package !== undefined && (obj.java_package = message.java_package);
-    message.java_outer_classname !== undefined && (obj.java_outer_classname = message.java_outer_classname);
-    message.java_multiple_files !== undefined && (obj.java_multiple_files = message.java_multiple_files);
-    message.java_generate_equals_and_hash !== undefined &&
-      (obj.java_generate_equals_and_hash = message.java_generate_equals_and_hash);
-    message.java_string_check_utf8 !== undefined && (obj.java_string_check_utf8 = message.java_string_check_utf8);
-    message.optimize_for !== undefined && (obj.optimize_for = fileOptions_OptimizeModeToJSON(message.optimize_for));
-    message.go_package !== undefined && (obj.go_package = message.go_package);
-    message.cc_generic_services !== undefined && (obj.cc_generic_services = message.cc_generic_services);
-    message.java_generic_services !== undefined && (obj.java_generic_services = message.java_generic_services);
-    message.py_generic_services !== undefined && (obj.py_generic_services = message.py_generic_services);
-    message.php_generic_services !== undefined && (obj.php_generic_services = message.php_generic_services);
-    message.deprecated !== undefined && (obj.deprecated = message.deprecated);
-    message.cc_enable_arenas !== undefined && (obj.cc_enable_arenas = message.cc_enable_arenas);
-    message.objc_class_prefix !== undefined && (obj.objc_class_prefix = message.objc_class_prefix);
-    message.csharp_namespace !== undefined && (obj.csharp_namespace = message.csharp_namespace);
-    message.swift_prefix !== undefined && (obj.swift_prefix = message.swift_prefix);
-    message.php_class_prefix !== undefined && (obj.php_class_prefix = message.php_class_prefix);
-    message.php_namespace !== undefined && (obj.php_namespace = message.php_namespace);
-    message.php_metadata_namespace !== undefined && (obj.php_metadata_namespace = message.php_metadata_namespace);
-    message.ruby_package !== undefined && (obj.ruby_package = message.ruby_package);
-    if (message.uninterpreted_option) {
-      obj.uninterpreted_option = message.uninterpreted_option.map((e) => e ? UninterpretedOption.toJSON(e) : undefined);
-    } else {
-      obj.uninterpreted_option = [];
+    if (message.java_package !== "") {
+      obj.java_package = message.java_package;
+    }
+    if (message.java_outer_classname !== "") {
+      obj.java_outer_classname = message.java_outer_classname;
+    }
+    if (message.java_multiple_files === true) {
+      obj.java_multiple_files = message.java_multiple_files;
+    }
+    if (message.java_generate_equals_and_hash === true) {
+      obj.java_generate_equals_and_hash = message.java_generate_equals_and_hash;
+    }
+    if (message.java_string_check_utf8 === true) {
+      obj.java_string_check_utf8 = message.java_string_check_utf8;
+    }
+    if (message.optimize_for !== FileOptions_OptimizeMode.SPEED) {
+      obj.optimize_for = fileOptions_OptimizeModeToJSON(message.optimize_for);
+    }
+    if (message.go_package !== "") {
+      obj.go_package = message.go_package;
+    }
+    if (message.cc_generic_services === true) {
+      obj.cc_generic_services = message.cc_generic_services;
+    }
+    if (message.java_generic_services === true) {
+      obj.java_generic_services = message.java_generic_services;
+    }
+    if (message.py_generic_services === true) {
+      obj.py_generic_services = message.py_generic_services;
+    }
+    if (message.php_generic_services === true) {
+      obj.php_generic_services = message.php_generic_services;
+    }
+    if (message.deprecated === true) {
+      obj.deprecated = message.deprecated;
+    }
+    if (message.cc_enable_arenas === true) {
+      obj.cc_enable_arenas = message.cc_enable_arenas;
+    }
+    if (message.objc_class_prefix !== "") {
+      obj.objc_class_prefix = message.objc_class_prefix;
+    }
+    if (message.csharp_namespace !== "") {
+      obj.csharp_namespace = message.csharp_namespace;
+    }
+    if (message.swift_prefix !== "") {
+      obj.swift_prefix = message.swift_prefix;
+    }
+    if (message.php_class_prefix !== "") {
+      obj.php_class_prefix = message.php_class_prefix;
+    }
+    if (message.php_namespace !== "") {
+      obj.php_namespace = message.php_namespace;
+    }
+    if (message.php_metadata_namespace !== "") {
+      obj.php_metadata_namespace = message.php_metadata_namespace;
+    }
+    if (message.ruby_package !== "") {
+      obj.ruby_package = message.ruby_package;
+    }
+    if (message.uninterpreted_option?.length) {
+      obj.uninterpreted_option = message.uninterpreted_option.map((e) => UninterpretedOption.toJSON(e));
     }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<FileOptions>, I>>(base?: I): FileOptions {
+    return FileOptions.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<FileOptions>, I>>(object: I): FileOptions {
@@ -2761,31 +3234,52 @@ export const MessageOptions = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MessageOptions {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMessageOptions();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.message_set_wire_format = reader.bool();
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.no_standard_descriptor_accessor = reader.bool();
-          break;
+          continue;
         case 3:
+          if (tag !== 24) {
+            break;
+          }
+
           message.deprecated = reader.bool();
-          break;
+          continue;
         case 7:
+          if (tag !== 56) {
+            break;
+          }
+
           message.map_entry = reader.bool();
-          break;
+          continue;
         case 999:
+          if (tag !== 7994) {
+            break;
+          }
+
           message.uninterpreted_option.push(UninterpretedOption.decode(reader, reader.uint32()));
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -2806,17 +3300,26 @@ export const MessageOptions = {
 
   toJSON(message: MessageOptions): unknown {
     const obj: any = {};
-    message.message_set_wire_format !== undefined && (obj.message_set_wire_format = message.message_set_wire_format);
-    message.no_standard_descriptor_accessor !== undefined &&
-      (obj.no_standard_descriptor_accessor = message.no_standard_descriptor_accessor);
-    message.deprecated !== undefined && (obj.deprecated = message.deprecated);
-    message.map_entry !== undefined && (obj.map_entry = message.map_entry);
-    if (message.uninterpreted_option) {
-      obj.uninterpreted_option = message.uninterpreted_option.map((e) => e ? UninterpretedOption.toJSON(e) : undefined);
-    } else {
-      obj.uninterpreted_option = [];
+    if (message.message_set_wire_format === true) {
+      obj.message_set_wire_format = message.message_set_wire_format;
+    }
+    if (message.no_standard_descriptor_accessor === true) {
+      obj.no_standard_descriptor_accessor = message.no_standard_descriptor_accessor;
+    }
+    if (message.deprecated === true) {
+      obj.deprecated = message.deprecated;
+    }
+    if (message.map_entry === true) {
+      obj.map_entry = message.map_entry;
+    }
+    if (message.uninterpreted_option?.length) {
+      obj.uninterpreted_option = message.uninterpreted_option.map((e) => UninterpretedOption.toJSON(e));
     }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MessageOptions>, I>>(base?: I): MessageOptions {
+    return MessageOptions.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<MessageOptions>, I>>(object: I): MessageOptions {
@@ -2869,37 +3372,66 @@ export const FieldOptions = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): FieldOptions {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseFieldOptions();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.ctype = fieldOptions_CTypeFromJSON(reader.int32());
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.packed = reader.bool();
-          break;
+          continue;
         case 6:
+          if (tag !== 48) {
+            break;
+          }
+
           message.jstype = fieldOptions_JSTypeFromJSON(reader.int32());
-          break;
+          continue;
         case 5:
+          if (tag !== 40) {
+            break;
+          }
+
           message.lazy = reader.bool();
-          break;
+          continue;
         case 3:
+          if (tag !== 24) {
+            break;
+          }
+
           message.deprecated = reader.bool();
-          break;
+          continue;
         case 10:
+          if (tag !== 80) {
+            break;
+          }
+
           message.weak = reader.bool();
-          break;
+          continue;
         case 999:
+          if (tag !== 7994) {
+            break;
+          }
+
           message.uninterpreted_option.push(UninterpretedOption.decode(reader, reader.uint32()));
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -2920,18 +3452,32 @@ export const FieldOptions = {
 
   toJSON(message: FieldOptions): unknown {
     const obj: any = {};
-    message.ctype !== undefined && (obj.ctype = fieldOptions_CTypeToJSON(message.ctype));
-    message.packed !== undefined && (obj.packed = message.packed);
-    message.jstype !== undefined && (obj.jstype = fieldOptions_JSTypeToJSON(message.jstype));
-    message.lazy !== undefined && (obj.lazy = message.lazy);
-    message.deprecated !== undefined && (obj.deprecated = message.deprecated);
-    message.weak !== undefined && (obj.weak = message.weak);
-    if (message.uninterpreted_option) {
-      obj.uninterpreted_option = message.uninterpreted_option.map((e) => e ? UninterpretedOption.toJSON(e) : undefined);
-    } else {
-      obj.uninterpreted_option = [];
+    if (message.ctype !== FieldOptions_CType.STRING) {
+      obj.ctype = fieldOptions_CTypeToJSON(message.ctype);
+    }
+    if (message.packed === true) {
+      obj.packed = message.packed;
+    }
+    if (message.jstype !== FieldOptions_JSType.JS_NORMAL) {
+      obj.jstype = fieldOptions_JSTypeToJSON(message.jstype);
+    }
+    if (message.lazy === true) {
+      obj.lazy = message.lazy;
+    }
+    if (message.deprecated === true) {
+      obj.deprecated = message.deprecated;
+    }
+    if (message.weak === true) {
+      obj.weak = message.weak;
+    }
+    if (message.uninterpreted_option?.length) {
+      obj.uninterpreted_option = message.uninterpreted_option.map((e) => UninterpretedOption.toJSON(e));
     }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<FieldOptions>, I>>(base?: I): FieldOptions {
+    return FieldOptions.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<FieldOptions>, I>>(object: I): FieldOptions {
@@ -2960,19 +3506,24 @@ export const OneofOptions = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): OneofOptions {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseOneofOptions();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 999:
+          if (tag !== 7994) {
+            break;
+          }
+
           message.uninterpreted_option.push(UninterpretedOption.decode(reader, reader.uint32()));
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -2987,12 +3538,14 @@ export const OneofOptions = {
 
   toJSON(message: OneofOptions): unknown {
     const obj: any = {};
-    if (message.uninterpreted_option) {
-      obj.uninterpreted_option = message.uninterpreted_option.map((e) => e ? UninterpretedOption.toJSON(e) : undefined);
-    } else {
-      obj.uninterpreted_option = [];
+    if (message.uninterpreted_option?.length) {
+      obj.uninterpreted_option = message.uninterpreted_option.map((e) => UninterpretedOption.toJSON(e));
     }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<OneofOptions>, I>>(base?: I): OneofOptions {
+    return OneofOptions.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<OneofOptions>, I>>(object: I): OneofOptions {
@@ -3021,25 +3574,38 @@ export const EnumOptions = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EnumOptions {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEnumOptions();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.allow_alias = reader.bool();
-          break;
+          continue;
         case 3:
+          if (tag !== 24) {
+            break;
+          }
+
           message.deprecated = reader.bool();
-          break;
+          continue;
         case 999:
+          if (tag !== 7994) {
+            break;
+          }
+
           message.uninterpreted_option.push(UninterpretedOption.decode(reader, reader.uint32()));
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -3056,14 +3622,20 @@ export const EnumOptions = {
 
   toJSON(message: EnumOptions): unknown {
     const obj: any = {};
-    message.allow_alias !== undefined && (obj.allow_alias = message.allow_alias);
-    message.deprecated !== undefined && (obj.deprecated = message.deprecated);
-    if (message.uninterpreted_option) {
-      obj.uninterpreted_option = message.uninterpreted_option.map((e) => e ? UninterpretedOption.toJSON(e) : undefined);
-    } else {
-      obj.uninterpreted_option = [];
+    if (message.allow_alias === true) {
+      obj.allow_alias = message.allow_alias;
+    }
+    if (message.deprecated === true) {
+      obj.deprecated = message.deprecated;
+    }
+    if (message.uninterpreted_option?.length) {
+      obj.uninterpreted_option = message.uninterpreted_option.map((e) => UninterpretedOption.toJSON(e));
     }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<EnumOptions>, I>>(base?: I): EnumOptions {
+    return EnumOptions.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<EnumOptions>, I>>(object: I): EnumOptions {
@@ -3091,22 +3663,31 @@ export const EnumValueOptions = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EnumValueOptions {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEnumValueOptions();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.deprecated = reader.bool();
-          break;
+          continue;
         case 999:
+          if (tag !== 7994) {
+            break;
+          }
+
           message.uninterpreted_option.push(UninterpretedOption.decode(reader, reader.uint32()));
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -3122,13 +3703,17 @@ export const EnumValueOptions = {
 
   toJSON(message: EnumValueOptions): unknown {
     const obj: any = {};
-    message.deprecated !== undefined && (obj.deprecated = message.deprecated);
-    if (message.uninterpreted_option) {
-      obj.uninterpreted_option = message.uninterpreted_option.map((e) => e ? UninterpretedOption.toJSON(e) : undefined);
-    } else {
-      obj.uninterpreted_option = [];
+    if (message.deprecated === true) {
+      obj.deprecated = message.deprecated;
+    }
+    if (message.uninterpreted_option?.length) {
+      obj.uninterpreted_option = message.uninterpreted_option.map((e) => UninterpretedOption.toJSON(e));
     }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<EnumValueOptions>, I>>(base?: I): EnumValueOptions {
+    return EnumValueOptions.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<EnumValueOptions>, I>>(object: I): EnumValueOptions {
@@ -3155,22 +3740,31 @@ export const ServiceOptions = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): ServiceOptions {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseServiceOptions();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 33:
+          if (tag !== 264) {
+            break;
+          }
+
           message.deprecated = reader.bool();
-          break;
+          continue;
         case 999:
+          if (tag !== 7994) {
+            break;
+          }
+
           message.uninterpreted_option.push(UninterpretedOption.decode(reader, reader.uint32()));
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -3186,13 +3780,17 @@ export const ServiceOptions = {
 
   toJSON(message: ServiceOptions): unknown {
     const obj: any = {};
-    message.deprecated !== undefined && (obj.deprecated = message.deprecated);
-    if (message.uninterpreted_option) {
-      obj.uninterpreted_option = message.uninterpreted_option.map((e) => e ? UninterpretedOption.toJSON(e) : undefined);
-    } else {
-      obj.uninterpreted_option = [];
+    if (message.deprecated === true) {
+      obj.deprecated = message.deprecated;
+    }
+    if (message.uninterpreted_option?.length) {
+      obj.uninterpreted_option = message.uninterpreted_option.map((e) => UninterpretedOption.toJSON(e));
     }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ServiceOptions>, I>>(base?: I): ServiceOptions {
+    return ServiceOptions.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<ServiceOptions>, I>>(object: I): ServiceOptions {
@@ -3226,25 +3824,38 @@ export const MethodOptions = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MethodOptions {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMethodOptions();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 33:
+          if (tag !== 264) {
+            break;
+          }
+
           message.deprecated = reader.bool();
-          break;
+          continue;
         case 34:
+          if (tag !== 272) {
+            break;
+          }
+
           message.idempotency_level = methodOptions_IdempotencyLevelFromJSON(reader.int32());
-          break;
+          continue;
         case 999:
+          if (tag !== 7994) {
+            break;
+          }
+
           message.uninterpreted_option.push(UninterpretedOption.decode(reader, reader.uint32()));
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -3263,15 +3874,20 @@ export const MethodOptions = {
 
   toJSON(message: MethodOptions): unknown {
     const obj: any = {};
-    message.deprecated !== undefined && (obj.deprecated = message.deprecated);
-    message.idempotency_level !== undefined &&
-      (obj.idempotency_level = methodOptions_IdempotencyLevelToJSON(message.idempotency_level));
-    if (message.uninterpreted_option) {
-      obj.uninterpreted_option = message.uninterpreted_option.map((e) => e ? UninterpretedOption.toJSON(e) : undefined);
-    } else {
-      obj.uninterpreted_option = [];
+    if (message.deprecated === true) {
+      obj.deprecated = message.deprecated;
+    }
+    if (message.idempotency_level !== MethodOptions_IdempotencyLevel.IDEMPOTENCY_UNKNOWN) {
+      obj.idempotency_level = methodOptions_IdempotencyLevelToJSON(message.idempotency_level);
+    }
+    if (message.uninterpreted_option?.length) {
+      obj.uninterpreted_option = message.uninterpreted_option.map((e) => UninterpretedOption.toJSON(e));
     }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MethodOptions>, I>>(base?: I): MethodOptions {
+    return MethodOptions.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<MethodOptions>, I>>(object: I): MethodOptions {
@@ -3290,7 +3906,7 @@ function createBaseUninterpretedOption(): UninterpretedOption {
     positive_int_value: "0",
     negative_int_value: "0",
     double_value: 0,
-    string_value: new Uint8Array(),
+    string_value: new Uint8Array(0),
     aggregate_value: "",
   };
 }
@@ -3322,37 +3938,66 @@ export const UninterpretedOption = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): UninterpretedOption {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseUninterpretedOption();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.name.push(UninterpretedOption_NamePart.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.identifier_value = reader.string();
-          break;
+          continue;
         case 4:
+          if (tag !== 32) {
+            break;
+          }
+
           message.positive_int_value = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 5:
+          if (tag !== 40) {
+            break;
+          }
+
           message.negative_int_value = longToString(reader.int64() as Long);
-          break;
+          continue;
         case 6:
+          if (tag !== 49) {
+            break;
+          }
+
           message.double_value = reader.double();
-          break;
+          continue;
         case 7:
+          if (tag !== 58) {
+            break;
+          }
+
           message.string_value = reader.bytes();
-          break;
+          continue;
         case 8:
+          if (tag !== 66) {
+            break;
+          }
+
           message.aggregate_value = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -3364,28 +4009,39 @@ export const UninterpretedOption = {
       positive_int_value: isSet(object.positive_int_value) ? String(object.positive_int_value) : "0",
       negative_int_value: isSet(object.negative_int_value) ? String(object.negative_int_value) : "0",
       double_value: isSet(object.double_value) ? Number(object.double_value) : 0,
-      string_value: isSet(object.string_value) ? bytesFromBase64(object.string_value) : new Uint8Array(),
+      string_value: isSet(object.string_value) ? bytesFromBase64(object.string_value) : new Uint8Array(0),
       aggregate_value: isSet(object.aggregate_value) ? String(object.aggregate_value) : "",
     };
   },
 
   toJSON(message: UninterpretedOption): unknown {
     const obj: any = {};
-    if (message.name) {
-      obj.name = message.name.map((e) => e ? UninterpretedOption_NamePart.toJSON(e) : undefined);
-    } else {
-      obj.name = [];
+    if (message.name?.length) {
+      obj.name = message.name.map((e) => UninterpretedOption_NamePart.toJSON(e));
     }
-    message.identifier_value !== undefined && (obj.identifier_value = message.identifier_value);
-    message.positive_int_value !== undefined && (obj.positive_int_value = message.positive_int_value);
-    message.negative_int_value !== undefined && (obj.negative_int_value = message.negative_int_value);
-    message.double_value !== undefined && (obj.double_value = message.double_value);
-    message.string_value !== undefined &&
-      (obj.string_value = base64FromBytes(
-        message.string_value !== undefined ? message.string_value : new Uint8Array(),
-      ));
-    message.aggregate_value !== undefined && (obj.aggregate_value = message.aggregate_value);
+    if (message.identifier_value !== "") {
+      obj.identifier_value = message.identifier_value;
+    }
+    if (message.positive_int_value !== "0") {
+      obj.positive_int_value = message.positive_int_value;
+    }
+    if (message.negative_int_value !== "0") {
+      obj.negative_int_value = message.negative_int_value;
+    }
+    if (message.double_value !== 0) {
+      obj.double_value = message.double_value;
+    }
+    if (message.string_value.length !== 0) {
+      obj.string_value = base64FromBytes(message.string_value);
+    }
+    if (message.aggregate_value !== "") {
+      obj.aggregate_value = message.aggregate_value;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<UninterpretedOption>, I>>(base?: I): UninterpretedOption {
+    return UninterpretedOption.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<UninterpretedOption>, I>>(object: I): UninterpretedOption {
@@ -3395,7 +4051,7 @@ export const UninterpretedOption = {
     message.positive_int_value = object.positive_int_value ?? "0";
     message.negative_int_value = object.negative_int_value ?? "0";
     message.double_value = object.double_value ?? 0;
-    message.string_value = object.string_value ?? new Uint8Array();
+    message.string_value = object.string_value ?? new Uint8Array(0);
     message.aggregate_value = object.aggregate_value ?? "";
     return message;
   },
@@ -3417,22 +4073,31 @@ export const UninterpretedOption_NamePart = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): UninterpretedOption_NamePart {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseUninterpretedOption_NamePart();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.name_part = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.is_extension = reader.bool();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -3446,9 +4111,17 @@ export const UninterpretedOption_NamePart = {
 
   toJSON(message: UninterpretedOption_NamePart): unknown {
     const obj: any = {};
-    message.name_part !== undefined && (obj.name_part = message.name_part);
-    message.is_extension !== undefined && (obj.is_extension = message.is_extension);
+    if (message.name_part !== "") {
+      obj.name_part = message.name_part;
+    }
+    if (message.is_extension === true) {
+      obj.is_extension = message.is_extension;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<UninterpretedOption_NamePart>, I>>(base?: I): UninterpretedOption_NamePart {
+    return UninterpretedOption_NamePart.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<UninterpretedOption_NamePart>, I>>(object: I): UninterpretedOption_NamePart {
@@ -3472,19 +4145,24 @@ export const SourceCodeInfo = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): SourceCodeInfo {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseSourceCodeInfo();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.location.push(SourceCodeInfo_Location.decode(reader, reader.uint32()));
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -3499,12 +4177,14 @@ export const SourceCodeInfo = {
 
   toJSON(message: SourceCodeInfo): unknown {
     const obj: any = {};
-    if (message.location) {
-      obj.location = message.location.map((e) => e ? SourceCodeInfo_Location.toJSON(e) : undefined);
-    } else {
-      obj.location = [];
+    if (message.location?.length) {
+      obj.location = message.location.map((e) => SourceCodeInfo_Location.toJSON(e));
     }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<SourceCodeInfo>, I>>(base?: I): SourceCodeInfo {
+    return SourceCodeInfo.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<SourceCodeInfo>, I>>(object: I): SourceCodeInfo {
@@ -3543,45 +4223,72 @@ export const SourceCodeInfo_Location = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): SourceCodeInfo_Location {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseSourceCodeInfo_Location();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          if ((tag & 7) === 2) {
+          if (tag === 8) {
+            message.path.push(reader.int32());
+
+            continue;
+          }
+
+          if (tag === 10) {
             const end2 = reader.uint32() + reader.pos;
             while (reader.pos < end2) {
               message.path.push(reader.int32());
             }
-          } else {
-            message.path.push(reader.int32());
+
+            continue;
           }
+
           break;
         case 2:
-          if ((tag & 7) === 2) {
+          if (tag === 16) {
+            message.span.push(reader.int32());
+
+            continue;
+          }
+
+          if (tag === 18) {
             const end2 = reader.uint32() + reader.pos;
             while (reader.pos < end2) {
               message.span.push(reader.int32());
             }
-          } else {
-            message.span.push(reader.int32());
+
+            continue;
           }
+
           break;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.leading_comments = reader.string();
-          break;
+          continue;
         case 4:
+          if (tag !== 34) {
+            break;
+          }
+
           message.trailing_comments = reader.string();
-          break;
+          continue;
         case 6:
+          if (tag !== 50) {
+            break;
+          }
+
           message.leading_detached_comments.push(reader.string());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -3600,24 +4307,26 @@ export const SourceCodeInfo_Location = {
 
   toJSON(message: SourceCodeInfo_Location): unknown {
     const obj: any = {};
-    if (message.path) {
+    if (message.path?.length) {
       obj.path = message.path.map((e) => Math.round(e));
-    } else {
-      obj.path = [];
     }
-    if (message.span) {
+    if (message.span?.length) {
       obj.span = message.span.map((e) => Math.round(e));
-    } else {
-      obj.span = [];
     }
-    message.leading_comments !== undefined && (obj.leading_comments = message.leading_comments);
-    message.trailing_comments !== undefined && (obj.trailing_comments = message.trailing_comments);
-    if (message.leading_detached_comments) {
-      obj.leading_detached_comments = message.leading_detached_comments.map((e) => e);
-    } else {
-      obj.leading_detached_comments = [];
+    if (message.leading_comments !== "") {
+      obj.leading_comments = message.leading_comments;
+    }
+    if (message.trailing_comments !== "") {
+      obj.trailing_comments = message.trailing_comments;
+    }
+    if (message.leading_detached_comments?.length) {
+      obj.leading_detached_comments = message.leading_detached_comments;
     }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<SourceCodeInfo_Location>, I>>(base?: I): SourceCodeInfo_Location {
+    return SourceCodeInfo_Location.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<SourceCodeInfo_Location>, I>>(object: I): SourceCodeInfo_Location {
@@ -3644,19 +4353,24 @@ export const GeneratedCodeInfo = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): GeneratedCodeInfo {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseGeneratedCodeInfo();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.annotation.push(GeneratedCodeInfo_Annotation.decode(reader, reader.uint32()));
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -3671,12 +4385,14 @@ export const GeneratedCodeInfo = {
 
   toJSON(message: GeneratedCodeInfo): unknown {
     const obj: any = {};
-    if (message.annotation) {
-      obj.annotation = message.annotation.map((e) => e ? GeneratedCodeInfo_Annotation.toJSON(e) : undefined);
-    } else {
-      obj.annotation = [];
+    if (message.annotation?.length) {
+      obj.annotation = message.annotation.map((e) => GeneratedCodeInfo_Annotation.toJSON(e));
     }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<GeneratedCodeInfo>, I>>(base?: I): GeneratedCodeInfo {
+    return GeneratedCodeInfo.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<GeneratedCodeInfo>, I>>(object: I): GeneratedCodeInfo {
@@ -3710,35 +4426,55 @@ export const GeneratedCodeInfo_Annotation = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): GeneratedCodeInfo_Annotation {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseGeneratedCodeInfo_Annotation();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          if ((tag & 7) === 2) {
+          if (tag === 8) {
+            message.path.push(reader.int32());
+
+            continue;
+          }
+
+          if (tag === 10) {
             const end2 = reader.uint32() + reader.pos;
             while (reader.pos < end2) {
               message.path.push(reader.int32());
             }
-          } else {
-            message.path.push(reader.int32());
+
+            continue;
           }
+
           break;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.source_file = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag !== 24) {
+            break;
+          }
+
           message.begin = reader.int32();
-          break;
+          continue;
         case 4:
+          if (tag !== 32) {
+            break;
+          }
+
           message.end = reader.int32();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -3754,15 +4490,23 @@ export const GeneratedCodeInfo_Annotation = {
 
   toJSON(message: GeneratedCodeInfo_Annotation): unknown {
     const obj: any = {};
-    if (message.path) {
+    if (message.path?.length) {
       obj.path = message.path.map((e) => Math.round(e));
-    } else {
-      obj.path = [];
     }
-    message.source_file !== undefined && (obj.source_file = message.source_file);
-    message.begin !== undefined && (obj.begin = Math.round(message.begin));
-    message.end !== undefined && (obj.end = Math.round(message.end));
+    if (message.source_file !== "") {
+      obj.source_file = message.source_file;
+    }
+    if (message.begin !== 0) {
+      obj.begin = Math.round(message.begin);
+    }
+    if (message.end !== 0) {
+      obj.end = Math.round(message.end);
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<GeneratedCodeInfo_Annotation>, I>>(base?: I): GeneratedCodeInfo_Annotation {
+    return GeneratedCodeInfo_Annotation.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<GeneratedCodeInfo_Annotation>, I>>(object: I): GeneratedCodeInfo_Annotation {
@@ -3775,10 +4519,10 @@ export const GeneratedCodeInfo_Annotation = {
   },
 };
 
-declare var self: any | undefined;
-declare var window: any | undefined;
-declare var global: any | undefined;
-var globalThis: any = (() => {
+declare const self: any | undefined;
+declare const window: any | undefined;
+declare const global: any | undefined;
+const tsProtoGlobalThis: any = (() => {
   if (typeof globalThis !== "undefined") {
     return globalThis;
   }
@@ -3795,10 +4539,10 @@ var globalThis: any = (() => {
 })();
 
 function bytesFromBase64(b64: string): Uint8Array {
-  if (globalThis.Buffer) {
-    return Uint8Array.from(globalThis.Buffer.from(b64, "base64"));
+  if (tsProtoGlobalThis.Buffer) {
+    return Uint8Array.from(tsProtoGlobalThis.Buffer.from(b64, "base64"));
   } else {
-    const bin = globalThis.atob(b64);
+    const bin = tsProtoGlobalThis.atob(b64);
     const arr = new Uint8Array(bin.length);
     for (let i = 0; i < bin.length; ++i) {
       arr[i] = bin.charCodeAt(i);
@@ -3808,14 +4552,14 @@ function bytesFromBase64(b64: string): Uint8Array {
 }
 
 function base64FromBytes(arr: Uint8Array): string {
-  if (globalThis.Buffer) {
-    return globalThis.Buffer.from(arr).toString("base64");
+  if (tsProtoGlobalThis.Buffer) {
+    return tsProtoGlobalThis.Buffer.from(arr).toString("base64");
   } else {
     const bin: string[] = [];
     arr.forEach((byte) => {
       bin.push(String.fromCharCode(byte));
     });
-    return globalThis.btoa(bin.join(""));
+    return tsProtoGlobalThis.btoa(bin.join(""));
   }
 }
 

@@ -100,28 +100,45 @@ export const MsgClaimUnlocked = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgClaimUnlocked {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgClaimUnlocked();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.authority = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 3:
+          if (tag !== 24) {
+            break;
+          }
+
           message.amount = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 4:
+          if (tag !== 34) {
+            break;
+          }
+
           message.recipient = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -137,11 +154,23 @@ export const MsgClaimUnlocked = {
 
   toJSON(message: MsgClaimUnlocked): unknown {
     const obj: any = {};
-    message.authority !== undefined && (obj.authority = message.authority);
-    message.id !== undefined && (obj.id = message.id);
-    message.amount !== undefined && (obj.amount = message.amount);
-    message.recipient !== undefined && (obj.recipient = message.recipient);
+    if (message.authority !== "") {
+      obj.authority = message.authority;
+    }
+    if (message.id !== "0") {
+      obj.id = message.id;
+    }
+    if (message.amount !== "0") {
+      obj.amount = message.amount;
+    }
+    if (message.recipient !== "") {
+      obj.recipient = message.recipient;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MsgClaimUnlocked>, I>>(base?: I): MsgClaimUnlocked {
+    return MsgClaimUnlocked.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<MsgClaimUnlocked>, I>>(object: I): MsgClaimUnlocked {
@@ -164,16 +193,17 @@ export const MsgClaimUnlockedResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgClaimUnlockedResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgClaimUnlockedResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        default:
-          reader.skipType(tag & 7);
-          break;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -185,6 +215,10 @@ export const MsgClaimUnlockedResponse = {
   toJSON(_: MsgClaimUnlockedResponse): unknown {
     const obj: any = {};
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MsgClaimUnlockedResponse>, I>>(base?: I): MsgClaimUnlockedResponse {
+    return MsgClaimUnlockedResponse.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<MsgClaimUnlockedResponse>, I>>(_: I): MsgClaimUnlockedResponse {
@@ -212,25 +246,38 @@ export const MsgClaimAuthorityRewards = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgClaimAuthorityRewards {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgClaimAuthorityRewards();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.authority = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.amount = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.recipient = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -245,10 +292,20 @@ export const MsgClaimAuthorityRewards = {
 
   toJSON(message: MsgClaimAuthorityRewards): unknown {
     const obj: any = {};
-    message.authority !== undefined && (obj.authority = message.authority);
-    message.amount !== undefined && (obj.amount = message.amount);
-    message.recipient !== undefined && (obj.recipient = message.recipient);
+    if (message.authority !== "") {
+      obj.authority = message.authority;
+    }
+    if (message.amount !== "0") {
+      obj.amount = message.amount;
+    }
+    if (message.recipient !== "") {
+      obj.recipient = message.recipient;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MsgClaimAuthorityRewards>, I>>(base?: I): MsgClaimAuthorityRewards {
+    return MsgClaimAuthorityRewards.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<MsgClaimAuthorityRewards>, I>>(object: I): MsgClaimAuthorityRewards {
@@ -270,16 +327,17 @@ export const MsgClaimAuthorityRewardsResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgClaimAuthorityRewardsResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgClaimAuthorityRewardsResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        default:
-          reader.skipType(tag & 7);
-          break;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -291,6 +349,12 @@ export const MsgClaimAuthorityRewardsResponse = {
   toJSON(_: MsgClaimAuthorityRewardsResponse): unknown {
     const obj: any = {};
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MsgClaimAuthorityRewardsResponse>, I>>(
+    base?: I,
+  ): MsgClaimAuthorityRewardsResponse {
+    return MsgClaimAuthorityRewardsResponse.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<MsgClaimAuthorityRewardsResponse>, I>>(
@@ -323,28 +387,45 @@ export const MsgClaimAccountRewards = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgClaimAccountRewards {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgClaimAccountRewards();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.authority = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 3:
+          if (tag !== 24) {
+            break;
+          }
+
           message.amount = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 4:
+          if (tag !== 34) {
+            break;
+          }
+
           message.recipient = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -360,11 +441,23 @@ export const MsgClaimAccountRewards = {
 
   toJSON(message: MsgClaimAccountRewards): unknown {
     const obj: any = {};
-    message.authority !== undefined && (obj.authority = message.authority);
-    message.id !== undefined && (obj.id = message.id);
-    message.amount !== undefined && (obj.amount = message.amount);
-    message.recipient !== undefined && (obj.recipient = message.recipient);
+    if (message.authority !== "") {
+      obj.authority = message.authority;
+    }
+    if (message.id !== "0") {
+      obj.id = message.id;
+    }
+    if (message.amount !== "0") {
+      obj.amount = message.amount;
+    }
+    if (message.recipient !== "") {
+      obj.recipient = message.recipient;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MsgClaimAccountRewards>, I>>(base?: I): MsgClaimAccountRewards {
+    return MsgClaimAccountRewards.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<MsgClaimAccountRewards>, I>>(object: I): MsgClaimAccountRewards {
@@ -387,16 +480,17 @@ export const MsgClaimAccountRewardsResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgClaimAccountRewardsResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgClaimAccountRewardsResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        default:
-          reader.skipType(tag & 7);
-          break;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -408,6 +502,10 @@ export const MsgClaimAccountRewardsResponse = {
   toJSON(_: MsgClaimAccountRewardsResponse): unknown {
     const obj: any = {};
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MsgClaimAccountRewardsResponse>, I>>(base?: I): MsgClaimAccountRewardsResponse {
+    return MsgClaimAccountRewardsResponse.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<MsgClaimAccountRewardsResponse>, I>>(_: I): MsgClaimAccountRewardsResponse {
@@ -435,25 +533,38 @@ export const MsgClawback = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgClawback {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgClawback();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.authority = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 3:
+          if (tag !== 24) {
+            break;
+          }
+
           message.clawback = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -468,10 +579,20 @@ export const MsgClawback = {
 
   toJSON(message: MsgClawback): unknown {
     const obj: any = {};
-    message.authority !== undefined && (obj.authority = message.authority);
-    message.id !== undefined && (obj.id = message.id);
-    message.clawback !== undefined && (obj.clawback = message.clawback);
+    if (message.authority !== "") {
+      obj.authority = message.authority;
+    }
+    if (message.id !== "0") {
+      obj.id = message.id;
+    }
+    if (message.clawback !== "0") {
+      obj.clawback = message.clawback;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MsgClawback>, I>>(base?: I): MsgClawback {
+    return MsgClawback.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<MsgClawback>, I>>(object: I): MsgClawback {
@@ -493,16 +614,17 @@ export const MsgClawbackResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgClawbackResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgClawbackResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        default:
-          reader.skipType(tag & 7);
-          break;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -514,6 +636,10 @@ export const MsgClawbackResponse = {
   toJSON(_: MsgClawbackResponse): unknown {
     const obj: any = {};
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MsgClawbackResponse>, I>>(base?: I): MsgClawbackResponse {
+    return MsgClawbackResponse.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<MsgClawbackResponse>, I>>(_: I): MsgClawbackResponse {
@@ -541,25 +667,38 @@ export const MsgCreateTeamVestingAccount = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgCreateTeamVestingAccount {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgCreateTeamVestingAccount();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.authority = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.total_allocation = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 3:
+          if (tag !== 24) {
+            break;
+          }
+
           message.commencement = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -574,10 +713,20 @@ export const MsgCreateTeamVestingAccount = {
 
   toJSON(message: MsgCreateTeamVestingAccount): unknown {
     const obj: any = {};
-    message.authority !== undefined && (obj.authority = message.authority);
-    message.total_allocation !== undefined && (obj.total_allocation = message.total_allocation);
-    message.commencement !== undefined && (obj.commencement = message.commencement);
+    if (message.authority !== "") {
+      obj.authority = message.authority;
+    }
+    if (message.total_allocation !== "0") {
+      obj.total_allocation = message.total_allocation;
+    }
+    if (message.commencement !== "0") {
+      obj.commencement = message.commencement;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MsgCreateTeamVestingAccount>, I>>(base?: I): MsgCreateTeamVestingAccount {
+    return MsgCreateTeamVestingAccount.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<MsgCreateTeamVestingAccount>, I>>(object: I): MsgCreateTeamVestingAccount {
@@ -599,16 +748,17 @@ export const MsgCreateTeamVestingAccountResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgCreateTeamVestingAccountResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgCreateTeamVestingAccountResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        default:
-          reader.skipType(tag & 7);
-          break;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -620,6 +770,12 @@ export const MsgCreateTeamVestingAccountResponse = {
   toJSON(_: MsgCreateTeamVestingAccountResponse): unknown {
     const obj: any = {};
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MsgCreateTeamVestingAccountResponse>, I>>(
+    base?: I,
+  ): MsgCreateTeamVestingAccountResponse {
+    return MsgCreateTeamVestingAccountResponse.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<MsgCreateTeamVestingAccountResponse>, I>>(
@@ -644,11 +800,12 @@ export interface Msg {
   ClaimAccountRewards(request: MsgClaimAccountRewards): Promise<MsgClaimAccountRewardsResponse>;
 }
 
+export const MsgServiceName = "kyve.team.v1beta1.Msg";
 export class MsgClientImpl implements Msg {
   private readonly rpc: Rpc;
   private readonly service: string;
   constructor(rpc: Rpc, opts?: { service?: string }) {
-    this.service = opts?.service || "kyve.team.v1beta1.Msg";
+    this.service = opts?.service || MsgServiceName;
     this.rpc = rpc;
     this.ClaimUnlocked = this.ClaimUnlocked.bind(this);
     this.Clawback = this.Clawback.bind(this);
@@ -659,31 +816,31 @@ export class MsgClientImpl implements Msg {
   ClaimUnlocked(request: MsgClaimUnlocked): Promise<MsgClaimUnlockedResponse> {
     const data = MsgClaimUnlocked.encode(request).finish();
     const promise = this.rpc.request(this.service, "ClaimUnlocked", data);
-    return promise.then((data) => MsgClaimUnlockedResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) => MsgClaimUnlockedResponse.decode(_m0.Reader.create(data)));
   }
 
   Clawback(request: MsgClawback): Promise<MsgClawbackResponse> {
     const data = MsgClawback.encode(request).finish();
     const promise = this.rpc.request(this.service, "Clawback", data);
-    return promise.then((data) => MsgClawbackResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) => MsgClawbackResponse.decode(_m0.Reader.create(data)));
   }
 
   CreateTeamVestingAccount(request: MsgCreateTeamVestingAccount): Promise<MsgCreateTeamVestingAccountResponse> {
     const data = MsgCreateTeamVestingAccount.encode(request).finish();
     const promise = this.rpc.request(this.service, "CreateTeamVestingAccount", data);
-    return promise.then((data) => MsgCreateTeamVestingAccountResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) => MsgCreateTeamVestingAccountResponse.decode(_m0.Reader.create(data)));
   }
 
   ClaimAuthorityRewards(request: MsgClaimAuthorityRewards): Promise<MsgClaimAuthorityRewardsResponse> {
     const data = MsgClaimAuthorityRewards.encode(request).finish();
     const promise = this.rpc.request(this.service, "ClaimAuthorityRewards", data);
-    return promise.then((data) => MsgClaimAuthorityRewardsResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) => MsgClaimAuthorityRewardsResponse.decode(_m0.Reader.create(data)));
   }
 
   ClaimAccountRewards(request: MsgClaimAccountRewards): Promise<MsgClaimAccountRewardsResponse> {
     const data = MsgClaimAccountRewards.encode(request).finish();
     const promise = this.rpc.request(this.service, "ClaimAccountRewards", data);
-    return promise.then((data) => MsgClaimAccountRewardsResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) => MsgClaimAccountRewardsResponse.decode(_m0.Reader.create(data)));
   }
 }
 

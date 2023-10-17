@@ -8,7 +8,19 @@ export const protobufPackage = "cosmos.distribution.v1beta1";
 /** Params defines the set of params for the distribution module. */
 export interface Params {
   community_tax: string;
+  /**
+   * Deprecated: The base_proposer_reward field is deprecated and is no longer used
+   * in the x/distribution module's reward mechanism.
+   *
+   * @deprecated
+   */
   base_proposer_reward: string;
+  /**
+   * Deprecated: The bonus_proposer_reward field is deprecated and is no longer used
+   * in the x/distribution module's reward mechanism.
+   *
+   * @deprecated
+   */
   bonus_proposer_reward: string;
   withdraw_addr_enabled: boolean;
 }
@@ -83,6 +95,13 @@ export interface FeePool {
  * CommunityPoolSpendProposal details a proposal for use of community funds,
  * together with how many coins are proposed to be spent, and to which
  * recipient account.
+ *
+ * Deprecated: Do not use. As of the Cosmos SDK release v0.47.x, there is no
+ * longer a need for an explicit CommunityPoolSpendProposal. To spend community
+ * pool funds, a simple MsgCommunityPoolSpend can be invoked from the x/gov
+ * module via a v1 governance proposal.
+ *
+ * @deprecated
  */
 export interface CommunityPoolSpendProposal {
   title: string;
@@ -148,28 +167,45 @@ export const Params = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Params {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseParams();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.community_tax = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.base_proposer_reward = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.bonus_proposer_reward = reader.string();
-          break;
+          continue;
         case 4:
+          if (tag !== 32) {
+            break;
+          }
+
           message.withdraw_addr_enabled = reader.bool();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -185,11 +221,23 @@ export const Params = {
 
   toJSON(message: Params): unknown {
     const obj: any = {};
-    message.community_tax !== undefined && (obj.community_tax = message.community_tax);
-    message.base_proposer_reward !== undefined && (obj.base_proposer_reward = message.base_proposer_reward);
-    message.bonus_proposer_reward !== undefined && (obj.bonus_proposer_reward = message.bonus_proposer_reward);
-    message.withdraw_addr_enabled !== undefined && (obj.withdraw_addr_enabled = message.withdraw_addr_enabled);
+    if (message.community_tax !== "") {
+      obj.community_tax = message.community_tax;
+    }
+    if (message.base_proposer_reward !== "") {
+      obj.base_proposer_reward = message.base_proposer_reward;
+    }
+    if (message.bonus_proposer_reward !== "") {
+      obj.bonus_proposer_reward = message.bonus_proposer_reward;
+    }
+    if (message.withdraw_addr_enabled === true) {
+      obj.withdraw_addr_enabled = message.withdraw_addr_enabled;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<Params>, I>>(base?: I): Params {
+    return Params.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<Params>, I>>(object: I): Params {
@@ -218,22 +266,31 @@ export const ValidatorHistoricalRewards = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): ValidatorHistoricalRewards {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseValidatorHistoricalRewards();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.cumulative_reward_ratio.push(DecCoin.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.reference_count = reader.uint32();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -249,13 +306,17 @@ export const ValidatorHistoricalRewards = {
 
   toJSON(message: ValidatorHistoricalRewards): unknown {
     const obj: any = {};
-    if (message.cumulative_reward_ratio) {
-      obj.cumulative_reward_ratio = message.cumulative_reward_ratio.map((e) => e ? DecCoin.toJSON(e) : undefined);
-    } else {
-      obj.cumulative_reward_ratio = [];
+    if (message.cumulative_reward_ratio?.length) {
+      obj.cumulative_reward_ratio = message.cumulative_reward_ratio.map((e) => DecCoin.toJSON(e));
     }
-    message.reference_count !== undefined && (obj.reference_count = Math.round(message.reference_count));
+    if (message.reference_count !== 0) {
+      obj.reference_count = Math.round(message.reference_count);
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ValidatorHistoricalRewards>, I>>(base?: I): ValidatorHistoricalRewards {
+    return ValidatorHistoricalRewards.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<ValidatorHistoricalRewards>, I>>(object: I): ValidatorHistoricalRewards {
@@ -282,22 +343,31 @@ export const ValidatorCurrentRewards = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): ValidatorCurrentRewards {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseValidatorCurrentRewards();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.rewards.push(DecCoin.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.period = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -311,13 +381,17 @@ export const ValidatorCurrentRewards = {
 
   toJSON(message: ValidatorCurrentRewards): unknown {
     const obj: any = {};
-    if (message.rewards) {
-      obj.rewards = message.rewards.map((e) => e ? DecCoin.toJSON(e) : undefined);
-    } else {
-      obj.rewards = [];
+    if (message.rewards?.length) {
+      obj.rewards = message.rewards.map((e) => DecCoin.toJSON(e));
     }
-    message.period !== undefined && (obj.period = message.period);
+    if (message.period !== "0") {
+      obj.period = message.period;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ValidatorCurrentRewards>, I>>(base?: I): ValidatorCurrentRewards {
+    return ValidatorCurrentRewards.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<ValidatorCurrentRewards>, I>>(object: I): ValidatorCurrentRewards {
@@ -341,19 +415,24 @@ export const ValidatorAccumulatedCommission = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): ValidatorAccumulatedCommission {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseValidatorAccumulatedCommission();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.commission.push(DecCoin.decode(reader, reader.uint32()));
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -366,12 +445,14 @@ export const ValidatorAccumulatedCommission = {
 
   toJSON(message: ValidatorAccumulatedCommission): unknown {
     const obj: any = {};
-    if (message.commission) {
-      obj.commission = message.commission.map((e) => e ? DecCoin.toJSON(e) : undefined);
-    } else {
-      obj.commission = [];
+    if (message.commission?.length) {
+      obj.commission = message.commission.map((e) => DecCoin.toJSON(e));
     }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ValidatorAccumulatedCommission>, I>>(base?: I): ValidatorAccumulatedCommission {
+    return ValidatorAccumulatedCommission.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<ValidatorAccumulatedCommission>, I>>(
@@ -396,19 +477,24 @@ export const ValidatorOutstandingRewards = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): ValidatorOutstandingRewards {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseValidatorOutstandingRewards();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.rewards.push(DecCoin.decode(reader, reader.uint32()));
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -419,12 +505,14 @@ export const ValidatorOutstandingRewards = {
 
   toJSON(message: ValidatorOutstandingRewards): unknown {
     const obj: any = {};
-    if (message.rewards) {
-      obj.rewards = message.rewards.map((e) => e ? DecCoin.toJSON(e) : undefined);
-    } else {
-      obj.rewards = [];
+    if (message.rewards?.length) {
+      obj.rewards = message.rewards.map((e) => DecCoin.toJSON(e));
     }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ValidatorOutstandingRewards>, I>>(base?: I): ValidatorOutstandingRewards {
+    return ValidatorOutstandingRewards.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<ValidatorOutstandingRewards>, I>>(object: I): ValidatorOutstandingRewards {
@@ -450,22 +538,31 @@ export const ValidatorSlashEvent = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): ValidatorSlashEvent {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseValidatorSlashEvent();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.validator_period = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.fraction = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -479,9 +576,17 @@ export const ValidatorSlashEvent = {
 
   toJSON(message: ValidatorSlashEvent): unknown {
     const obj: any = {};
-    message.validator_period !== undefined && (obj.validator_period = message.validator_period);
-    message.fraction !== undefined && (obj.fraction = message.fraction);
+    if (message.validator_period !== "0") {
+      obj.validator_period = message.validator_period;
+    }
+    if (message.fraction !== "") {
+      obj.fraction = message.fraction;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ValidatorSlashEvent>, I>>(base?: I): ValidatorSlashEvent {
+    return ValidatorSlashEvent.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<ValidatorSlashEvent>, I>>(object: I): ValidatorSlashEvent {
@@ -505,19 +610,24 @@ export const ValidatorSlashEvents = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): ValidatorSlashEvents {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseValidatorSlashEvents();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.validator_slash_events.push(ValidatorSlashEvent.decode(reader, reader.uint32()));
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -532,14 +642,14 @@ export const ValidatorSlashEvents = {
 
   toJSON(message: ValidatorSlashEvents): unknown {
     const obj: any = {};
-    if (message.validator_slash_events) {
-      obj.validator_slash_events = message.validator_slash_events.map((e) =>
-        e ? ValidatorSlashEvent.toJSON(e) : undefined
-      );
-    } else {
-      obj.validator_slash_events = [];
+    if (message.validator_slash_events?.length) {
+      obj.validator_slash_events = message.validator_slash_events.map((e) => ValidatorSlashEvent.toJSON(e));
     }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ValidatorSlashEvents>, I>>(base?: I): ValidatorSlashEvents {
+    return ValidatorSlashEvents.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<ValidatorSlashEvents>, I>>(object: I): ValidatorSlashEvents {
@@ -563,19 +673,24 @@ export const FeePool = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): FeePool {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseFeePool();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.community_pool.push(DecCoin.decode(reader, reader.uint32()));
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -590,12 +705,14 @@ export const FeePool = {
 
   toJSON(message: FeePool): unknown {
     const obj: any = {};
-    if (message.community_pool) {
-      obj.community_pool = message.community_pool.map((e) => e ? DecCoin.toJSON(e) : undefined);
-    } else {
-      obj.community_pool = [];
+    if (message.community_pool?.length) {
+      obj.community_pool = message.community_pool.map((e) => DecCoin.toJSON(e));
     }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<FeePool>, I>>(base?: I): FeePool {
+    return FeePool.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<FeePool>, I>>(object: I): FeePool {
@@ -627,28 +744,45 @@ export const CommunityPoolSpendProposal = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): CommunityPoolSpendProposal {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseCommunityPoolSpendProposal();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.title = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.description = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.recipient = reader.string();
-          break;
+          continue;
         case 4:
+          if (tag !== 34) {
+            break;
+          }
+
           message.amount.push(Coin.decode(reader, reader.uint32()));
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -664,15 +798,23 @@ export const CommunityPoolSpendProposal = {
 
   toJSON(message: CommunityPoolSpendProposal): unknown {
     const obj: any = {};
-    message.title !== undefined && (obj.title = message.title);
-    message.description !== undefined && (obj.description = message.description);
-    message.recipient !== undefined && (obj.recipient = message.recipient);
-    if (message.amount) {
-      obj.amount = message.amount.map((e) => e ? Coin.toJSON(e) : undefined);
-    } else {
-      obj.amount = [];
+    if (message.title !== "") {
+      obj.title = message.title;
+    }
+    if (message.description !== "") {
+      obj.description = message.description;
+    }
+    if (message.recipient !== "") {
+      obj.recipient = message.recipient;
+    }
+    if (message.amount?.length) {
+      obj.amount = message.amount.map((e) => Coin.toJSON(e));
     }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<CommunityPoolSpendProposal>, I>>(base?: I): CommunityPoolSpendProposal {
+    return CommunityPoolSpendProposal.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<CommunityPoolSpendProposal>, I>>(object: I): CommunityPoolSpendProposal {
@@ -704,25 +846,38 @@ export const DelegatorStartingInfo = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): DelegatorStartingInfo {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseDelegatorStartingInfo();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.previous_period = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.stake = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag !== 24) {
+            break;
+          }
+
           message.height = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -737,10 +892,20 @@ export const DelegatorStartingInfo = {
 
   toJSON(message: DelegatorStartingInfo): unknown {
     const obj: any = {};
-    message.previous_period !== undefined && (obj.previous_period = message.previous_period);
-    message.stake !== undefined && (obj.stake = message.stake);
-    message.height !== undefined && (obj.height = message.height);
+    if (message.previous_period !== "0") {
+      obj.previous_period = message.previous_period;
+    }
+    if (message.stake !== "") {
+      obj.stake = message.stake;
+    }
+    if (message.height !== "0") {
+      obj.height = message.height;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<DelegatorStartingInfo>, I>>(base?: I): DelegatorStartingInfo {
+    return DelegatorStartingInfo.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<DelegatorStartingInfo>, I>>(object: I): DelegatorStartingInfo {
@@ -768,22 +933,31 @@ export const DelegationDelegatorReward = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): DelegationDelegatorReward {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseDelegationDelegatorReward();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.validator_address = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.reward.push(DecCoin.decode(reader, reader.uint32()));
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -797,13 +971,17 @@ export const DelegationDelegatorReward = {
 
   toJSON(message: DelegationDelegatorReward): unknown {
     const obj: any = {};
-    message.validator_address !== undefined && (obj.validator_address = message.validator_address);
-    if (message.reward) {
-      obj.reward = message.reward.map((e) => e ? DecCoin.toJSON(e) : undefined);
-    } else {
-      obj.reward = [];
+    if (message.validator_address !== "") {
+      obj.validator_address = message.validator_address;
+    }
+    if (message.reward?.length) {
+      obj.reward = message.reward.map((e) => DecCoin.toJSON(e));
     }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<DelegationDelegatorReward>, I>>(base?: I): DelegationDelegatorReward {
+    return DelegationDelegatorReward.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<DelegationDelegatorReward>, I>>(object: I): DelegationDelegatorReward {
@@ -839,31 +1017,52 @@ export const CommunityPoolSpendProposalWithDeposit = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): CommunityPoolSpendProposalWithDeposit {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseCommunityPoolSpendProposalWithDeposit();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.title = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.description = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.recipient = reader.string();
-          break;
+          continue;
         case 4:
+          if (tag !== 34) {
+            break;
+          }
+
           message.amount = reader.string();
-          break;
+          continue;
         case 5:
+          if (tag !== 42) {
+            break;
+          }
+
           message.deposit = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -880,12 +1079,28 @@ export const CommunityPoolSpendProposalWithDeposit = {
 
   toJSON(message: CommunityPoolSpendProposalWithDeposit): unknown {
     const obj: any = {};
-    message.title !== undefined && (obj.title = message.title);
-    message.description !== undefined && (obj.description = message.description);
-    message.recipient !== undefined && (obj.recipient = message.recipient);
-    message.amount !== undefined && (obj.amount = message.amount);
-    message.deposit !== undefined && (obj.deposit = message.deposit);
+    if (message.title !== "") {
+      obj.title = message.title;
+    }
+    if (message.description !== "") {
+      obj.description = message.description;
+    }
+    if (message.recipient !== "") {
+      obj.recipient = message.recipient;
+    }
+    if (message.amount !== "") {
+      obj.amount = message.amount;
+    }
+    if (message.deposit !== "") {
+      obj.deposit = message.deposit;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<CommunityPoolSpendProposalWithDeposit>, I>>(
+    base?: I,
+  ): CommunityPoolSpendProposalWithDeposit {
+    return CommunityPoolSpendProposalWithDeposit.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<CommunityPoolSpendProposalWithDeposit>, I>>(

@@ -170,28 +170,45 @@ export const Delegator = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Delegator {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseDelegator();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.staker = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.delegator = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag !== 24) {
+            break;
+          }
+
           message.k_index = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 4:
+          if (tag !== 32) {
+            break;
+          }
+
           message.initial_amount = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -207,11 +224,23 @@ export const Delegator = {
 
   toJSON(message: Delegator): unknown {
     const obj: any = {};
-    message.staker !== undefined && (obj.staker = message.staker);
-    message.delegator !== undefined && (obj.delegator = message.delegator);
-    message.k_index !== undefined && (obj.k_index = message.k_index);
-    message.initial_amount !== undefined && (obj.initial_amount = message.initial_amount);
+    if (message.staker !== "") {
+      obj.staker = message.staker;
+    }
+    if (message.delegator !== "") {
+      obj.delegator = message.delegator;
+    }
+    if (message.k_index !== "0") {
+      obj.k_index = message.k_index;
+    }
+    if (message.initial_amount !== "0") {
+      obj.initial_amount = message.initial_amount;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<Delegator>, I>>(base?: I): Delegator {
+    return Delegator.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<Delegator>, I>>(object: I): Delegator {
@@ -243,25 +272,38 @@ export const DelegationEntry = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): DelegationEntry {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseDelegationEntry();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.staker = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.k_index = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.value = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -276,10 +318,20 @@ export const DelegationEntry = {
 
   toJSON(message: DelegationEntry): unknown {
     const obj: any = {};
-    message.staker !== undefined && (obj.staker = message.staker);
-    message.k_index !== undefined && (obj.k_index = message.k_index);
-    message.value !== undefined && (obj.value = message.value);
+    if (message.staker !== "") {
+      obj.staker = message.staker;
+    }
+    if (message.k_index !== "0") {
+      obj.k_index = message.k_index;
+    }
+    if (message.value !== "") {
+      obj.value = message.value;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<DelegationEntry>, I>>(base?: I): DelegationEntry {
+    return DelegationEntry.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<DelegationEntry>, I>>(object: I): DelegationEntry {
@@ -326,34 +378,59 @@ export const DelegationData = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): DelegationData {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseDelegationData();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.staker = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.current_rewards = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 3:
+          if (tag !== 24) {
+            break;
+          }
+
           message.total_delegation = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 4:
+          if (tag !== 32) {
+            break;
+          }
+
           message.latest_index_k = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 5:
+          if (tag !== 40) {
+            break;
+          }
+
           message.delegator_count = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 6:
+          if (tag !== 48) {
+            break;
+          }
+
           message.latest_index_was_undelegation = reader.bool();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -373,14 +450,29 @@ export const DelegationData = {
 
   toJSON(message: DelegationData): unknown {
     const obj: any = {};
-    message.staker !== undefined && (obj.staker = message.staker);
-    message.current_rewards !== undefined && (obj.current_rewards = message.current_rewards);
-    message.total_delegation !== undefined && (obj.total_delegation = message.total_delegation);
-    message.latest_index_k !== undefined && (obj.latest_index_k = message.latest_index_k);
-    message.delegator_count !== undefined && (obj.delegator_count = message.delegator_count);
-    message.latest_index_was_undelegation !== undefined &&
-      (obj.latest_index_was_undelegation = message.latest_index_was_undelegation);
+    if (message.staker !== "") {
+      obj.staker = message.staker;
+    }
+    if (message.current_rewards !== "0") {
+      obj.current_rewards = message.current_rewards;
+    }
+    if (message.total_delegation !== "0") {
+      obj.total_delegation = message.total_delegation;
+    }
+    if (message.latest_index_k !== "0") {
+      obj.latest_index_k = message.latest_index_k;
+    }
+    if (message.delegator_count !== "0") {
+      obj.delegator_count = message.delegator_count;
+    }
+    if (message.latest_index_was_undelegation === true) {
+      obj.latest_index_was_undelegation = message.latest_index_was_undelegation;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<DelegationData>, I>>(base?: I): DelegationData {
+    return DelegationData.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<DelegationData>, I>>(object: I): DelegationData {
@@ -414,25 +506,38 @@ export const DelegationSlash = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): DelegationSlash {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseDelegationSlash();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.staker = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.k_index = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.fraction = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -447,10 +552,20 @@ export const DelegationSlash = {
 
   toJSON(message: DelegationSlash): unknown {
     const obj: any = {};
-    message.staker !== undefined && (obj.staker = message.staker);
-    message.k_index !== undefined && (obj.k_index = message.k_index);
-    message.fraction !== undefined && (obj.fraction = message.fraction);
+    if (message.staker !== "") {
+      obj.staker = message.staker;
+    }
+    if (message.k_index !== "0") {
+      obj.k_index = message.k_index;
+    }
+    if (message.fraction !== "") {
+      obj.fraction = message.fraction;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<DelegationSlash>, I>>(base?: I): DelegationSlash {
+    return DelegationSlash.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<DelegationSlash>, I>>(object: I): DelegationSlash {
@@ -487,31 +602,52 @@ export const UndelegationQueueEntry = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): UndelegationQueueEntry {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseUndelegationQueueEntry();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.index = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.staker = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.delegator = reader.string();
-          break;
+          continue;
         case 4:
+          if (tag !== 32) {
+            break;
+          }
+
           message.amount = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 5:
+          if (tag !== 40) {
+            break;
+          }
+
           message.creation_time = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -528,12 +664,26 @@ export const UndelegationQueueEntry = {
 
   toJSON(message: UndelegationQueueEntry): unknown {
     const obj: any = {};
-    message.index !== undefined && (obj.index = message.index);
-    message.staker !== undefined && (obj.staker = message.staker);
-    message.delegator !== undefined && (obj.delegator = message.delegator);
-    message.amount !== undefined && (obj.amount = message.amount);
-    message.creation_time !== undefined && (obj.creation_time = message.creation_time);
+    if (message.index !== "0") {
+      obj.index = message.index;
+    }
+    if (message.staker !== "") {
+      obj.staker = message.staker;
+    }
+    if (message.delegator !== "") {
+      obj.delegator = message.delegator;
+    }
+    if (message.amount !== "0") {
+      obj.amount = message.amount;
+    }
+    if (message.creation_time !== "0") {
+      obj.creation_time = message.creation_time;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<UndelegationQueueEntry>, I>>(base?: I): UndelegationQueueEntry {
+    return UndelegationQueueEntry.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<UndelegationQueueEntry>, I>>(object: I): UndelegationQueueEntry {
@@ -563,22 +713,31 @@ export const QueueState = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): QueueState {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseQueueState();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.low_index = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.high_index = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -592,9 +751,17 @@ export const QueueState = {
 
   toJSON(message: QueueState): unknown {
     const obj: any = {};
-    message.low_index !== undefined && (obj.low_index = message.low_index);
-    message.high_index !== undefined && (obj.high_index = message.high_index);
+    if (message.low_index !== "0") {
+      obj.low_index = message.low_index;
+    }
+    if (message.high_index !== "0") {
+      obj.high_index = message.high_index;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<QueueState>, I>>(base?: I): QueueState {
+    return QueueState.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<QueueState>, I>>(object: I): QueueState {
@@ -621,22 +788,31 @@ export const RedelegationCooldown = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): RedelegationCooldown {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseRedelegationCooldown();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.address = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.creation_date = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -650,9 +826,17 @@ export const RedelegationCooldown = {
 
   toJSON(message: RedelegationCooldown): unknown {
     const obj: any = {};
-    message.address !== undefined && (obj.address = message.address);
-    message.creation_date !== undefined && (obj.creation_date = message.creation_date);
+    if (message.address !== "") {
+      obj.address = message.address;
+    }
+    if (message.creation_date !== "0") {
+      obj.creation_date = message.creation_date;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<RedelegationCooldown>, I>>(base?: I): RedelegationCooldown {
+    return RedelegationCooldown.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<RedelegationCooldown>, I>>(object: I): RedelegationCooldown {

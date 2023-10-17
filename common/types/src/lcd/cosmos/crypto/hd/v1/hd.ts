@@ -3,6 +3,8 @@ import _m0 from "protobufjs/minimal";
 
 export const protobufPackage = "cosmos.crypto.hd.v1";
 
+/** Since: cosmos-sdk 0.46 */
+
 /** BIP44Params is used as path field in ledger item in Record. */
 export interface BIP44Params {
   /** purpose is a constant set to 44' (or 0x8000002C) following the BIP43 recommendation */
@@ -45,31 +47,52 @@ export const BIP44Params = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): BIP44Params {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseBIP44Params();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.purpose = reader.uint32();
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.coin_type = reader.uint32();
-          break;
+          continue;
         case 3:
+          if (tag !== 24) {
+            break;
+          }
+
           message.account = reader.uint32();
-          break;
+          continue;
         case 4:
+          if (tag !== 32) {
+            break;
+          }
+
           message.change = reader.bool();
-          break;
+          continue;
         case 5:
+          if (tag !== 40) {
+            break;
+          }
+
           message.address_index = reader.uint32();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -86,12 +109,26 @@ export const BIP44Params = {
 
   toJSON(message: BIP44Params): unknown {
     const obj: any = {};
-    message.purpose !== undefined && (obj.purpose = Math.round(message.purpose));
-    message.coin_type !== undefined && (obj.coin_type = Math.round(message.coin_type));
-    message.account !== undefined && (obj.account = Math.round(message.account));
-    message.change !== undefined && (obj.change = message.change);
-    message.address_index !== undefined && (obj.address_index = Math.round(message.address_index));
+    if (message.purpose !== 0) {
+      obj.purpose = Math.round(message.purpose);
+    }
+    if (message.coin_type !== 0) {
+      obj.coin_type = Math.round(message.coin_type);
+    }
+    if (message.account !== 0) {
+      obj.account = Math.round(message.account);
+    }
+    if (message.change === true) {
+      obj.change = message.change;
+    }
+    if (message.address_index !== 0) {
+      obj.address_index = Math.round(message.address_index);
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<BIP44Params>, I>>(base?: I): BIP44Params {
+    return BIP44Params.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<BIP44Params>, I>>(object: I): BIP44Params {

@@ -5,25 +5,29 @@ import { BIP44Params } from "../../hd/v1/hd";
 
 export const protobufPackage = "cosmos.crypto.keyring.v1";
 
+/** Since: cosmos-sdk 0.46 */
+
 /** Record is used for representing a key in the keyring. */
 export interface Record {
   /** name represents a name of Record */
   name: string;
   /** pub_key represents a public key in any format */
-  pub_key?: Any;
-  /** local stores the public information about a locally stored key */
+  pub_key?:
+    | Any
+    | undefined;
+  /** local stores the private key locally. */
   local?:
     | Record_Local
     | undefined;
-  /** ledger stores the public information about a Ledger key */
+  /** ledger stores the information about a Ledger key. */
   ledger?:
     | Record_Ledger
     | undefined;
-  /** Multi does not store any information. */
+  /** Multi does not store any other information. */
   multi?:
     | Record_Multi
     | undefined;
-  /** Offline does not store any information. */
+  /** Offline does not store any other information. */
   offline?: Record_Offline | undefined;
 }
 
@@ -32,13 +36,12 @@ export interface Record {
  * Local item
  */
 export interface Record_Local {
-  priv_key?: Any;
-  priv_key_type: string;
+  priv_key?: Any | undefined;
 }
 
 /** Ledger item */
 export interface Record_Ledger {
-  path?: BIP44Params;
+  path?: BIP44Params | undefined;
 }
 
 /** Multi item */
@@ -77,34 +80,59 @@ export const Record = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Record {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseRecord();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.name = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.pub_key = Any.decode(reader, reader.uint32());
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.local = Record_Local.decode(reader, reader.uint32());
-          break;
+          continue;
         case 4:
+          if (tag !== 34) {
+            break;
+          }
+
           message.ledger = Record_Ledger.decode(reader, reader.uint32());
-          break;
+          continue;
         case 5:
+          if (tag !== 42) {
+            break;
+          }
+
           message.multi = Record_Multi.decode(reader, reader.uint32());
-          break;
+          continue;
         case 6:
+          if (tag !== 50) {
+            break;
+          }
+
           message.offline = Record_Offline.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -122,14 +150,29 @@ export const Record = {
 
   toJSON(message: Record): unknown {
     const obj: any = {};
-    message.name !== undefined && (obj.name = message.name);
-    message.pub_key !== undefined && (obj.pub_key = message.pub_key ? Any.toJSON(message.pub_key) : undefined);
-    message.local !== undefined && (obj.local = message.local ? Record_Local.toJSON(message.local) : undefined);
-    message.ledger !== undefined && (obj.ledger = message.ledger ? Record_Ledger.toJSON(message.ledger) : undefined);
-    message.multi !== undefined && (obj.multi = message.multi ? Record_Multi.toJSON(message.multi) : undefined);
-    message.offline !== undefined &&
-      (obj.offline = message.offline ? Record_Offline.toJSON(message.offline) : undefined);
+    if (message.name !== "") {
+      obj.name = message.name;
+    }
+    if (message.pub_key !== undefined) {
+      obj.pub_key = Any.toJSON(message.pub_key);
+    }
+    if (message.local !== undefined) {
+      obj.local = Record_Local.toJSON(message.local);
+    }
+    if (message.ledger !== undefined) {
+      obj.ledger = Record_Ledger.toJSON(message.ledger);
+    }
+    if (message.multi !== undefined) {
+      obj.multi = Record_Multi.toJSON(message.multi);
+    }
+    if (message.offline !== undefined) {
+      obj.offline = Record_Offline.toJSON(message.offline);
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<Record>, I>>(base?: I): Record {
+    return Record.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<Record>, I>>(object: I): Record {
@@ -155,7 +198,7 @@ export const Record = {
 };
 
 function createBaseRecord_Local(): Record_Local {
-  return { priv_key: undefined, priv_key_type: "" };
+  return { priv_key: undefined };
 }
 
 export const Record_Local = {
@@ -163,45 +206,46 @@ export const Record_Local = {
     if (message.priv_key !== undefined) {
       Any.encode(message.priv_key, writer.uint32(10).fork()).ldelim();
     }
-    if (message.priv_key_type !== "") {
-      writer.uint32(18).string(message.priv_key_type);
-    }
     return writer;
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Record_Local {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseRecord_Local();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.priv_key = Any.decode(reader, reader.uint32());
-          break;
-        case 2:
-          message.priv_key_type = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): Record_Local {
-    return {
-      priv_key: isSet(object.priv_key) ? Any.fromJSON(object.priv_key) : undefined,
-      priv_key_type: isSet(object.priv_key_type) ? String(object.priv_key_type) : "",
-    };
+    return { priv_key: isSet(object.priv_key) ? Any.fromJSON(object.priv_key) : undefined };
   },
 
   toJSON(message: Record_Local): unknown {
     const obj: any = {};
-    message.priv_key !== undefined && (obj.priv_key = message.priv_key ? Any.toJSON(message.priv_key) : undefined);
-    message.priv_key_type !== undefined && (obj.priv_key_type = message.priv_key_type);
+    if (message.priv_key !== undefined) {
+      obj.priv_key = Any.toJSON(message.priv_key);
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<Record_Local>, I>>(base?: I): Record_Local {
+    return Record_Local.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<Record_Local>, I>>(object: I): Record_Local {
@@ -209,7 +253,6 @@ export const Record_Local = {
     message.priv_key = (object.priv_key !== undefined && object.priv_key !== null)
       ? Any.fromPartial(object.priv_key)
       : undefined;
-    message.priv_key_type = object.priv_key_type ?? "";
     return message;
   },
 };
@@ -227,19 +270,24 @@ export const Record_Ledger = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Record_Ledger {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseRecord_Ledger();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.path = BIP44Params.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -250,8 +298,14 @@ export const Record_Ledger = {
 
   toJSON(message: Record_Ledger): unknown {
     const obj: any = {};
-    message.path !== undefined && (obj.path = message.path ? BIP44Params.toJSON(message.path) : undefined);
+    if (message.path !== undefined) {
+      obj.path = BIP44Params.toJSON(message.path);
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<Record_Ledger>, I>>(base?: I): Record_Ledger {
+    return Record_Ledger.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<Record_Ledger>, I>>(object: I): Record_Ledger {
@@ -273,16 +327,17 @@ export const Record_Multi = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Record_Multi {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseRecord_Multi();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        default:
-          reader.skipType(tag & 7);
-          break;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -294,6 +349,10 @@ export const Record_Multi = {
   toJSON(_: Record_Multi): unknown {
     const obj: any = {};
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<Record_Multi>, I>>(base?: I): Record_Multi {
+    return Record_Multi.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<Record_Multi>, I>>(_: I): Record_Multi {
@@ -312,16 +371,17 @@ export const Record_Offline = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Record_Offline {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseRecord_Offline();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        default:
-          reader.skipType(tag & 7);
-          break;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -333,6 +393,10 @@ export const Record_Offline = {
   toJSON(_: Record_Offline): unknown {
     const obj: any = {};
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<Record_Offline>, I>>(base?: I): Record_Offline {
+    return Record_Offline.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<Record_Offline>, I>>(_: I): Record_Offline {

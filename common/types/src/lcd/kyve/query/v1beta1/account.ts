@@ -33,7 +33,9 @@ export interface QueryAccountAssetsResponse {
 /** QueryAccountFundedListRequest ... */
 export interface QueryAccountDelegationUnbondingsRequest {
   /** pagination defines an optional pagination for the request. */
-  pagination?: PageRequest;
+  pagination?:
+    | PageRequest
+    | undefined;
   /** address ... */
   address: string;
 }
@@ -43,7 +45,7 @@ export interface QueryAccountDelegationUnbondingsResponse {
   /** balance ... */
   unbondings: DelegationUnbonding[];
   /** pagination defines the pagination in the response. */
-  pagination?: PageResponse;
+  pagination?: PageResponse | undefined;
 }
 
 /** QueryAccountAssetsResponse is the response type for the Query/AccountAssets RPC method. */
@@ -53,7 +55,7 @@ export interface DelegationUnbonding {
   /** creation_time */
   creation_time: string;
   /** staker */
-  staker?: FullStaker;
+  staker?: FullStaker | undefined;
 }
 
 /** QueryAccountFundedListRequest is the request type for the account queries with pagination */
@@ -73,7 +75,7 @@ export interface Funded {
   /** amount ... */
   amount: string;
   /** pool ... */
-  pool?: BasicPool;
+  pool?: BasicPool | undefined;
 }
 
 /** QueryAccountDelegationListRequest ... */
@@ -111,19 +113,24 @@ export const QueryAccountAssetsRequest = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): QueryAccountAssetsRequest {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseQueryAccountAssetsRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.address = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -134,8 +141,14 @@ export const QueryAccountAssetsRequest = {
 
   toJSON(message: QueryAccountAssetsRequest): unknown {
     const obj: any = {};
-    message.address !== undefined && (obj.address = message.address);
+    if (message.address !== "") {
+      obj.address = message.address;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<QueryAccountAssetsRequest>, I>>(base?: I): QueryAccountAssetsRequest {
+    return QueryAccountAssetsRequest.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<QueryAccountAssetsRequest>, I>>(object: I): QueryAccountAssetsRequest {
@@ -184,37 +197,66 @@ export const QueryAccountAssetsResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): QueryAccountAssetsResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseQueryAccountAssetsResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.balance = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.protocol_self_delegation = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 3:
+          if (tag !== 24) {
+            break;
+          }
+
           message.protocol_self_delegation_unbonding = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 4:
+          if (tag !== 32) {
+            break;
+          }
+
           message.protocol_delegation = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 5:
+          if (tag !== 40) {
+            break;
+          }
+
           message.protocol_delegation_unbonding = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 6:
+          if (tag !== 48) {
+            break;
+          }
+
           message.protocol_rewards = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 7:
+          if (tag !== 56) {
+            break;
+          }
+
           message.protocol_funding = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -237,16 +279,32 @@ export const QueryAccountAssetsResponse = {
 
   toJSON(message: QueryAccountAssetsResponse): unknown {
     const obj: any = {};
-    message.balance !== undefined && (obj.balance = message.balance);
-    message.protocol_self_delegation !== undefined && (obj.protocol_self_delegation = message.protocol_self_delegation);
-    message.protocol_self_delegation_unbonding !== undefined &&
-      (obj.protocol_self_delegation_unbonding = message.protocol_self_delegation_unbonding);
-    message.protocol_delegation !== undefined && (obj.protocol_delegation = message.protocol_delegation);
-    message.protocol_delegation_unbonding !== undefined &&
-      (obj.protocol_delegation_unbonding = message.protocol_delegation_unbonding);
-    message.protocol_rewards !== undefined && (obj.protocol_rewards = message.protocol_rewards);
-    message.protocol_funding !== undefined && (obj.protocol_funding = message.protocol_funding);
+    if (message.balance !== "0") {
+      obj.balance = message.balance;
+    }
+    if (message.protocol_self_delegation !== "0") {
+      obj.protocol_self_delegation = message.protocol_self_delegation;
+    }
+    if (message.protocol_self_delegation_unbonding !== "0") {
+      obj.protocol_self_delegation_unbonding = message.protocol_self_delegation_unbonding;
+    }
+    if (message.protocol_delegation !== "0") {
+      obj.protocol_delegation = message.protocol_delegation;
+    }
+    if (message.protocol_delegation_unbonding !== "0") {
+      obj.protocol_delegation_unbonding = message.protocol_delegation_unbonding;
+    }
+    if (message.protocol_rewards !== "0") {
+      obj.protocol_rewards = message.protocol_rewards;
+    }
+    if (message.protocol_funding !== "0") {
+      obj.protocol_funding = message.protocol_funding;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<QueryAccountAssetsResponse>, I>>(base?: I): QueryAccountAssetsResponse {
+    return QueryAccountAssetsResponse.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<QueryAccountAssetsResponse>, I>>(object: I): QueryAccountAssetsResponse {
@@ -278,22 +336,31 @@ export const QueryAccountDelegationUnbondingsRequest = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): QueryAccountDelegationUnbondingsRequest {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseQueryAccountDelegationUnbondingsRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.pagination = PageRequest.decode(reader, reader.uint32());
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.address = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -307,10 +374,19 @@ export const QueryAccountDelegationUnbondingsRequest = {
 
   toJSON(message: QueryAccountDelegationUnbondingsRequest): unknown {
     const obj: any = {};
-    message.pagination !== undefined &&
-      (obj.pagination = message.pagination ? PageRequest.toJSON(message.pagination) : undefined);
-    message.address !== undefined && (obj.address = message.address);
+    if (message.pagination !== undefined) {
+      obj.pagination = PageRequest.toJSON(message.pagination);
+    }
+    if (message.address !== "") {
+      obj.address = message.address;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<QueryAccountDelegationUnbondingsRequest>, I>>(
+    base?: I,
+  ): QueryAccountDelegationUnbondingsRequest {
+    return QueryAccountDelegationUnbondingsRequest.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<QueryAccountDelegationUnbondingsRequest>, I>>(
@@ -341,22 +417,31 @@ export const QueryAccountDelegationUnbondingsResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): QueryAccountDelegationUnbondingsResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseQueryAccountDelegationUnbondingsResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.unbondings.push(DelegationUnbonding.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.pagination = PageResponse.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -372,14 +457,19 @@ export const QueryAccountDelegationUnbondingsResponse = {
 
   toJSON(message: QueryAccountDelegationUnbondingsResponse): unknown {
     const obj: any = {};
-    if (message.unbondings) {
-      obj.unbondings = message.unbondings.map((e) => e ? DelegationUnbonding.toJSON(e) : undefined);
-    } else {
-      obj.unbondings = [];
+    if (message.unbondings?.length) {
+      obj.unbondings = message.unbondings.map((e) => DelegationUnbonding.toJSON(e));
     }
-    message.pagination !== undefined &&
-      (obj.pagination = message.pagination ? PageResponse.toJSON(message.pagination) : undefined);
+    if (message.pagination !== undefined) {
+      obj.pagination = PageResponse.toJSON(message.pagination);
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<QueryAccountDelegationUnbondingsResponse>, I>>(
+    base?: I,
+  ): QueryAccountDelegationUnbondingsResponse {
+    return QueryAccountDelegationUnbondingsResponse.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<QueryAccountDelegationUnbondingsResponse>, I>>(
@@ -413,25 +503,38 @@ export const DelegationUnbonding = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): DelegationUnbonding {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseDelegationUnbonding();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.amount = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.creation_time = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.staker = FullStaker.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -446,10 +549,20 @@ export const DelegationUnbonding = {
 
   toJSON(message: DelegationUnbonding): unknown {
     const obj: any = {};
-    message.amount !== undefined && (obj.amount = message.amount);
-    message.creation_time !== undefined && (obj.creation_time = message.creation_time);
-    message.staker !== undefined && (obj.staker = message.staker ? FullStaker.toJSON(message.staker) : undefined);
+    if (message.amount !== "0") {
+      obj.amount = message.amount;
+    }
+    if (message.creation_time !== "0") {
+      obj.creation_time = message.creation_time;
+    }
+    if (message.staker !== undefined) {
+      obj.staker = FullStaker.toJSON(message.staker);
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<DelegationUnbonding>, I>>(base?: I): DelegationUnbonding {
+    return DelegationUnbonding.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<DelegationUnbonding>, I>>(object: I): DelegationUnbonding {
@@ -476,19 +589,24 @@ export const QueryAccountFundedListRequest = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): QueryAccountFundedListRequest {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseQueryAccountFundedListRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.address = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -499,8 +617,14 @@ export const QueryAccountFundedListRequest = {
 
   toJSON(message: QueryAccountFundedListRequest): unknown {
     const obj: any = {};
-    message.address !== undefined && (obj.address = message.address);
+    if (message.address !== "") {
+      obj.address = message.address;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<QueryAccountFundedListRequest>, I>>(base?: I): QueryAccountFundedListRequest {
+    return QueryAccountFundedListRequest.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<QueryAccountFundedListRequest>, I>>(
@@ -525,19 +649,24 @@ export const QueryAccountFundedListResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): QueryAccountFundedListResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseQueryAccountFundedListResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.funded.push(Funded.decode(reader, reader.uint32()));
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -548,12 +677,14 @@ export const QueryAccountFundedListResponse = {
 
   toJSON(message: QueryAccountFundedListResponse): unknown {
     const obj: any = {};
-    if (message.funded) {
-      obj.funded = message.funded.map((e) => e ? Funded.toJSON(e) : undefined);
-    } else {
-      obj.funded = [];
+    if (message.funded?.length) {
+      obj.funded = message.funded.map((e) => Funded.toJSON(e));
     }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<QueryAccountFundedListResponse>, I>>(base?: I): QueryAccountFundedListResponse {
+    return QueryAccountFundedListResponse.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<QueryAccountFundedListResponse>, I>>(
@@ -581,22 +712,31 @@ export const Funded = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Funded {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseFunded();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.amount = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.pool = BasicPool.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -610,9 +750,17 @@ export const Funded = {
 
   toJSON(message: Funded): unknown {
     const obj: any = {};
-    message.amount !== undefined && (obj.amount = message.amount);
-    message.pool !== undefined && (obj.pool = message.pool ? BasicPool.toJSON(message.pool) : undefined);
+    if (message.amount !== "0") {
+      obj.amount = message.amount;
+    }
+    if (message.pool !== undefined) {
+      obj.pool = BasicPool.toJSON(message.pool);
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<Funded>, I>>(base?: I): Funded {
+    return Funded.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<Funded>, I>>(object: I): Funded {
@@ -636,19 +784,24 @@ export const QueryAccountRedelegationRequest = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): QueryAccountRedelegationRequest {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseQueryAccountRedelegationRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.address = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -659,8 +812,14 @@ export const QueryAccountRedelegationRequest = {
 
   toJSON(message: QueryAccountRedelegationRequest): unknown {
     const obj: any = {};
-    message.address !== undefined && (obj.address = message.address);
+    if (message.address !== "") {
+      obj.address = message.address;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<QueryAccountRedelegationRequest>, I>>(base?: I): QueryAccountRedelegationRequest {
+    return QueryAccountRedelegationRequest.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<QueryAccountRedelegationRequest>, I>>(
@@ -688,22 +847,31 @@ export const QueryAccountRedelegationResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): QueryAccountRedelegationResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseQueryAccountRedelegationResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.redelegation_cooldown_entries.push(RedelegationEntry.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.available_slots = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -719,15 +887,19 @@ export const QueryAccountRedelegationResponse = {
 
   toJSON(message: QueryAccountRedelegationResponse): unknown {
     const obj: any = {};
-    if (message.redelegation_cooldown_entries) {
-      obj.redelegation_cooldown_entries = message.redelegation_cooldown_entries.map((e) =>
-        e ? RedelegationEntry.toJSON(e) : undefined
-      );
-    } else {
-      obj.redelegation_cooldown_entries = [];
+    if (message.redelegation_cooldown_entries?.length) {
+      obj.redelegation_cooldown_entries = message.redelegation_cooldown_entries.map((e) => RedelegationEntry.toJSON(e));
     }
-    message.available_slots !== undefined && (obj.available_slots = message.available_slots);
+    if (message.available_slots !== "0") {
+      obj.available_slots = message.available_slots;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<QueryAccountRedelegationResponse>, I>>(
+    base?: I,
+  ): QueryAccountRedelegationResponse {
+    return QueryAccountRedelegationResponse.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<QueryAccountRedelegationResponse>, I>>(
@@ -757,22 +929,31 @@ export const RedelegationEntry = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): RedelegationEntry {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseRedelegationEntry();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.creation_date = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.finish_date = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -786,9 +967,17 @@ export const RedelegationEntry = {
 
   toJSON(message: RedelegationEntry): unknown {
     const obj: any = {};
-    message.creation_date !== undefined && (obj.creation_date = message.creation_date);
-    message.finish_date !== undefined && (obj.finish_date = message.finish_date);
+    if (message.creation_date !== "0") {
+      obj.creation_date = message.creation_date;
+    }
+    if (message.finish_date !== "0") {
+      obj.finish_date = message.finish_date;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<RedelegationEntry>, I>>(base?: I): RedelegationEntry {
+    return RedelegationEntry.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<RedelegationEntry>, I>>(object: I): RedelegationEntry {
@@ -813,11 +1002,12 @@ export interface QueryAccount {
   AccountRedelegation(request: QueryAccountRedelegationRequest): Promise<QueryAccountRedelegationResponse>;
 }
 
+export const QueryAccountServiceName = "kyve.query.v1beta1.QueryAccount";
 export class QueryAccountClientImpl implements QueryAccount {
   private readonly rpc: Rpc;
   private readonly service: string;
   constructor(rpc: Rpc, opts?: { service?: string }) {
-    this.service = opts?.service || "kyve.query.v1beta1.QueryAccount";
+    this.service = opts?.service || QueryAccountServiceName;
     this.rpc = rpc;
     this.AccountAssets = this.AccountAssets.bind(this);
     this.AccountDelegationUnbondings = this.AccountDelegationUnbondings.bind(this);
@@ -827,7 +1017,7 @@ export class QueryAccountClientImpl implements QueryAccount {
   AccountAssets(request: QueryAccountAssetsRequest): Promise<QueryAccountAssetsResponse> {
     const data = QueryAccountAssetsRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "AccountAssets", data);
-    return promise.then((data) => QueryAccountAssetsResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) => QueryAccountAssetsResponse.decode(_m0.Reader.create(data)));
   }
 
   AccountDelegationUnbondings(
@@ -835,19 +1025,19 @@ export class QueryAccountClientImpl implements QueryAccount {
   ): Promise<QueryAccountDelegationUnbondingsResponse> {
     const data = QueryAccountDelegationUnbondingsRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "AccountDelegationUnbondings", data);
-    return promise.then((data) => QueryAccountDelegationUnbondingsResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) => QueryAccountDelegationUnbondingsResponse.decode(_m0.Reader.create(data)));
   }
 
   AccountFundedList(request: QueryAccountFundedListRequest): Promise<QueryAccountFundedListResponse> {
     const data = QueryAccountFundedListRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "AccountFundedList", data);
-    return promise.then((data) => QueryAccountFundedListResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) => QueryAccountFundedListResponse.decode(_m0.Reader.create(data)));
   }
 
   AccountRedelegation(request: QueryAccountRedelegationRequest): Promise<QueryAccountRedelegationResponse> {
     const data = QueryAccountRedelegationRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "AccountRedelegation", data);
-    return promise.then((data) => QueryAccountRedelegationResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) => QueryAccountRedelegationResponse.decode(_m0.Reader.create(data)));
   }
 }
 

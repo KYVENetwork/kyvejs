@@ -13,9 +13,13 @@ export const protobufPackage = "kyve.bundles.v1beta1";
  */
 export interface EventUpdateParams {
   /** old_params is the module's old parameters. */
-  old_params?: Params;
+  old_params?:
+    | Params
+    | undefined;
   /** new_params is the module's new parameters. */
-  new_params?: Params;
+  new_params?:
+    | Params
+    | undefined;
   /** payload is the parameter updates that were performed. */
   payload: string;
 }
@@ -195,25 +199,38 @@ export const EventUpdateParams = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EventUpdateParams {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventUpdateParams();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.old_params = Params.decode(reader, reader.uint32());
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.new_params = Params.decode(reader, reader.uint32());
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.payload = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -228,12 +245,20 @@ export const EventUpdateParams = {
 
   toJSON(message: EventUpdateParams): unknown {
     const obj: any = {};
-    message.old_params !== undefined &&
-      (obj.old_params = message.old_params ? Params.toJSON(message.old_params) : undefined);
-    message.new_params !== undefined &&
-      (obj.new_params = message.new_params ? Params.toJSON(message.new_params) : undefined);
-    message.payload !== undefined && (obj.payload = message.payload);
+    if (message.old_params !== undefined) {
+      obj.old_params = Params.toJSON(message.old_params);
+    }
+    if (message.new_params !== undefined) {
+      obj.new_params = Params.toJSON(message.new_params);
+    }
+    if (message.payload !== "") {
+      obj.payload = message.payload;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<EventUpdateParams>, I>>(base?: I): EventUpdateParams {
+    return EventUpdateParams.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<EventUpdateParams>, I>>(object: I): EventUpdateParams {
@@ -271,28 +296,45 @@ export const EventBundleVote = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EventBundleVote {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventBundleVote();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.pool_id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.staker = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.storage_id = reader.string();
-          break;
+          continue;
         case 4:
+          if (tag !== 32) {
+            break;
+          }
+
           message.vote = voteTypeFromJSON(reader.int32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -308,11 +350,23 @@ export const EventBundleVote = {
 
   toJSON(message: EventBundleVote): unknown {
     const obj: any = {};
-    message.pool_id !== undefined && (obj.pool_id = message.pool_id);
-    message.staker !== undefined && (obj.staker = message.staker);
-    message.storage_id !== undefined && (obj.storage_id = message.storage_id);
-    message.vote !== undefined && (obj.vote = voteTypeToJSON(message.vote));
+    if (message.pool_id !== "0") {
+      obj.pool_id = message.pool_id;
+    }
+    if (message.staker !== "") {
+      obj.staker = message.staker;
+    }
+    if (message.storage_id !== "") {
+      obj.storage_id = message.storage_id;
+    }
+    if (message.vote !== VoteType.VOTE_TYPE_UNSPECIFIED) {
+      obj.vote = voteTypeToJSON(message.vote);
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<EventBundleVote>, I>>(base?: I): EventBundleVote {
+    return EventBundleVote.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<EventBundleVote>, I>>(object: I): EventBundleVote {
@@ -392,58 +446,115 @@ export const EventBundleProposed = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EventBundleProposed {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventBundleProposed();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.pool_id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.storage_id = reader.string();
-          break;
+          continue;
         case 4:
+          if (tag !== 34) {
+            break;
+          }
+
           message.uploader = reader.string();
-          break;
+          continue;
         case 5:
+          if (tag !== 40) {
+            break;
+          }
+
           message.data_size = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 6:
+          if (tag !== 48) {
+            break;
+          }
+
           message.from_index = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 7:
+          if (tag !== 56) {
+            break;
+          }
+
           message.bundle_size = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 8:
+          if (tag !== 66) {
+            break;
+          }
+
           message.from_key = reader.string();
-          break;
+          continue;
         case 9:
+          if (tag !== 74) {
+            break;
+          }
+
           message.to_key = reader.string();
-          break;
+          continue;
         case 10:
+          if (tag !== 82) {
+            break;
+          }
+
           message.bundle_summary = reader.string();
-          break;
+          continue;
         case 11:
+          if (tag !== 90) {
+            break;
+          }
+
           message.data_hash = reader.string();
-          break;
+          continue;
         case 12:
+          if (tag !== 96) {
+            break;
+          }
+
           message.proposed_at = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 13:
+          if (tag !== 104) {
+            break;
+          }
+
           message.storage_provider_id = reader.uint32();
-          break;
+          continue;
         case 14:
+          if (tag !== 112) {
+            break;
+          }
+
           message.compression_id = reader.uint32();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -469,21 +580,53 @@ export const EventBundleProposed = {
 
   toJSON(message: EventBundleProposed): unknown {
     const obj: any = {};
-    message.pool_id !== undefined && (obj.pool_id = message.pool_id);
-    message.id !== undefined && (obj.id = message.id);
-    message.storage_id !== undefined && (obj.storage_id = message.storage_id);
-    message.uploader !== undefined && (obj.uploader = message.uploader);
-    message.data_size !== undefined && (obj.data_size = message.data_size);
-    message.from_index !== undefined && (obj.from_index = message.from_index);
-    message.bundle_size !== undefined && (obj.bundle_size = message.bundle_size);
-    message.from_key !== undefined && (obj.from_key = message.from_key);
-    message.to_key !== undefined && (obj.to_key = message.to_key);
-    message.bundle_summary !== undefined && (obj.bundle_summary = message.bundle_summary);
-    message.data_hash !== undefined && (obj.data_hash = message.data_hash);
-    message.proposed_at !== undefined && (obj.proposed_at = message.proposed_at);
-    message.storage_provider_id !== undefined && (obj.storage_provider_id = Math.round(message.storage_provider_id));
-    message.compression_id !== undefined && (obj.compression_id = Math.round(message.compression_id));
+    if (message.pool_id !== "0") {
+      obj.pool_id = message.pool_id;
+    }
+    if (message.id !== "0") {
+      obj.id = message.id;
+    }
+    if (message.storage_id !== "") {
+      obj.storage_id = message.storage_id;
+    }
+    if (message.uploader !== "") {
+      obj.uploader = message.uploader;
+    }
+    if (message.data_size !== "0") {
+      obj.data_size = message.data_size;
+    }
+    if (message.from_index !== "0") {
+      obj.from_index = message.from_index;
+    }
+    if (message.bundle_size !== "0") {
+      obj.bundle_size = message.bundle_size;
+    }
+    if (message.from_key !== "") {
+      obj.from_key = message.from_key;
+    }
+    if (message.to_key !== "") {
+      obj.to_key = message.to_key;
+    }
+    if (message.bundle_summary !== "") {
+      obj.bundle_summary = message.bundle_summary;
+    }
+    if (message.data_hash !== "") {
+      obj.data_hash = message.data_hash;
+    }
+    if (message.proposed_at !== "0") {
+      obj.proposed_at = message.proposed_at;
+    }
+    if (message.storage_provider_id !== 0) {
+      obj.storage_provider_id = Math.round(message.storage_provider_id);
+    }
+    if (message.compression_id !== 0) {
+      obj.compression_id = Math.round(message.compression_id);
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<EventBundleProposed>, I>>(base?: I): EventBundleProposed {
+    return EventBundleProposed.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<EventBundleProposed>, I>>(object: I): EventBundleProposed {
@@ -581,64 +724,129 @@ export const EventBundleFinalized = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EventBundleFinalized {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventBundleFinalized();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.pool_id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 3:
+          if (tag !== 24) {
+            break;
+          }
+
           message.valid = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 4:
+          if (tag !== 32) {
+            break;
+          }
+
           message.invalid = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 5:
+          if (tag !== 40) {
+            break;
+          }
+
           message.abstain = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 6:
+          if (tag !== 48) {
+            break;
+          }
+
           message.total = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 7:
+          if (tag !== 56) {
+            break;
+          }
+
           message.status = bundleStatusFromJSON(reader.int32());
-          break;
+          continue;
         case 8:
+          if (tag !== 64) {
+            break;
+          }
+
           message.funders_payout = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 9:
+          if (tag !== 72) {
+            break;
+          }
+
           message.inflation_payout = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 10:
+          if (tag !== 80) {
+            break;
+          }
+
           message.reward_treasury = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 11:
+          if (tag !== 88) {
+            break;
+          }
+
           message.reward_uploader = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 12:
+          if (tag !== 96) {
+            break;
+          }
+
           message.reward_delegation = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 13:
+          if (tag !== 104) {
+            break;
+          }
+
           message.reward_total = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 14:
+          if (tag !== 112) {
+            break;
+          }
+
           message.finalized_at = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 15:
+          if (tag !== 122) {
+            break;
+          }
+
           message.uploader = reader.string();
-          break;
+          continue;
         case 16:
+          if (tag !== 130) {
+            break;
+          }
+
           message.next_uploader = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -666,23 +874,59 @@ export const EventBundleFinalized = {
 
   toJSON(message: EventBundleFinalized): unknown {
     const obj: any = {};
-    message.pool_id !== undefined && (obj.pool_id = message.pool_id);
-    message.id !== undefined && (obj.id = message.id);
-    message.valid !== undefined && (obj.valid = message.valid);
-    message.invalid !== undefined && (obj.invalid = message.invalid);
-    message.abstain !== undefined && (obj.abstain = message.abstain);
-    message.total !== undefined && (obj.total = message.total);
-    message.status !== undefined && (obj.status = bundleStatusToJSON(message.status));
-    message.funders_payout !== undefined && (obj.funders_payout = message.funders_payout);
-    message.inflation_payout !== undefined && (obj.inflation_payout = message.inflation_payout);
-    message.reward_treasury !== undefined && (obj.reward_treasury = message.reward_treasury);
-    message.reward_uploader !== undefined && (obj.reward_uploader = message.reward_uploader);
-    message.reward_delegation !== undefined && (obj.reward_delegation = message.reward_delegation);
-    message.reward_total !== undefined && (obj.reward_total = message.reward_total);
-    message.finalized_at !== undefined && (obj.finalized_at = message.finalized_at);
-    message.uploader !== undefined && (obj.uploader = message.uploader);
-    message.next_uploader !== undefined && (obj.next_uploader = message.next_uploader);
+    if (message.pool_id !== "0") {
+      obj.pool_id = message.pool_id;
+    }
+    if (message.id !== "0") {
+      obj.id = message.id;
+    }
+    if (message.valid !== "0") {
+      obj.valid = message.valid;
+    }
+    if (message.invalid !== "0") {
+      obj.invalid = message.invalid;
+    }
+    if (message.abstain !== "0") {
+      obj.abstain = message.abstain;
+    }
+    if (message.total !== "0") {
+      obj.total = message.total;
+    }
+    if (message.status !== BundleStatus.BUNDLE_STATUS_UNSPECIFIED) {
+      obj.status = bundleStatusToJSON(message.status);
+    }
+    if (message.funders_payout !== "0") {
+      obj.funders_payout = message.funders_payout;
+    }
+    if (message.inflation_payout !== "0") {
+      obj.inflation_payout = message.inflation_payout;
+    }
+    if (message.reward_treasury !== "0") {
+      obj.reward_treasury = message.reward_treasury;
+    }
+    if (message.reward_uploader !== "0") {
+      obj.reward_uploader = message.reward_uploader;
+    }
+    if (message.reward_delegation !== "0") {
+      obj.reward_delegation = message.reward_delegation;
+    }
+    if (message.reward_total !== "0") {
+      obj.reward_total = message.reward_total;
+    }
+    if (message.finalized_at !== "0") {
+      obj.finalized_at = message.finalized_at;
+    }
+    if (message.uploader !== "") {
+      obj.uploader = message.uploader;
+    }
+    if (message.next_uploader !== "") {
+      obj.next_uploader = message.next_uploader;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<EventBundleFinalized>, I>>(base?: I): EventBundleFinalized {
+    return EventBundleFinalized.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<EventBundleFinalized>, I>>(object: I): EventBundleFinalized {
@@ -726,25 +970,38 @@ export const EventClaimedUploaderRole = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EventClaimedUploaderRole {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventClaimedUploaderRole();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.pool_id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.new_uploader = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -759,10 +1016,20 @@ export const EventClaimedUploaderRole = {
 
   toJSON(message: EventClaimedUploaderRole): unknown {
     const obj: any = {};
-    message.pool_id !== undefined && (obj.pool_id = message.pool_id);
-    message.id !== undefined && (obj.id = message.id);
-    message.new_uploader !== undefined && (obj.new_uploader = message.new_uploader);
+    if (message.pool_id !== "0") {
+      obj.pool_id = message.pool_id;
+    }
+    if (message.id !== "0") {
+      obj.id = message.id;
+    }
+    if (message.new_uploader !== "") {
+      obj.new_uploader = message.new_uploader;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<EventClaimedUploaderRole>, I>>(base?: I): EventClaimedUploaderRole {
+    return EventClaimedUploaderRole.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<EventClaimedUploaderRole>, I>>(object: I): EventClaimedUploaderRole {
@@ -796,28 +1063,45 @@ export const EventSkippedUploaderRole = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EventSkippedUploaderRole {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventSkippedUploaderRole();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.pool_id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.previous_uploader = reader.string();
-          break;
+          continue;
         case 4:
+          if (tag !== 34) {
+            break;
+          }
+
           message.new_uploader = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -833,11 +1117,23 @@ export const EventSkippedUploaderRole = {
 
   toJSON(message: EventSkippedUploaderRole): unknown {
     const obj: any = {};
-    message.pool_id !== undefined && (obj.pool_id = message.pool_id);
-    message.id !== undefined && (obj.id = message.id);
-    message.previous_uploader !== undefined && (obj.previous_uploader = message.previous_uploader);
-    message.new_uploader !== undefined && (obj.new_uploader = message.new_uploader);
+    if (message.pool_id !== "0") {
+      obj.pool_id = message.pool_id;
+    }
+    if (message.id !== "0") {
+      obj.id = message.id;
+    }
+    if (message.previous_uploader !== "") {
+      obj.previous_uploader = message.previous_uploader;
+    }
+    if (message.new_uploader !== "") {
+      obj.new_uploader = message.new_uploader;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<EventSkippedUploaderRole>, I>>(base?: I): EventSkippedUploaderRole {
+    return EventSkippedUploaderRole.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<EventSkippedUploaderRole>, I>>(object: I): EventSkippedUploaderRole {
@@ -869,25 +1165,38 @@ export const EventPointIncreased = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EventPointIncreased {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventPointIncreased();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.pool_id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.staker = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag !== 24) {
+            break;
+          }
+
           message.current_points = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -902,10 +1211,20 @@ export const EventPointIncreased = {
 
   toJSON(message: EventPointIncreased): unknown {
     const obj: any = {};
-    message.pool_id !== undefined && (obj.pool_id = message.pool_id);
-    message.staker !== undefined && (obj.staker = message.staker);
-    message.current_points !== undefined && (obj.current_points = message.current_points);
+    if (message.pool_id !== "0") {
+      obj.pool_id = message.pool_id;
+    }
+    if (message.staker !== "") {
+      obj.staker = message.staker;
+    }
+    if (message.current_points !== "0") {
+      obj.current_points = message.current_points;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<EventPointIncreased>, I>>(base?: I): EventPointIncreased {
+    return EventPointIncreased.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<EventPointIncreased>, I>>(object: I): EventPointIncreased {
@@ -933,22 +1252,31 @@ export const EventPointsReset = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EventPointsReset {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventPointsReset();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.pool_id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.staker = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -962,9 +1290,17 @@ export const EventPointsReset = {
 
   toJSON(message: EventPointsReset): unknown {
     const obj: any = {};
-    message.pool_id !== undefined && (obj.pool_id = message.pool_id);
-    message.staker !== undefined && (obj.staker = message.staker);
+    if (message.pool_id !== "0") {
+      obj.pool_id = message.pool_id;
+    }
+    if (message.staker !== "") {
+      obj.staker = message.staker;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<EventPointsReset>, I>>(base?: I): EventPointsReset {
+    return EventPointsReset.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<EventPointsReset>, I>>(object: I): EventPointsReset {

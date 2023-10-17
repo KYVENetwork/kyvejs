@@ -7,10 +7,8 @@ export const protobufPackage = "cosmos.app.v1alpha1";
 export interface ModuleDescriptor {
   /**
    * go_import names the package that should be imported by an app to load the
-   * module in the runtime module registry. Either go_import must be defined here
-   * or the go_package option must be defined at the file level to indicate
-   * to users where to location the module implementation. go_import takes
-   * precedence over go_package when both are defined.
+   * module in the runtime module registry. It is required to make debugging
+   * of configuration errors easier for users.
    */
   go_import: string;
   /**
@@ -45,8 +43,8 @@ export interface PackageReference {
    * present in a previous version.
    *
    * A package should indicate its revision with a source code comment
-   * above the package declaration in one of its fields containing the
-   * test "Revision N" where N is an integer revision. All packages start
+   * above the package declaration in one of its files containing the
+   * text "Revision N" where N is an integer revision. All packages start
    * at revision 0 the first time they are released in a module.
    *
    * When a new version of a module is released and items are added to existing
@@ -107,25 +105,38 @@ export const ModuleDescriptor = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): ModuleDescriptor {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseModuleDescriptor();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.go_import = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.use_package.push(PackageReference.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.can_migrate_from.push(MigrateFromInfo.decode(reader, reader.uint32()));
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -144,18 +155,20 @@ export const ModuleDescriptor = {
 
   toJSON(message: ModuleDescriptor): unknown {
     const obj: any = {};
-    message.go_import !== undefined && (obj.go_import = message.go_import);
-    if (message.use_package) {
-      obj.use_package = message.use_package.map((e) => e ? PackageReference.toJSON(e) : undefined);
-    } else {
-      obj.use_package = [];
+    if (message.go_import !== "") {
+      obj.go_import = message.go_import;
     }
-    if (message.can_migrate_from) {
-      obj.can_migrate_from = message.can_migrate_from.map((e) => e ? MigrateFromInfo.toJSON(e) : undefined);
-    } else {
-      obj.can_migrate_from = [];
+    if (message.use_package?.length) {
+      obj.use_package = message.use_package.map((e) => PackageReference.toJSON(e));
+    }
+    if (message.can_migrate_from?.length) {
+      obj.can_migrate_from = message.can_migrate_from.map((e) => MigrateFromInfo.toJSON(e));
     }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ModuleDescriptor>, I>>(base?: I): ModuleDescriptor {
+    return ModuleDescriptor.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<ModuleDescriptor>, I>>(object: I): ModuleDescriptor {
@@ -183,22 +196,31 @@ export const PackageReference = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): PackageReference {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBasePackageReference();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.name = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.revision = reader.uint32();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -212,9 +234,17 @@ export const PackageReference = {
 
   toJSON(message: PackageReference): unknown {
     const obj: any = {};
-    message.name !== undefined && (obj.name = message.name);
-    message.revision !== undefined && (obj.revision = Math.round(message.revision));
+    if (message.name !== "") {
+      obj.name = message.name;
+    }
+    if (message.revision !== 0) {
+      obj.revision = Math.round(message.revision);
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<PackageReference>, I>>(base?: I): PackageReference {
+    return PackageReference.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<PackageReference>, I>>(object: I): PackageReference {
@@ -238,19 +268,24 @@ export const MigrateFromInfo = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MigrateFromInfo {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMigrateFromInfo();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.module = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -261,8 +296,14 @@ export const MigrateFromInfo = {
 
   toJSON(message: MigrateFromInfo): unknown {
     const obj: any = {};
-    message.module !== undefined && (obj.module = message.module);
+    if (message.module !== "") {
+      obj.module = message.module;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MigrateFromInfo>, I>>(base?: I): MigrateFromInfo {
+    return MigrateFromInfo.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<MigrateFromInfo>, I>>(object: I): MigrateFromInfo {

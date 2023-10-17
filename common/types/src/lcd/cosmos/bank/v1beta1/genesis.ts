@@ -1,14 +1,16 @@
 /* eslint-disable */
 import _m0 from "protobufjs/minimal";
 import { Coin } from "../../base/v1beta1/coin";
-import { Metadata, Params } from "./bank";
+import { Metadata, Params, SendEnabled } from "./bank";
 
 export const protobufPackage = "cosmos.bank.v1beta1";
 
 /** GenesisState defines the bank module's genesis state. */
 export interface GenesisState {
-  /** params defines all the paramaters of the module. */
-  params?: Params;
+  /** params defines all the parameters of the module. */
+  params?:
+    | Params
+    | undefined;
   /** balances is an array containing the balances of all the accounts. */
   balances: Balance[];
   /**
@@ -16,8 +18,14 @@ export interface GenesisState {
    * balances. Otherwise, it will be used to validate that the sum of the balances equals this amount.
    */
   supply: Coin[];
-  /** denom_metadata defines the metadata of the differents coins. */
+  /** denom_metadata defines the metadata of the different coins. */
   denom_metadata: Metadata[];
+  /**
+   * send_enabled defines the denoms where send is enabled or disabled.
+   *
+   * Since: cosmos-sdk 0.47
+   */
+  send_enabled: SendEnabled[];
 }
 
 /**
@@ -32,7 +40,7 @@ export interface Balance {
 }
 
 function createBaseGenesisState(): GenesisState {
-  return { params: undefined, balances: [], supply: [], denom_metadata: [] };
+  return { params: undefined, balances: [], supply: [], denom_metadata: [], send_enabled: [] };
 }
 
 export const GenesisState = {
@@ -49,32 +57,59 @@ export const GenesisState = {
     for (const v of message.denom_metadata) {
       Metadata.encode(v!, writer.uint32(34).fork()).ldelim();
     }
+    for (const v of message.send_enabled) {
+      SendEnabled.encode(v!, writer.uint32(42).fork()).ldelim();
+    }
     return writer;
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): GenesisState {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseGenesisState();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.params = Params.decode(reader, reader.uint32());
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.balances.push(Balance.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.supply.push(Coin.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 4:
+          if (tag !== 34) {
+            break;
+          }
+
           message.denom_metadata.push(Metadata.decode(reader, reader.uint32()));
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
+        case 5:
+          if (tag !== 42) {
+            break;
+          }
+
+          message.send_enabled.push(SendEnabled.decode(reader, reader.uint32()));
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -87,28 +122,34 @@ export const GenesisState = {
       denom_metadata: Array.isArray(object?.denom_metadata)
         ? object.denom_metadata.map((e: any) => Metadata.fromJSON(e))
         : [],
+      send_enabled: Array.isArray(object?.send_enabled)
+        ? object.send_enabled.map((e: any) => SendEnabled.fromJSON(e))
+        : [],
     };
   },
 
   toJSON(message: GenesisState): unknown {
     const obj: any = {};
-    message.params !== undefined && (obj.params = message.params ? Params.toJSON(message.params) : undefined);
-    if (message.balances) {
-      obj.balances = message.balances.map((e) => e ? Balance.toJSON(e) : undefined);
-    } else {
-      obj.balances = [];
+    if (message.params !== undefined) {
+      obj.params = Params.toJSON(message.params);
     }
-    if (message.supply) {
-      obj.supply = message.supply.map((e) => e ? Coin.toJSON(e) : undefined);
-    } else {
-      obj.supply = [];
+    if (message.balances?.length) {
+      obj.balances = message.balances.map((e) => Balance.toJSON(e));
     }
-    if (message.denom_metadata) {
-      obj.denom_metadata = message.denom_metadata.map((e) => e ? Metadata.toJSON(e) : undefined);
-    } else {
-      obj.denom_metadata = [];
+    if (message.supply?.length) {
+      obj.supply = message.supply.map((e) => Coin.toJSON(e));
+    }
+    if (message.denom_metadata?.length) {
+      obj.denom_metadata = message.denom_metadata.map((e) => Metadata.toJSON(e));
+    }
+    if (message.send_enabled?.length) {
+      obj.send_enabled = message.send_enabled.map((e) => SendEnabled.toJSON(e));
     }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<GenesisState>, I>>(base?: I): GenesisState {
+    return GenesisState.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<GenesisState>, I>>(object: I): GenesisState {
@@ -119,6 +160,7 @@ export const GenesisState = {
     message.balances = object.balances?.map((e) => Balance.fromPartial(e)) || [];
     message.supply = object.supply?.map((e) => Coin.fromPartial(e)) || [];
     message.denom_metadata = object.denom_metadata?.map((e) => Metadata.fromPartial(e)) || [];
+    message.send_enabled = object.send_enabled?.map((e) => SendEnabled.fromPartial(e)) || [];
     return message;
   },
 };
@@ -139,22 +181,31 @@ export const Balance = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Balance {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseBalance();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.address = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.coins.push(Coin.decode(reader, reader.uint32()));
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -168,13 +219,17 @@ export const Balance = {
 
   toJSON(message: Balance): unknown {
     const obj: any = {};
-    message.address !== undefined && (obj.address = message.address);
-    if (message.coins) {
-      obj.coins = message.coins.map((e) => e ? Coin.toJSON(e) : undefined);
-    } else {
-      obj.coins = [];
+    if (message.address !== "") {
+      obj.address = message.address;
+    }
+    if (message.coins?.length) {
+      obj.coins = message.coins.map((e) => Coin.toJSON(e));
     }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<Balance>, I>>(base?: I): Balance {
+    return Balance.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<Balance>, I>>(object: I): Balance {

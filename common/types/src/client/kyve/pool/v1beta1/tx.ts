@@ -4,34 +4,6 @@ import _m0 from "protobufjs/minimal";
 
 export const protobufPackage = "kyve.pool.v1beta1";
 
-/** MsgFundPool defines a SDK message for funding a pool. */
-export interface MsgFundPool {
-  /** creator ... */
-  creator: string;
-  /** id ... */
-  id: string;
-  /** amount ... */
-  amount: string;
-}
-
-/** MsgFundPoolResponse defines the Msg/DefundPool response type. */
-export interface MsgFundPoolResponse {
-}
-
-/** MsgDefundPool defines a SDK message for defunding a pool. */
-export interface MsgDefundPool {
-  /** creator ... */
-  creator: string;
-  /** id ... */
-  id: string;
-  /** amount ... */
-  amount: string;
-}
-
-/** MsgDefundPoolResponse defines the Msg/DefundPool response type. */
-export interface MsgDefundPoolResponse {
-}
-
 /** MsgCreatePool defines a SDK message for creating a new pool. */
 export interface MsgCreatePool {
   /** authority is the address of the governance account. */
@@ -48,8 +20,8 @@ export interface MsgCreatePool {
   start_key: string;
   /** upload_interval ... */
   upload_interval: string;
-  /** operating_cost ... */
-  operating_cost: string;
+  /** inflation_share_weight ... */
+  inflation_share_weight: string;
   /** min_delegation ... */
   min_delegation: string;
   /** max_bundle_size ... */
@@ -150,218 +122,6 @@ export interface MsgUpdateParams {
 export interface MsgUpdateParamsResponse {
 }
 
-function createBaseMsgFundPool(): MsgFundPool {
-  return { creator: "", id: "0", amount: "0" };
-}
-
-export const MsgFundPool = {
-  encode(message: MsgFundPool, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.creator !== "") {
-      writer.uint32(10).string(message.creator);
-    }
-    if (message.id !== "0") {
-      writer.uint32(16).uint64(message.id);
-    }
-    if (message.amount !== "0") {
-      writer.uint32(24).uint64(message.amount);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): MsgFundPool {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgFundPool();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.creator = reader.string();
-          break;
-        case 2:
-          message.id = longToString(reader.uint64() as Long);
-          break;
-        case 3:
-          message.amount = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): MsgFundPool {
-    return {
-      creator: isSet(object.creator) ? String(object.creator) : "",
-      id: isSet(object.id) ? String(object.id) : "0",
-      amount: isSet(object.amount) ? String(object.amount) : "0",
-    };
-  },
-
-  toJSON(message: MsgFundPool): unknown {
-    const obj: any = {};
-    message.creator !== undefined && (obj.creator = message.creator);
-    message.id !== undefined && (obj.id = message.id);
-    message.amount !== undefined && (obj.amount = message.amount);
-    return obj;
-  },
-
-  fromPartial<I extends Exact<DeepPartial<MsgFundPool>, I>>(object: I): MsgFundPool {
-    const message = createBaseMsgFundPool();
-    message.creator = object.creator ?? "";
-    message.id = object.id ?? "0";
-    message.amount = object.amount ?? "0";
-    return message;
-  },
-};
-
-function createBaseMsgFundPoolResponse(): MsgFundPoolResponse {
-  return {};
-}
-
-export const MsgFundPoolResponse = {
-  encode(_: MsgFundPoolResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): MsgFundPoolResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgFundPoolResponse();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(_: any): MsgFundPoolResponse {
-    return {};
-  },
-
-  toJSON(_: MsgFundPoolResponse): unknown {
-    const obj: any = {};
-    return obj;
-  },
-
-  fromPartial<I extends Exact<DeepPartial<MsgFundPoolResponse>, I>>(_: I): MsgFundPoolResponse {
-    const message = createBaseMsgFundPoolResponse();
-    return message;
-  },
-};
-
-function createBaseMsgDefundPool(): MsgDefundPool {
-  return { creator: "", id: "0", amount: "0" };
-}
-
-export const MsgDefundPool = {
-  encode(message: MsgDefundPool, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.creator !== "") {
-      writer.uint32(10).string(message.creator);
-    }
-    if (message.id !== "0") {
-      writer.uint32(16).uint64(message.id);
-    }
-    if (message.amount !== "0") {
-      writer.uint32(24).uint64(message.amount);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): MsgDefundPool {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgDefundPool();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.creator = reader.string();
-          break;
-        case 2:
-          message.id = longToString(reader.uint64() as Long);
-          break;
-        case 3:
-          message.amount = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): MsgDefundPool {
-    return {
-      creator: isSet(object.creator) ? String(object.creator) : "",
-      id: isSet(object.id) ? String(object.id) : "0",
-      amount: isSet(object.amount) ? String(object.amount) : "0",
-    };
-  },
-
-  toJSON(message: MsgDefundPool): unknown {
-    const obj: any = {};
-    message.creator !== undefined && (obj.creator = message.creator);
-    message.id !== undefined && (obj.id = message.id);
-    message.amount !== undefined && (obj.amount = message.amount);
-    return obj;
-  },
-
-  fromPartial<I extends Exact<DeepPartial<MsgDefundPool>, I>>(object: I): MsgDefundPool {
-    const message = createBaseMsgDefundPool();
-    message.creator = object.creator ?? "";
-    message.id = object.id ?? "0";
-    message.amount = object.amount ?? "0";
-    return message;
-  },
-};
-
-function createBaseMsgDefundPoolResponse(): MsgDefundPoolResponse {
-  return {};
-}
-
-export const MsgDefundPoolResponse = {
-  encode(_: MsgDefundPoolResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): MsgDefundPoolResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgDefundPoolResponse();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(_: any): MsgDefundPoolResponse {
-    return {};
-  },
-
-  toJSON(_: MsgDefundPoolResponse): unknown {
-    const obj: any = {};
-    return obj;
-  },
-
-  fromPartial<I extends Exact<DeepPartial<MsgDefundPoolResponse>, I>>(_: I): MsgDefundPoolResponse {
-    const message = createBaseMsgDefundPoolResponse();
-    return message;
-  },
-};
-
 function createBaseMsgCreatePool(): MsgCreatePool {
   return {
     authority: "",
@@ -371,7 +131,7 @@ function createBaseMsgCreatePool(): MsgCreatePool {
     config: "",
     start_key: "",
     upload_interval: "0",
-    operating_cost: "0",
+    inflation_share_weight: "0",
     min_delegation: "0",
     max_bundle_size: "0",
     version: "",
@@ -404,8 +164,8 @@ export const MsgCreatePool = {
     if (message.upload_interval !== "0") {
       writer.uint32(56).uint64(message.upload_interval);
     }
-    if (message.operating_cost !== "0") {
-      writer.uint32(64).uint64(message.operating_cost);
+    if (message.inflation_share_weight !== "0") {
+      writer.uint32(64).uint64(message.inflation_share_weight);
     }
     if (message.min_delegation !== "0") {
       writer.uint32(72).uint64(message.min_delegation);
@@ -429,58 +189,115 @@ export const MsgCreatePool = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgCreatePool {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgCreatePool();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.authority = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.name = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.runtime = reader.string();
-          break;
+          continue;
         case 4:
+          if (tag !== 34) {
+            break;
+          }
+
           message.logo = reader.string();
-          break;
+          continue;
         case 5:
+          if (tag !== 42) {
+            break;
+          }
+
           message.config = reader.string();
-          break;
+          continue;
         case 6:
+          if (tag !== 50) {
+            break;
+          }
+
           message.start_key = reader.string();
-          break;
+          continue;
         case 7:
+          if (tag !== 56) {
+            break;
+          }
+
           message.upload_interval = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 8:
-          message.operating_cost = longToString(reader.uint64() as Long);
-          break;
+          if (tag !== 64) {
+            break;
+          }
+
+          message.inflation_share_weight = longToString(reader.uint64() as Long);
+          continue;
         case 9:
+          if (tag !== 72) {
+            break;
+          }
+
           message.min_delegation = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 10:
+          if (tag !== 80) {
+            break;
+          }
+
           message.max_bundle_size = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 11:
+          if (tag !== 90) {
+            break;
+          }
+
           message.version = reader.string();
-          break;
+          continue;
         case 12:
+          if (tag !== 98) {
+            break;
+          }
+
           message.binaries = reader.string();
-          break;
+          continue;
         case 13:
+          if (tag !== 104) {
+            break;
+          }
+
           message.storage_provider_id = reader.uint32();
-          break;
+          continue;
         case 14:
+          if (tag !== 112) {
+            break;
+          }
+
           message.compression_id = reader.uint32();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -494,7 +311,7 @@ export const MsgCreatePool = {
       config: isSet(object.config) ? String(object.config) : "",
       start_key: isSet(object.start_key) ? String(object.start_key) : "",
       upload_interval: isSet(object.upload_interval) ? String(object.upload_interval) : "0",
-      operating_cost: isSet(object.operating_cost) ? String(object.operating_cost) : "0",
+      inflation_share_weight: isSet(object.inflation_share_weight) ? String(object.inflation_share_weight) : "0",
       min_delegation: isSet(object.min_delegation) ? String(object.min_delegation) : "0",
       max_bundle_size: isSet(object.max_bundle_size) ? String(object.max_bundle_size) : "0",
       version: isSet(object.version) ? String(object.version) : "",
@@ -506,21 +323,53 @@ export const MsgCreatePool = {
 
   toJSON(message: MsgCreatePool): unknown {
     const obj: any = {};
-    message.authority !== undefined && (obj.authority = message.authority);
-    message.name !== undefined && (obj.name = message.name);
-    message.runtime !== undefined && (obj.runtime = message.runtime);
-    message.logo !== undefined && (obj.logo = message.logo);
-    message.config !== undefined && (obj.config = message.config);
-    message.start_key !== undefined && (obj.start_key = message.start_key);
-    message.upload_interval !== undefined && (obj.upload_interval = message.upload_interval);
-    message.operating_cost !== undefined && (obj.operating_cost = message.operating_cost);
-    message.min_delegation !== undefined && (obj.min_delegation = message.min_delegation);
-    message.max_bundle_size !== undefined && (obj.max_bundle_size = message.max_bundle_size);
-    message.version !== undefined && (obj.version = message.version);
-    message.binaries !== undefined && (obj.binaries = message.binaries);
-    message.storage_provider_id !== undefined && (obj.storage_provider_id = Math.round(message.storage_provider_id));
-    message.compression_id !== undefined && (obj.compression_id = Math.round(message.compression_id));
+    if (message.authority !== "") {
+      obj.authority = message.authority;
+    }
+    if (message.name !== "") {
+      obj.name = message.name;
+    }
+    if (message.runtime !== "") {
+      obj.runtime = message.runtime;
+    }
+    if (message.logo !== "") {
+      obj.logo = message.logo;
+    }
+    if (message.config !== "") {
+      obj.config = message.config;
+    }
+    if (message.start_key !== "") {
+      obj.start_key = message.start_key;
+    }
+    if (message.upload_interval !== "0") {
+      obj.upload_interval = message.upload_interval;
+    }
+    if (message.inflation_share_weight !== "0") {
+      obj.inflation_share_weight = message.inflation_share_weight;
+    }
+    if (message.min_delegation !== "0") {
+      obj.min_delegation = message.min_delegation;
+    }
+    if (message.max_bundle_size !== "0") {
+      obj.max_bundle_size = message.max_bundle_size;
+    }
+    if (message.version !== "") {
+      obj.version = message.version;
+    }
+    if (message.binaries !== "") {
+      obj.binaries = message.binaries;
+    }
+    if (message.storage_provider_id !== 0) {
+      obj.storage_provider_id = Math.round(message.storage_provider_id);
+    }
+    if (message.compression_id !== 0) {
+      obj.compression_id = Math.round(message.compression_id);
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MsgCreatePool>, I>>(base?: I): MsgCreatePool {
+    return MsgCreatePool.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<MsgCreatePool>, I>>(object: I): MsgCreatePool {
@@ -532,7 +381,7 @@ export const MsgCreatePool = {
     message.config = object.config ?? "";
     message.start_key = object.start_key ?? "";
     message.upload_interval = object.upload_interval ?? "0";
-    message.operating_cost = object.operating_cost ?? "0";
+    message.inflation_share_weight = object.inflation_share_weight ?? "0";
     message.min_delegation = object.min_delegation ?? "0";
     message.max_bundle_size = object.max_bundle_size ?? "0";
     message.version = object.version ?? "";
@@ -553,16 +402,17 @@ export const MsgCreatePoolResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgCreatePoolResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgCreatePoolResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        default:
-          reader.skipType(tag & 7);
-          break;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -574,6 +424,10 @@ export const MsgCreatePoolResponse = {
   toJSON(_: MsgCreatePoolResponse): unknown {
     const obj: any = {};
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MsgCreatePoolResponse>, I>>(base?: I): MsgCreatePoolResponse {
+    return MsgCreatePoolResponse.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<MsgCreatePoolResponse>, I>>(_: I): MsgCreatePoolResponse {
@@ -601,25 +455,38 @@ export const MsgUpdatePool = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgUpdatePool {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgUpdatePool();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.authority = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.payload = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -634,10 +501,20 @@ export const MsgUpdatePool = {
 
   toJSON(message: MsgUpdatePool): unknown {
     const obj: any = {};
-    message.authority !== undefined && (obj.authority = message.authority);
-    message.id !== undefined && (obj.id = message.id);
-    message.payload !== undefined && (obj.payload = message.payload);
+    if (message.authority !== "") {
+      obj.authority = message.authority;
+    }
+    if (message.id !== "0") {
+      obj.id = message.id;
+    }
+    if (message.payload !== "") {
+      obj.payload = message.payload;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MsgUpdatePool>, I>>(base?: I): MsgUpdatePool {
+    return MsgUpdatePool.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<MsgUpdatePool>, I>>(object: I): MsgUpdatePool {
@@ -659,16 +536,17 @@ export const MsgUpdatePoolResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgUpdatePoolResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgUpdatePoolResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        default:
-          reader.skipType(tag & 7);
-          break;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -680,6 +558,10 @@ export const MsgUpdatePoolResponse = {
   toJSON(_: MsgUpdatePoolResponse): unknown {
     const obj: any = {};
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MsgUpdatePoolResponse>, I>>(base?: I): MsgUpdatePoolResponse {
+    return MsgUpdatePoolResponse.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<MsgUpdatePoolResponse>, I>>(_: I): MsgUpdatePoolResponse {
@@ -704,22 +586,31 @@ export const MsgDisablePool = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgDisablePool {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgDisablePool();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.authority = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.id = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -733,9 +624,17 @@ export const MsgDisablePool = {
 
   toJSON(message: MsgDisablePool): unknown {
     const obj: any = {};
-    message.authority !== undefined && (obj.authority = message.authority);
-    message.id !== undefined && (obj.id = message.id);
+    if (message.authority !== "") {
+      obj.authority = message.authority;
+    }
+    if (message.id !== "0") {
+      obj.id = message.id;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MsgDisablePool>, I>>(base?: I): MsgDisablePool {
+    return MsgDisablePool.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<MsgDisablePool>, I>>(object: I): MsgDisablePool {
@@ -756,16 +655,17 @@ export const MsgDisablePoolResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgDisablePoolResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgDisablePoolResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        default:
-          reader.skipType(tag & 7);
-          break;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -777,6 +677,10 @@ export const MsgDisablePoolResponse = {
   toJSON(_: MsgDisablePoolResponse): unknown {
     const obj: any = {};
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MsgDisablePoolResponse>, I>>(base?: I): MsgDisablePoolResponse {
+    return MsgDisablePoolResponse.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<MsgDisablePoolResponse>, I>>(_: I): MsgDisablePoolResponse {
@@ -801,22 +705,31 @@ export const MsgEnablePool = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgEnablePool {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgEnablePool();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.authority = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.id = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -830,9 +743,17 @@ export const MsgEnablePool = {
 
   toJSON(message: MsgEnablePool): unknown {
     const obj: any = {};
-    message.authority !== undefined && (obj.authority = message.authority);
-    message.id !== undefined && (obj.id = message.id);
+    if (message.authority !== "") {
+      obj.authority = message.authority;
+    }
+    if (message.id !== "0") {
+      obj.id = message.id;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MsgEnablePool>, I>>(base?: I): MsgEnablePool {
+    return MsgEnablePool.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<MsgEnablePool>, I>>(object: I): MsgEnablePool {
@@ -853,16 +774,17 @@ export const MsgEnablePoolResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgEnablePoolResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgEnablePoolResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        default:
-          reader.skipType(tag & 7);
-          break;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -874,6 +796,10 @@ export const MsgEnablePoolResponse = {
   toJSON(_: MsgEnablePoolResponse): unknown {
     const obj: any = {};
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MsgEnablePoolResponse>, I>>(base?: I): MsgEnablePoolResponse {
+    return MsgEnablePoolResponse.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<MsgEnablePoolResponse>, I>>(_: I): MsgEnablePoolResponse {
@@ -910,34 +836,59 @@ export const MsgScheduleRuntimeUpgrade = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgScheduleRuntimeUpgrade {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgScheduleRuntimeUpgrade();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.authority = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.runtime = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.version = reader.string();
-          break;
+          continue;
         case 4:
+          if (tag !== 32) {
+            break;
+          }
+
           message.scheduled_at = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 5:
+          if (tag !== 40) {
+            break;
+          }
+
           message.duration = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 6:
+          if (tag !== 50) {
+            break;
+          }
+
           message.binaries = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -955,13 +906,29 @@ export const MsgScheduleRuntimeUpgrade = {
 
   toJSON(message: MsgScheduleRuntimeUpgrade): unknown {
     const obj: any = {};
-    message.authority !== undefined && (obj.authority = message.authority);
-    message.runtime !== undefined && (obj.runtime = message.runtime);
-    message.version !== undefined && (obj.version = message.version);
-    message.scheduled_at !== undefined && (obj.scheduled_at = message.scheduled_at);
-    message.duration !== undefined && (obj.duration = message.duration);
-    message.binaries !== undefined && (obj.binaries = message.binaries);
+    if (message.authority !== "") {
+      obj.authority = message.authority;
+    }
+    if (message.runtime !== "") {
+      obj.runtime = message.runtime;
+    }
+    if (message.version !== "") {
+      obj.version = message.version;
+    }
+    if (message.scheduled_at !== "0") {
+      obj.scheduled_at = message.scheduled_at;
+    }
+    if (message.duration !== "0") {
+      obj.duration = message.duration;
+    }
+    if (message.binaries !== "") {
+      obj.binaries = message.binaries;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MsgScheduleRuntimeUpgrade>, I>>(base?: I): MsgScheduleRuntimeUpgrade {
+    return MsgScheduleRuntimeUpgrade.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<MsgScheduleRuntimeUpgrade>, I>>(object: I): MsgScheduleRuntimeUpgrade {
@@ -986,16 +953,17 @@ export const MsgScheduleRuntimeUpgradeResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgScheduleRuntimeUpgradeResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgScheduleRuntimeUpgradeResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        default:
-          reader.skipType(tag & 7);
-          break;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -1007,6 +975,12 @@ export const MsgScheduleRuntimeUpgradeResponse = {
   toJSON(_: MsgScheduleRuntimeUpgradeResponse): unknown {
     const obj: any = {};
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MsgScheduleRuntimeUpgradeResponse>, I>>(
+    base?: I,
+  ): MsgScheduleRuntimeUpgradeResponse {
+    return MsgScheduleRuntimeUpgradeResponse.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<MsgScheduleRuntimeUpgradeResponse>, I>>(
@@ -1033,22 +1007,31 @@ export const MsgCancelRuntimeUpgrade = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgCancelRuntimeUpgrade {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgCancelRuntimeUpgrade();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.authority = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.runtime = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -1062,9 +1045,17 @@ export const MsgCancelRuntimeUpgrade = {
 
   toJSON(message: MsgCancelRuntimeUpgrade): unknown {
     const obj: any = {};
-    message.authority !== undefined && (obj.authority = message.authority);
-    message.runtime !== undefined && (obj.runtime = message.runtime);
+    if (message.authority !== "") {
+      obj.authority = message.authority;
+    }
+    if (message.runtime !== "") {
+      obj.runtime = message.runtime;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MsgCancelRuntimeUpgrade>, I>>(base?: I): MsgCancelRuntimeUpgrade {
+    return MsgCancelRuntimeUpgrade.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<MsgCancelRuntimeUpgrade>, I>>(object: I): MsgCancelRuntimeUpgrade {
@@ -1085,16 +1076,17 @@ export const MsgCancelRuntimeUpgradeResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgCancelRuntimeUpgradeResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgCancelRuntimeUpgradeResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        default:
-          reader.skipType(tag & 7);
-          break;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -1106,6 +1098,10 @@ export const MsgCancelRuntimeUpgradeResponse = {
   toJSON(_: MsgCancelRuntimeUpgradeResponse): unknown {
     const obj: any = {};
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MsgCancelRuntimeUpgradeResponse>, I>>(base?: I): MsgCancelRuntimeUpgradeResponse {
+    return MsgCancelRuntimeUpgradeResponse.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<MsgCancelRuntimeUpgradeResponse>, I>>(_: I): MsgCancelRuntimeUpgradeResponse {
@@ -1130,22 +1126,31 @@ export const MsgUpdateParams = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgUpdateParams {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgUpdateParams();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.authority = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.payload = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -1159,9 +1164,17 @@ export const MsgUpdateParams = {
 
   toJSON(message: MsgUpdateParams): unknown {
     const obj: any = {};
-    message.authority !== undefined && (obj.authority = message.authority);
-    message.payload !== undefined && (obj.payload = message.payload);
+    if (message.authority !== "") {
+      obj.authority = message.authority;
+    }
+    if (message.payload !== "") {
+      obj.payload = message.payload;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MsgUpdateParams>, I>>(base?: I): MsgUpdateParams {
+    return MsgUpdateParams.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<MsgUpdateParams>, I>>(object: I): MsgUpdateParams {
@@ -1182,16 +1195,17 @@ export const MsgUpdateParamsResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgUpdateParamsResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgUpdateParamsResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        default:
-          reader.skipType(tag & 7);
-          break;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -1205,6 +1219,10 @@ export const MsgUpdateParamsResponse = {
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<MsgUpdateParamsResponse>, I>>(base?: I): MsgUpdateParamsResponse {
+    return MsgUpdateParamsResponse.fromPartial(base ?? {});
+  },
+
   fromPartial<I extends Exact<DeepPartial<MsgUpdateParamsResponse>, I>>(_: I): MsgUpdateParamsResponse {
     const message = createBaseMsgUpdateParamsResponse();
     return message;
@@ -1213,10 +1231,6 @@ export const MsgUpdateParamsResponse = {
 
 /** Msg defines the Msg service. */
 export interface Msg {
-  /** FundPool ... */
-  FundPool(request: MsgFundPool): Promise<MsgFundPoolResponse>;
-  /** DefundPool ... */
-  DefundPool(request: MsgDefundPool): Promise<MsgDefundPoolResponse>;
   /**
    * CreatePool defines a governance operation for creating a new pool.
    * The authority is hard-coded to the x/gov module account.
@@ -1254,14 +1268,13 @@ export interface Msg {
   UpdateParams(request: MsgUpdateParams): Promise<MsgUpdateParamsResponse>;
 }
 
+export const MsgServiceName = "kyve.pool.v1beta1.Msg";
 export class MsgClientImpl implements Msg {
   private readonly rpc: Rpc;
   private readonly service: string;
   constructor(rpc: Rpc, opts?: { service?: string }) {
-    this.service = opts?.service || "kyve.pool.v1beta1.Msg";
+    this.service = opts?.service || MsgServiceName;
     this.rpc = rpc;
-    this.FundPool = this.FundPool.bind(this);
-    this.DefundPool = this.DefundPool.bind(this);
     this.CreatePool = this.CreatePool.bind(this);
     this.UpdatePool = this.UpdatePool.bind(this);
     this.DisablePool = this.DisablePool.bind(this);
@@ -1270,58 +1283,46 @@ export class MsgClientImpl implements Msg {
     this.CancelRuntimeUpgrade = this.CancelRuntimeUpgrade.bind(this);
     this.UpdateParams = this.UpdateParams.bind(this);
   }
-  FundPool(request: MsgFundPool): Promise<MsgFundPoolResponse> {
-    const data = MsgFundPool.encode(request).finish();
-    const promise = this.rpc.request(this.service, "FundPool", data);
-    return promise.then((data) => MsgFundPoolResponse.decode(new _m0.Reader(data)));
-  }
-
-  DefundPool(request: MsgDefundPool): Promise<MsgDefundPoolResponse> {
-    const data = MsgDefundPool.encode(request).finish();
-    const promise = this.rpc.request(this.service, "DefundPool", data);
-    return promise.then((data) => MsgDefundPoolResponse.decode(new _m0.Reader(data)));
-  }
-
   CreatePool(request: MsgCreatePool): Promise<MsgCreatePoolResponse> {
     const data = MsgCreatePool.encode(request).finish();
     const promise = this.rpc.request(this.service, "CreatePool", data);
-    return promise.then((data) => MsgCreatePoolResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) => MsgCreatePoolResponse.decode(_m0.Reader.create(data)));
   }
 
   UpdatePool(request: MsgUpdatePool): Promise<MsgUpdatePoolResponse> {
     const data = MsgUpdatePool.encode(request).finish();
     const promise = this.rpc.request(this.service, "UpdatePool", data);
-    return promise.then((data) => MsgUpdatePoolResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) => MsgUpdatePoolResponse.decode(_m0.Reader.create(data)));
   }
 
   DisablePool(request: MsgDisablePool): Promise<MsgDisablePoolResponse> {
     const data = MsgDisablePool.encode(request).finish();
     const promise = this.rpc.request(this.service, "DisablePool", data);
-    return promise.then((data) => MsgDisablePoolResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) => MsgDisablePoolResponse.decode(_m0.Reader.create(data)));
   }
 
   EnablePool(request: MsgEnablePool): Promise<MsgEnablePoolResponse> {
     const data = MsgEnablePool.encode(request).finish();
     const promise = this.rpc.request(this.service, "EnablePool", data);
-    return promise.then((data) => MsgEnablePoolResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) => MsgEnablePoolResponse.decode(_m0.Reader.create(data)));
   }
 
   ScheduleRuntimeUpgrade(request: MsgScheduleRuntimeUpgrade): Promise<MsgScheduleRuntimeUpgradeResponse> {
     const data = MsgScheduleRuntimeUpgrade.encode(request).finish();
     const promise = this.rpc.request(this.service, "ScheduleRuntimeUpgrade", data);
-    return promise.then((data) => MsgScheduleRuntimeUpgradeResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) => MsgScheduleRuntimeUpgradeResponse.decode(_m0.Reader.create(data)));
   }
 
   CancelRuntimeUpgrade(request: MsgCancelRuntimeUpgrade): Promise<MsgCancelRuntimeUpgradeResponse> {
     const data = MsgCancelRuntimeUpgrade.encode(request).finish();
     const promise = this.rpc.request(this.service, "CancelRuntimeUpgrade", data);
-    return promise.then((data) => MsgCancelRuntimeUpgradeResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) => MsgCancelRuntimeUpgradeResponse.decode(_m0.Reader.create(data)));
   }
 
   UpdateParams(request: MsgUpdateParams): Promise<MsgUpdateParamsResponse> {
     const data = MsgUpdateParams.encode(request).finish();
     const promise = this.rpc.request(this.service, "UpdateParams", data);
-    return promise.then((data) => MsgUpdateParamsResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) => MsgUpdateParamsResponse.decode(_m0.Reader.create(data)));
   }
 }
 

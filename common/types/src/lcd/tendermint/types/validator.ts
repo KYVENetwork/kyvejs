@@ -7,19 +7,19 @@ export const protobufPackage = "tendermint.types";
 
 export interface ValidatorSet {
   validators: Validator[];
-  proposer?: Validator;
+  proposer?: Validator | undefined;
   total_voting_power: string;
 }
 
 export interface Validator {
   address: Uint8Array;
-  pub_key?: PublicKey;
+  pub_key?: PublicKey | undefined;
   voting_power: string;
   proposer_priority: string;
 }
 
 export interface SimpleValidator {
-  pub_key?: PublicKey;
+  pub_key?: PublicKey | undefined;
   voting_power: string;
 }
 
@@ -42,25 +42,38 @@ export const ValidatorSet = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): ValidatorSet {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseValidatorSet();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.validators.push(Validator.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.proposer = Validator.decode(reader, reader.uint32());
-          break;
+          continue;
         case 3:
+          if (tag !== 24) {
+            break;
+          }
+
           message.total_voting_power = longToString(reader.int64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -75,15 +88,20 @@ export const ValidatorSet = {
 
   toJSON(message: ValidatorSet): unknown {
     const obj: any = {};
-    if (message.validators) {
-      obj.validators = message.validators.map((e) => e ? Validator.toJSON(e) : undefined);
-    } else {
-      obj.validators = [];
+    if (message.validators?.length) {
+      obj.validators = message.validators.map((e) => Validator.toJSON(e));
     }
-    message.proposer !== undefined &&
-      (obj.proposer = message.proposer ? Validator.toJSON(message.proposer) : undefined);
-    message.total_voting_power !== undefined && (obj.total_voting_power = message.total_voting_power);
+    if (message.proposer !== undefined) {
+      obj.proposer = Validator.toJSON(message.proposer);
+    }
+    if (message.total_voting_power !== "0") {
+      obj.total_voting_power = message.total_voting_power;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ValidatorSet>, I>>(base?: I): ValidatorSet {
+    return ValidatorSet.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<ValidatorSet>, I>>(object: I): ValidatorSet {
@@ -98,7 +116,7 @@ export const ValidatorSet = {
 };
 
 function createBaseValidator(): Validator {
-  return { address: new Uint8Array(), pub_key: undefined, voting_power: "0", proposer_priority: "0" };
+  return { address: new Uint8Array(0), pub_key: undefined, voting_power: "0", proposer_priority: "0" };
 }
 
 export const Validator = {
@@ -119,35 +137,52 @@ export const Validator = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Validator {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseValidator();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.address = reader.bytes();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.pub_key = PublicKey.decode(reader, reader.uint32());
-          break;
+          continue;
         case 3:
+          if (tag !== 24) {
+            break;
+          }
+
           message.voting_power = longToString(reader.int64() as Long);
-          break;
+          continue;
         case 4:
+          if (tag !== 32) {
+            break;
+          }
+
           message.proposer_priority = longToString(reader.int64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): Validator {
     return {
-      address: isSet(object.address) ? bytesFromBase64(object.address) : new Uint8Array(),
+      address: isSet(object.address) ? bytesFromBase64(object.address) : new Uint8Array(0),
       pub_key: isSet(object.pub_key) ? PublicKey.fromJSON(object.pub_key) : undefined,
       voting_power: isSet(object.voting_power) ? String(object.voting_power) : "0",
       proposer_priority: isSet(object.proposer_priority) ? String(object.proposer_priority) : "0",
@@ -156,17 +191,28 @@ export const Validator = {
 
   toJSON(message: Validator): unknown {
     const obj: any = {};
-    message.address !== undefined &&
-      (obj.address = base64FromBytes(message.address !== undefined ? message.address : new Uint8Array()));
-    message.pub_key !== undefined && (obj.pub_key = message.pub_key ? PublicKey.toJSON(message.pub_key) : undefined);
-    message.voting_power !== undefined && (obj.voting_power = message.voting_power);
-    message.proposer_priority !== undefined && (obj.proposer_priority = message.proposer_priority);
+    if (message.address.length !== 0) {
+      obj.address = base64FromBytes(message.address);
+    }
+    if (message.pub_key !== undefined) {
+      obj.pub_key = PublicKey.toJSON(message.pub_key);
+    }
+    if (message.voting_power !== "0") {
+      obj.voting_power = message.voting_power;
+    }
+    if (message.proposer_priority !== "0") {
+      obj.proposer_priority = message.proposer_priority;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<Validator>, I>>(base?: I): Validator {
+    return Validator.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<Validator>, I>>(object: I): Validator {
     const message = createBaseValidator();
-    message.address = object.address ?? new Uint8Array();
+    message.address = object.address ?? new Uint8Array(0);
     message.pub_key = (object.pub_key !== undefined && object.pub_key !== null)
       ? PublicKey.fromPartial(object.pub_key)
       : undefined;
@@ -192,22 +238,31 @@ export const SimpleValidator = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): SimpleValidator {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseSimpleValidator();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.pub_key = PublicKey.decode(reader, reader.uint32());
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.voting_power = longToString(reader.int64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -221,9 +276,17 @@ export const SimpleValidator = {
 
   toJSON(message: SimpleValidator): unknown {
     const obj: any = {};
-    message.pub_key !== undefined && (obj.pub_key = message.pub_key ? PublicKey.toJSON(message.pub_key) : undefined);
-    message.voting_power !== undefined && (obj.voting_power = message.voting_power);
+    if (message.pub_key !== undefined) {
+      obj.pub_key = PublicKey.toJSON(message.pub_key);
+    }
+    if (message.voting_power !== "0") {
+      obj.voting_power = message.voting_power;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<SimpleValidator>, I>>(base?: I): SimpleValidator {
+    return SimpleValidator.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<SimpleValidator>, I>>(object: I): SimpleValidator {
@@ -236,10 +299,10 @@ export const SimpleValidator = {
   },
 };
 
-declare var self: any | undefined;
-declare var window: any | undefined;
-declare var global: any | undefined;
-var globalThis: any = (() => {
+declare const self: any | undefined;
+declare const window: any | undefined;
+declare const global: any | undefined;
+const tsProtoGlobalThis: any = (() => {
   if (typeof globalThis !== "undefined") {
     return globalThis;
   }
@@ -256,10 +319,10 @@ var globalThis: any = (() => {
 })();
 
 function bytesFromBase64(b64: string): Uint8Array {
-  if (globalThis.Buffer) {
-    return Uint8Array.from(globalThis.Buffer.from(b64, "base64"));
+  if (tsProtoGlobalThis.Buffer) {
+    return Uint8Array.from(tsProtoGlobalThis.Buffer.from(b64, "base64"));
   } else {
-    const bin = globalThis.atob(b64);
+    const bin = tsProtoGlobalThis.atob(b64);
     const arr = new Uint8Array(bin.length);
     for (let i = 0; i < bin.length; ++i) {
       arr[i] = bin.charCodeAt(i);
@@ -269,14 +332,14 @@ function bytesFromBase64(b64: string): Uint8Array {
 }
 
 function base64FromBytes(arr: Uint8Array): string {
-  if (globalThis.Buffer) {
-    return globalThis.Buffer.from(arr).toString("base64");
+  if (tsProtoGlobalThis.Buffer) {
+    return tsProtoGlobalThis.Buffer.from(arr).toString("base64");
   } else {
     const bin: string[] = [];
     arr.forEach((byte) => {
       bin.push(String.fromCharCode(byte));
     });
-    return globalThis.btoa(bin.join(""));
+    return tsProtoGlobalThis.btoa(bin.join(""));
   }
 }
 

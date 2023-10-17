@@ -10,10 +10,10 @@ export const protobufPackage = "tendermint.types";
  * validity of blocks.
  */
 export interface ConsensusParams {
-  block?: BlockParams;
-  evidence?: EvidenceParams;
-  validator?: ValidatorParams;
-  version?: VersionParams;
+  block?: BlockParams | undefined;
+  evidence?: EvidenceParams | undefined;
+  validator?: ValidatorParams | undefined;
+  version?: VersionParams | undefined;
 }
 
 /** BlockParams contains limits on the block size. */
@@ -28,13 +28,6 @@ export interface BlockParams {
    * Note: must be greater or equal to -1
    */
   max_gas: string;
-  /**
-   * Minimum time increment between consecutive blocks (in milliseconds) If the
-   * block header timestamp is ahead of the system clock, decrease this value.
-   *
-   * Not exposed to the application.
-   */
-  time_iota_ms: string;
 }
 
 /** EvidenceParams determine how we handle evidence of malfeasance. */
@@ -53,7 +46,9 @@ export interface EvidenceParams {
    * mechanism for handling [Nothing-At-Stake
    * attacks](https://github.com/ethereum/wiki/wiki/Proof-of-Stake-FAQ#what-is-the-nothing-at-stake-problem-and-how-can-it-be-fixed).
    */
-  max_age_duration?: Duration;
+  max_age_duration?:
+    | Duration
+    | undefined;
   /**
    * This sets the maximum size of total evidence in bytes that can be committed in a single block.
    * and should fall comfortably under the max block bytes.
@@ -72,7 +67,7 @@ export interface ValidatorParams {
 
 /** VersionParams contains the ABCI application version. */
 export interface VersionParams {
-  app_version: string;
+  app: string;
 }
 
 /**
@@ -107,28 +102,45 @@ export const ConsensusParams = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): ConsensusParams {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseConsensusParams();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.block = BlockParams.decode(reader, reader.uint32());
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.evidence = EvidenceParams.decode(reader, reader.uint32());
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.validator = ValidatorParams.decode(reader, reader.uint32());
-          break;
+          continue;
         case 4:
+          if (tag !== 34) {
+            break;
+          }
+
           message.version = VersionParams.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -144,14 +156,23 @@ export const ConsensusParams = {
 
   toJSON(message: ConsensusParams): unknown {
     const obj: any = {};
-    message.block !== undefined && (obj.block = message.block ? BlockParams.toJSON(message.block) : undefined);
-    message.evidence !== undefined &&
-      (obj.evidence = message.evidence ? EvidenceParams.toJSON(message.evidence) : undefined);
-    message.validator !== undefined &&
-      (obj.validator = message.validator ? ValidatorParams.toJSON(message.validator) : undefined);
-    message.version !== undefined &&
-      (obj.version = message.version ? VersionParams.toJSON(message.version) : undefined);
+    if (message.block !== undefined) {
+      obj.block = BlockParams.toJSON(message.block);
+    }
+    if (message.evidence !== undefined) {
+      obj.evidence = EvidenceParams.toJSON(message.evidence);
+    }
+    if (message.validator !== undefined) {
+      obj.validator = ValidatorParams.toJSON(message.validator);
+    }
+    if (message.version !== undefined) {
+      obj.version = VersionParams.toJSON(message.version);
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ConsensusParams>, I>>(base?: I): ConsensusParams {
+    return ConsensusParams.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<ConsensusParams>, I>>(object: I): ConsensusParams {
@@ -173,7 +194,7 @@ export const ConsensusParams = {
 };
 
 function createBaseBlockParams(): BlockParams {
-  return { max_bytes: "0", max_gas: "0", time_iota_ms: "0" };
+  return { max_bytes: "0", max_gas: "0" };
 }
 
 export const BlockParams = {
@@ -184,32 +205,35 @@ export const BlockParams = {
     if (message.max_gas !== "0") {
       writer.uint32(16).int64(message.max_gas);
     }
-    if (message.time_iota_ms !== "0") {
-      writer.uint32(24).int64(message.time_iota_ms);
-    }
     return writer;
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): BlockParams {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseBlockParams();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.max_bytes = longToString(reader.int64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.max_gas = longToString(reader.int64() as Long);
-          break;
-        case 3:
-          message.time_iota_ms = longToString(reader.int64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -218,23 +242,28 @@ export const BlockParams = {
     return {
       max_bytes: isSet(object.max_bytes) ? String(object.max_bytes) : "0",
       max_gas: isSet(object.max_gas) ? String(object.max_gas) : "0",
-      time_iota_ms: isSet(object.time_iota_ms) ? String(object.time_iota_ms) : "0",
     };
   },
 
   toJSON(message: BlockParams): unknown {
     const obj: any = {};
-    message.max_bytes !== undefined && (obj.max_bytes = message.max_bytes);
-    message.max_gas !== undefined && (obj.max_gas = message.max_gas);
-    message.time_iota_ms !== undefined && (obj.time_iota_ms = message.time_iota_ms);
+    if (message.max_bytes !== "0") {
+      obj.max_bytes = message.max_bytes;
+    }
+    if (message.max_gas !== "0") {
+      obj.max_gas = message.max_gas;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<BlockParams>, I>>(base?: I): BlockParams {
+    return BlockParams.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<BlockParams>, I>>(object: I): BlockParams {
     const message = createBaseBlockParams();
     message.max_bytes = object.max_bytes ?? "0";
     message.max_gas = object.max_gas ?? "0";
-    message.time_iota_ms = object.time_iota_ms ?? "0";
     return message;
   },
 };
@@ -258,25 +287,38 @@ export const EvidenceParams = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EvidenceParams {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEvidenceParams();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.max_age_num_blocks = longToString(reader.int64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.max_age_duration = Duration.decode(reader, reader.uint32());
-          break;
+          continue;
         case 3:
+          if (tag !== 24) {
+            break;
+          }
+
           message.max_bytes = longToString(reader.int64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -291,11 +333,20 @@ export const EvidenceParams = {
 
   toJSON(message: EvidenceParams): unknown {
     const obj: any = {};
-    message.max_age_num_blocks !== undefined && (obj.max_age_num_blocks = message.max_age_num_blocks);
-    message.max_age_duration !== undefined &&
-      (obj.max_age_duration = message.max_age_duration ? Duration.toJSON(message.max_age_duration) : undefined);
-    message.max_bytes !== undefined && (obj.max_bytes = message.max_bytes);
+    if (message.max_age_num_blocks !== "0") {
+      obj.max_age_num_blocks = message.max_age_num_blocks;
+    }
+    if (message.max_age_duration !== undefined) {
+      obj.max_age_duration = Duration.toJSON(message.max_age_duration);
+    }
+    if (message.max_bytes !== "0") {
+      obj.max_bytes = message.max_bytes;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<EvidenceParams>, I>>(base?: I): EvidenceParams {
+    return EvidenceParams.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<EvidenceParams>, I>>(object: I): EvidenceParams {
@@ -322,19 +373,24 @@ export const ValidatorParams = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): ValidatorParams {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseValidatorParams();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.pub_key_types.push(reader.string());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -347,12 +403,14 @@ export const ValidatorParams = {
 
   toJSON(message: ValidatorParams): unknown {
     const obj: any = {};
-    if (message.pub_key_types) {
-      obj.pub_key_types = message.pub_key_types.map((e) => e);
-    } else {
-      obj.pub_key_types = [];
+    if (message.pub_key_types?.length) {
+      obj.pub_key_types = message.pub_key_types;
     }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ValidatorParams>, I>>(base?: I): ValidatorParams {
+    return ValidatorParams.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<ValidatorParams>, I>>(object: I): ValidatorParams {
@@ -363,48 +421,59 @@ export const ValidatorParams = {
 };
 
 function createBaseVersionParams(): VersionParams {
-  return { app_version: "0" };
+  return { app: "0" };
 }
 
 export const VersionParams = {
   encode(message: VersionParams, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.app_version !== "0") {
-      writer.uint32(8).uint64(message.app_version);
+    if (message.app !== "0") {
+      writer.uint32(8).uint64(message.app);
     }
     return writer;
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): VersionParams {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseVersionParams();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.app_version = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          if (tag !== 8) {
+            break;
+          }
+
+          message.app = longToString(reader.uint64() as Long);
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): VersionParams {
-    return { app_version: isSet(object.app_version) ? String(object.app_version) : "0" };
+    return { app: isSet(object.app) ? String(object.app) : "0" };
   },
 
   toJSON(message: VersionParams): unknown {
     const obj: any = {};
-    message.app_version !== undefined && (obj.app_version = message.app_version);
+    if (message.app !== "0") {
+      obj.app = message.app;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<VersionParams>, I>>(base?: I): VersionParams {
+    return VersionParams.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<VersionParams>, I>>(object: I): VersionParams {
     const message = createBaseVersionParams();
-    message.app_version = object.app_version ?? "0";
+    message.app = object.app ?? "0";
     return message;
   },
 };
@@ -425,22 +494,31 @@ export const HashedParams = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): HashedParams {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseHashedParams();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.block_max_bytes = longToString(reader.int64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.block_max_gas = longToString(reader.int64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -454,9 +532,17 @@ export const HashedParams = {
 
   toJSON(message: HashedParams): unknown {
     const obj: any = {};
-    message.block_max_bytes !== undefined && (obj.block_max_bytes = message.block_max_bytes);
-    message.block_max_gas !== undefined && (obj.block_max_gas = message.block_max_gas);
+    if (message.block_max_bytes !== "0") {
+      obj.block_max_bytes = message.block_max_bytes;
+    }
+    if (message.block_max_gas !== "0") {
+      obj.block_max_gas = message.block_max_gas;
+    }
     return obj;
+  },
+
+  create<I extends Exact<DeepPartial<HashedParams>, I>>(base?: I): HashedParams {
+    return HashedParams.fromPartial(base ?? {});
   },
 
   fromPartial<I extends Exact<DeepPartial<HashedParams>, I>>(object: I): HashedParams {
