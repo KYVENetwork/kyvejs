@@ -89,7 +89,7 @@ describe("compression tests", () => {
 
   test("Valid parsing", async () => {
     const fill =
-      "[{\"key\": \"key1\",\"value\": \"value1\"}, {\"key\": \"key2\",\"value\": \"value2\"}]";
+      '[{"key": "key1","value": "value1"}, {"key": "key2","value": "value2"}]';
     // using array call for function as it is protected
     const parsed = await v["saveBundleDecompress"](
       Buffer.alloc(fill.length, fill)
@@ -112,7 +112,7 @@ describe("compression tests", () => {
 
   test("Valid gzip compression and decompression", async () => {
     const fill =
-      "[{\"key\": \"key1\",\"value\": \"value1\"}, {\"key\": \"key2\",\"value\": \"value2\"}]";
+      '[{"key": "key1","value": "value1"}, {"key": "key2","value": "value2"}]';
 
     const gzipper = new Gzip();
     const zipped = await gzipper.compress(Buffer.alloc(fill.length, fill));
