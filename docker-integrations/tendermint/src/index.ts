@@ -1,6 +1,7 @@
 import * as grpc from '@grpc/grpc-js';
-import { TendermintServer } from './server';
+
 import { RuntimeService } from './protos/runtime';
+import { TendermintServer } from './server';
 
 const runtimeServer: grpc.Server = new grpc.Server();
 
@@ -32,14 +33,14 @@ process.on('SIGINT', shutdown);
 process.on('SIGTERM', shutdown);
 
 runtimeServer.bindAsync(
-  "0.0.0.0:50051",
+  '0.0.0.0:50051',
   grpc.ServerCredentials.createInsecure(),
   (error: Error | null, port: number) => {
-      if (error) {
-          console.error("Error binding server:", error);
-      } else {
-          console.log(`Server running at http://0.0.0.0:${port}`);
-          runtimeServer.start();
-      }
+    if (error) {
+      console.error('Error binding server:', error);
+    } else {
+      console.log(`Server running at http://0.0.0.0:${port}`);
+      runtimeServer.start();
+    }
   }
 );
