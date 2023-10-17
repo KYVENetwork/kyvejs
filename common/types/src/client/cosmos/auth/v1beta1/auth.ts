@@ -24,21 +24,6 @@ export interface ModuleAccount {
   permissions: string[];
 }
 
-/**
- * ModuleCredential represents a unclaimable pubkey for base accounts controlled by modules.
- *
- * Since: cosmos-sdk 0.47
- */
-export interface ModuleCredential {
-  /** module_name is the name of the module used for address derivation (passed into address.Module). */
-  module_name: string;
-  /**
-   * derivation_keys is for deriving a module account address (passed into address.Module)
-   * adding more keys creates sub-account addresses (passed into address.Derive)
-   */
-  derivation_keys: Uint8Array[];
-}
-
 /** Params defines the parameters for the auth module. */
 export interface Params {
   max_memo_characters: string;
@@ -247,83 +232,6 @@ export const ModuleAccount = {
   },
 };
 
-function createBaseModuleCredential(): ModuleCredential {
-  return { module_name: "", derivation_keys: [] };
-}
-
-export const ModuleCredential = {
-  encode(message: ModuleCredential, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.module_name !== "") {
-      writer.uint32(10).string(message.module_name);
-    }
-    for (const v of message.derivation_keys) {
-      writer.uint32(18).bytes(v!);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): ModuleCredential {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseModuleCredential();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.module_name = reader.string();
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.derivation_keys.push(reader.bytes());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): ModuleCredential {
-    return {
-      module_name: isSet(object.module_name) ? String(object.module_name) : "",
-      derivation_keys: Array.isArray(object?.derivation_keys)
-        ? object.derivation_keys.map((e: any) => bytesFromBase64(e))
-        : [],
-    };
-  },
-
-  toJSON(message: ModuleCredential): unknown {
-    const obj: any = {};
-    if (message.module_name !== "") {
-      obj.module_name = message.module_name;
-    }
-    if (message.derivation_keys?.length) {
-      obj.derivation_keys = message.derivation_keys.map((e) => base64FromBytes(e));
-    }
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<ModuleCredential>, I>>(base?: I): ModuleCredential {
-    return ModuleCredential.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<ModuleCredential>, I>>(object: I): ModuleCredential {
-    const message = createBaseModuleCredential();
-    message.module_name = object.module_name ?? "";
-    message.derivation_keys = object.derivation_keys?.map((e) => e) || [];
-    return message;
-  },
-};
-
 function createBaseParams(): Params {
   return {
     max_memo_characters: "0",
@@ -451,50 +359,6 @@ export const Params = {
     return message;
   },
 };
-
-declare const self: any | undefined;
-declare const window: any | undefined;
-declare const global: any | undefined;
-const tsProtoGlobalThis: any = (() => {
-  if (typeof globalThis !== "undefined") {
-    return globalThis;
-  }
-  if (typeof self !== "undefined") {
-    return self;
-  }
-  if (typeof window !== "undefined") {
-    return window;
-  }
-  if (typeof global !== "undefined") {
-    return global;
-  }
-  throw "Unable to locate global object";
-})();
-
-function bytesFromBase64(b64: string): Uint8Array {
-  if (tsProtoGlobalThis.Buffer) {
-    return Uint8Array.from(tsProtoGlobalThis.Buffer.from(b64, "base64"));
-  } else {
-    const bin = tsProtoGlobalThis.atob(b64);
-    const arr = new Uint8Array(bin.length);
-    for (let i = 0; i < bin.length; ++i) {
-      arr[i] = bin.charCodeAt(i);
-    }
-    return arr;
-  }
-}
-
-function base64FromBytes(arr: Uint8Array): string {
-  if (tsProtoGlobalThis.Buffer) {
-    return tsProtoGlobalThis.Buffer.from(arr).toString("base64");
-  } else {
-    const bin: string[] = [];
-    arr.forEach((byte) => {
-      bin.push(String.fromCharCode(byte));
-    });
-    return tsProtoGlobalThis.btoa(bin.join(""));
-  }
-}
 
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 

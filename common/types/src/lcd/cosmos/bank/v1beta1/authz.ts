@@ -12,26 +12,16 @@ export const protobufPackage = "cosmos.bank.v1beta1";
  */
 export interface SendAuthorization {
   spend_limit: Coin[];
-  /**
-   * allow_list specifies an optional list of addresses to whom the grantee can send tokens on behalf of the
-   * granter. If omitted, any recipient is allowed.
-   *
-   * Since: cosmos-sdk 0.47
-   */
-  allow_list: string[];
 }
 
 function createBaseSendAuthorization(): SendAuthorization {
-  return { spend_limit: [], allow_list: [] };
+  return { spend_limit: [] };
 }
 
 export const SendAuthorization = {
   encode(message: SendAuthorization, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     for (const v of message.spend_limit) {
       Coin.encode(v!, writer.uint32(10).fork()).ldelim();
-    }
-    for (const v of message.allow_list) {
-      writer.uint32(18).string(v!);
     }
     return writer;
   },
@@ -50,13 +40,6 @@ export const SendAuthorization = {
 
           message.spend_limit.push(Coin.decode(reader, reader.uint32()));
           continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.allow_list.push(reader.string());
-          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -69,7 +52,6 @@ export const SendAuthorization = {
   fromJSON(object: any): SendAuthorization {
     return {
       spend_limit: Array.isArray(object?.spend_limit) ? object.spend_limit.map((e: any) => Coin.fromJSON(e)) : [],
-      allow_list: Array.isArray(object?.allow_list) ? object.allow_list.map((e: any) => String(e)) : [],
     };
   },
 
@@ -77,9 +59,6 @@ export const SendAuthorization = {
     const obj: any = {};
     if (message.spend_limit?.length) {
       obj.spend_limit = message.spend_limit.map((e) => Coin.toJSON(e));
-    }
-    if (message.allow_list?.length) {
-      obj.allow_list = message.allow_list;
     }
     return obj;
   },
@@ -91,7 +70,6 @@ export const SendAuthorization = {
   fromPartial<I extends Exact<DeepPartial<SendAuthorization>, I>>(object: I): SendAuthorization {
     const message = createBaseSendAuthorization();
     message.spend_limit = object.spend_limit?.map((e) => Coin.fromPartial(e)) || [];
-    message.allow_list = object.allow_list?.map((e) => e) || [];
     return message;
   },
 };

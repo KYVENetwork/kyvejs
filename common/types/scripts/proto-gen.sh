@@ -4,13 +4,13 @@ mkdir temp
 
 # clone cosmos-sdk repo
 COSMOS_SDK_REPO="git@github.com:KYVENetwork/cosmos-sdk.git"
-COSMOS_SDK_VERSION="v0.47.5-kyve-rc0"
+COSMOS_SDK_VERSION="v0.46.13-kyve"
 
 git -C ./temp clone  -b ${COSMOS_SDK_VERSION} --single-branch ${COSMOS_SDK_REPO}
 
 # clone chain repo
 KYVE_CHAIN_REPO="git@github.com:KYVENetwork/chain.git"
-KYVE_CHAIN_VERSION="rapha/funders-module"
+KYVE_CHAIN_VERSION="v1.3.0"
 
 git -C ./temp clone  -b ${KYVE_CHAIN_VERSION} --single-branch ${KYVE_CHAIN_REPO}
 

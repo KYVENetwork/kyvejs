@@ -16,7 +16,7 @@ export interface QueryGroupInfoRequest {
 
 /** QueryGroupInfoResponse is the Query/GroupInfo response type. */
 export interface QueryGroupInfoResponse {
-  /** info is the GroupInfo of the group. */
+  /** info is the GroupInfo for the group. */
   info?: GroupInfo | undefined;
 }
 
@@ -28,7 +28,7 @@ export interface QueryGroupPolicyInfoRequest {
 
 /** QueryGroupPolicyInfoResponse is the Query/GroupPolicyInfo response type. */
 export interface QueryGroupPolicyInfoResponse {
-  /** info is the GroupPolicyInfo of the group policy. */
+  /** info is the GroupPolicyInfo for the group policy. */
   info?: GroupPolicyInfo | undefined;
 }
 
@@ -2232,13 +2232,13 @@ export interface Query {
   GroupInfo(request: QueryGroupInfoRequest): Promise<QueryGroupInfoResponse>;
   /** GroupPolicyInfo queries group policy info based on account address of group policy. */
   GroupPolicyInfo(request: QueryGroupPolicyInfoRequest): Promise<QueryGroupPolicyInfoResponse>;
-  /** GroupMembers queries members of a group by group id. */
+  /** GroupMembers queries members of a group */
   GroupMembers(request: QueryGroupMembersRequest): Promise<QueryGroupMembersResponse>;
   /** GroupsByAdmin queries groups by admin address. */
   GroupsByAdmin(request: QueryGroupsByAdminRequest): Promise<QueryGroupsByAdminResponse>;
   /** GroupPoliciesByGroup queries group policies by group id. */
   GroupPoliciesByGroup(request: QueryGroupPoliciesByGroupRequest): Promise<QueryGroupPoliciesByGroupResponse>;
-  /** GroupPoliciesByAdmin queries group policies by admin address. */
+  /** GroupsByAdmin queries group policies by admin address. */
   GroupPoliciesByAdmin(request: QueryGroupPoliciesByAdminRequest): Promise<QueryGroupPoliciesByAdminResponse>;
   /** Proposal queries a proposal based on proposal id. */
   Proposal(request: QueryProposalRequest): Promise<QueryProposalResponse>;
@@ -2246,7 +2246,7 @@ export interface Query {
   ProposalsByGroupPolicy(request: QueryProposalsByGroupPolicyRequest): Promise<QueryProposalsByGroupPolicyResponse>;
   /** VoteByProposalVoter queries a vote by proposal id and voter. */
   VoteByProposalVoter(request: QueryVoteByProposalVoterRequest): Promise<QueryVoteByProposalVoterResponse>;
-  /** VotesByProposal queries a vote by proposal id. */
+  /** VotesByProposal queries a vote by proposal. */
   VotesByProposal(request: QueryVotesByProposalRequest): Promise<QueryVotesByProposalResponse>;
   /** VotesByVoter queries a vote by voter. */
   VotesByVoter(request: QueryVotesByVoterRequest): Promise<QueryVotesByVoterResponse>;

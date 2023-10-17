@@ -30,7 +30,7 @@ export interface DelegatorWithdrawInfo {
 export interface ValidatorOutstandingRewardsRecord {
   /** validator_address is the address of the validator. */
   validator_address: string;
-  /** outstanding_rewards represents the outstanding rewards of a validator. */
+  /** outstanding_rewards represents the oustanding rewards of a validator. */
   outstanding_rewards: DecCoin[];
 }
 
@@ -80,7 +80,7 @@ export interface DelegatorStartingInfoRecord {
 export interface ValidatorSlashEventRecord {
   /** validator_address is the address of the validator. */
   validator_address: string;
-  /** height defines the block height at which the slash event occurred. */
+  /** height defines the block height at which the slash event occured. */
   height: string;
   /** period is the period of the slash event. */
   period: string;
@@ -90,7 +90,7 @@ export interface ValidatorSlashEventRecord {
 
 /** GenesisState defines the distribution module's genesis state. */
 export interface GenesisState {
-  /** params defines all the parameters of the module. */
+  /** params defines all the paramaters of the module. */
   params?:
     | Params
     | undefined;
@@ -104,7 +104,7 @@ export interface GenesisState {
   previous_proposer: string;
   /** fee_pool defines the outstanding rewards of all validators at genesis. */
   outstanding_rewards: ValidatorOutstandingRewardsRecord[];
-  /** fee_pool defines the accumulated commissions of all validators at genesis. */
+  /** fee_pool defines the accumulated commisions of all validators at genesis. */
   validator_accumulated_commissions: ValidatorAccumulatedCommissionRecord[];
   /** fee_pool defines the historical rewards of all validators at genesis. */
   validator_historical_rewards: ValidatorHistoricalRewardsRecord[];

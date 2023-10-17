@@ -1,13 +1,13 @@
 /* eslint-disable */
 import _m0 from "protobufjs/minimal";
 import { Coin } from "../../base/v1beta1/coin";
-import { Metadata, Params, SendEnabled } from "./bank";
+import { Metadata, Params } from "./bank";
 
 export const protobufPackage = "cosmos.bank.v1beta1";
 
 /** GenesisState defines the bank module's genesis state. */
 export interface GenesisState {
-  /** params defines all the parameters of the module. */
+  /** params defines all the paramaters of the module. */
   params?:
     | Params
     | undefined;
@@ -18,14 +18,8 @@ export interface GenesisState {
    * balances. Otherwise, it will be used to validate that the sum of the balances equals this amount.
    */
   supply: Coin[];
-  /** denom_metadata defines the metadata of the different coins. */
+  /** denom_metadata defines the metadata of the differents coins. */
   denom_metadata: Metadata[];
-  /**
-   * send_enabled defines the denoms where send is enabled or disabled.
-   *
-   * Since: cosmos-sdk 0.47
-   */
-  send_enabled: SendEnabled[];
 }
 
 /**
@@ -40,7 +34,7 @@ export interface Balance {
 }
 
 function createBaseGenesisState(): GenesisState {
-  return { params: undefined, balances: [], supply: [], denom_metadata: [], send_enabled: [] };
+  return { params: undefined, balances: [], supply: [], denom_metadata: [] };
 }
 
 export const GenesisState = {
@@ -56,9 +50,6 @@ export const GenesisState = {
     }
     for (const v of message.denom_metadata) {
       Metadata.encode(v!, writer.uint32(34).fork()).ldelim();
-    }
-    for (const v of message.send_enabled) {
-      SendEnabled.encode(v!, writer.uint32(42).fork()).ldelim();
     }
     return writer;
   },
@@ -98,13 +89,6 @@ export const GenesisState = {
 
           message.denom_metadata.push(Metadata.decode(reader, reader.uint32()));
           continue;
-        case 5:
-          if (tag !== 42) {
-            break;
-          }
-
-          message.send_enabled.push(SendEnabled.decode(reader, reader.uint32()));
-          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -121,9 +105,6 @@ export const GenesisState = {
       supply: Array.isArray(object?.supply) ? object.supply.map((e: any) => Coin.fromJSON(e)) : [],
       denom_metadata: Array.isArray(object?.denom_metadata)
         ? object.denom_metadata.map((e: any) => Metadata.fromJSON(e))
-        : [],
-      send_enabled: Array.isArray(object?.send_enabled)
-        ? object.send_enabled.map((e: any) => SendEnabled.fromJSON(e))
         : [],
     };
   },
@@ -142,9 +123,6 @@ export const GenesisState = {
     if (message.denom_metadata?.length) {
       obj.denom_metadata = message.denom_metadata.map((e) => Metadata.toJSON(e));
     }
-    if (message.send_enabled?.length) {
-      obj.send_enabled = message.send_enabled.map((e) => SendEnabled.toJSON(e));
-    }
     return obj;
   },
 
@@ -160,7 +138,6 @@ export const GenesisState = {
     message.balances = object.balances?.map((e) => Balance.fromPartial(e)) || [];
     message.supply = object.supply?.map((e) => Coin.fromPartial(e)) || [];
     message.denom_metadata = object.denom_metadata?.map((e) => Metadata.fromPartial(e)) || [];
-    message.send_enabled = object.send_enabled?.map((e) => SendEnabled.fromPartial(e)) || [];
     return message;
   },
 };

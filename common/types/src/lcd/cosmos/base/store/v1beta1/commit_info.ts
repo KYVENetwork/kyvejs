@@ -1,7 +1,6 @@
 /* eslint-disable */
 import Long from "long";
 import _m0 from "protobufjs/minimal";
-import { Timestamp } from "../../../../google/protobuf/timestamp";
 
 export const protobufPackage = "cosmos.base.store.v1beta1";
 
@@ -12,7 +11,6 @@ export const protobufPackage = "cosmos.base.store.v1beta1";
 export interface CommitInfo {
   version: string;
   store_infos: StoreInfo[];
-  timestamp?: Date | undefined;
 }
 
 /**
@@ -25,7 +23,7 @@ export interface StoreInfo {
 }
 
 /**
- * CommitID defines the commitment information when a specific store is
+ * CommitID defines the committment information when a specific store is
  * committed.
  */
 export interface CommitID {
@@ -34,7 +32,7 @@ export interface CommitID {
 }
 
 function createBaseCommitInfo(): CommitInfo {
-  return { version: "0", store_infos: [], timestamp: undefined };
+  return { version: "0", store_infos: [] };
 }
 
 export const CommitInfo = {
@@ -44,9 +42,6 @@ export const CommitInfo = {
     }
     for (const v of message.store_infos) {
       StoreInfo.encode(v!, writer.uint32(18).fork()).ldelim();
-    }
-    if (message.timestamp !== undefined) {
-      Timestamp.encode(toTimestamp(message.timestamp), writer.uint32(26).fork()).ldelim();
     }
     return writer;
   },
@@ -72,13 +67,6 @@ export const CommitInfo = {
 
           message.store_infos.push(StoreInfo.decode(reader, reader.uint32()));
           continue;
-        case 3:
-          if (tag !== 26) {
-            break;
-          }
-
-          message.timestamp = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
-          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -92,7 +80,6 @@ export const CommitInfo = {
     return {
       version: isSet(object.version) ? String(object.version) : "0",
       store_infos: Array.isArray(object?.store_infos) ? object.store_infos.map((e: any) => StoreInfo.fromJSON(e)) : [],
-      timestamp: isSet(object.timestamp) ? fromJsonTimestamp(object.timestamp) : undefined,
     };
   },
 
@@ -103,9 +90,6 @@ export const CommitInfo = {
     }
     if (message.store_infos?.length) {
       obj.store_infos = message.store_infos.map((e) => StoreInfo.toJSON(e));
-    }
-    if (message.timestamp !== undefined) {
-      obj.timestamp = message.timestamp.toISOString();
     }
     return obj;
   },
@@ -118,7 +102,6 @@ export const CommitInfo = {
     const message = createBaseCommitInfo();
     message.version = object.version ?? "0";
     message.store_infos = object.store_infos?.map((e) => StoreInfo.fromPartial(e)) || [];
-    message.timestamp = object.timestamp ?? undefined;
     return message;
   },
 };
@@ -329,28 +312,6 @@ export type DeepPartial<T> = T extends Builtin ? T
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin ? P
   : P & { [K in keyof P]: Exact<P[K], I[K]> } & { [K in Exclude<keyof I, KeysOfUnion<P>>]: never };
-
-function toTimestamp(date: Date): Timestamp {
-  const seconds = Math.trunc(date.getTime() / 1_000).toString();
-  const nanos = (date.getTime() % 1_000) * 1_000_000;
-  return { seconds, nanos };
-}
-
-function fromTimestamp(t: Timestamp): Date {
-  let millis = (Number(t.seconds) || 0) * 1_000;
-  millis += (t.nanos || 0) / 1_000_000;
-  return new Date(millis);
-}
-
-function fromJsonTimestamp(o: any): Date {
-  if (o instanceof Date) {
-    return o;
-  } else if (typeof o === "string") {
-    return new Date(o);
-  } else {
-    return fromTimestamp(Timestamp.fromJSON(o));
-  }
-}
 
 function longToString(long: Long) {
   return long.toString();

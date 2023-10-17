@@ -28,7 +28,10 @@ export interface Plan {
   time?:
     | Date
     | undefined;
-  /** The height at which the upgrade must be performed. */
+  /**
+   * The height at which the upgrade must be performed.
+   * Only used if Time is not set.
+   */
   height: string;
   /**
    * Any application specific upgrade info to be included on-chain
@@ -54,11 +57,8 @@ export interface Plan {
  * @deprecated
  */
 export interface SoftwareUpgradeProposal {
-  /** title of the proposal */
   title: string;
-  /** description of the proposal */
   description: string;
-  /** plan of the proposal */
   plan?: Plan | undefined;
 }
 
@@ -71,9 +71,7 @@ export interface SoftwareUpgradeProposal {
  * @deprecated
  */
 export interface CancelSoftwareUpgradeProposal {
-  /** title of the proposal */
   title: string;
-  /** description of the proposal */
   description: string;
 }
 

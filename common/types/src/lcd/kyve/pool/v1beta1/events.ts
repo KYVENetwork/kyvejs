@@ -51,10 +51,10 @@ export interface EventCreatePool {
    */
   upload_interval: string;
   /**
-   * inflation_share_weight is the fixed cost which gets paid out
+   * operating_cost is the fixed cost which gets paid out
    * to every successful uploader
    */
-  inflation_share_weight: string;
+  operating_cost: string;
   /**
    * min_delegation is the minimum amount of $KYVE the pool has
    * to have in order to produce bundles
@@ -162,10 +162,10 @@ export interface EventPoolUpdated {
    */
   upload_interval: string;
   /**
-   * inflation_share_weight is the fixed cost which gets paid out
+   * operating_cost is the fixed cost which gets paid out
    * to every successful uploader
    */
-  inflation_share_weight: string;
+  operating_cost: string;
   /**
    * min_delegation is the minimum amount of $KYVE the pool has
    * to have in order to produce bundles
@@ -189,6 +189,32 @@ export interface EventPoolUpdated {
 }
 
 /**
+ * EventFundPool is an event emitted when a pool is funded.
+ * emitted_by: MsgFundPool
+ */
+export interface EventFundPool {
+  /** pool_id is the unique ID of the pool. */
+  pool_id: string;
+  /** address is the account address of the pool funder. */
+  address: string;
+  /** amount is the amount in ukyve the funder has funded */
+  amount: string;
+}
+
+/**
+ * EventDefundPool is an event emitted when a pool is defunded.
+ * emitted_by: MsgDefundPool
+ */
+export interface EventDefundPool {
+  /** pool_id is the unique ID of the pool. */
+  pool_id: string;
+  /** address is the account address of the pool funder. */
+  address: string;
+  /** amount is the amount in ukyve the funder has defunded */
+  amount: string;
+}
+
+/**
  * EventDefundPool is an event emitted when a pool is defunded.
  * emitted_by: MsgSubmitBundleProposal
  */
@@ -199,6 +225,15 @@ export interface EventPoolFundsSlashed {
   address: string;
   /** amount is the amount in ukyve the validator has lost due to the slash */
   amount: string;
+}
+
+/**
+ * EventPoolOutOfFunds is an event emitted when a pool has run out of funds
+ * emitted_by: MsgSubmitBundleProposal
+ */
+export interface EventPoolOutOfFunds {
+  /** pool_id is the unique ID of the pool. */
+  pool_id: string;
 }
 
 function createBaseEventUpdateParams(): EventUpdateParams {
@@ -304,7 +339,7 @@ function createBaseEventCreatePool(): EventCreatePool {
     config: "",
     start_key: "",
     upload_interval: "0",
-    inflation_share_weight: "0",
+    operating_cost: "0",
     min_delegation: "0",
     max_bundle_size: "0",
     version: "",
@@ -337,8 +372,8 @@ export const EventCreatePool = {
     if (message.upload_interval !== "0") {
       writer.uint32(56).uint64(message.upload_interval);
     }
-    if (message.inflation_share_weight !== "0") {
-      writer.uint32(64).uint64(message.inflation_share_weight);
+    if (message.operating_cost !== "0") {
+      writer.uint32(64).uint64(message.operating_cost);
     }
     if (message.min_delegation !== "0") {
       writer.uint32(72).uint64(message.min_delegation);
@@ -422,7 +457,7 @@ export const EventCreatePool = {
             break;
           }
 
-          message.inflation_share_weight = longToString(reader.uint64() as Long);
+          message.operating_cost = longToString(reader.uint64() as Long);
           continue;
         case 9:
           if (tag !== 72) {
@@ -484,7 +519,7 @@ export const EventCreatePool = {
       config: isSet(object.config) ? String(object.config) : "",
       start_key: isSet(object.start_key) ? String(object.start_key) : "",
       upload_interval: isSet(object.upload_interval) ? String(object.upload_interval) : "0",
-      inflation_share_weight: isSet(object.inflation_share_weight) ? String(object.inflation_share_weight) : "0",
+      operating_cost: isSet(object.operating_cost) ? String(object.operating_cost) : "0",
       min_delegation: isSet(object.min_delegation) ? String(object.min_delegation) : "0",
       max_bundle_size: isSet(object.max_bundle_size) ? String(object.max_bundle_size) : "0",
       version: isSet(object.version) ? String(object.version) : "",
@@ -517,8 +552,8 @@ export const EventCreatePool = {
     if (message.upload_interval !== "0") {
       obj.upload_interval = message.upload_interval;
     }
-    if (message.inflation_share_weight !== "0") {
-      obj.inflation_share_weight = message.inflation_share_weight;
+    if (message.operating_cost !== "0") {
+      obj.operating_cost = message.operating_cost;
     }
     if (message.min_delegation !== "0") {
       obj.min_delegation = message.min_delegation;
@@ -554,7 +589,7 @@ export const EventCreatePool = {
     message.config = object.config ?? "";
     message.start_key = object.start_key ?? "";
     message.upload_interval = object.upload_interval ?? "0";
-    message.inflation_share_weight = object.inflation_share_weight ?? "0";
+    message.operating_cost = object.operating_cost ?? "0";
     message.min_delegation = object.min_delegation ?? "0";
     message.max_bundle_size = object.max_bundle_size ?? "0";
     message.version = object.version ?? "";
@@ -924,7 +959,7 @@ function createBaseEventPoolUpdated(): EventPoolUpdated {
     logo: "",
     config: "",
     upload_interval: "0",
-    inflation_share_weight: "0",
+    operating_cost: "0",
     min_delegation: "0",
     max_bundle_size: "0",
     storage_provider_id: 0,
@@ -955,8 +990,8 @@ export const EventPoolUpdated = {
     if (message.upload_interval !== "0") {
       writer.uint32(56).uint64(message.upload_interval);
     }
-    if (message.inflation_share_weight !== "0") {
-      writer.uint32(64).uint64(message.inflation_share_weight);
+    if (message.operating_cost !== "0") {
+      writer.uint32(64).uint64(message.operating_cost);
     }
     if (message.min_delegation !== "0") {
       writer.uint32(72).uint64(message.min_delegation);
@@ -1034,7 +1069,7 @@ export const EventPoolUpdated = {
             break;
           }
 
-          message.inflation_share_weight = longToString(reader.uint64() as Long);
+          message.operating_cost = longToString(reader.uint64() as Long);
           continue;
         case 9:
           if (tag !== 72) {
@@ -1082,7 +1117,7 @@ export const EventPoolUpdated = {
       logo: isSet(object.logo) ? String(object.logo) : "",
       config: isSet(object.config) ? String(object.config) : "",
       upload_interval: isSet(object.upload_interval) ? String(object.upload_interval) : "0",
-      inflation_share_weight: isSet(object.inflation_share_weight) ? String(object.inflation_share_weight) : "0",
+      operating_cost: isSet(object.operating_cost) ? String(object.operating_cost) : "0",
       min_delegation: isSet(object.min_delegation) ? String(object.min_delegation) : "0",
       max_bundle_size: isSet(object.max_bundle_size) ? String(object.max_bundle_size) : "0",
       storage_provider_id: isSet(object.storage_provider_id) ? Number(object.storage_provider_id) : 0,
@@ -1113,8 +1148,8 @@ export const EventPoolUpdated = {
     if (message.upload_interval !== "0") {
       obj.upload_interval = message.upload_interval;
     }
-    if (message.inflation_share_weight !== "0") {
-      obj.inflation_share_weight = message.inflation_share_weight;
+    if (message.operating_cost !== "0") {
+      obj.operating_cost = message.operating_cost;
     }
     if (message.min_delegation !== "0") {
       obj.min_delegation = message.min_delegation;
@@ -1144,11 +1179,191 @@ export const EventPoolUpdated = {
     message.logo = object.logo ?? "";
     message.config = object.config ?? "";
     message.upload_interval = object.upload_interval ?? "0";
-    message.inflation_share_weight = object.inflation_share_weight ?? "0";
+    message.operating_cost = object.operating_cost ?? "0";
     message.min_delegation = object.min_delegation ?? "0";
     message.max_bundle_size = object.max_bundle_size ?? "0";
     message.storage_provider_id = object.storage_provider_id ?? 0;
     message.compression_id = object.compression_id ?? 0;
+    return message;
+  },
+};
+
+function createBaseEventFundPool(): EventFundPool {
+  return { pool_id: "0", address: "", amount: "0" };
+}
+
+export const EventFundPool = {
+  encode(message: EventFundPool, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.pool_id !== "0") {
+      writer.uint32(8).uint64(message.pool_id);
+    }
+    if (message.address !== "") {
+      writer.uint32(18).string(message.address);
+    }
+    if (message.amount !== "0") {
+      writer.uint32(24).uint64(message.amount);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): EventFundPool {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseEventFundPool();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 8) {
+            break;
+          }
+
+          message.pool_id = longToString(reader.uint64() as Long);
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.address = reader.string();
+          continue;
+        case 3:
+          if (tag !== 24) {
+            break;
+          }
+
+          message.amount = longToString(reader.uint64() as Long);
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): EventFundPool {
+    return {
+      pool_id: isSet(object.pool_id) ? String(object.pool_id) : "0",
+      address: isSet(object.address) ? String(object.address) : "",
+      amount: isSet(object.amount) ? String(object.amount) : "0",
+    };
+  },
+
+  toJSON(message: EventFundPool): unknown {
+    const obj: any = {};
+    if (message.pool_id !== "0") {
+      obj.pool_id = message.pool_id;
+    }
+    if (message.address !== "") {
+      obj.address = message.address;
+    }
+    if (message.amount !== "0") {
+      obj.amount = message.amount;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<EventFundPool>, I>>(base?: I): EventFundPool {
+    return EventFundPool.fromPartial(base ?? {});
+  },
+
+  fromPartial<I extends Exact<DeepPartial<EventFundPool>, I>>(object: I): EventFundPool {
+    const message = createBaseEventFundPool();
+    message.pool_id = object.pool_id ?? "0";
+    message.address = object.address ?? "";
+    message.amount = object.amount ?? "0";
+    return message;
+  },
+};
+
+function createBaseEventDefundPool(): EventDefundPool {
+  return { pool_id: "0", address: "", amount: "0" };
+}
+
+export const EventDefundPool = {
+  encode(message: EventDefundPool, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.pool_id !== "0") {
+      writer.uint32(8).uint64(message.pool_id);
+    }
+    if (message.address !== "") {
+      writer.uint32(18).string(message.address);
+    }
+    if (message.amount !== "0") {
+      writer.uint32(24).uint64(message.amount);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): EventDefundPool {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseEventDefundPool();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 8) {
+            break;
+          }
+
+          message.pool_id = longToString(reader.uint64() as Long);
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.address = reader.string();
+          continue;
+        case 3:
+          if (tag !== 24) {
+            break;
+          }
+
+          message.amount = longToString(reader.uint64() as Long);
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): EventDefundPool {
+    return {
+      pool_id: isSet(object.pool_id) ? String(object.pool_id) : "0",
+      address: isSet(object.address) ? String(object.address) : "",
+      amount: isSet(object.amount) ? String(object.amount) : "0",
+    };
+  },
+
+  toJSON(message: EventDefundPool): unknown {
+    const obj: any = {};
+    if (message.pool_id !== "0") {
+      obj.pool_id = message.pool_id;
+    }
+    if (message.address !== "") {
+      obj.address = message.address;
+    }
+    if (message.amount !== "0") {
+      obj.amount = message.amount;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<EventDefundPool>, I>>(base?: I): EventDefundPool {
+    return EventDefundPool.fromPartial(base ?? {});
+  },
+
+  fromPartial<I extends Exact<DeepPartial<EventDefundPool>, I>>(object: I): EventDefundPool {
+    const message = createBaseEventDefundPool();
+    message.pool_id = object.pool_id ?? "0";
+    message.address = object.address ?? "";
+    message.amount = object.amount ?? "0";
     return message;
   },
 };
@@ -1239,6 +1454,64 @@ export const EventPoolFundsSlashed = {
     message.pool_id = object.pool_id ?? "0";
     message.address = object.address ?? "";
     message.amount = object.amount ?? "0";
+    return message;
+  },
+};
+
+function createBaseEventPoolOutOfFunds(): EventPoolOutOfFunds {
+  return { pool_id: "0" };
+}
+
+export const EventPoolOutOfFunds = {
+  encode(message: EventPoolOutOfFunds, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.pool_id !== "0") {
+      writer.uint32(8).uint64(message.pool_id);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): EventPoolOutOfFunds {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseEventPoolOutOfFunds();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 8) {
+            break;
+          }
+
+          message.pool_id = longToString(reader.uint64() as Long);
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): EventPoolOutOfFunds {
+    return { pool_id: isSet(object.pool_id) ? String(object.pool_id) : "0" };
+  },
+
+  toJSON(message: EventPoolOutOfFunds): unknown {
+    const obj: any = {};
+    if (message.pool_id !== "0") {
+      obj.pool_id = message.pool_id;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<EventPoolOutOfFunds>, I>>(base?: I): EventPoolOutOfFunds {
+    return EventPoolOutOfFunds.fromPartial(base ?? {});
+  },
+
+  fromPartial<I extends Exact<DeepPartial<EventPoolOutOfFunds>, I>>(object: I): EventPoolOutOfFunds {
+    const message = createBaseEventPoolOutOfFunds();
+    message.pool_id = object.pool_id ?? "0";
     return message;
   },
 };

@@ -28,6 +28,13 @@ export interface BlockParams {
    * Note: must be greater or equal to -1
    */
   max_gas: string;
+  /**
+   * Minimum time increment between consecutive blocks (in milliseconds) If the
+   * block header timestamp is ahead of the system clock, decrease this value.
+   *
+   * Not exposed to the application.
+   */
+  time_iota_ms: string;
 }
 
 /** EvidenceParams determine how we handle evidence of malfeasance. */
@@ -67,7 +74,7 @@ export interface ValidatorParams {
 
 /** VersionParams contains the ABCI application version. */
 export interface VersionParams {
-  app: string;
+  app_version: string;
 }
 
 /**
@@ -194,7 +201,7 @@ export const ConsensusParams = {
 };
 
 function createBaseBlockParams(): BlockParams {
-  return { max_bytes: "0", max_gas: "0" };
+  return { max_bytes: "0", max_gas: "0", time_iota_ms: "0" };
 }
 
 export const BlockParams = {
@@ -204,6 +211,9 @@ export const BlockParams = {
     }
     if (message.max_gas !== "0") {
       writer.uint32(16).int64(message.max_gas);
+    }
+    if (message.time_iota_ms !== "0") {
+      writer.uint32(24).int64(message.time_iota_ms);
     }
     return writer;
   },
@@ -229,6 +239,13 @@ export const BlockParams = {
 
           message.max_gas = longToString(reader.int64() as Long);
           continue;
+        case 3:
+          if (tag !== 24) {
+            break;
+          }
+
+          message.time_iota_ms = longToString(reader.int64() as Long);
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -242,6 +259,7 @@ export const BlockParams = {
     return {
       max_bytes: isSet(object.max_bytes) ? String(object.max_bytes) : "0",
       max_gas: isSet(object.max_gas) ? String(object.max_gas) : "0",
+      time_iota_ms: isSet(object.time_iota_ms) ? String(object.time_iota_ms) : "0",
     };
   },
 
@@ -252,6 +270,9 @@ export const BlockParams = {
     }
     if (message.max_gas !== "0") {
       obj.max_gas = message.max_gas;
+    }
+    if (message.time_iota_ms !== "0") {
+      obj.time_iota_ms = message.time_iota_ms;
     }
     return obj;
   },
@@ -264,6 +285,7 @@ export const BlockParams = {
     const message = createBaseBlockParams();
     message.max_bytes = object.max_bytes ?? "0";
     message.max_gas = object.max_gas ?? "0";
+    message.time_iota_ms = object.time_iota_ms ?? "0";
     return message;
   },
 };
@@ -421,13 +443,13 @@ export const ValidatorParams = {
 };
 
 function createBaseVersionParams(): VersionParams {
-  return { app: "0" };
+  return { app_version: "0" };
 }
 
 export const VersionParams = {
   encode(message: VersionParams, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.app !== "0") {
-      writer.uint32(8).uint64(message.app);
+    if (message.app_version !== "0") {
+      writer.uint32(8).uint64(message.app_version);
     }
     return writer;
   },
@@ -444,7 +466,7 @@ export const VersionParams = {
             break;
           }
 
-          message.app = longToString(reader.uint64() as Long);
+          message.app_version = longToString(reader.uint64() as Long);
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -456,13 +478,13 @@ export const VersionParams = {
   },
 
   fromJSON(object: any): VersionParams {
-    return { app: isSet(object.app) ? String(object.app) : "0" };
+    return { app_version: isSet(object.app_version) ? String(object.app_version) : "0" };
   },
 
   toJSON(message: VersionParams): unknown {
     const obj: any = {};
-    if (message.app !== "0") {
-      obj.app = message.app;
+    if (message.app_version !== "0") {
+      obj.app_version = message.app_version;
     }
     return obj;
   },
@@ -473,7 +495,7 @@ export const VersionParams = {
 
   fromPartial<I extends Exact<DeepPartial<VersionParams>, I>>(object: I): VersionParams {
     const message = createBaseVersionParams();
-    message.app = object.app ?? "0";
+    message.app_version = object.app_version ?? "0";
     return message;
   },
 };

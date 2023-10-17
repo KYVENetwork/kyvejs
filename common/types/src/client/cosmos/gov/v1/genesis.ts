@@ -1,7 +1,7 @@
 /* eslint-disable */
 import Long from "long";
 import _m0 from "protobufjs/minimal";
-import { Deposit, DepositParams, Params, Proposal, TallyParams, Vote, VotingParams } from "./gov";
+import { Deposit, DepositParams, Proposal, TallyParams, Vote, VotingParams } from "./gov";
 
 export const protobufPackage = "cosmos.gov.v1";
 
@@ -17,39 +17,16 @@ export interface GenesisState {
   votes: Vote[];
   /** proposals defines all the proposals present at genesis. */
   proposals: Proposal[];
-  /**
-   * Deprecated: Prefer to use `params` instead.
-   * deposit_params defines all the paramaters of related to deposit.
-   *
-   * @deprecated
-   */
+  /** params defines all the paramaters of related to deposit. */
   deposit_params?:
     | DepositParams
     | undefined;
-  /**
-   * Deprecated: Prefer to use `params` instead.
-   * voting_params defines all the paramaters of related to voting.
-   *
-   * @deprecated
-   */
+  /** params defines all the paramaters of related to voting. */
   voting_params?:
     | VotingParams
     | undefined;
-  /**
-   * Deprecated: Prefer to use `params` instead.
-   * tally_params defines all the paramaters of related to tally.
-   *
-   * @deprecated
-   */
-  tally_params?:
-    | TallyParams
-    | undefined;
-  /**
-   * params defines all the paramaters of x/gov module.
-   *
-   * Since: cosmos-sdk 0.47
-   */
-  params?: Params | undefined;
+  /** params defines all the paramaters of related to tally. */
+  tally_params?: TallyParams | undefined;
 }
 
 function createBaseGenesisState(): GenesisState {
@@ -61,7 +38,6 @@ function createBaseGenesisState(): GenesisState {
     deposit_params: undefined,
     voting_params: undefined,
     tally_params: undefined,
-    params: undefined,
   };
 }
 
@@ -87,9 +63,6 @@ export const GenesisState = {
     }
     if (message.tally_params !== undefined) {
       TallyParams.encode(message.tally_params, writer.uint32(58).fork()).ldelim();
-    }
-    if (message.params !== undefined) {
-      Params.encode(message.params, writer.uint32(66).fork()).ldelim();
     }
     return writer;
   },
@@ -150,13 +123,6 @@ export const GenesisState = {
 
           message.tally_params = TallyParams.decode(reader, reader.uint32());
           continue;
-        case 8:
-          if (tag !== 66) {
-            break;
-          }
-
-          message.params = Params.decode(reader, reader.uint32());
-          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -175,7 +141,6 @@ export const GenesisState = {
       deposit_params: isSet(object.deposit_params) ? DepositParams.fromJSON(object.deposit_params) : undefined,
       voting_params: isSet(object.voting_params) ? VotingParams.fromJSON(object.voting_params) : undefined,
       tally_params: isSet(object.tally_params) ? TallyParams.fromJSON(object.tally_params) : undefined,
-      params: isSet(object.params) ? Params.fromJSON(object.params) : undefined,
     };
   },
 
@@ -202,9 +167,6 @@ export const GenesisState = {
     if (message.tally_params !== undefined) {
       obj.tally_params = TallyParams.toJSON(message.tally_params);
     }
-    if (message.params !== undefined) {
-      obj.params = Params.toJSON(message.params);
-    }
     return obj;
   },
 
@@ -226,9 +188,6 @@ export const GenesisState = {
       : undefined;
     message.tally_params = (object.tally_params !== undefined && object.tally_params !== null)
       ? TallyParams.fromPartial(object.tally_params)
-      : undefined;
-    message.params = (object.params !== undefined && object.params !== null)
-      ? Params.fromPartial(object.params)
       : undefined;
     return message;
   },

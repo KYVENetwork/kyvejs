@@ -12,7 +12,7 @@ export interface Minter {
   annual_provisions: string;
 }
 
-/** Params defines the parameters for the x/mint module. */
+/** Params holds parameters for the mint module. */
 export interface Params {
   /** type of coin to mint */
   mint_denom: string;
