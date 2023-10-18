@@ -7,14 +7,14 @@ export const protobufPackage = "kyve.bundles.v1beta1";
 /** VoteType ... */
 export enum VoteType {
   /** VOTE_TYPE_UNSPECIFIED - VOTE_TYPE_UNSPECIFIED ... */
-  VOTE_TYPE_UNSPECIFIED = "VOTE_TYPE_UNSPECIFIED",
+  VOTE_TYPE_UNSPECIFIED = 0,
   /** VOTE_TYPE_VALID - VOTE_TYPE_VALID ... */
-  VOTE_TYPE_VALID = "VOTE_TYPE_VALID",
+  VOTE_TYPE_VALID = 1,
   /** VOTE_TYPE_INVALID - VOTE_TYPE_INVALID ... */
-  VOTE_TYPE_INVALID = "VOTE_TYPE_INVALID",
+  VOTE_TYPE_INVALID = 2,
   /** VOTE_TYPE_ABSTAIN - VOTE_TYPE_ABSTAIN ... */
-  VOTE_TYPE_ABSTAIN = "VOTE_TYPE_ABSTAIN",
-  UNRECOGNIZED = "UNRECOGNIZED",
+  VOTE_TYPE_ABSTAIN = 3,
+  UNRECOGNIZED = -1,
 }
 
 export function voteTypeFromJSON(object: any): VoteType {
@@ -51,22 +51,6 @@ export function voteTypeToJSON(object: VoteType): string {
     case VoteType.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";
-  }
-}
-
-export function voteTypeToNumber(object: VoteType): number {
-  switch (object) {
-    case VoteType.VOTE_TYPE_UNSPECIFIED:
-      return 0;
-    case VoteType.VOTE_TYPE_VALID:
-      return 1;
-    case VoteType.VOTE_TYPE_INVALID:
-      return 2;
-    case VoteType.VOTE_TYPE_ABSTAIN:
-      return 3;
-    case VoteType.UNRECOGNIZED:
-    default:
-      return -1;
   }
 }
 
@@ -425,7 +409,7 @@ export const MsgSubmitBundleProposalResponse = {
 };
 
 function createBaseMsgVoteBundleProposal(): MsgVoteBundleProposal {
-  return { creator: "", staker: "", pool_id: "0", storage_id: "", vote: VoteType.VOTE_TYPE_UNSPECIFIED };
+  return { creator: "", staker: "", pool_id: "0", storage_id: "", vote: 0 };
 }
 
 export const MsgVoteBundleProposal = {
@@ -442,8 +426,8 @@ export const MsgVoteBundleProposal = {
     if (message.storage_id !== "") {
       writer.uint32(34).string(message.storage_id);
     }
-    if (message.vote !== VoteType.VOTE_TYPE_UNSPECIFIED) {
-      writer.uint32(40).int32(voteTypeToNumber(message.vote));
+    if (message.vote !== 0) {
+      writer.uint32(40).int32(message.vote);
     }
     return writer;
   },
@@ -488,7 +472,7 @@ export const MsgVoteBundleProposal = {
             break;
           }
 
-          message.vote = voteTypeFromJSON(reader.int32());
+          message.vote = reader.int32() as any;
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -505,7 +489,7 @@ export const MsgVoteBundleProposal = {
       staker: isSet(object.staker) ? globalThis.String(object.staker) : "",
       pool_id: isSet(object.pool_id) ? globalThis.String(object.pool_id) : "0",
       storage_id: isSet(object.storage_id) ? globalThis.String(object.storage_id) : "",
-      vote: isSet(object.vote) ? voteTypeFromJSON(object.vote) : VoteType.VOTE_TYPE_UNSPECIFIED,
+      vote: isSet(object.vote) ? voteTypeFromJSON(object.vote) : 0,
     };
   },
 
@@ -523,7 +507,7 @@ export const MsgVoteBundleProposal = {
     if (message.storage_id !== "") {
       obj.storage_id = message.storage_id;
     }
-    if (message.vote !== VoteType.VOTE_TYPE_UNSPECIFIED) {
+    if (message.vote !== 0) {
       obj.vote = voteTypeToJSON(message.vote);
     }
     return obj;
@@ -538,7 +522,7 @@ export const MsgVoteBundleProposal = {
     message.staker = object.staker ?? "";
     message.pool_id = object.pool_id ?? "0";
     message.storage_id = object.storage_id ?? "";
-    message.vote = object.vote ?? VoteType.VOTE_TYPE_UNSPECIFIED;
+    message.vote = object.vote ?? 0;
     return message;
   },
 };

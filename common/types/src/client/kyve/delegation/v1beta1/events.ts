@@ -1,7 +1,7 @@
 /* eslint-disable */
 import Long from "long";
 import _m0 from "protobufjs/minimal";
-import { SlashType, slashTypeFromJSON, slashTypeToJSON, slashTypeToNumber } from "./delegation";
+import { SlashType, slashTypeFromJSON, slashTypeToJSON } from "./delegation";
 import { Params } from "./params";
 
 export const protobufPackage = "kyve.delegation.v1beta1";
@@ -681,7 +681,7 @@ export const EventWithdrawRewards = {
 };
 
 function createBaseEventSlash(): EventSlash {
-  return { pool_id: "0", staker: "", amount: "0", slash_type: SlashType.SLASH_TYPE_UNSPECIFIED };
+  return { pool_id: "0", staker: "", amount: "0", slash_type: 0 };
 }
 
 export const EventSlash = {
@@ -695,8 +695,8 @@ export const EventSlash = {
     if (message.amount !== "0") {
       writer.uint32(24).uint64(message.amount);
     }
-    if (message.slash_type !== SlashType.SLASH_TYPE_UNSPECIFIED) {
-      writer.uint32(32).int32(slashTypeToNumber(message.slash_type));
+    if (message.slash_type !== 0) {
+      writer.uint32(32).int32(message.slash_type);
     }
     return writer;
   },
@@ -734,7 +734,7 @@ export const EventSlash = {
             break;
           }
 
-          message.slash_type = slashTypeFromJSON(reader.int32());
+          message.slash_type = reader.int32() as any;
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -750,7 +750,7 @@ export const EventSlash = {
       pool_id: isSet(object.pool_id) ? globalThis.String(object.pool_id) : "0",
       staker: isSet(object.staker) ? globalThis.String(object.staker) : "",
       amount: isSet(object.amount) ? globalThis.String(object.amount) : "0",
-      slash_type: isSet(object.slash_type) ? slashTypeFromJSON(object.slash_type) : SlashType.SLASH_TYPE_UNSPECIFIED,
+      slash_type: isSet(object.slash_type) ? slashTypeFromJSON(object.slash_type) : 0,
     };
   },
 
@@ -765,7 +765,7 @@ export const EventSlash = {
     if (message.amount !== "0") {
       obj.amount = message.amount;
     }
-    if (message.slash_type !== SlashType.SLASH_TYPE_UNSPECIFIED) {
+    if (message.slash_type !== 0) {
       obj.slash_type = slashTypeToJSON(message.slash_type);
     }
     return obj;
@@ -779,7 +779,7 @@ export const EventSlash = {
     message.pool_id = object.pool_id ?? "0";
     message.staker = object.staker ?? "";
     message.amount = object.amount ?? "0";
-    message.slash_type = object.slash_type ?? SlashType.SLASH_TYPE_UNSPECIFIED;
+    message.slash_type = object.slash_type ?? 0;
     return message;
   },
 };

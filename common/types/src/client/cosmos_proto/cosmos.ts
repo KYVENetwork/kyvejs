@@ -4,10 +4,10 @@ import _m0 from "protobufjs/minimal";
 export const protobufPackage = "cosmos_proto";
 
 export enum ScalarType {
-  SCALAR_TYPE_UNSPECIFIED = "SCALAR_TYPE_UNSPECIFIED",
-  SCALAR_TYPE_STRING = "SCALAR_TYPE_STRING",
-  SCALAR_TYPE_BYTES = "SCALAR_TYPE_BYTES",
-  UNRECOGNIZED = "UNRECOGNIZED",
+  SCALAR_TYPE_UNSPECIFIED = 0,
+  SCALAR_TYPE_STRING = 1,
+  SCALAR_TYPE_BYTES = 2,
+  UNRECOGNIZED = -1,
 }
 
 export function scalarTypeFromJSON(object: any): ScalarType {
@@ -39,20 +39,6 @@ export function scalarTypeToJSON(object: ScalarType): string {
     case ScalarType.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";
-  }
-}
-
-export function scalarTypeToNumber(object: ScalarType): number {
-  switch (object) {
-    case ScalarType.SCALAR_TYPE_UNSPECIFIED:
-      return 0;
-    case ScalarType.SCALAR_TYPE_STRING:
-      return 1;
-    case ScalarType.SCALAR_TYPE_BYTES:
-      return 2;
-    case ScalarType.UNRECOGNIZED:
-    default:
-      return -1;
   }
 }
 
@@ -195,7 +181,7 @@ export const ScalarDescriptor = {
     }
     writer.uint32(26).fork();
     for (const v of message.field_type) {
-      writer.int32(scalarTypeToNumber(v));
+      writer.int32(v);
     }
     writer.ldelim();
     return writer;
@@ -224,7 +210,7 @@ export const ScalarDescriptor = {
           continue;
         case 3:
           if (tag === 24) {
-            message.field_type.push(scalarTypeFromJSON(reader.int32()));
+            message.field_type.push(reader.int32() as any);
 
             continue;
           }
@@ -232,7 +218,7 @@ export const ScalarDescriptor = {
           if (tag === 26) {
             const end2 = reader.uint32() + reader.pos;
             while (reader.pos < end2) {
-              message.field_type.push(scalarTypeFromJSON(reader.int32()));
+              message.field_type.push(reader.int32() as any);
             }
 
             continue;

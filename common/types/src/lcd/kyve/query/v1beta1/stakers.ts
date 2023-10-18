@@ -10,12 +10,12 @@ export const protobufPackage = "kyve.query.v1beta1";
 /** StakerStatus ... */
 export enum StakerStatus {
   /** STAKER_STATUS_UNSPECIFIED - STAKER_STATUS_UNSPECIFIED ... */
-  STAKER_STATUS_UNSPECIFIED = 0,
+  STAKER_STATUS_UNSPECIFIED = "STAKER_STATUS_UNSPECIFIED",
   /** STAKER_STATUS_ACTIVE - STAKER_STATUS_ACTIVE ... */
-  STAKER_STATUS_ACTIVE = 1,
+  STAKER_STATUS_ACTIVE = "STAKER_STATUS_ACTIVE",
   /** STAKER_STATUS_INACTIVE - STAKER_STATUS_INACTIVE ... */
-  STAKER_STATUS_INACTIVE = 2,
-  UNRECOGNIZED = -1,
+  STAKER_STATUS_INACTIVE = "STAKER_STATUS_INACTIVE",
+  UNRECOGNIZED = "UNRECOGNIZED",
 }
 
 export function stakerStatusFromJSON(object: any): StakerStatus {
@@ -47,6 +47,20 @@ export function stakerStatusToJSON(object: StakerStatus): string {
     case StakerStatus.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";
+  }
+}
+
+export function stakerStatusToNumber(object: StakerStatus): number {
+  switch (object) {
+    case StakerStatus.STAKER_STATUS_UNSPECIFIED:
+      return 0;
+    case StakerStatus.STAKER_STATUS_ACTIVE:
+      return 1;
+    case StakerStatus.STAKER_STATUS_INACTIVE:
+      return 2;
+    case StakerStatus.UNRECOGNIZED:
+    default:
+      return -1;
   }
 }
 
@@ -119,7 +133,7 @@ export interface QueryStakersByPoolCountResponse {
 }
 
 function createBaseQueryStakersRequest(): QueryStakersRequest {
-  return { pagination: undefined, status: 0, search: "" };
+  return { pagination: undefined, status: StakerStatus.STAKER_STATUS_UNSPECIFIED, search: "" };
 }
 
 export const QueryStakersRequest = {
@@ -127,8 +141,8 @@ export const QueryStakersRequest = {
     if (message.pagination !== undefined) {
       PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
     }
-    if (message.status !== 0) {
-      writer.uint32(16).int32(message.status);
+    if (message.status !== StakerStatus.STAKER_STATUS_UNSPECIFIED) {
+      writer.uint32(16).int32(stakerStatusToNumber(message.status));
     }
     if (message.search !== "") {
       writer.uint32(26).string(message.search);
@@ -155,7 +169,7 @@ export const QueryStakersRequest = {
             break;
           }
 
-          message.status = reader.int32() as any;
+          message.status = stakerStatusFromJSON(reader.int32());
           continue;
         case 3:
           if (tag !== 26) {
@@ -176,7 +190,7 @@ export const QueryStakersRequest = {
   fromJSON(object: any): QueryStakersRequest {
     return {
       pagination: isSet(object.pagination) ? PageRequest.fromJSON(object.pagination) : undefined,
-      status: isSet(object.status) ? stakerStatusFromJSON(object.status) : 0,
+      status: isSet(object.status) ? stakerStatusFromJSON(object.status) : StakerStatus.STAKER_STATUS_UNSPECIFIED,
       search: isSet(object.search) ? globalThis.String(object.search) : "",
     };
   },
@@ -186,7 +200,7 @@ export const QueryStakersRequest = {
     if (message.pagination !== undefined) {
       obj.pagination = PageRequest.toJSON(message.pagination);
     }
-    if (message.status !== 0) {
+    if (message.status !== StakerStatus.STAKER_STATUS_UNSPECIFIED) {
       obj.status = stakerStatusToJSON(message.status);
     }
     if (message.search !== "") {
@@ -203,7 +217,7 @@ export const QueryStakersRequest = {
     message.pagination = (object.pagination !== undefined && object.pagination !== null)
       ? PageRequest.fromPartial(object.pagination)
       : undefined;
-    message.status = object.status ?? 0;
+    message.status = object.status ?? StakerStatus.STAKER_STATUS_UNSPECIFIED;
     message.search = object.search ?? "";
     return message;
   },

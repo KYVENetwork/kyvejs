@@ -7,18 +7,18 @@ export const protobufPackage = "kyve.pool.v1beta1";
 /** PoolStatus ... */
 export enum PoolStatus {
   /** POOL_STATUS_UNSPECIFIED - POOL_STATUS_UNSPECIFIED ... */
-  POOL_STATUS_UNSPECIFIED = "POOL_STATUS_UNSPECIFIED",
+  POOL_STATUS_UNSPECIFIED = 0,
   /** POOL_STATUS_ACTIVE - POOL_STATUS_ACTIVE ... */
-  POOL_STATUS_ACTIVE = "POOL_STATUS_ACTIVE",
+  POOL_STATUS_ACTIVE = 1,
   /** POOL_STATUS_DISABLED - POOL_STATUS_DISABLED ... */
-  POOL_STATUS_DISABLED = "POOL_STATUS_DISABLED",
+  POOL_STATUS_DISABLED = 2,
   /** POOL_STATUS_NO_FUNDS - POOL_STATUS_NO_FUNDS ... */
-  POOL_STATUS_NO_FUNDS = "POOL_STATUS_NO_FUNDS",
+  POOL_STATUS_NO_FUNDS = 3,
   /** POOL_STATUS_NOT_ENOUGH_DELEGATION - POOL_STATUS_NOT_ENOUGH_DELEGATION ... */
-  POOL_STATUS_NOT_ENOUGH_DELEGATION = "POOL_STATUS_NOT_ENOUGH_DELEGATION",
+  POOL_STATUS_NOT_ENOUGH_DELEGATION = 4,
   /** POOL_STATUS_UPGRADING - POOL_STATUS_UPGRADING ... */
-  POOL_STATUS_UPGRADING = "POOL_STATUS_UPGRADING",
-  UNRECOGNIZED = "UNRECOGNIZED",
+  POOL_STATUS_UPGRADING = 5,
+  UNRECOGNIZED = -1,
 }
 
 export function poolStatusFromJSON(object: any): PoolStatus {
@@ -65,26 +65,6 @@ export function poolStatusToJSON(object: PoolStatus): string {
     case PoolStatus.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";
-  }
-}
-
-export function poolStatusToNumber(object: PoolStatus): number {
-  switch (object) {
-    case PoolStatus.POOL_STATUS_UNSPECIFIED:
-      return 0;
-    case PoolStatus.POOL_STATUS_ACTIVE:
-      return 1;
-    case PoolStatus.POOL_STATUS_DISABLED:
-      return 2;
-    case PoolStatus.POOL_STATUS_NO_FUNDS:
-      return 3;
-    case PoolStatus.POOL_STATUS_NOT_ENOUGH_DELEGATION:
-      return 4;
-    case PoolStatus.POOL_STATUS_UPGRADING:
-      return 5;
-    case PoolStatus.UNRECOGNIZED:
-    default:
-      return -1;
   }
 }
 

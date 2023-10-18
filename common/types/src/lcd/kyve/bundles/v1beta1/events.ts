@@ -1,9 +1,9 @@
 /* eslint-disable */
 import Long from "long";
 import _m0 from "protobufjs/minimal";
-import { BundleStatus, bundleStatusFromJSON, bundleStatusToJSON } from "./bundles";
+import { BundleStatus, bundleStatusFromJSON, bundleStatusToJSON, bundleStatusToNumber } from "./bundles";
 import { Params } from "./params";
-import { VoteType, voteTypeFromJSON, voteTypeToJSON } from "./tx";
+import { VoteType, voteTypeFromJSON, voteTypeToJSON, voteTypeToNumber } from "./tx";
 
 export const protobufPackage = "kyve.bundles.v1beta1";
 
@@ -274,7 +274,7 @@ export const EventUpdateParams = {
 };
 
 function createBaseEventBundleVote(): EventBundleVote {
-  return { pool_id: "0", staker: "", storage_id: "", vote: 0 };
+  return { pool_id: "0", staker: "", storage_id: "", vote: VoteType.VOTE_TYPE_UNSPECIFIED };
 }
 
 export const EventBundleVote = {
@@ -288,8 +288,8 @@ export const EventBundleVote = {
     if (message.storage_id !== "") {
       writer.uint32(26).string(message.storage_id);
     }
-    if (message.vote !== 0) {
-      writer.uint32(32).int32(message.vote);
+    if (message.vote !== VoteType.VOTE_TYPE_UNSPECIFIED) {
+      writer.uint32(32).int32(voteTypeToNumber(message.vote));
     }
     return writer;
   },
@@ -327,7 +327,7 @@ export const EventBundleVote = {
             break;
           }
 
-          message.vote = reader.int32() as any;
+          message.vote = voteTypeFromJSON(reader.int32());
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -343,7 +343,7 @@ export const EventBundleVote = {
       pool_id: isSet(object.pool_id) ? globalThis.String(object.pool_id) : "0",
       staker: isSet(object.staker) ? globalThis.String(object.staker) : "",
       storage_id: isSet(object.storage_id) ? globalThis.String(object.storage_id) : "",
-      vote: isSet(object.vote) ? voteTypeFromJSON(object.vote) : 0,
+      vote: isSet(object.vote) ? voteTypeFromJSON(object.vote) : VoteType.VOTE_TYPE_UNSPECIFIED,
     };
   },
 
@@ -358,7 +358,7 @@ export const EventBundleVote = {
     if (message.storage_id !== "") {
       obj.storage_id = message.storage_id;
     }
-    if (message.vote !== 0) {
+    if (message.vote !== VoteType.VOTE_TYPE_UNSPECIFIED) {
       obj.vote = voteTypeToJSON(message.vote);
     }
     return obj;
@@ -372,7 +372,7 @@ export const EventBundleVote = {
     message.pool_id = object.pool_id ?? "0";
     message.staker = object.staker ?? "";
     message.storage_id = object.storage_id ?? "";
-    message.vote = object.vote ?? 0;
+    message.vote = object.vote ?? VoteType.VOTE_TYPE_UNSPECIFIED;
     return message;
   },
 };
@@ -654,7 +654,7 @@ function createBaseEventBundleFinalized(): EventBundleFinalized {
     invalid: "0",
     abstain: "0",
     total: "0",
-    status: 0,
+    status: BundleStatus.BUNDLE_STATUS_UNSPECIFIED,
     funders_payout: "0",
     inflation_payout: "0",
     reward_treasury: "0",
@@ -687,8 +687,8 @@ export const EventBundleFinalized = {
     if (message.total !== "0") {
       writer.uint32(48).uint64(message.total);
     }
-    if (message.status !== 0) {
-      writer.uint32(56).int32(message.status);
+    if (message.status !== BundleStatus.BUNDLE_STATUS_UNSPECIFIED) {
+      writer.uint32(56).int32(bundleStatusToNumber(message.status));
     }
     if (message.funders_payout !== "0") {
       writer.uint32(64).uint64(message.funders_payout);
@@ -774,7 +774,7 @@ export const EventBundleFinalized = {
             break;
           }
 
-          message.status = reader.int32() as any;
+          message.status = bundleStatusFromJSON(reader.int32());
           continue;
         case 8:
           if (tag !== 64) {
@@ -856,7 +856,7 @@ export const EventBundleFinalized = {
       invalid: isSet(object.invalid) ? globalThis.String(object.invalid) : "0",
       abstain: isSet(object.abstain) ? globalThis.String(object.abstain) : "0",
       total: isSet(object.total) ? globalThis.String(object.total) : "0",
-      status: isSet(object.status) ? bundleStatusFromJSON(object.status) : 0,
+      status: isSet(object.status) ? bundleStatusFromJSON(object.status) : BundleStatus.BUNDLE_STATUS_UNSPECIFIED,
       funders_payout: isSet(object.funders_payout) ? globalThis.String(object.funders_payout) : "0",
       inflation_payout: isSet(object.inflation_payout) ? globalThis.String(object.inflation_payout) : "0",
       reward_treasury: isSet(object.reward_treasury) ? globalThis.String(object.reward_treasury) : "0",
@@ -889,7 +889,7 @@ export const EventBundleFinalized = {
     if (message.total !== "0") {
       obj.total = message.total;
     }
-    if (message.status !== 0) {
+    if (message.status !== BundleStatus.BUNDLE_STATUS_UNSPECIFIED) {
       obj.status = bundleStatusToJSON(message.status);
     }
     if (message.funders_payout !== "0") {
@@ -933,7 +933,7 @@ export const EventBundleFinalized = {
     message.invalid = object.invalid ?? "0";
     message.abstain = object.abstain ?? "0";
     message.total = object.total ?? "0";
-    message.status = object.status ?? 0;
+    message.status = object.status ?? BundleStatus.BUNDLE_STATUS_UNSPECIFIED;
     message.funders_payout = object.funders_payout ?? "0";
     message.inflation_payout = object.inflation_payout ?? "0";
     message.reward_treasury = object.reward_treasury ?? "0";

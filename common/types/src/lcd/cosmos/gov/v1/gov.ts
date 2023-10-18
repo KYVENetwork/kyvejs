@@ -13,16 +13,16 @@ export const protobufPackage = "cosmos.gov.v1";
 /** VoteOption enumerates the valid vote options for a given governance proposal. */
 export enum VoteOption {
   /** VOTE_OPTION_UNSPECIFIED - VOTE_OPTION_UNSPECIFIED defines a no-op vote option. */
-  VOTE_OPTION_UNSPECIFIED = 0,
+  VOTE_OPTION_UNSPECIFIED = "VOTE_OPTION_UNSPECIFIED",
   /** VOTE_OPTION_YES - VOTE_OPTION_YES defines a yes vote option. */
-  VOTE_OPTION_YES = 1,
+  VOTE_OPTION_YES = "VOTE_OPTION_YES",
   /** VOTE_OPTION_ABSTAIN - VOTE_OPTION_ABSTAIN defines an abstain vote option. */
-  VOTE_OPTION_ABSTAIN = 2,
+  VOTE_OPTION_ABSTAIN = "VOTE_OPTION_ABSTAIN",
   /** VOTE_OPTION_NO - VOTE_OPTION_NO defines a no vote option. */
-  VOTE_OPTION_NO = 3,
+  VOTE_OPTION_NO = "VOTE_OPTION_NO",
   /** VOTE_OPTION_NO_WITH_VETO - VOTE_OPTION_NO_WITH_VETO defines a no with veto vote option. */
-  VOTE_OPTION_NO_WITH_VETO = 4,
-  UNRECOGNIZED = -1,
+  VOTE_OPTION_NO_WITH_VETO = "VOTE_OPTION_NO_WITH_VETO",
+  UNRECOGNIZED = "UNRECOGNIZED",
 }
 
 export function voteOptionFromJSON(object: any): VoteOption {
@@ -67,36 +67,54 @@ export function voteOptionToJSON(object: VoteOption): string {
   }
 }
 
+export function voteOptionToNumber(object: VoteOption): number {
+  switch (object) {
+    case VoteOption.VOTE_OPTION_UNSPECIFIED:
+      return 0;
+    case VoteOption.VOTE_OPTION_YES:
+      return 1;
+    case VoteOption.VOTE_OPTION_ABSTAIN:
+      return 2;
+    case VoteOption.VOTE_OPTION_NO:
+      return 3;
+    case VoteOption.VOTE_OPTION_NO_WITH_VETO:
+      return 4;
+    case VoteOption.UNRECOGNIZED:
+    default:
+      return -1;
+  }
+}
+
 /** ProposalStatus enumerates the valid statuses of a proposal. */
 export enum ProposalStatus {
   /** PROPOSAL_STATUS_UNSPECIFIED - PROPOSAL_STATUS_UNSPECIFIED defines the default proposal status. */
-  PROPOSAL_STATUS_UNSPECIFIED = 0,
+  PROPOSAL_STATUS_UNSPECIFIED = "PROPOSAL_STATUS_UNSPECIFIED",
   /**
    * PROPOSAL_STATUS_DEPOSIT_PERIOD - PROPOSAL_STATUS_DEPOSIT_PERIOD defines a proposal status during the deposit
    * period.
    */
-  PROPOSAL_STATUS_DEPOSIT_PERIOD = 1,
+  PROPOSAL_STATUS_DEPOSIT_PERIOD = "PROPOSAL_STATUS_DEPOSIT_PERIOD",
   /**
    * PROPOSAL_STATUS_VOTING_PERIOD - PROPOSAL_STATUS_VOTING_PERIOD defines a proposal status during the voting
    * period.
    */
-  PROPOSAL_STATUS_VOTING_PERIOD = 2,
+  PROPOSAL_STATUS_VOTING_PERIOD = "PROPOSAL_STATUS_VOTING_PERIOD",
   /**
    * PROPOSAL_STATUS_PASSED - PROPOSAL_STATUS_PASSED defines a proposal status of a proposal that has
    * passed.
    */
-  PROPOSAL_STATUS_PASSED = 3,
+  PROPOSAL_STATUS_PASSED = "PROPOSAL_STATUS_PASSED",
   /**
    * PROPOSAL_STATUS_REJECTED - PROPOSAL_STATUS_REJECTED defines a proposal status of a proposal that has
    * been rejected.
    */
-  PROPOSAL_STATUS_REJECTED = 4,
+  PROPOSAL_STATUS_REJECTED = "PROPOSAL_STATUS_REJECTED",
   /**
    * PROPOSAL_STATUS_FAILED - PROPOSAL_STATUS_FAILED defines a proposal status of a proposal that has
    * failed.
    */
-  PROPOSAL_STATUS_FAILED = 5,
-  UNRECOGNIZED = -1,
+  PROPOSAL_STATUS_FAILED = "PROPOSAL_STATUS_FAILED",
+  UNRECOGNIZED = "UNRECOGNIZED",
 }
 
 export function proposalStatusFromJSON(object: any): ProposalStatus {
@@ -143,6 +161,26 @@ export function proposalStatusToJSON(object: ProposalStatus): string {
     case ProposalStatus.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";
+  }
+}
+
+export function proposalStatusToNumber(object: ProposalStatus): number {
+  switch (object) {
+    case ProposalStatus.PROPOSAL_STATUS_UNSPECIFIED:
+      return 0;
+    case ProposalStatus.PROPOSAL_STATUS_DEPOSIT_PERIOD:
+      return 1;
+    case ProposalStatus.PROPOSAL_STATUS_VOTING_PERIOD:
+      return 2;
+    case ProposalStatus.PROPOSAL_STATUS_PASSED:
+      return 3;
+    case ProposalStatus.PROPOSAL_STATUS_REJECTED:
+      return 4;
+    case ProposalStatus.PROPOSAL_STATUS_FAILED:
+      return 5;
+    case ProposalStatus.UNRECOGNIZED:
+    default:
+      return -1;
   }
 }
 
@@ -325,13 +363,13 @@ export interface Params {
 }
 
 function createBaseWeightedVoteOption(): WeightedVoteOption {
-  return { option: 0, weight: "" };
+  return { option: VoteOption.VOTE_OPTION_UNSPECIFIED, weight: "" };
 }
 
 export const WeightedVoteOption = {
   encode(message: WeightedVoteOption, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.option !== 0) {
-      writer.uint32(8).int32(message.option);
+    if (message.option !== VoteOption.VOTE_OPTION_UNSPECIFIED) {
+      writer.uint32(8).int32(voteOptionToNumber(message.option));
     }
     if (message.weight !== "") {
       writer.uint32(18).string(message.weight);
@@ -351,7 +389,7 @@ export const WeightedVoteOption = {
             break;
           }
 
-          message.option = reader.int32() as any;
+          message.option = voteOptionFromJSON(reader.int32());
           continue;
         case 2:
           if (tag !== 18) {
@@ -371,14 +409,14 @@ export const WeightedVoteOption = {
 
   fromJSON(object: any): WeightedVoteOption {
     return {
-      option: isSet(object.option) ? voteOptionFromJSON(object.option) : 0,
+      option: isSet(object.option) ? voteOptionFromJSON(object.option) : VoteOption.VOTE_OPTION_UNSPECIFIED,
       weight: isSet(object.weight) ? globalThis.String(object.weight) : "",
     };
   },
 
   toJSON(message: WeightedVoteOption): unknown {
     const obj: any = {};
-    if (message.option !== 0) {
+    if (message.option !== VoteOption.VOTE_OPTION_UNSPECIFIED) {
       obj.option = voteOptionToJSON(message.option);
     }
     if (message.weight !== "") {
@@ -392,7 +430,7 @@ export const WeightedVoteOption = {
   },
   fromPartial<I extends Exact<DeepPartial<WeightedVoteOption>, I>>(object: I): WeightedVoteOption {
     const message = createBaseWeightedVoteOption();
-    message.option = object.option ?? 0;
+    message.option = object.option ?? VoteOption.VOTE_OPTION_UNSPECIFIED;
     message.weight = object.weight ?? "";
     return message;
   },
@@ -491,7 +529,7 @@ function createBaseProposal(): Proposal {
   return {
     id: "0",
     messages: [],
-    status: 0,
+    status: ProposalStatus.PROPOSAL_STATUS_UNSPECIFIED,
     final_tally_result: undefined,
     submit_time: undefined,
     deposit_end_time: undefined,
@@ -513,8 +551,8 @@ export const Proposal = {
     for (const v of message.messages) {
       Any.encode(v!, writer.uint32(18).fork()).ldelim();
     }
-    if (message.status !== 0) {
-      writer.uint32(24).int32(message.status);
+    if (message.status !== ProposalStatus.PROPOSAL_STATUS_UNSPECIFIED) {
+      writer.uint32(24).int32(proposalStatusToNumber(message.status));
     }
     if (message.final_tally_result !== undefined) {
       TallyResult.encode(message.final_tally_result, writer.uint32(34).fork()).ldelim();
@@ -575,7 +613,7 @@ export const Proposal = {
             break;
           }
 
-          message.status = reader.int32() as any;
+          message.status = proposalStatusFromJSON(reader.int32());
           continue;
         case 4:
           if (tag !== 34) {
@@ -660,7 +698,7 @@ export const Proposal = {
     return {
       id: isSet(object.id) ? globalThis.String(object.id) : "0",
       messages: globalThis.Array.isArray(object?.messages) ? object.messages.map((e: any) => Any.fromJSON(e)) : [],
-      status: isSet(object.status) ? proposalStatusFromJSON(object.status) : 0,
+      status: isSet(object.status) ? proposalStatusFromJSON(object.status) : ProposalStatus.PROPOSAL_STATUS_UNSPECIFIED,
       final_tally_result: isSet(object.final_tally_result)
         ? TallyResult.fromJSON(object.final_tally_result)
         : undefined,
@@ -686,7 +724,7 @@ export const Proposal = {
     if (message.messages?.length) {
       obj.messages = message.messages.map((e) => Any.toJSON(e));
     }
-    if (message.status !== 0) {
+    if (message.status !== ProposalStatus.PROPOSAL_STATUS_UNSPECIFIED) {
       obj.status = proposalStatusToJSON(message.status);
     }
     if (message.final_tally_result !== undefined) {
@@ -729,7 +767,7 @@ export const Proposal = {
     const message = createBaseProposal();
     message.id = object.id ?? "0";
     message.messages = object.messages?.map((e) => Any.fromPartial(e)) || [];
-    message.status = object.status ?? 0;
+    message.status = object.status ?? ProposalStatus.PROPOSAL_STATUS_UNSPECIFIED;
     message.final_tally_result = (object.final_tally_result !== undefined && object.final_tally_result !== null)
       ? TallyResult.fromPartial(object.final_tally_result)
       : undefined;

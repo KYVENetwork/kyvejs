@@ -3,7 +3,14 @@ import Long from "long";
 import _m0 from "protobufjs/minimal";
 import { Any } from "../../../google/protobuf/any";
 import { Coin } from "../../base/v1beta1/coin";
-import { Params, VoteOption, voteOptionFromJSON, voteOptionToJSON, WeightedVoteOption } from "./gov";
+import {
+  Params,
+  VoteOption,
+  voteOptionFromJSON,
+  voteOptionToJSON,
+  voteOptionToNumber,
+  WeightedVoteOption,
+} from "./gov";
 
 export const protobufPackage = "cosmos.gov.v1";
 
@@ -443,7 +450,7 @@ export const MsgExecLegacyContentResponse = {
 };
 
 function createBaseMsgVote(): MsgVote {
-  return { proposal_id: "0", voter: "", option: 0, metadata: "" };
+  return { proposal_id: "0", voter: "", option: VoteOption.VOTE_OPTION_UNSPECIFIED, metadata: "" };
 }
 
 export const MsgVote = {
@@ -454,8 +461,8 @@ export const MsgVote = {
     if (message.voter !== "") {
       writer.uint32(18).string(message.voter);
     }
-    if (message.option !== 0) {
-      writer.uint32(24).int32(message.option);
+    if (message.option !== VoteOption.VOTE_OPTION_UNSPECIFIED) {
+      writer.uint32(24).int32(voteOptionToNumber(message.option));
     }
     if (message.metadata !== "") {
       writer.uint32(34).string(message.metadata);
@@ -489,7 +496,7 @@ export const MsgVote = {
             break;
           }
 
-          message.option = reader.int32() as any;
+          message.option = voteOptionFromJSON(reader.int32());
           continue;
         case 4:
           if (tag !== 34) {
@@ -511,7 +518,7 @@ export const MsgVote = {
     return {
       proposal_id: isSet(object.proposal_id) ? globalThis.String(object.proposal_id) : "0",
       voter: isSet(object.voter) ? globalThis.String(object.voter) : "",
-      option: isSet(object.option) ? voteOptionFromJSON(object.option) : 0,
+      option: isSet(object.option) ? voteOptionFromJSON(object.option) : VoteOption.VOTE_OPTION_UNSPECIFIED,
       metadata: isSet(object.metadata) ? globalThis.String(object.metadata) : "",
     };
   },
@@ -524,7 +531,7 @@ export const MsgVote = {
     if (message.voter !== "") {
       obj.voter = message.voter;
     }
-    if (message.option !== 0) {
+    if (message.option !== VoteOption.VOTE_OPTION_UNSPECIFIED) {
       obj.option = voteOptionToJSON(message.option);
     }
     if (message.metadata !== "") {
@@ -540,7 +547,7 @@ export const MsgVote = {
     const message = createBaseMsgVote();
     message.proposal_id = object.proposal_id ?? "0";
     message.voter = object.voter ?? "";
-    message.option = object.option ?? 0;
+    message.option = object.option ?? VoteOption.VOTE_OPTION_UNSPECIFIED;
     message.metadata = object.metadata ?? "";
     return message;
   },

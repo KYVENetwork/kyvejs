@@ -1,7 +1,7 @@
 /* eslint-disable */
 import Long from "long";
 import _m0 from "protobufjs/minimal";
-import { PoolStatus, poolStatusFromJSON, poolStatusToJSON, poolStatusToNumber } from "../../pool/v1beta1/pool";
+import { PoolStatus, poolStatusFromJSON, poolStatusToJSON } from "../../pool/v1beta1/pool";
 
 export const protobufPackage = "kyve.query.v1beta1";
 
@@ -177,7 +177,7 @@ function createBaseBasicPool(): BasicPool {
     upload_interval: "0",
     total_funds: "0",
     total_delegation: "0",
-    status: PoolStatus.POOL_STATUS_UNSPECIFIED,
+    status: 0,
   };
 }
 
@@ -207,8 +207,8 @@ export const BasicPool = {
     if (message.total_delegation !== "0") {
       writer.uint32(64).uint64(message.total_delegation);
     }
-    if (message.status !== PoolStatus.POOL_STATUS_UNSPECIFIED) {
-      writer.uint32(72).int32(poolStatusToNumber(message.status));
+    if (message.status !== 0) {
+      writer.uint32(72).int32(message.status);
     }
     return writer;
   },
@@ -281,7 +281,7 @@ export const BasicPool = {
             break;
           }
 
-          message.status = poolStatusFromJSON(reader.int32());
+          message.status = reader.int32() as any;
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -304,7 +304,7 @@ export const BasicPool = {
       upload_interval: isSet(object.upload_interval) ? globalThis.String(object.upload_interval) : "0",
       total_funds: isSet(object.total_funds) ? globalThis.String(object.total_funds) : "0",
       total_delegation: isSet(object.total_delegation) ? globalThis.String(object.total_delegation) : "0",
-      status: isSet(object.status) ? poolStatusFromJSON(object.status) : PoolStatus.POOL_STATUS_UNSPECIFIED,
+      status: isSet(object.status) ? poolStatusFromJSON(object.status) : 0,
     };
   },
 
@@ -334,7 +334,7 @@ export const BasicPool = {
     if (message.total_delegation !== "0") {
       obj.total_delegation = message.total_delegation;
     }
-    if (message.status !== PoolStatus.POOL_STATUS_UNSPECIFIED) {
+    if (message.status !== 0) {
       obj.status = poolStatusToJSON(message.status);
     }
     return obj;
@@ -353,7 +353,7 @@ export const BasicPool = {
     message.upload_interval = object.upload_interval ?? "0";
     message.total_funds = object.total_funds ?? "0";
     message.total_delegation = object.total_delegation ?? "0";
-    message.status = object.status ?? PoolStatus.POOL_STATUS_UNSPECIFIED;
+    message.status = object.status ?? 0;
     return message;
   },
 };

@@ -3,7 +3,7 @@ import Long from "long";
 import _m0 from "protobufjs/minimal";
 import { PageRequest, PageResponse } from "../../../cosmos/base/query/v1beta1/pagination";
 import { BundleProposal } from "../../bundles/v1beta1/bundles";
-import { Pool, PoolStatus, poolStatusFromJSON, poolStatusToJSON } from "../../pool/v1beta1/pool";
+import { Pool, PoolStatus, poolStatusFromJSON, poolStatusToJSON, poolStatusToNumber } from "../../pool/v1beta1/pool";
 
 export const protobufPackage = "kyve.query.v1beta1";
 
@@ -274,7 +274,7 @@ function createBasePoolResponse(): PoolResponse {
     stakers: [],
     total_self_delegation: "0",
     total_delegation: "0",
-    status: 0,
+    status: PoolStatus.POOL_STATUS_UNSPECIFIED,
     account: "",
     account_balance: "0",
   };
@@ -300,8 +300,8 @@ export const PoolResponse = {
     if (message.total_delegation !== "0") {
       writer.uint32(48).uint64(message.total_delegation);
     }
-    if (message.status !== 0) {
-      writer.uint32(56).int32(message.status);
+    if (message.status !== PoolStatus.POOL_STATUS_UNSPECIFIED) {
+      writer.uint32(56).int32(poolStatusToNumber(message.status));
     }
     if (message.account !== "") {
       writer.uint32(66).string(message.account);
@@ -366,7 +366,7 @@ export const PoolResponse = {
             break;
           }
 
-          message.status = reader.int32() as any;
+          message.status = poolStatusFromJSON(reader.int32());
           continue;
         case 8:
           if (tag !== 66) {
@@ -401,7 +401,7 @@ export const PoolResponse = {
         ? globalThis.String(object.total_self_delegation)
         : "0",
       total_delegation: isSet(object.total_delegation) ? globalThis.String(object.total_delegation) : "0",
-      status: isSet(object.status) ? poolStatusFromJSON(object.status) : 0,
+      status: isSet(object.status) ? poolStatusFromJSON(object.status) : PoolStatus.POOL_STATUS_UNSPECIFIED,
       account: isSet(object.account) ? globalThis.String(object.account) : "",
       account_balance: isSet(object.account_balance) ? globalThis.String(object.account_balance) : "0",
     };
@@ -427,7 +427,7 @@ export const PoolResponse = {
     if (message.total_delegation !== "0") {
       obj.total_delegation = message.total_delegation;
     }
-    if (message.status !== 0) {
+    if (message.status !== PoolStatus.POOL_STATUS_UNSPECIFIED) {
       obj.status = poolStatusToJSON(message.status);
     }
     if (message.account !== "") {
@@ -452,7 +452,7 @@ export const PoolResponse = {
     message.stakers = object.stakers?.map((e) => e) || [];
     message.total_self_delegation = object.total_self_delegation ?? "0";
     message.total_delegation = object.total_delegation ?? "0";
-    message.status = object.status ?? 0;
+    message.status = object.status ?? PoolStatus.POOL_STATUS_UNSPECIFIED;
     message.account = object.account ?? "";
     message.account_balance = object.account_balance ?? "0";
     return message;

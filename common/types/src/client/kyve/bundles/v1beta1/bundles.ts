@@ -10,18 +10,18 @@ export const protobufPackage = "kyve.bundles.v1beta1";
  */
 export enum BundleStatus {
   /** BUNDLE_STATUS_UNSPECIFIED - BUNDLE_STATUS_UNSPECIFIED ... */
-  BUNDLE_STATUS_UNSPECIFIED = "BUNDLE_STATUS_UNSPECIFIED",
+  BUNDLE_STATUS_UNSPECIFIED = 0,
   /** BUNDLE_STATUS_VALID - BUNDLE_STATUS_VALID ... */
-  BUNDLE_STATUS_VALID = "BUNDLE_STATUS_VALID",
+  BUNDLE_STATUS_VALID = 1,
   /** BUNDLE_STATUS_INVALID - BUNDLE_STATUS_INVALID ... */
-  BUNDLE_STATUS_INVALID = "BUNDLE_STATUS_INVALID",
+  BUNDLE_STATUS_INVALID = 2,
   /** BUNDLE_STATUS_NO_FUNDS - BUNDLE_STATUS_NO_FUNDS ... */
-  BUNDLE_STATUS_NO_FUNDS = "BUNDLE_STATUS_NO_FUNDS",
+  BUNDLE_STATUS_NO_FUNDS = 3,
   /** BUNDLE_STATUS_NO_QUORUM - BUNDLE_STATUS_NO_QUORUM ... */
-  BUNDLE_STATUS_NO_QUORUM = "BUNDLE_STATUS_NO_QUORUM",
+  BUNDLE_STATUS_NO_QUORUM = 4,
   /** BUNDLE_STATUS_DISABLED - BUNDLE_STATUS_DISABLED  ... */
-  BUNDLE_STATUS_DISABLED = "BUNDLE_STATUS_DISABLED",
-  UNRECOGNIZED = "UNRECOGNIZED",
+  BUNDLE_STATUS_DISABLED = 5,
+  UNRECOGNIZED = -1,
 }
 
 export function bundleStatusFromJSON(object: any): BundleStatus {
@@ -68,26 +68,6 @@ export function bundleStatusToJSON(object: BundleStatus): string {
     case BundleStatus.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";
-  }
-}
-
-export function bundleStatusToNumber(object: BundleStatus): number {
-  switch (object) {
-    case BundleStatus.BUNDLE_STATUS_UNSPECIFIED:
-      return 0;
-    case BundleStatus.BUNDLE_STATUS_VALID:
-      return 1;
-    case BundleStatus.BUNDLE_STATUS_INVALID:
-      return 2;
-    case BundleStatus.BUNDLE_STATUS_NO_FUNDS:
-      return 3;
-    case BundleStatus.BUNDLE_STATUS_NO_QUORUM:
-      return 4;
-    case BundleStatus.BUNDLE_STATUS_DISABLED:
-      return 5;
-    case BundleStatus.UNRECOGNIZED:
-    default:
-      return -1;
   }
 }
 
