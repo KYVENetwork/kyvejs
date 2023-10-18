@@ -18,12 +18,12 @@ make proto-setup
 # Generate lcd proto files
 echo "Generating proto files for lcd"
 cp ../../buf/buf.gen.lcd.yaml ./proto/buf.gen.yaml
-docker run --rm --volume .:/workspace --workdir /workspace kyve-proto sh ./proto/generate.sh
+docker run --rm --volume "$(pwd)":/workspace --workdir /workspace kyve-proto sh ./proto/generate.sh
 
 # Generate client proto files
 echo "Generating proto files for client"
 cp ../../buf/buf.gen.client.yaml ./proto/buf.gen.yaml
-docker run --rm --volume .:/workspace --workdir /workspace kyve-proto sh ./proto/generate.sh
+docker run --rm --volume "$(pwd)":/workspace --workdir /workspace kyve-proto sh ./proto/generate.sh
 
 # Cleanup src folder
 cd ../../
