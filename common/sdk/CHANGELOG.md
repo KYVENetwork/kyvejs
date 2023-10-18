@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.0.5](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/sdk@1.0.4...@kyvejs/sdk@1.0.5) (2023-10-18)
+
+### Bug Fixes
+
+- migrate bundles endpoint ([#79](https://github.com/KYVENetwork/kyvejs/issues/79)) ([a4586c8](https://github.com/KYVENetwork/kyvejs/commit/a4586c810bff3e7788a14de0c09ecaf84520d5d3))
+
 ## [1.0.4](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/sdk@1.0.3...@kyvejs/sdk@1.0.4) (2023-08-17)
 
 ### Bug Fixes
