@@ -1,0 +1,6 @@
+syntax = "proto3";
+
+// Add imports here to generate the types from cosmos-sdk or any other proto files that you need
+
+import "cosmos/gov/v1/tx.proto";
+
