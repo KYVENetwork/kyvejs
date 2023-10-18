@@ -51,40 +51,56 @@ export const Coin = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Coin {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseCoin();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.denom = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.amount = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): Coin {
     return {
-      denom: isSet(object.denom) ? String(object.denom) : "",
-      amount: isSet(object.amount) ? String(object.amount) : "",
+      denom: isSet(object.denom) ? globalThis.String(object.denom) : "",
+      amount: isSet(object.amount) ? globalThis.String(object.amount) : "",
     };
   },
 
   toJSON(message: Coin): unknown {
     const obj: any = {};
-    message.denom !== undefined && (obj.denom = message.denom);
-    message.amount !== undefined && (obj.amount = message.amount);
+    if (message.denom !== "") {
+      obj.denom = message.denom;
+    }
+    if (message.amount !== "") {
+      obj.amount = message.amount;
+    }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<Coin>, I>>(base?: I): Coin {
+    return Coin.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<Coin>, I>>(object: I): Coin {
     const message = createBaseCoin();
     message.denom = object.denom ?? "";
@@ -109,40 +125,56 @@ export const DecCoin = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): DecCoin {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseDecCoin();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.denom = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.amount = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): DecCoin {
     return {
-      denom: isSet(object.denom) ? String(object.denom) : "",
-      amount: isSet(object.amount) ? String(object.amount) : "",
+      denom: isSet(object.denom) ? globalThis.String(object.denom) : "",
+      amount: isSet(object.amount) ? globalThis.String(object.amount) : "",
     };
   },
 
   toJSON(message: DecCoin): unknown {
     const obj: any = {};
-    message.denom !== undefined && (obj.denom = message.denom);
-    message.amount !== undefined && (obj.amount = message.amount);
+    if (message.denom !== "") {
+      obj.denom = message.denom;
+    }
+    if (message.amount !== "") {
+      obj.amount = message.amount;
+    }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<DecCoin>, I>>(base?: I): DecCoin {
+    return DecCoin.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<DecCoin>, I>>(object: I): DecCoin {
     const message = createBaseDecCoin();
     message.denom = object.denom ?? "";
@@ -164,33 +196,43 @@ export const IntProto = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): IntProto {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseIntProto();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.int = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): IntProto {
-    return { int: isSet(object.int) ? String(object.int) : "" };
+    return { int: isSet(object.int) ? globalThis.String(object.int) : "" };
   },
 
   toJSON(message: IntProto): unknown {
     const obj: any = {};
-    message.int !== undefined && (obj.int = message.int);
+    if (message.int !== "") {
+      obj.int = message.int;
+    }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<IntProto>, I>>(base?: I): IntProto {
+    return IntProto.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<IntProto>, I>>(object: I): IntProto {
     const message = createBaseIntProto();
     message.int = object.int ?? "";
@@ -211,33 +253,43 @@ export const DecProto = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): DecProto {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseDecProto();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.dec = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): DecProto {
-    return { dec: isSet(object.dec) ? String(object.dec) : "" };
+    return { dec: isSet(object.dec) ? globalThis.String(object.dec) : "" };
   },
 
   toJSON(message: DecProto): unknown {
     const obj: any = {};
-    message.dec !== undefined && (obj.dec = message.dec);
+    if (message.dec !== "") {
+      obj.dec = message.dec;
+    }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<DecProto>, I>>(base?: I): DecProto {
+    return DecProto.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<DecProto>, I>>(object: I): DecProto {
     const message = createBaseDecProto();
     message.dec = object.dec ?? "";
@@ -248,7 +300,8 @@ export const DecProto = {
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
 export type DeepPartial<T> = T extends Builtin ? T
-  : T extends Array<infer U> ? Array<DeepPartial<U>> : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
+  : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
+  : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
   : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 

@@ -7,14 +7,14 @@ export const protobufPackage = "kyve.bundles.v1beta1";
 /** VoteType ... */
 export enum VoteType {
   /** VOTE_TYPE_UNSPECIFIED - VOTE_TYPE_UNSPECIFIED ... */
-  VOTE_TYPE_UNSPECIFIED = 0,
+  VOTE_TYPE_UNSPECIFIED = "VOTE_TYPE_UNSPECIFIED",
   /** VOTE_TYPE_VALID - VOTE_TYPE_VALID ... */
-  VOTE_TYPE_VALID = 1,
+  VOTE_TYPE_VALID = "VOTE_TYPE_VALID",
   /** VOTE_TYPE_INVALID - VOTE_TYPE_INVALID ... */
-  VOTE_TYPE_INVALID = 2,
+  VOTE_TYPE_INVALID = "VOTE_TYPE_INVALID",
   /** VOTE_TYPE_ABSTAIN - VOTE_TYPE_ABSTAIN ... */
-  VOTE_TYPE_ABSTAIN = 3,
-  UNRECOGNIZED = -1,
+  VOTE_TYPE_ABSTAIN = "VOTE_TYPE_ABSTAIN",
+  UNRECOGNIZED = "UNRECOGNIZED",
 }
 
 export function voteTypeFromJSON(object: any): VoteType {
@@ -51,6 +51,22 @@ export function voteTypeToJSON(object: VoteType): string {
     case VoteType.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";
+  }
+}
+
+export function voteTypeToNumber(object: VoteType): number {
+  switch (object) {
+    case VoteType.VOTE_TYPE_UNSPECIFIED:
+      return 0;
+    case VoteType.VOTE_TYPE_VALID:
+      return 1;
+    case VoteType.VOTE_TYPE_INVALID:
+      return 2;
+    case VoteType.VOTE_TYPE_ABSTAIN:
+      return 3;
+    case VoteType.UNRECOGNIZED:
+    default:
+      return -1;
   }
 }
 
@@ -199,85 +215,155 @@ export const MsgSubmitBundleProposal = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgSubmitBundleProposal {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgSubmitBundleProposal();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.creator = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.staker = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag !== 24) {
+            break;
+          }
+
           message.pool_id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 4:
+          if (tag !== 34) {
+            break;
+          }
+
           message.storage_id = reader.string();
-          break;
+          continue;
         case 5:
+          if (tag !== 40) {
+            break;
+          }
+
           message.data_size = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 6:
+          if (tag !== 50) {
+            break;
+          }
+
           message.data_hash = reader.string();
-          break;
+          continue;
         case 7:
+          if (tag !== 56) {
+            break;
+          }
+
           message.from_index = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 8:
+          if (tag !== 64) {
+            break;
+          }
+
           message.bundle_size = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 9:
+          if (tag !== 74) {
+            break;
+          }
+
           message.from_key = reader.string();
-          break;
+          continue;
         case 10:
+          if (tag !== 82) {
+            break;
+          }
+
           message.to_key = reader.string();
-          break;
+          continue;
         case 11:
+          if (tag !== 90) {
+            break;
+          }
+
           message.bundle_summary = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): MsgSubmitBundleProposal {
     return {
-      creator: isSet(object.creator) ? String(object.creator) : "",
-      staker: isSet(object.staker) ? String(object.staker) : "",
-      pool_id: isSet(object.pool_id) ? String(object.pool_id) : "0",
-      storage_id: isSet(object.storage_id) ? String(object.storage_id) : "",
-      data_size: isSet(object.data_size) ? String(object.data_size) : "0",
-      data_hash: isSet(object.data_hash) ? String(object.data_hash) : "",
-      from_index: isSet(object.from_index) ? String(object.from_index) : "0",
-      bundle_size: isSet(object.bundle_size) ? String(object.bundle_size) : "0",
-      from_key: isSet(object.from_key) ? String(object.from_key) : "",
-      to_key: isSet(object.to_key) ? String(object.to_key) : "",
-      bundle_summary: isSet(object.bundle_summary) ? String(object.bundle_summary) : "",
+      creator: isSet(object.creator) ? globalThis.String(object.creator) : "",
+      staker: isSet(object.staker) ? globalThis.String(object.staker) : "",
+      pool_id: isSet(object.pool_id) ? globalThis.String(object.pool_id) : "0",
+      storage_id: isSet(object.storage_id) ? globalThis.String(object.storage_id) : "",
+      data_size: isSet(object.data_size) ? globalThis.String(object.data_size) : "0",
+      data_hash: isSet(object.data_hash) ? globalThis.String(object.data_hash) : "",
+      from_index: isSet(object.from_index) ? globalThis.String(object.from_index) : "0",
+      bundle_size: isSet(object.bundle_size) ? globalThis.String(object.bundle_size) : "0",
+      from_key: isSet(object.from_key) ? globalThis.String(object.from_key) : "",
+      to_key: isSet(object.to_key) ? globalThis.String(object.to_key) : "",
+      bundle_summary: isSet(object.bundle_summary) ? globalThis.String(object.bundle_summary) : "",
     };
   },
 
   toJSON(message: MsgSubmitBundleProposal): unknown {
     const obj: any = {};
-    message.creator !== undefined && (obj.creator = message.creator);
-    message.staker !== undefined && (obj.staker = message.staker);
-    message.pool_id !== undefined && (obj.pool_id = message.pool_id);
-    message.storage_id !== undefined && (obj.storage_id = message.storage_id);
-    message.data_size !== undefined && (obj.data_size = message.data_size);
-    message.data_hash !== undefined && (obj.data_hash = message.data_hash);
-    message.from_index !== undefined && (obj.from_index = message.from_index);
-    message.bundle_size !== undefined && (obj.bundle_size = message.bundle_size);
-    message.from_key !== undefined && (obj.from_key = message.from_key);
-    message.to_key !== undefined && (obj.to_key = message.to_key);
-    message.bundle_summary !== undefined && (obj.bundle_summary = message.bundle_summary);
+    if (message.creator !== "") {
+      obj.creator = message.creator;
+    }
+    if (message.staker !== "") {
+      obj.staker = message.staker;
+    }
+    if (message.pool_id !== "0") {
+      obj.pool_id = message.pool_id;
+    }
+    if (message.storage_id !== "") {
+      obj.storage_id = message.storage_id;
+    }
+    if (message.data_size !== "0") {
+      obj.data_size = message.data_size;
+    }
+    if (message.data_hash !== "") {
+      obj.data_hash = message.data_hash;
+    }
+    if (message.from_index !== "0") {
+      obj.from_index = message.from_index;
+    }
+    if (message.bundle_size !== "0") {
+      obj.bundle_size = message.bundle_size;
+    }
+    if (message.from_key !== "") {
+      obj.from_key = message.from_key;
+    }
+    if (message.to_key !== "") {
+      obj.to_key = message.to_key;
+    }
+    if (message.bundle_summary !== "") {
+      obj.bundle_summary = message.bundle_summary;
+    }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<MsgSubmitBundleProposal>, I>>(base?: I): MsgSubmitBundleProposal {
+    return MsgSubmitBundleProposal.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<MsgSubmitBundleProposal>, I>>(object: I): MsgSubmitBundleProposal {
     const message = createBaseMsgSubmitBundleProposal();
     message.creator = object.creator ?? "";
@@ -305,16 +391,17 @@ export const MsgSubmitBundleProposalResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgSubmitBundleProposalResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgSubmitBundleProposalResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        default:
-          reader.skipType(tag & 7);
-          break;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -328,6 +415,9 @@ export const MsgSubmitBundleProposalResponse = {
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<MsgSubmitBundleProposalResponse>, I>>(base?: I): MsgSubmitBundleProposalResponse {
+    return MsgSubmitBundleProposalResponse.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<MsgSubmitBundleProposalResponse>, I>>(_: I): MsgSubmitBundleProposalResponse {
     const message = createBaseMsgSubmitBundleProposalResponse();
     return message;
@@ -335,7 +425,7 @@ export const MsgSubmitBundleProposalResponse = {
 };
 
 function createBaseMsgVoteBundleProposal(): MsgVoteBundleProposal {
-  return { creator: "", staker: "", pool_id: "0", storage_id: "", vote: 0 };
+  return { creator: "", staker: "", pool_id: "0", storage_id: "", vote: VoteType.VOTE_TYPE_UNSPECIFIED };
 }
 
 export const MsgVoteBundleProposal = {
@@ -352,69 +442,103 @@ export const MsgVoteBundleProposal = {
     if (message.storage_id !== "") {
       writer.uint32(34).string(message.storage_id);
     }
-    if (message.vote !== 0) {
-      writer.uint32(40).int32(message.vote);
+    if (message.vote !== VoteType.VOTE_TYPE_UNSPECIFIED) {
+      writer.uint32(40).int32(voteTypeToNumber(message.vote));
     }
     return writer;
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgVoteBundleProposal {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgVoteBundleProposal();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.creator = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.staker = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag !== 24) {
+            break;
+          }
+
           message.pool_id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 4:
+          if (tag !== 34) {
+            break;
+          }
+
           message.storage_id = reader.string();
-          break;
+          continue;
         case 5:
-          message.vote = reader.int32() as any;
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          if (tag !== 40) {
+            break;
+          }
+
+          message.vote = voteTypeFromJSON(reader.int32());
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): MsgVoteBundleProposal {
     return {
-      creator: isSet(object.creator) ? String(object.creator) : "",
-      staker: isSet(object.staker) ? String(object.staker) : "",
-      pool_id: isSet(object.pool_id) ? String(object.pool_id) : "0",
-      storage_id: isSet(object.storage_id) ? String(object.storage_id) : "",
-      vote: isSet(object.vote) ? voteTypeFromJSON(object.vote) : 0,
+      creator: isSet(object.creator) ? globalThis.String(object.creator) : "",
+      staker: isSet(object.staker) ? globalThis.String(object.staker) : "",
+      pool_id: isSet(object.pool_id) ? globalThis.String(object.pool_id) : "0",
+      storage_id: isSet(object.storage_id) ? globalThis.String(object.storage_id) : "",
+      vote: isSet(object.vote) ? voteTypeFromJSON(object.vote) : VoteType.VOTE_TYPE_UNSPECIFIED,
     };
   },
 
   toJSON(message: MsgVoteBundleProposal): unknown {
     const obj: any = {};
-    message.creator !== undefined && (obj.creator = message.creator);
-    message.staker !== undefined && (obj.staker = message.staker);
-    message.pool_id !== undefined && (obj.pool_id = message.pool_id);
-    message.storage_id !== undefined && (obj.storage_id = message.storage_id);
-    message.vote !== undefined && (obj.vote = voteTypeToJSON(message.vote));
+    if (message.creator !== "") {
+      obj.creator = message.creator;
+    }
+    if (message.staker !== "") {
+      obj.staker = message.staker;
+    }
+    if (message.pool_id !== "0") {
+      obj.pool_id = message.pool_id;
+    }
+    if (message.storage_id !== "") {
+      obj.storage_id = message.storage_id;
+    }
+    if (message.vote !== VoteType.VOTE_TYPE_UNSPECIFIED) {
+      obj.vote = voteTypeToJSON(message.vote);
+    }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<MsgVoteBundleProposal>, I>>(base?: I): MsgVoteBundleProposal {
+    return MsgVoteBundleProposal.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<MsgVoteBundleProposal>, I>>(object: I): MsgVoteBundleProposal {
     const message = createBaseMsgVoteBundleProposal();
     message.creator = object.creator ?? "";
     message.staker = object.staker ?? "";
     message.pool_id = object.pool_id ?? "0";
     message.storage_id = object.storage_id ?? "";
-    message.vote = object.vote ?? 0;
+    message.vote = object.vote ?? VoteType.VOTE_TYPE_UNSPECIFIED;
     return message;
   },
 };
@@ -429,16 +553,17 @@ export const MsgVoteBundleProposalResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgVoteBundleProposalResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgVoteBundleProposalResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        default:
-          reader.skipType(tag & 7);
-          break;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -452,6 +577,9 @@ export const MsgVoteBundleProposalResponse = {
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<MsgVoteBundleProposalResponse>, I>>(base?: I): MsgVoteBundleProposalResponse {
+    return MsgVoteBundleProposalResponse.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<MsgVoteBundleProposalResponse>, I>>(_: I): MsgVoteBundleProposalResponse {
     const message = createBaseMsgVoteBundleProposalResponse();
     return message;
@@ -477,45 +605,67 @@ export const MsgClaimUploaderRole = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgClaimUploaderRole {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgClaimUploaderRole();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.creator = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.staker = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag !== 24) {
+            break;
+          }
+
           message.pool_id = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): MsgClaimUploaderRole {
     return {
-      creator: isSet(object.creator) ? String(object.creator) : "",
-      staker: isSet(object.staker) ? String(object.staker) : "",
-      pool_id: isSet(object.pool_id) ? String(object.pool_id) : "0",
+      creator: isSet(object.creator) ? globalThis.String(object.creator) : "",
+      staker: isSet(object.staker) ? globalThis.String(object.staker) : "",
+      pool_id: isSet(object.pool_id) ? globalThis.String(object.pool_id) : "0",
     };
   },
 
   toJSON(message: MsgClaimUploaderRole): unknown {
     const obj: any = {};
-    message.creator !== undefined && (obj.creator = message.creator);
-    message.staker !== undefined && (obj.staker = message.staker);
-    message.pool_id !== undefined && (obj.pool_id = message.pool_id);
+    if (message.creator !== "") {
+      obj.creator = message.creator;
+    }
+    if (message.staker !== "") {
+      obj.staker = message.staker;
+    }
+    if (message.pool_id !== "0") {
+      obj.pool_id = message.pool_id;
+    }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<MsgClaimUploaderRole>, I>>(base?: I): MsgClaimUploaderRole {
+    return MsgClaimUploaderRole.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<MsgClaimUploaderRole>, I>>(object: I): MsgClaimUploaderRole {
     const message = createBaseMsgClaimUploaderRole();
     message.creator = object.creator ?? "";
@@ -535,16 +685,17 @@ export const MsgClaimUploaderRoleResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgClaimUploaderRoleResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgClaimUploaderRoleResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        default:
-          reader.skipType(tag & 7);
-          break;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -558,6 +709,9 @@ export const MsgClaimUploaderRoleResponse = {
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<MsgClaimUploaderRoleResponse>, I>>(base?: I): MsgClaimUploaderRoleResponse {
+    return MsgClaimUploaderRoleResponse.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<MsgClaimUploaderRoleResponse>, I>>(_: I): MsgClaimUploaderRoleResponse {
     const message = createBaseMsgClaimUploaderRoleResponse();
     return message;
@@ -586,50 +740,78 @@ export const MsgSkipUploaderRole = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgSkipUploaderRole {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgSkipUploaderRole();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.creator = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.staker = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag !== 24) {
+            break;
+          }
+
           message.pool_id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 4:
+          if (tag !== 32) {
+            break;
+          }
+
           message.from_index = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): MsgSkipUploaderRole {
     return {
-      creator: isSet(object.creator) ? String(object.creator) : "",
-      staker: isSet(object.staker) ? String(object.staker) : "",
-      pool_id: isSet(object.pool_id) ? String(object.pool_id) : "0",
-      from_index: isSet(object.from_index) ? String(object.from_index) : "0",
+      creator: isSet(object.creator) ? globalThis.String(object.creator) : "",
+      staker: isSet(object.staker) ? globalThis.String(object.staker) : "",
+      pool_id: isSet(object.pool_id) ? globalThis.String(object.pool_id) : "0",
+      from_index: isSet(object.from_index) ? globalThis.String(object.from_index) : "0",
     };
   },
 
   toJSON(message: MsgSkipUploaderRole): unknown {
     const obj: any = {};
-    message.creator !== undefined && (obj.creator = message.creator);
-    message.staker !== undefined && (obj.staker = message.staker);
-    message.pool_id !== undefined && (obj.pool_id = message.pool_id);
-    message.from_index !== undefined && (obj.from_index = message.from_index);
+    if (message.creator !== "") {
+      obj.creator = message.creator;
+    }
+    if (message.staker !== "") {
+      obj.staker = message.staker;
+    }
+    if (message.pool_id !== "0") {
+      obj.pool_id = message.pool_id;
+    }
+    if (message.from_index !== "0") {
+      obj.from_index = message.from_index;
+    }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<MsgSkipUploaderRole>, I>>(base?: I): MsgSkipUploaderRole {
+    return MsgSkipUploaderRole.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<MsgSkipUploaderRole>, I>>(object: I): MsgSkipUploaderRole {
     const message = createBaseMsgSkipUploaderRole();
     message.creator = object.creator ?? "";
@@ -650,16 +832,17 @@ export const MsgSkipUploaderRoleResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgSkipUploaderRoleResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgSkipUploaderRoleResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        default:
-          reader.skipType(tag & 7);
-          break;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -673,6 +856,9 @@ export const MsgSkipUploaderRoleResponse = {
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<MsgSkipUploaderRoleResponse>, I>>(base?: I): MsgSkipUploaderRoleResponse {
+    return MsgSkipUploaderRoleResponse.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<MsgSkipUploaderRoleResponse>, I>>(_: I): MsgSkipUploaderRoleResponse {
     const message = createBaseMsgSkipUploaderRoleResponse();
     return message;
@@ -695,40 +881,56 @@ export const MsgUpdateParams = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgUpdateParams {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgUpdateParams();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.authority = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.payload = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): MsgUpdateParams {
     return {
-      authority: isSet(object.authority) ? String(object.authority) : "",
-      payload: isSet(object.payload) ? String(object.payload) : "",
+      authority: isSet(object.authority) ? globalThis.String(object.authority) : "",
+      payload: isSet(object.payload) ? globalThis.String(object.payload) : "",
     };
   },
 
   toJSON(message: MsgUpdateParams): unknown {
     const obj: any = {};
-    message.authority !== undefined && (obj.authority = message.authority);
-    message.payload !== undefined && (obj.payload = message.payload);
+    if (message.authority !== "") {
+      obj.authority = message.authority;
+    }
+    if (message.payload !== "") {
+      obj.payload = message.payload;
+    }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<MsgUpdateParams>, I>>(base?: I): MsgUpdateParams {
+    return MsgUpdateParams.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<MsgUpdateParams>, I>>(object: I): MsgUpdateParams {
     const message = createBaseMsgUpdateParams();
     message.authority = object.authority ?? "";
@@ -747,16 +949,17 @@ export const MsgUpdateParamsResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgUpdateParamsResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgUpdateParamsResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        default:
-          reader.skipType(tag & 7);
-          break;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -770,6 +973,9 @@ export const MsgUpdateParamsResponse = {
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<MsgUpdateParamsResponse>, I>>(base?: I): MsgUpdateParamsResponse {
+    return MsgUpdateParamsResponse.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<MsgUpdateParamsResponse>, I>>(_: I): MsgUpdateParamsResponse {
     const message = createBaseMsgUpdateParamsResponse();
     return message;
@@ -793,11 +999,12 @@ export interface Msg {
   UpdateParams(request: MsgUpdateParams): Promise<MsgUpdateParamsResponse>;
 }
 
+export const MsgServiceName = "kyve.bundles.v1beta1.Msg";
 export class MsgClientImpl implements Msg {
   private readonly rpc: Rpc;
   private readonly service: string;
   constructor(rpc: Rpc, opts?: { service?: string }) {
-    this.service = opts?.service || "kyve.bundles.v1beta1.Msg";
+    this.service = opts?.service || MsgServiceName;
     this.rpc = rpc;
     this.SubmitBundleProposal = this.SubmitBundleProposal.bind(this);
     this.VoteBundleProposal = this.VoteBundleProposal.bind(this);
@@ -808,31 +1015,31 @@ export class MsgClientImpl implements Msg {
   SubmitBundleProposal(request: MsgSubmitBundleProposal): Promise<MsgSubmitBundleProposalResponse> {
     const data = MsgSubmitBundleProposal.encode(request).finish();
     const promise = this.rpc.request(this.service, "SubmitBundleProposal", data);
-    return promise.then((data) => MsgSubmitBundleProposalResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) => MsgSubmitBundleProposalResponse.decode(_m0.Reader.create(data)));
   }
 
   VoteBundleProposal(request: MsgVoteBundleProposal): Promise<MsgVoteBundleProposalResponse> {
     const data = MsgVoteBundleProposal.encode(request).finish();
     const promise = this.rpc.request(this.service, "VoteBundleProposal", data);
-    return promise.then((data) => MsgVoteBundleProposalResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) => MsgVoteBundleProposalResponse.decode(_m0.Reader.create(data)));
   }
 
   ClaimUploaderRole(request: MsgClaimUploaderRole): Promise<MsgClaimUploaderRoleResponse> {
     const data = MsgClaimUploaderRole.encode(request).finish();
     const promise = this.rpc.request(this.service, "ClaimUploaderRole", data);
-    return promise.then((data) => MsgClaimUploaderRoleResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) => MsgClaimUploaderRoleResponse.decode(_m0.Reader.create(data)));
   }
 
   SkipUploaderRole(request: MsgSkipUploaderRole): Promise<MsgSkipUploaderRoleResponse> {
     const data = MsgSkipUploaderRole.encode(request).finish();
     const promise = this.rpc.request(this.service, "SkipUploaderRole", data);
-    return promise.then((data) => MsgSkipUploaderRoleResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) => MsgSkipUploaderRoleResponse.decode(_m0.Reader.create(data)));
   }
 
   UpdateParams(request: MsgUpdateParams): Promise<MsgUpdateParamsResponse> {
     const data = MsgUpdateParams.encode(request).finish();
     const promise = this.rpc.request(this.service, "UpdateParams", data);
-    return promise.then((data) => MsgUpdateParamsResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) => MsgUpdateParamsResponse.decode(_m0.Reader.create(data)));
   }
 }
 
@@ -843,7 +1050,8 @@ interface Rpc {
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
 export type DeepPartial<T> = T extends Builtin ? T
-  : T extends Array<infer U> ? Array<DeepPartial<U>> : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
+  : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
+  : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
   : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 

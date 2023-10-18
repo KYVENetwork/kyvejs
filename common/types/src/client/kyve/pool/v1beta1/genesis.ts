@@ -9,7 +9,9 @@ export const protobufPackage = "kyve.pool.v1beta1";
 /** GenesisState defines the pool module's genesis state. */
 export interface GenesisState {
   /** params ... */
-  params?: Params;
+  params?:
+    | Params
+    | undefined;
   /** pool_list ... */
   pool_list: Pool[];
   /** pool_count ... */
@@ -35,25 +37,38 @@ export const GenesisState = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): GenesisState {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseGenesisState();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.params = Params.decode(reader, reader.uint32());
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.pool_list.push(Pool.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 3:
+          if (tag !== 24) {
+            break;
+          }
+
           message.pool_count = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -61,23 +76,28 @@ export const GenesisState = {
   fromJSON(object: any): GenesisState {
     return {
       params: isSet(object.params) ? Params.fromJSON(object.params) : undefined,
-      pool_list: Array.isArray(object?.pool_list) ? object.pool_list.map((e: any) => Pool.fromJSON(e)) : [],
-      pool_count: isSet(object.pool_count) ? String(object.pool_count) : "0",
+      pool_list: globalThis.Array.isArray(object?.pool_list) ? object.pool_list.map((e: any) => Pool.fromJSON(e)) : [],
+      pool_count: isSet(object.pool_count) ? globalThis.String(object.pool_count) : "0",
     };
   },
 
   toJSON(message: GenesisState): unknown {
     const obj: any = {};
-    message.params !== undefined && (obj.params = message.params ? Params.toJSON(message.params) : undefined);
-    if (message.pool_list) {
-      obj.pool_list = message.pool_list.map((e) => e ? Pool.toJSON(e) : undefined);
-    } else {
-      obj.pool_list = [];
+    if (message.params !== undefined) {
+      obj.params = Params.toJSON(message.params);
     }
-    message.pool_count !== undefined && (obj.pool_count = message.pool_count);
+    if (message.pool_list?.length) {
+      obj.pool_list = message.pool_list.map((e) => Pool.toJSON(e));
+    }
+    if (message.pool_count !== "0") {
+      obj.pool_count = message.pool_count;
+    }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<GenesisState>, I>>(base?: I): GenesisState {
+    return GenesisState.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<GenesisState>, I>>(object: I): GenesisState {
     const message = createBaseGenesisState();
     message.params = (object.params !== undefined && object.params !== null)
@@ -92,7 +112,8 @@ export const GenesisState = {
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
 export type DeepPartial<T> = T extends Builtin ? T
-  : T extends Array<infer U> ? Array<DeepPartial<U>> : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
+  : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
+  : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
   : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 

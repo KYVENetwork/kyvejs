@@ -28,8 +28,12 @@ export const protobufPackage = "google.protobuf";
  *     if (any.is(Foo.class)) {
  *       foo = any.unpack(Foo.class);
  *     }
+ *     // or ...
+ *     if (any.isSameTypeAs(Foo.getDefaultInstance())) {
+ *       foo = any.unpack(Foo.getDefaultInstance());
+ *     }
  *
- *  Example 3: Pack and unpack a message in Python.
+ * Example 3: Pack and unpack a message in Python.
  *
  *     foo = Foo(...)
  *     any = Any()
@@ -39,13 +43,16 @@ export const protobufPackage = "google.protobuf";
  *       any.Unpack(foo)
  *       ...
  *
- *  Example 4: Pack and unpack a message in Go
+ * Example 4: Pack and unpack a message in Go
  *
  *      foo := &pb.Foo{...}
- *      any, err := ptypes.MarshalAny(foo)
+ *      any, err := anypb.New(foo)
+ *      if err != nil {
+ *        ...
+ *      }
  *      ...
  *      foo := &pb.Foo{}
- *      if err := ptypes.UnmarshalAny(any, foo); err != nil {
+ *      if err := any.UnmarshalTo(foo); err != nil {
  *        ...
  *      }
  *
@@ -56,7 +63,7 @@ export const protobufPackage = "google.protobuf";
  * name "y.z".
  *
  * JSON
- * ====
+ *
  * The JSON representation of an `Any` value uses the regular
  * representation of the deserialized, embedded message, with an
  * additional field `@type` which contains the type URL. Example:
@@ -119,7 +126,7 @@ export interface Any {
 }
 
 function createBaseAny(): Any {
-  return { type_url: "", value: new Uint8Array() };
+  return { type_url: "", value: new Uint8Array(0) };
 }
 
 export const Any = {
@@ -134,67 +141,63 @@ export const Any = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Any {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseAny();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.type_url = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.value = reader.bytes();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): Any {
     return {
-      type_url: isSet(object.type_url) ? String(object.type_url) : "",
-      value: isSet(object.value) ? bytesFromBase64(object.value) : new Uint8Array(),
+      type_url: isSet(object.type_url) ? globalThis.String(object.type_url) : "",
+      value: isSet(object.value) ? bytesFromBase64(object.value) : new Uint8Array(0),
     };
   },
 
   toJSON(message: Any): unknown {
     const obj: any = {};
-    message.type_url !== undefined && (obj.type_url = message.type_url);
-    message.value !== undefined &&
-      (obj.value = base64FromBytes(message.value !== undefined ? message.value : new Uint8Array()));
+    if (message.type_url !== "") {
+      obj.type_url = message.type_url;
+    }
+    if (message.value.length !== 0) {
+      obj.value = base64FromBytes(message.value);
+    }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<Any>, I>>(base?: I): Any {
+    return Any.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<Any>, I>>(object: I): Any {
     const message = createBaseAny();
     message.type_url = object.type_url ?? "";
-    message.value = object.value ?? new Uint8Array();
+    message.value = object.value ?? new Uint8Array(0);
     return message;
   },
 };
-
-declare var self: any | undefined;
-declare var window: any | undefined;
-declare var global: any | undefined;
-var globalThis: any = (() => {
-  if (typeof globalThis !== "undefined") {
-    return globalThis;
-  }
-  if (typeof self !== "undefined") {
-    return self;
-  }
-  if (typeof window !== "undefined") {
-    return window;
-  }
-  if (typeof global !== "undefined") {
-    return global;
-  }
-  throw "Unable to locate global object";
-})();
 
 function bytesFromBase64(b64: string): Uint8Array {
   if (globalThis.Buffer) {
@@ -215,7 +218,7 @@ function base64FromBytes(arr: Uint8Array): string {
   } else {
     const bin: string[] = [];
     arr.forEach((byte) => {
-      bin.push(String.fromCharCode(byte));
+      bin.push(globalThis.String.fromCharCode(byte));
     });
     return globalThis.btoa(bin.join(""));
   }
@@ -224,7 +227,8 @@ function base64FromBytes(arr: Uint8Array): string {
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
 export type DeepPartial<T> = T extends Builtin ? T
-  : T extends Array<infer U> ? Array<DeepPartial<U>> : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
+  : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
+  : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
   : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 

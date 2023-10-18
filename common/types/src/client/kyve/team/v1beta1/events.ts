@@ -102,50 +102,78 @@ export const EventCreateTeamVestingAccount = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EventCreateTeamVestingAccount {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventCreateTeamVestingAccount();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.authority = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 3:
+          if (tag !== 24) {
+            break;
+          }
+
           message.total_allocation = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 4:
+          if (tag !== 32) {
+            break;
+          }
+
           message.commencement = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): EventCreateTeamVestingAccount {
     return {
-      authority: isSet(object.authority) ? String(object.authority) : "",
-      id: isSet(object.id) ? String(object.id) : "0",
-      total_allocation: isSet(object.total_allocation) ? String(object.total_allocation) : "0",
-      commencement: isSet(object.commencement) ? String(object.commencement) : "0",
+      authority: isSet(object.authority) ? globalThis.String(object.authority) : "",
+      id: isSet(object.id) ? globalThis.String(object.id) : "0",
+      total_allocation: isSet(object.total_allocation) ? globalThis.String(object.total_allocation) : "0",
+      commencement: isSet(object.commencement) ? globalThis.String(object.commencement) : "0",
     };
   },
 
   toJSON(message: EventCreateTeamVestingAccount): unknown {
     const obj: any = {};
-    message.authority !== undefined && (obj.authority = message.authority);
-    message.id !== undefined && (obj.id = message.id);
-    message.total_allocation !== undefined && (obj.total_allocation = message.total_allocation);
-    message.commencement !== undefined && (obj.commencement = message.commencement);
+    if (message.authority !== "") {
+      obj.authority = message.authority;
+    }
+    if (message.id !== "0") {
+      obj.id = message.id;
+    }
+    if (message.total_allocation !== "0") {
+      obj.total_allocation = message.total_allocation;
+    }
+    if (message.commencement !== "0") {
+      obj.commencement = message.commencement;
+    }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<EventCreateTeamVestingAccount>, I>>(base?: I): EventCreateTeamVestingAccount {
+    return EventCreateTeamVestingAccount.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<EventCreateTeamVestingAccount>, I>>(
     object: I,
   ): EventCreateTeamVestingAccount {
@@ -180,50 +208,78 @@ export const EventClawback = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EventClawback {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventClawback();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.authority = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 3:
+          if (tag !== 24) {
+            break;
+          }
+
           message.clawback = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 4:
+          if (tag !== 32) {
+            break;
+          }
+
           message.amount = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): EventClawback {
     return {
-      authority: isSet(object.authority) ? String(object.authority) : "",
-      id: isSet(object.id) ? String(object.id) : "0",
-      clawback: isSet(object.clawback) ? String(object.clawback) : "0",
-      amount: isSet(object.amount) ? String(object.amount) : "0",
+      authority: isSet(object.authority) ? globalThis.String(object.authority) : "",
+      id: isSet(object.id) ? globalThis.String(object.id) : "0",
+      clawback: isSet(object.clawback) ? globalThis.String(object.clawback) : "0",
+      amount: isSet(object.amount) ? globalThis.String(object.amount) : "0",
     };
   },
 
   toJSON(message: EventClawback): unknown {
     const obj: any = {};
-    message.authority !== undefined && (obj.authority = message.authority);
-    message.id !== undefined && (obj.id = message.id);
-    message.clawback !== undefined && (obj.clawback = message.clawback);
-    message.amount !== undefined && (obj.amount = message.amount);
+    if (message.authority !== "") {
+      obj.authority = message.authority;
+    }
+    if (message.id !== "0") {
+      obj.id = message.id;
+    }
+    if (message.clawback !== "0") {
+      obj.clawback = message.clawback;
+    }
+    if (message.amount !== "0") {
+      obj.amount = message.amount;
+    }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<EventClawback>, I>>(base?: I): EventClawback {
+    return EventClawback.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<EventClawback>, I>>(object: I): EventClawback {
     const message = createBaseEventClawback();
     message.authority = object.authority ?? "";
@@ -256,50 +312,78 @@ export const EventClaimedUnlocked = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EventClaimedUnlocked {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventClaimedUnlocked();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.authority = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 3:
+          if (tag !== 24) {
+            break;
+          }
+
           message.amount = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 4:
+          if (tag !== 34) {
+            break;
+          }
+
           message.recipient = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): EventClaimedUnlocked {
     return {
-      authority: isSet(object.authority) ? String(object.authority) : "",
-      id: isSet(object.id) ? String(object.id) : "0",
-      amount: isSet(object.amount) ? String(object.amount) : "0",
-      recipient: isSet(object.recipient) ? String(object.recipient) : "",
+      authority: isSet(object.authority) ? globalThis.String(object.authority) : "",
+      id: isSet(object.id) ? globalThis.String(object.id) : "0",
+      amount: isSet(object.amount) ? globalThis.String(object.amount) : "0",
+      recipient: isSet(object.recipient) ? globalThis.String(object.recipient) : "",
     };
   },
 
   toJSON(message: EventClaimedUnlocked): unknown {
     const obj: any = {};
-    message.authority !== undefined && (obj.authority = message.authority);
-    message.id !== undefined && (obj.id = message.id);
-    message.amount !== undefined && (obj.amount = message.amount);
-    message.recipient !== undefined && (obj.recipient = message.recipient);
+    if (message.authority !== "") {
+      obj.authority = message.authority;
+    }
+    if (message.id !== "0") {
+      obj.id = message.id;
+    }
+    if (message.amount !== "0") {
+      obj.amount = message.amount;
+    }
+    if (message.recipient !== "") {
+      obj.recipient = message.recipient;
+    }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<EventClaimedUnlocked>, I>>(base?: I): EventClaimedUnlocked {
+    return EventClaimedUnlocked.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<EventClaimedUnlocked>, I>>(object: I): EventClaimedUnlocked {
     const message = createBaseEventClaimedUnlocked();
     message.authority = object.authority ?? "";
@@ -332,50 +416,78 @@ export const EventClaimInflationRewards = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EventClaimInflationRewards {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventClaimInflationRewards();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.authority = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 3:
+          if (tag !== 24) {
+            break;
+          }
+
           message.amount = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 4:
+          if (tag !== 34) {
+            break;
+          }
+
           message.recipient = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): EventClaimInflationRewards {
     return {
-      authority: isSet(object.authority) ? String(object.authority) : "",
-      id: isSet(object.id) ? String(object.id) : "0",
-      amount: isSet(object.amount) ? String(object.amount) : "0",
-      recipient: isSet(object.recipient) ? String(object.recipient) : "",
+      authority: isSet(object.authority) ? globalThis.String(object.authority) : "",
+      id: isSet(object.id) ? globalThis.String(object.id) : "0",
+      amount: isSet(object.amount) ? globalThis.String(object.amount) : "0",
+      recipient: isSet(object.recipient) ? globalThis.String(object.recipient) : "",
     };
   },
 
   toJSON(message: EventClaimInflationRewards): unknown {
     const obj: any = {};
-    message.authority !== undefined && (obj.authority = message.authority);
-    message.id !== undefined && (obj.id = message.id);
-    message.amount !== undefined && (obj.amount = message.amount);
-    message.recipient !== undefined && (obj.recipient = message.recipient);
+    if (message.authority !== "") {
+      obj.authority = message.authority;
+    }
+    if (message.id !== "0") {
+      obj.id = message.id;
+    }
+    if (message.amount !== "0") {
+      obj.amount = message.amount;
+    }
+    if (message.recipient !== "") {
+      obj.recipient = message.recipient;
+    }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<EventClaimInflationRewards>, I>>(base?: I): EventClaimInflationRewards {
+    return EventClaimInflationRewards.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<EventClaimInflationRewards>, I>>(object: I): EventClaimInflationRewards {
     const message = createBaseEventClaimInflationRewards();
     message.authority = object.authority ?? "";
@@ -405,45 +517,67 @@ export const EventClaimAuthorityRewards = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EventClaimAuthorityRewards {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventClaimAuthorityRewards();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.authority = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.amount = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.recipient = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): EventClaimAuthorityRewards {
     return {
-      authority: isSet(object.authority) ? String(object.authority) : "",
-      amount: isSet(object.amount) ? String(object.amount) : "0",
-      recipient: isSet(object.recipient) ? String(object.recipient) : "",
+      authority: isSet(object.authority) ? globalThis.String(object.authority) : "",
+      amount: isSet(object.amount) ? globalThis.String(object.amount) : "0",
+      recipient: isSet(object.recipient) ? globalThis.String(object.recipient) : "",
     };
   },
 
   toJSON(message: EventClaimAuthorityRewards): unknown {
     const obj: any = {};
-    message.authority !== undefined && (obj.authority = message.authority);
-    message.amount !== undefined && (obj.amount = message.amount);
-    message.recipient !== undefined && (obj.recipient = message.recipient);
+    if (message.authority !== "") {
+      obj.authority = message.authority;
+    }
+    if (message.amount !== "0") {
+      obj.amount = message.amount;
+    }
+    if (message.recipient !== "") {
+      obj.recipient = message.recipient;
+    }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<EventClaimAuthorityRewards>, I>>(base?: I): EventClaimAuthorityRewards {
+    return EventClaimAuthorityRewards.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<EventClaimAuthorityRewards>, I>>(object: I): EventClaimAuthorityRewards {
     const message = createBaseEventClaimAuthorityRewards();
     message.authority = object.authority ?? "";
@@ -456,7 +590,8 @@ export const EventClaimAuthorityRewards = {
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
 export type DeepPartial<T> = T extends Builtin ? T
-  : T extends Array<infer U> ? Array<DeepPartial<U>> : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
+  : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
+  : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
   : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 
