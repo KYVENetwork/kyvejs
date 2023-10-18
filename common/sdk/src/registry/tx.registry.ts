@@ -17,15 +17,15 @@ import { MsgUndelegate } from "@kyvejs/types/client/kyve/delegation/v1beta1/tx";
 import { MsgUpdateParams as MsgUpdateParamsDelegation } from "@kyvejs/types/client/kyve/delegation/v1beta1/tx";
 /** fees **/
 import { MsgUpdateParams as MsgUpdateParamsGlobal } from "@kyvejs/types/client/kyve/global/v1beta1/tx";
-/** pool **/
-import { MsgFundPool } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
-import { MsgDefundPool } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
 import { MsgCreatePool } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
 import { MsgUpdatePool } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
 import { MsgDisablePool } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
 import { MsgEnablePool } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
 import { MsgScheduleRuntimeUpgrade } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
 import { MsgCancelRuntimeUpgrade } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
+/** funders **/
+import { MsgFundPool } from "@kyvejs/types/client/kyve/funders/v1beta1/tx";
+import { MsgDefundPool } from "@kyvejs/types/client/kyve/funders/v1beta1/tx";
 /** stakers **/
 import {
   MsgClaimCommissionRewards,
@@ -40,14 +40,15 @@ import { MsgUpdateParams as MsgUpdateParamsStakers } from "@kyvejs/types/client/
 export const registry: ReadonlyArray<[string, GeneratedType]> = [
   ...defaultRegistryTypes,
   /**pool **/
-  ["/kyve.pool.v1beta1.MsgFundPool", MsgFundPool],
-  ["/kyve.pool.v1beta1.MsgDefundPool", MsgDefundPool],
   ["/kyve.pool.v1beta1.MsgCreatePool", MsgCreatePool],
   ["/kyve.pool.v1beta1.UpdatePool", MsgUpdatePool],
   ["/kyve.pool.v1beta1.MsgDisablePool", MsgDisablePool],
   ["/kyve.pool.v1beta1.MsgEnablePool", MsgEnablePool],
   ["/kyve.pool.v1beta1.MsgScheduleRuntimeUpgrade", MsgScheduleRuntimeUpgrade],
   ["/kyve.pool.v1beta1.MsgCancelRuntimeUpgrade", MsgCancelRuntimeUpgrade],
+  /** funders **/
+  ["/kyve.pool.v1beta1.MsgFundPool", MsgFundPool],
+  ["/kyve.pool.v1beta1.MsgDefundPool", MsgDefundPool],
   /** stakers **/
   ["/kyve.stakers.v1beta1.MsgCreateStaker", MsgCreateStaker],
   ["/kyve.stakers.v1beta1.MsgUpdateMetadata", MsgUpdateMetadata],
