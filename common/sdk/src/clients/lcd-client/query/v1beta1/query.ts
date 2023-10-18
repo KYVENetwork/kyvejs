@@ -142,7 +142,7 @@ export class KyveRegistryLCDClient extends AbstractKyveLCDClient {
   async finalizedBundle(
     params: kyveQueryBundles.QueryFinalizedBundleRequest
   ): Promise<kyveQueryBundles.QueryFinalizedBundleResponse> {
-    const endpoint = `/kyve/query/v1beta1/finalized_bundle/${params.pool_id}/${params.id}`;
+    const endpoint = `/kyve/v1/bundles/${params.pool_id}/${params.id}`;
     return await this.request(endpoint);
   }
 
@@ -156,7 +156,7 @@ export class KyveRegistryLCDClient extends AbstractKyveLCDClient {
     if (typeof params?.pagination !== "undefined") {
       parameters.pagination = params.pagination;
     }
-    const endpoint = `/kyve/query/v1beta1/finalized_bundles/${params.pool_id}`;
+    const endpoint = `/kyve/v1/bundles/${params.pool_id}`;
     return await this.request(endpoint, parameters);
   }
   async currentVoteStatus(
