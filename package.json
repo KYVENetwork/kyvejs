@@ -37,5 +37,6 @@
     "lint:fix": "lerna run lint:fix",
     "custom-version": "yarn lerna version --conventional-commits=false"
   },
-  "version": "0.0.0"
+  "version": "0.0.0",
+  "packageManager": "yarn@3.6.4"
 }
