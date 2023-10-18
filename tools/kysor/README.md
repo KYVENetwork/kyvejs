@@ -10,7 +10,7 @@
 
 KYVE has a broad ecosystem of projects archiving their data with KYVE. To standardize different data from different projects KYVE created special runtimes for standards like `@kyvejs/evm` for all EVM based chains. This has great benefits but also has downsides for protocol node runners in terms of user experience.
 
-Without KYSOR for every pool the node runner has to get the binaries manually. If you want to run on another pool which has a different runtime you again have to manually obtain the binaries. Furthermore, if a pool ever upgrades to a newer protocol node version, you have the same procedure like before. Even worse, you might miss the update and receive a timeout slash for being offline
+Without KYSOR for every pool the node runner has to get the binaries manually. If you want to run on another pool which has a different runtime you again have to manually obtain the binaries. Furthermore, if a pool ever upgrades to a newer protocol node version, you have the same procedure as before. Even worse, you might miss the update and receive a timeout slash for being offline
 
 **Running nodes with KYSOR has the following benefits:**
 
@@ -76,15 +76,15 @@ we would recommend initializing with the following properties:
 ./kysor init --chain-id korellia --rpc https://rpc.korellia.kyve.network/ --rest https://api.korellia.kyve.network/ --auto-download-binaries
 ```
 
-This command creates a `config.toml` under the following directory: `$HOME/.kysor/`. You can edit this file if you wish to change the chain Id or the auto download feature.
+This command creates a `config.toml` under the following directory: `$HOME/.kysor/`. You can edit this file if you wish to change the chain ID or the auto download feature.
 
-::: warning
-**IMPORTANT**: Since we are in testnet it is okay to leave auto download on, but once KYVE is in mainnet we would highly recommend turning auto download off and compiling the upgrade binaries yourself. You can find more information below for how to upgrade with KYSOR manually.
-:::
+> :warning: **IMPORTANT**: Since we are in testnet it is okay to leave auto download on, but once KYVE is in mainnet we
+> would highly recommend turning auto download off and compiling the upgrade binaries yourself. You can find more
+> information below for how to upgrade with KYSOR manually.
 
 **Create your first valaccount**
 
-Now that KYSOR is initalized we move on to the next step. For every pool you run on a _valaccount_ has to be created. In our example, we want to run on the Moonbeam pool with Pool Id `0`. A new valaccount with a new mnemonic can be created in the following way:
+Now that KYSOR is initialized we move on to the next step. For every pool you run on a _valaccount_ has to be created. In our example, we want to run on the Moonbeam pool with Pool Id `0`. A new valaccount with a new mnemonic can be created in the following way:
 
 ```bash
 ./kysor valaccounts create \
@@ -111,9 +111,11 @@ If you want to create a valaccount from an existing mnemonic just add the `--rec
 
 This will prompt you to enter the mnemonic you want to import. More help on how to manage valaccounts can be found with `./kysor valaccounts --help`
 
-::: warning
-**INFORMATION**: Of course multiple valaccounts can be created for each pool. We would recommend naming the valaccounts after the pool you want to run with this account on like in this case `moonbeam` for example. These names are just used locally for config management. Also if you have multiple valaccounts running on the same machine you are required to change the port of the metrics server (if enabled of course) so the don't overlap.
-:::
+> :information_source: **INFORMATION**: Of course multiple valaccounts can be created for each pool. We would recommend
+> naming the valaccounts after the pool you want to run with this account on like in this case `moonbeam` for example.
+> These names are just used locally for config management. Also, if you have multiple valaccounts running on the same
+> machine you are required to change the port of the metrics server (if enabled of course) so they don't overlap.
+
 
 **Run the KYSOR**
 
@@ -145,7 +147,7 @@ Before an upgrade you are then required to prebuild the upgrade binaries **yours
 mv kyve-upgrade-binary $HOME/.kysor/upgrades/pool-$POOL/$VERSION/bin
 ```
 
-$POOL is the pool id where the binary should run on. For example for the Moonbeam pool with pool id `0` and upgrade version `1.0.0-beta.6` you should move the upgrade binary to the following folder:
+`$POOL` is the pool id where the binary should run on. For example for the Moonbeam pool with pool id `0` and upgrade version `1.0.0-beta.6` you should move the upgrade binary to the following folder:
 
 ```bash
 mv kyve-moonbeam-binary $HOME/.kysor/upgrades/pool-0/1.0.0-beta.6/bin/
@@ -155,7 +157,7 @@ The upgrade binaries of each version in korellia will be available here: [github
 
 **General KYSOR directory structure**
 
-Knowing where KYSOR saves it's logs and binaries can be helpful. The example below shows the following setup: The KYSOR runs on two pools with pool id `0` and `2`. Pool `2` is still running on version `0.8.6` while pool `0` has already upgraded from `1.8.6` to `1.8.7`
+Knowing where KYSOR saves its logs and binaries can be helpful. The example below shows the following setup: The KYSOR runs on two pools with pool id `0` and `2`. Pool `2` is still running on version `0.8.6` while pool `0` has already upgraded from `1.8.6` to `1.8.7`
 
 ```
 .kysor
