@@ -3,6 +3,32 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.0.11](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/protocol@1.0.10...@kyvejs/protocol@1.0.11) (2023-10-05)
+
+### Bug Fixes
+
+- compression errror returns empty array ([#76](https://github.com/KYVENetwork/kyvejs/issues/76)) ([b11a925](https://github.com/KYVENetwork/kyvejs/commit/b11a9252f7084b80779203613d1d76256a2ec790))
+
+## [1.0.10](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/protocol@1.0.9...@kyvejs/protocol@1.0.10) (2023-10-04)
+
+**Note:** Version bump only for package @kyvejs/protocol
+
+## [1.0.9](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/protocol@1.0.8...@kyvejs/protocol@1.0.9) (2023-10-04)
+
+**Note:** Version bump only for package @kyvejs/protocol
+
+## [1.0.8](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/protocol@1.0.7...@kyvejs/protocol@1.0.8) (2023-09-27)
+
+### Bug Fixes
+
+- use latest protocol version ([#72](https://github.com/KYVENetwork/kyvejs/issues/72)) ([f6eb8e4](https://github.com/KYVENetwork/kyvejs/commit/f6eb8e438c83007000d3051c4764555d508d72f8))
+
+## [1.0.7](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/protocol@1.0.6...@kyvejs/protocol@1.0.7) (2023-09-27)
+
+### Bug Fixes
+
+- wrap runtime nextKey in backoff strategy ([407d9e3](https://github.com/KYVENetwork/kyvejs/commit/407d9e323144ecc160dd2d9ac25e7370f7bce40d))
+
 ## [1.0.6](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/protocol@1.0.5...@kyvejs/protocol@1.0.6) (2023-08-17)
 
 ### Bug Fixes

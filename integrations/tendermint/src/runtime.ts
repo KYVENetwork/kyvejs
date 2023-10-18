@@ -1,4 +1,4 @@
-import { DataItem, IRuntime, Validator } from '@kyvejs/protocol';
+import { DataItem, IRuntime, Validator, VOTE } from '@kyvejs/protocol';
 import { name, version } from '../package.json';
 import axios from 'axios';
 import Ajv from 'ajv';
@@ -182,11 +182,25 @@ export default class Tendermint implements IRuntime {
     _: Validator,
     proposedDataItem: DataItem,
     validationDataItem: DataItem
-  ): Promise<boolean> {
-    // apply equal comparison
-    return (
-      JSON.stringify(proposedDataItem) === JSON.stringify(validationDataItem)
-    );
+  ): Promise<number> {
+    if (JSON.stringify(proposedDataItem) === JSON.stringify(validationDataItem)) {
+      return VOTE.VALID
+    }
+    // prevent nondeterministic misbehaviour due to osmosis-1 specific problems
+    if (validationDataItem.value.block.block.header.chain_id === "osmosis-1") {
+      _.logger.info("Removing begin_block_events: osmosis-1 identified")
+      // remove nondeterministic begin_block_events to prevent incorrect invalid vote
+      delete validationDataItem.value.block_results.begin_block_events;
+      delete proposedDataItem.value.block_results.begin_block_events;
+
+      if (JSON.stringify(proposedDataItem) === JSON.stringify(validationDataItem)) {
+        _.logger.warn("Voting abstain: value.block_results.begin_block_events don't match")
+        // vote abstain if begin_block_events are not equal
+        return VOTE.ABSTAIN
+      }
+    }
+    // vote invalid if data does not match
+    return VOTE.INVALID
   }
 
   async summarizeDataBundle(_: Validator, bundle: DataItem[]): Promise<string> {

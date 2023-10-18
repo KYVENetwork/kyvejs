@@ -1,5 +1,5 @@
 import { gunzipSync, gzipSync } from "zlib";
-import { MAX_BUNDLE_BYTE_SIZE } from "../..";
+import { MAX_COMPRESSION_BYTE_SIZE } from "../..";
 
 import { ICompression } from "../../types";
 
@@ -14,7 +14,7 @@ export class Gzip implements ICompression {
   async decompress(data: Buffer) {
     // limit maxOutputLength to protect against zip bombs
     return gunzipSync(data, {
-      maxOutputLength: MAX_BUNDLE_BYTE_SIZE,
+      maxOutputLength: MAX_COMPRESSION_BYTE_SIZE,
     });
   }
 }
