@@ -11,7 +11,7 @@ import kyveQueryDelegationRes from "@kyvejs/types/lcd/kyve/query/v1beta1/delegat
 import kyveQueryPoolsRes from "@kyvejs/types/lcd/kyve/query/v1beta1/pools";
 import kyveQueryStakersRes from "@kyvejs/types/lcd/kyve/query/v1beta1/stakers";
 
-import { AbstractKyveLCDClient } from "../../lcd-client.abstract";
+import {AbstractKyveLCDClient} from "../../lcd-client.abstract";
 
 type NestedPartial<T> = {
   [K in keyof T]?: T[K] extends Array<infer R>
