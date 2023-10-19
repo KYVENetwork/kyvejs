@@ -1,6 +1,6 @@
 {
   "name": "@kyvejs/tendermint-bsync",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "license": "MIT",
   "scripts": {
     "build": "rimraf dist && tsc",
@@ -22,7 +22,7 @@
     "singleQuote": true
   },
   "dependencies": {
-    "@kyvejs/protocol": "1.0.12",
+    "@kyvejs/protocol": "1.0.13",
     "axios": "^0.27.2"
   },
   "devDependencies": {

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.0.13](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/protocol@1.0.12...@kyvejs/protocol@1.0.13) (2023-10-19)
+
+### Bug Fixes
+
+- idle if data is not available ([#84](https://github.com/KYVENetwork/kyvejs/issues/84)) ([afade99](https://github.com/KYVENetwork/kyvejs/commit/afade998cd967fbb6064275a1a16c224fb1625cf))
+
 ## [1.0.12](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/protocol@1.0.11...@kyvejs/protocol@1.0.12) (2023-10-18)
 
 **Note:** Version bump only for package @kyvejs/protocol

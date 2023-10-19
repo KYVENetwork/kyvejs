@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.0.0-beta.7](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint-ssync@1.0.0-beta.6...@kyvejs/tendermint-ssync@1.0.0-beta.7) (2023-10-19)
+
+### Bug Fixes
+
+- use key as bundle summary in state-sync runtime ([#83](https://github.com/KYVENetwork/kyvejs/issues/83)) ([da043cc](https://github.com/KYVENetwork/kyvejs/commit/da043cc1ed14a4dabb85357c7a1178b37f2d4ed0))
+
 # [1.0.0-beta.6](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint-ssync@1.0.0-beta.5...@kyvejs/tendermint-ssync@1.0.0-beta.6) (2023-10-18)
 
 **Note:** Version bump only for package @kyvejs/tendermint-ssync
