@@ -16,7 +16,9 @@ export const protobufPackage = "kyve.delegation.v1beta1";
 /** GenesisState defines the delegation module's genesis state. */
 export interface GenesisState {
   /** params defines all the parameters of the module. */
-  params?: Params;
+  params?:
+    | Params
+    | undefined;
   /** delegator_list ... */
   delegator_list: Delegator[];
   /** delegation_entry_list ... */
@@ -28,7 +30,9 @@ export interface GenesisState {
   /** undelegation_queue_entry_list ... */
   undelegation_queue_entry_list: UndelegationQueueEntry[];
   /** queue_state_undelegation ... */
-  queue_state_undelegation?: QueueState;
+  queue_state_undelegation?:
+    | QueueState
+    | undefined;
   /** redelegation_cooldown_list ... */
   redelegation_cooldown_list: RedelegationCooldown[];
 }
@@ -76,40 +80,73 @@ export const GenesisState = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): GenesisState {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseGenesisState();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.params = Params.decode(reader, reader.uint32());
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.delegator_list.push(Delegator.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.delegation_entry_list.push(DelegationEntry.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 4:
+          if (tag !== 34) {
+            break;
+          }
+
           message.delegation_data_list.push(DelegationData.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 5:
+          if (tag !== 42) {
+            break;
+          }
+
           message.delegation_slash_list.push(DelegationSlash.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 6:
+          if (tag !== 50) {
+            break;
+          }
+
           message.undelegation_queue_entry_list.push(UndelegationQueueEntry.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 7:
+          if (tag !== 58) {
+            break;
+          }
+
           message.queue_state_undelegation = QueueState.decode(reader, reader.uint32());
-          break;
+          continue;
         case 8:
+          if (tag !== 66) {
+            break;
+          }
+
           message.redelegation_cooldown_list.push(RedelegationCooldown.decode(reader, reader.uint32()));
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -117,25 +154,25 @@ export const GenesisState = {
   fromJSON(object: any): GenesisState {
     return {
       params: isSet(object.params) ? Params.fromJSON(object.params) : undefined,
-      delegator_list: Array.isArray(object?.delegator_list)
+      delegator_list: globalThis.Array.isArray(object?.delegator_list)
         ? object.delegator_list.map((e: any) => Delegator.fromJSON(e))
         : [],
-      delegation_entry_list: Array.isArray(object?.delegation_entry_list)
+      delegation_entry_list: globalThis.Array.isArray(object?.delegation_entry_list)
         ? object.delegation_entry_list.map((e: any) => DelegationEntry.fromJSON(e))
         : [],
-      delegation_data_list: Array.isArray(object?.delegation_data_list)
+      delegation_data_list: globalThis.Array.isArray(object?.delegation_data_list)
         ? object.delegation_data_list.map((e: any) => DelegationData.fromJSON(e))
         : [],
-      delegation_slash_list: Array.isArray(object?.delegation_slash_list)
+      delegation_slash_list: globalThis.Array.isArray(object?.delegation_slash_list)
         ? object.delegation_slash_list.map((e: any) => DelegationSlash.fromJSON(e))
         : [],
-      undelegation_queue_entry_list: Array.isArray(object?.undelegation_queue_entry_list)
+      undelegation_queue_entry_list: globalThis.Array.isArray(object?.undelegation_queue_entry_list)
         ? object.undelegation_queue_entry_list.map((e: any) => UndelegationQueueEntry.fromJSON(e))
         : [],
       queue_state_undelegation: isSet(object.queue_state_undelegation)
         ? QueueState.fromJSON(object.queue_state_undelegation)
         : undefined,
-      redelegation_cooldown_list: Array.isArray(object?.redelegation_cooldown_list)
+      redelegation_cooldown_list: globalThis.Array.isArray(object?.redelegation_cooldown_list)
         ? object.redelegation_cooldown_list.map((e: any) => RedelegationCooldown.fromJSON(e))
         : [],
     };
@@ -143,47 +180,38 @@ export const GenesisState = {
 
   toJSON(message: GenesisState): unknown {
     const obj: any = {};
-    message.params !== undefined && (obj.params = message.params ? Params.toJSON(message.params) : undefined);
-    if (message.delegator_list) {
-      obj.delegator_list = message.delegator_list.map((e) => e ? Delegator.toJSON(e) : undefined);
-    } else {
-      obj.delegator_list = [];
+    if (message.params !== undefined) {
+      obj.params = Params.toJSON(message.params);
     }
-    if (message.delegation_entry_list) {
-      obj.delegation_entry_list = message.delegation_entry_list.map((e) => e ? DelegationEntry.toJSON(e) : undefined);
-    } else {
-      obj.delegation_entry_list = [];
+    if (message.delegator_list?.length) {
+      obj.delegator_list = message.delegator_list.map((e) => Delegator.toJSON(e));
     }
-    if (message.delegation_data_list) {
-      obj.delegation_data_list = message.delegation_data_list.map((e) => e ? DelegationData.toJSON(e) : undefined);
-    } else {
-      obj.delegation_data_list = [];
+    if (message.delegation_entry_list?.length) {
+      obj.delegation_entry_list = message.delegation_entry_list.map((e) => DelegationEntry.toJSON(e));
     }
-    if (message.delegation_slash_list) {
-      obj.delegation_slash_list = message.delegation_slash_list.map((e) => e ? DelegationSlash.toJSON(e) : undefined);
-    } else {
-      obj.delegation_slash_list = [];
+    if (message.delegation_data_list?.length) {
+      obj.delegation_data_list = message.delegation_data_list.map((e) => DelegationData.toJSON(e));
     }
-    if (message.undelegation_queue_entry_list) {
+    if (message.delegation_slash_list?.length) {
+      obj.delegation_slash_list = message.delegation_slash_list.map((e) => DelegationSlash.toJSON(e));
+    }
+    if (message.undelegation_queue_entry_list?.length) {
       obj.undelegation_queue_entry_list = message.undelegation_queue_entry_list.map((e) =>
-        e ? UndelegationQueueEntry.toJSON(e) : undefined
+        UndelegationQueueEntry.toJSON(e)
       );
-    } else {
-      obj.undelegation_queue_entry_list = [];
     }
-    message.queue_state_undelegation !== undefined && (obj.queue_state_undelegation = message.queue_state_undelegation
-      ? QueueState.toJSON(message.queue_state_undelegation)
-      : undefined);
-    if (message.redelegation_cooldown_list) {
-      obj.redelegation_cooldown_list = message.redelegation_cooldown_list.map((e) =>
-        e ? RedelegationCooldown.toJSON(e) : undefined
-      );
-    } else {
-      obj.redelegation_cooldown_list = [];
+    if (message.queue_state_undelegation !== undefined) {
+      obj.queue_state_undelegation = QueueState.toJSON(message.queue_state_undelegation);
+    }
+    if (message.redelegation_cooldown_list?.length) {
+      obj.redelegation_cooldown_list = message.redelegation_cooldown_list.map((e) => RedelegationCooldown.toJSON(e));
     }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<GenesisState>, I>>(base?: I): GenesisState {
+    return GenesisState.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<GenesisState>, I>>(object: I): GenesisState {
     const message = createBaseGenesisState();
     message.params = (object.params !== undefined && object.params !== null)
@@ -208,7 +236,8 @@ export const GenesisState = {
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
 export type DeepPartial<T> = T extends Builtin ? T
-  : T extends Array<infer U> ? Array<DeepPartial<U>> : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
+  : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
+  : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
   : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 

@@ -11,9 +11,13 @@ export const protobufPackage = "kyve.pool.v1beta1";
  */
 export interface EventUpdateParams {
   /** old_params is the module's old parameters. */
-  old_params?: Params;
+  old_params?:
+    | Params
+    | undefined;
   /** new_params is the module's new parameters. */
-  new_params?: Params;
+  new_params?:
+    | Params
+    | undefined;
   /** payload is the parameter updates that were performed. */
   payload: string;
 }
@@ -251,25 +255,38 @@ export const EventUpdateParams = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EventUpdateParams {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventUpdateParams();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.old_params = Params.decode(reader, reader.uint32());
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.new_params = Params.decode(reader, reader.uint32());
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.payload = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -278,20 +295,27 @@ export const EventUpdateParams = {
     return {
       old_params: isSet(object.old_params) ? Params.fromJSON(object.old_params) : undefined,
       new_params: isSet(object.new_params) ? Params.fromJSON(object.new_params) : undefined,
-      payload: isSet(object.payload) ? String(object.payload) : "",
+      payload: isSet(object.payload) ? globalThis.String(object.payload) : "",
     };
   },
 
   toJSON(message: EventUpdateParams): unknown {
     const obj: any = {};
-    message.old_params !== undefined &&
-      (obj.old_params = message.old_params ? Params.toJSON(message.old_params) : undefined);
-    message.new_params !== undefined &&
-      (obj.new_params = message.new_params ? Params.toJSON(message.new_params) : undefined);
-    message.payload !== undefined && (obj.payload = message.payload);
+    if (message.old_params !== undefined) {
+      obj.old_params = Params.toJSON(message.old_params);
+    }
+    if (message.new_params !== undefined) {
+      obj.new_params = Params.toJSON(message.new_params);
+    }
+    if (message.payload !== "") {
+      obj.payload = message.payload;
+    }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<EventUpdateParams>, I>>(base?: I): EventUpdateParams {
+    return EventUpdateParams.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<EventUpdateParams>, I>>(object: I): EventUpdateParams {
     const message = createBaseEventUpdateParams();
     message.old_params = (object.old_params !== undefined && object.old_params !== null)
@@ -372,100 +396,188 @@ export const EventCreatePool = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EventCreatePool {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventCreatePool();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.name = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.runtime = reader.string();
-          break;
+          continue;
         case 4:
+          if (tag !== 34) {
+            break;
+          }
+
           message.logo = reader.string();
-          break;
+          continue;
         case 5:
+          if (tag !== 42) {
+            break;
+          }
+
           message.config = reader.string();
-          break;
+          continue;
         case 6:
+          if (tag !== 50) {
+            break;
+          }
+
           message.start_key = reader.string();
-          break;
+          continue;
         case 7:
+          if (tag !== 56) {
+            break;
+          }
+
           message.upload_interval = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 8:
+          if (tag !== 64) {
+            break;
+          }
+
           message.operating_cost = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 9:
+          if (tag !== 72) {
+            break;
+          }
+
           message.min_delegation = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 10:
+          if (tag !== 80) {
+            break;
+          }
+
           message.max_bundle_size = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 11:
+          if (tag !== 90) {
+            break;
+          }
+
           message.version = reader.string();
-          break;
+          continue;
         case 12:
+          if (tag !== 98) {
+            break;
+          }
+
           message.binaries = reader.string();
-          break;
+          continue;
         case 13:
+          if (tag !== 104) {
+            break;
+          }
+
           message.storage_provider_id = reader.uint32();
-          break;
+          continue;
         case 14:
+          if (tag !== 112) {
+            break;
+          }
+
           message.compression_id = reader.uint32();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): EventCreatePool {
     return {
-      id: isSet(object.id) ? String(object.id) : "0",
-      name: isSet(object.name) ? String(object.name) : "",
-      runtime: isSet(object.runtime) ? String(object.runtime) : "",
-      logo: isSet(object.logo) ? String(object.logo) : "",
-      config: isSet(object.config) ? String(object.config) : "",
-      start_key: isSet(object.start_key) ? String(object.start_key) : "",
-      upload_interval: isSet(object.upload_interval) ? String(object.upload_interval) : "0",
-      operating_cost: isSet(object.operating_cost) ? String(object.operating_cost) : "0",
-      min_delegation: isSet(object.min_delegation) ? String(object.min_delegation) : "0",
-      max_bundle_size: isSet(object.max_bundle_size) ? String(object.max_bundle_size) : "0",
-      version: isSet(object.version) ? String(object.version) : "",
-      binaries: isSet(object.binaries) ? String(object.binaries) : "",
-      storage_provider_id: isSet(object.storage_provider_id) ? Number(object.storage_provider_id) : 0,
-      compression_id: isSet(object.compression_id) ? Number(object.compression_id) : 0,
+      id: isSet(object.id) ? globalThis.String(object.id) : "0",
+      name: isSet(object.name) ? globalThis.String(object.name) : "",
+      runtime: isSet(object.runtime) ? globalThis.String(object.runtime) : "",
+      logo: isSet(object.logo) ? globalThis.String(object.logo) : "",
+      config: isSet(object.config) ? globalThis.String(object.config) : "",
+      start_key: isSet(object.start_key) ? globalThis.String(object.start_key) : "",
+      upload_interval: isSet(object.upload_interval) ? globalThis.String(object.upload_interval) : "0",
+      operating_cost: isSet(object.operating_cost) ? globalThis.String(object.operating_cost) : "0",
+      min_delegation: isSet(object.min_delegation) ? globalThis.String(object.min_delegation) : "0",
+      max_bundle_size: isSet(object.max_bundle_size) ? globalThis.String(object.max_bundle_size) : "0",
+      version: isSet(object.version) ? globalThis.String(object.version) : "",
+      binaries: isSet(object.binaries) ? globalThis.String(object.binaries) : "",
+      storage_provider_id: isSet(object.storage_provider_id) ? globalThis.Number(object.storage_provider_id) : 0,
+      compression_id: isSet(object.compression_id) ? globalThis.Number(object.compression_id) : 0,
     };
   },
 
   toJSON(message: EventCreatePool): unknown {
     const obj: any = {};
-    message.id !== undefined && (obj.id = message.id);
-    message.name !== undefined && (obj.name = message.name);
-    message.runtime !== undefined && (obj.runtime = message.runtime);
-    message.logo !== undefined && (obj.logo = message.logo);
-    message.config !== undefined && (obj.config = message.config);
-    message.start_key !== undefined && (obj.start_key = message.start_key);
-    message.upload_interval !== undefined && (obj.upload_interval = message.upload_interval);
-    message.operating_cost !== undefined && (obj.operating_cost = message.operating_cost);
-    message.min_delegation !== undefined && (obj.min_delegation = message.min_delegation);
-    message.max_bundle_size !== undefined && (obj.max_bundle_size = message.max_bundle_size);
-    message.version !== undefined && (obj.version = message.version);
-    message.binaries !== undefined && (obj.binaries = message.binaries);
-    message.storage_provider_id !== undefined && (obj.storage_provider_id = Math.round(message.storage_provider_id));
-    message.compression_id !== undefined && (obj.compression_id = Math.round(message.compression_id));
+    if (message.id !== "0") {
+      obj.id = message.id;
+    }
+    if (message.name !== "") {
+      obj.name = message.name;
+    }
+    if (message.runtime !== "") {
+      obj.runtime = message.runtime;
+    }
+    if (message.logo !== "") {
+      obj.logo = message.logo;
+    }
+    if (message.config !== "") {
+      obj.config = message.config;
+    }
+    if (message.start_key !== "") {
+      obj.start_key = message.start_key;
+    }
+    if (message.upload_interval !== "0") {
+      obj.upload_interval = message.upload_interval;
+    }
+    if (message.operating_cost !== "0") {
+      obj.operating_cost = message.operating_cost;
+    }
+    if (message.min_delegation !== "0") {
+      obj.min_delegation = message.min_delegation;
+    }
+    if (message.max_bundle_size !== "0") {
+      obj.max_bundle_size = message.max_bundle_size;
+    }
+    if (message.version !== "") {
+      obj.version = message.version;
+    }
+    if (message.binaries !== "") {
+      obj.binaries = message.binaries;
+    }
+    if (message.storage_provider_id !== 0) {
+      obj.storage_provider_id = Math.round(message.storage_provider_id);
+    }
+    if (message.compression_id !== 0) {
+      obj.compression_id = Math.round(message.compression_id);
+    }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<EventCreatePool>, I>>(base?: I): EventCreatePool {
+    return EventCreatePool.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<EventCreatePool>, I>>(object: I): EventCreatePool {
     const message = createBaseEventCreatePool();
     message.id = object.id ?? "0";
@@ -499,33 +611,43 @@ export const EventPoolEnabled = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EventPoolEnabled {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventPoolEnabled();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.id = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): EventPoolEnabled {
-    return { id: isSet(object.id) ? String(object.id) : "0" };
+    return { id: isSet(object.id) ? globalThis.String(object.id) : "0" };
   },
 
   toJSON(message: EventPoolEnabled): unknown {
     const obj: any = {};
-    message.id !== undefined && (obj.id = message.id);
+    if (message.id !== "0") {
+      obj.id = message.id;
+    }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<EventPoolEnabled>, I>>(base?: I): EventPoolEnabled {
+    return EventPoolEnabled.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<EventPoolEnabled>, I>>(object: I): EventPoolEnabled {
     const message = createBaseEventPoolEnabled();
     message.id = object.id ?? "0";
@@ -546,33 +668,43 @@ export const EventPoolDisabled = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EventPoolDisabled {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventPoolDisabled();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.id = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): EventPoolDisabled {
-    return { id: isSet(object.id) ? String(object.id) : "0" };
+    return { id: isSet(object.id) ? globalThis.String(object.id) : "0" };
   },
 
   toJSON(message: EventPoolDisabled): unknown {
     const obj: any = {};
-    message.id !== undefined && (obj.id = message.id);
+    if (message.id !== "0") {
+      obj.id = message.id;
+    }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<EventPoolDisabled>, I>>(base?: I): EventPoolDisabled {
+    return EventPoolDisabled.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<EventPoolDisabled>, I>>(object: I): EventPoolDisabled {
     const message = createBaseEventPoolDisabled();
     message.id = object.id ?? "0";
@@ -610,71 +742,112 @@ export const EventRuntimeUpgradeScheduled = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EventRuntimeUpgradeScheduled {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventRuntimeUpgradeScheduled();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.runtime = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.version = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag !== 24) {
+            break;
+          }
+
           message.scheduled_at = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 4:
+          if (tag !== 32) {
+            break;
+          }
+
           message.duration = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 5:
+          if (tag !== 42) {
+            break;
+          }
+
           message.binaries = reader.string();
-          break;
+          continue;
         case 6:
-          if ((tag & 7) === 2) {
+          if (tag === 48) {
+            message.affected_pools.push(longToString(reader.uint64() as Long));
+
+            continue;
+          }
+
+          if (tag === 50) {
             const end2 = reader.uint32() + reader.pos;
             while (reader.pos < end2) {
               message.affected_pools.push(longToString(reader.uint64() as Long));
             }
-          } else {
-            message.affected_pools.push(longToString(reader.uint64() as Long));
+
+            continue;
           }
-          break;
-        default:
-          reader.skipType(tag & 7);
+
           break;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): EventRuntimeUpgradeScheduled {
     return {
-      runtime: isSet(object.runtime) ? String(object.runtime) : "",
-      version: isSet(object.version) ? String(object.version) : "",
-      scheduled_at: isSet(object.scheduled_at) ? String(object.scheduled_at) : "0",
-      duration: isSet(object.duration) ? String(object.duration) : "0",
-      binaries: isSet(object.binaries) ? String(object.binaries) : "",
-      affected_pools: Array.isArray(object?.affected_pools) ? object.affected_pools.map((e: any) => String(e)) : [],
+      runtime: isSet(object.runtime) ? globalThis.String(object.runtime) : "",
+      version: isSet(object.version) ? globalThis.String(object.version) : "",
+      scheduled_at: isSet(object.scheduled_at) ? globalThis.String(object.scheduled_at) : "0",
+      duration: isSet(object.duration) ? globalThis.String(object.duration) : "0",
+      binaries: isSet(object.binaries) ? globalThis.String(object.binaries) : "",
+      affected_pools: globalThis.Array.isArray(object?.affected_pools)
+        ? object.affected_pools.map((e: any) => globalThis.String(e))
+        : [],
     };
   },
 
   toJSON(message: EventRuntimeUpgradeScheduled): unknown {
     const obj: any = {};
-    message.runtime !== undefined && (obj.runtime = message.runtime);
-    message.version !== undefined && (obj.version = message.version);
-    message.scheduled_at !== undefined && (obj.scheduled_at = message.scheduled_at);
-    message.duration !== undefined && (obj.duration = message.duration);
-    message.binaries !== undefined && (obj.binaries = message.binaries);
-    if (message.affected_pools) {
-      obj.affected_pools = message.affected_pools.map((e) => e);
-    } else {
-      obj.affected_pools = [];
+    if (message.runtime !== "") {
+      obj.runtime = message.runtime;
+    }
+    if (message.version !== "") {
+      obj.version = message.version;
+    }
+    if (message.scheduled_at !== "0") {
+      obj.scheduled_at = message.scheduled_at;
+    }
+    if (message.duration !== "0") {
+      obj.duration = message.duration;
+    }
+    if (message.binaries !== "") {
+      obj.binaries = message.binaries;
+    }
+    if (message.affected_pools?.length) {
+      obj.affected_pools = message.affected_pools;
     }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<EventRuntimeUpgradeScheduled>, I>>(base?: I): EventRuntimeUpgradeScheduled {
+    return EventRuntimeUpgradeScheduled.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<EventRuntimeUpgradeScheduled>, I>>(object: I): EventRuntimeUpgradeScheduled {
     const message = createBaseEventRuntimeUpgradeScheduled();
     message.runtime = object.runtime ?? "";
@@ -705,51 +878,68 @@ export const EventRuntimeUpgradeCancelled = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EventRuntimeUpgradeCancelled {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventRuntimeUpgradeCancelled();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.runtime = reader.string();
-          break;
+          continue;
         case 2:
-          if ((tag & 7) === 2) {
+          if (tag === 16) {
+            message.affected_pools.push(longToString(reader.uint64() as Long));
+
+            continue;
+          }
+
+          if (tag === 18) {
             const end2 = reader.uint32() + reader.pos;
             while (reader.pos < end2) {
               message.affected_pools.push(longToString(reader.uint64() as Long));
             }
-          } else {
-            message.affected_pools.push(longToString(reader.uint64() as Long));
+
+            continue;
           }
-          break;
-        default:
-          reader.skipType(tag & 7);
+
           break;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): EventRuntimeUpgradeCancelled {
     return {
-      runtime: isSet(object.runtime) ? String(object.runtime) : "",
-      affected_pools: Array.isArray(object?.affected_pools) ? object.affected_pools.map((e: any) => String(e)) : [],
+      runtime: isSet(object.runtime) ? globalThis.String(object.runtime) : "",
+      affected_pools: globalThis.Array.isArray(object?.affected_pools)
+        ? object.affected_pools.map((e: any) => globalThis.String(e))
+        : [],
     };
   },
 
   toJSON(message: EventRuntimeUpgradeCancelled): unknown {
     const obj: any = {};
-    message.runtime !== undefined && (obj.runtime = message.runtime);
-    if (message.affected_pools) {
-      obj.affected_pools = message.affected_pools.map((e) => e);
-    } else {
-      obj.affected_pools = [];
+    if (message.runtime !== "") {
+      obj.runtime = message.runtime;
+    }
+    if (message.affected_pools?.length) {
+      obj.affected_pools = message.affected_pools;
     }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<EventRuntimeUpgradeCancelled>, I>>(base?: I): EventRuntimeUpgradeCancelled {
+    return EventRuntimeUpgradeCancelled.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<EventRuntimeUpgradeCancelled>, I>>(object: I): EventRuntimeUpgradeCancelled {
     const message = createBaseEventRuntimeUpgradeCancelled();
     message.runtime = object.runtime ?? "";
@@ -817,90 +1007,166 @@ export const EventPoolUpdated = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EventPoolUpdated {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventPoolUpdated();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.raw_update_string = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.name = reader.string();
-          break;
+          continue;
         case 4:
+          if (tag !== 34) {
+            break;
+          }
+
           message.runtime = reader.string();
-          break;
+          continue;
         case 5:
+          if (tag !== 42) {
+            break;
+          }
+
           message.logo = reader.string();
-          break;
+          continue;
         case 6:
+          if (tag !== 50) {
+            break;
+          }
+
           message.config = reader.string();
-          break;
+          continue;
         case 7:
+          if (tag !== 56) {
+            break;
+          }
+
           message.upload_interval = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 8:
+          if (tag !== 64) {
+            break;
+          }
+
           message.operating_cost = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 9:
+          if (tag !== 72) {
+            break;
+          }
+
           message.min_delegation = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 10:
+          if (tag !== 80) {
+            break;
+          }
+
           message.max_bundle_size = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 11:
+          if (tag !== 88) {
+            break;
+          }
+
           message.storage_provider_id = reader.uint32();
-          break;
+          continue;
         case 12:
+          if (tag !== 96) {
+            break;
+          }
+
           message.compression_id = reader.uint32();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): EventPoolUpdated {
     return {
-      id: isSet(object.id) ? String(object.id) : "0",
-      raw_update_string: isSet(object.raw_update_string) ? String(object.raw_update_string) : "",
-      name: isSet(object.name) ? String(object.name) : "",
-      runtime: isSet(object.runtime) ? String(object.runtime) : "",
-      logo: isSet(object.logo) ? String(object.logo) : "",
-      config: isSet(object.config) ? String(object.config) : "",
-      upload_interval: isSet(object.upload_interval) ? String(object.upload_interval) : "0",
-      operating_cost: isSet(object.operating_cost) ? String(object.operating_cost) : "0",
-      min_delegation: isSet(object.min_delegation) ? String(object.min_delegation) : "0",
-      max_bundle_size: isSet(object.max_bundle_size) ? String(object.max_bundle_size) : "0",
-      storage_provider_id: isSet(object.storage_provider_id) ? Number(object.storage_provider_id) : 0,
-      compression_id: isSet(object.compression_id) ? Number(object.compression_id) : 0,
+      id: isSet(object.id) ? globalThis.String(object.id) : "0",
+      raw_update_string: isSet(object.raw_update_string) ? globalThis.String(object.raw_update_string) : "",
+      name: isSet(object.name) ? globalThis.String(object.name) : "",
+      runtime: isSet(object.runtime) ? globalThis.String(object.runtime) : "",
+      logo: isSet(object.logo) ? globalThis.String(object.logo) : "",
+      config: isSet(object.config) ? globalThis.String(object.config) : "",
+      upload_interval: isSet(object.upload_interval) ? globalThis.String(object.upload_interval) : "0",
+      operating_cost: isSet(object.operating_cost) ? globalThis.String(object.operating_cost) : "0",
+      min_delegation: isSet(object.min_delegation) ? globalThis.String(object.min_delegation) : "0",
+      max_bundle_size: isSet(object.max_bundle_size) ? globalThis.String(object.max_bundle_size) : "0",
+      storage_provider_id: isSet(object.storage_provider_id) ? globalThis.Number(object.storage_provider_id) : 0,
+      compression_id: isSet(object.compression_id) ? globalThis.Number(object.compression_id) : 0,
     };
   },
 
   toJSON(message: EventPoolUpdated): unknown {
     const obj: any = {};
-    message.id !== undefined && (obj.id = message.id);
-    message.raw_update_string !== undefined && (obj.raw_update_string = message.raw_update_string);
-    message.name !== undefined && (obj.name = message.name);
-    message.runtime !== undefined && (obj.runtime = message.runtime);
-    message.logo !== undefined && (obj.logo = message.logo);
-    message.config !== undefined && (obj.config = message.config);
-    message.upload_interval !== undefined && (obj.upload_interval = message.upload_interval);
-    message.operating_cost !== undefined && (obj.operating_cost = message.operating_cost);
-    message.min_delegation !== undefined && (obj.min_delegation = message.min_delegation);
-    message.max_bundle_size !== undefined && (obj.max_bundle_size = message.max_bundle_size);
-    message.storage_provider_id !== undefined && (obj.storage_provider_id = Math.round(message.storage_provider_id));
-    message.compression_id !== undefined && (obj.compression_id = Math.round(message.compression_id));
+    if (message.id !== "0") {
+      obj.id = message.id;
+    }
+    if (message.raw_update_string !== "") {
+      obj.raw_update_string = message.raw_update_string;
+    }
+    if (message.name !== "") {
+      obj.name = message.name;
+    }
+    if (message.runtime !== "") {
+      obj.runtime = message.runtime;
+    }
+    if (message.logo !== "") {
+      obj.logo = message.logo;
+    }
+    if (message.config !== "") {
+      obj.config = message.config;
+    }
+    if (message.upload_interval !== "0") {
+      obj.upload_interval = message.upload_interval;
+    }
+    if (message.operating_cost !== "0") {
+      obj.operating_cost = message.operating_cost;
+    }
+    if (message.min_delegation !== "0") {
+      obj.min_delegation = message.min_delegation;
+    }
+    if (message.max_bundle_size !== "0") {
+      obj.max_bundle_size = message.max_bundle_size;
+    }
+    if (message.storage_provider_id !== 0) {
+      obj.storage_provider_id = Math.round(message.storage_provider_id);
+    }
+    if (message.compression_id !== 0) {
+      obj.compression_id = Math.round(message.compression_id);
+    }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<EventPoolUpdated>, I>>(base?: I): EventPoolUpdated {
+    return EventPoolUpdated.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<EventPoolUpdated>, I>>(object: I): EventPoolUpdated {
     const message = createBaseEventPoolUpdated();
     message.id = object.id ?? "0";
@@ -938,45 +1204,67 @@ export const EventFundPool = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EventFundPool {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventFundPool();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.pool_id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.address = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag !== 24) {
+            break;
+          }
+
           message.amount = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): EventFundPool {
     return {
-      pool_id: isSet(object.pool_id) ? String(object.pool_id) : "0",
-      address: isSet(object.address) ? String(object.address) : "",
-      amount: isSet(object.amount) ? String(object.amount) : "0",
+      pool_id: isSet(object.pool_id) ? globalThis.String(object.pool_id) : "0",
+      address: isSet(object.address) ? globalThis.String(object.address) : "",
+      amount: isSet(object.amount) ? globalThis.String(object.amount) : "0",
     };
   },
 
   toJSON(message: EventFundPool): unknown {
     const obj: any = {};
-    message.pool_id !== undefined && (obj.pool_id = message.pool_id);
-    message.address !== undefined && (obj.address = message.address);
-    message.amount !== undefined && (obj.amount = message.amount);
+    if (message.pool_id !== "0") {
+      obj.pool_id = message.pool_id;
+    }
+    if (message.address !== "") {
+      obj.address = message.address;
+    }
+    if (message.amount !== "0") {
+      obj.amount = message.amount;
+    }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<EventFundPool>, I>>(base?: I): EventFundPool {
+    return EventFundPool.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<EventFundPool>, I>>(object: I): EventFundPool {
     const message = createBaseEventFundPool();
     message.pool_id = object.pool_id ?? "0";
@@ -1005,45 +1293,67 @@ export const EventDefundPool = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EventDefundPool {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventDefundPool();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.pool_id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.address = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag !== 24) {
+            break;
+          }
+
           message.amount = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): EventDefundPool {
     return {
-      pool_id: isSet(object.pool_id) ? String(object.pool_id) : "0",
-      address: isSet(object.address) ? String(object.address) : "",
-      amount: isSet(object.amount) ? String(object.amount) : "0",
+      pool_id: isSet(object.pool_id) ? globalThis.String(object.pool_id) : "0",
+      address: isSet(object.address) ? globalThis.String(object.address) : "",
+      amount: isSet(object.amount) ? globalThis.String(object.amount) : "0",
     };
   },
 
   toJSON(message: EventDefundPool): unknown {
     const obj: any = {};
-    message.pool_id !== undefined && (obj.pool_id = message.pool_id);
-    message.address !== undefined && (obj.address = message.address);
-    message.amount !== undefined && (obj.amount = message.amount);
+    if (message.pool_id !== "0") {
+      obj.pool_id = message.pool_id;
+    }
+    if (message.address !== "") {
+      obj.address = message.address;
+    }
+    if (message.amount !== "0") {
+      obj.amount = message.amount;
+    }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<EventDefundPool>, I>>(base?: I): EventDefundPool {
+    return EventDefundPool.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<EventDefundPool>, I>>(object: I): EventDefundPool {
     const message = createBaseEventDefundPool();
     message.pool_id = object.pool_id ?? "0";
@@ -1072,45 +1382,67 @@ export const EventPoolFundsSlashed = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EventPoolFundsSlashed {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventPoolFundsSlashed();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.pool_id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.address = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag !== 24) {
+            break;
+          }
+
           message.amount = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): EventPoolFundsSlashed {
     return {
-      pool_id: isSet(object.pool_id) ? String(object.pool_id) : "0",
-      address: isSet(object.address) ? String(object.address) : "",
-      amount: isSet(object.amount) ? String(object.amount) : "0",
+      pool_id: isSet(object.pool_id) ? globalThis.String(object.pool_id) : "0",
+      address: isSet(object.address) ? globalThis.String(object.address) : "",
+      amount: isSet(object.amount) ? globalThis.String(object.amount) : "0",
     };
   },
 
   toJSON(message: EventPoolFundsSlashed): unknown {
     const obj: any = {};
-    message.pool_id !== undefined && (obj.pool_id = message.pool_id);
-    message.address !== undefined && (obj.address = message.address);
-    message.amount !== undefined && (obj.amount = message.amount);
+    if (message.pool_id !== "0") {
+      obj.pool_id = message.pool_id;
+    }
+    if (message.address !== "") {
+      obj.address = message.address;
+    }
+    if (message.amount !== "0") {
+      obj.amount = message.amount;
+    }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<EventPoolFundsSlashed>, I>>(base?: I): EventPoolFundsSlashed {
+    return EventPoolFundsSlashed.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<EventPoolFundsSlashed>, I>>(object: I): EventPoolFundsSlashed {
     const message = createBaseEventPoolFundsSlashed();
     message.pool_id = object.pool_id ?? "0";
@@ -1133,33 +1465,43 @@ export const EventPoolOutOfFunds = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EventPoolOutOfFunds {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventPoolOutOfFunds();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.pool_id = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): EventPoolOutOfFunds {
-    return { pool_id: isSet(object.pool_id) ? String(object.pool_id) : "0" };
+    return { pool_id: isSet(object.pool_id) ? globalThis.String(object.pool_id) : "0" };
   },
 
   toJSON(message: EventPoolOutOfFunds): unknown {
     const obj: any = {};
-    message.pool_id !== undefined && (obj.pool_id = message.pool_id);
+    if (message.pool_id !== "0") {
+      obj.pool_id = message.pool_id;
+    }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<EventPoolOutOfFunds>, I>>(base?: I): EventPoolOutOfFunds {
+    return EventPoolOutOfFunds.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<EventPoolOutOfFunds>, I>>(object: I): EventPoolOutOfFunds {
     const message = createBaseEventPoolOutOfFunds();
     message.pool_id = object.pool_id ?? "0";
@@ -1170,7 +1512,8 @@ export const EventPoolOutOfFunds = {
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
 export type DeepPartial<T> = T extends Builtin ? T
-  : T extends Array<infer U> ? Array<DeepPartial<U>> : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
+  : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
+  : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
   : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 

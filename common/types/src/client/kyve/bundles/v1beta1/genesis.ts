@@ -1,6 +1,6 @@
 /* eslint-disable */
 import _m0 from "protobufjs/minimal";
-import { BundleProposal, FinalizedBundle } from "./bundles";
+import { BundleProposal, FinalizedBundle, RoundRobinProgress } from "./bundles";
 import { Params } from "./params";
 
 export const protobufPackage = "kyve.bundles.v1beta1";
@@ -8,15 +8,19 @@ export const protobufPackage = "kyve.bundles.v1beta1";
 /** GenesisState defines the bundles module's genesis state. */
 export interface GenesisState {
   /** params defines all the parameters of the module. */
-  params?: Params;
+  params?:
+    | Params
+    | undefined;
   /** bundle_proposal_list ... */
   bundle_proposal_list: BundleProposal[];
   /** finalized_bundle_list ... */
   finalized_bundle_list: FinalizedBundle[];
+  /** round_robin_progress_list ... */
+  round_robin_progress_list: RoundRobinProgress[];
 }
 
 function createBaseGenesisState(): GenesisState {
-  return { params: undefined, bundle_proposal_list: [], finalized_bundle_list: [] };
+  return { params: undefined, bundle_proposal_list: [], finalized_bundle_list: [], round_robin_progress_list: [] };
 }
 
 export const GenesisState = {
@@ -30,29 +34,52 @@ export const GenesisState = {
     for (const v of message.finalized_bundle_list) {
       FinalizedBundle.encode(v!, writer.uint32(26).fork()).ldelim();
     }
+    for (const v of message.round_robin_progress_list) {
+      RoundRobinProgress.encode(v!, writer.uint32(34).fork()).ldelim();
+    }
     return writer;
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): GenesisState {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseGenesisState();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.params = Params.decode(reader, reader.uint32());
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.bundle_proposal_list.push(BundleProposal.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.finalized_bundle_list.push(FinalizedBundle.decode(reader, reader.uint32()));
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
+        case 4:
+          if (tag !== 34) {
+            break;
+          }
+
+          message.round_robin_progress_list.push(RoundRobinProgress.decode(reader, reader.uint32()));
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -60,31 +87,38 @@ export const GenesisState = {
   fromJSON(object: any): GenesisState {
     return {
       params: isSet(object.params) ? Params.fromJSON(object.params) : undefined,
-      bundle_proposal_list: Array.isArray(object?.bundle_proposal_list)
+      bundle_proposal_list: globalThis.Array.isArray(object?.bundle_proposal_list)
         ? object.bundle_proposal_list.map((e: any) => BundleProposal.fromJSON(e))
         : [],
-      finalized_bundle_list: Array.isArray(object?.finalized_bundle_list)
+      finalized_bundle_list: globalThis.Array.isArray(object?.finalized_bundle_list)
         ? object.finalized_bundle_list.map((e: any) => FinalizedBundle.fromJSON(e))
+        : [],
+      round_robin_progress_list: globalThis.Array.isArray(object?.round_robin_progress_list)
+        ? object.round_robin_progress_list.map((e: any) => RoundRobinProgress.fromJSON(e))
         : [],
     };
   },
 
   toJSON(message: GenesisState): unknown {
     const obj: any = {};
-    message.params !== undefined && (obj.params = message.params ? Params.toJSON(message.params) : undefined);
-    if (message.bundle_proposal_list) {
-      obj.bundle_proposal_list = message.bundle_proposal_list.map((e) => e ? BundleProposal.toJSON(e) : undefined);
-    } else {
-      obj.bundle_proposal_list = [];
+    if (message.params !== undefined) {
+      obj.params = Params.toJSON(message.params);
     }
-    if (message.finalized_bundle_list) {
-      obj.finalized_bundle_list = message.finalized_bundle_list.map((e) => e ? FinalizedBundle.toJSON(e) : undefined);
-    } else {
-      obj.finalized_bundle_list = [];
+    if (message.bundle_proposal_list?.length) {
+      obj.bundle_proposal_list = message.bundle_proposal_list.map((e) => BundleProposal.toJSON(e));
+    }
+    if (message.finalized_bundle_list?.length) {
+      obj.finalized_bundle_list = message.finalized_bundle_list.map((e) => FinalizedBundle.toJSON(e));
+    }
+    if (message.round_robin_progress_list?.length) {
+      obj.round_robin_progress_list = message.round_robin_progress_list.map((e) => RoundRobinProgress.toJSON(e));
     }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<GenesisState>, I>>(base?: I): GenesisState {
+    return GenesisState.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<GenesisState>, I>>(object: I): GenesisState {
     const message = createBaseGenesisState();
     message.params = (object.params !== undefined && object.params !== null)
@@ -92,6 +126,8 @@ export const GenesisState = {
       : undefined;
     message.bundle_proposal_list = object.bundle_proposal_list?.map((e) => BundleProposal.fromPartial(e)) || [];
     message.finalized_bundle_list = object.finalized_bundle_list?.map((e) => FinalizedBundle.fromPartial(e)) || [];
+    message.round_robin_progress_list =
+      object.round_robin_progress_list?.map((e) => RoundRobinProgress.fromPartial(e)) || [];
     return message;
   },
 };
@@ -99,7 +135,8 @@ export const GenesisState = {
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
 export type DeepPartial<T> = T extends Builtin ? T
-  : T extends Array<infer U> ? Array<DeepPartial<U>> : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
+  : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
+  : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
   : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 

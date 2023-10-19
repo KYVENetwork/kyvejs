@@ -162,70 +162,122 @@ export const Staker = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Staker {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseStaker();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.address = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.commission = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.moniker = reader.string();
-          break;
+          continue;
         case 4:
+          if (tag !== 34) {
+            break;
+          }
+
           message.website = reader.string();
-          break;
+          continue;
         case 5:
+          if (tag !== 42) {
+            break;
+          }
+
           message.identity = reader.string();
-          break;
+          continue;
         case 6:
+          if (tag !== 50) {
+            break;
+          }
+
           message.security_contact = reader.string();
-          break;
+          continue;
         case 7:
+          if (tag !== 58) {
+            break;
+          }
+
           message.details = reader.string();
-          break;
+          continue;
         case 8:
+          if (tag !== 64) {
+            break;
+          }
+
           message.commission_rewards = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): Staker {
     return {
-      address: isSet(object.address) ? String(object.address) : "",
-      commission: isSet(object.commission) ? String(object.commission) : "",
-      moniker: isSet(object.moniker) ? String(object.moniker) : "",
-      website: isSet(object.website) ? String(object.website) : "",
-      identity: isSet(object.identity) ? String(object.identity) : "",
-      security_contact: isSet(object.security_contact) ? String(object.security_contact) : "",
-      details: isSet(object.details) ? String(object.details) : "",
-      commission_rewards: isSet(object.commission_rewards) ? String(object.commission_rewards) : "0",
+      address: isSet(object.address) ? globalThis.String(object.address) : "",
+      commission: isSet(object.commission) ? globalThis.String(object.commission) : "",
+      moniker: isSet(object.moniker) ? globalThis.String(object.moniker) : "",
+      website: isSet(object.website) ? globalThis.String(object.website) : "",
+      identity: isSet(object.identity) ? globalThis.String(object.identity) : "",
+      security_contact: isSet(object.security_contact) ? globalThis.String(object.security_contact) : "",
+      details: isSet(object.details) ? globalThis.String(object.details) : "",
+      commission_rewards: isSet(object.commission_rewards) ? globalThis.String(object.commission_rewards) : "0",
     };
   },
 
   toJSON(message: Staker): unknown {
     const obj: any = {};
-    message.address !== undefined && (obj.address = message.address);
-    message.commission !== undefined && (obj.commission = message.commission);
-    message.moniker !== undefined && (obj.moniker = message.moniker);
-    message.website !== undefined && (obj.website = message.website);
-    message.identity !== undefined && (obj.identity = message.identity);
-    message.security_contact !== undefined && (obj.security_contact = message.security_contact);
-    message.details !== undefined && (obj.details = message.details);
-    message.commission_rewards !== undefined && (obj.commission_rewards = message.commission_rewards);
+    if (message.address !== "") {
+      obj.address = message.address;
+    }
+    if (message.commission !== "") {
+      obj.commission = message.commission;
+    }
+    if (message.moniker !== "") {
+      obj.moniker = message.moniker;
+    }
+    if (message.website !== "") {
+      obj.website = message.website;
+    }
+    if (message.identity !== "") {
+      obj.identity = message.identity;
+    }
+    if (message.security_contact !== "") {
+      obj.security_contact = message.security_contact;
+    }
+    if (message.details !== "") {
+      obj.details = message.details;
+    }
+    if (message.commission_rewards !== "0") {
+      obj.commission_rewards = message.commission_rewards;
+    }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<Staker>, I>>(base?: I): Staker {
+    return Staker.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<Staker>, I>>(object: I): Staker {
     const message = createBaseStaker();
     message.address = object.address ?? "";
@@ -265,55 +317,89 @@ export const Valaccount = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Valaccount {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseValaccount();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.pool_id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.staker = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.valaddress = reader.string();
-          break;
+          continue;
         case 4:
+          if (tag !== 32) {
+            break;
+          }
+
           message.points = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 5:
+          if (tag !== 40) {
+            break;
+          }
+
           message.is_leaving = reader.bool();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): Valaccount {
     return {
-      pool_id: isSet(object.pool_id) ? String(object.pool_id) : "0",
-      staker: isSet(object.staker) ? String(object.staker) : "",
-      valaddress: isSet(object.valaddress) ? String(object.valaddress) : "",
-      points: isSet(object.points) ? String(object.points) : "0",
-      is_leaving: isSet(object.is_leaving) ? Boolean(object.is_leaving) : false,
+      pool_id: isSet(object.pool_id) ? globalThis.String(object.pool_id) : "0",
+      staker: isSet(object.staker) ? globalThis.String(object.staker) : "",
+      valaddress: isSet(object.valaddress) ? globalThis.String(object.valaddress) : "",
+      points: isSet(object.points) ? globalThis.String(object.points) : "0",
+      is_leaving: isSet(object.is_leaving) ? globalThis.Boolean(object.is_leaving) : false,
     };
   },
 
   toJSON(message: Valaccount): unknown {
     const obj: any = {};
-    message.pool_id !== undefined && (obj.pool_id = message.pool_id);
-    message.staker !== undefined && (obj.staker = message.staker);
-    message.valaddress !== undefined && (obj.valaddress = message.valaddress);
-    message.points !== undefined && (obj.points = message.points);
-    message.is_leaving !== undefined && (obj.is_leaving = message.is_leaving);
+    if (message.pool_id !== "0") {
+      obj.pool_id = message.pool_id;
+    }
+    if (message.staker !== "") {
+      obj.staker = message.staker;
+    }
+    if (message.valaddress !== "") {
+      obj.valaddress = message.valaddress;
+    }
+    if (message.points !== "0") {
+      obj.points = message.points;
+    }
+    if (message.is_leaving === true) {
+      obj.is_leaving = message.is_leaving;
+    }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<Valaccount>, I>>(base?: I): Valaccount {
+    return Valaccount.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<Valaccount>, I>>(object: I): Valaccount {
     const message = createBaseValaccount();
     message.pool_id = object.pool_id ?? "0";
@@ -347,50 +433,78 @@ export const CommissionChangeEntry = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): CommissionChangeEntry {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseCommissionChangeEntry();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.index = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.staker = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.commission = reader.string();
-          break;
+          continue;
         case 4:
+          if (tag !== 32) {
+            break;
+          }
+
           message.creation_date = longToString(reader.int64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): CommissionChangeEntry {
     return {
-      index: isSet(object.index) ? String(object.index) : "0",
-      staker: isSet(object.staker) ? String(object.staker) : "",
-      commission: isSet(object.commission) ? String(object.commission) : "",
-      creation_date: isSet(object.creation_date) ? String(object.creation_date) : "0",
+      index: isSet(object.index) ? globalThis.String(object.index) : "0",
+      staker: isSet(object.staker) ? globalThis.String(object.staker) : "",
+      commission: isSet(object.commission) ? globalThis.String(object.commission) : "",
+      creation_date: isSet(object.creation_date) ? globalThis.String(object.creation_date) : "0",
     };
   },
 
   toJSON(message: CommissionChangeEntry): unknown {
     const obj: any = {};
-    message.index !== undefined && (obj.index = message.index);
-    message.staker !== undefined && (obj.staker = message.staker);
-    message.commission !== undefined && (obj.commission = message.commission);
-    message.creation_date !== undefined && (obj.creation_date = message.creation_date);
+    if (message.index !== "0") {
+      obj.index = message.index;
+    }
+    if (message.staker !== "") {
+      obj.staker = message.staker;
+    }
+    if (message.commission !== "") {
+      obj.commission = message.commission;
+    }
+    if (message.creation_date !== "0") {
+      obj.creation_date = message.creation_date;
+    }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<CommissionChangeEntry>, I>>(base?: I): CommissionChangeEntry {
+    return CommissionChangeEntry.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<CommissionChangeEntry>, I>>(object: I): CommissionChangeEntry {
     const message = createBaseCommissionChangeEntry();
     message.index = object.index ?? "0";
@@ -423,50 +537,78 @@ export const LeavePoolEntry = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): LeavePoolEntry {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseLeavePoolEntry();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.index = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.staker = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag !== 24) {
+            break;
+          }
+
           message.pool_id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 4:
+          if (tag !== 32) {
+            break;
+          }
+
           message.creation_date = longToString(reader.int64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): LeavePoolEntry {
     return {
-      index: isSet(object.index) ? String(object.index) : "0",
-      staker: isSet(object.staker) ? String(object.staker) : "",
-      pool_id: isSet(object.pool_id) ? String(object.pool_id) : "0",
-      creation_date: isSet(object.creation_date) ? String(object.creation_date) : "0",
+      index: isSet(object.index) ? globalThis.String(object.index) : "0",
+      staker: isSet(object.staker) ? globalThis.String(object.staker) : "",
+      pool_id: isSet(object.pool_id) ? globalThis.String(object.pool_id) : "0",
+      creation_date: isSet(object.creation_date) ? globalThis.String(object.creation_date) : "0",
     };
   },
 
   toJSON(message: LeavePoolEntry): unknown {
     const obj: any = {};
-    message.index !== undefined && (obj.index = message.index);
-    message.staker !== undefined && (obj.staker = message.staker);
-    message.pool_id !== undefined && (obj.pool_id = message.pool_id);
-    message.creation_date !== undefined && (obj.creation_date = message.creation_date);
+    if (message.index !== "0") {
+      obj.index = message.index;
+    }
+    if (message.staker !== "") {
+      obj.staker = message.staker;
+    }
+    if (message.pool_id !== "0") {
+      obj.pool_id = message.pool_id;
+    }
+    if (message.creation_date !== "0") {
+      obj.creation_date = message.creation_date;
+    }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<LeavePoolEntry>, I>>(base?: I): LeavePoolEntry {
+    return LeavePoolEntry.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<LeavePoolEntry>, I>>(object: I): LeavePoolEntry {
     const message = createBaseLeavePoolEntry();
     message.index = object.index ?? "0";
@@ -493,40 +635,56 @@ export const QueueState = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): QueueState {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseQueueState();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.low_index = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.high_index = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): QueueState {
     return {
-      low_index: isSet(object.low_index) ? String(object.low_index) : "0",
-      high_index: isSet(object.high_index) ? String(object.high_index) : "0",
+      low_index: isSet(object.low_index) ? globalThis.String(object.low_index) : "0",
+      high_index: isSet(object.high_index) ? globalThis.String(object.high_index) : "0",
     };
   },
 
   toJSON(message: QueueState): unknown {
     const obj: any = {};
-    message.low_index !== undefined && (obj.low_index = message.low_index);
-    message.high_index !== undefined && (obj.high_index = message.high_index);
+    if (message.low_index !== "0") {
+      obj.low_index = message.low_index;
+    }
+    if (message.high_index !== "0") {
+      obj.high_index = message.high_index;
+    }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<QueueState>, I>>(base?: I): QueueState {
+    return QueueState.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<QueueState>, I>>(object: I): QueueState {
     const message = createBaseQueueState();
     message.low_index = object.low_index ?? "0";
@@ -538,7 +696,8 @@ export const QueueState = {
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
 export type DeepPartial<T> = T extends Builtin ? T
-  : T extends Array<infer U> ? Array<DeepPartial<U>> : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
+  : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
+  : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
   : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 

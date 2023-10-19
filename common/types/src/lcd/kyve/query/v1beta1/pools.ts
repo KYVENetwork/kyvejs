@@ -10,7 +10,9 @@ export const protobufPackage = "kyve.query.v1beta1";
 /** QueryPoolsRequest is the request type for the Query/Pools RPC method. */
 export interface QueryPoolsRequest {
   /** pagination defines an optional pagination for the request. */
-  pagination?: PageRequest;
+  pagination?:
+    | PageRequest
+    | undefined;
   /** search ... */
   search: string;
   /** runtime ... */
@@ -26,7 +28,7 @@ export interface QueryPoolsResponse {
   /** pools ... */
   pools: PoolResponse[];
   /** pagination defines the pagination in the response. */
-  pagination?: PageResponse;
+  pagination?: PageResponse | undefined;
 }
 
 /** PoolResponse ... */
@@ -34,9 +36,13 @@ export interface PoolResponse {
   /** id ... */
   id: string;
   /** data ... */
-  data?: Pool;
+  data?:
+    | Pool
+    | undefined;
   /** bundle_proposal ... */
-  bundle_proposal?: BundleProposal;
+  bundle_proposal?:
+    | BundleProposal
+    | undefined;
   /** stakers ... */
   stakers: string[];
   /** total_stake ... */
@@ -60,7 +66,7 @@ export interface QueryPoolRequest {
 /** QueryPoolResponse is the response type for the Query/Pool RPC method. */
 export interface QueryPoolResponse {
   /** pool ... */
-  pool?: PoolResponse;
+  pool?: PoolResponse | undefined;
 }
 
 function createBaseQueryPoolsRequest(): QueryPoolsRequest {
@@ -88,31 +94,52 @@ export const QueryPoolsRequest = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): QueryPoolsRequest {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseQueryPoolsRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.pagination = PageRequest.decode(reader, reader.uint32());
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.search = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.runtime = reader.string();
-          break;
+          continue;
         case 4:
+          if (tag !== 32) {
+            break;
+          }
+
           message.disabled = reader.bool();
-          break;
+          continue;
         case 5:
+          if (tag !== 40) {
+            break;
+          }
+
           message.storage_provider_id = reader.uint32();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -120,24 +147,36 @@ export const QueryPoolsRequest = {
   fromJSON(object: any): QueryPoolsRequest {
     return {
       pagination: isSet(object.pagination) ? PageRequest.fromJSON(object.pagination) : undefined,
-      search: isSet(object.search) ? String(object.search) : "",
-      runtime: isSet(object.runtime) ? String(object.runtime) : "",
-      disabled: isSet(object.disabled) ? Boolean(object.disabled) : false,
-      storage_provider_id: isSet(object.storage_provider_id) ? Number(object.storage_provider_id) : 0,
+      search: isSet(object.search) ? globalThis.String(object.search) : "",
+      runtime: isSet(object.runtime) ? globalThis.String(object.runtime) : "",
+      disabled: isSet(object.disabled) ? globalThis.Boolean(object.disabled) : false,
+      storage_provider_id: isSet(object.storage_provider_id) ? globalThis.Number(object.storage_provider_id) : 0,
     };
   },
 
   toJSON(message: QueryPoolsRequest): unknown {
     const obj: any = {};
-    message.pagination !== undefined &&
-      (obj.pagination = message.pagination ? PageRequest.toJSON(message.pagination) : undefined);
-    message.search !== undefined && (obj.search = message.search);
-    message.runtime !== undefined && (obj.runtime = message.runtime);
-    message.disabled !== undefined && (obj.disabled = message.disabled);
-    message.storage_provider_id !== undefined && (obj.storage_provider_id = Math.round(message.storage_provider_id));
+    if (message.pagination !== undefined) {
+      obj.pagination = PageRequest.toJSON(message.pagination);
+    }
+    if (message.search !== "") {
+      obj.search = message.search;
+    }
+    if (message.runtime !== "") {
+      obj.runtime = message.runtime;
+    }
+    if (message.disabled === true) {
+      obj.disabled = message.disabled;
+    }
+    if (message.storage_provider_id !== 0) {
+      obj.storage_provider_id = Math.round(message.storage_provider_id);
+    }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<QueryPoolsRequest>, I>>(base?: I): QueryPoolsRequest {
+    return QueryPoolsRequest.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<QueryPoolsRequest>, I>>(object: I): QueryPoolsRequest {
     const message = createBaseQueryPoolsRequest();
     message.pagination = (object.pagination !== undefined && object.pagination !== null)
@@ -167,45 +206,56 @@ export const QueryPoolsResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): QueryPoolsResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseQueryPoolsResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.pools.push(PoolResponse.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.pagination = PageResponse.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): QueryPoolsResponse {
     return {
-      pools: Array.isArray(object?.pools) ? object.pools.map((e: any) => PoolResponse.fromJSON(e)) : [],
+      pools: globalThis.Array.isArray(object?.pools) ? object.pools.map((e: any) => PoolResponse.fromJSON(e)) : [],
       pagination: isSet(object.pagination) ? PageResponse.fromJSON(object.pagination) : undefined,
     };
   },
 
   toJSON(message: QueryPoolsResponse): unknown {
     const obj: any = {};
-    if (message.pools) {
-      obj.pools = message.pools.map((e) => e ? PoolResponse.toJSON(e) : undefined);
-    } else {
-      obj.pools = [];
+    if (message.pools?.length) {
+      obj.pools = message.pools.map((e) => PoolResponse.toJSON(e));
     }
-    message.pagination !== undefined &&
-      (obj.pagination = message.pagination ? PageResponse.toJSON(message.pagination) : undefined);
+    if (message.pagination !== undefined) {
+      obj.pagination = PageResponse.toJSON(message.pagination);
+    }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<QueryPoolsResponse>, I>>(base?: I): QueryPoolsResponse {
+    return QueryPoolsResponse.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<QueryPoolsResponse>, I>>(object: I): QueryPoolsResponse {
     const message = createBaseQueryPoolsResponse();
     message.pools = object.pools?.map((e) => PoolResponse.fromPartial(e)) || [];
@@ -263,80 +313,135 @@ export const PoolResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): PoolResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBasePoolResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.data = Pool.decode(reader, reader.uint32());
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.bundle_proposal = BundleProposal.decode(reader, reader.uint32());
-          break;
+          continue;
         case 4:
+          if (tag !== 34) {
+            break;
+          }
+
           message.stakers.push(reader.string());
-          break;
+          continue;
         case 5:
+          if (tag !== 40) {
+            break;
+          }
+
           message.total_self_delegation = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 6:
+          if (tag !== 48) {
+            break;
+          }
+
           message.total_delegation = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 7:
+          if (tag !== 56) {
+            break;
+          }
+
           message.status = poolStatusFromJSON(reader.int32());
-          break;
+          continue;
         case 8:
+          if (tag !== 66) {
+            break;
+          }
+
           message.account = reader.string();
-          break;
+          continue;
         case 9:
+          if (tag !== 72) {
+            break;
+          }
+
           message.account_balance = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): PoolResponse {
     return {
-      id: isSet(object.id) ? String(object.id) : "0",
+      id: isSet(object.id) ? globalThis.String(object.id) : "0",
       data: isSet(object.data) ? Pool.fromJSON(object.data) : undefined,
       bundle_proposal: isSet(object.bundle_proposal) ? BundleProposal.fromJSON(object.bundle_proposal) : undefined,
-      stakers: Array.isArray(object?.stakers) ? object.stakers.map((e: any) => String(e)) : [],
-      total_self_delegation: isSet(object.total_self_delegation) ? String(object.total_self_delegation) : "0",
-      total_delegation: isSet(object.total_delegation) ? String(object.total_delegation) : "0",
+      stakers: globalThis.Array.isArray(object?.stakers) ? object.stakers.map((e: any) => globalThis.String(e)) : [],
+      total_self_delegation: isSet(object.total_self_delegation)
+        ? globalThis.String(object.total_self_delegation)
+        : "0",
+      total_delegation: isSet(object.total_delegation) ? globalThis.String(object.total_delegation) : "0",
       status: isSet(object.status) ? poolStatusFromJSON(object.status) : PoolStatus.POOL_STATUS_UNSPECIFIED,
-      account: isSet(object.account) ? String(object.account) : "",
-      account_balance: isSet(object.account_balance) ? String(object.account_balance) : "0",
+      account: isSet(object.account) ? globalThis.String(object.account) : "",
+      account_balance: isSet(object.account_balance) ? globalThis.String(object.account_balance) : "0",
     };
   },
 
   toJSON(message: PoolResponse): unknown {
     const obj: any = {};
-    message.id !== undefined && (obj.id = message.id);
-    message.data !== undefined && (obj.data = message.data ? Pool.toJSON(message.data) : undefined);
-    message.bundle_proposal !== undefined &&
-      (obj.bundle_proposal = message.bundle_proposal ? BundleProposal.toJSON(message.bundle_proposal) : undefined);
-    if (message.stakers) {
-      obj.stakers = message.stakers.map((e) => e);
-    } else {
-      obj.stakers = [];
+    if (message.id !== "0") {
+      obj.id = message.id;
     }
-    message.total_self_delegation !== undefined && (obj.total_self_delegation = message.total_self_delegation);
-    message.total_delegation !== undefined && (obj.total_delegation = message.total_delegation);
-    message.status !== undefined && (obj.status = poolStatusToJSON(message.status));
-    message.account !== undefined && (obj.account = message.account);
-    message.account_balance !== undefined && (obj.account_balance = message.account_balance);
+    if (message.data !== undefined) {
+      obj.data = Pool.toJSON(message.data);
+    }
+    if (message.bundle_proposal !== undefined) {
+      obj.bundle_proposal = BundleProposal.toJSON(message.bundle_proposal);
+    }
+    if (message.stakers?.length) {
+      obj.stakers = message.stakers;
+    }
+    if (message.total_self_delegation !== "0") {
+      obj.total_self_delegation = message.total_self_delegation;
+    }
+    if (message.total_delegation !== "0") {
+      obj.total_delegation = message.total_delegation;
+    }
+    if (message.status !== PoolStatus.POOL_STATUS_UNSPECIFIED) {
+      obj.status = poolStatusToJSON(message.status);
+    }
+    if (message.account !== "") {
+      obj.account = message.account;
+    }
+    if (message.account_balance !== "0") {
+      obj.account_balance = message.account_balance;
+    }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<PoolResponse>, I>>(base?: I): PoolResponse {
+    return PoolResponse.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<PoolResponse>, I>>(object: I): PoolResponse {
     const message = createBasePoolResponse();
     message.id = object.id ?? "0";
@@ -367,33 +472,43 @@ export const QueryPoolRequest = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): QueryPoolRequest {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseQueryPoolRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.id = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): QueryPoolRequest {
-    return { id: isSet(object.id) ? String(object.id) : "0" };
+    return { id: isSet(object.id) ? globalThis.String(object.id) : "0" };
   },
 
   toJSON(message: QueryPoolRequest): unknown {
     const obj: any = {};
-    message.id !== undefined && (obj.id = message.id);
+    if (message.id !== "0") {
+      obj.id = message.id;
+    }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<QueryPoolRequest>, I>>(base?: I): QueryPoolRequest {
+    return QueryPoolRequest.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<QueryPoolRequest>, I>>(object: I): QueryPoolRequest {
     const message = createBaseQueryPoolRequest();
     message.id = object.id ?? "0";
@@ -414,19 +529,24 @@ export const QueryPoolResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): QueryPoolResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseQueryPoolResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.pool = PoolResponse.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -437,10 +557,15 @@ export const QueryPoolResponse = {
 
   toJSON(message: QueryPoolResponse): unknown {
     const obj: any = {};
-    message.pool !== undefined && (obj.pool = message.pool ? PoolResponse.toJSON(message.pool) : undefined);
+    if (message.pool !== undefined) {
+      obj.pool = PoolResponse.toJSON(message.pool);
+    }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<QueryPoolResponse>, I>>(base?: I): QueryPoolResponse {
+    return QueryPoolResponse.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<QueryPoolResponse>, I>>(object: I): QueryPoolResponse {
     const message = createBaseQueryPoolResponse();
     message.pool = (object.pool !== undefined && object.pool !== null)
@@ -458,11 +583,12 @@ export interface QueryPool {
   Pool(request: QueryPoolRequest): Promise<QueryPoolResponse>;
 }
 
+export const QueryPoolServiceName = "kyve.query.v1beta1.QueryPool";
 export class QueryPoolClientImpl implements QueryPool {
   private readonly rpc: Rpc;
   private readonly service: string;
   constructor(rpc: Rpc, opts?: { service?: string }) {
-    this.service = opts?.service || "kyve.query.v1beta1.QueryPool";
+    this.service = opts?.service || QueryPoolServiceName;
     this.rpc = rpc;
     this.Pools = this.Pools.bind(this);
     this.Pool = this.Pool.bind(this);
@@ -470,13 +596,13 @@ export class QueryPoolClientImpl implements QueryPool {
   Pools(request: QueryPoolsRequest): Promise<QueryPoolsResponse> {
     const data = QueryPoolsRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "Pools", data);
-    return promise.then((data) => QueryPoolsResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) => QueryPoolsResponse.decode(_m0.Reader.create(data)));
   }
 
   Pool(request: QueryPoolRequest): Promise<QueryPoolResponse> {
     const data = QueryPoolRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "Pool", data);
-    return promise.then((data) => QueryPoolResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) => QueryPoolResponse.decode(_m0.Reader.create(data)));
   }
 }
 
@@ -487,7 +613,8 @@ interface Rpc {
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
 export type DeepPartial<T> = T extends Builtin ? T
-  : T extends Array<infer U> ? Array<DeepPartial<U>> : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
+  : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
+  : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
   : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 

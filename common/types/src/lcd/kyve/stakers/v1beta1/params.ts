@@ -28,40 +28,58 @@ export const Params = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Params {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseParams();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.commission_change_time = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.leave_pool_time = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): Params {
     return {
-      commission_change_time: isSet(object.commission_change_time) ? String(object.commission_change_time) : "0",
-      leave_pool_time: isSet(object.leave_pool_time) ? String(object.leave_pool_time) : "0",
+      commission_change_time: isSet(object.commission_change_time)
+        ? globalThis.String(object.commission_change_time)
+        : "0",
+      leave_pool_time: isSet(object.leave_pool_time) ? globalThis.String(object.leave_pool_time) : "0",
     };
   },
 
   toJSON(message: Params): unknown {
     const obj: any = {};
-    message.commission_change_time !== undefined && (obj.commission_change_time = message.commission_change_time);
-    message.leave_pool_time !== undefined && (obj.leave_pool_time = message.leave_pool_time);
+    if (message.commission_change_time !== "0") {
+      obj.commission_change_time = message.commission_change_time;
+    }
+    if (message.leave_pool_time !== "0") {
+      obj.leave_pool_time = message.leave_pool_time;
+    }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<Params>, I>>(base?: I): Params {
+    return Params.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<Params>, I>>(object: I): Params {
     const message = createBaseParams();
     message.commission_change_time = object.commission_change_time ?? "0";
@@ -73,7 +91,8 @@ export const Params = {
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
 export type DeepPartial<T> = T extends Builtin ? T
-  : T extends Array<infer U> ? Array<DeepPartial<U>> : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
+  : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
+  : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
   : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 
