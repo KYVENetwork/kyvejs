@@ -1898,6 +1898,17 @@
     big-integer "^1.6.48"
     utility-types "^3.10.0"
 
+"@kyvejs/types@1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@kyvejs/types/-/types-1.0.3.tgz#58b2cb854dd4722287e6cc67a9dcc4cb6ea56de5"
+  integrity sha512-y7uFE6ARMcRnM11ls8zHv/JWx9HyMF96Isce0ivRJ0Lwqqgv6+2ChnvkVoVdfIelq68NtGxorM+v1PDDq0Nrhw==
+  dependencies:
+    "@protobufs/cosmos" "^0.0.11"
+    "@protobufs/gogoproto" "^0.0.10"
+    "@protobufs/google" "^0.0.10"
+    nx "^14.4.3"
+    ts-proto "^1.115.4"
+
 "@lerna/child-process@7.1.4":
   version "7.1.4"
   resolved "https://registry.yarnpkg.com/@lerna/child-process/-/child-process-7.1.4.tgz#5ab64540b01a339ecc6787f4f06d29aee99d71d5"

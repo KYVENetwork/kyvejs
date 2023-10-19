@@ -11,9 +11,13 @@ export const protobufPackage = "kyve.stakers.v1beta1";
  */
 export interface EventUpdateParams {
   /** old_params is the module's old parameters. */
-  old_params?: Params;
+  old_params?:
+    | Params
+    | undefined;
   /** new_params is the module's new parameters. */
-  new_params?: Params;
+  new_params?:
+    | Params
+    | undefined;
   /** payload is the parameter updates that were performed. */
   payload: string;
 }
@@ -120,25 +124,38 @@ export const EventUpdateParams = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EventUpdateParams {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventUpdateParams();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.old_params = Params.decode(reader, reader.uint32());
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.new_params = Params.decode(reader, reader.uint32());
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.payload = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -147,20 +164,27 @@ export const EventUpdateParams = {
     return {
       old_params: isSet(object.old_params) ? Params.fromJSON(object.old_params) : undefined,
       new_params: isSet(object.new_params) ? Params.fromJSON(object.new_params) : undefined,
-      payload: isSet(object.payload) ? String(object.payload) : "",
+      payload: isSet(object.payload) ? globalThis.String(object.payload) : "",
     };
   },
 
   toJSON(message: EventUpdateParams): unknown {
     const obj: any = {};
-    message.old_params !== undefined &&
-      (obj.old_params = message.old_params ? Params.toJSON(message.old_params) : undefined);
-    message.new_params !== undefined &&
-      (obj.new_params = message.new_params ? Params.toJSON(message.new_params) : undefined);
-    message.payload !== undefined && (obj.payload = message.payload);
+    if (message.old_params !== undefined) {
+      obj.old_params = Params.toJSON(message.old_params);
+    }
+    if (message.new_params !== undefined) {
+      obj.new_params = Params.toJSON(message.new_params);
+    }
+    if (message.payload !== "") {
+      obj.payload = message.payload;
+    }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<EventUpdateParams>, I>>(base?: I): EventUpdateParams {
+    return EventUpdateParams.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<EventUpdateParams>, I>>(object: I): EventUpdateParams {
     const message = createBaseEventUpdateParams();
     message.old_params = (object.old_params !== undefined && object.old_params !== null)
@@ -193,45 +217,67 @@ export const EventCreateStaker = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EventCreateStaker {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventCreateStaker();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.staker = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.amount = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.commission = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): EventCreateStaker {
     return {
-      staker: isSet(object.staker) ? String(object.staker) : "",
-      amount: isSet(object.amount) ? String(object.amount) : "0",
-      commission: isSet(object.commission) ? String(object.commission) : "",
+      staker: isSet(object.staker) ? globalThis.String(object.staker) : "",
+      amount: isSet(object.amount) ? globalThis.String(object.amount) : "0",
+      commission: isSet(object.commission) ? globalThis.String(object.commission) : "",
     };
   },
 
   toJSON(message: EventCreateStaker): unknown {
     const obj: any = {};
-    message.staker !== undefined && (obj.staker = message.staker);
-    message.amount !== undefined && (obj.amount = message.amount);
-    message.commission !== undefined && (obj.commission = message.commission);
+    if (message.staker !== "") {
+      obj.staker = message.staker;
+    }
+    if (message.amount !== "0") {
+      obj.amount = message.amount;
+    }
+    if (message.commission !== "") {
+      obj.commission = message.commission;
+    }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<EventCreateStaker>, I>>(base?: I): EventCreateStaker {
+    return EventCreateStaker.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<EventCreateStaker>, I>>(object: I): EventCreateStaker {
     const message = createBaseEventCreateStaker();
     message.staker = object.staker ?? "";
@@ -269,60 +315,100 @@ export const EventUpdateMetadata = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EventUpdateMetadata {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventUpdateMetadata();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.staker = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.moniker = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.website = reader.string();
-          break;
+          continue;
         case 4:
+          if (tag !== 34) {
+            break;
+          }
+
           message.identity = reader.string();
-          break;
+          continue;
         case 5:
+          if (tag !== 42) {
+            break;
+          }
+
           message.security_contact = reader.string();
-          break;
+          continue;
         case 6:
+          if (tag !== 50) {
+            break;
+          }
+
           message.details = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): EventUpdateMetadata {
     return {
-      staker: isSet(object.staker) ? String(object.staker) : "",
-      moniker: isSet(object.moniker) ? String(object.moniker) : "",
-      website: isSet(object.website) ? String(object.website) : "",
-      identity: isSet(object.identity) ? String(object.identity) : "",
-      security_contact: isSet(object.security_contact) ? String(object.security_contact) : "",
-      details: isSet(object.details) ? String(object.details) : "",
+      staker: isSet(object.staker) ? globalThis.String(object.staker) : "",
+      moniker: isSet(object.moniker) ? globalThis.String(object.moniker) : "",
+      website: isSet(object.website) ? globalThis.String(object.website) : "",
+      identity: isSet(object.identity) ? globalThis.String(object.identity) : "",
+      security_contact: isSet(object.security_contact) ? globalThis.String(object.security_contact) : "",
+      details: isSet(object.details) ? globalThis.String(object.details) : "",
     };
   },
 
   toJSON(message: EventUpdateMetadata): unknown {
     const obj: any = {};
-    message.staker !== undefined && (obj.staker = message.staker);
-    message.moniker !== undefined && (obj.moniker = message.moniker);
-    message.website !== undefined && (obj.website = message.website);
-    message.identity !== undefined && (obj.identity = message.identity);
-    message.security_contact !== undefined && (obj.security_contact = message.security_contact);
-    message.details !== undefined && (obj.details = message.details);
+    if (message.staker !== "") {
+      obj.staker = message.staker;
+    }
+    if (message.moniker !== "") {
+      obj.moniker = message.moniker;
+    }
+    if (message.website !== "") {
+      obj.website = message.website;
+    }
+    if (message.identity !== "") {
+      obj.identity = message.identity;
+    }
+    if (message.security_contact !== "") {
+      obj.security_contact = message.security_contact;
+    }
+    if (message.details !== "") {
+      obj.details = message.details;
+    }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<EventUpdateMetadata>, I>>(base?: I): EventUpdateMetadata {
+    return EventUpdateMetadata.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<EventUpdateMetadata>, I>>(object: I): EventUpdateMetadata {
     const message = createBaseEventUpdateMetadata();
     message.staker = object.staker ?? "";
@@ -351,40 +437,56 @@ export const EventUpdateCommission = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EventUpdateCommission {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventUpdateCommission();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.staker = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.commission = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): EventUpdateCommission {
     return {
-      staker: isSet(object.staker) ? String(object.staker) : "",
-      commission: isSet(object.commission) ? String(object.commission) : "",
+      staker: isSet(object.staker) ? globalThis.String(object.staker) : "",
+      commission: isSet(object.commission) ? globalThis.String(object.commission) : "",
     };
   },
 
   toJSON(message: EventUpdateCommission): unknown {
     const obj: any = {};
-    message.staker !== undefined && (obj.staker = message.staker);
-    message.commission !== undefined && (obj.commission = message.commission);
+    if (message.staker !== "") {
+      obj.staker = message.staker;
+    }
+    if (message.commission !== "") {
+      obj.commission = message.commission;
+    }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<EventUpdateCommission>, I>>(base?: I): EventUpdateCommission {
+    return EventUpdateCommission.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<EventUpdateCommission>, I>>(object: I): EventUpdateCommission {
     const message = createBaseEventUpdateCommission();
     message.staker = object.staker ?? "";
@@ -409,40 +511,56 @@ export const EventClaimCommissionRewards = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EventClaimCommissionRewards {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventClaimCommissionRewards();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.staker = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.amount = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): EventClaimCommissionRewards {
     return {
-      staker: isSet(object.staker) ? String(object.staker) : "",
-      amount: isSet(object.amount) ? String(object.amount) : "0",
+      staker: isSet(object.staker) ? globalThis.String(object.staker) : "",
+      amount: isSet(object.amount) ? globalThis.String(object.amount) : "0",
     };
   },
 
   toJSON(message: EventClaimCommissionRewards): unknown {
     const obj: any = {};
-    message.staker !== undefined && (obj.staker = message.staker);
-    message.amount !== undefined && (obj.amount = message.amount);
+    if (message.staker !== "") {
+      obj.staker = message.staker;
+    }
+    if (message.amount !== "0") {
+      obj.amount = message.amount;
+    }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<EventClaimCommissionRewards>, I>>(base?: I): EventClaimCommissionRewards {
+    return EventClaimCommissionRewards.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<EventClaimCommissionRewards>, I>>(object: I): EventClaimCommissionRewards {
     const message = createBaseEventClaimCommissionRewards();
     message.staker = object.staker ?? "";
@@ -473,50 +591,78 @@ export const EventJoinPool = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EventJoinPool {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventJoinPool();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.pool_id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.staker = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.valaddress = reader.string();
-          break;
+          continue;
         case 4:
+          if (tag !== 32) {
+            break;
+          }
+
           message.amount = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): EventJoinPool {
     return {
-      pool_id: isSet(object.pool_id) ? String(object.pool_id) : "0",
-      staker: isSet(object.staker) ? String(object.staker) : "",
-      valaddress: isSet(object.valaddress) ? String(object.valaddress) : "",
-      amount: isSet(object.amount) ? String(object.amount) : "0",
+      pool_id: isSet(object.pool_id) ? globalThis.String(object.pool_id) : "0",
+      staker: isSet(object.staker) ? globalThis.String(object.staker) : "",
+      valaddress: isSet(object.valaddress) ? globalThis.String(object.valaddress) : "",
+      amount: isSet(object.amount) ? globalThis.String(object.amount) : "0",
     };
   },
 
   toJSON(message: EventJoinPool): unknown {
     const obj: any = {};
-    message.pool_id !== undefined && (obj.pool_id = message.pool_id);
-    message.staker !== undefined && (obj.staker = message.staker);
-    message.valaddress !== undefined && (obj.valaddress = message.valaddress);
-    message.amount !== undefined && (obj.amount = message.amount);
+    if (message.pool_id !== "0") {
+      obj.pool_id = message.pool_id;
+    }
+    if (message.staker !== "") {
+      obj.staker = message.staker;
+    }
+    if (message.valaddress !== "") {
+      obj.valaddress = message.valaddress;
+    }
+    if (message.amount !== "0") {
+      obj.amount = message.amount;
+    }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<EventJoinPool>, I>>(base?: I): EventJoinPool {
+    return EventJoinPool.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<EventJoinPool>, I>>(object: I): EventJoinPool {
     const message = createBaseEventJoinPool();
     message.pool_id = object.pool_id ?? "0";
@@ -543,40 +689,56 @@ export const EventLeavePool = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EventLeavePool {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventLeavePool();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.pool_id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.staker = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): EventLeavePool {
     return {
-      pool_id: isSet(object.pool_id) ? String(object.pool_id) : "0",
-      staker: isSet(object.staker) ? String(object.staker) : "",
+      pool_id: isSet(object.pool_id) ? globalThis.String(object.pool_id) : "0",
+      staker: isSet(object.staker) ? globalThis.String(object.staker) : "",
     };
   },
 
   toJSON(message: EventLeavePool): unknown {
     const obj: any = {};
-    message.pool_id !== undefined && (obj.pool_id = message.pool_id);
-    message.staker !== undefined && (obj.staker = message.staker);
+    if (message.pool_id !== "0") {
+      obj.pool_id = message.pool_id;
+    }
+    if (message.staker !== "") {
+      obj.staker = message.staker;
+    }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<EventLeavePool>, I>>(base?: I): EventLeavePool {
+    return EventLeavePool.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<EventLeavePool>, I>>(object: I): EventLeavePool {
     const message = createBaseEventLeavePool();
     message.pool_id = object.pool_id ?? "0";
@@ -588,7 +750,8 @@ export const EventLeavePool = {
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
 export type DeepPartial<T> = T extends Builtin ? T
-  : T extends Array<infer U> ? Array<DeepPartial<U>> : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
+  : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
+  : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
   : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 

@@ -177,9 +177,13 @@ export interface Pool {
   /** total_funds ... */
   total_funds: string;
   /** protocol ... */
-  protocol?: Protocol;
+  protocol?:
+    | Protocol
+    | undefined;
   /** upgrade_plan ... */
-  upgrade_plan?: UpgradePlan;
+  upgrade_plan?:
+    | UpgradePlan
+    | undefined;
   /** storage_provider_id ... */
   current_storage_provider_id: number;
   /** compression_id ... */
@@ -205,45 +209,67 @@ export const Protocol = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Protocol {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseProtocol();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.version = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.binaries = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag !== 24) {
+            break;
+          }
+
           message.last_upgrade = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): Protocol {
     return {
-      version: isSet(object.version) ? String(object.version) : "",
-      binaries: isSet(object.binaries) ? String(object.binaries) : "",
-      last_upgrade: isSet(object.last_upgrade) ? String(object.last_upgrade) : "0",
+      version: isSet(object.version) ? globalThis.String(object.version) : "",
+      binaries: isSet(object.binaries) ? globalThis.String(object.binaries) : "",
+      last_upgrade: isSet(object.last_upgrade) ? globalThis.String(object.last_upgrade) : "0",
     };
   },
 
   toJSON(message: Protocol): unknown {
     const obj: any = {};
-    message.version !== undefined && (obj.version = message.version);
-    message.binaries !== undefined && (obj.binaries = message.binaries);
-    message.last_upgrade !== undefined && (obj.last_upgrade = message.last_upgrade);
+    if (message.version !== "") {
+      obj.version = message.version;
+    }
+    if (message.binaries !== "") {
+      obj.binaries = message.binaries;
+    }
+    if (message.last_upgrade !== "0") {
+      obj.last_upgrade = message.last_upgrade;
+    }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<Protocol>, I>>(base?: I): Protocol {
+    return Protocol.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<Protocol>, I>>(object: I): Protocol {
     const message = createBaseProtocol();
     message.version = object.version ?? "";
@@ -275,50 +301,78 @@ export const UpgradePlan = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): UpgradePlan {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseUpgradePlan();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.version = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.binaries = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag !== 24) {
+            break;
+          }
+
           message.scheduled_at = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 4:
+          if (tag !== 32) {
+            break;
+          }
+
           message.duration = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): UpgradePlan {
     return {
-      version: isSet(object.version) ? String(object.version) : "",
-      binaries: isSet(object.binaries) ? String(object.binaries) : "",
-      scheduled_at: isSet(object.scheduled_at) ? String(object.scheduled_at) : "0",
-      duration: isSet(object.duration) ? String(object.duration) : "0",
+      version: isSet(object.version) ? globalThis.String(object.version) : "",
+      binaries: isSet(object.binaries) ? globalThis.String(object.binaries) : "",
+      scheduled_at: isSet(object.scheduled_at) ? globalThis.String(object.scheduled_at) : "0",
+      duration: isSet(object.duration) ? globalThis.String(object.duration) : "0",
     };
   },
 
   toJSON(message: UpgradePlan): unknown {
     const obj: any = {};
-    message.version !== undefined && (obj.version = message.version);
-    message.binaries !== undefined && (obj.binaries = message.binaries);
-    message.scheduled_at !== undefined && (obj.scheduled_at = message.scheduled_at);
-    message.duration !== undefined && (obj.duration = message.duration);
+    if (message.version !== "") {
+      obj.version = message.version;
+    }
+    if (message.binaries !== "") {
+      obj.binaries = message.binaries;
+    }
+    if (message.scheduled_at !== "0") {
+      obj.scheduled_at = message.scheduled_at;
+    }
+    if (message.duration !== "0") {
+      obj.duration = message.duration;
+    }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<UpgradePlan>, I>>(base?: I): UpgradePlan {
+    return UpgradePlan.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<UpgradePlan>, I>>(object: I): UpgradePlan {
     const message = createBaseUpgradePlan();
     message.version = object.version ?? "";
@@ -345,40 +399,56 @@ export const Funder = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Funder {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseFunder();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.address = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.amount = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): Funder {
     return {
-      address: isSet(object.address) ? String(object.address) : "",
-      amount: isSet(object.amount) ? String(object.amount) : "0",
+      address: isSet(object.address) ? globalThis.String(object.address) : "",
+      amount: isSet(object.amount) ? globalThis.String(object.amount) : "0",
     };
   },
 
   toJSON(message: Funder): unknown {
     const obj: any = {};
-    message.address !== undefined && (obj.address = message.address);
-    message.amount !== undefined && (obj.amount = message.amount);
+    if (message.address !== "") {
+      obj.address = message.address;
+    }
+    if (message.amount !== "0") {
+      obj.amount = message.amount;
+    }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<Funder>, I>>(base?: I): Funder {
+    return Funder.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<Funder>, I>>(object: I): Funder {
     const message = createBaseFunder();
     message.address = object.address ?? "";
@@ -482,144 +552,269 @@ export const Pool = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Pool {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBasePool();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.name = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.runtime = reader.string();
-          break;
+          continue;
         case 4:
+          if (tag !== 34) {
+            break;
+          }
+
           message.logo = reader.string();
-          break;
+          continue;
         case 5:
+          if (tag !== 42) {
+            break;
+          }
+
           message.config = reader.string();
-          break;
+          continue;
         case 6:
+          if (tag !== 50) {
+            break;
+          }
+
           message.start_key = reader.string();
-          break;
+          continue;
         case 7:
+          if (tag !== 58) {
+            break;
+          }
+
           message.current_key = reader.string();
-          break;
+          continue;
         case 8:
+          if (tag !== 66) {
+            break;
+          }
+
           message.current_summary = reader.string();
-          break;
+          continue;
         case 9:
+          if (tag !== 72) {
+            break;
+          }
+
           message.current_index = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 10:
+          if (tag !== 80) {
+            break;
+          }
+
           message.total_bundles = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 11:
+          if (tag !== 88) {
+            break;
+          }
+
           message.upload_interval = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 12:
+          if (tag !== 96) {
+            break;
+          }
+
           message.operating_cost = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 13:
+          if (tag !== 104) {
+            break;
+          }
+
           message.min_delegation = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 14:
+          if (tag !== 112) {
+            break;
+          }
+
           message.max_bundle_size = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 15:
+          if (tag !== 120) {
+            break;
+          }
+
           message.disabled = reader.bool();
-          break;
+          continue;
         case 16:
+          if (tag !== 130) {
+            break;
+          }
+
           message.funders.push(Funder.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 17:
+          if (tag !== 136) {
+            break;
+          }
+
           message.total_funds = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 18:
+          if (tag !== 146) {
+            break;
+          }
+
           message.protocol = Protocol.decode(reader, reader.uint32());
-          break;
+          continue;
         case 19:
+          if (tag !== 154) {
+            break;
+          }
+
           message.upgrade_plan = UpgradePlan.decode(reader, reader.uint32());
-          break;
+          continue;
         case 20:
+          if (tag !== 160) {
+            break;
+          }
+
           message.current_storage_provider_id = reader.uint32();
-          break;
+          continue;
         case 21:
+          if (tag !== 168) {
+            break;
+          }
+
           message.current_compression_id = reader.uint32();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): Pool {
     return {
-      id: isSet(object.id) ? String(object.id) : "0",
-      name: isSet(object.name) ? String(object.name) : "",
-      runtime: isSet(object.runtime) ? String(object.runtime) : "",
-      logo: isSet(object.logo) ? String(object.logo) : "",
-      config: isSet(object.config) ? String(object.config) : "",
-      start_key: isSet(object.start_key) ? String(object.start_key) : "",
-      current_key: isSet(object.current_key) ? String(object.current_key) : "",
-      current_summary: isSet(object.current_summary) ? String(object.current_summary) : "",
-      current_index: isSet(object.current_index) ? String(object.current_index) : "0",
-      total_bundles: isSet(object.total_bundles) ? String(object.total_bundles) : "0",
-      upload_interval: isSet(object.upload_interval) ? String(object.upload_interval) : "0",
-      operating_cost: isSet(object.operating_cost) ? String(object.operating_cost) : "0",
-      min_delegation: isSet(object.min_delegation) ? String(object.min_delegation) : "0",
-      max_bundle_size: isSet(object.max_bundle_size) ? String(object.max_bundle_size) : "0",
-      disabled: isSet(object.disabled) ? Boolean(object.disabled) : false,
-      funders: Array.isArray(object?.funders) ? object.funders.map((e: any) => Funder.fromJSON(e)) : [],
-      total_funds: isSet(object.total_funds) ? String(object.total_funds) : "0",
+      id: isSet(object.id) ? globalThis.String(object.id) : "0",
+      name: isSet(object.name) ? globalThis.String(object.name) : "",
+      runtime: isSet(object.runtime) ? globalThis.String(object.runtime) : "",
+      logo: isSet(object.logo) ? globalThis.String(object.logo) : "",
+      config: isSet(object.config) ? globalThis.String(object.config) : "",
+      start_key: isSet(object.start_key) ? globalThis.String(object.start_key) : "",
+      current_key: isSet(object.current_key) ? globalThis.String(object.current_key) : "",
+      current_summary: isSet(object.current_summary) ? globalThis.String(object.current_summary) : "",
+      current_index: isSet(object.current_index) ? globalThis.String(object.current_index) : "0",
+      total_bundles: isSet(object.total_bundles) ? globalThis.String(object.total_bundles) : "0",
+      upload_interval: isSet(object.upload_interval) ? globalThis.String(object.upload_interval) : "0",
+      operating_cost: isSet(object.operating_cost) ? globalThis.String(object.operating_cost) : "0",
+      min_delegation: isSet(object.min_delegation) ? globalThis.String(object.min_delegation) : "0",
+      max_bundle_size: isSet(object.max_bundle_size) ? globalThis.String(object.max_bundle_size) : "0",
+      disabled: isSet(object.disabled) ? globalThis.Boolean(object.disabled) : false,
+      funders: globalThis.Array.isArray(object?.funders) ? object.funders.map((e: any) => Funder.fromJSON(e)) : [],
+      total_funds: isSet(object.total_funds) ? globalThis.String(object.total_funds) : "0",
       protocol: isSet(object.protocol) ? Protocol.fromJSON(object.protocol) : undefined,
       upgrade_plan: isSet(object.upgrade_plan) ? UpgradePlan.fromJSON(object.upgrade_plan) : undefined,
       current_storage_provider_id: isSet(object.current_storage_provider_id)
-        ? Number(object.current_storage_provider_id)
+        ? globalThis.Number(object.current_storage_provider_id)
         : 0,
-      current_compression_id: isSet(object.current_compression_id) ? Number(object.current_compression_id) : 0,
+      current_compression_id: isSet(object.current_compression_id)
+        ? globalThis.Number(object.current_compression_id)
+        : 0,
     };
   },
 
   toJSON(message: Pool): unknown {
     const obj: any = {};
-    message.id !== undefined && (obj.id = message.id);
-    message.name !== undefined && (obj.name = message.name);
-    message.runtime !== undefined && (obj.runtime = message.runtime);
-    message.logo !== undefined && (obj.logo = message.logo);
-    message.config !== undefined && (obj.config = message.config);
-    message.start_key !== undefined && (obj.start_key = message.start_key);
-    message.current_key !== undefined && (obj.current_key = message.current_key);
-    message.current_summary !== undefined && (obj.current_summary = message.current_summary);
-    message.current_index !== undefined && (obj.current_index = message.current_index);
-    message.total_bundles !== undefined && (obj.total_bundles = message.total_bundles);
-    message.upload_interval !== undefined && (obj.upload_interval = message.upload_interval);
-    message.operating_cost !== undefined && (obj.operating_cost = message.operating_cost);
-    message.min_delegation !== undefined && (obj.min_delegation = message.min_delegation);
-    message.max_bundle_size !== undefined && (obj.max_bundle_size = message.max_bundle_size);
-    message.disabled !== undefined && (obj.disabled = message.disabled);
-    if (message.funders) {
-      obj.funders = message.funders.map((e) => e ? Funder.toJSON(e) : undefined);
-    } else {
-      obj.funders = [];
+    if (message.id !== "0") {
+      obj.id = message.id;
     }
-    message.total_funds !== undefined && (obj.total_funds = message.total_funds);
-    message.protocol !== undefined && (obj.protocol = message.protocol ? Protocol.toJSON(message.protocol) : undefined);
-    message.upgrade_plan !== undefined &&
-      (obj.upgrade_plan = message.upgrade_plan ? UpgradePlan.toJSON(message.upgrade_plan) : undefined);
-    message.current_storage_provider_id !== undefined &&
-      (obj.current_storage_provider_id = Math.round(message.current_storage_provider_id));
-    message.current_compression_id !== undefined &&
-      (obj.current_compression_id = Math.round(message.current_compression_id));
+    if (message.name !== "") {
+      obj.name = message.name;
+    }
+    if (message.runtime !== "") {
+      obj.runtime = message.runtime;
+    }
+    if (message.logo !== "") {
+      obj.logo = message.logo;
+    }
+    if (message.config !== "") {
+      obj.config = message.config;
+    }
+    if (message.start_key !== "") {
+      obj.start_key = message.start_key;
+    }
+    if (message.current_key !== "") {
+      obj.current_key = message.current_key;
+    }
+    if (message.current_summary !== "") {
+      obj.current_summary = message.current_summary;
+    }
+    if (message.current_index !== "0") {
+      obj.current_index = message.current_index;
+    }
+    if (message.total_bundles !== "0") {
+      obj.total_bundles = message.total_bundles;
+    }
+    if (message.upload_interval !== "0") {
+      obj.upload_interval = message.upload_interval;
+    }
+    if (message.operating_cost !== "0") {
+      obj.operating_cost = message.operating_cost;
+    }
+    if (message.min_delegation !== "0") {
+      obj.min_delegation = message.min_delegation;
+    }
+    if (message.max_bundle_size !== "0") {
+      obj.max_bundle_size = message.max_bundle_size;
+    }
+    if (message.disabled === true) {
+      obj.disabled = message.disabled;
+    }
+    if (message.funders?.length) {
+      obj.funders = message.funders.map((e) => Funder.toJSON(e));
+    }
+    if (message.total_funds !== "0") {
+      obj.total_funds = message.total_funds;
+    }
+    if (message.protocol !== undefined) {
+      obj.protocol = Protocol.toJSON(message.protocol);
+    }
+    if (message.upgrade_plan !== undefined) {
+      obj.upgrade_plan = UpgradePlan.toJSON(message.upgrade_plan);
+    }
+    if (message.current_storage_provider_id !== 0) {
+      obj.current_storage_provider_id = Math.round(message.current_storage_provider_id);
+    }
+    if (message.current_compression_id !== 0) {
+      obj.current_compression_id = Math.round(message.current_compression_id);
+    }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<Pool>, I>>(base?: I): Pool {
+    return Pool.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<Pool>, I>>(object: I): Pool {
     const message = createBasePool();
     message.id = object.id ?? "0";
@@ -654,7 +849,8 @@ export const Pool = {
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
 export type DeepPartial<T> = T extends Builtin ? T
-  : T extends Array<infer U> ? Array<DeepPartial<U>> : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
+  : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
+  : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
   : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 

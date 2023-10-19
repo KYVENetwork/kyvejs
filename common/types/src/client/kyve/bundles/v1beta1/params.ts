@@ -38,50 +38,78 @@ export const Params = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Params {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseParams();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.upload_timeout = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.storage_cost = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.network_fee = reader.string();
-          break;
+          continue;
         case 4:
+          if (tag !== 32) {
+            break;
+          }
+
           message.max_points = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): Params {
     return {
-      upload_timeout: isSet(object.upload_timeout) ? String(object.upload_timeout) : "0",
-      storage_cost: isSet(object.storage_cost) ? String(object.storage_cost) : "",
-      network_fee: isSet(object.network_fee) ? String(object.network_fee) : "",
-      max_points: isSet(object.max_points) ? String(object.max_points) : "0",
+      upload_timeout: isSet(object.upload_timeout) ? globalThis.String(object.upload_timeout) : "0",
+      storage_cost: isSet(object.storage_cost) ? globalThis.String(object.storage_cost) : "",
+      network_fee: isSet(object.network_fee) ? globalThis.String(object.network_fee) : "",
+      max_points: isSet(object.max_points) ? globalThis.String(object.max_points) : "0",
     };
   },
 
   toJSON(message: Params): unknown {
     const obj: any = {};
-    message.upload_timeout !== undefined && (obj.upload_timeout = message.upload_timeout);
-    message.storage_cost !== undefined && (obj.storage_cost = message.storage_cost);
-    message.network_fee !== undefined && (obj.network_fee = message.network_fee);
-    message.max_points !== undefined && (obj.max_points = message.max_points);
+    if (message.upload_timeout !== "0") {
+      obj.upload_timeout = message.upload_timeout;
+    }
+    if (message.storage_cost !== "") {
+      obj.storage_cost = message.storage_cost;
+    }
+    if (message.network_fee !== "") {
+      obj.network_fee = message.network_fee;
+    }
+    if (message.max_points !== "0") {
+      obj.max_points = message.max_points;
+    }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<Params>, I>>(base?: I): Params {
+    return Params.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<Params>, I>>(object: I): Params {
     const message = createBaseParams();
     message.upload_timeout = object.upload_timeout ?? "0";
@@ -95,7 +123,8 @@ export const Params = {
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
 export type DeepPartial<T> = T extends Builtin ? T
-  : T extends Array<infer U> ? Array<DeepPartial<U>> : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
+  : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
+  : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
   : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 

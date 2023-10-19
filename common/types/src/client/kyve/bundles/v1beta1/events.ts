@@ -13,9 +13,13 @@ export const protobufPackage = "kyve.bundles.v1beta1";
  */
 export interface EventUpdateParams {
   /** old_params is the module's old parameters. */
-  old_params?: Params;
+  old_params?:
+    | Params
+    | undefined;
   /** new_params is the module's new parameters. */
-  new_params?: Params;
+  new_params?:
+    | Params
+    | undefined;
   /** payload is the parameter updates that were performed. */
   payload: string;
 }
@@ -195,25 +199,38 @@ export const EventUpdateParams = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EventUpdateParams {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventUpdateParams();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.old_params = Params.decode(reader, reader.uint32());
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.new_params = Params.decode(reader, reader.uint32());
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.payload = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -222,20 +239,27 @@ export const EventUpdateParams = {
     return {
       old_params: isSet(object.old_params) ? Params.fromJSON(object.old_params) : undefined,
       new_params: isSet(object.new_params) ? Params.fromJSON(object.new_params) : undefined,
-      payload: isSet(object.payload) ? String(object.payload) : "",
+      payload: isSet(object.payload) ? globalThis.String(object.payload) : "",
     };
   },
 
   toJSON(message: EventUpdateParams): unknown {
     const obj: any = {};
-    message.old_params !== undefined &&
-      (obj.old_params = message.old_params ? Params.toJSON(message.old_params) : undefined);
-    message.new_params !== undefined &&
-      (obj.new_params = message.new_params ? Params.toJSON(message.new_params) : undefined);
-    message.payload !== undefined && (obj.payload = message.payload);
+    if (message.old_params !== undefined) {
+      obj.old_params = Params.toJSON(message.old_params);
+    }
+    if (message.new_params !== undefined) {
+      obj.new_params = Params.toJSON(message.new_params);
+    }
+    if (message.payload !== "") {
+      obj.payload = message.payload;
+    }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<EventUpdateParams>, I>>(base?: I): EventUpdateParams {
+    return EventUpdateParams.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<EventUpdateParams>, I>>(object: I): EventUpdateParams {
     const message = createBaseEventUpdateParams();
     message.old_params = (object.old_params !== undefined && object.old_params !== null)
@@ -271,50 +295,78 @@ export const EventBundleVote = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EventBundleVote {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventBundleVote();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.pool_id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.staker = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.storage_id = reader.string();
-          break;
+          continue;
         case 4:
+          if (tag !== 32) {
+            break;
+          }
+
           message.vote = reader.int32() as any;
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): EventBundleVote {
     return {
-      pool_id: isSet(object.pool_id) ? String(object.pool_id) : "0",
-      staker: isSet(object.staker) ? String(object.staker) : "",
-      storage_id: isSet(object.storage_id) ? String(object.storage_id) : "",
+      pool_id: isSet(object.pool_id) ? globalThis.String(object.pool_id) : "0",
+      staker: isSet(object.staker) ? globalThis.String(object.staker) : "",
+      storage_id: isSet(object.storage_id) ? globalThis.String(object.storage_id) : "",
       vote: isSet(object.vote) ? voteTypeFromJSON(object.vote) : 0,
     };
   },
 
   toJSON(message: EventBundleVote): unknown {
     const obj: any = {};
-    message.pool_id !== undefined && (obj.pool_id = message.pool_id);
-    message.staker !== undefined && (obj.staker = message.staker);
-    message.storage_id !== undefined && (obj.storage_id = message.storage_id);
-    message.vote !== undefined && (obj.vote = voteTypeToJSON(message.vote));
+    if (message.pool_id !== "0") {
+      obj.pool_id = message.pool_id;
+    }
+    if (message.staker !== "") {
+      obj.staker = message.staker;
+    }
+    if (message.storage_id !== "") {
+      obj.storage_id = message.storage_id;
+    }
+    if (message.vote !== 0) {
+      obj.vote = voteTypeToJSON(message.vote);
+    }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<EventBundleVote>, I>>(base?: I): EventBundleVote {
+    return EventBundleVote.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<EventBundleVote>, I>>(object: I): EventBundleVote {
     const message = createBaseEventBundleVote();
     message.pool_id = object.pool_id ?? "0";
@@ -392,100 +444,188 @@ export const EventBundleProposed = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EventBundleProposed {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventBundleProposed();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.pool_id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.storage_id = reader.string();
-          break;
+          continue;
         case 4:
+          if (tag !== 34) {
+            break;
+          }
+
           message.uploader = reader.string();
-          break;
+          continue;
         case 5:
+          if (tag !== 40) {
+            break;
+          }
+
           message.data_size = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 6:
+          if (tag !== 48) {
+            break;
+          }
+
           message.from_index = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 7:
+          if (tag !== 56) {
+            break;
+          }
+
           message.bundle_size = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 8:
+          if (tag !== 66) {
+            break;
+          }
+
           message.from_key = reader.string();
-          break;
+          continue;
         case 9:
+          if (tag !== 74) {
+            break;
+          }
+
           message.to_key = reader.string();
-          break;
+          continue;
         case 10:
+          if (tag !== 82) {
+            break;
+          }
+
           message.bundle_summary = reader.string();
-          break;
+          continue;
         case 11:
+          if (tag !== 90) {
+            break;
+          }
+
           message.data_hash = reader.string();
-          break;
+          continue;
         case 12:
+          if (tag !== 96) {
+            break;
+          }
+
           message.proposed_at = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 13:
+          if (tag !== 104) {
+            break;
+          }
+
           message.storage_provider_id = reader.uint32();
-          break;
+          continue;
         case 14:
+          if (tag !== 112) {
+            break;
+          }
+
           message.compression_id = reader.uint32();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): EventBundleProposed {
     return {
-      pool_id: isSet(object.pool_id) ? String(object.pool_id) : "0",
-      id: isSet(object.id) ? String(object.id) : "0",
-      storage_id: isSet(object.storage_id) ? String(object.storage_id) : "",
-      uploader: isSet(object.uploader) ? String(object.uploader) : "",
-      data_size: isSet(object.data_size) ? String(object.data_size) : "0",
-      from_index: isSet(object.from_index) ? String(object.from_index) : "0",
-      bundle_size: isSet(object.bundle_size) ? String(object.bundle_size) : "0",
-      from_key: isSet(object.from_key) ? String(object.from_key) : "",
-      to_key: isSet(object.to_key) ? String(object.to_key) : "",
-      bundle_summary: isSet(object.bundle_summary) ? String(object.bundle_summary) : "",
-      data_hash: isSet(object.data_hash) ? String(object.data_hash) : "",
-      proposed_at: isSet(object.proposed_at) ? String(object.proposed_at) : "0",
-      storage_provider_id: isSet(object.storage_provider_id) ? Number(object.storage_provider_id) : 0,
-      compression_id: isSet(object.compression_id) ? Number(object.compression_id) : 0,
+      pool_id: isSet(object.pool_id) ? globalThis.String(object.pool_id) : "0",
+      id: isSet(object.id) ? globalThis.String(object.id) : "0",
+      storage_id: isSet(object.storage_id) ? globalThis.String(object.storage_id) : "",
+      uploader: isSet(object.uploader) ? globalThis.String(object.uploader) : "",
+      data_size: isSet(object.data_size) ? globalThis.String(object.data_size) : "0",
+      from_index: isSet(object.from_index) ? globalThis.String(object.from_index) : "0",
+      bundle_size: isSet(object.bundle_size) ? globalThis.String(object.bundle_size) : "0",
+      from_key: isSet(object.from_key) ? globalThis.String(object.from_key) : "",
+      to_key: isSet(object.to_key) ? globalThis.String(object.to_key) : "",
+      bundle_summary: isSet(object.bundle_summary) ? globalThis.String(object.bundle_summary) : "",
+      data_hash: isSet(object.data_hash) ? globalThis.String(object.data_hash) : "",
+      proposed_at: isSet(object.proposed_at) ? globalThis.String(object.proposed_at) : "0",
+      storage_provider_id: isSet(object.storage_provider_id) ? globalThis.Number(object.storage_provider_id) : 0,
+      compression_id: isSet(object.compression_id) ? globalThis.Number(object.compression_id) : 0,
     };
   },
 
   toJSON(message: EventBundleProposed): unknown {
     const obj: any = {};
-    message.pool_id !== undefined && (obj.pool_id = message.pool_id);
-    message.id !== undefined && (obj.id = message.id);
-    message.storage_id !== undefined && (obj.storage_id = message.storage_id);
-    message.uploader !== undefined && (obj.uploader = message.uploader);
-    message.data_size !== undefined && (obj.data_size = message.data_size);
-    message.from_index !== undefined && (obj.from_index = message.from_index);
-    message.bundle_size !== undefined && (obj.bundle_size = message.bundle_size);
-    message.from_key !== undefined && (obj.from_key = message.from_key);
-    message.to_key !== undefined && (obj.to_key = message.to_key);
-    message.bundle_summary !== undefined && (obj.bundle_summary = message.bundle_summary);
-    message.data_hash !== undefined && (obj.data_hash = message.data_hash);
-    message.proposed_at !== undefined && (obj.proposed_at = message.proposed_at);
-    message.storage_provider_id !== undefined && (obj.storage_provider_id = Math.round(message.storage_provider_id));
-    message.compression_id !== undefined && (obj.compression_id = Math.round(message.compression_id));
+    if (message.pool_id !== "0") {
+      obj.pool_id = message.pool_id;
+    }
+    if (message.id !== "0") {
+      obj.id = message.id;
+    }
+    if (message.storage_id !== "") {
+      obj.storage_id = message.storage_id;
+    }
+    if (message.uploader !== "") {
+      obj.uploader = message.uploader;
+    }
+    if (message.data_size !== "0") {
+      obj.data_size = message.data_size;
+    }
+    if (message.from_index !== "0") {
+      obj.from_index = message.from_index;
+    }
+    if (message.bundle_size !== "0") {
+      obj.bundle_size = message.bundle_size;
+    }
+    if (message.from_key !== "") {
+      obj.from_key = message.from_key;
+    }
+    if (message.to_key !== "") {
+      obj.to_key = message.to_key;
+    }
+    if (message.bundle_summary !== "") {
+      obj.bundle_summary = message.bundle_summary;
+    }
+    if (message.data_hash !== "") {
+      obj.data_hash = message.data_hash;
+    }
+    if (message.proposed_at !== "0") {
+      obj.proposed_at = message.proposed_at;
+    }
+    if (message.storage_provider_id !== 0) {
+      obj.storage_provider_id = Math.round(message.storage_provider_id);
+    }
+    if (message.compression_id !== 0) {
+      obj.compression_id = Math.round(message.compression_id);
+    }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<EventBundleProposed>, I>>(base?: I): EventBundleProposed {
+    return EventBundleProposed.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<EventBundleProposed>, I>>(object: I): EventBundleProposed {
     const message = createBaseEventBundleProposed();
     message.pool_id = object.pool_id ?? "0";
@@ -581,110 +721,210 @@ export const EventBundleFinalized = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EventBundleFinalized {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventBundleFinalized();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.pool_id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 3:
+          if (tag !== 24) {
+            break;
+          }
+
           message.valid = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 4:
+          if (tag !== 32) {
+            break;
+          }
+
           message.invalid = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 5:
+          if (tag !== 40) {
+            break;
+          }
+
           message.abstain = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 6:
+          if (tag !== 48) {
+            break;
+          }
+
           message.total = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 7:
+          if (tag !== 56) {
+            break;
+          }
+
           message.status = reader.int32() as any;
-          break;
+          continue;
         case 8:
+          if (tag !== 64) {
+            break;
+          }
+
           message.funders_payout = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 9:
+          if (tag !== 72) {
+            break;
+          }
+
           message.inflation_payout = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 10:
+          if (tag !== 80) {
+            break;
+          }
+
           message.reward_treasury = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 11:
+          if (tag !== 88) {
+            break;
+          }
+
           message.reward_uploader = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 12:
+          if (tag !== 96) {
+            break;
+          }
+
           message.reward_delegation = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 13:
+          if (tag !== 104) {
+            break;
+          }
+
           message.reward_total = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 14:
+          if (tag !== 112) {
+            break;
+          }
+
           message.finalized_at = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 15:
+          if (tag !== 122) {
+            break;
+          }
+
           message.uploader = reader.string();
-          break;
+          continue;
         case 16:
+          if (tag !== 130) {
+            break;
+          }
+
           message.next_uploader = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): EventBundleFinalized {
     return {
-      pool_id: isSet(object.pool_id) ? String(object.pool_id) : "0",
-      id: isSet(object.id) ? String(object.id) : "0",
-      valid: isSet(object.valid) ? String(object.valid) : "0",
-      invalid: isSet(object.invalid) ? String(object.invalid) : "0",
-      abstain: isSet(object.abstain) ? String(object.abstain) : "0",
-      total: isSet(object.total) ? String(object.total) : "0",
+      pool_id: isSet(object.pool_id) ? globalThis.String(object.pool_id) : "0",
+      id: isSet(object.id) ? globalThis.String(object.id) : "0",
+      valid: isSet(object.valid) ? globalThis.String(object.valid) : "0",
+      invalid: isSet(object.invalid) ? globalThis.String(object.invalid) : "0",
+      abstain: isSet(object.abstain) ? globalThis.String(object.abstain) : "0",
+      total: isSet(object.total) ? globalThis.String(object.total) : "0",
       status: isSet(object.status) ? bundleStatusFromJSON(object.status) : 0,
-      funders_payout: isSet(object.funders_payout) ? String(object.funders_payout) : "0",
-      inflation_payout: isSet(object.inflation_payout) ? String(object.inflation_payout) : "0",
-      reward_treasury: isSet(object.reward_treasury) ? String(object.reward_treasury) : "0",
-      reward_uploader: isSet(object.reward_uploader) ? String(object.reward_uploader) : "0",
-      reward_delegation: isSet(object.reward_delegation) ? String(object.reward_delegation) : "0",
-      reward_total: isSet(object.reward_total) ? String(object.reward_total) : "0",
-      finalized_at: isSet(object.finalized_at) ? String(object.finalized_at) : "0",
-      uploader: isSet(object.uploader) ? String(object.uploader) : "",
-      next_uploader: isSet(object.next_uploader) ? String(object.next_uploader) : "",
+      funders_payout: isSet(object.funders_payout) ? globalThis.String(object.funders_payout) : "0",
+      inflation_payout: isSet(object.inflation_payout) ? globalThis.String(object.inflation_payout) : "0",
+      reward_treasury: isSet(object.reward_treasury) ? globalThis.String(object.reward_treasury) : "0",
+      reward_uploader: isSet(object.reward_uploader) ? globalThis.String(object.reward_uploader) : "0",
+      reward_delegation: isSet(object.reward_delegation) ? globalThis.String(object.reward_delegation) : "0",
+      reward_total: isSet(object.reward_total) ? globalThis.String(object.reward_total) : "0",
+      finalized_at: isSet(object.finalized_at) ? globalThis.String(object.finalized_at) : "0",
+      uploader: isSet(object.uploader) ? globalThis.String(object.uploader) : "",
+      next_uploader: isSet(object.next_uploader) ? globalThis.String(object.next_uploader) : "",
     };
   },
 
   toJSON(message: EventBundleFinalized): unknown {
     const obj: any = {};
-    message.pool_id !== undefined && (obj.pool_id = message.pool_id);
-    message.id !== undefined && (obj.id = message.id);
-    message.valid !== undefined && (obj.valid = message.valid);
-    message.invalid !== undefined && (obj.invalid = message.invalid);
-    message.abstain !== undefined && (obj.abstain = message.abstain);
-    message.total !== undefined && (obj.total = message.total);
-    message.status !== undefined && (obj.status = bundleStatusToJSON(message.status));
-    message.funders_payout !== undefined && (obj.funders_payout = message.funders_payout);
-    message.inflation_payout !== undefined && (obj.inflation_payout = message.inflation_payout);
-    message.reward_treasury !== undefined && (obj.reward_treasury = message.reward_treasury);
-    message.reward_uploader !== undefined && (obj.reward_uploader = message.reward_uploader);
-    message.reward_delegation !== undefined && (obj.reward_delegation = message.reward_delegation);
-    message.reward_total !== undefined && (obj.reward_total = message.reward_total);
-    message.finalized_at !== undefined && (obj.finalized_at = message.finalized_at);
-    message.uploader !== undefined && (obj.uploader = message.uploader);
-    message.next_uploader !== undefined && (obj.next_uploader = message.next_uploader);
+    if (message.pool_id !== "0") {
+      obj.pool_id = message.pool_id;
+    }
+    if (message.id !== "0") {
+      obj.id = message.id;
+    }
+    if (message.valid !== "0") {
+      obj.valid = message.valid;
+    }
+    if (message.invalid !== "0") {
+      obj.invalid = message.invalid;
+    }
+    if (message.abstain !== "0") {
+      obj.abstain = message.abstain;
+    }
+    if (message.total !== "0") {
+      obj.total = message.total;
+    }
+    if (message.status !== 0) {
+      obj.status = bundleStatusToJSON(message.status);
+    }
+    if (message.funders_payout !== "0") {
+      obj.funders_payout = message.funders_payout;
+    }
+    if (message.inflation_payout !== "0") {
+      obj.inflation_payout = message.inflation_payout;
+    }
+    if (message.reward_treasury !== "0") {
+      obj.reward_treasury = message.reward_treasury;
+    }
+    if (message.reward_uploader !== "0") {
+      obj.reward_uploader = message.reward_uploader;
+    }
+    if (message.reward_delegation !== "0") {
+      obj.reward_delegation = message.reward_delegation;
+    }
+    if (message.reward_total !== "0") {
+      obj.reward_total = message.reward_total;
+    }
+    if (message.finalized_at !== "0") {
+      obj.finalized_at = message.finalized_at;
+    }
+    if (message.uploader !== "") {
+      obj.uploader = message.uploader;
+    }
+    if (message.next_uploader !== "") {
+      obj.next_uploader = message.next_uploader;
+    }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<EventBundleFinalized>, I>>(base?: I): EventBundleFinalized {
+    return EventBundleFinalized.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<EventBundleFinalized>, I>>(object: I): EventBundleFinalized {
     const message = createBaseEventBundleFinalized();
     message.pool_id = object.pool_id ?? "0";
@@ -726,45 +966,67 @@ export const EventClaimedUploaderRole = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EventClaimedUploaderRole {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventClaimedUploaderRole();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.pool_id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.new_uploader = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): EventClaimedUploaderRole {
     return {
-      pool_id: isSet(object.pool_id) ? String(object.pool_id) : "0",
-      id: isSet(object.id) ? String(object.id) : "0",
-      new_uploader: isSet(object.new_uploader) ? String(object.new_uploader) : "",
+      pool_id: isSet(object.pool_id) ? globalThis.String(object.pool_id) : "0",
+      id: isSet(object.id) ? globalThis.String(object.id) : "0",
+      new_uploader: isSet(object.new_uploader) ? globalThis.String(object.new_uploader) : "",
     };
   },
 
   toJSON(message: EventClaimedUploaderRole): unknown {
     const obj: any = {};
-    message.pool_id !== undefined && (obj.pool_id = message.pool_id);
-    message.id !== undefined && (obj.id = message.id);
-    message.new_uploader !== undefined && (obj.new_uploader = message.new_uploader);
+    if (message.pool_id !== "0") {
+      obj.pool_id = message.pool_id;
+    }
+    if (message.id !== "0") {
+      obj.id = message.id;
+    }
+    if (message.new_uploader !== "") {
+      obj.new_uploader = message.new_uploader;
+    }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<EventClaimedUploaderRole>, I>>(base?: I): EventClaimedUploaderRole {
+    return EventClaimedUploaderRole.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<EventClaimedUploaderRole>, I>>(object: I): EventClaimedUploaderRole {
     const message = createBaseEventClaimedUploaderRole();
     message.pool_id = object.pool_id ?? "0";
@@ -796,50 +1058,78 @@ export const EventSkippedUploaderRole = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EventSkippedUploaderRole {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventSkippedUploaderRole();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.pool_id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.previous_uploader = reader.string();
-          break;
+          continue;
         case 4:
+          if (tag !== 34) {
+            break;
+          }
+
           message.new_uploader = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): EventSkippedUploaderRole {
     return {
-      pool_id: isSet(object.pool_id) ? String(object.pool_id) : "0",
-      id: isSet(object.id) ? String(object.id) : "0",
-      previous_uploader: isSet(object.previous_uploader) ? String(object.previous_uploader) : "",
-      new_uploader: isSet(object.new_uploader) ? String(object.new_uploader) : "",
+      pool_id: isSet(object.pool_id) ? globalThis.String(object.pool_id) : "0",
+      id: isSet(object.id) ? globalThis.String(object.id) : "0",
+      previous_uploader: isSet(object.previous_uploader) ? globalThis.String(object.previous_uploader) : "",
+      new_uploader: isSet(object.new_uploader) ? globalThis.String(object.new_uploader) : "",
     };
   },
 
   toJSON(message: EventSkippedUploaderRole): unknown {
     const obj: any = {};
-    message.pool_id !== undefined && (obj.pool_id = message.pool_id);
-    message.id !== undefined && (obj.id = message.id);
-    message.previous_uploader !== undefined && (obj.previous_uploader = message.previous_uploader);
-    message.new_uploader !== undefined && (obj.new_uploader = message.new_uploader);
+    if (message.pool_id !== "0") {
+      obj.pool_id = message.pool_id;
+    }
+    if (message.id !== "0") {
+      obj.id = message.id;
+    }
+    if (message.previous_uploader !== "") {
+      obj.previous_uploader = message.previous_uploader;
+    }
+    if (message.new_uploader !== "") {
+      obj.new_uploader = message.new_uploader;
+    }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<EventSkippedUploaderRole>, I>>(base?: I): EventSkippedUploaderRole {
+    return EventSkippedUploaderRole.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<EventSkippedUploaderRole>, I>>(object: I): EventSkippedUploaderRole {
     const message = createBaseEventSkippedUploaderRole();
     message.pool_id = object.pool_id ?? "0";
@@ -869,45 +1159,67 @@ export const EventPointIncreased = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EventPointIncreased {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventPointIncreased();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.pool_id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.staker = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag !== 24) {
+            break;
+          }
+
           message.current_points = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): EventPointIncreased {
     return {
-      pool_id: isSet(object.pool_id) ? String(object.pool_id) : "0",
-      staker: isSet(object.staker) ? String(object.staker) : "",
-      current_points: isSet(object.current_points) ? String(object.current_points) : "0",
+      pool_id: isSet(object.pool_id) ? globalThis.String(object.pool_id) : "0",
+      staker: isSet(object.staker) ? globalThis.String(object.staker) : "",
+      current_points: isSet(object.current_points) ? globalThis.String(object.current_points) : "0",
     };
   },
 
   toJSON(message: EventPointIncreased): unknown {
     const obj: any = {};
-    message.pool_id !== undefined && (obj.pool_id = message.pool_id);
-    message.staker !== undefined && (obj.staker = message.staker);
-    message.current_points !== undefined && (obj.current_points = message.current_points);
+    if (message.pool_id !== "0") {
+      obj.pool_id = message.pool_id;
+    }
+    if (message.staker !== "") {
+      obj.staker = message.staker;
+    }
+    if (message.current_points !== "0") {
+      obj.current_points = message.current_points;
+    }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<EventPointIncreased>, I>>(base?: I): EventPointIncreased {
+    return EventPointIncreased.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<EventPointIncreased>, I>>(object: I): EventPointIncreased {
     const message = createBaseEventPointIncreased();
     message.pool_id = object.pool_id ?? "0";
@@ -933,40 +1245,56 @@ export const EventPointsReset = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EventPointsReset {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventPointsReset();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.pool_id = longToString(reader.uint64() as Long);
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.staker = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): EventPointsReset {
     return {
-      pool_id: isSet(object.pool_id) ? String(object.pool_id) : "0",
-      staker: isSet(object.staker) ? String(object.staker) : "",
+      pool_id: isSet(object.pool_id) ? globalThis.String(object.pool_id) : "0",
+      staker: isSet(object.staker) ? globalThis.String(object.staker) : "",
     };
   },
 
   toJSON(message: EventPointsReset): unknown {
     const obj: any = {};
-    message.pool_id !== undefined && (obj.pool_id = message.pool_id);
-    message.staker !== undefined && (obj.staker = message.staker);
+    if (message.pool_id !== "0") {
+      obj.pool_id = message.pool_id;
+    }
+    if (message.staker !== "") {
+      obj.staker = message.staker;
+    }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<EventPointsReset>, I>>(base?: I): EventPointsReset {
+    return EventPointsReset.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<EventPointsReset>, I>>(object: I): EventPointsReset {
     const message = createBaseEventPointsReset();
     message.pool_id = object.pool_id ?? "0";
@@ -978,7 +1306,8 @@ export const EventPointsReset = {
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
 export type DeepPartial<T> = T extends Builtin ? T
-  : T extends Array<infer U> ? Array<DeepPartial<U>> : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
+  : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
+  : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
   : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 

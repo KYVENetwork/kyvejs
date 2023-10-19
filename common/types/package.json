@@ -1,6 +1,6 @@
 {
   "name": "@kyvejs/types",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "repository": {
@@ -21,13 +21,6 @@
     "lcd/",
     "client/"
   ],
-  "dependencies": {
-    "@protobufs/cosmos": "^0.0.11",
-    "@protobufs/gogoproto": "^0.0.10",
-    "@protobufs/google": "^0.0.10",
-    "nx": "^14.4.3",
-    "ts-proto": "^1.115.4"
-  },
   "devDependencies": {
     "rimraf": "^3.0.2",
     "typescript": "^4.7.3"

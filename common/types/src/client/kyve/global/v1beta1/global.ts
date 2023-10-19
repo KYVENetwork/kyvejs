@@ -79,68 +79,95 @@ export const Params = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Params {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseParams();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.min_gas_price = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.burn_ratio = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.gas_adjustments.push(GasAdjustment.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 4:
+          if (tag !== 34) {
+            break;
+          }
+
           message.gas_refunds.push(GasRefund.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 5:
+          if (tag !== 42) {
+            break;
+          }
+
           message.min_initial_deposit_ratio = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): Params {
     return {
-      min_gas_price: isSet(object.min_gas_price) ? String(object.min_gas_price) : "",
-      burn_ratio: isSet(object.burn_ratio) ? String(object.burn_ratio) : "",
-      gas_adjustments: Array.isArray(object?.gas_adjustments)
+      min_gas_price: isSet(object.min_gas_price) ? globalThis.String(object.min_gas_price) : "",
+      burn_ratio: isSet(object.burn_ratio) ? globalThis.String(object.burn_ratio) : "",
+      gas_adjustments: globalThis.Array.isArray(object?.gas_adjustments)
         ? object.gas_adjustments.map((e: any) => GasAdjustment.fromJSON(e))
         : [],
-      gas_refunds: Array.isArray(object?.gas_refunds) ? object.gas_refunds.map((e: any) => GasRefund.fromJSON(e)) : [],
+      gas_refunds: globalThis.Array.isArray(object?.gas_refunds)
+        ? object.gas_refunds.map((e: any) => GasRefund.fromJSON(e))
+        : [],
       min_initial_deposit_ratio: isSet(object.min_initial_deposit_ratio)
-        ? String(object.min_initial_deposit_ratio)
+        ? globalThis.String(object.min_initial_deposit_ratio)
         : "",
     };
   },
 
   toJSON(message: Params): unknown {
     const obj: any = {};
-    message.min_gas_price !== undefined && (obj.min_gas_price = message.min_gas_price);
-    message.burn_ratio !== undefined && (obj.burn_ratio = message.burn_ratio);
-    if (message.gas_adjustments) {
-      obj.gas_adjustments = message.gas_adjustments.map((e) => e ? GasAdjustment.toJSON(e) : undefined);
-    } else {
-      obj.gas_adjustments = [];
+    if (message.min_gas_price !== "") {
+      obj.min_gas_price = message.min_gas_price;
     }
-    if (message.gas_refunds) {
-      obj.gas_refunds = message.gas_refunds.map((e) => e ? GasRefund.toJSON(e) : undefined);
-    } else {
-      obj.gas_refunds = [];
+    if (message.burn_ratio !== "") {
+      obj.burn_ratio = message.burn_ratio;
     }
-    message.min_initial_deposit_ratio !== undefined &&
-      (obj.min_initial_deposit_ratio = message.min_initial_deposit_ratio);
+    if (message.gas_adjustments?.length) {
+      obj.gas_adjustments = message.gas_adjustments.map((e) => GasAdjustment.toJSON(e));
+    }
+    if (message.gas_refunds?.length) {
+      obj.gas_refunds = message.gas_refunds.map((e) => GasRefund.toJSON(e));
+    }
+    if (message.min_initial_deposit_ratio !== "") {
+      obj.min_initial_deposit_ratio = message.min_initial_deposit_ratio;
+    }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<Params>, I>>(base?: I): Params {
+    return Params.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<Params>, I>>(object: I): Params {
     const message = createBaseParams();
     message.min_gas_price = object.min_gas_price ?? "";
@@ -168,40 +195,56 @@ export const GasAdjustment = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): GasAdjustment {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseGasAdjustment();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.type = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.amount = longToString(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): GasAdjustment {
     return {
-      type: isSet(object.type) ? String(object.type) : "",
-      amount: isSet(object.amount) ? String(object.amount) : "0",
+      type: isSet(object.type) ? globalThis.String(object.type) : "",
+      amount: isSet(object.amount) ? globalThis.String(object.amount) : "0",
     };
   },
 
   toJSON(message: GasAdjustment): unknown {
     const obj: any = {};
-    message.type !== undefined && (obj.type = message.type);
-    message.amount !== undefined && (obj.amount = message.amount);
+    if (message.type !== "") {
+      obj.type = message.type;
+    }
+    if (message.amount !== "0") {
+      obj.amount = message.amount;
+    }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<GasAdjustment>, I>>(base?: I): GasAdjustment {
+    return GasAdjustment.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<GasAdjustment>, I>>(object: I): GasAdjustment {
     const message = createBaseGasAdjustment();
     message.type = object.type ?? "";
@@ -226,40 +269,56 @@ export const GasRefund = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): GasRefund {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseGasRefund();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.type = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.fraction = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): GasRefund {
     return {
-      type: isSet(object.type) ? String(object.type) : "",
-      fraction: isSet(object.fraction) ? String(object.fraction) : "",
+      type: isSet(object.type) ? globalThis.String(object.type) : "",
+      fraction: isSet(object.fraction) ? globalThis.String(object.fraction) : "",
     };
   },
 
   toJSON(message: GasRefund): unknown {
     const obj: any = {};
-    message.type !== undefined && (obj.type = message.type);
-    message.fraction !== undefined && (obj.fraction = message.fraction);
+    if (message.type !== "") {
+      obj.type = message.type;
+    }
+    if (message.fraction !== "") {
+      obj.fraction = message.fraction;
+    }
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<GasRefund>, I>>(base?: I): GasRefund {
+    return GasRefund.fromPartial(base ?? ({} as any));
+  },
   fromPartial<I extends Exact<DeepPartial<GasRefund>, I>>(object: I): GasRefund {
     const message = createBaseGasRefund();
     message.type = object.type ?? "";
@@ -271,7 +330,8 @@ export const GasRefund = {
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
 export type DeepPartial<T> = T extends Builtin ? T
-  : T extends Array<infer U> ? Array<DeepPartial<U>> : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
+  : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
+  : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
   : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 
