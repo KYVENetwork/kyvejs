@@ -5,7 +5,7 @@ import {
 } from "@kyvejs/types/client/kyve/funders/v1beta1/tx";
 import { isNotEmpty } from "../utils";
 
-export const createPoolAminoConverters = (): AminoConverters => {
+export const createFundersAminoConverters = (): AminoConverters => {
   return {
     "/kyve.funders.v1beta1.MsgFundPool": {
       aminoType: "kyve/pool/MsgFundPool",
