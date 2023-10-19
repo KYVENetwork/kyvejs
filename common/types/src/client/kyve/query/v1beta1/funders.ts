@@ -59,10 +59,12 @@ export interface QueryFundersRequest {
 
 /** QueryFundersResponse is the response type for the Query/Funders RPC method. */
 export interface QueryFundersResponse {
+  /** pagination defines the pagination in the response. */
+  pagination?:
+    | PageResponse
+    | undefined;
   /** funders ... */
   funders: Funder[];
-  /** pagination defines the pagination in the response. */
-  pagination?: PageResponse | undefined;
 }
 
 /** QueryFunderRequest is the request type for the Query/Funder RPC method. */
@@ -78,6 +80,54 @@ export interface QueryFunderResponse {
   /** funder ... */
   funder?:
     | Funder
+    | undefined;
+  /** fundings ... */
+  fundings: Funding[];
+}
+
+/** QueryFundingsByFunderRequest is the request type for the Query/FundingsByFunder RPC method. */
+export interface QueryFundingsByFunderRequest {
+  /** pagination defines an optional pagination for the request. */
+  pagination?:
+    | PageRequest
+    | undefined;
+  /** address ... */
+  address: string;
+  /** search */
+  search: string;
+  /** with_inactive_fundings ... */
+  with_inactive_fundings: boolean;
+}
+
+/** QueryFundingsByFunderResponse is the response type for the Query/FundingsByFunder RPC method. */
+export interface QueryFundingsByFunderResponse {
+  /** pagination defines the pagination in the response. */
+  pagination?:
+    | PageResponse
+    | undefined;
+  /** fundings ... */
+  fundings: Funding[];
+}
+
+/** QueryFundingsByPoolRequest is the request type for the Query/FundingsByPool RPC method. */
+export interface QueryFundingsByPoolRequest {
+  /** pagination defines an optional pagination for the request. */
+  pagination?:
+    | PageRequest
+    | undefined;
+  /** pool_id ... */
+  pool_id: string;
+  /** search */
+  search: string;
+  /** with_inactive_fundings ... */
+  with_inactive_fundings: boolean;
+}
+
+/** QueryFundingsByPoolResponse is the response type for the Query/FundingsByPool RPC method. */
+export interface QueryFundingsByPoolResponse {
+  /** pagination defines the pagination in the response. */
+  pagination?:
+    | PageResponse
     | undefined;
   /** fundings ... */
   fundings: Funding[];
@@ -537,16 +587,16 @@ export const QueryFundersRequest = {
 };
 
 function createBaseQueryFundersResponse(): QueryFundersResponse {
-  return { funders: [], pagination: undefined };
+  return { pagination: undefined, funders: [] };
 }
 
 export const QueryFundersResponse = {
   encode(message: QueryFundersResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    for (const v of message.funders) {
-      Funder.encode(v!, writer.uint32(10).fork()).ldelim();
-    }
     if (message.pagination !== undefined) {
-      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+      PageResponse.encode(message.pagination, writer.uint32(10).fork()).ldelim();
+    }
+    for (const v of message.funders) {
+      Funder.encode(v!, writer.uint32(18).fork()).ldelim();
     }
     return writer;
   },
@@ -563,14 +613,14 @@ export const QueryFundersResponse = {
             break;
           }
 
-          message.funders.push(Funder.decode(reader, reader.uint32()));
+          message.pagination = PageResponse.decode(reader, reader.uint32());
           continue;
         case 2:
           if (tag !== 18) {
             break;
           }
 
-          message.pagination = PageResponse.decode(reader, reader.uint32());
+          message.funders.push(Funder.decode(reader, reader.uint32()));
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -583,18 +633,18 @@ export const QueryFundersResponse = {
 
   fromJSON(object: any): QueryFundersResponse {
     return {
-      funders: globalThis.Array.isArray(object?.funders) ? object.funders.map((e: any) => Funder.fromJSON(e)) : [],
       pagination: isSet(object.pagination) ? PageResponse.fromJSON(object.pagination) : undefined,
+      funders: globalThis.Array.isArray(object?.funders) ? object.funders.map((e: any) => Funder.fromJSON(e)) : [],
     };
   },
 
   toJSON(message: QueryFundersResponse): unknown {
     const obj: any = {};
-    if (message.funders?.length) {
-      obj.funders = message.funders.map((e) => Funder.toJSON(e));
-    }
     if (message.pagination !== undefined) {
       obj.pagination = PageResponse.toJSON(message.pagination);
+    }
+    if (message.funders?.length) {
+      obj.funders = message.funders.map((e) => Funder.toJSON(e));
     }
     return obj;
   },
@@ -604,10 +654,10 @@ export const QueryFundersResponse = {
   },
   fromPartial<I extends Exact<DeepPartial<QueryFundersResponse>, I>>(object: I): QueryFundersResponse {
     const message = createBaseQueryFundersResponse();
-    message.funders = object.funders?.map((e) => Funder.fromPartial(e)) || [];
     message.pagination = (object.pagination !== undefined && object.pagination !== null)
       ? PageResponse.fromPartial(object.pagination)
       : undefined;
+    message.funders = object.funders?.map((e) => Funder.fromPartial(e)) || [];
     return message;
   },
 };
@@ -764,12 +814,386 @@ export const QueryFunderResponse = {
   },
 };
 
+function createBaseQueryFundingsByFunderRequest(): QueryFundingsByFunderRequest {
+  return { pagination: undefined, address: "", search: "", with_inactive_fundings: false };
+}
+
+export const QueryFundingsByFunderRequest = {
+  encode(message: QueryFundingsByFunderRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.address !== "") {
+      writer.uint32(18).string(message.address);
+    }
+    if (message.search !== "") {
+      writer.uint32(26).string(message.search);
+    }
+    if (message.with_inactive_fundings === true) {
+      writer.uint32(32).bool(message.with_inactive_fundings);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryFundingsByFunderRequest {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryFundingsByFunderRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.address = reader.string();
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.search = reader.string();
+          continue;
+        case 4:
+          if (tag !== 32) {
+            break;
+          }
+
+          message.with_inactive_fundings = reader.bool();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryFundingsByFunderRequest {
+    return {
+      pagination: isSet(object.pagination) ? PageRequest.fromJSON(object.pagination) : undefined,
+      address: isSet(object.address) ? globalThis.String(object.address) : "",
+      search: isSet(object.search) ? globalThis.String(object.search) : "",
+      with_inactive_fundings: isSet(object.with_inactive_fundings)
+        ? globalThis.Boolean(object.with_inactive_fundings)
+        : false,
+    };
+  },
+
+  toJSON(message: QueryFundingsByFunderRequest): unknown {
+    const obj: any = {};
+    if (message.pagination !== undefined) {
+      obj.pagination = PageRequest.toJSON(message.pagination);
+    }
+    if (message.address !== "") {
+      obj.address = message.address;
+    }
+    if (message.search !== "") {
+      obj.search = message.search;
+    }
+    if (message.with_inactive_fundings === true) {
+      obj.with_inactive_fundings = message.with_inactive_fundings;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<QueryFundingsByFunderRequest>, I>>(base?: I): QueryFundingsByFunderRequest {
+    return QueryFundingsByFunderRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<QueryFundingsByFunderRequest>, I>>(object: I): QueryFundingsByFunderRequest {
+    const message = createBaseQueryFundingsByFunderRequest();
+    message.pagination = (object.pagination !== undefined && object.pagination !== null)
+      ? PageRequest.fromPartial(object.pagination)
+      : undefined;
+    message.address = object.address ?? "";
+    message.search = object.search ?? "";
+    message.with_inactive_fundings = object.with_inactive_fundings ?? false;
+    return message;
+  },
+};
+
+function createBaseQueryFundingsByFunderResponse(): QueryFundingsByFunderResponse {
+  return { pagination: undefined, fundings: [] };
+}
+
+export const QueryFundingsByFunderResponse = {
+  encode(message: QueryFundingsByFunderResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(10).fork()).ldelim();
+    }
+    for (const v of message.fundings) {
+      Funding.encode(v!, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryFundingsByFunderResponse {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryFundingsByFunderResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.fundings.push(Funding.decode(reader, reader.uint32()));
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryFundingsByFunderResponse {
+    return {
+      pagination: isSet(object.pagination) ? PageResponse.fromJSON(object.pagination) : undefined,
+      fundings: globalThis.Array.isArray(object?.fundings) ? object.fundings.map((e: any) => Funding.fromJSON(e)) : [],
+    };
+  },
+
+  toJSON(message: QueryFundingsByFunderResponse): unknown {
+    const obj: any = {};
+    if (message.pagination !== undefined) {
+      obj.pagination = PageResponse.toJSON(message.pagination);
+    }
+    if (message.fundings?.length) {
+      obj.fundings = message.fundings.map((e) => Funding.toJSON(e));
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<QueryFundingsByFunderResponse>, I>>(base?: I): QueryFundingsByFunderResponse {
+    return QueryFundingsByFunderResponse.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<QueryFundingsByFunderResponse>, I>>(
+    object: I,
+  ): QueryFundingsByFunderResponse {
+    const message = createBaseQueryFundingsByFunderResponse();
+    message.pagination = (object.pagination !== undefined && object.pagination !== null)
+      ? PageResponse.fromPartial(object.pagination)
+      : undefined;
+    message.fundings = object.fundings?.map((e) => Funding.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+function createBaseQueryFundingsByPoolRequest(): QueryFundingsByPoolRequest {
+  return { pagination: undefined, pool_id: "0", search: "", with_inactive_fundings: false };
+}
+
+export const QueryFundingsByPoolRequest = {
+  encode(message: QueryFundingsByPoolRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pool_id !== "0") {
+      writer.uint32(16).uint64(message.pool_id);
+    }
+    if (message.search !== "") {
+      writer.uint32(26).string(message.search);
+    }
+    if (message.with_inactive_fundings === true) {
+      writer.uint32(32).bool(message.with_inactive_fundings);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryFundingsByPoolRequest {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryFundingsByPoolRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          continue;
+        case 2:
+          if (tag !== 16) {
+            break;
+          }
+
+          message.pool_id = longToString(reader.uint64() as Long);
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.search = reader.string();
+          continue;
+        case 4:
+          if (tag !== 32) {
+            break;
+          }
+
+          message.with_inactive_fundings = reader.bool();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryFundingsByPoolRequest {
+    return {
+      pagination: isSet(object.pagination) ? PageRequest.fromJSON(object.pagination) : undefined,
+      pool_id: isSet(object.pool_id) ? globalThis.String(object.pool_id) : "0",
+      search: isSet(object.search) ? globalThis.String(object.search) : "",
+      with_inactive_fundings: isSet(object.with_inactive_fundings)
+        ? globalThis.Boolean(object.with_inactive_fundings)
+        : false,
+    };
+  },
+
+  toJSON(message: QueryFundingsByPoolRequest): unknown {
+    const obj: any = {};
+    if (message.pagination !== undefined) {
+      obj.pagination = PageRequest.toJSON(message.pagination);
+    }
+    if (message.pool_id !== "0") {
+      obj.pool_id = message.pool_id;
+    }
+    if (message.search !== "") {
+      obj.search = message.search;
+    }
+    if (message.with_inactive_fundings === true) {
+      obj.with_inactive_fundings = message.with_inactive_fundings;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<QueryFundingsByPoolRequest>, I>>(base?: I): QueryFundingsByPoolRequest {
+    return QueryFundingsByPoolRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<QueryFundingsByPoolRequest>, I>>(object: I): QueryFundingsByPoolRequest {
+    const message = createBaseQueryFundingsByPoolRequest();
+    message.pagination = (object.pagination !== undefined && object.pagination !== null)
+      ? PageRequest.fromPartial(object.pagination)
+      : undefined;
+    message.pool_id = object.pool_id ?? "0";
+    message.search = object.search ?? "";
+    message.with_inactive_fundings = object.with_inactive_fundings ?? false;
+    return message;
+  },
+};
+
+function createBaseQueryFundingsByPoolResponse(): QueryFundingsByPoolResponse {
+  return { pagination: undefined, fundings: [] };
+}
+
+export const QueryFundingsByPoolResponse = {
+  encode(message: QueryFundingsByPoolResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(10).fork()).ldelim();
+    }
+    for (const v of message.fundings) {
+      Funding.encode(v!, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryFundingsByPoolResponse {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryFundingsByPoolResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.fundings.push(Funding.decode(reader, reader.uint32()));
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryFundingsByPoolResponse {
+    return {
+      pagination: isSet(object.pagination) ? PageResponse.fromJSON(object.pagination) : undefined,
+      fundings: globalThis.Array.isArray(object?.fundings) ? object.fundings.map((e: any) => Funding.fromJSON(e)) : [],
+    };
+  },
+
+  toJSON(message: QueryFundingsByPoolResponse): unknown {
+    const obj: any = {};
+    if (message.pagination !== undefined) {
+      obj.pagination = PageResponse.toJSON(message.pagination);
+    }
+    if (message.fundings?.length) {
+      obj.fundings = message.fundings.map((e) => Funding.toJSON(e));
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<QueryFundingsByPoolResponse>, I>>(base?: I): QueryFundingsByPoolResponse {
+    return QueryFundingsByPoolResponse.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<QueryFundingsByPoolResponse>, I>>(object: I): QueryFundingsByPoolResponse {
+    const message = createBaseQueryFundingsByPoolResponse();
+    message.pagination = (object.pagination !== undefined && object.pagination !== null)
+      ? PageResponse.fromPartial(object.pagination)
+      : undefined;
+    message.fundings = object.fundings?.map((e) => Funding.fromPartial(e)) || [];
+    return message;
+  },
+};
+
 /** QueryFunders ... */
 export interface QueryFunders {
   /** Funders queries all funders. */
   Funders(request: QueryFundersRequest): Promise<QueryFundersResponse>;
   /** Funder queries a funder by address. */
   Funder(request: QueryFunderRequest): Promise<QueryFunderResponse>;
+  /** FundingsByFunder queries all fundings of a funder by address. */
+  FundingsByFunder(request: QueryFundingsByFunderRequest): Promise<QueryFundingsByFunderResponse>;
+  /** FundingsByPool queries all fundings of a pool by id. */
+  FundingsByPool(request: QueryFundingsByPoolRequest): Promise<QueryFundingsByPoolResponse>;
 }
 
 export const QueryFundersServiceName = "kyve.query.v1beta1.QueryFunders";
@@ -781,6 +1205,8 @@ export class QueryFundersClientImpl implements QueryFunders {
     this.rpc = rpc;
     this.Funders = this.Funders.bind(this);
     this.Funder = this.Funder.bind(this);
+    this.FundingsByFunder = this.FundingsByFunder.bind(this);
+    this.FundingsByPool = this.FundingsByPool.bind(this);
   }
   Funders(request: QueryFundersRequest): Promise<QueryFundersResponse> {
     const data = QueryFundersRequest.encode(request).finish();
@@ -792,6 +1218,18 @@ export class QueryFundersClientImpl implements QueryFunders {
     const data = QueryFunderRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "Funder", data);
     return promise.then((data) => QueryFunderResponse.decode(_m0.Reader.create(data)));
+  }
+
+  FundingsByFunder(request: QueryFundingsByFunderRequest): Promise<QueryFundingsByFunderResponse> {
+    const data = QueryFundingsByFunderRequest.encode(request).finish();
+    const promise = this.rpc.request(this.service, "FundingsByFunder", data);
+    return promise.then((data) => QueryFundingsByFunderResponse.decode(_m0.Reader.create(data)));
+  }
+
+  FundingsByPool(request: QueryFundingsByPoolRequest): Promise<QueryFundingsByPoolResponse> {
+    const data = QueryFundingsByPoolRequest.encode(request).finish();
+    const promise = this.rpc.request(this.service, "FundingsByPool", data);
+    return promise.then((data) => QueryFundingsByPoolResponse.decode(_m0.Reader.create(data)));
   }
 }
 

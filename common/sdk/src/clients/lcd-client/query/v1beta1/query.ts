@@ -275,5 +275,23 @@ export class KyveRegistryLCDClient extends AbstractKyveLCDClient {
     const endpoint = `/kyve/query/v1beta1/funders`;
     return await this.request(endpoint, parameters);
   }
+
+  async fundings_by_funder(
+    params: PaginationPartialRequestUtilType<kyveQueryFunders.QueryFundingsByFunderRequest>
+  ): Promise<
+    PaginationResponseTypeUtil<kyveQueryFundersRes.QueryFundingsByFunderResponse>
+  > {
+    const endpoint = `/kyve/query/v1beta1/fundings_by_funder/${params.address}`;
+    return await this.request(endpoint, params);
+  }
+
+  async fundings_by_pool(
+    params: PaginationPartialRequestUtilType<kyveQueryFunders.QueryFundingsByPoolRequest>
+  ): Promise<
+    PaginationResponseTypeUtil<kyveQueryFundersRes.QueryFundingsByPoolResponse>
+  > {
+    const endpoint = `/kyve/query/v1beta1/fundings_by_pool/${params.pool_id}`;
+    return await this.request(endpoint, params);
+  }
   /** EndFunders **/
 }
