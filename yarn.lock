@@ -2371,7 +2371,7 @@ __metadata:
     "@cosmjs/proto-signing": ^0.27.1
     "@cosmjs/stargate": ^0.27.1
     "@kyvejs/sdk": 1.0.4
-    "@kyvejs/types": 1.0.3
+    "@kyvejs/types": 1.0.4
     "@types/cli-progress": ^3.9.2
     "@types/clone": ^2.1.1
     "@types/fs-extra": ^9.0.13
