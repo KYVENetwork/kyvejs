@@ -2340,7 +2340,7 @@ __metadata:
   resolution: "@kyve/kysor@workspace:tools/kysor"
   dependencies:
     "@iarna/toml": ^2.2.5
-    "@kyvejs/sdk": 1.0.4
+    "@kyvejs/sdk": 1.0.5
     "@kyvejs/types": 1.0.3
     "@types/download": ^8.0.1
     "@types/node": ^18.11.9
@@ -2362,7 +2362,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@kyvejs/protocol@1.0.11, @kyvejs/protocol@workspace:common/protocol":
+"@kyvejs/protocol@1.0.12, @kyvejs/protocol@workspace:common/protocol":
   version: 0.0.0-use.local
   resolution: "@kyvejs/protocol@workspace:common/protocol"
   dependencies:
@@ -2370,7 +2370,7 @@ __metadata:
     "@bundlr-network/client": ^0.8.9
     "@cosmjs/proto-signing": ^0.27.1
     "@cosmjs/stargate": ^0.27.1
-    "@kyvejs/sdk": 1.0.4
+    "@kyvejs/sdk": 1.0.5
     "@kyvejs/types": 1.0.4
     "@types/cli-progress": ^3.9.2
     "@types/clone": ^2.1.1
@@ -2408,7 +2408,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@kyvejs/sdk@1.0.4, @kyvejs/sdk@workspace:common/sdk":
+"@kyvejs/sdk@1.0.5, @kyvejs/sdk@workspace:common/sdk":
   version: 0.0.0-use.local
   resolution: "@kyvejs/sdk@workspace:common/sdk"
   dependencies:
@@ -2447,7 +2447,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@kyvejs/tendermint-bsync@workspace:integrations/tendermint-bsync"
   dependencies:
-    "@kyvejs/protocol": 1.0.11
+    "@kyvejs/protocol": 1.0.12
     axios: ^0.27.2
     pkg: ^5.8.0
     prettier: ^2.7.1
@@ -2462,7 +2462,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@kyvejs/tendermint-ssync@workspace:integrations/tendermint-ssync"
   dependencies:
-    "@kyvejs/protocol": 1.0.11
+    "@kyvejs/protocol": 1.0.12
     axios: ^0.27.2
     pkg: ^5.8.0
     prettier: ^2.7.1
@@ -2477,7 +2477,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@kyvejs/tendermint@workspace:integrations/tendermint"
   dependencies:
-    "@kyvejs/protocol": 1.0.11
+    "@kyvejs/protocol": 1.0.12
     ajv: ^8.12.0
     axios: ^0.27.2
     dotenv: ^16.3.1

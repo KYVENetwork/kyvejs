@@ -2,7 +2,7 @@
 
 # Variables
 KYVE_CHAIN_REPO="git@github.com:KYVENetwork/chain.git"
-#KYVE_CHAIN_VERSION="v1.3.0"
+#KYVE_CHAIN_VERSION="v1.4.0"
 KYVE_CHAIN_VERSION="rapha/funders-module"  # TODO: change to v1.4.0
 
 echo "Cloning chain repo version ${KYVE_CHAIN_VERSION}"
@@ -11,6 +11,7 @@ git -C ./tmp clone  -b ${KYVE_CHAIN_VERSION} --single-branch ${KYVE_CHAIN_REPO}
 
 # Setup protobuf docker image and build proto files
 cd tmp/chain
+cp ../../buf/Dockerfile ./proto/Dockerfile
 cp ../../buf/generate.sh ./proto/generate.sh
 cp ../../buf/proto/import.proto ./proto/kyve/import.proto
 make proto-setup
