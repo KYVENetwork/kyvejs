@@ -47,7 +47,7 @@ import {
   isStorageBalanceLow,
 } from "./methods";
 import { ICacheProvider, IMetrics, IRuntime } from "./types";
-import { standardizeError } from "./utils";
+import { IDLE_TIME, sleep, standardizeError } from "./utils";
 import { SupportedChains } from "@kyvejs/sdk/dist/constants";
 import { storageProviderFactory } from "./reactors/storageProviders";
 import { compressionFactory } from "./reactors/compression";
@@ -315,6 +315,11 @@ export class Validator {
 
     if (await this.isStorageBalanceZero()) {
       process.exit(1);
+    }
+
+    // until data is not available we wait and idle
+    while (!(await this.isDataAvailable())) {
+      await sleep(IDLE_TIME);
     }
 
     if (!(await this.isDataAvailable())) {

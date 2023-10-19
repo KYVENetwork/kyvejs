@@ -45,8 +45,8 @@ export async function isDataAvailable(this: Validator): Promise<boolean> {
 
     return true;
   } catch (err) {
-    this.logger.fatal(`Data not available. Exiting ...`);
-    this.logger.fatal(standardizeError(err));
+    this.logger.warn(`Data not available for next key. Retrying in 60s ...`);
+    this.logger.debug(standardizeError(err));
 
     return false;
   }
