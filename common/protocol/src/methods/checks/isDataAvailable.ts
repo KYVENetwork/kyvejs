@@ -11,6 +11,8 @@ import { Validator, standardizeError } from "../..";
  * @return {Promise<boolean>}
  */
 export async function isDataAvailable(this: Validator): Promise<boolean> {
+  let nextKey: string = "";
+
   try {
     // log debug method
     if (this.pool.data!.current_key) {
@@ -18,7 +20,7 @@ export async function isDataAvailable(this: Validator): Promise<boolean> {
     }
 
     // get the next key to node has to fetch
-    const nextKey = this.pool.data!.current_key
+    nextKey = this.pool.data!.current_key
       ? await this.runtime.nextKey(this, this.pool.data!.current_key)
       : this.pool.data!.start_key;
 
@@ -45,8 +47,10 @@ export async function isDataAvailable(this: Validator): Promise<boolean> {
 
     return true;
   } catch (err) {
-    this.logger.fatal(`Data not available. Exiting ...`);
-    this.logger.fatal(standardizeError(err));
+    this.logger.warn(
+      `Data not available for next key: ${nextKey}: Retrying in 10s ...`
+    );
+    this.logger.debug(standardizeError(err));
 
     return false;
   }
