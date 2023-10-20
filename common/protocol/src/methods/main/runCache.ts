@@ -136,7 +136,7 @@ export async function runCache(this: Validator): Promise<void> {
         const nextKey = key
           ? await callWithBackoffStrategy(
               async () => {
-                return await this.runtime.nextKey(this, key);
+                return await this.runtime.nextKey(key);
               },
               {
                 limitTimeoutMs: 5 * 60 * 1000,
@@ -151,7 +151,6 @@ export async function runCache(this: Validator): Promise<void> {
                 this.logger.debug(standardizeError(err));
               }
             )
-          ? await this.runtime.nextKey(key)
           : poolRound.data!.start_key;
 
         if (!itemFound) {
