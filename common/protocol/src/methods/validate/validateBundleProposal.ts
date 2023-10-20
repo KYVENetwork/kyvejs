@@ -209,11 +209,6 @@ export async function validateBundleProposal(
               `this.runtime.validateDataItem($THIS, $PROPOSED_DATA_ITEM, $VALIDATION_DATA_ITEM)`
             );
             const vote = await this.runtime.validateDataItem(
-              this,
-              proposedBundle[i],
-              validationBundle[i]
-            );
-            valid = await this.runtime.validateDataItem(
               proposedBundle[i],
               validationBundle[i]
             );

@@ -189,22 +189,26 @@ export default class Tendermint implements IRuntime {
     proposedDataItem: DataItem,
     validationDataItem: DataItem
   ): Promise<number> {
-    if (JSON.stringify(proposedDataItem) === JSON.stringify(validationDataItem)) {
-      return VOTE.VALID
+    if (
+      JSON.stringify(proposedDataItem) === JSON.stringify(validationDataItem)
+    ) {
+      return VOTE.VALID;
     }
-    // prevent nondeterministic misbehaviour
-    v.logger.info("Removing block_results: difference identified")
-    // remove nondeterministic block_results to prevent incorrect invalid vote
-    delete validationDataItem.value.block_results;
-    delete proposedDataItem.value.block_results;
+    // prevent nondeterministic misbehaviour due to osmosis-1 specific problems
+    if (validationDataItem.value.block.block.header.chain_id === 'osmosis-1') {
+      // remove nondeterministic begin_block_events to prevent incorrect invalid vote
+      delete validationDataItem.value.block_results.begin_block_events;
+      delete proposedDataItem.value.block_results.begin_block_events;
 
-    if (JSON.stringify(proposedDataItem) === JSON.stringify(validationDataItem)) {
-      v.logger.warn("Voting abstain: value.block_results don't match")
-      // vote abstain if begin_block_events are not equal
-      return VOTE.ABSTAIN
+      if (
+        JSON.stringify(proposedDataItem) === JSON.stringify(validationDataItem)
+      ) {
+        // vote abstain if begin_block_events are not equal
+        return VOTE.ABSTAIN;
+      }
     }
     // vote invalid if data does not match
-    return VOTE.INVALID
+    return VOTE.INVALID;
   }
 
   async summarizeDataBundle(bundle: DataItem[]): Promise<string> {

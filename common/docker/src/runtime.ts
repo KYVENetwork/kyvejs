@@ -1,12 +1,17 @@
 import { DataItem, IRuntime } from '@kyvejs/protocol';
 import * as grpc from '@grpc/grpc-js';
 import {
-  GetRuntimeNameResponse, GetRuntimeVersionResponse, ValidateSetConfigResponse,
-  GetDataItemResponse, PrevalidateDataItemResponse, TransformDataItemResponse,
-  ValidateDataItemResponse, SummarizeDataBundleResponse, NextKeyResponse,
-  RuntimeClient
- } from './protos/runtime';
-
+  GetRuntimeNameResponse,
+  GetRuntimeVersionResponse,
+  ValidateSetConfigResponse,
+  GetDataItemResponse,
+  PrevalidateDataItemResponse,
+  TransformDataItemResponse,
+  ValidateDataItemResponse,
+  SummarizeDataBundleResponse,
+  NextKeyResponse,
+  RuntimeClient,
+} from './protos/runtime';
 
 // config is a serialized string
 type IConfig = string;
@@ -27,25 +32,31 @@ export default class Docker implements IRuntime {
 
   async getName(): Promise<string> {
     return new Promise<string>((resolve, reject) => {
-      this.grpcClient.getRuntimeName({}, (error: Error | null, runtimeResponse: GetRuntimeNameResponse) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve(runtimeResponse.name);
+      this.grpcClient.getRuntimeName(
+        {},
+        (error: Error | null, runtimeResponse: GetRuntimeNameResponse) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(runtimeResponse.name);
+          }
         }
-      });
+      );
     });
   }
 
   async getVersion(): Promise<string> {
     return new Promise<string>((resolve, reject) => {
-      this.grpcClient.getRuntimeVersion({}, (error: Error | null, runtimeResponse: GetRuntimeVersionResponse) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve(runtimeResponse.version);
+      this.grpcClient.getRuntimeVersion(
+        {},
+        (error: Error | null, runtimeResponse: GetRuntimeVersionResponse) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(runtimeResponse.version);
+          }
         }
-      });
+      );
     });
   }
 
@@ -87,13 +98,13 @@ export default class Docker implements IRuntime {
             reject(error);
           } else {
             if (runtimeResponse.data_item === undefined) {
-              throw new Error("runtimeResponse.dataItem is undefined");
+              throw new Error('runtimeResponse.dataItem is undefined');
             }
 
             console.log(runtimeResponse);
             const responseDataItem: DataItem = {
               key: runtimeResponse.data_item.key,
-              value: JSON.parse(runtimeResponse.data_item.value)
+              value: JSON.parse(runtimeResponse.data_item.value),
             };
             resolve(responseDataItem);
           }
@@ -102,12 +113,11 @@ export default class Docker implements IRuntime {
     });
   }
 
-
   async prevalidateDataItem(item: DataItem): Promise<boolean> {
     const request_item = {
       key: item.key,
-      value: JSON.stringify(item.value)
-  };
+      value: JSON.stringify(item.value),
+    };
     return new Promise<boolean>((resolve, reject) => {
       this.grpcClient.prevalidateDataItem(
         {
@@ -131,8 +141,8 @@ export default class Docker implements IRuntime {
   async transformDataItem(item: DataItem): Promise<DataItem> {
     const request_item = {
       key: item.key,
-      value: JSON.stringify(item.value)
-  };
+      value: JSON.stringify(item.value),
+    };
     return new Promise<DataItem>((resolve, reject) => {
       this.grpcClient.transformDataItem(
         {
@@ -147,12 +157,12 @@ export default class Docker implements IRuntime {
             reject(error);
           } else {
             if (runtimeResponse.transformed_data_item === undefined) {
-              throw new Error("runtimeResponse.dataItem is undefined");
+              throw new Error('runtimeResponse.dataItem is undefined');
             }
 
             const responseDataItem: DataItem = {
               key: runtimeResponse.transformed_data_item.key,
-              value: JSON.parse(runtimeResponse.transformed_data_item.value)
+              value: JSON.parse(runtimeResponse.transformed_data_item.value),
             };
             resolve(responseDataItem);
           }
@@ -167,11 +177,11 @@ export default class Docker implements IRuntime {
   ): Promise<boolean> {
     const request_proposed_data_item = {
       key: proposedDataItem.key,
-      value: JSON.stringify(proposedDataItem.value)
+      value: JSON.stringify(proposedDataItem.value),
     };
     const request_validation_data_item = {
-        key: validationDataItem.key,
-        value: JSON.stringify(validationDataItem.value)
+      key: validationDataItem.key,
+      value: JSON.stringify(validationDataItem.value),
     };
     return new Promise<boolean>((resolve, reject) => {
       this.grpcClient.validateDataItem(
@@ -180,7 +190,7 @@ export default class Docker implements IRuntime {
             serialized_config: this.config,
           },
           proposed_data_item: request_proposed_data_item,
-          validation_data_item: request_validation_data_item
+          validation_data_item: request_validation_data_item,
         },
         (error: Error | null, runtimeResponse: ValidateDataItemResponse) => {
           if (error) {
@@ -234,7 +244,7 @@ export default class Docker implements IRuntime {
             reject(error);
           } else {
             if (runtimeResponse.next_key === undefined) {
-              throw new Error("runtimeResponse.dataItem is undefined");
+              throw new Error('runtimeResponse.dataItem is undefined');
             }
 
             resolve(runtimeResponse.next_key);
@@ -244,4 +254,3 @@ export default class Docker implements IRuntime {
     });
   }
 }
-
