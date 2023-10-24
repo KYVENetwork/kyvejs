@@ -179,7 +179,7 @@ export default class Tendermint implements IRuntime {
   }
 
   async validateDataItem(
-    _: Validator,
+    v: Validator,
     proposedDataItem: DataItem,
     validationDataItem: DataItem
   ): Promise<number> {
@@ -187,13 +187,13 @@ export default class Tendermint implements IRuntime {
       return VOTE.VALID
     }
     // prevent nondeterministic misbehaviour
-    _.logger.info("Removing block_results: difference identified")
+    v.logger.info("Removing block_results: difference identified")
     // remove nondeterministic block_results to prevent incorrect invalid vote
     delete validationDataItem.value.block_results;
     delete proposedDataItem.value.block_results;
 
     if (JSON.stringify(proposedDataItem) === JSON.stringify(validationDataItem)) {
-      _.logger.warn("Voting abstain: value.block_results don't match")
+      v.logger.warn("Voting abstain: value.block_results don't match")
       // vote abstain if begin_block_events are not equal
       return VOTE.ABSTAIN
     }
