@@ -37,6 +37,8 @@ export interface FundingStats {
 
 /** Funding ... */
 export interface Funding {
+  /** funder_address */
+  funder_address: string;
   /** pool_id ... */
   pool_id: string;
   /** amount ... */
@@ -407,22 +409,25 @@ export const FundingStats = {
 };
 
 function createBaseFunding(): Funding {
-  return { pool_id: "0", amount: "0", amount_per_bundle: "0", total_funded: "0" };
+  return { funder_address: "", pool_id: "0", amount: "0", amount_per_bundle: "0", total_funded: "0" };
 }
 
 export const Funding = {
   encode(message: Funding, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.funder_address !== "") {
+      writer.uint32(10).string(message.funder_address);
+    }
     if (message.pool_id !== "0") {
-      writer.uint32(8).uint64(message.pool_id);
+      writer.uint32(16).uint64(message.pool_id);
     }
     if (message.amount !== "0") {
-      writer.uint32(16).uint64(message.amount);
+      writer.uint32(24).uint64(message.amount);
     }
     if (message.amount_per_bundle !== "0") {
-      writer.uint32(24).uint64(message.amount_per_bundle);
+      writer.uint32(32).uint64(message.amount_per_bundle);
     }
     if (message.total_funded !== "0") {
-      writer.uint32(32).uint64(message.total_funded);
+      writer.uint32(40).uint64(message.total_funded);
     }
     return writer;
   },
@@ -435,28 +440,35 @@ export const Funding = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          if (tag !== 8) {
+          if (tag !== 10) {
             break;
           }
 
-          message.pool_id = longToString(reader.uint64() as Long);
+          message.funder_address = reader.string();
           continue;
         case 2:
           if (tag !== 16) {
             break;
           }
 
-          message.amount = longToString(reader.uint64() as Long);
+          message.pool_id = longToString(reader.uint64() as Long);
           continue;
         case 3:
           if (tag !== 24) {
             break;
           }
 
-          message.amount_per_bundle = longToString(reader.uint64() as Long);
+          message.amount = longToString(reader.uint64() as Long);
           continue;
         case 4:
           if (tag !== 32) {
+            break;
+          }
+
+          message.amount_per_bundle = longToString(reader.uint64() as Long);
+          continue;
+        case 5:
+          if (tag !== 40) {
             break;
           }
 
@@ -473,6 +485,7 @@ export const Funding = {
 
   fromJSON(object: any): Funding {
     return {
+      funder_address: isSet(object.funder_address) ? globalThis.String(object.funder_address) : "",
       pool_id: isSet(object.pool_id) ? globalThis.String(object.pool_id) : "0",
       amount: isSet(object.amount) ? globalThis.String(object.amount) : "0",
       amount_per_bundle: isSet(object.amount_per_bundle) ? globalThis.String(object.amount_per_bundle) : "0",
@@ -482,6 +495,9 @@ export const Funding = {
 
   toJSON(message: Funding): unknown {
     const obj: any = {};
+    if (message.funder_address !== "") {
+      obj.funder_address = message.funder_address;
+    }
     if (message.pool_id !== "0") {
       obj.pool_id = message.pool_id;
     }
@@ -502,6 +518,7 @@ export const Funding = {
   },
   fromPartial<I extends Exact<DeepPartial<Funding>, I>>(object: I): Funding {
     const message = createBaseFunding();
+    message.funder_address = object.funder_address ?? "";
     message.pool_id = object.pool_id ?? "0";
     message.amount = object.amount ?? "0";
     message.amount_per_bundle = object.amount_per_bundle ?? "0";
