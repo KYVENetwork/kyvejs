@@ -186,18 +186,16 @@ export default class Tendermint implements IRuntime {
     if (JSON.stringify(proposedDataItem) === JSON.stringify(validationDataItem)) {
       return VOTE.VALID
     }
-    // prevent nondeterministic misbehaviour due to osmosis-1 specific problems
-    if (validationDataItem.value.block.block.header.chain_id === "osmosis-1") {
-      _.logger.info("Removing begin_block_events: osmosis-1 identified")
-      // remove nondeterministic begin_block_events to prevent incorrect invalid vote
-      delete validationDataItem.value.block_results.begin_block_events;
-      delete proposedDataItem.value.block_results.begin_block_events;
+    // prevent nondeterministic misbehaviour
+    _.logger.info("Removing block_results: difference identified")
+    // remove nondeterministic block_results to prevent incorrect invalid vote
+    delete validationDataItem.value.block_results;
+    delete proposedDataItem.value.block_results;
 
-      if (JSON.stringify(proposedDataItem) === JSON.stringify(validationDataItem)) {
-        _.logger.warn("Voting abstain: value.block_results.begin_block_events don't match")
-        // vote abstain if begin_block_events are not equal
-        return VOTE.ABSTAIN
-      }
+    if (JSON.stringify(proposedDataItem) === JSON.stringify(validationDataItem)) {
+      _.logger.warn("Voting abstain: value.block_results don't match")
+      // vote abstain if begin_block_events are not equal
+      return VOTE.ABSTAIN
     }
     // vote invalid if data does not match
     return VOTE.INVALID
