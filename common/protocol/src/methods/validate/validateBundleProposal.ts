@@ -34,6 +34,26 @@ export async function validateBundleProposal(
       return true;
     }
 
+    // vote invalid if bundle size is zero
+    this.logger.debug(`Validating bundle proposal by bundle size`);
+    this.logger.debug(`Proposed = ${this.pool.bundle_proposal!.bundle_size}`);
+
+    if (parseInt(this.pool.bundle_proposal!.bundle_size) === 0) {
+      this.logger.info(
+        `Found no data items on bundle downloaded from storage provider`
+      );
+
+      const success = await this.voteBundleProposal(
+        this.pool.bundle_proposal!.storage_id,
+        VOTE.INVALID
+      );
+      return success;
+    }
+
+    this.logger.info(
+      `Found data items = ${this.pool.bundle_proposal!.bundle_size}`
+    );
+
     // vote invalid if data size does not match with proposed data size
     this.logger.debug(`Validating bundle proposal by data size`);
     this.logger.debug(`Proposed = ${this.pool.bundle_proposal!.data_size}`);
