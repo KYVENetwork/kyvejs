@@ -21,7 +21,6 @@ import {
   getBalancesForMetrics,
   runCache,
   runNode,
-  saveBundleDecompress,
   saveBundleDownload,
   saveLoadValidationBundle,
   setupCacheProvider,
@@ -138,7 +137,6 @@ export class Validator {
 
   // validate
   protected saveBundleDownload = saveBundleDownload;
-  protected saveBundleDecompress = saveBundleDecompress;
   protected saveLoadValidationBundle = saveLoadValidationBundle;
   protected validateBundleProposal = validateBundleProposal;
 
