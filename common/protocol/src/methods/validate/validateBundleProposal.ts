@@ -1,7 +1,7 @@
 import { VoteType } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
 
-import { Validator } from "../..";
-import { sha256, standardizeError, VOTE } from "../../utils";
+import { DataItem, Validator } from "../..";
+import { bytesToBundle, sha256, standardizeError, VOTE } from "../../utils";
 
 /**
  * validateBundleProposal validates a proposed bundle proposal
@@ -137,12 +137,42 @@ export async function validateBundleProposal(
 
     // if storage provider result is empty skip runtime validation
     if (storageProviderResult.byteLength) {
-      try {
-        // decompress the bundle with the specified compression type
-        // and convert the bytes into a JSON format
-        const proposedBundle = await this.saveBundleDecompress(
-          storageProviderResult
+      // get current compression defined on pool
+      this.logger.debug(`this.compressionFactory()`);
+      const compression = this.compressionFactory();
+
+      // decompress the bundle with the specified compression type
+      // and convert the bytes into a JSON format
+      this.logger.debug(
+        `this.compression.decompress($STORAGE_PROVIDER_RESULT)`
+      );
+      const decompressed = await compression
+        .decompress(storageProviderResult)
+        .catch((err) => {
+          this.logger.error(
+            `Unexpected error decompressing bundle. Voting abstain ...`
+          );
+          this.logger.error(standardizeError(err));
+
+          return null;
+        });
+
+      // vote abstain if decompressed is null
+      if (decompressed === null) {
+        const success = await this.voteBundleProposal(
+          this.pool.bundle_proposal!.storage_id,
+          VOTE.ABSTAIN
         );
+        return success;
+      }
+
+      this.logger.info(
+        `Successfully decompressed bundle with Compression:${compression.name}`
+      );
+
+      try {
+        // parse raw decompressed bundle back to json format
+        const proposedBundle: DataItem[] = bytesToBundle(decompressed);
 
         // perform custom runtime bundle validation
         this.logger.debug(

@@ -37,7 +37,6 @@ export * from "./queries/getBalancesForMetrics";
 export * from "./queries/syncPoolState";
 
 // validate
-export * from "./validate/saveBundleDecompress";
 export * from "./validate/saveBundleDownload";
 export * from "./validate/saveLoadValidationBundle";
 export * from "./validate/validateBundleProposal";
