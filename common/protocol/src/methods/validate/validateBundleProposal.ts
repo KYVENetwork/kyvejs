@@ -38,7 +38,7 @@ export async function validateBundleProposal(
     this.logger.debug(`Validating bundle proposal by bundle size`);
     this.logger.debug(`Proposed = ${this.pool.bundle_proposal!.bundle_size}`);
 
-    if (parseInt(this.pool.bundle_proposal!.data_size) === 0) {
+    if (parseInt(this.pool.bundle_proposal!.bundle_size) === 0) {
       this.logger.info(
         `Found no data items on bundle downloaded from storage provider`
       );
