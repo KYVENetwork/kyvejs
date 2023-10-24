@@ -47,8 +47,8 @@ export const registry: ReadonlyArray<[string, GeneratedType]> = [
   ["/kyve.pool.v1beta1.MsgScheduleRuntimeUpgrade", MsgScheduleRuntimeUpgrade],
   ["/kyve.pool.v1beta1.MsgCancelRuntimeUpgrade", MsgCancelRuntimeUpgrade],
   /** funders **/
-  ["/kyve.pool.v1beta1.MsgFundPool", MsgFundPool],
-  ["/kyve.pool.v1beta1.MsgDefundPool", MsgDefundPool],
+  ["/kyve.funders.v1beta1.MsgFundPool", MsgFundPool],
+  ["/kyve.funders.v1beta1.MsgDefundPool", MsgDefundPool],
   /** stakers **/
   ["/kyve.stakers.v1beta1.MsgCreateStaker", MsgCreateStaker],
   ["/kyve.stakers.v1beta1.MsgUpdateMetadata", MsgUpdateMetadata],
@@ -81,14 +81,14 @@ export const load = (protoRegistry: Registry) => {
 export const encodeTxMsg = {
   fundPool(value: MsgFundPool) {
     return {
-      type_url: "/kyve.pool.v1beta1.MsgFundPool",
+      type_url: "/kyve.funders.v1beta1.MsgFundPool",
       value: MsgFundPool.encode(value).finish(),
     };
   },
 
   defundPool(value: MsgDefundPool) {
     return {
-      type_url: "/kyve.pool.v1beta1.MsgDefundPool",
+      type_url: "/kyve.funders.v1beta1.MsgDefundPool",
       value: MsgDefundPool.encode(value).finish(),
     };
   },
@@ -257,14 +257,14 @@ export const encodeTxMsg = {
 export const withTypeUrl = {
   fundPool(value: MsgFundPool) {
     return {
-      typeUrl: "/kyve.pool.v1beta1.MsgFundPool",
+      typeUrl: "/kyve.funders.v1beta1.MsgFundPool",
       value,
     };
   },
 
   defundPool(value: MsgDefundPool) {
     return {
-      typeUrl: "/kyve.pool.v1beta1.MsgDefundPool",
+      typeUrl: "/kyve.funders.v1beta1.MsgDefundPool",
       value,
     };
   },
