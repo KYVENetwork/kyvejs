@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.0.14](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/protocol@1.0.13...@kyvejs/protocol@1.0.14) (2023-10-24)
+
+### Bug Fixes
+
+- vote instantly invalid if empty bundle was found ([#86](https://github.com/KYVENetwork/kyvejs/issues/86)) ([bbf844e](https://github.com/KYVENetwork/kyvejs/commit/bbf844efa6c8dfe77222c3e542aab834b817c33a))
+
 ## [1.0.13](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/protocol@1.0.12...@kyvejs/protocol@1.0.13) (2023-10-19)
 
 ### Bug Fixes

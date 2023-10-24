@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.0.11](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint@1.0.10...@kyvejs/tendermint@1.0.11) (2023-10-24)
+
+### Bug Fixes
+
+- block_result schema ([#88](https://github.com/KYVENetwork/kyvejs/issues/88)) ([9060ccf](https://github.com/KYVENetwork/kyvejs/commit/9060ccf86d3f73f22e6c146da610a7045a69678c))
+
 ## [1.0.10](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint@1.0.9...@kyvejs/tendermint@1.0.10) (2023-10-24)
 
 **Note:** Version bump only for package @kyvejs/tendermint
