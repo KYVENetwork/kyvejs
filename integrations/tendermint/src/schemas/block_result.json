@@ -98,7 +98,7 @@
                       "type": "string"
                     },
                     "value": {
-                      "type": "string"
+                      "type": ["string", "null"]
                     },
                     "index": {
                       "type": "boolean"
@@ -132,7 +132,7 @@
                       "type": "string"
                     },
                     "value": {
-                      "type": "string"
+                      "type": ["string", "null"]
                     },
                     "index": {
                       "type": "boolean"
