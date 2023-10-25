@@ -1,6 +1,6 @@
 import { appendFileSync, existsSync, mkdirSync } from "fs";
 import path from "path";
-import { DataItem, Validator } from "../..";
+import { DataItem, standardizeError, Validator } from "../..";
 
 /**
  * archiveDebugBundle is used for storing a bundle for debug
@@ -18,22 +18,29 @@ export function archiveDebugBundle(
   validationBundle: DataItem[],
   metadata: object
 ): void {
-  // if "debug" folder under target path does not exist create it
-  if (!existsSync(path.join(this.home, `debug`))) {
-    mkdirSync(path.join(this.home, `debug`), { recursive: true });
+  try {
+    // if "debug" folder under target path does not exist create it
+    if (!existsSync(path.join(this.home, `debug`))) {
+      mkdirSync(path.join(this.home, `debug`), { recursive: true });
+    }
+
+    const storageId = this.pool?.bundle_proposal?.storage_id ?? "";
+
+    // save current pool state to specified path target
+    appendFileSync(
+      path.join(this.home, `debug`, `pool_state_${storageId}.json`),
+      JSON.stringify(this.pool || {})
+    );
+
+    // save local bundle to specified path target
+    appendFileSync(
+      path.join(this.home, `debug`, `validation_bundle_${storageId}.json`),
+      JSON.stringify(validationBundle || {})
+    );
+
+    this.logger.info("Successfully saved debug information");
+  } catch (err) {
+    this.logger.error("Failed to save debug information");
+    this.logger.error(standardizeError(err));
   }
-
-  const storageId = this.pool?.bundle_proposal?.storage_id ?? "";
-
-  // save current pool state to specified path target
-  appendFileSync(
-    path.join(this.home, `debug`, `pool_state_${storageId}.json`),
-    JSON.stringify(this.pool || {})
-  );
-
-  // save local bundle to specified path target
-  appendFileSync(
-    path.join(this.home, `debug`, `validation_bundle_${storageId}.json`),
-    JSON.stringify(validationBundle || {})
-  );
 }

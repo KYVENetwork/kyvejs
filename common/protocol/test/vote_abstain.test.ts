@@ -2147,9 +2147,7 @@ describe("vote abstain tests", () => {
     // ASSERT CACHE INTERFACES
     // =======================
 
-    expect(cacheProvider.get).toHaveBeenCalledTimes(2);
-    expect(cacheProvider.get).toHaveBeenNthCalledWith(1, "0");
-    expect(cacheProvider.get).toHaveBeenNthCalledWith(2, "1");
+    expect(cacheProvider.get).toHaveBeenCalledTimes(0);
 
     // =============================
     // ASSERT COMPRESSION INTERFACES

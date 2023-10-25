@@ -1913,6 +1913,11 @@ describe("invalid votes tests", () => {
     const dataSize = compressedBundle.byteLength.toString();
     const dataHash = sha256(bundleBytes);
 
+    storageProvider.retrieveBundle = jest.fn().mockResolvedValue({
+      storageId: "another_test_storage_id",
+      storageData: compressedBundle,
+    });
+
     v["syncPoolState"] = jest.fn().mockImplementation(() => {
       v.pool = {
         ...genesis_pool,
