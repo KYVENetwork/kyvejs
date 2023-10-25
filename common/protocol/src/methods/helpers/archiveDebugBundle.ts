@@ -50,14 +50,15 @@ export function archiveDebugBundle(
     );
 
     const storageId = this.pool?.bundle_proposal?.storage_id ?? "";
+    const zipPath = path.join(
+      this.home,
+      `debug`,
+      `${vote}_${Math.floor(Date.now() / 1000)}_${storageId.slice(0, 6)}.zip`
+    );
 
     zip
       .generateNodeStream({ type: "nodebuffer", streamFiles: true })
-      .pipe(
-        createWriteStream(
-          path.join(this.home, `debug`, `${vote}_${storageId}.zip`)
-        )
-      )
+      .pipe(createWriteStream(zipPath))
       .on("finish", () => {
         this.logger.info("Successfully saved debug information");
       });
