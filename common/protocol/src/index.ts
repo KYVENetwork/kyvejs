@@ -75,6 +75,7 @@ export class Validator {
   public name!: string;
 
   // logger attributes
+  public logFile!: string;
   public logger!: Logger;
 
   // metrics attributes
@@ -296,6 +297,9 @@ export class Validator {
     this.metrics = options.metrics;
     this.metricsPort = parseInt(options.metricsPort);
     this.home = options.home;
+
+    // name the log file after the time the node got started
+    this.logFile = `${new Date().toISOString()}.log`;
 
     // perform setups
     this.setupLogger();

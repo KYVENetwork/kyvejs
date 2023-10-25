@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, createWriteStream } from "fs";
+import { existsSync, mkdirSync, createWriteStream, readFileSync } from "fs";
 import path from "path";
 import { DataItem, standardizeError, Validator } from "../..";
 import JSZip from "jszip";
@@ -47,6 +47,12 @@ export function archiveDebugBundle(
     zip.file(
       "diff.txt",
       jsonDiff.diffString(proposedBundle, validationBundle, { color: false })
+    );
+
+    // save the logfile of the current session
+    zip.file(
+      "debug.log",
+      readFileSync(path.join(this.home, "logs", this.logFile))
     );
 
     const storageId = this.pool?.bundle_proposal?.storage_id ?? "";
