@@ -12,6 +12,52 @@ import * as _m0 from "protobufjs/minimal";
 
 export const protobufPackage = "";
 
+/** Defines the vote enum */
+export enum VOTE {
+  UNSPECIFIED = 0,
+  VALID = 1,
+  INVALID = 2,
+  ABSTAIN = 3,
+  UNRECOGNIZED = -1,
+}
+
+export function vOTEFromJSON(object: any): VOTE {
+  switch (object) {
+    case 0:
+    case "UNSPECIFIED":
+      return VOTE.UNSPECIFIED;
+    case 1:
+    case "VALID":
+      return VOTE.VALID;
+    case 2:
+    case "INVALID":
+      return VOTE.INVALID;
+    case 3:
+    case "ABSTAIN":
+      return VOTE.ABSTAIN;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return VOTE.UNRECOGNIZED;
+  }
+}
+
+export function vOTEToJSON(object: VOTE): string {
+  switch (object) {
+    case VOTE.UNSPECIFIED:
+      return "UNSPECIFIED";
+    case VOTE.VALID:
+      return "VALID";
+    case VOTE.INVALID:
+      return "INVALID";
+    case VOTE.ABSTAIN:
+      return "ABSTAIN";
+    case VOTE.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+
 /**
  * The main data entity served by the gRPC service
  * Contains the block key and the block value as a serialized value
@@ -112,7 +158,7 @@ export interface ValidateDataItemRequest {
 }
 
 export interface ValidateDataItemResponse {
-  valid: boolean;
+  vote: number;
 }
 
 /**
@@ -1098,13 +1144,13 @@ export const ValidateDataItemRequest = {
 };
 
 function createBaseValidateDataItemResponse(): ValidateDataItemResponse {
-  return { valid: false };
+  return { vote: 0 };
 }
 
 export const ValidateDataItemResponse = {
   encode(message: ValidateDataItemResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.valid === true) {
-      writer.uint32(8).bool(message.valid);
+    if (message.vote !== 0) {
+      writer.uint32(8).int32(message.vote);
     }
     return writer;
   },
@@ -1121,7 +1167,7 @@ export const ValidateDataItemResponse = {
             break;
           }
 
-          message.valid = reader.bool();
+          message.vote = reader.int32();
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -1133,13 +1179,13 @@ export const ValidateDataItemResponse = {
   },
 
   fromJSON(object: any): ValidateDataItemResponse {
-    return { valid: isSet(object.valid) ? globalThis.Boolean(object.valid) : false };
+    return { vote: isSet(object.vote) ? globalThis.Number(object.vote) : 0 };
   },
 
   toJSON(message: ValidateDataItemResponse): unknown {
     const obj: any = {};
-    if (message.valid === true) {
-      obj.valid = message.valid;
+    if (message.vote !== 0) {
+      obj.vote = Math.round(message.vote);
     }
     return obj;
   },
@@ -1149,7 +1195,7 @@ export const ValidateDataItemResponse = {
   },
   fromPartial<I extends Exact<DeepPartial<ValidateDataItemResponse>, I>>(object: I): ValidateDataItemResponse {
     const message = createBaseValidateDataItemResponse();
-    message.valid = object.valid ?? false;
+    message.vote = object.vote ?? 0;
     return message;
   },
 };

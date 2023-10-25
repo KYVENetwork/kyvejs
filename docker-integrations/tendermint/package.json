@@ -12,9 +12,9 @@
     "export-grpc-stubs": "protoc --plugin=./node_modules/.bin/protoc-gen-ts_proto --ts_proto_opt=snakeToCamel=false --ts_proto_opt=outputServices=grpc-js --ts_proto_out=./src/proto --proto_path=./src/proto runtime.proto",
     "test-build": "yarn build && rimraf out"
   },
-  "bin": "./dist/index.js",
+  "bin": "./dist/src/index.js",
   "pkg": {
-    "scripts": "./dist/index.js",
+    "scripts": "./dist/src/index.js",
     "targets": [
       "latest-linux-x64",
       "latest-linux-arm64",

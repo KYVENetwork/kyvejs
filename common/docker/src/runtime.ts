@@ -62,7 +62,6 @@ export default class Docker implements IRuntime {
 
   async validateSetConfig(rawConfig: string): Promise<string> {
     return new Promise<string>((resolve, reject) => {
-      console.log(rawConfig);
       this.grpcClient.validateSetConfig(
         {
           raw_config: rawConfig,
@@ -84,7 +83,6 @@ export default class Docker implements IRuntime {
 
   async getDataItem(key: string): Promise<DataItem> {
     return new Promise<DataItem>((resolve, reject) => {
-      console.log(this.config);
       this.grpcClient.getDataItem(
         {
           config: {
@@ -101,7 +99,6 @@ export default class Docker implements IRuntime {
               throw new Error('runtimeResponse.dataItem is undefined');
             }
 
-            console.log(runtimeResponse);
             const responseDataItem: DataItem = {
               key: runtimeResponse.data_item.key,
               value: JSON.parse(runtimeResponse.data_item.value),
@@ -174,7 +171,7 @@ export default class Docker implements IRuntime {
   async validateDataItem(
     proposedDataItem: DataItem,
     validationDataItem: DataItem
-  ): Promise<boolean> {
+  ): Promise<number> {
     const request_proposed_data_item = {
       key: proposedDataItem.key,
       value: JSON.stringify(proposedDataItem.value),
@@ -183,7 +180,7 @@ export default class Docker implements IRuntime {
       key: validationDataItem.key,
       value: JSON.stringify(validationDataItem.value),
     };
-    return new Promise<boolean>((resolve, reject) => {
+    return new Promise<number>((resolve, reject) => {
       this.grpcClient.validateDataItem(
         {
           config: {
@@ -197,7 +194,7 @@ export default class Docker implements IRuntime {
             // Handle the error here if needed
             reject(error);
           } else {
-            resolve(runtimeResponse.valid);
+            resolve(runtimeResponse.vote);
           }
         }
       );

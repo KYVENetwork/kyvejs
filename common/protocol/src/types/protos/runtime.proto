@@ -12,6 +12,15 @@ message RuntimeConfig {
   string serialized_config = 1;
 }
 
+
+/* Defines the vote enum */
+enum VOTE {
+  UNSPECIFIED = 0;
+  VALID = 1;
+  INVALID = 2;
+  ABSTAIN = 3;
+}
+
 /* getRuntimeName
  * Request returning the name of the runtime 
 * returns the runtime name as a string */
@@ -89,7 +98,7 @@ message ValidateDataItemRequest {
 }
 
 message ValidateDataItemResponse {
-  bool valid = 1;
+  int32 vote = 1;
 }
 
 /* summarizeDataBundle

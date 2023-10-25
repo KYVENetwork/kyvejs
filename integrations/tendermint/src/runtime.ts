@@ -5,6 +5,7 @@ import Ajv from 'ajv';
 import block_schema from './schemas/block.json';
 import block_results_schema from './schemas/block_result.json';
 
+
 const ajv = new Ajv();
 
 // Tendermint config

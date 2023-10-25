@@ -1,8 +1,9 @@
+
 import * as grpc from '@grpc/grpc-js';
 import axios from 'axios';
 
 import { name, version } from '../package.json';
-import { DataItem } from './protos/runtime';
+import { DataItem, VOTE } from './protos/runtime';
 
 type EmptyRequest = Record<string, never>;
 
@@ -76,13 +77,17 @@ export class TendermintServer {
       const blockResponse = await axios.get(
         `${config.rpc}/block?height=${key}`
       );
+
       const block = blockResponse.data.result;
+
 
       // Fetch block results from rpc at the given block height
       const blockResultsResponse = await axios.get(
         `${config.rpc}/block_results?height=${key}`
       );
+
       const blockResults = blockResultsResponse.data.result;
+
 
       // Construct the Value message
       const value = {
@@ -246,9 +251,9 @@ export class TendermintServer {
         proposed_data_item: DataItem;
         validation_data_item: DataItem;
       },
-      { valid: boolean }
+      { vote: number }
     >,
-    callback: grpc.sendUnaryData<{ valid: boolean }>
+    callback: grpc.sendUnaryData<{ vote: number }>
   ) {
     try {
       const request_proposed_data_item = call.request.proposed_data_item;
@@ -262,11 +267,31 @@ export class TendermintServer {
         value: JSON.parse(request_validation_data_item.value),
       };
 
-      // Apply equal comparison
-      const isValid =
-        JSON.stringify(proposedDataItem) === JSON.stringify(validationDataItem);
+      if (
+          JSON.stringify(proposedDataItem) === JSON.stringify(validationDataItem)
+      ) {
+        callback(null, { vote: VOTE.VALID });
+        return;
+      }
 
-      callback(null, { valid: isValid });
+      // prevent nondeterministic misbehaviour due to osmosis-1 specific problems
+      if (validationDataItem.value.block.block.header.chain_id === "osmosis-1") {
+        // remove nondeterministic begin_block_events to prevent incorrect invalid vote
+        delete validationDataItem.value.block_results.begin_block_events;
+        delete proposedDataItem.value.block_results.begin_block_events;
+
+        if (
+            JSON.stringify(proposedDataItem) === JSON.stringify(validationDataItem)
+        ) {
+          // vote abstain if begin_block_events are not equal
+          callback(null, { vote: VOTE.ABSTAIN });
+          return;
+
+        }
+      }
+
+      // vote invalid if data does not match
+      callback(null, { vote: VOTE.INVALID });
     } catch (error: any) {
       callback({
         code: grpc.status.INTERNAL,
