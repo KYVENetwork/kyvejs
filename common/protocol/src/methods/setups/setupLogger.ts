@@ -10,7 +10,6 @@ import { Validator, standardizeError } from "../..";
  *
  * @method setupLogger
  * @param {Validator} this
- * @param {string} logFile the name of the log file for the current session
  * @return {void}
  */
 export function setupLogger(this: Validator): void {

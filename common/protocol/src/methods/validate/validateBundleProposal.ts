@@ -334,6 +334,11 @@ export async function validateBundleProposal(
         ? VoteType.VOTE_TYPE_VALID
         : VoteType.VOTE_TYPE_INVALID;
 
+      // TODO: test remove
+      this.archiveDebugBundle(vote, proposedBundle, validationBundle, {
+        reason: "test",
+      });
+
       const success = await this.voteBundleProposal(
         this.pool.bundle_proposal!.storage_id,
         vote
