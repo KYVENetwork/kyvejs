@@ -31,6 +31,7 @@ import {
   skipUploaderRole,
   submitBundleProposal,
   syncPoolState,
+  parseProposedBundle,
   validateBundleProposal,
   isNodeValidator,
   isPoolActive,
@@ -138,6 +139,7 @@ export class Validator {
   // validate
   protected saveBundleDownload = saveBundleDownload;
   protected saveLoadValidationBundle = saveLoadValidationBundle;
+  protected parseProposedBundle = parseProposedBundle;
   protected validateBundleProposal = validateBundleProposal;
 
   // upload

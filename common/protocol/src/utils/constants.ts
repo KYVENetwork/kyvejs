@@ -12,11 +12,3 @@ export const MAX_BUNDLE_BYTE_SIZE = 200 * 1024 * 1024;
 
 // the max compression size - currently 2GB
 export const MAX_COMPRESSION_BYTE_SIZE = 2 * 10 ** 9;
-
-// a vote map to allow human readable votes
-export const VOTE = {
-  UNSPECIFIED: 0,
-  VALID: 1,
-  INVALID: 2,
-  ABSTAIN: 3,
-};

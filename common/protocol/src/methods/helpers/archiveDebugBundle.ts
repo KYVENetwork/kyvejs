@@ -11,7 +11,13 @@ import { DataItem, Validator } from "../..";
  * @param {DataItem[]} bundle local validation bundle which should get archived for debug purposes
  * @return {void}
  */
-export function archiveDebugBundle(this: Validator, bundle: DataItem[]): void {
+export function archiveDebugBundle(
+  this: Validator,
+  vote: number,
+  proposedBundle: DataItem[],
+  validationBundle: DataItem[],
+  metadata: object
+): void {
   // if "debug" folder under target path does not exist create it
   if (!existsSync(path.join(this.home, `debug`))) {
     mkdirSync(path.join(this.home, `debug`), { recursive: true });
@@ -28,6 +34,6 @@ export function archiveDebugBundle(this: Validator, bundle: DataItem[]): void {
   // save local bundle to specified path target
   appendFileSync(
     path.join(this.home, `debug`, `validation_bundle_${storageId}.json`),
-    JSON.stringify(bundle || {})
+    JSON.stringify(validationBundle || {})
   );
 }

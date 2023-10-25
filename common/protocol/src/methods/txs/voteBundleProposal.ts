@@ -1,4 +1,5 @@
-import { Validator, standardizeError, VOTE } from "../..";
+import { Validator, standardizeError } from "../..";
+import { VoteType } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
 
 /**
  * voteBundleProposal submits a vote on the current bundle proposal.
@@ -23,11 +24,11 @@ export async function voteBundleProposal(
       let voteMessage = "";
 
       // determine vote type for verbose logging
-      if (vote === VOTE.VALID) {
+      if (vote === VoteType.VOTE_TYPE_VALID) {
         voteMessage = "valid";
-      } else if (vote === VOTE.INVALID) {
+      } else if (vote === VoteType.VOTE_TYPE_INVALID) {
         voteMessage = "invalid";
-      } else if (vote === VOTE.ABSTAIN) {
+      } else if (vote === VoteType.VOTE_TYPE_ABSTAIN) {
         voteMessage = "abstain";
       } else {
         throw Error(`Invalid vote: ${vote}`);

@@ -39,6 +39,7 @@ export * from "./queries/syncPoolState";
 // validate
 export * from "./validate/saveBundleDownload";
 export * from "./validate/saveLoadValidationBundle";
+export * from "./validate/parseProposedBundle";
 export * from "./validate/validateBundleProposal";
 
 // upload
