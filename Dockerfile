@@ -1,39 +1,18 @@
-FROM node:lts
-
+# Build Stage 1
+# This build created a staging docker image
+#
+FROM node:lts AS appbuild
 WORKDIR /usr/src/app
+COPY . .
+RUN yarn build:docker
+RUN cd ./common/docker
+RUN yarn run build:binaries
 
-# install core
-RUN mkdir -p common/types
-RUN mkdir -p common/sdk
-RUN mkdir -p common/protocol
+# Build Stage 2
+# This build takes the production build from staging build
 
-COPY ./package.json ./
-COPY ./tsconfig.json ./
-COPY ./lerna.json ./
-COPY ./nx.json ./
-
-COPY ./common/types/package.json ./common/types/
-COPY ./common/types/tsconfig.json ./common/types/
-COPY ./common/types/scripts ./common/types/scripts
-COPY ./common/types/src ./common/types/src
-
-COPY ./common/sdk/package.json ./common/sdk/
-COPY ./common/sdk/tsconfig.json ./common/sdk/
-COPY ./common/sdk/src ./common/sdk/src
-
-COPY ./common/protocol/package.json ./common/protocol/
-COPY ./common/protocol/tsconfig.json ./common/protocol/
-COPY ./common/protocol/src ./common/protocol/src
-
-RUN mkdir -p integrations/tendermint
-
-COPY ./integrations/tendermint/package.json ./integrations/tendermint/
-COPY ./integrations/tendermint/tsconfig.json ./integrations/tendermint/
-COPY ./integrations/tendermint/src ./integrations/tendermint/src
-
-RUN yarn install
-RUN yarn setup
-
-# start core
-WORKDIR /usr/src/app/integrations/tendermint
-ENTRYPOINT ["yarn", "start"]
+FROM node:slim AS runtime
+ENV RUNTIME_SERVER_ADDR=runtime:50051
+WORKDIR /usr/src/app
+COPY --from=appbuild /usr/src/app/common/docker/out/kyve* ./
+CMD ["./kyve-linux-x64"]

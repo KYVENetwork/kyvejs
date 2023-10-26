@@ -1,4 +1,3 @@
-
 import * as grpc from '@grpc/grpc-js';
 import axios from 'axios';
 
@@ -80,14 +79,12 @@ export class TendermintServer {
 
       const block = blockResponse.data.result;
 
-
       // Fetch block results from rpc at the given block height
       const blockResultsResponse = await axios.get(
         `${config.rpc}/block_results?height=${key}`
       );
 
       const blockResults = blockResultsResponse.data.result;
-
 
       // Construct the Value message
       const value = {
@@ -268,25 +265,27 @@ export class TendermintServer {
       };
 
       if (
-          JSON.stringify(proposedDataItem) === JSON.stringify(validationDataItem)
+        JSON.stringify(proposedDataItem) === JSON.stringify(validationDataItem)
       ) {
         callback(null, { vote: VOTE.VALID });
         return;
       }
 
       // prevent nondeterministic misbehaviour due to osmosis-1 specific problems
-      if (validationDataItem.value.block.block.header.chain_id === "osmosis-1") {
+      if (
+        validationDataItem.value.block.block.header.chain_id === 'osmosis-1'
+      ) {
         // remove nondeterministic begin_block_events to prevent incorrect invalid vote
         delete validationDataItem.value.block_results.begin_block_events;
         delete proposedDataItem.value.block_results.begin_block_events;
 
         if (
-            JSON.stringify(proposedDataItem) === JSON.stringify(validationDataItem)
+          JSON.stringify(proposedDataItem) ===
+          JSON.stringify(validationDataItem)
         ) {
           // vote abstain if begin_block_events are not equal
           callback(null, { vote: VOTE.ABSTAIN });
           return;
-
         }
       }
 

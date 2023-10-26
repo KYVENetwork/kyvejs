@@ -17,7 +17,7 @@ import {
 type IConfig = string;
 
 export default class Docker implements IRuntime {
-  private static readonly GRPC_URL = 'localhost:50051';
+  private static readonly RUNTIME_SERVER_ADDR = process.env.RUNTIME_SERVER_ADDR || 'localhost:50051';
 
   private grpcClient: RuntimeClient;
 
@@ -25,7 +25,7 @@ export default class Docker implements IRuntime {
 
   constructor() {
     this.grpcClient = new RuntimeClient(
-      Docker.GRPC_URL,
+      Docker.RUNTIME_SERVER_ADDR,
       grpc.credentials.createInsecure()
     );
   }

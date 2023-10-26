@@ -9,8 +9,7 @@
     "format": "prettier --write .",
     "lint": "eslint . --ignore-path ./.eslintignore --ext ts --ext tsx --ext js --ext jsx",
     "lint:fix": "eslint --fix . --ignore-path ./.eslintignore --ext ts --ext tsx --ext js --ext jsx",
-    "export-grpc-stubs": "protoc --plugin=./node_modules/.bin/protoc-gen-ts_proto --ts_proto_opt=snakeToCamel=false --ts_proto_opt=outputServices=grpc-js --ts_proto_out=./src/proto --proto_path=./src/proto runtime.proto",
-    "test-build": "yarn build && rimraf out"
+    "export-grpc-stubs": "protoc --proto_path=../../common/protocol/src/types --plugin=../../node_modules/.bin/protoc-gen-ts_proto --ts_proto_opt=snakeToCamel=false --ts_proto_opt=outputServices=grpc-js --ts_proto_out=./src ../../common/protocol/src/types/protos/runtime.proto"
   },
   "bin": "./dist/src/index.js",
   "pkg": {
