@@ -95,8 +95,6 @@ export interface QueryFundingsByFunderRequest {
     | undefined;
   /** address ... */
   address: string;
-  /** search */
-  search: string;
   /** with_inactive_fundings ... */
   with_inactive_fundings: boolean;
 }
@@ -119,8 +117,6 @@ export interface QueryFundingsByPoolRequest {
     | undefined;
   /** pool_id ... */
   pool_id: string;
-  /** search */
-  search: string;
   /** with_inactive_fundings ... */
   with_inactive_fundings: boolean;
 }
@@ -832,7 +828,7 @@ export const QueryFunderResponse = {
 };
 
 function createBaseQueryFundingsByFunderRequest(): QueryFundingsByFunderRequest {
-  return { pagination: undefined, address: "", search: "", with_inactive_fundings: false };
+  return { pagination: undefined, address: "", with_inactive_fundings: false };
 }
 
 export const QueryFundingsByFunderRequest = {
@@ -843,11 +839,8 @@ export const QueryFundingsByFunderRequest = {
     if (message.address !== "") {
       writer.uint32(18).string(message.address);
     }
-    if (message.search !== "") {
-      writer.uint32(26).string(message.search);
-    }
     if (message.with_inactive_fundings === true) {
-      writer.uint32(32).bool(message.with_inactive_fundings);
+      writer.uint32(24).bool(message.with_inactive_fundings);
     }
     return writer;
   },
@@ -874,14 +867,7 @@ export const QueryFundingsByFunderRequest = {
           message.address = reader.string();
           continue;
         case 3:
-          if (tag !== 26) {
-            break;
-          }
-
-          message.search = reader.string();
-          continue;
-        case 4:
-          if (tag !== 32) {
+          if (tag !== 24) {
             break;
           }
 
@@ -900,7 +886,6 @@ export const QueryFundingsByFunderRequest = {
     return {
       pagination: isSet(object.pagination) ? PageRequest.fromJSON(object.pagination) : undefined,
       address: isSet(object.address) ? globalThis.String(object.address) : "",
-      search: isSet(object.search) ? globalThis.String(object.search) : "",
       with_inactive_fundings: isSet(object.with_inactive_fundings)
         ? globalThis.Boolean(object.with_inactive_fundings)
         : false,
@@ -914,9 +899,6 @@ export const QueryFundingsByFunderRequest = {
     }
     if (message.address !== "") {
       obj.address = message.address;
-    }
-    if (message.search !== "") {
-      obj.search = message.search;
     }
     if (message.with_inactive_fundings === true) {
       obj.with_inactive_fundings = message.with_inactive_fundings;
@@ -933,7 +915,6 @@ export const QueryFundingsByFunderRequest = {
       ? PageRequest.fromPartial(object.pagination)
       : undefined;
     message.address = object.address ?? "";
-    message.search = object.search ?? "";
     message.with_inactive_fundings = object.with_inactive_fundings ?? false;
     return message;
   },
@@ -1018,7 +999,7 @@ export const QueryFundingsByFunderResponse = {
 };
 
 function createBaseQueryFundingsByPoolRequest(): QueryFundingsByPoolRequest {
-  return { pagination: undefined, pool_id: "0", search: "", with_inactive_fundings: false };
+  return { pagination: undefined, pool_id: "0", with_inactive_fundings: false };
 }
 
 export const QueryFundingsByPoolRequest = {
@@ -1029,11 +1010,8 @@ export const QueryFundingsByPoolRequest = {
     if (message.pool_id !== "0") {
       writer.uint32(16).uint64(message.pool_id);
     }
-    if (message.search !== "") {
-      writer.uint32(26).string(message.search);
-    }
     if (message.with_inactive_fundings === true) {
-      writer.uint32(32).bool(message.with_inactive_fundings);
+      writer.uint32(24).bool(message.with_inactive_fundings);
     }
     return writer;
   },
@@ -1060,14 +1038,7 @@ export const QueryFundingsByPoolRequest = {
           message.pool_id = longToString(reader.uint64() as Long);
           continue;
         case 3:
-          if (tag !== 26) {
-            break;
-          }
-
-          message.search = reader.string();
-          continue;
-        case 4:
-          if (tag !== 32) {
+          if (tag !== 24) {
             break;
           }
 
@@ -1086,7 +1057,6 @@ export const QueryFundingsByPoolRequest = {
     return {
       pagination: isSet(object.pagination) ? PageRequest.fromJSON(object.pagination) : undefined,
       pool_id: isSet(object.pool_id) ? globalThis.String(object.pool_id) : "0",
-      search: isSet(object.search) ? globalThis.String(object.search) : "",
       with_inactive_fundings: isSet(object.with_inactive_fundings)
         ? globalThis.Boolean(object.with_inactive_fundings)
         : false,
@@ -1100,9 +1070,6 @@ export const QueryFundingsByPoolRequest = {
     }
     if (message.pool_id !== "0") {
       obj.pool_id = message.pool_id;
-    }
-    if (message.search !== "") {
-      obj.search = message.search;
     }
     if (message.with_inactive_fundings === true) {
       obj.with_inactive_fundings = message.with_inactive_fundings;
@@ -1119,7 +1086,6 @@ export const QueryFundingsByPoolRequest = {
       ? PageRequest.fromPartial(object.pagination)
       : undefined;
     message.pool_id = object.pool_id ?? "0";
-    message.search = object.search ?? "";
     message.with_inactive_fundings = object.with_inactive_fundings ?? false;
     return message;
   },

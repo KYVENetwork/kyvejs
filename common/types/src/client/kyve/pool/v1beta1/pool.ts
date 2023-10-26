@@ -420,16 +420,16 @@ export const Pool = {
       writer.uint32(120).bool(message.disabled);
     }
     if (message.protocol !== undefined) {
-      Protocol.encode(message.protocol, writer.uint32(146).fork()).ldelim();
+      Protocol.encode(message.protocol, writer.uint32(130).fork()).ldelim();
     }
     if (message.upgrade_plan !== undefined) {
-      UpgradePlan.encode(message.upgrade_plan, writer.uint32(154).fork()).ldelim();
+      UpgradePlan.encode(message.upgrade_plan, writer.uint32(138).fork()).ldelim();
     }
     if (message.current_storage_provider_id !== 0) {
-      writer.uint32(160).uint32(message.current_storage_provider_id);
+      writer.uint32(144).uint32(message.current_storage_provider_id);
     }
     if (message.current_compression_id !== 0) {
-      writer.uint32(168).uint32(message.current_compression_id);
+      writer.uint32(152).uint32(message.current_compression_id);
     }
     return writer;
   },
@@ -546,29 +546,29 @@ export const Pool = {
 
           message.disabled = reader.bool();
           continue;
-        case 18:
-          if (tag !== 146) {
+        case 16:
+          if (tag !== 130) {
             break;
           }
 
           message.protocol = Protocol.decode(reader, reader.uint32());
           continue;
-        case 19:
-          if (tag !== 154) {
+        case 17:
+          if (tag !== 138) {
             break;
           }
 
           message.upgrade_plan = UpgradePlan.decode(reader, reader.uint32());
           continue;
-        case 20:
-          if (tag !== 160) {
+        case 18:
+          if (tag !== 144) {
             break;
           }
 
           message.current_storage_provider_id = reader.uint32();
           continue;
-        case 21:
-          if (tag !== 168) {
+        case 19:
+          if (tag !== 152) {
             break;
           }
 
