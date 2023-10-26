@@ -24,7 +24,9 @@ import { MsgEnablePool } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
 import { MsgScheduleRuntimeUpgrade } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
 import { MsgCancelRuntimeUpgrade } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
 /** funders **/
-import { MsgFundPool } from "@kyvejs/types/client/kyve/funders/v1beta1/tx";
+import { MsgCreateFunder } from '@kyvejs/types/lcd/kyve/funders/v1beta1/tx';
+import { MsgUpdateFunder } from '@kyvejs/types/lcd/kyve/funders/v1beta1/tx';
+import { MsgFundPool } from '@kyvejs/types/client/kyve/funders/v1beta1/tx';
 import { MsgDefundPool } from "@kyvejs/types/client/kyve/funders/v1beta1/tx";
 /** stakers **/
 import {
@@ -47,6 +49,8 @@ export const registry: ReadonlyArray<[string, GeneratedType]> = [
   ["/kyve.pool.v1beta1.MsgScheduleRuntimeUpgrade", MsgScheduleRuntimeUpgrade],
   ["/kyve.pool.v1beta1.MsgCancelRuntimeUpgrade", MsgCancelRuntimeUpgrade],
   /** funders **/
+  ["/kyve.funders.v1beta1.MsgCreateFunder", MsgCreateFunder],
+  ["/kyve.funders.v1beta1.MsgUpdateFunder", MsgUpdateFunder],
   ["/kyve.funders.v1beta1.MsgFundPool", MsgFundPool],
   ["/kyve.funders.v1beta1.MsgDefundPool", MsgDefundPool],
   /** stakers **/
@@ -79,6 +83,20 @@ export const load = (protoRegistry: Registry) => {
   });
 };
 export const encodeTxMsg = {
+  createFunder(value: MsgCreateFunder) {
+    return {
+      type_url: "/kyve.funders.v1beta1.MsgCreateFunder",
+      value: MsgCreateFunder.encode(value).finish(),
+    };
+  },
+
+  updateFunder(value: MsgUpdateFunder) {
+    return {
+      type_url: "/kyve.funders.v1beta1.MsgUpdateFunder",
+      value: MsgUpdateFunder.encode(value).finish(),
+    };
+  },
+
   fundPool(value: MsgFundPool) {
     return {
       type_url: "/kyve.funders.v1beta1.MsgFundPool",
@@ -255,6 +273,20 @@ export const encodeTxMsg = {
 };
 
 export const withTypeUrl = {
+  createFunder(value: MsgCreateFunder) {
+    return {
+      typeUrl: "/kyve.funders.v1beta1.MsgCreateFunder",
+      value,
+    };
+  },
+
+  updateFunder(value: MsgUpdateFunder) {
+    return {
+      typeUrl: "/kyve.funders.v1beta1.MsgUpdateFunder",
+      value,
+    };
+  },
+
   fundPool(value: MsgFundPool) {
     return {
       typeUrl: "/kyve.funders.v1beta1.MsgFundPool",
