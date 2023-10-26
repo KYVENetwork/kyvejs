@@ -2347,7 +2347,7 @@ __metadata:
     "@types/node-fetch": ^2.6.2
     "@types/prompts": ^2.0.14
     axios: ^0.27.2
-    bignumber.js: ^9.1.0
+    bignumber.js: ^9.1.2
     commander: ^9.4.0
     dotenv: ^16.0.3
     download: ^8.0.0
@@ -2385,7 +2385,7 @@ __metadata:
     "@types/uuid": ^9.0.2
     arweave: ^1.10.17
     axios: ^0.24.0
-    bignumber.js: ^9.0.1
+    bignumber.js: ^9.1.2
     clone: ^2.1.2
     commander: ^9.4.1
     fs-extra: ^10.0.1
@@ -2427,7 +2427,7 @@ __metadata:
     ajv: ^8.11.0
     axios: 0.25.0
     bech32: 2.0.0
-    bignumber.js: 9.0.2
+    bignumber.js: 9.1.2
     copyfiles: ^2.4.1
     humanize-number: 0.0.2
     jest: ^28.1.1
@@ -4962,14 +4962,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bignumber.js@npm:9.0.2":
-  version: 9.0.2
-  resolution: "bignumber.js@npm:9.0.2"
-  checksum: 8637b71d0a99104b20413c47578953970006fec6b4df796b9dcfd9835ea9c402ea0e727eba9a5ca9f9a393c1d88b6168c5bbe0887598b708d4f8b4870ad62e1f
+"bignumber.js@npm:9.1.2, bignumber.js@npm:^9.1.2":
+  version: 9.1.2
+  resolution: "bignumber.js@npm:9.1.2"
+  checksum: 582c03af77ec9cb0ebd682a373ee6c66475db94a4325f92299621d544aa4bd45cb45fd60001610e94aef8ae98a0905fa538241d9638d4422d57abbeeac6fadaf
   languageName: node
   linkType: hard
 
-"bignumber.js@npm:^9.0.0, bignumber.js@npm:^9.0.1, bignumber.js@npm:^9.0.2, bignumber.js@npm:^9.1.0":
+"bignumber.js@npm:^9.0.0, bignumber.js@npm:^9.0.1, bignumber.js@npm:^9.0.2":
   version: 9.1.1
   resolution: "bignumber.js@npm:9.1.1"
   checksum: ad243b7e2f9120b112d670bb3d674128f0bd2ca1745b0a6c9df0433bd2c0252c43e6315d944c2ac07b4c639e7496b425e46842773cf89c6a2dcd4f31e5c4b11e

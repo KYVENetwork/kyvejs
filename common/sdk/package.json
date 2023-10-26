@@ -34,7 +34,7 @@
     "@kyvejs/types": "1.0.4",
     "axios": "0.25.0",
     "bech32": "2.0.0",
-    "bignumber.js": "9.0.2",
+    "bignumber.js": "9.1.2",
     "humanize-number": "0.0.2",
     "qs": "^6.10.5"
   },
