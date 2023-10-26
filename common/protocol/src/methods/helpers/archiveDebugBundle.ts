@@ -2,7 +2,8 @@ import { existsSync, mkdirSync, createWriteStream, readFileSync } from "fs";
 import path from "path";
 import { DataItem, standardizeError, Validator } from "../..";
 import JSZip from "jszip";
-import jsonDiff from "json-diff";
+import * as Diff from "diff";
+import { VoteType } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
 
 /**
  * archiveDebugBundle is used for storing a bundle for debug
@@ -24,7 +25,6 @@ export function archiveDebugBundle(
   metadata: object
 ): void {
   try {
-    console.log("starting archiveDebugBundle");
     // if "debug" folder under target path does not exist create it
     if (!existsSync(path.join(this.home, `debug`))) {
       mkdirSync(path.join(this.home, `debug`), { recursive: true });
@@ -33,44 +33,66 @@ export function archiveDebugBundle(
     const zip = new JSZip();
 
     // save metadata which includes vote reasons and args
-    zip.file("metadata.json", JSON.stringify(metadata, null, 2));
-    console.log("completed metadata.json");
+    const metadata_str = JSON.stringify(metadata || {}, null, 2);
+    zip.file("metadata.json", metadata_str);
 
     // save current pool state including the raw bundle proposal
-    zip.file("pool.json", JSON.stringify(this.pool || {}, null, 2));
-    console.log("completed pool.json");
+    const pool_str = JSON.stringify(this.pool || {}, null, 2);
+    zip.file("pool.json", pool_str);
 
     // save the proposed bundle from the uploader
-    zip.file("proposed_bundle.json", JSON.stringify(proposedBundle, null, 2));
-    console.log("completed proposed_bundle.json");
+    const proposed_bundle_str = JSON.stringify(proposedBundle || [], null, 2);
+    zip.file("proposed_bundle.json", proposed_bundle_str);
 
     // save the locally created bundle from this node
-    zip.file(
-      "validation_bundle.json",
-      JSON.stringify(validationBundle, null, 2)
+    const validation_bundle_str = JSON.stringify(
+      validationBundle || [],
+      null,
+      2
     );
-    console.log("completed validation_bundle.json");
+    zip.file("validation_bundle.json", validation_bundle_str);
 
     // save the diff of the proposed and local bundle
-    // TODO: does not work
-    // zip.file(
-    //   "diff.txt",
-    //   jsonDiff.diffString(proposedBundle, validationBundle, { color: false })
-    // );
-    console.log("completed diff.txt");
+    const diff_str = Diff.createTwoFilesPatch(
+      "proposed_bundle.json",
+      "validation_bundle.json",
+      proposed_bundle_str,
+      validation_bundle_str
+    );
+    zip.file("diff.txt", diff_str);
 
     // save the logfile of the current session
-    zip.file(
-      "debug.log",
-      readFileSync(path.join(this.home, "logs", this.logFile))
-    );
-    console.log("completed debug.log");
+    const debug_str = readFileSync(path.join(this.home, "logs", this.logFile));
+    zip.file("debug.log", debug_str);
+
+    // get human readable vote
+    let voteType = "";
+
+    switch (vote) {
+      case VoteType.VOTE_TYPE_VALID:
+        voteType = "valid";
+        break;
+      case VoteType.VOTE_TYPE_INVALID:
+        voteType = "invalid";
+        break;
+      case VoteType.VOTE_TYPE_ABSTAIN:
+        voteType = "abstain";
+        break;
+      case VoteType.VOTE_TYPE_UNSPECIFIED:
+        voteType = "unspecified";
+        break;
+      default:
+        voteType = "unrecognized";
+    }
 
     const storageId = this.pool?.bundle_proposal?.storage_id ?? "";
     const zipPath = path.join(
       this.home,
       `debug`,
-      `${vote}_${Math.floor(Date.now() / 1000)}_${storageId.slice(0, 6)}.zip`
+      `${voteType}_${Math.floor(Date.now() / 1000)}_${storageId.slice(
+        0,
+        6
+      )}.zip`
     );
 
     // save zip file

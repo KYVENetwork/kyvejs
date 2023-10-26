@@ -1526,13 +1526,6 @@
     "@ethersproject/properties" "^5.7.0"
     "@ethersproject/strings" "^5.7.0"
 
-"@ewoudenberg/difflib@0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@ewoudenberg/difflib/-/difflib-0.1.0.tgz#a2ae5d3321ffa7c1b47691cf0db189d1264aaaa4"
-  integrity sha512-OU5P5mJyD3OoWYMWY+yIgwvgNS9cFAU10f+DDuvtogcWQOoJIsQ4Hy2McSfUfhKjq8L0FuWVb4Rt7kgA+XK86A==
-  dependencies:
-    heap ">= 0.2.0"
-
 "@humanwhocodes/config-array@^0.11.10":
   version "0.11.10"
   resolved "https://registry.yarnpkg.com/@humanwhocodes/config-array/-/config-array-0.11.10.tgz#5a3ffe32cc9306365fb3fd572596cd602d5e12d2"
@@ -2979,6 +2972,11 @@
   dependencies:
     "@types/node" "*"
 
+"@types/diff@^5.0.7":
+  version "5.0.7"
+  resolved "https://registry.yarnpkg.com/@types/diff/-/diff-5.0.7.tgz#471bad8be0d911ed04d115863402920f3a84079c"
+  integrity sha512-adBosR2GntaQQiuHnfRN9HtxYpoHHJBcdyz7VSXhjpSAmtvIfu/S1fjTqwuIx/Ypba6LCZdfWIqPYx2BR5TneQ==
+
 "@types/download@^8.0.1":
   version "8.0.2"
   resolved "https://registry.yarnpkg.com/@types/download/-/download-8.0.2.tgz#2ef0a8b19caec152b51a2efe2e99a6795dcf1ec2"
@@ -3037,11 +3035,6 @@
   dependencies:
     expect "^28.0.0"
     pretty-format "^28.0.0"
-
-"@types/json-diff@^1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@types/json-diff/-/json-diff-1.0.1.tgz#533f520aa8d6d8aa105526a243c6920c38061f9d"
-  integrity sha512-ikZFvf8Daw68CV6Ggawl0uz3UvisGrr4BNXhgLG25jLesuSUQVS2j7MYuZQfN5TLiBID+zAoyDsdwqmdgnr5Ow==
 
 "@types/json-schema@^7.0.9":
   version "7.0.12"
@@ -4341,11 +4334,6 @@ color-support@^1.1.3:
   resolved "https://registry.yarnpkg.com/color-support/-/color-support-1.1.3.tgz#93834379a1cc9a0c61f82f52f0d04322251bd5a2"
   integrity sha512-qiBjkpbMLO/HL68y+lh4q0/O1MZFj2RX6X/KmMa3+gJD3z+WwI1ZzDHysvqHGS3mP6mznPckpXmw1nI9cJjyRg==
 
-colors@^1.4.0:
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/colors/-/colors-1.4.0.tgz#c50491479d4c1bdaed2c9ced32cf7c7dc2360f78"
-  integrity sha512-a+UqTh4kgZg/SlGvfbzDHpgRu7AAQOmmqRHJnxhRZICKFUT91brVhNNt58CMWU9PsBbv3PDCZUHbVxuDiH2mtA==
-
 columnify@1.6.0:
   version "1.6.0"
   resolved "https://registry.yarnpkg.com/columnify/-/columnify-1.6.0.tgz#6989531713c9008bb29735e61e37acf5bd553cf3"
@@ -4819,6 +4807,11 @@ diff@^4.0.1:
   resolved "https://registry.yarnpkg.com/diff/-/diff-4.0.2.tgz#60f3aecb89d5fae520c11aa19efc2bb982aade7d"
   integrity sha512-58lmxKSA4BNyLz+HHMUzlOEpg09FV+ev6ZMe3vJihgdxzgcwZ8VoEEPmALCZG9LmqfVoNMMKpttIYTVG6uDY7A==
 
+diff@^5.1.0:
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/diff/-/diff-5.1.0.tgz#bc52d298c5ea8df9194800224445ed43ffc87e40"
+  integrity sha512-D+mk+qE8VC/PAUrlAU34N+VfXev0ghe5ywmpqrawphmVZc1bEfn56uo9qpyGp1p4xpzOHkSW4ztBd6L7Xx4ACw==
+
 dir-glob@^3.0.1:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/dir-glob/-/dir-glob-3.0.1.tgz#56dbf73d992a4a93ba1584f4534063fd2e41717f"
@@ -4873,13 +4866,6 @@ dprint-node@^1.0.7:
   integrity sha512-NTZOW9A7ipb0n7z7nC3wftvsbceircwVHSgzobJsEQa+7RnOMbhrfX5IflA6CtC4GA63DSAiHYXa4JKEy9F7cA==
   dependencies:
     detect-libc "^1.0.3"
-
-dreamopt@~0.8.0:
-  version "0.8.0"
-  resolved "https://registry.yarnpkg.com/dreamopt/-/dreamopt-0.8.0.tgz#5bcc80be7097e45fc489c342405ab68140a8c1d9"
-  integrity sha512-vyJTp8+mC+G+5dfgsY+r3ckxlz+QMX40VjPQsZc5gxVAxLmi64TBoVkP54A/pRAXMXsbu2GMMBrZPxNv23waMg==
-  dependencies:
-    wordwrap ">=0.0.2"
 
 duplexer3@^0.1.4:
   version "0.1.5"
@@ -5962,11 +5948,6 @@ hash.js@1.1.7, hash.js@^1.0.0, hash.js@^1.0.3:
     inherits "^2.0.3"
     minimalistic-assert "^1.0.1"
 
-"heap@>= 0.2.0":
-  version "0.2.7"
-  resolved "https://registry.yarnpkg.com/heap/-/heap-0.2.7.tgz#1e6adf711d3f27ce35a81fe3b7bd576c2260a8fc"
-  integrity sha512-2bsegYkkHO+h/9MGbn6KWcE45cHZgPANo5LXF7EvWdT0yT2EguSVO1nDgU5c8+ZOPwp2vMNa7YFsJhVcDR9Sdg==
-
 hi-base32@^0.5.1:
   version "0.5.1"
   resolved "https://registry.yarnpkg.com/hi-base32/-/hi-base32-0.5.1.tgz#1279f2ddae2673219ea5870c2121d2a33132857e"
@@ -6935,15 +6916,6 @@ json-buffer@3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/json-buffer/-/json-buffer-3.0.0.tgz#5b1f397afc75d677bde8bcfc0e47e1f9a3d9a898"
   integrity sha512-CuUqjv0FUZIdXkHPI8MezCnFCdaTAacej1TZYulLoAg1h/PhwkdXFN4V/gzY4g+fMBCOV2xF+rp7t2XD2ns/NQ==
-
-json-diff@^1.0.6:
-  version "1.0.6"
-  resolved "https://registry.yarnpkg.com/json-diff/-/json-diff-1.0.6.tgz#63690f695469b6437efaed5bb3d51f011f7cac28"
-  integrity sha512-tcFIPRdlc35YkYdGxcamJjllUhXWv4n2rK9oJ2RsAzV4FBkuV4ojKEDgcZ+kpKxDmJKv+PFK65+1tVVOnSeEqA==
-  dependencies:
-    "@ewoudenberg/difflib" "0.1.0"
-    colors "^1.4.0"
-    dreamopt "~0.8.0"
 
 json-parse-better-errors@^1.0.1:
   version "1.0.2"
@@ -10157,7 +10129,7 @@ wif@^2.0.6:
   dependencies:
     bs58check "<3.0.0"
 
-wordwrap@>=0.0.2, wordwrap@^1.0.0:
+wordwrap@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/wordwrap/-/wordwrap-1.0.0.tgz#27584810891456a4171c8d0226441ade90cbcaeb"
   integrity sha512-gvVzJFlPycKc5dZN4yPkP8w7Dc37BtP1yczEneOb4uq34pXZcvrtRTmWV8W+Ume+XCxKgbjM+nevkyFPMybd4Q==
