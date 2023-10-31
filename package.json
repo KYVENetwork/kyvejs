@@ -28,10 +28,10 @@
   },
   "scripts": {
     "setup": "lerna clean && yarn install && lerna run build",
-    "build:docker": "yarn nx reset && yarn install && lerna run build",
     "graph": "yarn nx graph",
     "build": "lerna run build",
     "build:binaries": "lerna run build:binaries --concurrency 1",
+    "build:docker": "yarn install && lerna run build",
     "pub": "lerna run build && lerna publish",
     "build:changed": "lerna run --since origin/master --include-dependents build",
     "test": "lerna run test",
@@ -40,7 +40,7 @@
     "clean": "lerna run clean",
     "lint": "lerna run lint",
     "lint:fix": "lerna run lint:fix",
-    "custom-version": "yarn lerna version --conventional-commits=false",
+    "custom-version": "yarn lerna version --conventional-commits=false"
   },
   "version": "0.0.0"
 }

@@ -3,7 +3,8 @@
 #
 FROM node:lts AS appbuild
 WORKDIR /usr/src/app
-COPY . .
+COPY package.json yarn.lock lerna.json tsconfig.json ./
+COPY common ./common
 RUN yarn build:docker
 RUN cd ./common/docker
 RUN yarn run build:binaries

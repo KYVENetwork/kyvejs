@@ -8,7 +8,7 @@
     "start": "node ./dist/src/index.js",
     "format": "prettier --write .",
     "lint": "eslint . --ignore-path ./.eslintignore --ext ts --ext tsx --ext js --ext jsx",
-    "lint:fix": "eslint --fix . --ignore-path ./.eslintignore --ext ts --ext tsx --ext js --ext jsx",
+    "lint:fix": "eslint --fix . --ignore-path ./.eslintignore --ext ts --ext tsx --ext js --ext jsx"
   },
   "bin": "./dist/src/index.js",
   "pkg": {
