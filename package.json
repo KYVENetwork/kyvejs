@@ -9,7 +9,6 @@
     "common/*",
     "docker-integrations/*",
     "integrations/*",
-    "proxies/*",
     "tools/*"
   ],
   "devDependencies": {
@@ -42,7 +41,6 @@
     "lint": "lerna run lint",
     "lint:fix": "lerna run lint:fix",
     "custom-version": "yarn lerna version --conventional-commits=false",
-    "export-grpc-stubs": "protoc --proto_path=./common/protocol/src/types --plugin=./node_modules/.bin/protoc-gen-ts_proto --ts_proto_opt=snakeToCamel=false --ts_proto_opt=outputServices=grpc-js --ts_proto_out=./common/docker/src common/protocol/src/types/protos/runtime.proto"
   },
   "version": "0.0.0"
 }
