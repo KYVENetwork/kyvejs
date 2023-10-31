@@ -1,0 +1,8 @@
+**/out
+.git
+.env
+.aws
+*.md
+LICENSE
+scripts/
+Dockerfile
