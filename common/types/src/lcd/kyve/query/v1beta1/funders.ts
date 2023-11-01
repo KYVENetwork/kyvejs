@@ -5,6 +5,63 @@ import { PageRequest, PageResponse } from "../../../cosmos/base/query/v1beta1/pa
 
 export const protobufPackage = "kyve.query.v1beta1";
 
+/** FundingStatus ... */
+export enum FundingStatus {
+  /** FUNDING_STATUS_UNSPECIFIED - FundingStatusUnspecified ... */
+  FUNDING_STATUS_UNSPECIFIED = "FUNDING_STATUS_UNSPECIFIED",
+  /** FUNDING_STATUS_ACTIVE - FundingStatusActive status is set when the funding is active. */
+  FUNDING_STATUS_ACTIVE = "FUNDING_STATUS_ACTIVE",
+  /** FUNDING_STATUS_INACTIVE - FundingStatusInactive status is set when the funding has been used up or refunded. */
+  FUNDING_STATUS_INACTIVE = "FUNDING_STATUS_INACTIVE",
+  UNRECOGNIZED = "UNRECOGNIZED",
+}
+
+export function fundingStatusFromJSON(object: any): FundingStatus {
+  switch (object) {
+    case 0:
+    case "FUNDING_STATUS_UNSPECIFIED":
+      return FundingStatus.FUNDING_STATUS_UNSPECIFIED;
+    case 1:
+    case "FUNDING_STATUS_ACTIVE":
+      return FundingStatus.FUNDING_STATUS_ACTIVE;
+    case 2:
+    case "FUNDING_STATUS_INACTIVE":
+      return FundingStatus.FUNDING_STATUS_INACTIVE;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return FundingStatus.UNRECOGNIZED;
+  }
+}
+
+export function fundingStatusToJSON(object: FundingStatus): string {
+  switch (object) {
+    case FundingStatus.FUNDING_STATUS_UNSPECIFIED:
+      return "FUNDING_STATUS_UNSPECIFIED";
+    case FundingStatus.FUNDING_STATUS_ACTIVE:
+      return "FUNDING_STATUS_ACTIVE";
+    case FundingStatus.FUNDING_STATUS_INACTIVE:
+      return "FUNDING_STATUS_INACTIVE";
+    case FundingStatus.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+
+export function fundingStatusToNumber(object: FundingStatus): number {
+  switch (object) {
+    case FundingStatus.FUNDING_STATUS_UNSPECIFIED:
+      return 0;
+    case FundingStatus.FUNDING_STATUS_ACTIVE:
+      return 1;
+    case FundingStatus.FUNDING_STATUS_INACTIVE:
+      return 2;
+    case FundingStatus.UNRECOGNIZED:
+    default:
+      return -1;
+  }
+}
+
 /** Funder ... */
 export interface Funder {
   /** address ... */
@@ -73,8 +130,8 @@ export interface QueryFundersResponse {
 export interface QueryFunderRequest {
   /** address ... */
   address: string;
-  /** with_inactive_fundings ... */
-  with_inactive_fundings: boolean;
+  /** status ... */
+  status: FundingStatus;
 }
 
 /** QueryFunderResponse is the response type for the Query/Funder RPC method. */
@@ -95,8 +152,8 @@ export interface QueryFundingsByFunderRequest {
     | undefined;
   /** address ... */
   address: string;
-  /** with_inactive_fundings ... */
-  with_inactive_fundings: boolean;
+  /** status ... */
+  status: FundingStatus;
 }
 
 /** QueryFundingsByFunderResponse is the response type for the Query/FundingsByFunder RPC method. */
@@ -117,8 +174,8 @@ export interface QueryFundingsByPoolRequest {
     | undefined;
   /** pool_id ... */
   pool_id: string;
-  /** with_inactive_fundings ... */
-  with_inactive_fundings: boolean;
+  /** status ... */
+  status: FundingStatus;
 }
 
 /** QueryFundingsByPoolResponse is the response type for the Query/FundingsByPool RPC method. */
@@ -676,7 +733,7 @@ export const QueryFundersResponse = {
 };
 
 function createBaseQueryFunderRequest(): QueryFunderRequest {
-  return { address: "", with_inactive_fundings: false };
+  return { address: "", status: FundingStatus.FUNDING_STATUS_UNSPECIFIED };
 }
 
 export const QueryFunderRequest = {
@@ -684,8 +741,8 @@ export const QueryFunderRequest = {
     if (message.address !== "") {
       writer.uint32(10).string(message.address);
     }
-    if (message.with_inactive_fundings === true) {
-      writer.uint32(16).bool(message.with_inactive_fundings);
+    if (message.status !== FundingStatus.FUNDING_STATUS_UNSPECIFIED) {
+      writer.uint32(24).int32(fundingStatusToNumber(message.status));
     }
     return writer;
   },
@@ -704,12 +761,12 @@ export const QueryFunderRequest = {
 
           message.address = reader.string();
           continue;
-        case 2:
-          if (tag !== 16) {
+        case 3:
+          if (tag !== 24) {
             break;
           }
 
-          message.with_inactive_fundings = reader.bool();
+          message.status = fundingStatusFromJSON(reader.int32());
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -723,9 +780,7 @@ export const QueryFunderRequest = {
   fromJSON(object: any): QueryFunderRequest {
     return {
       address: isSet(object.address) ? globalThis.String(object.address) : "",
-      with_inactive_fundings: isSet(object.with_inactive_fundings)
-        ? globalThis.Boolean(object.with_inactive_fundings)
-        : false,
+      status: isSet(object.status) ? fundingStatusFromJSON(object.status) : FundingStatus.FUNDING_STATUS_UNSPECIFIED,
     };
   },
 
@@ -734,8 +789,8 @@ export const QueryFunderRequest = {
     if (message.address !== "") {
       obj.address = message.address;
     }
-    if (message.with_inactive_fundings === true) {
-      obj.with_inactive_fundings = message.with_inactive_fundings;
+    if (message.status !== FundingStatus.FUNDING_STATUS_UNSPECIFIED) {
+      obj.status = fundingStatusToJSON(message.status);
     }
     return obj;
   },
@@ -746,7 +801,7 @@ export const QueryFunderRequest = {
   fromPartial<I extends Exact<DeepPartial<QueryFunderRequest>, I>>(object: I): QueryFunderRequest {
     const message = createBaseQueryFunderRequest();
     message.address = object.address ?? "";
-    message.with_inactive_fundings = object.with_inactive_fundings ?? false;
+    message.status = object.status ?? FundingStatus.FUNDING_STATUS_UNSPECIFIED;
     return message;
   },
 };
@@ -828,7 +883,7 @@ export const QueryFunderResponse = {
 };
 
 function createBaseQueryFundingsByFunderRequest(): QueryFundingsByFunderRequest {
-  return { pagination: undefined, address: "", with_inactive_fundings: false };
+  return { pagination: undefined, address: "", status: FundingStatus.FUNDING_STATUS_UNSPECIFIED };
 }
 
 export const QueryFundingsByFunderRequest = {
@@ -839,8 +894,8 @@ export const QueryFundingsByFunderRequest = {
     if (message.address !== "") {
       writer.uint32(18).string(message.address);
     }
-    if (message.with_inactive_fundings === true) {
-      writer.uint32(24).bool(message.with_inactive_fundings);
+    if (message.status !== FundingStatus.FUNDING_STATUS_UNSPECIFIED) {
+      writer.uint32(24).int32(fundingStatusToNumber(message.status));
     }
     return writer;
   },
@@ -871,7 +926,7 @@ export const QueryFundingsByFunderRequest = {
             break;
           }
 
-          message.with_inactive_fundings = reader.bool();
+          message.status = fundingStatusFromJSON(reader.int32());
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -886,9 +941,7 @@ export const QueryFundingsByFunderRequest = {
     return {
       pagination: isSet(object.pagination) ? PageRequest.fromJSON(object.pagination) : undefined,
       address: isSet(object.address) ? globalThis.String(object.address) : "",
-      with_inactive_fundings: isSet(object.with_inactive_fundings)
-        ? globalThis.Boolean(object.with_inactive_fundings)
-        : false,
+      status: isSet(object.status) ? fundingStatusFromJSON(object.status) : FundingStatus.FUNDING_STATUS_UNSPECIFIED,
     };
   },
 
@@ -900,8 +953,8 @@ export const QueryFundingsByFunderRequest = {
     if (message.address !== "") {
       obj.address = message.address;
     }
-    if (message.with_inactive_fundings === true) {
-      obj.with_inactive_fundings = message.with_inactive_fundings;
+    if (message.status !== FundingStatus.FUNDING_STATUS_UNSPECIFIED) {
+      obj.status = fundingStatusToJSON(message.status);
     }
     return obj;
   },
@@ -915,7 +968,7 @@ export const QueryFundingsByFunderRequest = {
       ? PageRequest.fromPartial(object.pagination)
       : undefined;
     message.address = object.address ?? "";
-    message.with_inactive_fundings = object.with_inactive_fundings ?? false;
+    message.status = object.status ?? FundingStatus.FUNDING_STATUS_UNSPECIFIED;
     return message;
   },
 };
@@ -999,7 +1052,7 @@ export const QueryFundingsByFunderResponse = {
 };
 
 function createBaseQueryFundingsByPoolRequest(): QueryFundingsByPoolRequest {
-  return { pagination: undefined, pool_id: "0", with_inactive_fundings: false };
+  return { pagination: undefined, pool_id: "0", status: FundingStatus.FUNDING_STATUS_UNSPECIFIED };
 }
 
 export const QueryFundingsByPoolRequest = {
@@ -1010,8 +1063,8 @@ export const QueryFundingsByPoolRequest = {
     if (message.pool_id !== "0") {
       writer.uint32(16).uint64(message.pool_id);
     }
-    if (message.with_inactive_fundings === true) {
-      writer.uint32(24).bool(message.with_inactive_fundings);
+    if (message.status !== FundingStatus.FUNDING_STATUS_UNSPECIFIED) {
+      writer.uint32(24).int32(fundingStatusToNumber(message.status));
     }
     return writer;
   },
@@ -1042,7 +1095,7 @@ export const QueryFundingsByPoolRequest = {
             break;
           }
 
-          message.with_inactive_fundings = reader.bool();
+          message.status = fundingStatusFromJSON(reader.int32());
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -1057,9 +1110,7 @@ export const QueryFundingsByPoolRequest = {
     return {
       pagination: isSet(object.pagination) ? PageRequest.fromJSON(object.pagination) : undefined,
       pool_id: isSet(object.pool_id) ? globalThis.String(object.pool_id) : "0",
-      with_inactive_fundings: isSet(object.with_inactive_fundings)
-        ? globalThis.Boolean(object.with_inactive_fundings)
-        : false,
+      status: isSet(object.status) ? fundingStatusFromJSON(object.status) : FundingStatus.FUNDING_STATUS_UNSPECIFIED,
     };
   },
 
@@ -1071,8 +1122,8 @@ export const QueryFundingsByPoolRequest = {
     if (message.pool_id !== "0") {
       obj.pool_id = message.pool_id;
     }
-    if (message.with_inactive_fundings === true) {
-      obj.with_inactive_fundings = message.with_inactive_fundings;
+    if (message.status !== FundingStatus.FUNDING_STATUS_UNSPECIFIED) {
+      obj.status = fundingStatusToJSON(message.status);
     }
     return obj;
   },
@@ -1086,7 +1137,7 @@ export const QueryFundingsByPoolRequest = {
       ? PageRequest.fromPartial(object.pagination)
       : undefined;
     message.pool_id = object.pool_id ?? "0";
-    message.with_inactive_fundings = object.with_inactive_fundings ?? false;
+    message.status = object.status ?? FundingStatus.FUNDING_STATUS_UNSPECIFIED;
     return message;
   },
 };

@@ -45,8 +45,6 @@ export interface FundingState {
   pool_id: string;
   /** active_funder_addresses is the list of all active fundings */
   active_funder_addresses: string[];
-  /** total_amount is the total amount of funds in ukyve the pool has from all fundings */
-  total_amount: string;
 }
 
 function createBaseFunder(): Funder {
@@ -303,7 +301,7 @@ export const Funding = {
 };
 
 function createBaseFundingState(): FundingState {
-  return { pool_id: "0", active_funder_addresses: [], total_amount: "0" };
+  return { pool_id: "0", active_funder_addresses: [] };
 }
 
 export const FundingState = {
@@ -313,9 +311,6 @@ export const FundingState = {
     }
     for (const v of message.active_funder_addresses) {
       writer.uint32(18).string(v!);
-    }
-    if (message.total_amount !== "0") {
-      writer.uint32(24).uint64(message.total_amount);
     }
     return writer;
   },
@@ -341,13 +336,6 @@ export const FundingState = {
 
           message.active_funder_addresses.push(reader.string());
           continue;
-        case 3:
-          if (tag !== 24) {
-            break;
-          }
-
-          message.total_amount = longToString(reader.uint64() as Long);
-          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -363,7 +351,6 @@ export const FundingState = {
       active_funder_addresses: globalThis.Array.isArray(object?.active_funder_addresses)
         ? object.active_funder_addresses.map((e: any) => globalThis.String(e))
         : [],
-      total_amount: isSet(object.total_amount) ? globalThis.String(object.total_amount) : "0",
     };
   },
 
@@ -375,9 +362,6 @@ export const FundingState = {
     if (message.active_funder_addresses?.length) {
       obj.active_funder_addresses = message.active_funder_addresses;
     }
-    if (message.total_amount !== "0") {
-      obj.total_amount = message.total_amount;
-    }
     return obj;
   },
 
@@ -388,7 +372,6 @@ export const FundingState = {
     const message = createBaseFundingState();
     message.pool_id = object.pool_id ?? "0";
     message.active_funder_addresses = object.active_funder_addresses?.map((e) => e) || [];
-    message.total_amount = object.total_amount ?? "0";
     return message;
   },
 };

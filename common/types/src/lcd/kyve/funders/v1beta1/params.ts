@@ -10,10 +10,16 @@ export interface Params {
   min_funding_amount: string;
   /** Minimum amount of tokens that can be funded per bundle. */
   min_funding_amount_per_bundle: string;
+  /**
+   * Minimum ratio between the funded amount and the amount_per_bundle.
+   * In other words this param ensures, that a funder provides at least funding for
+   * `min_funding_multiple` bundles.
+   */
+  min_funding_multiple: string;
 }
 
 function createBaseParams(): Params {
-  return { min_funding_amount: "0", min_funding_amount_per_bundle: "0" };
+  return { min_funding_amount: "0", min_funding_amount_per_bundle: "0", min_funding_multiple: "0" };
 }
 
 export const Params = {
@@ -23,6 +29,9 @@ export const Params = {
     }
     if (message.min_funding_amount_per_bundle !== "0") {
       writer.uint32(16).uint64(message.min_funding_amount_per_bundle);
+    }
+    if (message.min_funding_multiple !== "0") {
+      writer.uint32(24).uint64(message.min_funding_multiple);
     }
     return writer;
   },
@@ -48,6 +57,13 @@ export const Params = {
 
           message.min_funding_amount_per_bundle = longToString(reader.uint64() as Long);
           continue;
+        case 3:
+          if (tag !== 24) {
+            break;
+          }
+
+          message.min_funding_multiple = longToString(reader.uint64() as Long);
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -63,6 +79,7 @@ export const Params = {
       min_funding_amount_per_bundle: isSet(object.min_funding_amount_per_bundle)
         ? globalThis.String(object.min_funding_amount_per_bundle)
         : "0",
+      min_funding_multiple: isSet(object.min_funding_multiple) ? globalThis.String(object.min_funding_multiple) : "0",
     };
   },
 
@@ -74,6 +91,9 @@ export const Params = {
     if (message.min_funding_amount_per_bundle !== "0") {
       obj.min_funding_amount_per_bundle = message.min_funding_amount_per_bundle;
     }
+    if (message.min_funding_multiple !== "0") {
+      obj.min_funding_multiple = message.min_funding_multiple;
+    }
     return obj;
   },
 
@@ -84,6 +104,7 @@ export const Params = {
     const message = createBaseParams();
     message.min_funding_amount = object.min_funding_amount ?? "0";
     message.min_funding_amount_per_bundle = object.min_funding_amount_per_bundle ?? "0";
+    message.min_funding_multiple = object.min_funding_multiple ?? "0";
     return message;
   },
 };
