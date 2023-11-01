@@ -4,7 +4,7 @@
   "license": "MIT",
   "scripts": {
     "build": "rimraf dist && tsc",
-    "build:binaries": "yarn build && rimraf out && pkg --no-bytecode --public-packages '*' --output out/kyve package.json && node ../../common/protocol/dist/src/scripts/checksum.js",
+    "build:binaries": "yarn build && rimraf out && pkg -t ${TARGET:-latest-linux-x64,latest-linux-arm64,latest-macos-x64} --no-bytecode --public-packages '*' --output out/kyve package.json && node ../../common/protocol/dist/src/scripts/checksum.js",
     "start": "node ./dist/index.js",
     "format": "prettier --write ."
   },
