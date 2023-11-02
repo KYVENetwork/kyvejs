@@ -15,6 +15,8 @@ import { MsgWithdrawRewards } from "@kyvejs/types/client/kyve/delegation/v1beta1
 import { MsgRedelegate } from "@kyvejs/types/client/kyve/delegation/v1beta1/tx";
 import { MsgUndelegate } from "@kyvejs/types/client/kyve/delegation/v1beta1/tx";
 import { MsgUpdateParams as MsgUpdateParamsDelegation } from "@kyvejs/types/client/kyve/delegation/v1beta1/tx";
+import { MsgFundPool } from "@kyvejs/types/client/kyve/funders/v1beta1/tx";
+import { MsgDefundPool } from "@kyvejs/types/client/kyve/funders/v1beta1/tx";
 /** fees **/
 import { MsgUpdateParams as MsgUpdateParamsGlobal } from "@kyvejs/types/client/kyve/global/v1beta1/tx";
 import { MsgCreatePool } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
@@ -23,11 +25,6 @@ import { MsgDisablePool } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
 import { MsgEnablePool } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
 import { MsgScheduleRuntimeUpgrade } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
 import { MsgCancelRuntimeUpgrade } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
-/** funders **/
-import { MsgCreateFunder } from '@kyvejs/types/lcd/kyve/funders/v1beta1/tx';
-import { MsgUpdateFunder } from '@kyvejs/types/lcd/kyve/funders/v1beta1/tx';
-import { MsgFundPool } from '@kyvejs/types/client/kyve/funders/v1beta1/tx';
-import { MsgDefundPool } from "@kyvejs/types/client/kyve/funders/v1beta1/tx";
 /** stakers **/
 import {
   MsgClaimCommissionRewards,
@@ -38,6 +35,9 @@ import { MsgJoinPool } from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
 import { MsgUpdateCommission } from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
 import { MsgLeavePool } from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
 import { MsgUpdateParams as MsgUpdateParamsStakers } from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
+/** funders **/
+import { MsgCreateFunder } from "@kyvejs/types/lcd/kyve/funders/v1beta1/tx";
+import { MsgUpdateFunder } from "@kyvejs/types/lcd/kyve/funders/v1beta1/tx";
 
 export const registry: ReadonlyArray<[string, GeneratedType]> = [
   ...defaultRegistryTypes,

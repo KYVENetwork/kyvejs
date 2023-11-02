@@ -1,13 +1,14 @@
-import { AminoConverters } from "@cosmjs/stargate";
 import { Decimal } from "@cosmjs/math";
+import { AminoConverters } from "@cosmjs/stargate";
 import {
-  MsgCreateStaker,
-  MsgUpdateMetadata,
-  MsgJoinPool,
-  MsgUpdateCommission,
-  MsgLeavePool,
   MsgClaimCommissionRewards,
+  MsgCreateStaker,
+  MsgJoinPool,
+  MsgLeavePool,
+  MsgUpdateCommission,
+  MsgUpdateMetadata,
 } from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
+
 import { isNotEmpty } from "../utils";
 
 function protoDecimalToJson(decimal: string): string {

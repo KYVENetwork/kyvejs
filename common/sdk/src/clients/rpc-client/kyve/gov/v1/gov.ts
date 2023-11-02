@@ -1,22 +1,22 @@
-import { StdFee } from '@cosmjs/amino/build/signdoc';
-import { coins } from '@cosmjs/stargate';
-import { VoteOption } from '@kyvejs/types/client/cosmos/gov/v1/gov';
-import { MsgUpdateParams as MsgUpdateParamsBundles } from '@kyvejs/types/client/kyve/bundles/v1beta1/tx';
-import { MsgUpdateParams as MsgUpdateParamsDelegation } from '@kyvejs/types/client/kyve/delegation/v1beta1/tx';
-import { MsgUpdateParams as MsgUpdateParamsGlobal } from '@kyvejs/types/client/kyve/global/v1beta1/tx';
+import { StdFee } from "@cosmjs/amino/build/signdoc";
+import { coins } from "@cosmjs/stargate";
+import { VoteOption } from "@kyvejs/types/client/cosmos/gov/v1/gov";
+import { MsgUpdateParams as MsgUpdateParamsBundles } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
+import { MsgUpdateParams as MsgUpdateParamsDelegation } from "@kyvejs/types/client/kyve/delegation/v1beta1/tx";
+import { MsgUpdateParams as MsgUpdateParamsGlobal } from "@kyvejs/types/client/kyve/global/v1beta1/tx";
 import {
   MsgCancelRuntimeUpgrade,
   MsgCreatePool,
   MsgDisablePool,
   MsgEnablePool,
   MsgScheduleRuntimeUpgrade,
-  MsgUpdatePool
-} from '@kyvejs/types/client/kyve/pool/v1beta1/tx';
-import { MsgUpdateParams as MsgUpdateParamsStakers } from '@kyvejs/types/client/kyve/stakers/v1beta1/tx';
+  MsgUpdatePool,
+} from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
+import { MsgUpdateParams as MsgUpdateParamsStakers } from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
 
-import { GOV_AUTHORITY } from '../../../../../constants';
-import { encodeTxMsg } from '../../../../../registry/tx.registry';
-import { KyveSigning, PendingTx } from '../../../signing';
+import { GOV_AUTHORITY } from "../../../../../constants";
+import { encodeTxMsg } from "../../../../../registry/tx.registry";
+import { KyveSigning, PendingTx } from "../../../signing";
 
 export default class KyveGovMsg extends KyveSigning {
   private createGovTx(

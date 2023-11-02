@@ -1,10 +1,11 @@
 import { AminoConverters } from "@cosmjs/stargate";
 import {
   MsgDelegate,
-  MsgWithdrawRewards,
   MsgRedelegate,
   MsgUndelegate,
+  MsgWithdrawRewards,
 } from "@kyvejs/types/client/kyve/delegation/v1beta1/tx";
+
 import { isNotEmpty } from "../utils";
 
 export const createDelegationAminoConverters = (): AminoConverters => {

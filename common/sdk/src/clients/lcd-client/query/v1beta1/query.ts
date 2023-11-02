@@ -2,18 +2,18 @@ import paginationQuery from "@kyvejs/types/client/cosmos/base/query/v1beta1/pagi
 import kyveQueryAccount from "@kyvejs/types/client/kyve/query/v1beta1/account";
 import kyveQueryBundles from "@kyvejs/types/client/kyve/query/v1beta1/bundles";
 import kyveQueryDelegation from "@kyvejs/types/client/kyve/query/v1beta1/delegation";
+import kyveQueryFunders from "@kyvejs/types/client/kyve/query/v1beta1/funders";
 import kyveQueryParamsRes from "@kyvejs/types/client/kyve/query/v1beta1/params";
 import kyveQueryPools from "@kyvejs/types/client/kyve/query/v1beta1/pools";
 import kyveQueryStakers from "@kyvejs/types/client/kyve/query/v1beta1/stakers";
 import kyveQueryAccountRes from "@kyvejs/types/lcd/kyve/query/v1beta1/account";
 import kyveQueryBundlesRes from "@kyvejs/types/lcd/kyve/query/v1beta1/bundles";
 import kyveQueryDelegationRes from "@kyvejs/types/lcd/kyve/query/v1beta1/delegation";
+import kyveQueryFundersRes from "@kyvejs/types/lcd/kyve/query/v1beta1/funders";
 import kyveQueryPoolsRes from "@kyvejs/types/lcd/kyve/query/v1beta1/pools";
 import kyveQueryStakersRes from "@kyvejs/types/lcd/kyve/query/v1beta1/stakers";
-import kyveQueryFunders from "@kyvejs/types/client/kyve/query/v1beta1/funders";
-import kyveQueryFundersRes from "@kyvejs/types/lcd/kyve/query/v1beta1/funders";
 
-import {AbstractKyveLCDClient} from "../../lcd-client.abstract";
+import { AbstractKyveLCDClient } from "../../lcd-client.abstract";
 
 type NestedPartial<T> = {
   [K in keyof T]?: T[K] extends Array<infer R>
@@ -262,7 +262,9 @@ export class KyveRegistryLCDClient extends AbstractKyveLCDClient {
 
   async funders(
     params?: PaginationAllPartialRequestUtilType<kyveQueryFunders.QueryFundersRequest>
-  ): Promise<PaginationResponseTypeUtil<kyveQueryFundersRes.QueryFundersResponse>> {
+  ): Promise<
+    PaginationResponseTypeUtil<kyveQueryFundersRes.QueryFundersResponse>
+  > {
     const parameters: Record<string, any> = {};
     if (typeof params?.pagination !== "undefined") {
       parameters.pagination = params.pagination;

@@ -1,5 +1,6 @@
 import { AminoConverters } from "@cosmjs/stargate";
 import { MsgVote } from "@kyvejs/types/client/cosmos/gov/v1/tx";
+
 import { isNotEmpty } from "../utils";
 
 export const createGovV1AminoConverters = (): AminoConverters => {
