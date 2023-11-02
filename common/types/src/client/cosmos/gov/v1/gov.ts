@@ -148,7 +148,9 @@ export function proposalStatusToJSON(object: ProposalStatus): string {
 
 /** WeightedVoteOption defines a unit of vote for vote split. */
 export interface WeightedVoteOption {
+  /** option defines the valid vote options, it must not contain duplicate vote options. */
   option: VoteOption;
+  /** weight is the vote weight associated with the vote option. */
   weight: string;
 }
 
@@ -157,38 +159,79 @@ export interface WeightedVoteOption {
  * proposal.
  */
 export interface Deposit {
+  /** proposal_id defines the unique id of the proposal. */
   proposal_id: string;
+  /** depositor defines the deposit addresses from the proposals. */
   depositor: string;
+  /** amount to be deposited by depositor. */
   amount: Coin[];
 }
 
 /** Proposal defines the core field members of a governance proposal. */
 export interface Proposal {
+  /** id defines the unique id of the proposal. */
   id: string;
+  /** messages are the arbitrary messages to be executed if the proposal passes. */
   messages: Any[];
+  /** status defines the proposal status. */
   status: ProposalStatus;
   /**
    * final_tally_result is the final tally result of the proposal. When
    * querying a proposal via gRPC, this field is not populated until the
    * proposal's voting period has ended.
    */
-  final_tally_result?: TallyResult | undefined;
-  submit_time?: Date | undefined;
-  deposit_end_time?: Date | undefined;
+  final_tally_result?:
+    | TallyResult
+    | undefined;
+  /** submit_time is the time of proposal submission. */
+  submit_time?:
+    | Date
+    | undefined;
+  /** deposit_end_time is the end time for deposition. */
+  deposit_end_time?:
+    | Date
+    | undefined;
+  /** total_deposit is the total deposit on the proposal. */
   total_deposit: Coin[];
-  voting_start_time?: Date | undefined;
+  /** voting_start_time is the starting time to vote on a proposal. */
+  voting_start_time?:
+    | Date
+    | undefined;
+  /** voting_end_time is the end time of voting on a proposal. */
   voting_end_time?:
     | Date
     | undefined;
   /** metadata is any arbitrary metadata attached to the proposal. */
   metadata: string;
+  /**
+   * title is the title of the proposal
+   *
+   * Since: cosmos-sdk 0.47
+   */
+  title: string;
+  /**
+   * summary is a short summary of the proposal
+   *
+   * Since: cosmos-sdk 0.47
+   */
+  summary: string;
+  /**
+   * Proposer is the address of the proposal sumbitter
+   *
+   * Since: cosmos-sdk 0.47
+   */
+  proposer: string;
 }
 
 /** TallyResult defines a standard tally for a governance proposal. */
 export interface TallyResult {
+  /** yes_count is the number of yes votes on a proposal. */
   yes_count: string;
+  /** abstain_count is the number of abstain votes on a proposal. */
   abstain_count: string;
+  /** no_count is the number of no votes on a proposal. */
   no_count: string;
+  /** no_with_veto_count is the number of no with veto votes on a proposal. */
   no_with_veto_count: string;
 }
 
@@ -197,8 +240,11 @@ export interface TallyResult {
  * A Vote consists of a proposal ID, the voter, and the vote option.
  */
 export interface Vote {
+  /** proposal_id defines the unique id of the proposal. */
   proposal_id: string;
+  /** voter is the voter address of the proposal. */
   voter: string;
+  /** options is the weighted vote options. */
   options: WeightedVoteOption[];
   /** metadata is any  arbitrary metadata to attached to the vote. */
   metadata: string;
@@ -210,19 +256,52 @@ export interface DepositParams {
   min_deposit: Coin[];
   /**
    * Maximum period for Atom holders to deposit on a proposal. Initial value: 2
-   *  months.
+   * months.
    */
   max_deposit_period?: Duration | undefined;
 }
 
 /** VotingParams defines the params for voting on governance proposals. */
 export interface VotingParams {
-  /** Length of the voting period. */
+  /** Duration of the voting period. */
   voting_period?: Duration | undefined;
 }
 
 /** TallyParams defines the params for tallying votes on governance proposals. */
 export interface TallyParams {
+  /**
+   * Minimum percentage of total stake needed to vote for a result to be
+   * considered valid.
+   */
+  quorum: string;
+  /** Minimum proportion of Yes votes for proposal to pass. Default value: 0.5. */
+  threshold: string;
+  /**
+   * Minimum value of Veto votes to Total votes ratio for proposal to be
+   * vetoed. Default value: 1/3.
+   */
+  veto_threshold: string;
+}
+
+/**
+ * Params defines the parameters for the x/gov module.
+ *
+ * Since: cosmos-sdk 0.47
+ */
+export interface Params {
+  /** Minimum deposit for a proposal to enter voting period. */
+  min_deposit: Coin[];
+  /**
+   * Maximum period for Atom holders to deposit on a proposal. Initial value: 2
+   * months.
+   */
+  max_deposit_period?:
+    | Duration
+    | undefined;
+  /** Duration of the voting period. */
+  voting_period?:
+    | Duration
+    | undefined;
   /**
    * Minimum percentage of total stake needed to vote for a result to be
    *  considered valid.
@@ -235,6 +314,14 @@ export interface TallyParams {
    *  vetoed. Default value: 1/3.
    */
   veto_threshold: string;
+  /** The ratio representing the proportion of the deposit value that must be paid at proposal submission. */
+  min_initial_deposit_ratio: string;
+  /** burn deposits if a proposal does not meet quorum */
+  burn_vote_quorum: boolean;
+  /** burn deposits if the proposal does not enter voting period */
+  burn_proposal_deposit_prevote: boolean;
+  /** burn deposits if quorum with vote type no_veto is met */
+  burn_vote_veto: boolean;
 }
 
 function createBaseWeightedVoteOption(): WeightedVoteOption {
@@ -412,6 +499,9 @@ function createBaseProposal(): Proposal {
     voting_start_time: undefined,
     voting_end_time: undefined,
     metadata: "",
+    title: "",
+    summary: "",
+    proposer: "",
   };
 }
 
@@ -446,6 +536,15 @@ export const Proposal = {
     }
     if (message.metadata !== "") {
       writer.uint32(82).string(message.metadata);
+    }
+    if (message.title !== "") {
+      writer.uint32(90).string(message.title);
+    }
+    if (message.summary !== "") {
+      writer.uint32(98).string(message.summary);
+    }
+    if (message.proposer !== "") {
+      writer.uint32(106).string(message.proposer);
     }
     return writer;
   },
@@ -527,6 +626,27 @@ export const Proposal = {
 
           message.metadata = reader.string();
           continue;
+        case 11:
+          if (tag !== 90) {
+            break;
+          }
+
+          message.title = reader.string();
+          continue;
+        case 12:
+          if (tag !== 98) {
+            break;
+          }
+
+          message.summary = reader.string();
+          continue;
+        case 13:
+          if (tag !== 106) {
+            break;
+          }
+
+          message.proposer = reader.string();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -552,6 +672,9 @@ export const Proposal = {
       voting_start_time: isSet(object.voting_start_time) ? fromJsonTimestamp(object.voting_start_time) : undefined,
       voting_end_time: isSet(object.voting_end_time) ? fromJsonTimestamp(object.voting_end_time) : undefined,
       metadata: isSet(object.metadata) ? globalThis.String(object.metadata) : "",
+      title: isSet(object.title) ? globalThis.String(object.title) : "",
+      summary: isSet(object.summary) ? globalThis.String(object.summary) : "",
+      proposer: isSet(object.proposer) ? globalThis.String(object.proposer) : "",
     };
   },
 
@@ -587,6 +710,15 @@ export const Proposal = {
     if (message.metadata !== "") {
       obj.metadata = message.metadata;
     }
+    if (message.title !== "") {
+      obj.title = message.title;
+    }
+    if (message.summary !== "") {
+      obj.summary = message.summary;
+    }
+    if (message.proposer !== "") {
+      obj.proposer = message.proposer;
+    }
     return obj;
   },
 
@@ -607,6 +739,9 @@ export const Proposal = {
     message.voting_start_time = object.voting_start_time ?? undefined;
     message.voting_end_time = object.voting_end_time ?? undefined;
     message.metadata = object.metadata ?? "";
+    message.title = object.title ?? "";
+    message.summary = object.summary ?? "";
+    message.proposer = object.proposer ?? "";
     return message;
   },
 };
@@ -1043,6 +1178,221 @@ export const TallyParams = {
     message.quorum = object.quorum ?? "";
     message.threshold = object.threshold ?? "";
     message.veto_threshold = object.veto_threshold ?? "";
+    return message;
+  },
+};
+
+function createBaseParams(): Params {
+  return {
+    min_deposit: [],
+    max_deposit_period: undefined,
+    voting_period: undefined,
+    quorum: "",
+    threshold: "",
+    veto_threshold: "",
+    min_initial_deposit_ratio: "",
+    burn_vote_quorum: false,
+    burn_proposal_deposit_prevote: false,
+    burn_vote_veto: false,
+  };
+}
+
+export const Params = {
+  encode(message: Params, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    for (const v of message.min_deposit) {
+      Coin.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.max_deposit_period !== undefined) {
+      Duration.encode(message.max_deposit_period, writer.uint32(18).fork()).ldelim();
+    }
+    if (message.voting_period !== undefined) {
+      Duration.encode(message.voting_period, writer.uint32(26).fork()).ldelim();
+    }
+    if (message.quorum !== "") {
+      writer.uint32(34).string(message.quorum);
+    }
+    if (message.threshold !== "") {
+      writer.uint32(42).string(message.threshold);
+    }
+    if (message.veto_threshold !== "") {
+      writer.uint32(50).string(message.veto_threshold);
+    }
+    if (message.min_initial_deposit_ratio !== "") {
+      writer.uint32(58).string(message.min_initial_deposit_ratio);
+    }
+    if (message.burn_vote_quorum === true) {
+      writer.uint32(104).bool(message.burn_vote_quorum);
+    }
+    if (message.burn_proposal_deposit_prevote === true) {
+      writer.uint32(112).bool(message.burn_proposal_deposit_prevote);
+    }
+    if (message.burn_vote_veto === true) {
+      writer.uint32(120).bool(message.burn_vote_veto);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): Params {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseParams();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.min_deposit.push(Coin.decode(reader, reader.uint32()));
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.max_deposit_period = Duration.decode(reader, reader.uint32());
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.voting_period = Duration.decode(reader, reader.uint32());
+          continue;
+        case 4:
+          if (tag !== 34) {
+            break;
+          }
+
+          message.quorum = reader.string();
+          continue;
+        case 5:
+          if (tag !== 42) {
+            break;
+          }
+
+          message.threshold = reader.string();
+          continue;
+        case 6:
+          if (tag !== 50) {
+            break;
+          }
+
+          message.veto_threshold = reader.string();
+          continue;
+        case 7:
+          if (tag !== 58) {
+            break;
+          }
+
+          message.min_initial_deposit_ratio = reader.string();
+          continue;
+        case 13:
+          if (tag !== 104) {
+            break;
+          }
+
+          message.burn_vote_quorum = reader.bool();
+          continue;
+        case 14:
+          if (tag !== 112) {
+            break;
+          }
+
+          message.burn_proposal_deposit_prevote = reader.bool();
+          continue;
+        case 15:
+          if (tag !== 120) {
+            break;
+          }
+
+          message.burn_vote_veto = reader.bool();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): Params {
+    return {
+      min_deposit: globalThis.Array.isArray(object?.min_deposit)
+        ? object.min_deposit.map((e: any) => Coin.fromJSON(e))
+        : [],
+      max_deposit_period: isSet(object.max_deposit_period) ? Duration.fromJSON(object.max_deposit_period) : undefined,
+      voting_period: isSet(object.voting_period) ? Duration.fromJSON(object.voting_period) : undefined,
+      quorum: isSet(object.quorum) ? globalThis.String(object.quorum) : "",
+      threshold: isSet(object.threshold) ? globalThis.String(object.threshold) : "",
+      veto_threshold: isSet(object.veto_threshold) ? globalThis.String(object.veto_threshold) : "",
+      min_initial_deposit_ratio: isSet(object.min_initial_deposit_ratio)
+        ? globalThis.String(object.min_initial_deposit_ratio)
+        : "",
+      burn_vote_quorum: isSet(object.burn_vote_quorum) ? globalThis.Boolean(object.burn_vote_quorum) : false,
+      burn_proposal_deposit_prevote: isSet(object.burn_proposal_deposit_prevote)
+        ? globalThis.Boolean(object.burn_proposal_deposit_prevote)
+        : false,
+      burn_vote_veto: isSet(object.burn_vote_veto) ? globalThis.Boolean(object.burn_vote_veto) : false,
+    };
+  },
+
+  toJSON(message: Params): unknown {
+    const obj: any = {};
+    if (message.min_deposit?.length) {
+      obj.min_deposit = message.min_deposit.map((e) => Coin.toJSON(e));
+    }
+    if (message.max_deposit_period !== undefined) {
+      obj.max_deposit_period = Duration.toJSON(message.max_deposit_period);
+    }
+    if (message.voting_period !== undefined) {
+      obj.voting_period = Duration.toJSON(message.voting_period);
+    }
+    if (message.quorum !== "") {
+      obj.quorum = message.quorum;
+    }
+    if (message.threshold !== "") {
+      obj.threshold = message.threshold;
+    }
+    if (message.veto_threshold !== "") {
+      obj.veto_threshold = message.veto_threshold;
+    }
+    if (message.min_initial_deposit_ratio !== "") {
+      obj.min_initial_deposit_ratio = message.min_initial_deposit_ratio;
+    }
+    if (message.burn_vote_quorum === true) {
+      obj.burn_vote_quorum = message.burn_vote_quorum;
+    }
+    if (message.burn_proposal_deposit_prevote === true) {
+      obj.burn_proposal_deposit_prevote = message.burn_proposal_deposit_prevote;
+    }
+    if (message.burn_vote_veto === true) {
+      obj.burn_vote_veto = message.burn_vote_veto;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<Params>, I>>(base?: I): Params {
+    return Params.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<Params>, I>>(object: I): Params {
+    const message = createBaseParams();
+    message.min_deposit = object.min_deposit?.map((e) => Coin.fromPartial(e)) || [];
+    message.max_deposit_period = (object.max_deposit_period !== undefined && object.max_deposit_period !== null)
+      ? Duration.fromPartial(object.max_deposit_period)
+      : undefined;
+    message.voting_period = (object.voting_period !== undefined && object.voting_period !== null)
+      ? Duration.fromPartial(object.voting_period)
+      : undefined;
+    message.quorum = object.quorum ?? "";
+    message.threshold = object.threshold ?? "";
+    message.veto_threshold = object.veto_threshold ?? "";
+    message.min_initial_deposit_ratio = object.min_initial_deposit_ratio ?? "";
+    message.burn_vote_quorum = object.burn_vote_quorum ?? false;
+    message.burn_proposal_deposit_prevote = object.burn_proposal_deposit_prevote ?? false;
+    message.burn_vote_veto = object.burn_vote_veto ?? false;
     return message;
   },
 };

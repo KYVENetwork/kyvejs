@@ -21,8 +21,8 @@ export interface BasicPool {
   runtime: string;
   /** logo of the pool */
   logo: string;
-  /** operating_cost is the base payout for each bundle reward */
-  operating_cost: string;
+  /** inflation_share_weight is the base payout for each bundle reward */
+  inflation_share_weight: string;
   /** upload_interval is the interval bundles get created */
   upload_interval: string;
   /**
@@ -173,7 +173,7 @@ function createBaseBasicPool(): BasicPool {
     name: "",
     runtime: "",
     logo: "",
-    operating_cost: "0",
+    inflation_share_weight: "0",
     upload_interval: "0",
     total_funds: "0",
     total_delegation: "0",
@@ -195,8 +195,8 @@ export const BasicPool = {
     if (message.logo !== "") {
       writer.uint32(34).string(message.logo);
     }
-    if (message.operating_cost !== "0") {
-      writer.uint32(40).uint64(message.operating_cost);
+    if (message.inflation_share_weight !== "0") {
+      writer.uint32(40).uint64(message.inflation_share_weight);
     }
     if (message.upload_interval !== "0") {
       writer.uint32(48).uint64(message.upload_interval);
@@ -253,7 +253,7 @@ export const BasicPool = {
             break;
           }
 
-          message.operating_cost = longToString(reader.uint64() as Long);
+          message.inflation_share_weight = longToString(reader.uint64() as Long);
           continue;
         case 6:
           if (tag !== 48) {
@@ -298,7 +298,9 @@ export const BasicPool = {
       name: isSet(object.name) ? globalThis.String(object.name) : "",
       runtime: isSet(object.runtime) ? globalThis.String(object.runtime) : "",
       logo: isSet(object.logo) ? globalThis.String(object.logo) : "",
-      operating_cost: isSet(object.operating_cost) ? globalThis.String(object.operating_cost) : "0",
+      inflation_share_weight: isSet(object.inflation_share_weight)
+        ? globalThis.String(object.inflation_share_weight)
+        : "0",
       upload_interval: isSet(object.upload_interval) ? globalThis.String(object.upload_interval) : "0",
       total_funds: isSet(object.total_funds) ? globalThis.String(object.total_funds) : "0",
       total_delegation: isSet(object.total_delegation) ? globalThis.String(object.total_delegation) : "0",
@@ -320,8 +322,8 @@ export const BasicPool = {
     if (message.logo !== "") {
       obj.logo = message.logo;
     }
-    if (message.operating_cost !== "0") {
-      obj.operating_cost = message.operating_cost;
+    if (message.inflation_share_weight !== "0") {
+      obj.inflation_share_weight = message.inflation_share_weight;
     }
     if (message.upload_interval !== "0") {
       obj.upload_interval = message.upload_interval;
@@ -347,7 +349,7 @@ export const BasicPool = {
     message.name = object.name ?? "";
     message.runtime = object.runtime ?? "";
     message.logo = object.logo ?? "";
-    message.operating_cost = object.operating_cost ?? "0";
+    message.inflation_share_weight = object.inflation_share_weight ?? "0";
     message.upload_interval = object.upload_interval ?? "0";
     message.total_funds = object.total_funds ?? "0";
     message.total_delegation = object.total_delegation ?? "0";

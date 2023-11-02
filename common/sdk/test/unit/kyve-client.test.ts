@@ -8,13 +8,9 @@ import { resolve } from "path";
 import {
   MsgCancelRuntimeUpgrade,
   MsgCreatePool,
-  MsgFundPool,
-  MsgPausePool,
   MsgScheduleRuntimeUpgrade,
-  MsgUnpausePool,
   MsgUpdatePool,
 } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
-import { MsgDefundPool } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
 /** stakers **/
 import {
   MsgCreateStaker,
@@ -40,6 +36,13 @@ import {
 import { MsgVoteBundleProposal } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
 import { MsgClaimUploaderRole } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
 import { MsgSkipUploaderRole } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
+/** funder **/
+import {
+  MsgCreateFunder,
+  MsgDefundPool,
+  MsgFundPool,
+  MsgUpdateFunder
+} from '@kyvejs/types/client/kyve/funders/v1beta1/tx';
 
 /** gov **/
 import Mock = jest.Mock;
@@ -143,10 +146,24 @@ const methodsByGroup = [
   ],
   [
     {
-      name: "pool",
-      pathToTypes: extractTsFromPath("../proto/client/kyve//pool/v1beta1"),
+      name: "funders",
+      pathToTypes: extractTsFromPath("../proto/client/kyve/funders/v1beta1"),
     },
     [
+      {
+        methodName: "createFunder",
+        parameters: {
+          params: MsgCreateFunder.fromJSON({}),
+          schemaType: "MsgFundPool",
+        },
+      },
+      {
+        methodName: "updateFunder",
+        parameters: {
+          params: MsgUpdateFunder.fromJSON({}),
+          schemaType: "MsgDefundPool",
+        },
+      },
       {
         methodName: "fundPool",
         parameters: {
