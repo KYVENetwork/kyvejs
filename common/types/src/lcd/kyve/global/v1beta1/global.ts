@@ -27,6 +27,8 @@ export interface Params {
    * min_initial_deposit_ratio sets a minimum fraction of initial deposit for a
    * governance proposal. This is used to avoid spamming of proposals and
    * polluting the proposals page.
+   *
+   * @deprecated
    */
   min_initial_deposit_ratio: string;
 }

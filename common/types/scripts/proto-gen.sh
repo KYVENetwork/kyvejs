@@ -2,7 +2,8 @@
 
 # Variables
 KYVE_CHAIN_REPO="git@github.com:KYVENetwork/chain.git"
-KYVE_CHAIN_VERSION="v1.3.0"
+#KYVE_CHAIN_VERSION="v1.4.0"
+KYVE_CHAIN_VERSION="rapha/funders-module"  # TODO(rapha): change to v1.4.0
 
 echo "Cloning chain repo version ${KYVE_CHAIN_VERSION}"
 mkdir -p ./tmp
