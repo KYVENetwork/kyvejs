@@ -8,7 +8,7 @@ import KyveClient from "./rpc-client/client";
 import KyveWebClient from "./rpc-client/web.client";
 
 import {
-  createFundersAminoConverters,
+  createPoolAminoConverters,
   createStakersAminoConverters,
   createDelegationAminoConverters,
   createBundlesAminoConverters,
@@ -48,7 +48,7 @@ export async function getSigningKyveClient(
       aminoTypes: new AminoTypes({
         ...createDefaultAminoConverters(),
         ...createGovV1AminoConverters(),
-        ...createFundersAminoConverters(),
+        ...createPoolAminoConverters(),
         ...createStakersAminoConverters(),
         ...createDelegationAminoConverters(),
         ...createBundlesAminoConverters(),

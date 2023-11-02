@@ -123,6 +123,17 @@ export interface UpgradePlan {
   duration: string;
 }
 
+/** Funder is the object which holds info about a single pool funder */
+export interface Funder {
+  /** address is the address of the funder */
+  address: string;
+  /**
+   * amount is the current amount of funds in ukyve the funder has
+   * still funded the pool with
+   */
+  amount: string;
+}
+
 /** Pool ... */
 export interface Pool {
   /** id - unique identifier of the pool, can not be changed */
@@ -150,8 +161,8 @@ export interface Pool {
   total_bundles: string;
   /** upload_interval ... */
   upload_interval: string;
-  /** inflation_share_weight ... */
-  inflation_share_weight: string;
+  /** operating_cost ... */
+  operating_cost: string;
   /** min_delegation ... */
   min_delegation: string;
   /** max_bundle_size ... */
@@ -161,6 +172,10 @@ export interface Pool {
    * Can only be done via governance.
    */
   disabled: boolean;
+  /** funders ... */
+  funders: Funder[];
+  /** total_funds ... */
+  total_funds: string;
   /** protocol ... */
   protocol?:
     | Protocol
@@ -368,6 +383,80 @@ export const UpgradePlan = {
   },
 };
 
+function createBaseFunder(): Funder {
+  return { address: "", amount: "0" };
+}
+
+export const Funder = {
+  encode(message: Funder, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.address !== "") {
+      writer.uint32(10).string(message.address);
+    }
+    if (message.amount !== "0") {
+      writer.uint32(16).uint64(message.amount);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): Funder {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseFunder();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.address = reader.string();
+          continue;
+        case 2:
+          if (tag !== 16) {
+            break;
+          }
+
+          message.amount = longToString(reader.uint64() as Long);
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): Funder {
+    return {
+      address: isSet(object.address) ? globalThis.String(object.address) : "",
+      amount: isSet(object.amount) ? globalThis.String(object.amount) : "0",
+    };
+  },
+
+  toJSON(message: Funder): unknown {
+    const obj: any = {};
+    if (message.address !== "") {
+      obj.address = message.address;
+    }
+    if (message.amount !== "0") {
+      obj.amount = message.amount;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<Funder>, I>>(base?: I): Funder {
+    return Funder.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<Funder>, I>>(object: I): Funder {
+    const message = createBaseFunder();
+    message.address = object.address ?? "";
+    message.amount = object.amount ?? "0";
+    return message;
+  },
+};
+
 function createBasePool(): Pool {
   return {
     id: "0",
@@ -381,10 +470,12 @@ function createBasePool(): Pool {
     current_index: "0",
     total_bundles: "0",
     upload_interval: "0",
-    inflation_share_weight: "0",
+    operating_cost: "0",
     min_delegation: "0",
     max_bundle_size: "0",
     disabled: false,
+    funders: [],
+    total_funds: "0",
     protocol: undefined,
     upgrade_plan: undefined,
     current_storage_provider_id: 0,
@@ -427,8 +518,8 @@ export const Pool = {
     if (message.upload_interval !== "0") {
       writer.uint32(88).uint64(message.upload_interval);
     }
-    if (message.inflation_share_weight !== "0") {
-      writer.uint32(96).uint64(message.inflation_share_weight);
+    if (message.operating_cost !== "0") {
+      writer.uint32(96).uint64(message.operating_cost);
     }
     if (message.min_delegation !== "0") {
       writer.uint32(104).uint64(message.min_delegation);
@@ -439,17 +530,23 @@ export const Pool = {
     if (message.disabled === true) {
       writer.uint32(120).bool(message.disabled);
     }
+    for (const v of message.funders) {
+      Funder.encode(v!, writer.uint32(130).fork()).ldelim();
+    }
+    if (message.total_funds !== "0") {
+      writer.uint32(136).uint64(message.total_funds);
+    }
     if (message.protocol !== undefined) {
-      Protocol.encode(message.protocol, writer.uint32(130).fork()).ldelim();
+      Protocol.encode(message.protocol, writer.uint32(146).fork()).ldelim();
     }
     if (message.upgrade_plan !== undefined) {
-      UpgradePlan.encode(message.upgrade_plan, writer.uint32(138).fork()).ldelim();
+      UpgradePlan.encode(message.upgrade_plan, writer.uint32(154).fork()).ldelim();
     }
     if (message.current_storage_provider_id !== 0) {
-      writer.uint32(144).uint32(message.current_storage_provider_id);
+      writer.uint32(160).uint32(message.current_storage_provider_id);
     }
     if (message.current_compression_id !== 0) {
-      writer.uint32(152).uint32(message.current_compression_id);
+      writer.uint32(168).uint32(message.current_compression_id);
     }
     return writer;
   },
@@ -543,7 +640,7 @@ export const Pool = {
             break;
           }
 
-          message.inflation_share_weight = longToString(reader.uint64() as Long);
+          message.operating_cost = longToString(reader.uint64() as Long);
           continue;
         case 13:
           if (tag !== 104) {
@@ -571,24 +668,38 @@ export const Pool = {
             break;
           }
 
-          message.protocol = Protocol.decode(reader, reader.uint32());
+          message.funders.push(Funder.decode(reader, reader.uint32()));
           continue;
         case 17:
-          if (tag !== 138) {
+          if (tag !== 136) {
+            break;
+          }
+
+          message.total_funds = longToString(reader.uint64() as Long);
+          continue;
+        case 18:
+          if (tag !== 146) {
+            break;
+          }
+
+          message.protocol = Protocol.decode(reader, reader.uint32());
+          continue;
+        case 19:
+          if (tag !== 154) {
             break;
           }
 
           message.upgrade_plan = UpgradePlan.decode(reader, reader.uint32());
           continue;
-        case 18:
-          if (tag !== 144) {
+        case 20:
+          if (tag !== 160) {
             break;
           }
 
           message.current_storage_provider_id = reader.uint32();
           continue;
-        case 19:
-          if (tag !== 152) {
+        case 21:
+          if (tag !== 168) {
             break;
           }
 
@@ -616,12 +727,12 @@ export const Pool = {
       current_index: isSet(object.current_index) ? globalThis.String(object.current_index) : "0",
       total_bundles: isSet(object.total_bundles) ? globalThis.String(object.total_bundles) : "0",
       upload_interval: isSet(object.upload_interval) ? globalThis.String(object.upload_interval) : "0",
-      inflation_share_weight: isSet(object.inflation_share_weight)
-        ? globalThis.String(object.inflation_share_weight)
-        : "0",
+      operating_cost: isSet(object.operating_cost) ? globalThis.String(object.operating_cost) : "0",
       min_delegation: isSet(object.min_delegation) ? globalThis.String(object.min_delegation) : "0",
       max_bundle_size: isSet(object.max_bundle_size) ? globalThis.String(object.max_bundle_size) : "0",
       disabled: isSet(object.disabled) ? globalThis.Boolean(object.disabled) : false,
+      funders: globalThis.Array.isArray(object?.funders) ? object.funders.map((e: any) => Funder.fromJSON(e)) : [],
+      total_funds: isSet(object.total_funds) ? globalThis.String(object.total_funds) : "0",
       protocol: isSet(object.protocol) ? Protocol.fromJSON(object.protocol) : undefined,
       upgrade_plan: isSet(object.upgrade_plan) ? UpgradePlan.fromJSON(object.upgrade_plan) : undefined,
       current_storage_provider_id: isSet(object.current_storage_provider_id)
@@ -668,8 +779,8 @@ export const Pool = {
     if (message.upload_interval !== "0") {
       obj.upload_interval = message.upload_interval;
     }
-    if (message.inflation_share_weight !== "0") {
-      obj.inflation_share_weight = message.inflation_share_weight;
+    if (message.operating_cost !== "0") {
+      obj.operating_cost = message.operating_cost;
     }
     if (message.min_delegation !== "0") {
       obj.min_delegation = message.min_delegation;
@@ -679,6 +790,12 @@ export const Pool = {
     }
     if (message.disabled === true) {
       obj.disabled = message.disabled;
+    }
+    if (message.funders?.length) {
+      obj.funders = message.funders.map((e) => Funder.toJSON(e));
+    }
+    if (message.total_funds !== "0") {
+      obj.total_funds = message.total_funds;
     }
     if (message.protocol !== undefined) {
       obj.protocol = Protocol.toJSON(message.protocol);
@@ -711,10 +828,12 @@ export const Pool = {
     message.current_index = object.current_index ?? "0";
     message.total_bundles = object.total_bundles ?? "0";
     message.upload_interval = object.upload_interval ?? "0";
-    message.inflation_share_weight = object.inflation_share_weight ?? "0";
+    message.operating_cost = object.operating_cost ?? "0";
     message.min_delegation = object.min_delegation ?? "0";
     message.max_bundle_size = object.max_bundle_size ?? "0";
     message.disabled = object.disabled ?? false;
+    message.funders = object.funders?.map((e) => Funder.fromPartial(e)) || [];
+    message.total_funds = object.total_funds ?? "0";
     message.protocol = (object.protocol !== undefined && object.protocol !== null)
       ? Protocol.fromPartial(object.protocol)
       : undefined;
