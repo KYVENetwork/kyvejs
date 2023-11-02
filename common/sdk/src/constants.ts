@@ -47,7 +47,7 @@ export const SUPPORTED_CHAIN_CONFIGS = {
     rest: "https://api-eu-1.korellia.kyve.network",
     coin: "KYVE",
     coinDenom: "tkyve",
-    coinDecimals: 9,
+    coinDecimals: 6,
     gasPrice: 1,
   },
   "kyve-beta": {
