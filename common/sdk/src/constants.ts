@@ -41,7 +41,7 @@ export const SUPPORTED_CHAIN_CONFIGS = {
     gasPrice: 0.02,
   },
   korellia: {
-    chainId: "korellia",
+    chainId: "korellia-2",
     chainName: "KYVE Korellia",
     rpc: "https://rpc-eu-1.korellia.kyve.network",
     rest: "https://api-eu-1.korellia.kyve.network",

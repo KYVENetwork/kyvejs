@@ -54,7 +54,7 @@ Sdk instance can be configured with a network object.
     const network = {
         rpc: "https://rpc.korellia.kyve.network",
         rest: "https://api.korellia.kyve.network",
-        chainId: "korellia",
+        chainId: "korellia-2",
         chainName: "Korellia",
    }
     const sdk = new KyveSDK(network);
