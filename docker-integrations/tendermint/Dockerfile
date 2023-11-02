@@ -23,7 +23,7 @@ COPY package.json tsconfig.json ./
 RUN yarn install --frozen-lockfile
 
 # Copy common files
-COPY src ./src
+COPY ./src ./src
 
 # Build the docker core
 RUN TARGET=latest-${TARGETOS}-${BINARYARCH} yarn run build:binaries

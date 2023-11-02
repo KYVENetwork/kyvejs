@@ -43,6 +43,7 @@ KYVE, the Web3 data lake solution, is a protocol that enables data providers to 
 - [@kyvejs/types](common/types/README.md) - holds all types for the KYVE application in typescript
 - [@kyvejs/sdk](common/sdk/README.md) - development kit for communicating with the KYVE blockchain
 - [@kyvejs/protocol](common/protocol/README.md) - core functionality for running validators on the KYVE network
+- [@kyvejs/docker](common/docker/README.md) - core functionality facilitating dockerising KYVE functionality and communicating with dockerised runtimes via gRPC
 
 **Tools:**
 
@@ -52,6 +53,7 @@ KYVE, the Web3 data lake solution, is a protocol that enables data providers to 
 
 - [@kyvejs/tendermint](integrations/tendermint/README.md) - The official KYVE Tendermint sync integration
 - [@kyvejs/tendermint-bsync](integrations/tendermint-bsync/README.md) - The official KYVE Tendermint block sync integration
+- [@kyvejs/tendermint-ssync](integrations/tendermint-ssync/README.md) - The official KYVE Tendermint block sync integration
 
 ## Build Integration Binaries
 
@@ -84,6 +86,61 @@ yarn build:binaries
 ```
 
 The binaries can then be found in the `/out` folder
+
+## Dockerized Execution
+
+In the Kyve project, the binaries can now be easily executed within a Docker container. This allows for simplified deployment and consistent runtime environments. Before running the Kyve binaries in a Docker container, please ensure that you have set up a Docker network. If you haven't already, you can create a Docker network using the following command:
+
+```
+docker network create --driver bridge kyve
+```
+
+**Building the Docker Image**
+
+To build a Docker image for Kyve Core, you can use the provided Dockerfile. Use the following command to build the image, while being in the root directory:
+
+```
+docker build -t kyve-core -f Dockerfile .
+```
+
+**Running Kyve Core in a Docker Container**
+
+Once you have built the Docker image, you can run Kyve Core in a Docker container. Below are the instructions for running Kyve Core as a node:
+
+1. Set your recovery phrase as the VALACCOUNT environment variable:
+
+```
+export VALACCOUNT="<recovery phrase>"
+```
+
+2. Run the Kyve Core container, replacing the placeholders with your specific parameters:
+
+```
+docker run --rm --name kyve-core --network kyve -e VALACCOUNT=$VALACCOUNT kyve-core ./kyve start --pool <pool id> --valaccount "$VALACCOUNT" --cache memory --rpc <rpc address> --rest <rest address> --chain-id=<chain id> --request-backoff 50 --debug
+```
+- `<recovery phrase>`: Replace this with your recovery phrase.
+- `<pool id>`: Specify the pool ID you want to join.
+- `<rpc address>`: Provide the RPC address of the network.
+- `<rest address>`: Provide the REST API address.
+- `<chain id>`: Specify the chain ID you want to interact with.
+
+**Development and Testing**
+
+For development and testing purposes, you can also run specific runtime methods in the Dockerized Kyve Core. Here's how to do it:
+
+Run the Kyve Core container for a specific runtime method and arguments:
+```
+docker run --rm --name kyve-core --network kyve kyve-core ./kyve runtime <method> <args>
+```
+- `<method>`: Replace this with the name of the runtime method you want to test.
+- `<args>`: Provide any required arguments for the runtime method.
+
+By following these instructions, you can easily dockerize and run Kyve Core and perform testing and development tasks. The Dockerized runtime provides a convenient and isolated environment for your Kyve project.
+
+
+
+
+
 
 ## How to contribute
 

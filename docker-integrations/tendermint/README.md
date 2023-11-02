@@ -44,23 +44,8 @@ on which tendermint chain gets archived the minimum hardware requirements are at
 This integration includes a Dockerfile which can be used to build a docker image. This Dockerfile uses multiple stages to separate the build time from the runtime requirements. The final image bundles all the architecture specific binaries and can be used to run the runtime on any architecture. 
 
 The image can be built with the following command:
-`cd ../ && docker build -t tendermint-grpc:v0.3 -f tendermint/Dockerfile .`
-The image can be run for a specific architecture with the following command:
-
-`docker run --rm -p 50051:50051 tendermint-grpc:v0.2 ./kyve-linux-arm64`
-
-The allowed values for the last argument are:
-* `./kyve-linux-arm64`
-* `./kyve-linux-x64`
-* `./kyve-macos-x64`
-
-### Docker assumptions
-
-This integration assumes that the `proto.runtime` file exists inside the `/src` folder. This file is used to generate the gRPC client and server code. The Dockerfile copies this file into the image and uses it to generate the code. If the file is not present, the build will not fail and the application will fail to start at runtime.
-
-At the moment the file is linked from the docker integration folder by use of a symbolic link. This is done to avoid having to copy the file into the integration folder every time it is changed. This is not ideal and should be changed in the future.
-
-`cd src/ && ln ../../docker/src/proto/runtime.proto runtime.proto`
+`docker build -t tendermint-grpc:v0.3 -f Dockerfile .`
+The image can will automatically build the appropriate binary based on your system and architecture.
 
 ## Integrations currently live
 
