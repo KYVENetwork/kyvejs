@@ -31,7 +31,7 @@
     "@cosmjs/tendermint-rpc": "^0.31.3",
     "@cosmostation/extension-client": "^0.0.6",
     "@keplr-wallet/cosmos": "^0.12.39",
-    "@kyvejs/types": "1.0.4",
+    "@kyvejs/types": "1.2.0",
     "axios": "0.25.0",
     "bech32": "2.0.0",
     "bignumber.js": "9.1.2",
