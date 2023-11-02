@@ -135,10 +135,7 @@ export default class TendermintSSync implements IRuntime {
   }
 
   async summarizeDataBundle(_: Validator, bundle: DataItem[]): Promise<string> {
-    // TODO: maybe app hash or snapshot hash?
-    return `${bundle.at(-1)?.value?.snapshot?.height ?? '0'}/${
-      bundle.at(-1)?.value?.chunkIndex
-    }`;
+    return bundle.at(-1)?.key ?? '';
   }
 
   async nextKey(_: Validator, key: string): Promise<string> {

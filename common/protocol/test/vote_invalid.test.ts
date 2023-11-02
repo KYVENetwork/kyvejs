@@ -36,6 +36,7 @@ TEST CASES - invalid votes tests
 * vote invalid but local bundle could not be loaded in the first try
 * vote invalid but bundle from storage provider could not be loaded in the first try
 * try to vote invalid where voteBundleProposal fails
+* vote invalid because bundle is empty
 
 */
 
@@ -1875,6 +1876,125 @@ describe("invalid votes tests", () => {
       standardizeJSON(bundle[0]),
       standardizeJSON(bundle[0])
     );
+
+    // ========================
+    // ASSERT NODEJS INTERFACES
+    // ========================
+
+    // assert that only one round ran
+    expect(v["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
+
+    // TODO: assert timeouts
+  });
+
+  test("vote invalid because bundle is empty", async () => {
+    // ARRANGE
+    const bundle: any[] = [];
+
+    const bundleBytes = bundleToBytes(bundle);
+    const compressedBundle = bundleBytes; // no compression
+    const dataSize = compressedBundle.byteLength.toString();
+    const dataHash = sha256(bundleBytes);
+
+    v["syncPoolState"] = jest.fn().mockImplementation(() => {
+      v.pool = {
+        ...genesis_pool,
+        bundle_proposal: {
+          ...genesis_pool.bundle_proposal,
+          storage_id: "another_test_storage_id",
+          uploader: "another_test_staker",
+          next_uploader: "another_test_staker",
+          data_size: dataSize,
+          data_hash: dataHash,
+          bundle_size: "0",
+          from_key: "test_key_1",
+          to_key: "test_key_1",
+          bundle_summary: JSON.stringify(bundle),
+          updated_at: "0",
+          voters_valid: ["another_test_staker"],
+        },
+      } as any;
+    });
+
+    // ACT
+    await runNode.call(v);
+
+    // ASSERT
+    const txs = v["client"][0].kyve.bundles.v1beta1;
+    const queries = v["lcd"][0].kyve.query.v1beta1;
+    const cacheProvider = v["cacheProvider"];
+    const runtime = v["runtime"];
+
+    // ========================
+    // ASSERT CLIENT INTERFACES
+    // ========================
+
+    expect(txs.claimUploaderRole).toHaveBeenCalledTimes(0);
+
+    expect(txs.voteBundleProposal).toHaveBeenCalledTimes(1);
+    expect(txs.voteBundleProposal).toHaveBeenLastCalledWith(
+      {
+        staker: "test_staker",
+        pool_id: "0",
+        storage_id: "another_test_storage_id",
+        vote: VoteType.VOTE_TYPE_INVALID,
+      },
+      {
+        fee: 1.6,
+      }
+    );
+
+    expect(txs.submitBundleProposal).toHaveBeenCalledTimes(0);
+
+    expect(txs.skipUploaderRole).toHaveBeenCalledTimes(0);
+
+    // =====================
+    // ASSERT LCD INTERFACES
+    // =====================
+
+    expect(queries.canVote).toHaveBeenCalledTimes(1);
+    expect(queries.canVote).toHaveBeenLastCalledWith({
+      staker: "test_staker",
+      pool_id: "0",
+      voter: "test_valaddress",
+      storage_id: "another_test_storage_id",
+    });
+
+    expect(queries.canPropose).toHaveBeenCalledTimes(0);
+
+    // =========================
+    // ASSERT STORAGE INTERFACES
+    // =========================
+
+    expect(storageProvider.saveBundle).toHaveBeenCalledTimes(0);
+
+    expect(storageProvider.retrieveBundle).toHaveBeenCalledTimes(1);
+    expect(storageProvider.retrieveBundle).toHaveBeenLastCalledWith(
+      "another_test_storage_id",
+      (120 - 20) * 1000
+    );
+
+    // =======================
+    // ASSERT CACHE INTERFACES
+    // =======================
+
+    expect(cacheProvider.get).toHaveBeenCalledTimes(0);
+
+    // =============================
+    // ASSERT COMPRESSION INTERFACES
+    // =============================
+
+    expect(compression.compress).toHaveBeenCalledTimes(0);
+
+    expect(compression.decompress).toHaveBeenCalledTimes(0);
+
+    // =============================
+    // ASSERT INTEGRATION INTERFACES
+    // =============================
+
+    expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(0);
+
+    expect(runtime.validateDataItem).toHaveBeenCalledTimes(0);
 
     // ========================
     // ASSERT NODEJS INTERFACES
