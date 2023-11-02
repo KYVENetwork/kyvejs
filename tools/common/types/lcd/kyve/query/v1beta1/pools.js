@@ -1,0 +1,661 @@
+"use strict";
+var __importDefault =
+  (this && this.__importDefault) ||
+  function (mod) {
+    return mod && mod.__esModule ? mod : { default: mod };
+  };
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.QueryPoolClientImpl =
+  exports.QueryPoolServiceName =
+  exports.QueryPoolResponse =
+  exports.QueryPoolRequest =
+  exports.PoolResponse =
+  exports.QueryPoolsResponse =
+  exports.QueryPoolsRequest =
+  exports.protobufPackage =
+    void 0;
+/* eslint-disable */
+var long_1 = __importDefault(require("long"));
+var minimal_1 = __importDefault(require("protobufjs/minimal"));
+var pagination_1 = require("../../../cosmos/base/query/v1beta1/pagination");
+var bundles_1 = require("../../bundles/v1beta1/bundles");
+var pool_1 = require("../../pool/v1beta1/pool");
+exports.protobufPackage = "kyve.query.v1beta1";
+function createBaseQueryPoolsRequest() {
+  return {
+    pagination: undefined,
+    search: "",
+    runtime: "",
+    disabled: false,
+    storage_provider_id: 0,
+  };
+}
+exports.QueryPoolsRequest = {
+  encode: function (message, writer) {
+    if (writer === void 0) {
+      writer = minimal_1.default.Writer.create();
+    }
+    if (message.pagination !== undefined) {
+      pagination_1.PageRequest.encode(
+        message.pagination,
+        writer.uint32(10).fork()
+      ).ldelim();
+    }
+    if (message.search !== "") {
+      writer.uint32(18).string(message.search);
+    }
+    if (message.runtime !== "") {
+      writer.uint32(26).string(message.runtime);
+    }
+    if (message.disabled === true) {
+      writer.uint32(32).bool(message.disabled);
+    }
+    if (message.storage_provider_id !== 0) {
+      writer.uint32(40).uint32(message.storage_provider_id);
+    }
+    return writer;
+  },
+  decode: function (input, length) {
+    var reader =
+      input instanceof minimal_1.default.Reader
+        ? input
+        : minimal_1.default.Reader.create(input);
+    var end = length === undefined ? reader.len : reader.pos + length;
+    var message = createBaseQueryPoolsRequest();
+    while (reader.pos < end) {
+      var tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+          message.pagination = pagination_1.PageRequest.decode(
+            reader,
+            reader.uint32()
+          );
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+          message.search = reader.string();
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+          message.runtime = reader.string();
+          continue;
+        case 4:
+          if (tag !== 32) {
+            break;
+          }
+          message.disabled = reader.bool();
+          continue;
+        case 5:
+          if (tag !== 40) {
+            break;
+          }
+          message.storage_provider_id = reader.uint32();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+  fromJSON: function (object) {
+    return {
+      pagination: isSet(object.pagination)
+        ? pagination_1.PageRequest.fromJSON(object.pagination)
+        : undefined,
+      search: isSet(object.search) ? globalThis.String(object.search) : "",
+      runtime: isSet(object.runtime) ? globalThis.String(object.runtime) : "",
+      disabled: isSet(object.disabled)
+        ? globalThis.Boolean(object.disabled)
+        : false,
+      storage_provider_id: isSet(object.storage_provider_id)
+        ? globalThis.Number(object.storage_provider_id)
+        : 0,
+    };
+  },
+  toJSON: function (message) {
+    var obj = {};
+    if (message.pagination !== undefined) {
+      obj.pagination = pagination_1.PageRequest.toJSON(message.pagination);
+    }
+    if (message.search !== "") {
+      obj.search = message.search;
+    }
+    if (message.runtime !== "") {
+      obj.runtime = message.runtime;
+    }
+    if (message.disabled === true) {
+      obj.disabled = message.disabled;
+    }
+    if (message.storage_provider_id !== 0) {
+      obj.storage_provider_id = Math.round(message.storage_provider_id);
+    }
+    return obj;
+  },
+  create: function (base) {
+    return exports.QueryPoolsRequest.fromPartial(
+      base !== null && base !== void 0 ? base : {}
+    );
+  },
+  fromPartial: function (object) {
+    var _a, _b, _c, _d;
+    var message = createBaseQueryPoolsRequest();
+    message.pagination =
+      object.pagination !== undefined && object.pagination !== null
+        ? pagination_1.PageRequest.fromPartial(object.pagination)
+        : undefined;
+    message.search = (_a = object.search) !== null && _a !== void 0 ? _a : "";
+    message.runtime = (_b = object.runtime) !== null && _b !== void 0 ? _b : "";
+    message.disabled =
+      (_c = object.disabled) !== null && _c !== void 0 ? _c : false;
+    message.storage_provider_id =
+      (_d = object.storage_provider_id) !== null && _d !== void 0 ? _d : 0;
+    return message;
+  },
+};
+function createBaseQueryPoolsResponse() {
+  return { pools: [], pagination: undefined };
+}
+exports.QueryPoolsResponse = {
+  encode: function (message, writer) {
+    if (writer === void 0) {
+      writer = minimal_1.default.Writer.create();
+    }
+    for (var _i = 0, _a = message.pools; _i < _a.length; _i++) {
+      var v = _a[_i];
+      exports.PoolResponse.encode(v, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      pagination_1.PageResponse.encode(
+        message.pagination,
+        writer.uint32(18).fork()
+      ).ldelim();
+    }
+    return writer;
+  },
+  decode: function (input, length) {
+    var reader =
+      input instanceof minimal_1.default.Reader
+        ? input
+        : minimal_1.default.Reader.create(input);
+    var end = length === undefined ? reader.len : reader.pos + length;
+    var message = createBaseQueryPoolsResponse();
+    while (reader.pos < end) {
+      var tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+          message.pools.push(
+            exports.PoolResponse.decode(reader, reader.uint32())
+          );
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+          message.pagination = pagination_1.PageResponse.decode(
+            reader,
+            reader.uint32()
+          );
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+  fromJSON: function (object) {
+    return {
+      pools: globalThis.Array.isArray(
+        object === null || object === void 0 ? void 0 : object.pools
+      )
+        ? object.pools.map(function (e) {
+            return exports.PoolResponse.fromJSON(e);
+          })
+        : [],
+      pagination: isSet(object.pagination)
+        ? pagination_1.PageResponse.fromJSON(object.pagination)
+        : undefined,
+    };
+  },
+  toJSON: function (message) {
+    var _a;
+    var obj = {};
+    if ((_a = message.pools) === null || _a === void 0 ? void 0 : _a.length) {
+      obj.pools = message.pools.map(function (e) {
+        return exports.PoolResponse.toJSON(e);
+      });
+    }
+    if (message.pagination !== undefined) {
+      obj.pagination = pagination_1.PageResponse.toJSON(message.pagination);
+    }
+    return obj;
+  },
+  create: function (base) {
+    return exports.QueryPoolsResponse.fromPartial(
+      base !== null && base !== void 0 ? base : {}
+    );
+  },
+  fromPartial: function (object) {
+    var _a;
+    var message = createBaseQueryPoolsResponse();
+    message.pools =
+      ((_a = object.pools) === null || _a === void 0
+        ? void 0
+        : _a.map(function (e) {
+            return exports.PoolResponse.fromPartial(e);
+          })) || [];
+    message.pagination =
+      object.pagination !== undefined && object.pagination !== null
+        ? pagination_1.PageResponse.fromPartial(object.pagination)
+        : undefined;
+    return message;
+  },
+};
+function createBasePoolResponse() {
+  return {
+    id: "0",
+    data: undefined,
+    bundle_proposal: undefined,
+    stakers: [],
+    total_self_delegation: "0",
+    total_delegation: "0",
+    status: pool_1.PoolStatus.POOL_STATUS_UNSPECIFIED,
+    account: "",
+    account_balance: "0",
+  };
+}
+exports.PoolResponse = {
+  encode: function (message, writer) {
+    if (writer === void 0) {
+      writer = minimal_1.default.Writer.create();
+    }
+    if (message.id !== "0") {
+      writer.uint32(8).uint64(message.id);
+    }
+    if (message.data !== undefined) {
+      pool_1.Pool.encode(message.data, writer.uint32(18).fork()).ldelim();
+    }
+    if (message.bundle_proposal !== undefined) {
+      bundles_1.BundleProposal.encode(
+        message.bundle_proposal,
+        writer.uint32(26).fork()
+      ).ldelim();
+    }
+    for (var _i = 0, _a = message.stakers; _i < _a.length; _i++) {
+      var v = _a[_i];
+      writer.uint32(34).string(v);
+    }
+    if (message.total_self_delegation !== "0") {
+      writer.uint32(40).uint64(message.total_self_delegation);
+    }
+    if (message.total_delegation !== "0") {
+      writer.uint32(48).uint64(message.total_delegation);
+    }
+    if (message.status !== pool_1.PoolStatus.POOL_STATUS_UNSPECIFIED) {
+      writer.uint32(56).int32((0, pool_1.poolStatusToNumber)(message.status));
+    }
+    if (message.account !== "") {
+      writer.uint32(66).string(message.account);
+    }
+    if (message.account_balance !== "0") {
+      writer.uint32(72).uint64(message.account_balance);
+    }
+    return writer;
+  },
+  decode: function (input, length) {
+    var reader =
+      input instanceof minimal_1.default.Reader
+        ? input
+        : minimal_1.default.Reader.create(input);
+    var end = length === undefined ? reader.len : reader.pos + length;
+    var message = createBasePoolResponse();
+    while (reader.pos < end) {
+      var tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 8) {
+            break;
+          }
+          message.id = longToString(reader.uint64());
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+          message.data = pool_1.Pool.decode(reader, reader.uint32());
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+          message.bundle_proposal = bundles_1.BundleProposal.decode(
+            reader,
+            reader.uint32()
+          );
+          continue;
+        case 4:
+          if (tag !== 34) {
+            break;
+          }
+          message.stakers.push(reader.string());
+          continue;
+        case 5:
+          if (tag !== 40) {
+            break;
+          }
+          message.total_self_delegation = longToString(reader.uint64());
+          continue;
+        case 6:
+          if (tag !== 48) {
+            break;
+          }
+          message.total_delegation = longToString(reader.uint64());
+          continue;
+        case 7:
+          if (tag !== 56) {
+            break;
+          }
+          message.status = (0, pool_1.poolStatusFromJSON)(reader.int32());
+          continue;
+        case 8:
+          if (tag !== 66) {
+            break;
+          }
+          message.account = reader.string();
+          continue;
+        case 9:
+          if (tag !== 72) {
+            break;
+          }
+          message.account_balance = longToString(reader.uint64());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+  fromJSON: function (object) {
+    return {
+      id: isSet(object.id) ? globalThis.String(object.id) : "0",
+      data: isSet(object.data) ? pool_1.Pool.fromJSON(object.data) : undefined,
+      bundle_proposal: isSet(object.bundle_proposal)
+        ? bundles_1.BundleProposal.fromJSON(object.bundle_proposal)
+        : undefined,
+      stakers: globalThis.Array.isArray(
+        object === null || object === void 0 ? void 0 : object.stakers
+      )
+        ? object.stakers.map(function (e) {
+            return globalThis.String(e);
+          })
+        : [],
+      total_self_delegation: isSet(object.total_self_delegation)
+        ? globalThis.String(object.total_self_delegation)
+        : "0",
+      total_delegation: isSet(object.total_delegation)
+        ? globalThis.String(object.total_delegation)
+        : "0",
+      status: isSet(object.status)
+        ? (0, pool_1.poolStatusFromJSON)(object.status)
+        : pool_1.PoolStatus.POOL_STATUS_UNSPECIFIED,
+      account: isSet(object.account) ? globalThis.String(object.account) : "",
+      account_balance: isSet(object.account_balance)
+        ? globalThis.String(object.account_balance)
+        : "0",
+    };
+  },
+  toJSON: function (message) {
+    var _a;
+    var obj = {};
+    if (message.id !== "0") {
+      obj.id = message.id;
+    }
+    if (message.data !== undefined) {
+      obj.data = pool_1.Pool.toJSON(message.data);
+    }
+    if (message.bundle_proposal !== undefined) {
+      obj.bundle_proposal = bundles_1.BundleProposal.toJSON(
+        message.bundle_proposal
+      );
+    }
+    if ((_a = message.stakers) === null || _a === void 0 ? void 0 : _a.length) {
+      obj.stakers = message.stakers;
+    }
+    if (message.total_self_delegation !== "0") {
+      obj.total_self_delegation = message.total_self_delegation;
+    }
+    if (message.total_delegation !== "0") {
+      obj.total_delegation = message.total_delegation;
+    }
+    if (message.status !== pool_1.PoolStatus.POOL_STATUS_UNSPECIFIED) {
+      obj.status = (0, pool_1.poolStatusToJSON)(message.status);
+    }
+    if (message.account !== "") {
+      obj.account = message.account;
+    }
+    if (message.account_balance !== "0") {
+      obj.account_balance = message.account_balance;
+    }
+    return obj;
+  },
+  create: function (base) {
+    return exports.PoolResponse.fromPartial(
+      base !== null && base !== void 0 ? base : {}
+    );
+  },
+  fromPartial: function (object) {
+    var _a, _b, _c, _d, _e, _f, _g;
+    var message = createBasePoolResponse();
+    message.id = (_a = object.id) !== null && _a !== void 0 ? _a : "0";
+    message.data =
+      object.data !== undefined && object.data !== null
+        ? pool_1.Pool.fromPartial(object.data)
+        : undefined;
+    message.bundle_proposal =
+      object.bundle_proposal !== undefined && object.bundle_proposal !== null
+        ? bundles_1.BundleProposal.fromPartial(object.bundle_proposal)
+        : undefined;
+    message.stakers =
+      ((_b = object.stakers) === null || _b === void 0
+        ? void 0
+        : _b.map(function (e) {
+            return e;
+          })) || [];
+    message.total_self_delegation =
+      (_c = object.total_self_delegation) !== null && _c !== void 0 ? _c : "0";
+    message.total_delegation =
+      (_d = object.total_delegation) !== null && _d !== void 0 ? _d : "0";
+    message.status =
+      (_e = object.status) !== null && _e !== void 0
+        ? _e
+        : pool_1.PoolStatus.POOL_STATUS_UNSPECIFIED;
+    message.account = (_f = object.account) !== null && _f !== void 0 ? _f : "";
+    message.account_balance =
+      (_g = object.account_balance) !== null && _g !== void 0 ? _g : "0";
+    return message;
+  },
+};
+function createBaseQueryPoolRequest() {
+  return { id: "0" };
+}
+exports.QueryPoolRequest = {
+  encode: function (message, writer) {
+    if (writer === void 0) {
+      writer = minimal_1.default.Writer.create();
+    }
+    if (message.id !== "0") {
+      writer.uint32(8).uint64(message.id);
+    }
+    return writer;
+  },
+  decode: function (input, length) {
+    var reader =
+      input instanceof minimal_1.default.Reader
+        ? input
+        : minimal_1.default.Reader.create(input);
+    var end = length === undefined ? reader.len : reader.pos + length;
+    var message = createBaseQueryPoolRequest();
+    while (reader.pos < end) {
+      var tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 8) {
+            break;
+          }
+          message.id = longToString(reader.uint64());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+  fromJSON: function (object) {
+    return { id: isSet(object.id) ? globalThis.String(object.id) : "0" };
+  },
+  toJSON: function (message) {
+    var obj = {};
+    if (message.id !== "0") {
+      obj.id = message.id;
+    }
+    return obj;
+  },
+  create: function (base) {
+    return exports.QueryPoolRequest.fromPartial(
+      base !== null && base !== void 0 ? base : {}
+    );
+  },
+  fromPartial: function (object) {
+    var _a;
+    var message = createBaseQueryPoolRequest();
+    message.id = (_a = object.id) !== null && _a !== void 0 ? _a : "0";
+    return message;
+  },
+};
+function createBaseQueryPoolResponse() {
+  return { pool: undefined };
+}
+exports.QueryPoolResponse = {
+  encode: function (message, writer) {
+    if (writer === void 0) {
+      writer = minimal_1.default.Writer.create();
+    }
+    if (message.pool !== undefined) {
+      exports.PoolResponse.encode(
+        message.pool,
+        writer.uint32(10).fork()
+      ).ldelim();
+    }
+    return writer;
+  },
+  decode: function (input, length) {
+    var reader =
+      input instanceof minimal_1.default.Reader
+        ? input
+        : minimal_1.default.Reader.create(input);
+    var end = length === undefined ? reader.len : reader.pos + length;
+    var message = createBaseQueryPoolResponse();
+    while (reader.pos < end) {
+      var tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+          message.pool = exports.PoolResponse.decode(reader, reader.uint32());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+  fromJSON: function (object) {
+    return {
+      pool: isSet(object.pool)
+        ? exports.PoolResponse.fromJSON(object.pool)
+        : undefined,
+    };
+  },
+  toJSON: function (message) {
+    var obj = {};
+    if (message.pool !== undefined) {
+      obj.pool = exports.PoolResponse.toJSON(message.pool);
+    }
+    return obj;
+  },
+  create: function (base) {
+    return exports.QueryPoolResponse.fromPartial(
+      base !== null && base !== void 0 ? base : {}
+    );
+  },
+  fromPartial: function (object) {
+    var message = createBaseQueryPoolResponse();
+    message.pool =
+      object.pool !== undefined && object.pool !== null
+        ? exports.PoolResponse.fromPartial(object.pool)
+        : undefined;
+    return message;
+  },
+};
+exports.QueryPoolServiceName = "kyve.query.v1beta1.QueryPool";
+var QueryPoolClientImpl = /** @class */ (function () {
+  function QueryPoolClientImpl(rpc, opts) {
+    this.service =
+      (opts === null || opts === void 0 ? void 0 : opts.service) ||
+      exports.QueryPoolServiceName;
+    this.rpc = rpc;
+    this.Pools = this.Pools.bind(this);
+    this.Pool = this.Pool.bind(this);
+  }
+  QueryPoolClientImpl.prototype.Pools = function (request) {
+    var data = exports.QueryPoolsRequest.encode(request).finish();
+    var promise = this.rpc.request(this.service, "Pools", data);
+    return promise.then(function (data) {
+      return exports.QueryPoolsResponse.decode(
+        minimal_1.default.Reader.create(data)
+      );
+    });
+  };
+  QueryPoolClientImpl.prototype.Pool = function (request) {
+    var data = exports.QueryPoolRequest.encode(request).finish();
+    var promise = this.rpc.request(this.service, "Pool", data);
+    return promise.then(function (data) {
+      return exports.QueryPoolResponse.decode(
+        minimal_1.default.Reader.create(data)
+      );
+    });
+  };
+  return QueryPoolClientImpl;
+})();
+exports.QueryPoolClientImpl = QueryPoolClientImpl;
+function longToString(long) {
+  return long.toString();
+}
+if (minimal_1.default.util.Long !== long_1.default) {
+  minimal_1.default.util.Long = long_1.default;
+  minimal_1.default.configure();
+}
+function isSet(value) {
+  return value !== null && value !== undefined;
+}
+//# sourceMappingURL=pools.js.map

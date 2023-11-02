@@ -41,7 +41,7 @@
     "@kyvejs/sdk": "1.0.5",
     "@kyvejs/types": "1.0.3",
     "axios": "^0.27.2",
-    "bignumber.js": "^9.1.0",
+    "bignumber.js": "^9.1.2",
     "commander": "^9.4.0",
     "dotenv": "^16.0.3",
     "download": "^8.0.0",
