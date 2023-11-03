@@ -7,9 +7,9 @@ import { valid, major, minor, patch, prerelease } from "semver";
  *
  * @method isValidVersion
  * @param {Validator} this
- * @return {boolean}
+ * @return {Promise<boolean>}
  */
-export function isValidVersion(this: Validator): boolean {
+export async function isValidVersion(this: Validator): Promise<boolean> {
   try {
     this.logger.debug(
       `Comparing remote runtime version with local runtime version`
@@ -27,7 +27,8 @@ export function isValidVersion(this: Validator): boolean {
       return false;
     }
 
-    const localVersion = valid(this.runtime.version);
+    const version = await this.runtime.getVersion();
+    const localVersion = valid(version);
 
     // exit if local version is invalid
     if (localVersion === null) {
@@ -43,7 +44,7 @@ export function isValidVersion(this: Validator): boolean {
     if (major(remoteVersion) !== major(localVersion)) {
       this.logger.fatal(`Running an invalid version. Exiting ...`);
       this.logger.fatal(
-        `Found Runtime version = ${this.runtime.version} required = ${
+        `Found Runtime version = ${version} required = ${
           this.pool.data!.protocol!.version
         }`
       );
@@ -54,7 +55,7 @@ export function isValidVersion(this: Validator): boolean {
     if (minor(remoteVersion) !== minor(localVersion)) {
       this.logger.fatal(`Running an invalid version. Exiting ...`);
       this.logger.fatal(
-        `Found Runtime version = ${this.runtime.version} required = ${
+        `Found Runtime version = ${version} required = ${
           this.pool.data!.protocol!.version
         }`
       );
@@ -65,7 +66,7 @@ export function isValidVersion(this: Validator): boolean {
     if (patch(remoteVersion) > patch(localVersion)) {
       this.logger.fatal(`Running an invalid version. Exiting ...`);
       this.logger.fatal(
-        `Found Runtime version = ${this.runtime.version} required = ${
+        `Found Runtime version = ${version} required = ${
           this.pool.data!.protocol!.version
         }`
       );
@@ -79,7 +80,7 @@ export function isValidVersion(this: Validator): boolean {
     ) {
       this.logger.fatal(`Running an invalid version. Exiting ...`);
       this.logger.fatal(
-        `Found Runtime version = ${this.runtime.version} required = ${
+        `Found Runtime version = ${version} required = ${
           this.pool.data!.protocol!.version
         }`
       );
@@ -87,9 +88,7 @@ export function isValidVersion(this: Validator): boolean {
     }
 
     // patch version can be different, continue in this case
-    this.logger.info(
-      `Validator running on valid runtime version = ${this.runtime.version}`
-    );
+    this.logger.info(`Validator running on valid runtime version = ${version}`);
 
     return true;
   } catch (err) {

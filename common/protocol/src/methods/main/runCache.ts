@@ -136,7 +136,7 @@ export async function runCache(this: Validator): Promise<void> {
         const nextKey = key
           ? await callWithBackoffStrategy(
               async () => {
-                return await this.runtime.nextKey(this, key);
+                return await this.runtime.nextKey(key);
               },
               {
                 limitTimeoutMs: 5 * 60 * 1000,
@@ -158,16 +158,17 @@ export async function runCache(this: Validator): Promise<void> {
           const dataItem: DataItem = await callWithBackoffStrategy(
             async () => {
               // get the data item from the runtime by key
-              this.logger.debug(`this.runtime.getDataItem($THIS,${nextKey})`);
-              const data = await this.runtime.getDataItem(this, nextKey);
+              this.logger.debug(`this.runtime.getDataItem(${nextKey})`);
+              const data = await this.runtime.getDataItem(nextKey);
 
               this.m.runtime_get_data_item_successful.inc();
 
               // prevalidate data item and reject if it fails
               this.logger.debug(
-                `this.runtime.prevalidateDataItem($THIS,$ITEM)`
+                `this.runtime.prevalidateDataItem($this.runtime.serializedConfig,$ITEM)`
               );
-              const valid = await this.runtime.prevalidateDataItem(this, data);
+
+              const valid = await this.runtime.prevalidateDataItem(data);
 
               if (!valid) {
                 throw new Error(
@@ -177,7 +178,7 @@ export async function runCache(this: Validator): Promise<void> {
 
               // transform data item
               this.logger.debug(`this.runtime.transformDataItem($ITEM)`);
-              return await this.runtime.transformDataItem(this, data);
+              return await this.runtime.transformDataItem(data);
             },
             {
               limitTimeoutMs: 5 * 60 * 1000,

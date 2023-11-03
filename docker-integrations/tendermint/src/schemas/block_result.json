@@ -1,0 +1,245 @@
+{
+  "type": "object",
+  "properties": {
+    "height": {
+      "type": "string"
+    },
+    "txs_results": {
+      "type": ["array", "null"],
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "integer"
+            },
+            "data": {
+              "type": ["string", "null"]
+            },
+            "log": {
+              "type": "string"
+            },
+            "info": {
+              "type": "string"
+            },
+            "gas_wanted": {
+              "type": "string"
+            },
+            "gas_used": {
+              "type": "string"
+            },
+            "events": {
+              "type": "array",
+              "items": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string"
+                    },
+                    "attributes": {
+                      "type": "array",
+                      "items": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "key": {
+                              "type": "string"
+                            },
+                            "value": {
+                              "type": ["string", "null"]
+                            },
+                            "index": {
+                              "type": "boolean"
+                            }
+                          },
+                          "required": ["key", "value", "index"]
+                        }
+                      ]
+                    }
+                  },
+                  "required": ["type", "attributes"]
+                }
+              ]
+            },
+            "codespace": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "code",
+            "data",
+            "log",
+            "info",
+            "gas_wanted",
+            "gas_used",
+            "events",
+            "codespace"
+          ]
+        }
+      ]
+    },
+    "begin_block_events": {
+      "type": ["array", "null"],
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string"
+            },
+            "attributes": {
+              "type": "array",
+              "items": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "key": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "string"
+                    },
+                    "index": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": ["key", "value", "index"]
+                }
+              ]
+            }
+          },
+          "required": ["type", "attributes"]
+        }
+      ]
+    },
+    "end_block_events": {
+      "type": ["array", "null"],
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string"
+            },
+            "attributes": {
+              "type": "array",
+              "items": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "key": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "string"
+                    },
+                    "index": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": ["key", "value", "index"]
+                }
+              ]
+            }
+          },
+          "required": ["type", "attributes"]
+        }
+      ]
+    },
+    "validator_updates": {
+      "type": ["array", "null"],
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "pub_key": {
+              "type": "object",
+              "properties": {
+                "Sum": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "object",
+                      "properties": {
+                        "ed25519": {
+                          "type": "string"
+                        }
+                      },
+                      "required": ["ed25519"]
+                    }
+                  },
+                  "required": ["type", "value"]
+                }
+              },
+              "required": ["Sum"]
+            },
+            "power": {
+              "type": "string"
+            }
+          }
+        }
+      ],
+      "required": ["pub_key"]
+    },
+    "consensus_param_updates": {
+      "type": "object",
+      "properties": {
+        "block": {
+          "type": "object",
+          "properties": {
+            "max_bytes": {
+              "type": "string"
+            },
+            "max_gas": {
+              "type": "string"
+            }
+          },
+          "required": ["max_bytes", "max_gas"]
+        },
+        "evidence": {
+          "type": "object",
+          "properties": {
+            "max_age_num_blocks": {
+              "type": "string"
+            },
+            "max_age_duration": {
+              "type": "string"
+            },
+            "max_bytes": {
+              "type": "string"
+            }
+          },
+          "required": ["max_age_num_blocks", "max_age_duration", "max_bytes"]
+        },
+        "validator": {
+          "type": "object",
+          "properties": {
+            "pub_key_types": {
+              "type": "array",
+              "items": [
+                {
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "required": ["pub_key_types"]
+        }
+      },
+      "required": ["block", "evidence", "validator"]
+    }
+  },
+  "required": [
+    "height",
+    "txs_results",
+    "begin_block_events",
+    "end_block_events",
+    "validator_updates",
+    "consensus_param_updates"
+  ],
+  "additionalProperties": false
+}
