@@ -3,8 +3,11 @@ import * as grpc from '@grpc/grpc-js';
 import { RuntimeService } from './protos/runtime';
 import { TendermintServer } from './server';
 
-const runtimeServer: grpc.Server = new grpc.Server();
-
+const maxMessageSize: number = 2 * 1024 * 1024 * 1024; // 2 GB
+const runtimeServer: grpc.Server = new grpc.Server({
+  'grpc.max_receive_message_length': maxMessageSize,
+  'grpc.max_send_message_length': maxMessageSize,
+});
 const runtimeService = new TendermintServer();
 
 runtimeServer.addService(RuntimeService, {
