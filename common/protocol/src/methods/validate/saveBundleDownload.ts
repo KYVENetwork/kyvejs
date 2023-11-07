@@ -1,7 +1,8 @@
 import BigNumber from "bignumber.js";
 
+import { VoteType } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
 import { Validator } from "../..";
-import { callWithBackoffStrategy, standardizeError, VOTE } from "../../utils";
+import { callWithBackoffStrategy, standardizeError } from "../../utils";
 
 /**
  * saveBundleDownload downloads a bundle from the storage provider.
@@ -103,7 +104,7 @@ export async function saveBundleDownload(
       if (!this.pool.bundle_proposal?.voters_abstain.includes(this.staker)) {
         await this.voteBundleProposal(
           this.pool.bundle_proposal!.storage_id,
-          VOTE.ABSTAIN
+          VoteType.VOTE_TYPE_ABSTAIN
         );
       }
     }

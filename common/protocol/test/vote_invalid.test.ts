@@ -6,7 +6,6 @@ import {
   Validator,
   sha256,
   standardizeJSON,
-  VOTE,
 } from "../src/index";
 import { runNode } from "../src/methods/main/runNode";
 import { genesis_pool } from "./mocks/constants";
@@ -117,7 +116,9 @@ describe("invalid votes tests", () => {
 
   test("vote invalid because runtime validate function returns false", async () => {
     // ARRANGE
-    const validateBundleMock = jest.fn().mockResolvedValue(VOTE.INVALID);
+    const validateBundleMock = jest
+      .fn()
+      .mockResolvedValue(VoteType.VOTE_TYPE_INVALID);
     v["runtime"].validateDataItem = validateBundleMock;
 
     const bundle = [
@@ -373,7 +374,8 @@ describe("invalid votes tests", () => {
 
     expect(compression.compress).toHaveBeenCalledTimes(0);
 
-    expect(compression.decompress).toHaveBeenCalledTimes(0);
+    expect(compression.decompress).toHaveBeenCalledTimes(1);
+    expect(compression.decompress).toHaveBeenLastCalledWith(compressedBundle);
 
     // =============================
     // ASSERT INTEGRATION INTERFACES
@@ -508,7 +510,8 @@ describe("invalid votes tests", () => {
 
     expect(compression.compress).toHaveBeenCalledTimes(0);
 
-    expect(compression.decompress).toHaveBeenCalledTimes(0);
+    expect(compression.decompress).toHaveBeenCalledTimes(1);
+    expect(compression.decompress).toHaveBeenLastCalledWith(compressedBundle);
 
     // =============================
     // ASSERT INTEGRATION INTERFACES
@@ -643,7 +646,8 @@ describe("invalid votes tests", () => {
 
     expect(compression.compress).toHaveBeenCalledTimes(0);
 
-    expect(compression.decompress).toHaveBeenCalledTimes(0);
+    expect(compression.decompress).toHaveBeenCalledTimes(1);
+    expect(compression.decompress).toHaveBeenLastCalledWith(compressedBundle);
 
     // =============================
     // ASSERT INTEGRATION INTERFACES
@@ -929,7 +933,8 @@ describe("invalid votes tests", () => {
 
     expect(compression.compress).toHaveBeenCalledTimes(0);
 
-    expect(compression.decompress).toHaveBeenCalledTimes(0);
+    expect(compression.decompress).toHaveBeenCalledTimes(1);
+    expect(compression.decompress).toHaveBeenLastCalledWith(compressedBundle);
 
     // =============================
     // ASSERT INTEGRATION INTERFACES
@@ -951,7 +956,9 @@ describe("invalid votes tests", () => {
 
   test("try to vote invalid after validator has voted abstain bebore", async () => {
     // ARRANGE
-    const validateBundleMock = jest.fn().mockResolvedValue(VOTE.INVALID);
+    const validateBundleMock = jest
+      .fn()
+      .mockResolvedValue(VoteType.VOTE_TYPE_INVALID);
 
     v["runtime"].validateDataItem = validateBundleMock;
 
@@ -1098,7 +1105,9 @@ describe("invalid votes tests", () => {
 
   test("try to vote invalid after validator has voted invalid before", async () => {
     // ARRANGE
-    const validateBundleMock = jest.fn().mockResolvedValue(VOTE.INVALID);
+    const validateBundleMock = jest
+      .fn()
+      .mockResolvedValue(VoteType.VOTE_TYPE_INVALID);
 
     v["runtime"].validateDataItem = validateBundleMock;
 
@@ -1228,7 +1237,9 @@ describe("invalid votes tests", () => {
 
   test("try to vote invalid after validator has voted valid before", async () => {
     // ARRANGE
-    const validateBundleMock = jest.fn().mockResolvedValue(VOTE.INVALID);
+    const validateBundleMock = jest
+      .fn()
+      .mockResolvedValue(VoteType.VOTE_TYPE_INVALID);
 
     v["runtime"].validateDataItem = validateBundleMock;
 
@@ -1356,7 +1367,9 @@ describe("invalid votes tests", () => {
 
   test("vote invalid but local bundle could not be loaded in the first try", async () => {
     // ARRANGE
-    v["runtime"].validateDataItem = jest.fn().mockResolvedValue(VOTE.INVALID);
+    v["runtime"].validateDataItem = jest
+      .fn()
+      .mockResolvedValue(VoteType.VOTE_TYPE_INVALID);
 
     const bundle = [
       { key: "test_key_1", value: "test_value_1" },
@@ -1515,7 +1528,9 @@ describe("invalid votes tests", () => {
 
   test("vote invalid but bundle from storage provider could not be loaded in the first try", async () => {
     // ARRANGE
-    v["runtime"].validateDataItem = jest.fn().mockResolvedValue(VOTE.INVALID);
+    v["runtime"].validateDataItem = jest
+      .fn()
+      .mockResolvedValue(VoteType.VOTE_TYPE_INVALID);
 
     const bundle = [
       { key: "test_key_1", value: "test_value_1" },
@@ -1692,7 +1707,9 @@ describe("invalid votes tests", () => {
       .mockReturnValueOnce(true)
       .mockReturnValue(false);
 
-    v["runtime"].validateDataItem = jest.fn().mockResolvedValue(VOTE.INVALID);
+    v["runtime"].validateDataItem = jest
+      .fn()
+      .mockResolvedValue(VoteType.VOTE_TYPE_INVALID);
 
     v["client"][0].kyve.bundles.v1beta1.voteBundleProposal = jest
       .fn()
@@ -1896,6 +1913,11 @@ describe("invalid votes tests", () => {
     const dataSize = compressedBundle.byteLength.toString();
     const dataHash = sha256(bundleBytes);
 
+    storageProvider.retrieveBundle = jest.fn().mockResolvedValue({
+      storageId: "another_test_storage_id",
+      storageData: compressedBundle,
+    });
+
     v["syncPoolState"] = jest.fn().mockImplementation(() => {
       v.pool = {
         ...genesis_pool,
@@ -1986,7 +2008,8 @@ describe("invalid votes tests", () => {
 
     expect(compression.compress).toHaveBeenCalledTimes(0);
 
-    expect(compression.decompress).toHaveBeenCalledTimes(0);
+    expect(compression.decompress).toHaveBeenCalledTimes(1);
+    expect(compression.decompress).toHaveBeenLastCalledWith(compressedBundle);
 
     // =============================
     // ASSERT INTEGRATION INTERFACES

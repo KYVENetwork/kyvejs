@@ -32,8 +32,10 @@
     "bignumber.js": "^9.0.1",
     "clone": "^2.1.2",
     "commander": "^9.4.1",
+    "diff": "^5.1.0",
     "fs-extra": "^10.0.1",
     "jsonfile": "^6.1.0",
+    "jszip": "^3.10.1",
     "level": "^8.0.0",
     "prando": "^6.0.1",
     "prom-client": "^14.1.0",
@@ -46,6 +48,7 @@
   },
   "devDependencies": {
     "@types/clone": "^2.1.1",
+    "@types/diff": "^5.0.7",
     "@types/fs-extra": "^9.0.13",
     "@types/jest": "^28.1.7",
     "@types/node": "^18.11.9",

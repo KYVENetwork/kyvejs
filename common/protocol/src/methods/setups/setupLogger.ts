@@ -19,9 +19,6 @@ export function setupLogger(this: Validator): void {
       mkdirSync(path.join(this.home, "logs"), { recursive: true });
     }
 
-    // name the log file after the time the node got started
-    const logFile = `${new Date().toISOString()}.log`;
-
     const logToTransport = (log: ILogObject) => {
       const message = log.argumentsArray[0];
 
@@ -53,7 +50,7 @@ export function setupLogger(this: Validator): void {
       }
 
       // save logs to specified path target
-      appendFileSync(path.join(this.home, `logs`, logFile), format + "\n");
+      appendFileSync(path.join(this.home, `logs`, this.logFile), format + "\n");
     };
 
     // hide verbose logging information
