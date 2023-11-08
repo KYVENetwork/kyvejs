@@ -34,7 +34,7 @@ RUN TARGET=latest-${TARGETOS}-${BINARYARCH} yarn run build:binaries:docker-core
 FROM node:slim AS runtime
 
 # Export environment variable which is used in the code
-ENV RUNTIME_SERVER_ADDR=runtime:50051
+ENV RUNTIME_CLIENT_ADDR=runtime:50051
 
 # Set the working directory
 WORKDIR /usr/src/app

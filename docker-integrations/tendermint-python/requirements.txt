@@ -1,0 +1,12 @@
+# gRPC and Protocol Buffers
+grpcio>=1.59.2
+grpcio-tools>=1.59.2
+protobuf>=4.25.0
+
+# HTTP requests library
+requests>=2.31.0
+
+# Development and linting tools
+black==23.11.0 # Black code formatter
+flake8==6.1.0  # Flake8 for linting
+isort==5.12.0  # Isort for sorting imports
