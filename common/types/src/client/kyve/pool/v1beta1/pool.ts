@@ -6,18 +6,42 @@ export const protobufPackage = "kyve.pool.v1beta1";
 
 /** PoolStatus ... */
 export enum PoolStatus {
-  /** POOL_STATUS_UNSPECIFIED - POOL_STATUS_UNSPECIFIED ... */
+  /**
+   * POOL_STATUS_UNSPECIFIED - POOL_STATUS_UNSPECIFIED indicates an unknown status, likely
+   * due to an error
+   */
   POOL_STATUS_UNSPECIFIED = 0,
-  /** POOL_STATUS_ACTIVE - POOL_STATUS_ACTIVE ... */
+  /**
+   * POOL_STATUS_ACTIVE - POOL_STATUS_ACTIVE indicates, that the pool is running
+   * normally
+   */
   POOL_STATUS_ACTIVE = 1,
-  /** POOL_STATUS_DISABLED - POOL_STATUS_DISABLED ... */
+  /**
+   * POOL_STATUS_DISABLED - POOL_STATUS_DISABLED indicates, that the pool was disabled
+   * by the governance and does not continue until it is enabled
+   * by the governance again
+   */
   POOL_STATUS_DISABLED = 2,
-  /** POOL_STATUS_NO_FUNDS - POOL_STATUS_NO_FUNDS ... */
+  /**
+   * POOL_STATUS_NO_FUNDS - POOL_STATUS_NO_FUNDS indicates, that the pool currently has no
+   * funds, but is continuing normally anyway, due to inflation splitting
+   */
   POOL_STATUS_NO_FUNDS = 3,
-  /** POOL_STATUS_NOT_ENOUGH_DELEGATION - POOL_STATUS_NOT_ENOUGH_DELEGATION ... */
+  /**
+   * POOL_STATUS_NOT_ENOUGH_DELEGATION - POOL_STATUS_NOT_ENOUGH_DELEGATION indicates, that the min delegation
+   * requirement has not been met and that the pool is halted
+   */
   POOL_STATUS_NOT_ENOUGH_DELEGATION = 4,
-  /** POOL_STATUS_UPGRADING - POOL_STATUS_UPGRADING ... */
+  /**
+   * POOL_STATUS_UPGRADING - POOL_STATUS_UPGRADING indicates, that the runtime is currently
+   * being upgraded and that the pool is halted
+   */
   POOL_STATUS_UPGRADING = 5,
+  /**
+   * POOL_STATUS_VOTING_POWER_TOO_HIGH - POOL_STATUS_VOTING_POWER_TOO_HIGH indicates, that one validator
+   * has more than 50% voting power and that the pool is halted
+   */
+  POOL_STATUS_VOTING_POWER_TOO_HIGH = 6,
   UNRECOGNIZED = -1,
 }
 
@@ -41,6 +65,9 @@ export function poolStatusFromJSON(object: any): PoolStatus {
     case 5:
     case "POOL_STATUS_UPGRADING":
       return PoolStatus.POOL_STATUS_UPGRADING;
+    case 6:
+    case "POOL_STATUS_VOTING_POWER_TOO_HIGH":
+      return PoolStatus.POOL_STATUS_VOTING_POWER_TOO_HIGH;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -62,6 +89,8 @@ export function poolStatusToJSON(object: PoolStatus): string {
       return "POOL_STATUS_NOT_ENOUGH_DELEGATION";
     case PoolStatus.POOL_STATUS_UPGRADING:
       return "POOL_STATUS_UPGRADING";
+    case PoolStatus.POOL_STATUS_VOTING_POWER_TOO_HIGH:
+      return "POOL_STATUS_VOTING_POWER_TOO_HIGH";
     case PoolStatus.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";
