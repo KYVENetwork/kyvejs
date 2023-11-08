@@ -1,1 +1,1 @@
-export const version = "rapha/funders-module"
+export const version = "main"
