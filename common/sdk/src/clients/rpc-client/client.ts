@@ -7,8 +7,8 @@ import { IConfig } from "../../constants";
 import KyveBaseMethods from "./kyve/base/v1beta1/base";
 import KyveBundlesMethods from "./kyve/bundles/v1beta1/bundles";
 import KyveDelegationMethods from "./kyve/delegation/v1beta1/delegation";
+import KyveFundersMethods from "./kyve/funders/v1beta1/funders";
 import KyveGovMethodsV1 from "./kyve/gov/v1/gov";
-import KyvePoolMethods from "./kyve/pool/v1beta1/pool";
 import KyveStakersMethods from "./kyve/stakers/v1beta1/stakers";
 
 export default class KyveClient {
@@ -28,8 +28,8 @@ export default class KyveClient {
     delegation: {
       v1beta1: KyveDelegationMethods;
     };
-    pool: {
-      v1beta1: KyvePoolMethods;
+    funders: {
+      v1beta1: KyveFundersMethods;
     };
     stakers: {
       v1beta1: KyveStakersMethods;
@@ -68,8 +68,12 @@ export default class KyveClient {
       gov: {
         v1: new KyveGovMethodsV1(this.nativeClient, this.account, config),
       },
-      pool: {
-        v1beta1: new KyvePoolMethods(this.nativeClient, this.account, config),
+      funders: {
+        v1beta1: new KyveFundersMethods(
+          this.nativeClient,
+          this.account,
+          config
+        ),
       },
       stakers: {
         v1beta1: new KyveStakersMethods(

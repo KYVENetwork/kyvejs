@@ -15,11 +15,10 @@ import { MsgWithdrawRewards } from "@kyvejs/types/client/kyve/delegation/v1beta1
 import { MsgRedelegate } from "@kyvejs/types/client/kyve/delegation/v1beta1/tx";
 import { MsgUndelegate } from "@kyvejs/types/client/kyve/delegation/v1beta1/tx";
 import { MsgUpdateParams as MsgUpdateParamsDelegation } from "@kyvejs/types/client/kyve/delegation/v1beta1/tx";
+import { MsgFundPool } from "@kyvejs/types/client/kyve/funders/v1beta1/tx";
+import { MsgDefundPool } from "@kyvejs/types/client/kyve/funders/v1beta1/tx";
 /** fees **/
 import { MsgUpdateParams as MsgUpdateParamsGlobal } from "@kyvejs/types/client/kyve/global/v1beta1/tx";
-/** pool **/
-import { MsgFundPool } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
-import { MsgDefundPool } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
 import { MsgCreatePool } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
 import { MsgUpdatePool } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
 import { MsgDisablePool } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
@@ -36,18 +35,24 @@ import { MsgJoinPool } from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
 import { MsgUpdateCommission } from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
 import { MsgLeavePool } from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
 import { MsgUpdateParams as MsgUpdateParamsStakers } from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
+/** funders **/
+import { MsgCreateFunder } from "@kyvejs/types/lcd/kyve/funders/v1beta1/tx";
+import { MsgUpdateFunder } from "@kyvejs/types/lcd/kyve/funders/v1beta1/tx";
 
 export const registry: ReadonlyArray<[string, GeneratedType]> = [
   ...defaultRegistryTypes,
   /**pool **/
-  ["/kyve.pool.v1beta1.MsgFundPool", MsgFundPool],
-  ["/kyve.pool.v1beta1.MsgDefundPool", MsgDefundPool],
   ["/kyve.pool.v1beta1.MsgCreatePool", MsgCreatePool],
   ["/kyve.pool.v1beta1.UpdatePool", MsgUpdatePool],
   ["/kyve.pool.v1beta1.MsgDisablePool", MsgDisablePool],
   ["/kyve.pool.v1beta1.MsgEnablePool", MsgEnablePool],
   ["/kyve.pool.v1beta1.MsgScheduleRuntimeUpgrade", MsgScheduleRuntimeUpgrade],
   ["/kyve.pool.v1beta1.MsgCancelRuntimeUpgrade", MsgCancelRuntimeUpgrade],
+  /** funders **/
+  ["/kyve.funders.v1beta1.MsgCreateFunder", MsgCreateFunder],
+  ["/kyve.funders.v1beta1.MsgUpdateFunder", MsgUpdateFunder],
+  ["/kyve.funders.v1beta1.MsgFundPool", MsgFundPool],
+  ["/kyve.funders.v1beta1.MsgDefundPool", MsgDefundPool],
   /** stakers **/
   ["/kyve.stakers.v1beta1.MsgCreateStaker", MsgCreateStaker],
   ["/kyve.stakers.v1beta1.MsgUpdateMetadata", MsgUpdateMetadata],
@@ -78,16 +83,30 @@ export const load = (protoRegistry: Registry) => {
   });
 };
 export const encodeTxMsg = {
+  createFunder(value: MsgCreateFunder) {
+    return {
+      type_url: "/kyve.funders.v1beta1.MsgCreateFunder",
+      value: MsgCreateFunder.encode(value).finish(),
+    };
+  },
+
+  updateFunder(value: MsgUpdateFunder) {
+    return {
+      type_url: "/kyve.funders.v1beta1.MsgUpdateFunder",
+      value: MsgUpdateFunder.encode(value).finish(),
+    };
+  },
+
   fundPool(value: MsgFundPool) {
     return {
-      type_url: "/kyve.pool.v1beta1.MsgFundPool",
+      type_url: "/kyve.funders.v1beta1.MsgFundPool",
       value: MsgFundPool.encode(value).finish(),
     };
   },
 
   defundPool(value: MsgDefundPool) {
     return {
-      type_url: "/kyve.pool.v1beta1.MsgDefundPool",
+      type_url: "/kyve.funders.v1beta1.MsgDefundPool",
       value: MsgDefundPool.encode(value).finish(),
     };
   },
@@ -254,16 +273,30 @@ export const encodeTxMsg = {
 };
 
 export const withTypeUrl = {
+  createFunder(value: MsgCreateFunder) {
+    return {
+      typeUrl: "/kyve.funders.v1beta1.MsgCreateFunder",
+      value,
+    };
+  },
+
+  updateFunder(value: MsgUpdateFunder) {
+    return {
+      typeUrl: "/kyve.funders.v1beta1.MsgUpdateFunder",
+      value,
+    };
+  },
+
   fundPool(value: MsgFundPool) {
     return {
-      typeUrl: "/kyve.pool.v1beta1.MsgFundPool",
+      typeUrl: "/kyve.funders.v1beta1.MsgFundPool",
       value,
     };
   },
 
   defundPool(value: MsgDefundPool) {
     return {
-      typeUrl: "/kyve.pool.v1beta1.MsgDefundPool",
+      typeUrl: "/kyve.funders.v1beta1.MsgDefundPool",
       value,
     };
   },

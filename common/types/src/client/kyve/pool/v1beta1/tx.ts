@@ -4,34 +4,6 @@ import _m0 from "protobufjs/minimal";
 
 export const protobufPackage = "kyve.pool.v1beta1";
 
-/** MsgFundPool defines a SDK message for funding a pool. */
-export interface MsgFundPool {
-  /** creator ... */
-  creator: string;
-  /** id ... */
-  id: string;
-  /** amount ... */
-  amount: string;
-}
-
-/** MsgFundPoolResponse defines the Msg/DefundPool response type. */
-export interface MsgFundPoolResponse {
-}
-
-/** MsgDefundPool defines a SDK message for defunding a pool. */
-export interface MsgDefundPool {
-  /** creator ... */
-  creator: string;
-  /** id ... */
-  id: string;
-  /** amount ... */
-  amount: string;
-}
-
-/** MsgDefundPoolResponse defines the Msg/DefundPool response type. */
-export interface MsgDefundPoolResponse {
-}
-
 /** MsgCreatePool defines a SDK message for creating a new pool. */
 export interface MsgCreatePool {
   /** authority is the address of the governance account. */
@@ -48,8 +20,8 @@ export interface MsgCreatePool {
   start_key: string;
   /** upload_interval ... */
   upload_interval: string;
-  /** operating_cost ... */
-  operating_cost: string;
+  /** inflation_share_weight ... */
+  inflation_share_weight: string;
   /** min_delegation ... */
   min_delegation: string;
   /** max_bundle_size ... */
@@ -150,270 +122,6 @@ export interface MsgUpdateParams {
 export interface MsgUpdateParamsResponse {
 }
 
-function createBaseMsgFundPool(): MsgFundPool {
-  return { creator: "", id: "0", amount: "0" };
-}
-
-export const MsgFundPool = {
-  encode(message: MsgFundPool, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.creator !== "") {
-      writer.uint32(10).string(message.creator);
-    }
-    if (message.id !== "0") {
-      writer.uint32(16).uint64(message.id);
-    }
-    if (message.amount !== "0") {
-      writer.uint32(24).uint64(message.amount);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): MsgFundPool {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgFundPool();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.creator = reader.string();
-          continue;
-        case 2:
-          if (tag !== 16) {
-            break;
-          }
-
-          message.id = longToString(reader.uint64() as Long);
-          continue;
-        case 3:
-          if (tag !== 24) {
-            break;
-          }
-
-          message.amount = longToString(reader.uint64() as Long);
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): MsgFundPool {
-    return {
-      creator: isSet(object.creator) ? globalThis.String(object.creator) : "",
-      id: isSet(object.id) ? globalThis.String(object.id) : "0",
-      amount: isSet(object.amount) ? globalThis.String(object.amount) : "0",
-    };
-  },
-
-  toJSON(message: MsgFundPool): unknown {
-    const obj: any = {};
-    if (message.creator !== "") {
-      obj.creator = message.creator;
-    }
-    if (message.id !== "0") {
-      obj.id = message.id;
-    }
-    if (message.amount !== "0") {
-      obj.amount = message.amount;
-    }
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<MsgFundPool>, I>>(base?: I): MsgFundPool {
-    return MsgFundPool.fromPartial(base ?? ({} as any));
-  },
-  fromPartial<I extends Exact<DeepPartial<MsgFundPool>, I>>(object: I): MsgFundPool {
-    const message = createBaseMsgFundPool();
-    message.creator = object.creator ?? "";
-    message.id = object.id ?? "0";
-    message.amount = object.amount ?? "0";
-    return message;
-  },
-};
-
-function createBaseMsgFundPoolResponse(): MsgFundPoolResponse {
-  return {};
-}
-
-export const MsgFundPoolResponse = {
-  encode(_: MsgFundPoolResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): MsgFundPoolResponse {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgFundPoolResponse();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(_: any): MsgFundPoolResponse {
-    return {};
-  },
-
-  toJSON(_: MsgFundPoolResponse): unknown {
-    const obj: any = {};
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<MsgFundPoolResponse>, I>>(base?: I): MsgFundPoolResponse {
-    return MsgFundPoolResponse.fromPartial(base ?? ({} as any));
-  },
-  fromPartial<I extends Exact<DeepPartial<MsgFundPoolResponse>, I>>(_: I): MsgFundPoolResponse {
-    const message = createBaseMsgFundPoolResponse();
-    return message;
-  },
-};
-
-function createBaseMsgDefundPool(): MsgDefundPool {
-  return { creator: "", id: "0", amount: "0" };
-}
-
-export const MsgDefundPool = {
-  encode(message: MsgDefundPool, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.creator !== "") {
-      writer.uint32(10).string(message.creator);
-    }
-    if (message.id !== "0") {
-      writer.uint32(16).uint64(message.id);
-    }
-    if (message.amount !== "0") {
-      writer.uint32(24).uint64(message.amount);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): MsgDefundPool {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgDefundPool();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.creator = reader.string();
-          continue;
-        case 2:
-          if (tag !== 16) {
-            break;
-          }
-
-          message.id = longToString(reader.uint64() as Long);
-          continue;
-        case 3:
-          if (tag !== 24) {
-            break;
-          }
-
-          message.amount = longToString(reader.uint64() as Long);
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): MsgDefundPool {
-    return {
-      creator: isSet(object.creator) ? globalThis.String(object.creator) : "",
-      id: isSet(object.id) ? globalThis.String(object.id) : "0",
-      amount: isSet(object.amount) ? globalThis.String(object.amount) : "0",
-    };
-  },
-
-  toJSON(message: MsgDefundPool): unknown {
-    const obj: any = {};
-    if (message.creator !== "") {
-      obj.creator = message.creator;
-    }
-    if (message.id !== "0") {
-      obj.id = message.id;
-    }
-    if (message.amount !== "0") {
-      obj.amount = message.amount;
-    }
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<MsgDefundPool>, I>>(base?: I): MsgDefundPool {
-    return MsgDefundPool.fromPartial(base ?? ({} as any));
-  },
-  fromPartial<I extends Exact<DeepPartial<MsgDefundPool>, I>>(object: I): MsgDefundPool {
-    const message = createBaseMsgDefundPool();
-    message.creator = object.creator ?? "";
-    message.id = object.id ?? "0";
-    message.amount = object.amount ?? "0";
-    return message;
-  },
-};
-
-function createBaseMsgDefundPoolResponse(): MsgDefundPoolResponse {
-  return {};
-}
-
-export const MsgDefundPoolResponse = {
-  encode(_: MsgDefundPoolResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): MsgDefundPoolResponse {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgDefundPoolResponse();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(_: any): MsgDefundPoolResponse {
-    return {};
-  },
-
-  toJSON(_: MsgDefundPoolResponse): unknown {
-    const obj: any = {};
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<MsgDefundPoolResponse>, I>>(base?: I): MsgDefundPoolResponse {
-    return MsgDefundPoolResponse.fromPartial(base ?? ({} as any));
-  },
-  fromPartial<I extends Exact<DeepPartial<MsgDefundPoolResponse>, I>>(_: I): MsgDefundPoolResponse {
-    const message = createBaseMsgDefundPoolResponse();
-    return message;
-  },
-};
-
 function createBaseMsgCreatePool(): MsgCreatePool {
   return {
     authority: "",
@@ -423,7 +131,7 @@ function createBaseMsgCreatePool(): MsgCreatePool {
     config: "",
     start_key: "",
     upload_interval: "0",
-    operating_cost: "0",
+    inflation_share_weight: "0",
     min_delegation: "0",
     max_bundle_size: "0",
     version: "",
@@ -456,8 +164,8 @@ export const MsgCreatePool = {
     if (message.upload_interval !== "0") {
       writer.uint32(56).uint64(message.upload_interval);
     }
-    if (message.operating_cost !== "0") {
-      writer.uint32(64).uint64(message.operating_cost);
+    if (message.inflation_share_weight !== "0") {
+      writer.uint32(64).uint64(message.inflation_share_weight);
     }
     if (message.min_delegation !== "0") {
       writer.uint32(72).uint64(message.min_delegation);
@@ -541,7 +249,7 @@ export const MsgCreatePool = {
             break;
           }
 
-          message.operating_cost = longToString(reader.uint64() as Long);
+          message.inflation_share_weight = longToString(reader.uint64() as Long);
           continue;
         case 9:
           if (tag !== 72) {
@@ -603,7 +311,9 @@ export const MsgCreatePool = {
       config: isSet(object.config) ? globalThis.String(object.config) : "",
       start_key: isSet(object.start_key) ? globalThis.String(object.start_key) : "",
       upload_interval: isSet(object.upload_interval) ? globalThis.String(object.upload_interval) : "0",
-      operating_cost: isSet(object.operating_cost) ? globalThis.String(object.operating_cost) : "0",
+      inflation_share_weight: isSet(object.inflation_share_weight)
+        ? globalThis.String(object.inflation_share_weight)
+        : "0",
       min_delegation: isSet(object.min_delegation) ? globalThis.String(object.min_delegation) : "0",
       max_bundle_size: isSet(object.max_bundle_size) ? globalThis.String(object.max_bundle_size) : "0",
       version: isSet(object.version) ? globalThis.String(object.version) : "",
@@ -636,8 +346,8 @@ export const MsgCreatePool = {
     if (message.upload_interval !== "0") {
       obj.upload_interval = message.upload_interval;
     }
-    if (message.operating_cost !== "0") {
-      obj.operating_cost = message.operating_cost;
+    if (message.inflation_share_weight !== "0") {
+      obj.inflation_share_weight = message.inflation_share_weight;
     }
     if (message.min_delegation !== "0") {
       obj.min_delegation = message.min_delegation;
@@ -672,7 +382,7 @@ export const MsgCreatePool = {
     message.config = object.config ?? "";
     message.start_key = object.start_key ?? "";
     message.upload_interval = object.upload_interval ?? "0";
-    message.operating_cost = object.operating_cost ?? "0";
+    message.inflation_share_weight = object.inflation_share_weight ?? "0";
     message.min_delegation = object.min_delegation ?? "0";
     message.max_bundle_size = object.max_bundle_size ?? "0";
     message.version = object.version ?? "";
@@ -1509,10 +1219,6 @@ export const MsgUpdateParamsResponse = {
 
 /** Msg defines the Msg service. */
 export interface Msg {
-  /** FundPool ... */
-  FundPool(request: MsgFundPool): Promise<MsgFundPoolResponse>;
-  /** DefundPool ... */
-  DefundPool(request: MsgDefundPool): Promise<MsgDefundPoolResponse>;
   /**
    * CreatePool defines a governance operation for creating a new pool.
    * The authority is hard-coded to the x/gov module account.
@@ -1557,8 +1263,6 @@ export class MsgClientImpl implements Msg {
   constructor(rpc: Rpc, opts?: { service?: string }) {
     this.service = opts?.service || MsgServiceName;
     this.rpc = rpc;
-    this.FundPool = this.FundPool.bind(this);
-    this.DefundPool = this.DefundPool.bind(this);
     this.CreatePool = this.CreatePool.bind(this);
     this.UpdatePool = this.UpdatePool.bind(this);
     this.DisablePool = this.DisablePool.bind(this);
@@ -1567,18 +1271,6 @@ export class MsgClientImpl implements Msg {
     this.CancelRuntimeUpgrade = this.CancelRuntimeUpgrade.bind(this);
     this.UpdateParams = this.UpdateParams.bind(this);
   }
-  FundPool(request: MsgFundPool): Promise<MsgFundPoolResponse> {
-    const data = MsgFundPool.encode(request).finish();
-    const promise = this.rpc.request(this.service, "FundPool", data);
-    return promise.then((data) => MsgFundPoolResponse.decode(_m0.Reader.create(data)));
-  }
-
-  DefundPool(request: MsgDefundPool): Promise<MsgDefundPoolResponse> {
-    const data = MsgDefundPool.encode(request).finish();
-    const promise = this.rpc.request(this.service, "DefundPool", data);
-    return promise.then((data) => MsgDefundPoolResponse.decode(_m0.Reader.create(data)));
-  }
-
   CreatePool(request: MsgCreatePool): Promise<MsgCreatePoolResponse> {
     const data = MsgCreatePool.encode(request).finish();
     const promise = this.rpc.request(this.service, "CreatePool", data);

@@ -22,6 +22,8 @@ export default class KyveGovMsg extends KyveSigning {
   private createGovTx(
     content: { type_url: string; value: unknown },
     deposit: string,
+    title: string,
+    summary: string,
     metadata?: string
   ) {
     return {
@@ -30,6 +32,8 @@ export default class KyveGovMsg extends KyveSigning {
         messages: [content],
         initial_deposit: coins(deposit.toString(), this.config.coinDenom),
         proposer: this.account.address,
+        title,
+        summary,
         metadata,
       },
     };
@@ -38,6 +42,8 @@ export default class KyveGovMsg extends KyveSigning {
   public createPool(
     value: Omit<MsgCreatePool, "authority">,
     deposit: string,
+    title: string,
+    summary: string,
     metadata?: string,
     options?: {
       fee?: StdFee | "auto" | number;
@@ -50,6 +56,8 @@ export default class KyveGovMsg extends KyveSigning {
         authority: GOV_AUTHORITY,
       }),
       deposit,
+      title,
+      summary,
       metadata
     );
 
@@ -61,6 +69,8 @@ export default class KyveGovMsg extends KyveSigning {
   public updatePool(
     value: Omit<MsgUpdatePool, "authority">,
     deposit: string,
+    title: string,
+    summary: string,
     metadata?: string,
     options?: {
       fee?: StdFee | "auto" | number;
@@ -73,6 +83,8 @@ export default class KyveGovMsg extends KyveSigning {
         authority: GOV_AUTHORITY,
       }),
       deposit,
+      title,
+      summary,
       metadata
     );
 
@@ -84,6 +96,8 @@ export default class KyveGovMsg extends KyveSigning {
   public disablePool(
     value: Omit<MsgDisablePool, "authority">,
     deposit: string,
+    title: string,
+    summary: string,
     metadata?: string,
     options?: {
       fee?: StdFee | "auto" | number;
@@ -96,6 +110,8 @@ export default class KyveGovMsg extends KyveSigning {
         authority: GOV_AUTHORITY,
       }),
       deposit,
+      title,
+      summary,
       metadata
     );
 
@@ -107,6 +123,8 @@ export default class KyveGovMsg extends KyveSigning {
   public enablePool(
     value: Omit<MsgEnablePool, "authority">,
     deposit: string,
+    title: string,
+    summary: string,
     metadata?: string,
     options?: {
       fee?: StdFee | "auto" | number;
@@ -119,6 +137,8 @@ export default class KyveGovMsg extends KyveSigning {
         authority: GOV_AUTHORITY,
       }),
       deposit,
+      title,
+      summary,
       metadata
     );
 
@@ -130,6 +150,8 @@ export default class KyveGovMsg extends KyveSigning {
   public scheduleRuntimeUpgrade(
     value: Omit<MsgScheduleRuntimeUpgrade, "authority">,
     deposit: string,
+    title: string,
+    summary: string,
     metadata?: string,
     options?: {
       fee?: StdFee | "auto" | number;
@@ -142,6 +164,8 @@ export default class KyveGovMsg extends KyveSigning {
         authority: GOV_AUTHORITY,
       }),
       deposit,
+      title,
+      summary,
       metadata
     );
 
@@ -153,6 +177,8 @@ export default class KyveGovMsg extends KyveSigning {
   public cancelRuntimeUpgrade(
     value: Omit<MsgCancelRuntimeUpgrade, "authority">,
     deposit: string,
+    title: string,
+    summary: string,
     metadata?: string,
     options?: {
       fee?: StdFee | "auto" | number;
@@ -165,6 +191,8 @@ export default class KyveGovMsg extends KyveSigning {
         authority: GOV_AUTHORITY,
       }),
       deposit,
+      title,
+      summary,
       metadata
     );
 
@@ -176,6 +204,8 @@ export default class KyveGovMsg extends KyveSigning {
   public updateParamsStakers(
     value: Omit<MsgUpdateParamsStakers, "authority">,
     deposit: string,
+    title: string,
+    summary: string,
     metadata?: string,
     options?: {
       fee?: StdFee | "auto" | number;
@@ -188,6 +218,8 @@ export default class KyveGovMsg extends KyveSigning {
         authority: GOV_AUTHORITY,
       }),
       deposit,
+      title,
+      summary,
       metadata
     );
 
@@ -199,6 +231,8 @@ export default class KyveGovMsg extends KyveSigning {
   public updateParamsDelegation(
     value: Omit<MsgUpdateParamsDelegation, "authority">,
     deposit: string,
+    title: string,
+    summary: string,
     metadata?: string,
     options?: {
       fee?: StdFee | "auto" | number;
@@ -211,6 +245,8 @@ export default class KyveGovMsg extends KyveSigning {
         authority: GOV_AUTHORITY,
       }),
       deposit,
+      title,
+      summary,
       metadata
     );
 
@@ -222,6 +258,8 @@ export default class KyveGovMsg extends KyveSigning {
   public updateParamsBundles(
     value: Omit<MsgUpdateParamsBundles, "authority">,
     deposit: string,
+    title: string,
+    summary: string,
     metadata?: string,
     options?: {
       fee?: StdFee | "auto" | number;
@@ -234,6 +272,8 @@ export default class KyveGovMsg extends KyveSigning {
         authority: GOV_AUTHORITY,
       }),
       deposit,
+      title,
+      summary,
       metadata
     );
 
@@ -245,6 +285,8 @@ export default class KyveGovMsg extends KyveSigning {
   public updateParamsGlobal(
     value: Omit<MsgUpdateParamsGlobal, "authority">,
     deposit: string,
+    title: string,
+    summary: string,
     metadata?: string,
     options?: {
       fee?: StdFee | "auto" | number;
@@ -257,6 +299,8 @@ export default class KyveGovMsg extends KyveSigning {
         authority: GOV_AUTHORITY,
       }),
       deposit,
+      title,
+      summary,
       metadata
     );
 

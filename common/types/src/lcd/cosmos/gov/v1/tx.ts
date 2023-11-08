@@ -3,7 +3,14 @@ import Long from "long";
 import _m0 from "protobufjs/minimal";
 import { Any } from "../../../google/protobuf/any";
 import { Coin } from "../../base/v1beta1/coin";
-import { VoteOption, voteOptionFromJSON, voteOptionToJSON, voteOptionToNumber, WeightedVoteOption } from "./gov";
+import {
+  Params,
+  VoteOption,
+  voteOptionFromJSON,
+  voteOptionToJSON,
+  voteOptionToNumber,
+  WeightedVoteOption,
+} from "./gov";
 
 export const protobufPackage = "cosmos.gov.v1";
 
@@ -14,15 +21,31 @@ export const protobufPackage = "cosmos.gov.v1";
  * proposal Content.
  */
 export interface MsgSubmitProposal {
+  /** messages are the arbitrary messages to be executed if proposal passes. */
   messages: Any[];
+  /** initial_deposit is the deposit value that must be paid at proposal submission. */
   initial_deposit: Coin[];
+  /** proposer is the account address of the proposer. */
   proposer: string;
   /** metadata is any arbitrary metadata attached to the proposal. */
   metadata: string;
+  /**
+   * title is the title of the proposal.
+   *
+   * Since: cosmos-sdk 0.47
+   */
+  title: string;
+  /**
+   * summary is the summary of the proposal
+   *
+   * Since: cosmos-sdk 0.47
+   */
+  summary: string;
 }
 
 /** MsgSubmitProposalResponse defines the Msg/SubmitProposal response type. */
 export interface MsgSubmitProposalResponse {
+  /** proposal_id defines the unique id of the proposal. */
   proposal_id: string;
 }
 
@@ -45,9 +68,13 @@ export interface MsgExecLegacyContentResponse {
 
 /** MsgVote defines a message to cast a vote. */
 export interface MsgVote {
+  /** proposal_id defines the unique id of the proposal. */
   proposal_id: string;
+  /** voter is the voter address for the proposal. */
   voter: string;
+  /** option defines the vote option. */
   option: VoteOption;
+  /** metadata is any arbitrary metadata attached to the Vote. */
   metadata: string;
 }
 
@@ -57,9 +84,13 @@ export interface MsgVoteResponse {
 
 /** MsgVoteWeighted defines a message to cast a vote. */
 export interface MsgVoteWeighted {
+  /** proposal_id defines the unique id of the proposal. */
   proposal_id: string;
+  /** voter is the voter address for the proposal. */
   voter: string;
+  /** options defines the weighted vote options. */
   options: WeightedVoteOption[];
+  /** metadata is any arbitrary metadata attached to the VoteWeighted. */
   metadata: string;
 }
 
@@ -69,8 +100,11 @@ export interface MsgVoteWeightedResponse {
 
 /** MsgDeposit defines a message to submit a deposit to an existing proposal. */
 export interface MsgDeposit {
+  /** proposal_id defines the unique id of the proposal. */
   proposal_id: string;
+  /** depositor defines the deposit addresses from the proposals. */
   depositor: string;
+  /** amount to be deposited by depositor. */
   amount: Coin[];
 }
 
@@ -78,8 +112,33 @@ export interface MsgDeposit {
 export interface MsgDepositResponse {
 }
 
+/**
+ * MsgUpdateParams is the Msg/UpdateParams request type.
+ *
+ * Since: cosmos-sdk 0.47
+ */
+export interface MsgUpdateParams {
+  /** authority is the address that controls the module (defaults to x/gov unless overwritten). */
+  authority: string;
+  /**
+   * params defines the x/gov parameters to update.
+   *
+   * NOTE: All parameters must be supplied.
+   */
+  params?: Params | undefined;
+}
+
+/**
+ * MsgUpdateParamsResponse defines the response structure for executing a
+ * MsgUpdateParams message.
+ *
+ * Since: cosmos-sdk 0.47
+ */
+export interface MsgUpdateParamsResponse {
+}
+
 function createBaseMsgSubmitProposal(): MsgSubmitProposal {
-  return { messages: [], initial_deposit: [], proposer: "", metadata: "" };
+  return { messages: [], initial_deposit: [], proposer: "", metadata: "", title: "", summary: "" };
 }
 
 export const MsgSubmitProposal = {
@@ -95,6 +154,12 @@ export const MsgSubmitProposal = {
     }
     if (message.metadata !== "") {
       writer.uint32(34).string(message.metadata);
+    }
+    if (message.title !== "") {
+      writer.uint32(42).string(message.title);
+    }
+    if (message.summary !== "") {
+      writer.uint32(50).string(message.summary);
     }
     return writer;
   },
@@ -134,6 +199,20 @@ export const MsgSubmitProposal = {
 
           message.metadata = reader.string();
           continue;
+        case 5:
+          if (tag !== 42) {
+            break;
+          }
+
+          message.title = reader.string();
+          continue;
+        case 6:
+          if (tag !== 50) {
+            break;
+          }
+
+          message.summary = reader.string();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -151,6 +230,8 @@ export const MsgSubmitProposal = {
         : [],
       proposer: isSet(object.proposer) ? globalThis.String(object.proposer) : "",
       metadata: isSet(object.metadata) ? globalThis.String(object.metadata) : "",
+      title: isSet(object.title) ? globalThis.String(object.title) : "",
+      summary: isSet(object.summary) ? globalThis.String(object.summary) : "",
     };
   },
 
@@ -168,6 +249,12 @@ export const MsgSubmitProposal = {
     if (message.metadata !== "") {
       obj.metadata = message.metadata;
     }
+    if (message.title !== "") {
+      obj.title = message.title;
+    }
+    if (message.summary !== "") {
+      obj.summary = message.summary;
+    }
     return obj;
   },
 
@@ -180,6 +267,8 @@ export const MsgSubmitProposal = {
     message.initial_deposit = object.initial_deposit?.map((e) => Coin.fromPartial(e)) || [];
     message.proposer = object.proposer ?? "";
     message.metadata = object.metadata ?? "";
+    message.title = object.title ?? "";
+    message.summary = object.summary ?? "";
     return message;
   },
 };
@@ -788,9 +877,128 @@ export const MsgDepositResponse = {
   },
 };
 
+function createBaseMsgUpdateParams(): MsgUpdateParams {
+  return { authority: "", params: undefined };
+}
+
+export const MsgUpdateParams = {
+  encode(message: MsgUpdateParams, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.authority !== "") {
+      writer.uint32(10).string(message.authority);
+    }
+    if (message.params !== undefined) {
+      Params.encode(message.params, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgUpdateParams {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgUpdateParams();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.authority = reader.string();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.params = Params.decode(reader, reader.uint32());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgUpdateParams {
+    return {
+      authority: isSet(object.authority) ? globalThis.String(object.authority) : "",
+      params: isSet(object.params) ? Params.fromJSON(object.params) : undefined,
+    };
+  },
+
+  toJSON(message: MsgUpdateParams): unknown {
+    const obj: any = {};
+    if (message.authority !== "") {
+      obj.authority = message.authority;
+    }
+    if (message.params !== undefined) {
+      obj.params = Params.toJSON(message.params);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MsgUpdateParams>, I>>(base?: I): MsgUpdateParams {
+    return MsgUpdateParams.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<MsgUpdateParams>, I>>(object: I): MsgUpdateParams {
+    const message = createBaseMsgUpdateParams();
+    message.authority = object.authority ?? "";
+    message.params = (object.params !== undefined && object.params !== null)
+      ? Params.fromPartial(object.params)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseMsgUpdateParamsResponse(): MsgUpdateParamsResponse {
+  return {};
+}
+
+export const MsgUpdateParamsResponse = {
+  encode(_: MsgUpdateParamsResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgUpdateParamsResponse {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgUpdateParamsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(_: any): MsgUpdateParamsResponse {
+    return {};
+  },
+
+  toJSON(_: MsgUpdateParamsResponse): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MsgUpdateParamsResponse>, I>>(base?: I): MsgUpdateParamsResponse {
+    return MsgUpdateParamsResponse.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<MsgUpdateParamsResponse>, I>>(_: I): MsgUpdateParamsResponse {
+    const message = createBaseMsgUpdateParamsResponse();
+    return message;
+  },
+};
+
 /** Msg defines the gov Msg service. */
 export interface Msg {
-  /** SubmitProposal defines a method to create new proposal given a content. */
+  /** SubmitProposal defines a method to create new proposal given the messages. */
   SubmitProposal(request: MsgSubmitProposal): Promise<MsgSubmitProposalResponse>;
   /**
    * ExecLegacyContent defines a Msg to be in included in a MsgSubmitProposal
@@ -803,6 +1011,13 @@ export interface Msg {
   VoteWeighted(request: MsgVoteWeighted): Promise<MsgVoteWeightedResponse>;
   /** Deposit defines a method to add deposit on a specific proposal. */
   Deposit(request: MsgDeposit): Promise<MsgDepositResponse>;
+  /**
+   * UpdateParams defines a governance operation for updating the x/gov module
+   * parameters. The authority is defined in the keeper.
+   *
+   * Since: cosmos-sdk 0.47
+   */
+  UpdateParams(request: MsgUpdateParams): Promise<MsgUpdateParamsResponse>;
 }
 
 export const MsgServiceName = "cosmos.gov.v1.Msg";
@@ -817,6 +1032,7 @@ export class MsgClientImpl implements Msg {
     this.Vote = this.Vote.bind(this);
     this.VoteWeighted = this.VoteWeighted.bind(this);
     this.Deposit = this.Deposit.bind(this);
+    this.UpdateParams = this.UpdateParams.bind(this);
   }
   SubmitProposal(request: MsgSubmitProposal): Promise<MsgSubmitProposalResponse> {
     const data = MsgSubmitProposal.encode(request).finish();
@@ -846,6 +1062,12 @@ export class MsgClientImpl implements Msg {
     const data = MsgDeposit.encode(request).finish();
     const promise = this.rpc.request(this.service, "Deposit", data);
     return promise.then((data) => MsgDepositResponse.decode(_m0.Reader.create(data)));
+  }
+
+  UpdateParams(request: MsgUpdateParams): Promise<MsgUpdateParamsResponse> {
+    const data = MsgUpdateParams.encode(request).finish();
+    const promise = this.rpc.request(this.service, "UpdateParams", data);
+    return promise.then((data) => MsgUpdateParamsResponse.decode(_m0.Reader.create(data)));
   }
 }
 

@@ -1,10 +1,11 @@
 import { AminoConverters } from "@cosmjs/stargate";
 import {
-  MsgSubmitBundleProposal,
-  MsgVoteBundleProposal,
   MsgClaimUploaderRole,
   MsgSkipUploaderRole,
+  MsgSubmitBundleProposal,
+  MsgVoteBundleProposal,
 } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
+
 import { isNotEmpty } from "../utils";
 
 export const createBundlesAminoConverters = (): AminoConverters => {
