@@ -1,3 +1,5 @@
+import { VoteType } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
+
 // the time a node should halt if the node decides to idle
 export const IDLE_TIME = 60 * 1000;
 
@@ -13,10 +15,5 @@ export const MAX_BUNDLE_BYTE_SIZE = 200 * 1024 * 1024;
 // the max compression size - currently 2GB
 export const MAX_COMPRESSION_BYTE_SIZE = 2 * 10 ** 9;
 
-// a vote map to allow human readable votes
-export const VOTE = {
-  UNSPECIFIED: 0,
-  VALID: 1,
-  INVALID: 2,
-  ABSTAIN: 3,
-};
+// re-export vote type
+export const VOTE = VoteType;

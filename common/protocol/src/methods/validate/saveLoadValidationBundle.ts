@@ -1,8 +1,9 @@
 import BigNumber from "bignumber.js";
 
+import { VoteType } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
 import { Validator } from "../..";
 import { DataItem } from "../../types";
-import { callWithBackoffStrategy, standardizeJSON, VOTE } from "../../utils";
+import { callWithBackoffStrategy, standardizeJSON } from "../../utils";
 
 /**
  * saveLoadValidationBundle loads the bundle from the local
@@ -99,7 +100,7 @@ export async function saveLoadValidationBundle(
       if (!this.pool.bundle_proposal?.voters_abstain.includes(this.staker)) {
         await this.voteBundleProposal(
           this.pool.bundle_proposal!.storage_id,
-          VOTE.ABSTAIN
+          VoteType.VOTE_TYPE_ABSTAIN
         );
       }
     }

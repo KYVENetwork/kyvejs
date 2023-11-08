@@ -129,9 +129,9 @@ export default class TendermintSSync implements IRuntime {
     if (
       JSON.stringify(proposedDataItem) === JSON.stringify(validationDataItem)
     ) {
-      return VOTE.VALID;
+      return VOTE.VOTE_TYPE_VALID;
     }
-    return VOTE.INVALID;
+    return VOTE.VOTE_TYPE_INVALID;
   }
 
   async summarizeDataBundle(_: Validator, bundle: DataItem[]): Promise<string> {
