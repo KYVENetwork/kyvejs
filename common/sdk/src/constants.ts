@@ -40,7 +40,7 @@ export const SUPPORTED_CHAIN_CONFIGS = {
     coinDecimals: 6,
     gasPrice: 0.02,
   },
-  korellia: {
+  "korellia-2": {
     chainId: "korellia-2",
     chainName: "KYVE Korellia",
     rpc: "https://rpc-eu-1.korellia.kyve.network",
@@ -48,7 +48,7 @@ export const SUPPORTED_CHAIN_CONFIGS = {
     coin: "KYVE",
     coinDenom: "tkyve",
     coinDecimals: 6,
-    gasPrice: 1,
+    gasPrice: 0.02,
   },
   "kyve-beta": {
     chainId: "kyve-beta",
@@ -57,8 +57,8 @@ export const SUPPORTED_CHAIN_CONFIGS = {
     rest: "https://api.beta.kyve.network",
     coin: "KYVE",
     coinDenom: "tkyve",
-    coinDecimals: 9,
-    gasPrice: 1,
+    coinDecimals: 6,
+    gasPrice: 0.02,
   },
   "kyve-alpha": {
     chainId: "kyve-alpha",
@@ -67,8 +67,8 @@ export const SUPPORTED_CHAIN_CONFIGS = {
     rest: "https://api.alpha.kyve.network",
     coin: "KYVE",
     coinDenom: "tkyve",
-    coinDecimals: 9,
-    gasPrice: 1,
+    coinDecimals: 6,
+    gasPrice: 0.02,
   },
   "kyve-local": {
     chainId: "kyve-local",
@@ -78,7 +78,7 @@ export const SUPPORTED_CHAIN_CONFIGS = {
     coin: "KYVE",
     coinDenom: "tkyve",
     coinDecimals: 6,
-    gasPrice: 1,
+    gasPrice: 0.02,
   },
 };
 
