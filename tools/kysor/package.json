@@ -38,7 +38,7 @@
   },
   "dependencies": {
     "@iarna/toml": "^2.2.5",
-    "@kyvejs/sdk": "1.1.0-rc0",
+    "@kyvejs/sdk": "1.1.0-rc1",
     "@kyvejs/types": "1.2.0-rc0",
     "axios": "^0.27.2",
     "bignumber.js": "^9.1.0",
