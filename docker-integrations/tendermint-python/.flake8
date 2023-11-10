@@ -1,0 +1,7 @@
+[flake8]
+max-line-length = 88
+ignore = E501,E402,E203
+select = W504
+exclude = venv,src/protos
+filename = *.py
+enable-extensions = E731
