@@ -9,11 +9,17 @@ interface IConfig {
 }
 
 export default class TendermintBSync implements IRuntime {
-  public name = name;
-  public version = version;
   public config!: IConfig;
 
-  async validateSetConfig(rawConfig: string): Promise<void> {
+  async getName(): Promise<string> {
+    return name;
+  }
+
+  async getVersion(): Promise<string> {
+    return version;
+  }
+
+  async validateSetConfig(rawConfig: string): Promise<string> {
     const config: IConfig = JSON.parse(rawConfig);
 
     if (!config.network) {
@@ -29,9 +35,10 @@ export default class TendermintBSync implements IRuntime {
     }
 
     this.config = config;
+    return JSON.stringify(config)
   }
 
-  async getDataItem(_: Validator, key: string): Promise<DataItem> {
+  async getDataItem(key: string): Promise<DataItem> {
     // fetch block from rpc at given block height
     const { data } = await axios.get(`${this.config.rpc}/block?height=${key}`);
     const block = data.result.block;
@@ -39,7 +46,7 @@ export default class TendermintBSync implements IRuntime {
     return { key, value: block };
   }
 
-  async prevalidateDataItem(_: Validator, item: DataItem): Promise<boolean> {
+  async prevalidateDataItem(item: DataItem): Promise<boolean> {
     // check if block is defined
     if (!item.value) {
       return false;
@@ -53,13 +60,12 @@ export default class TendermintBSync implements IRuntime {
     return true;
   }
 
-  async transformDataItem(_: Validator, item: DataItem): Promise<DataItem> {
+  async transformDataItem(item: DataItem): Promise<DataItem> {
     // don't transform data item
     return item;
   }
 
   async validateDataItem(
-    _: Validator,
     proposedDataItem: DataItem,
     validationDataItem: DataItem
   ): Promise<number> {
@@ -72,12 +78,12 @@ export default class TendermintBSync implements IRuntime {
     return VOTE.VOTE_TYPE_INVALID;
   }
 
-  async summarizeDataBundle(_: Validator, bundle: DataItem[]): Promise<string> {
+  async summarizeDataBundle(bundle: DataItem[]): Promise<string> {
     // use latest block height as bundle summary
     return bundle.at(-1)?.value?.header?.height ?? '';
   }
 
-  async nextKey(_: Validator, key: string): Promise<string> {
+  async nextKey(key: string): Promise<string> {
     // the next key is always current block height + 1
     return (parseInt(key) + 1).toString();
   }

@@ -17,11 +17,17 @@ interface ISnapshot {
 }
 
 export default class TendermintSSync implements IRuntime {
-  public name = name;
-  public version = version;
   public config!: IConfig;
 
-  async validateSetConfig(rawConfig: string): Promise<void> {
+  async getName(): Promise<string> {
+    return name;
+  }
+
+  async getVersion(): Promise<string> {
+    return version;
+  }
+
+  async validateSetConfig(rawConfig: string): Promise<string> {
     const config: IConfig = JSON.parse(rawConfig);
 
     if (!config.api) {
@@ -37,9 +43,10 @@ export default class TendermintSSync implements IRuntime {
     }
 
     this.config = config;
+    return JSON.stringify(config);
   }
 
-  async getDataItem(_: Validator, key: string): Promise<DataItem> {
+  async getDataItem(key: string): Promise<DataItem> {
     // fetch snapshot chunk from given height, format and chunk derived from key
     const [height, chunkIndex] = key.split('/').map((k) => +k);
 
@@ -106,7 +113,7 @@ export default class TendermintSSync implements IRuntime {
     };
   }
 
-  async prevalidateDataItem(_: Validator, item: DataItem): Promise<boolean> {
+  async prevalidateDataItem(item: DataItem): Promise<boolean> {
     // check if block is defined
     if (!item.value) {
       return false;
@@ -115,13 +122,12 @@ export default class TendermintSSync implements IRuntime {
     return true;
   }
 
-  async transformDataItem(_: Validator, item: DataItem): Promise<DataItem> {
+  async transformDataItem(item: DataItem): Promise<DataItem> {
     // don't transform data item
     return item;
   }
 
   async validateDataItem(
-    _: Validator,
     proposedDataItem: DataItem,
     validationDataItem: DataItem
   ): Promise<number> {
@@ -134,11 +140,11 @@ export default class TendermintSSync implements IRuntime {
     return VOTE.VOTE_TYPE_INVALID;
   }
 
-  async summarizeDataBundle(_: Validator, bundle: DataItem[]): Promise<string> {
+  async summarizeDataBundle(bundle: DataItem[]): Promise<string> {
     return bundle.at(-1)?.key ?? '';
   }
 
-  async nextKey(_: Validator, key: string): Promise<string> {
+  async nextKey(key: string): Promise<string> {
     // since we only need to fetch if we continue with the next snapshot
     const [height, chunkIndex] = key.split('/').map((k) => +k);
 

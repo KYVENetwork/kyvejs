@@ -5,6 +5,7 @@ import Ajv from 'ajv';
 import block_schema from './schemas/block.json';
 import block_results_schema from './schemas/block_result.json';
 
+
 const ajv = new Ajv();
 
 // Tendermint config
@@ -25,11 +26,17 @@ interface IEvent {
 }
 
 export default class Tendermint implements IRuntime {
-  public name = name;
-  public version = version;
   public config!: IConfig;
 
-  async validateSetConfig(rawConfig: string): Promise<void> {
+  async getName(): Promise<string> {
+    return name;
+  }
+
+  async getVersion(): Promise<string> {
+    return version;
+  }
+
+  async validateSetConfig(rawConfig: string): Promise<string> {
     const config: IConfig = JSON.parse(rawConfig);
 
     if (!config.network) {
@@ -45,9 +52,10 @@ export default class Tendermint implements IRuntime {
     }
 
     this.config = config;
+    return JSON.stringify(config);
   }
 
-  async getDataItem(_: Validator, key: string): Promise<DataItem> {
+  async getDataItem(key: string): Promise<DataItem> {
     // fetch block from rpc at given block height
     const {
       data: { result: block },
@@ -61,7 +69,7 @@ export default class Tendermint implements IRuntime {
     return { key, value: { block, block_results } };
   }
 
-  async prevalidateDataItem(_: Validator, item: DataItem): Promise<boolean> {
+  async prevalidateDataItem(item: DataItem): Promise<boolean> {
     // check if data item is defined
     if (!item.value) {
       return false;
@@ -104,7 +112,7 @@ export default class Tendermint implements IRuntime {
     return true;
   }
 
-  async transformDataItem(_: Validator, item: DataItem): Promise<DataItem> {
+  async transformDataItem(item: DataItem): Promise<DataItem> {
     // this method sorts all attributes of all events to ensure
     // determinism. Furthermore, the "log" property gets deleted from
     // the transaction results, since it contains duplicate information.
@@ -179,7 +187,6 @@ export default class Tendermint implements IRuntime {
   }
 
   async validateDataItem(
-    v: Validator,
     proposedDataItem: DataItem,
     validationDataItem: DataItem
   ): Promise<number> {
@@ -188,29 +195,29 @@ export default class Tendermint implements IRuntime {
     ) {
       return VOTE.VOTE_TYPE_VALID;
     }
-    // prevent nondeterministic misbehaviour
-    v.logger.info('Removing block_results: difference identified');
-    // remove nondeterministic block_results to prevent incorrect invalid vote
-    delete validationDataItem.value.block_results;
-    delete proposedDataItem.value.block_results;
+    // prevent nondeterministic misbehaviour due to osmosis-1 specific problems
+    if (validationDataItem.value.block.block.header.chain_id === 'osmosis-1') {
+      // remove nondeterministic begin_block_events to prevent incorrect invalid vote
+      delete validationDataItem.value.block_results.begin_block_events;
+      delete proposedDataItem.value.block_results.begin_block_events;
 
-    if (
-      JSON.stringify(proposedDataItem) === JSON.stringify(validationDataItem)
-    ) {
-      v.logger.warn("Voting abstain: value.block_results don't match");
-      // vote abstain if begin_block_events are not equal
-      return VOTE.VOTE_TYPE_ABSTAIN;
+      if (
+        JSON.stringify(proposedDataItem) === JSON.stringify(validationDataItem)
+      ) {
+        // vote abstain if begin_block_events are not equal
+        return VOTE.VOTE_TYPE_INVALID;
+      }
     }
     // vote invalid if data does not match
     return VOTE.VOTE_TYPE_INVALID;
   }
 
-  async summarizeDataBundle(_: Validator, bundle: DataItem[]): Promise<string> {
+  async summarizeDataBundle(bundle: DataItem[]): Promise<string> {
     // use latest block height as bundle summary
     return bundle.at(-1)?.value?.block?.block?.header?.height ?? '';
   }
 
-  async nextKey(_: Validator, key: string): Promise<string> {
+  async nextKey(key: string): Promise<string> {
     // the next key is always current block height + 1
     return (parseInt(key) + 1).toString();
   }

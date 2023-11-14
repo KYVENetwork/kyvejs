@@ -19,13 +19,16 @@ import { Validator, standardizeError } from "../..";
  */
 export async function setupValidator(this: Validator): Promise<void> {
   try {
+    const name = await this.runtime.getName();
+    const version = await this.runtime.getVersion();
+
     // log basic node info on startup
     this.logger.info(`Chain ID = ${this.chainId}`);
     this.logger.info(`Pool ID = ${this.poolId}`);
-    this.logger.info(`Runtime = ${this.runtime.name}`);
+    this.logger.info(`Runtime = ${name}`);
     this.logger.info(`Valaddress = ${this.client[0].account.address}\n`);
 
-    this.logger.info(`${this.runtime.name} = v${this.runtime.version}`);
+    this.logger.info(`${name} = v${version}`);
     this.logger.info(`@kyvejs/protocol = v${this.protocolVersion}\n`);
 
     // A Valname is likea human readable hash  based on chainId, pool id,
@@ -37,12 +40,12 @@ export async function setupValidator(this: Validator): Promise<void> {
     // the min patch version, the valname should only differ, if the local patch
     // version is smaller, therefore we take the min out of remote and local
     // patch version
-    const valnameSeed = `${this.chainId}-${this.poolId}-${
-      this.runtime.name
-    }-${major(this.runtime.version)}-${minor(this.runtime.version)}-${Math.min(
-      patch(this.runtime.version),
+    const valnameSeed = `${this.chainId}-${this.poolId}-${name}-${major(
+      version
+    )}-${minor(version)}-${Math.min(
+      patch(version),
       patch(this.pool.data!.protocol!.version)
-    )}-${JSON.stringify(prerelease(this.runtime.version))}-${
+    )}-${JSON.stringify(prerelease(version))}-${
       this.client[0].account.address
     }`;
 
