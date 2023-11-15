@@ -1,0 +1,250 @@
+syntax = "proto3";
+
+package kyve.rdk.runtime.v1;
+
+import "kyve/bundles/v1beta1/tx.proto";
+
+/*
+ * Interface of Runtime.
+ *
+ * The Runtime implements the custom logic of a pool and defines how data
+ * items are fetched and which order they should have.
+ */
+service RuntimeService {
+  /*
+   * Returns the name of the runtime. Example "@kyvejs/tendermint"
+   */
+  rpc GetRuntimeName(GetRuntimeNameRequest) returns (GetRuntimeNameResponse);
+
+  /*
+   * Returns the version of the runtime. Example "1.2.0"
+   */
+  rpc GetRuntimeVersion(GetRuntimeVersionRequest) returns (GetRuntimeVersionResponse);
+
+  /*
+   * Parses the raw runtime config found on pool, validates it and finally sets
+   * the property "config" in the runtime. A raw config could be an ipfs link to the
+   * actual config or a stringified yaml or json string. This method should error if
+   * the specific runtime config is not parsable or invalid.
+   *
+   * Deterministic behavior is required
+   */
+  rpc ValidateSetConfig(ValidateSetConfigRequest) returns (ValidateSetConfigResponse);
+
+  /*
+   * Gets the data item from a specific key and returns both key and the value.
+   *
+   * Deterministic behavior is required
+   */
+  rpc GetDataItem(GetDataItemRequest) returns (GetDataItemResponse);
+
+  /*
+   * Prevalidates a data item right after is was retrieved from source.
+   * If the prevalidation fails the item gets rejected and never makes
+   * it to the local cache. If the prevalidation succeeds the item gets
+   * transformed and written to cache were it is used from submission
+   * of proposals or bundle validation.
+   *
+   * Deterministic behavior is required
+   */
+  rpc PrevalidateDataItem(PrevalidateDataItemRequest) returns (PrevalidateDataItemResponse);
+
+  /*
+   * Transforms a single data item and return it. Used for example
+   * to remove unecessary data or format the data in a better way.
+   *
+   * Deterministic behavior is required
+   */
+  rpc TransformDataItem(TransformDataItemRequest) returns (TransformDataItemResponse);
+
+  /*
+   * Validates a single data item of a bundle proposal
+   *
+   * Deterministic behavior is required
+   */
+  rpc ValidateDataItem(ValidateDataItemRequest) returns (ValidateDataItemResponse);
+
+  /*
+   * Gets a formatted value string from a bundle. This produces a "summary" of
+   * a bundle which gets stored on-chain and therefore needs to be short.
+   *
+   * String should not be longer than 100 characters, else gas costs might be too expensive.
+   *
+   * Deterministic behavior is required
+   */
+  rpc SummarizeDataBundle(SummarizeDataBundleRequest) returns (SummarizeDataBundleResponse);
+
+  /*
+   * Gets the next key from the current key so that the data archived has an order.
+   *
+   * Deterministic behavior is required
+   */
+  rpc NextKey(NextKeyRequest) returns (NextKeyResponse);
+}
+
+/* The main data entity served by the gRPC service
+ * Contains the block key and the block value as a serialized value */
+message DataItem {
+  // The key of the data item
+  string key = 1;
+  // The value of the data item
+  string value = 2;
+}
+
+/* Configuration entity containing serialized info about connection to the respective chain */
+message RuntimeConfig {
+  // The serialized configuration
+  string serialized_config = 1;
+}
+
+/* GetRuntimeNameRequest
+ * Request returning the name of the runtime
+ * returns the runtime name as a string */
+message GetRuntimeNameRequest {}
+
+/* GetRuntimeNameResponse
+ * Response returning the name of the runtime
+ * returns the runtime name as a string */
+message GetRuntimeNameResponse {
+  // The name of the runtime
+  string name = 1;
+}
+
+/* GetRuntimeVersionRequest
+ * Request returning the version of the runtime
+ * returns the runtime version as a string */
+message GetRuntimeVersionRequest {}
+
+/* GetRuntimeVersionResponse
+ * Response returning the version of the runtime
+ * returns the runtime version as a string */
+message GetRuntimeVersionResponse {
+  // The version of the runtime
+  string version = 1;
+}
+
+/* ValidateSetConfigRequest
+ * Request validating a configuration string to connect to the respective chain
+ * returns a validated serialized configuration object */
+message ValidateSetConfigRequest {
+  // The raw configuration string
+  string raw_config = 1;
+}
+
+/* ValidateSetConfigResponse
+ * Response validating a configuration string to connect to the respective chain
+ * returns a validated serialized configuration object */
+message ValidateSetConfigResponse {
+  // The validated serialized configuration object
+  string serialized_config = 1;
+}
+
+/* GetDataItemRequest
+ * Request retrieving and returning a block from the respective chain
+ * Returns the requested block as a dataItem */
+message GetDataItemRequest {
+  // The configuration object
+  RuntimeConfig config = 1;
+  // The key of the data item
+  string key = 2;
+}
+
+/* GetDataItemResponse
+ * Response retrieving and returning a block from the respective chain
+ * Returns the requested block as a dataItem */
+message GetDataItemResponse {
+  // The data item
+  DataItem data_item = 1;
+}
+
+/* PrevalidateDataItemRequest
+ * Request pre-validating a dataItem that is about to be validated
+ * returns the pre-validation result as a boolean */
+message PrevalidateDataItemRequest {
+  // The configuration object
+  RuntimeConfig config = 1;
+  // The data item to be pre-validated
+  DataItem data_item = 2;
+}
+
+/* PrevalidateDataItemResponse
+ * Response pre-validating a dataItem that is about to be validated
+ * returns the pre-validation result as a boolean */
+message PrevalidateDataItemResponse {
+  // The pre-validation result
+  bool valid = 1;
+}
+
+/* TransformDataItemRequest
+ * Request transforming the given data item into a preferred format
+ * returns the transformed dataItem */
+message TransformDataItemRequest {
+  // The configuration object
+  RuntimeConfig config = 1;
+  // The data item to be transformed
+  DataItem data_item = 2;
+}
+
+/* TransformDataItemResponse
+ * Response transforming the given data item into a preferred format
+ * returns the transformed dataItem */
+message TransformDataItemResponse {
+  // The transformed data item
+  DataItem transformed_data_item = 1;
+}
+
+/* ValidateDataItemRequest
+ * Request validating a dataItem
+ * returns the validation result as a boolean */
+message ValidateDataItemRequest {
+  // The configuration object
+  RuntimeConfig config = 1;
+  // The proposed data item
+  DataItem proposed_data_item = 2;
+  // The data item to be validated
+  DataItem validation_data_item = 3;
+}
+
+/* ValidateDataItemResponse
+ * Response validating a dataItem
+ * returns the validation result as a boolean */
+message ValidateDataItemResponse {
+  // The validation result as vote
+  kyve.bundles.v1beta1.VoteType vote = 1;
+}
+
+/* SummarizeDataBundleRequest
+ * Request summarizing a dataBundle
+ * returns the bundle summary as a string */
+message SummarizeDataBundleRequest {
+  // The configuration object
+  RuntimeConfig config = 1;
+  // The data items to be summarized
+  repeated DataItem bundle = 2;
+}
+
+/* SummarizeDataBundleResponse
+ * Response summarizing a dataBundle
+ * returns the bundle summary as a string */
+message SummarizeDataBundleResponse {
+  // The bundle summary
+  string summary = 1;
+}
+
+/* NextKeyRequest
+ * Request retrieving the next key on the chain
+ * returns the key as a string */
+message NextKeyRequest {
+  // The configuration object
+  RuntimeConfig config = 1;
+  // The current key
+  string key = 2;
+}
+
+/* NextKeyResponse
+ * Response retrieving the next key on the chain
+ * returns the key as a string */
+message NextKeyResponse {
+  // The next key
+  string next_key = 1;
+}

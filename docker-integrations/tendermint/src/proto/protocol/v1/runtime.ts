@@ -8,33 +8,34 @@ import type {
   ServiceError,
   UntypedServiceImplementation,
 } from "@grpc/grpc-js";
-import * as _m0 from "protobufjs/minimal";
+import _m0 from "protobufjs/minimal";
+import { VoteType, voteTypeFromJSON, voteTypeToJSON } from "../../kyve/bundles/v1beta1/tx";
 
-export const protobufPackage = "";
+export const protobufPackage = "kyve.rdk.protocol.v1";
 
 /** Defines the vote enum */
 export enum VOTE {
-  UNSPECIFIED = 0,
-  VALID = 1,
-  INVALID = 2,
-  ABSTAIN = 3,
+  VOTE_UNSPECIFIED = 0,
+  VOTE_VALID = 1,
+  VOTE_INVALID = 2,
+  VOTE_ABSTAIN = 3,
   UNRECOGNIZED = -1,
 }
 
 export function vOTEFromJSON(object: any): VOTE {
   switch (object) {
     case 0:
-    case "UNSPECIFIED":
-      return VOTE.UNSPECIFIED;
+    case "VOTE_UNSPECIFIED":
+      return VOTE.VOTE_UNSPECIFIED;
     case 1:
-    case "VALID":
-      return VOTE.VALID;
+    case "VOTE_VALID":
+      return VOTE.VOTE_VALID;
     case 2:
-    case "INVALID":
-      return VOTE.INVALID;
+    case "VOTE_INVALID":
+      return VOTE.VOTE_INVALID;
     case 3:
-    case "ABSTAIN":
-      return VOTE.ABSTAIN;
+    case "VOTE_ABSTAIN":
+      return VOTE.VOTE_ABSTAIN;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -44,14 +45,14 @@ export function vOTEFromJSON(object: any): VOTE {
 
 export function vOTEToJSON(object: VOTE): string {
   switch (object) {
-    case VOTE.UNSPECIFIED:
-      return "UNSPECIFIED";
-    case VOTE.VALID:
-      return "VALID";
-    case VOTE.INVALID:
-      return "INVALID";
-    case VOTE.ABSTAIN:
-      return "ABSTAIN";
+    case VOTE.VOTE_UNSPECIFIED:
+      return "VOTE_UNSPECIFIED";
+    case VOTE.VOTE_VALID:
+      return "VOTE_VALID";
+    case VOTE.VOTE_INVALID:
+      return "VOTE_INVALID";
+    case VOTE.VOTE_ABSTAIN:
+      return "VOTE_ABSTAIN";
     case VOTE.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";
@@ -110,12 +111,12 @@ export interface ValidateSetConfigResponse {
  * Returns the requested block as a dataItem
  */
 export interface GetDataItemRequest {
-  config: RuntimeConfig | undefined;
+  config?: RuntimeConfig | undefined;
   key: string;
 }
 
 export interface GetDataItemResponse {
-  data_item: DataItem | undefined;
+  data_item?: DataItem | undefined;
 }
 
 /**
@@ -124,8 +125,8 @@ export interface GetDataItemResponse {
  * returns the pre-validation result as a boolean
  */
 export interface PrevalidateDataItemRequest {
-  config: RuntimeConfig | undefined;
-  data_item: DataItem | undefined;
+  config?: RuntimeConfig | undefined;
+  data_item?: DataItem | undefined;
 }
 
 export interface PrevalidateDataItemResponse {
@@ -138,12 +139,12 @@ export interface PrevalidateDataItemResponse {
  * returns the transformed dataItem
  */
 export interface TransformDataItemRequest {
-  config: RuntimeConfig | undefined;
-  data_item: DataItem | undefined;
+  config?: RuntimeConfig | undefined;
+  data_item?: DataItem | undefined;
 }
 
 export interface TransformDataItemResponse {
-  transformed_data_item: DataItem | undefined;
+  transformed_data_item?: DataItem | undefined;
 }
 
 /**
@@ -152,13 +153,13 @@ export interface TransformDataItemResponse {
  * returns the validation result as a boolean
  */
 export interface ValidateDataItemRequest {
-  config: RuntimeConfig | undefined;
-  proposed_data_item: DataItem | undefined;
-  validation_data_item: DataItem | undefined;
+  config?: RuntimeConfig | undefined;
+  proposed_data_item?: DataItem | undefined;
+  validation_data_item?: DataItem | undefined;
 }
 
 export interface ValidateDataItemResponse {
-  vote: number;
+  vote: VoteType;
 }
 
 /**
@@ -167,7 +168,7 @@ export interface ValidateDataItemResponse {
  * returns the bundle summary as a string
  */
 export interface SummarizeDataBundleRequest {
-  config: RuntimeConfig | undefined;
+  config?: RuntimeConfig | undefined;
   bundle: DataItem[];
 }
 
@@ -181,7 +182,7 @@ export interface SummarizeDataBundleResponse {
  * returns the key as a string
  */
 export interface NextKeyRequest {
-  config: RuntimeConfig | undefined;
+  config?: RuntimeConfig | undefined;
   key: string;
 }
 
@@ -1167,7 +1168,7 @@ export const ValidateDataItemResponse = {
             break;
           }
 
-          message.vote = reader.int32();
+          message.vote = reader.int32() as any;
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -1179,13 +1180,13 @@ export const ValidateDataItemResponse = {
   },
 
   fromJSON(object: any): ValidateDataItemResponse {
-    return { vote: isSet(object.vote) ? globalThis.Number(object.vote) : 0 };
+    return { vote: isSet(object.vote) ? voteTypeFromJSON(object.vote) : 0 };
   },
 
   toJSON(message: ValidateDataItemResponse): unknown {
     const obj: any = {};
     if (message.vote !== 0) {
-      obj.vote = Math.round(message.vote);
+      obj.vote = voteTypeToJSON(message.vote);
     }
     return obj;
   },
@@ -1466,10 +1467,10 @@ export const NextKeyResponse = {
   },
 };
 
-export type RuntimeService = typeof RuntimeService;
-export const RuntimeService = {
+export type RuntimeServiceService = typeof RuntimeServiceService;
+export const RuntimeServiceService = {
   getRuntimeName: {
-    path: "/Runtime/GetRuntimeName",
+    path: "/kyve.rdk.protocol.v1.RuntimeService/GetRuntimeName",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: GetRuntimeNameRequest) => Buffer.from(GetRuntimeNameRequest.encode(value).finish()),
@@ -1478,7 +1479,7 @@ export const RuntimeService = {
     responseDeserialize: (value: Buffer) => GetRuntimeNameResponse.decode(value),
   },
   getRuntimeVersion: {
-    path: "/Runtime/GetRuntimeVersion",
+    path: "/kyve.rdk.protocol.v1.RuntimeService/GetRuntimeVersion",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: GetRuntimeVersionRequest) => Buffer.from(GetRuntimeVersionRequest.encode(value).finish()),
@@ -1488,7 +1489,7 @@ export const RuntimeService = {
     responseDeserialize: (value: Buffer) => GetRuntimeVersionResponse.decode(value),
   },
   validateSetConfig: {
-    path: "/Runtime/ValidateSetConfig",
+    path: "/kyve.rdk.protocol.v1.RuntimeService/ValidateSetConfig",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: ValidateSetConfigRequest) => Buffer.from(ValidateSetConfigRequest.encode(value).finish()),
@@ -1498,7 +1499,7 @@ export const RuntimeService = {
     responseDeserialize: (value: Buffer) => ValidateSetConfigResponse.decode(value),
   },
   getDataItem: {
-    path: "/Runtime/GetDataItem",
+    path: "/kyve.rdk.protocol.v1.RuntimeService/GetDataItem",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: GetDataItemRequest) => Buffer.from(GetDataItemRequest.encode(value).finish()),
@@ -1507,7 +1508,7 @@ export const RuntimeService = {
     responseDeserialize: (value: Buffer) => GetDataItemResponse.decode(value),
   },
   prevalidateDataItem: {
-    path: "/Runtime/PrevalidateDataItem",
+    path: "/kyve.rdk.protocol.v1.RuntimeService/PrevalidateDataItem",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: PrevalidateDataItemRequest) =>
@@ -1518,7 +1519,7 @@ export const RuntimeService = {
     responseDeserialize: (value: Buffer) => PrevalidateDataItemResponse.decode(value),
   },
   transformDataItem: {
-    path: "/Runtime/TransformDataItem",
+    path: "/kyve.rdk.protocol.v1.RuntimeService/TransformDataItem",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: TransformDataItemRequest) => Buffer.from(TransformDataItemRequest.encode(value).finish()),
@@ -1528,7 +1529,7 @@ export const RuntimeService = {
     responseDeserialize: (value: Buffer) => TransformDataItemResponse.decode(value),
   },
   validateDataItem: {
-    path: "/Runtime/ValidateDataItem",
+    path: "/kyve.rdk.protocol.v1.RuntimeService/ValidateDataItem",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: ValidateDataItemRequest) => Buffer.from(ValidateDataItemRequest.encode(value).finish()),
@@ -1538,7 +1539,7 @@ export const RuntimeService = {
     responseDeserialize: (value: Buffer) => ValidateDataItemResponse.decode(value),
   },
   summarizeDataBundle: {
-    path: "/Runtime/SummarizeDataBundle",
+    path: "/kyve.rdk.protocol.v1.RuntimeService/SummarizeDataBundle",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: SummarizeDataBundleRequest) =>
@@ -1549,7 +1550,7 @@ export const RuntimeService = {
     responseDeserialize: (value: Buffer) => SummarizeDataBundleResponse.decode(value),
   },
   nextKey: {
-    path: "/Runtime/NextKey",
+    path: "/kyve.rdk.protocol.v1.RuntimeService/NextKey",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: NextKeyRequest) => Buffer.from(NextKeyRequest.encode(value).finish()),
@@ -1559,7 +1560,7 @@ export const RuntimeService = {
   },
 } as const;
 
-export interface RuntimeServer extends UntypedServiceImplementation {
+export interface RuntimeServiceServer extends UntypedServiceImplementation {
   getRuntimeName: handleUnaryCall<GetRuntimeNameRequest, GetRuntimeNameResponse>;
   getRuntimeVersion: handleUnaryCall<GetRuntimeVersionRequest, GetRuntimeVersionResponse>;
   validateSetConfig: handleUnaryCall<ValidateSetConfigRequest, ValidateSetConfigResponse>;
@@ -1571,7 +1572,7 @@ export interface RuntimeServer extends UntypedServiceImplementation {
   nextKey: handleUnaryCall<NextKeyRequest, NextKeyResponse>;
 }
 
-export interface RuntimeClient extends Client {
+export interface RuntimeServiceClient extends Client {
   getRuntimeName(
     request: GetRuntimeNameRequest,
     callback: (error: ServiceError | null, response: GetRuntimeNameResponse) => void,
@@ -1709,9 +1710,12 @@ export interface RuntimeClient extends Client {
   ): ClientUnaryCall;
 }
 
-export const RuntimeClient = makeGenericClientConstructor(RuntimeService, "Runtime") as unknown as {
-  new (address: string, credentials: ChannelCredentials, options?: Partial<ClientOptions>): RuntimeClient;
-  service: typeof RuntimeService;
+export const RuntimeServiceClient = makeGenericClientConstructor(
+  RuntimeServiceService,
+  "kyve.rdk.protocol.v1.RuntimeService",
+) as unknown as {
+  new (address: string, credentials: ChannelCredentials, options?: Partial<ClientOptions>): RuntimeServiceClient;
+  service: typeof RuntimeServiceService;
 };
 
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;

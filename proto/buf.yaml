@@ -1,0 +1,15 @@
+version: v1
+name: buf.build/rapha/kyve
+deps:
+  - buf.build/rapha/kyve
+breaking:
+  use:
+    - FILE
+lint:
+  use:
+    - DEFAULT
+    - COMMENTS
+  except:
+    - SERVICE_SUFFIX
+    - RPC_REQUEST_STANDARD_NAME
+    - RPC_RESPONSE_STANDARD_NAME

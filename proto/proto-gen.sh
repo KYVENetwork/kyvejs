@@ -2,7 +2,8 @@
 
 cd proto || exit 1
 
-output_folder="out"
+# Variables
+OUTPUT_FOLDER="out"
 
 build_docker_image() {
   printf "🏗️ Building docker image...\n"
@@ -16,7 +17,7 @@ build_docker_image() {
 run_protobuf_formatter() {
   printf "📝 Running protobuf formatter...\n"
   docker run --rm \
-    --volume "$(pwd)"/protocol:/workspace/protocol \
+    --volume "$(pwd)":/workspace \
     --workdir /workspace kyve-protocol-proto \
     buf format --diff --write
   printf "✅ Completed protobuf formatting!\n\n"
@@ -25,7 +26,7 @@ run_protobuf_formatter() {
 run_protobuf_linter() {
   printf "📝 Running protobuf linter...\n"
   docker run --rm \
-    --volume "$(pwd)"/protocol:/workspace/protocol \
+    --volume "$(pwd)":/workspace \
     --workdir /workspace \
     kyve-protocol-proto buf lint || exit 1
   printf "✅ Completed protobuf linting!\n\n"
@@ -36,10 +37,10 @@ run_protobuf_generator() {
   docker run --rm \
     --volume "$(pwd)":/workspace \
     --workdir /workspace kyve-protocol-proto \
-    buf generate
+    buf generate || exit 1
   if [ $? -eq 1 ]; then
     printf "🚨 Error generating proto files!\n"
-    rm -rf "$output_folder"
+    rm -rf "$OUTPUT_FOLDER"
     exit 1
   fi
   printf "✅ Completed generating proto files!\n\n"
@@ -47,25 +48,22 @@ run_protobuf_generator() {
 
 copy_files() {
   printf "📄 Copy generated files to folders...\n"
-  folders="../common/protocol/src/types/interfaces,../common/docker/src/proto"
-  files=$(find "$output_folder" -name "*.ts")
-  cnt_files=$(echo "$files" | wc -l)
-  if [ "$cnt_files" -eq 0 ]; then
-    printf "🚨 No files found!\n"
-    exit 1
-  fi
+  folders="../common/docker/src/proto,../docker-integrations/tendermint/src/proto"
 
   for folder in $(echo "$folders" | tr "," "\n"); do
-    printf "  📁 Copying %s files to %s...\n"  "$cnt_files" "$folder"
-    for file in $files; do
-      cp "$file" "$folder"
-    done
+    printf "  🧹 Cleaning %s...\n" "$folder"
+    rm -rf "${folder:?}"/*
+  done
+
+  for folder in $(echo "$folders" | tr "," "\n"); do
+    printf "  📁 Copying files to %s...\n" "$folder"
+    cp -r "$OUTPUT_FOLDER"/* "$folder"
   done
   printf "✅ Completed copying files!\n\n"
 }
 
 clean_up() {
-  rm -rf "$output_folder"
+  rm -rf "$OUTPUT_FOLDER"
 }
 
 build_docker_image

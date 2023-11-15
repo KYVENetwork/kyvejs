@@ -10,8 +10,8 @@ import {
   ValidateDataItemResponse,
   SummarizeDataBundleResponse,
   NextKeyResponse,
-  RuntimeClient,
-} from './protos/runtime';
+  RuntimeServiceClient,
+} from './proto/protocol/v1/runtime';
 
 // config is a serialized string
 type IConfig = string;
@@ -19,12 +19,12 @@ type IConfig = string;
 export default class Docker implements IRuntime {
   private static readonly RUNTIME_SERVER_ADDR = process.env.RUNTIME_SERVER_ADDR || 'localhost:50051';
 
-  private grpcClient: RuntimeClient;
+  private grpcClient: RuntimeServiceClient;
 
   public config!: IConfig;
 
   constructor() {
-    this.grpcClient = new RuntimeClient(
+    this.grpcClient = new RuntimeServiceClient(
       Docker.RUNTIME_SERVER_ADDR,
       grpc.credentials.createInsecure()
     );

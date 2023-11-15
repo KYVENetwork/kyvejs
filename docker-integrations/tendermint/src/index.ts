@@ -1,6 +1,6 @@
 import * as grpc from '@grpc/grpc-js';
 
-import { RuntimeService } from './protos/runtime';
+import { RuntimeServiceService } from './proto/kyve/rdk/runtime/v1/runtime';
 import { TendermintServer } from './server';
 
 const maxMessageSize: number = 2 * 1024 * 1024 * 1024; // 2 GB
@@ -10,7 +10,7 @@ const runtimeServer: grpc.Server = new grpc.Server({
 });
 const runtimeService = new TendermintServer();
 
-runtimeServer.addService(RuntimeService, {
+runtimeServer.addService(RuntimeServiceService, {
   getRuntimeName: runtimeService.getRuntimeName,
   getRuntimeVersion: runtimeService.getRuntimeVersion,
   validateSetConfig: runtimeService.validateSetConfig,

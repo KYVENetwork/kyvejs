@@ -2,7 +2,8 @@ import * as grpc from '@grpc/grpc-js';
 import axios from 'axios';
 
 import { name, version } from '../package.json';
-import { DataItem, VOTE } from './protos/runtime';
+import { DataItem } from './proto/kyve/rdk/runtime/v1/runtime';
+import { VoteType } from './proto/kyve/bundles/v1beta1/tx';
 
 type EmptyRequest = Record<string, never>;
 
@@ -267,7 +268,7 @@ export class TendermintServer {
       if (
         JSON.stringify(proposedDataItem) === JSON.stringify(validationDataItem)
       ) {
-        callback(null, { vote: VOTE.VALID });
+        callback(null, { vote: VoteType.VOTE_TYPE_VALID });
         return;
       }
 
@@ -284,13 +285,13 @@ export class TendermintServer {
           JSON.stringify(validationDataItem)
         ) {
           // vote abstain if begin_block_events are not equal
-          callback(null, { vote: VOTE.ABSTAIN });
+          callback(null, { vote: VoteType.VOTE_TYPE_ABSTAIN });
           return;
         }
       }
 
       // vote invalid if data does not match
-      callback(null, { vote: VOTE.INVALID });
+      callback(null, { vote: VoteType.VOTE_TYPE_INVALID });
     } catch (error: any) {
       callback({
         code: grpc.status.INTERNAL,
