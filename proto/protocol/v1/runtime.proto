@@ -1,5 +1,19 @@
 syntax = "proto3";
 
+package protocol.v1;
+
+service RuntimeService {
+  rpc GetRuntimeName(GetRuntimeNameRequest) returns (GetRuntimeNameResponse);
+  rpc GetRuntimeVersion(GetRuntimeVersionRequest) returns (GetRuntimeVersionResponse);
+  rpc ValidateSetConfig(ValidateSetConfigRequest) returns (ValidateSetConfigResponse);
+  rpc GetDataItem(GetDataItemRequest) returns (GetDataItemResponse);
+  rpc PrevalidateDataItem(PrevalidateDataItemRequest) returns (PrevalidateDataItemResponse);
+  rpc TransformDataItem(TransformDataItemRequest) returns (TransformDataItemResponse);
+  rpc ValidateDataItem(ValidateDataItemRequest) returns (ValidateDataItemResponse);
+  rpc SummarizeDataBundle(SummarizeDataBundleRequest) returns (SummarizeDataBundleResponse);
+  rpc NextKey(NextKeyRequest) returns (NextKeyResponse);
+}
+
 /* The main data entity served by the gRPC service
  * Contains the block key and the block value as a serialized value */
 message DataItem {
@@ -12,18 +26,17 @@ message RuntimeConfig {
   string serialized_config = 1;
 }
 
-
 /* Defines the vote enum */
 enum VOTE {
-  UNSPECIFIED = 0;
-  VALID = 1;
-  INVALID = 2;
-  ABSTAIN = 3;
+  VOTE_UNSPECIFIED = 0;
+  VOTE_VALID = 1;
+  VOTE_INVALID = 2;
+  VOTE_ABSTAIN = 3;
 }
 
 /* getRuntimeName
- * Request returning the name of the runtime 
-* returns the runtime name as a string */
+ * Request returning the name of the runtime
+ * returns the runtime name as a string */
 
 message GetRuntimeNameRequest {}
 
@@ -32,7 +45,7 @@ message GetRuntimeNameResponse {
 }
 
 /* getRuntimeName
- * Request returning the version of the runtime 
+ * Request returning the version of the runtime
  * returns the runtime version as a string */
 message GetRuntimeVersionRequest {}
 
@@ -52,7 +65,7 @@ message ValidateSetConfigResponse {
 }
 
 /* getDataItem
- * Request retrieving and returning a block from the respective chain 
+ * Request retrieving and returning a block from the respective chain
  * Returns the requested block as a dataItem */
 message GetDataItemRequest {
   RuntimeConfig config = 1;
@@ -64,7 +77,7 @@ message GetDataItemResponse {
 }
 
 /* prevalidateDataItem
- * Request pre-validating a dataItem that is about to be validated 
+ * Request pre-validating a dataItem that is about to be validated
  * returns the pre-validation result as a boolean */
 message PrevalidateDataItemRequest {
   RuntimeConfig config = 1;
@@ -87,9 +100,8 @@ message TransformDataItemResponse {
   DataItem transformed_data_item = 1;
 }
 
-
 /* validateDataItem
- * Request validating a dataItem 
+ * Request validating a dataItem
  * returns the validation result as a boolean */
 message ValidateDataItemRequest {
   RuntimeConfig config = 1;
@@ -102,7 +114,7 @@ message ValidateDataItemResponse {
 }
 
 /* summarizeDataBundle
- * Request summarizing a dataBundle 
+ * Request summarizing a dataBundle
  * returns the bundle summary as a string */
 message SummarizeDataBundleRequest {
   RuntimeConfig config = 1;
@@ -114,7 +126,7 @@ message SummarizeDataBundleResponse {
 }
 
 /* nextKey
- * Request retrieving the next key on the chain 
+ * Request retrieving the next key on the chain
  * returns the key as a string */
 message NextKeyRequest {
   RuntimeConfig config = 1;
@@ -123,16 +135,4 @@ message NextKeyRequest {
 
 message NextKeyResponse {
   string next_key = 1;
-}
-
-service Runtime {
-  rpc GetRuntimeName(GetRuntimeNameRequest) returns (GetRuntimeNameResponse);
-  rpc GetRuntimeVersion(GetRuntimeVersionRequest) returns (GetRuntimeVersionResponse);
-  rpc ValidateSetConfig (ValidateSetConfigRequest) returns (ValidateSetConfigResponse);
-  rpc GetDataItem (GetDataItemRequest) returns (GetDataItemResponse);
-  rpc PrevalidateDataItem (PrevalidateDataItemRequest) returns (PrevalidateDataItemResponse);
-  rpc TransformDataItem (TransformDataItemRequest) returns (TransformDataItemResponse);
-  rpc ValidateDataItem (ValidateDataItemRequest) returns (ValidateDataItemResponse);
-  rpc SummarizeDataBundle (SummarizeDataBundleRequest) returns (SummarizeDataBundleResponse);
-  rpc NextKey (NextKeyRequest) returns (NextKeyResponse);
 }

@@ -31,6 +31,7 @@
     "build": "lerna run build",
     "build:binaries": "lerna run build:binaries --concurrency 1",
     "build:binaries:docker-core": "yarn install && lerna run build:binaries --scope @kyvejs/docker",
+    "generate:protos": "bash proto/proto-gen.sh",
     "pub": "lerna run build && lerna publish",
     "build:changed": "lerna run --since origin/master --include-dependents build",
     "test": "lerna run test",
