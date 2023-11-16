@@ -62,43 +62,60 @@ export default class Tendermint implements IRuntime {
   }
 
   async prevalidateDataItem(_: Validator, item: DataItem): Promise<boolean> {
-    // check if data item is defined
+    // check if block is defined
     if (!item.value) {
-      return false;
+      throw new Error(`Value in data item is not defined: ${item.value}`);
     }
 
     // check if block and block results are defined
-    if (!item.value.block || !item.value.block_results) {
-      return false;
+    if (!item.value.block) {
+      throw new Error(`Block in data item is not defined: ${item.value.block}`);
     }
 
-    // check if network matches
-    if (this.config.network != item.value.block.block.header.chain_id) {
-      return false;
+    // check if block and block results are defined
+    if (!item.value.block_results) {
+      throw new Error(
+        `Block results in data item is not defined: ${item.value.block_results}`
+      );
     }
 
     // check if block height matches
     if (item.key !== item.value.block.block.header.height) {
-      return false;
+      throw new Error(
+        `Block height does not match: key${item.key} value:${item.value.block.block.header.height}`
+      );
     }
 
     // check if block results height matches
     if (item.key !== item.value.block_results.height) {
-      return false;
+      throw new Error(
+        `Block results height does not match: key${item.key} value:${item.value.block_results.height}`
+      );
+    }
+
+    // check if network matches
+    if (this.config.network != item.value.block.block.header.chain_id) {
+      throw new Error(
+        `Chain ID does not match: config${this.config.network} value:${item.value.block.block.header.chain_id}`
+      );
     }
 
     // validate block schema
     const block_validate = ajv.compile(block_schema);
 
     if (!block_validate(item.value.block)) {
-      return false;
+      throw new Error(
+        `Block schema validation failed: ${block_validate.errors}`
+      );
     }
 
     // validate block_results schema
     const block_results_validate = ajv.compile(block_results_schema);
 
     if (!block_results_validate(item.value.block_results)) {
-      return false;
+      throw new Error(
+        `Block results schema validation failed: ${block_results_validate.errors}`
+      );
     }
 
     return true;

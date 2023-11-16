@@ -164,15 +164,27 @@ export async function runCache(this: Validator): Promise<void> {
               this.m.runtime_get_data_item_successful.inc();
 
               // prevalidate data item and reject if it fails
-              this.logger.debug(
-                `this.runtime.prevalidateDataItem($THIS,$ITEM)`
-              );
-              const valid = await this.runtime.prevalidateDataItem(this, data);
-
-              if (!valid) {
-                throw new Error(
-                  `Prevalidation of data item with key ${nextKey} failed.`
+              try {
+                this.logger.debug(
+                  `this.runtime.prevalidateDataItem($THIS,$ITEM)`
                 );
+                const valid = await this.runtime.prevalidateDataItem(
+                  this,
+                  data
+                );
+
+                if (!valid) {
+                  this.logger.error(
+                    `Prevalidation of data item with key ${nextKey} failed, only voting abstain from now on. Please check if you have configured your data source correctly.`
+                  );
+                  throw new Error();
+                }
+              } catch (err) {
+                this.logger.error(standardizeError(err));
+                this.logger.error(
+                  `Prevalidation of data item with key ${nextKey} failed, only voting abstain from now on. Please check if you have configured your data source correctly.`
+                );
+                throw new Error();
               }
 
               // transform data item

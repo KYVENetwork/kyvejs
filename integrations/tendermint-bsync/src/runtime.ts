@@ -42,12 +42,21 @@ export default class TendermintBSync implements IRuntime {
   async prevalidateDataItem(_: Validator, item: DataItem): Promise<boolean> {
     // check if block is defined
     if (!item.value) {
-      return false;
+      throw new Error(`Value in data item is not defined: ${item.value}`);
+    }
+
+    // check if block height matches
+    if (item.key !== item.value.header.height) {
+      throw new Error(
+        `Block height does not match: key${item.key} value:${item.value.header.height}`
+      );
     }
 
     // check if network matches
     if (this.config.network != item.value.header.chain_id) {
-      return false;
+      throw new Error(
+        `Chain ID does not match: config${this.config.network} value:${item.value.header.chain_id}`
+      );
     }
 
     return true;

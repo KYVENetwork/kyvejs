@@ -16,14 +16,6 @@ interface ISnapshot {
   metadata: string;
 }
 
-interface TendermintSSyncValue {
-  snapshot: ISnapshot | null;
-  block: object | null;
-  seenCommit: object | null;
-  state: object | null;
-  chunk: string | null;
-}
-
 export default class TendermintSSync implements IRuntime {
   public name = name;
   public version = version;
@@ -118,22 +110,28 @@ export default class TendermintSSync implements IRuntime {
     // parse snapshot key
     const [height, chunkIndex] = item.key.split('/').map((k) => +k);
 
-    // return false if entire value is not defined
+    // throw error if entire value is not defined
     if (!item.value) {
-      return false;
+      throw new Error(`Value in data item is not defined: ${item.value}`);
     }
 
     if (chunkIndex > 0) {
-      // return false if one of those values is not null
-      return !(
+      // throw error if one of those values is not null
+      if (
         item.value.snapshot ||
         item.value.block ||
         item.value.seenCommit ||
         item.value.state
-      );
+      ) {
+        throw new Error(
+          `Value in data item has unexpected values; snapshot:${item.value.snapshot} block:${item.value.block} seenCommit:${item.value.seenCommit} state:${item.value.state}`
+        );
+      }
+
+      return true;
     }
 
-    // return false if one of those values is null
+    // throw error if one of those values is null
     if (
       !(
         item.value.snapshot &&
@@ -142,12 +140,18 @@ export default class TendermintSSync implements IRuntime {
         item.value.state
       )
     ) {
-      return false;
+      throw new Error(
+        `Value in data item has unexpected null values; snapshot:${!!item.value
+          .snapshot} block:${!!item.value.block} seenCommit:${!!item.value
+          .seenCommit} state:${!!item.value.state}`
+      );
     }
 
-    // return false if snapshot height mismatches
-    if (item.value.snapshot.height !== height) {
-      return false;
+    // throw error if snapshot height mismatches
+    if (+item.value.snapshot.height !== height) {
+      throw new Error(
+        `Snapshot height differs in key and value; key:${height} value:${item.value.snapshot.height}`
+      );
     }
 
     return true;
