@@ -107,9 +107,51 @@ export default class TendermintSSync implements IRuntime {
   }
 
   async prevalidateDataItem(_: Validator, item: DataItem): Promise<boolean> {
-    // check if block is defined
+    // parse snapshot key
+    const [height, chunkIndex] = item.key.split('/').map((k) => +k);
+
+    // throw error if entire value is not defined
     if (!item.value) {
-      return false;
+      throw new Error(`Value in data item is not defined: ${item.value}`);
+    }
+
+    if (chunkIndex > 0) {
+      // throw error if one of those values is not null
+      if (
+        item.value.snapshot ||
+        item.value.block ||
+        item.value.seenCommit ||
+        item.value.state
+      ) {
+        throw new Error(
+          `Value in data item has unexpected values; snapshot:${item.value.snapshot} block:${item.value.block} seenCommit:${item.value.seenCommit} state:${item.value.state}`
+        );
+      }
+
+      return true;
+    }
+
+    // throw error if one of those values is null
+    if (
+      !(
+        item.value.snapshot &&
+        item.value.block &&
+        item.value.seenCommit &&
+        item.value.state
+      )
+    ) {
+      throw new Error(
+        `Value in data item has unexpected null values; snapshot:${!!item.value
+          .snapshot} block:${!!item.value.block} seenCommit:${!!item.value
+          .seenCommit} state:${!!item.value.state}`
+      );
+    }
+
+    // throw error if snapshot height mismatches
+    if (+item.value.snapshot.height !== height) {
+      throw new Error(
+        `Snapshot height differs in key and value; key:${height} value:${item.value.snapshot.height}`
+      );
     }
 
     return true;
