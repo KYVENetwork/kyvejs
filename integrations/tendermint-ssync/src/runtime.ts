@@ -16,6 +16,14 @@ interface ISnapshot {
   metadata: string;
 }
 
+interface TendermintSSyncValue {
+  snapshot: ISnapshot | null;
+  block: object | null;
+  seenCommit: object | null;
+  state: object | null;
+  chunk: string | null;
+}
+
 export default class TendermintSSync implements IRuntime {
   public name = name;
   public version = version;
@@ -107,8 +115,38 @@ export default class TendermintSSync implements IRuntime {
   }
 
   async prevalidateDataItem(_: Validator, item: DataItem): Promise<boolean> {
-    // check if block is defined
+    // parse snapshot key
+    const [height, chunkIndex] = item.key.split('/').map((k) => +k);
+
+    // return false if entire value is not defined
     if (!item.value) {
+      return false;
+    }
+
+    if (chunkIndex > 0) {
+      // return false if one of those values is not null
+      return !(
+        item.value.snapshot ||
+        item.value.block ||
+        item.value.seenCommit ||
+        item.value.state
+      );
+    }
+
+    // return false if one of those values is null
+    if (
+      !(
+        item.value.snapshot &&
+        item.value.block &&
+        item.value.seenCommit &&
+        item.value.state
+      )
+    ) {
+      return false;
+    }
+
+    // return false if snapshot height mismatches
+    if (item.value.snapshot.height !== height) {
       return false;
     }
 
