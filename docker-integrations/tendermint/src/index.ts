@@ -1,6 +1,6 @@
 import * as grpc from '@grpc/grpc-js';
 
-import { RuntimeServiceService } from './proto/kyve/rdk/runtime/v1/runtime';
+import { RuntimeServiceService } from './proto/kyverdk/runtime/v1/runtime';
 import { TendermintServer } from './server';
 
 const maxMessageSize: number = 2 * 1024 * 1024 * 1024; // 2 GB

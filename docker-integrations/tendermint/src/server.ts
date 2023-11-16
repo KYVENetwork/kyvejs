@@ -2,7 +2,7 @@ import * as grpc from '@grpc/grpc-js';
 import axios from 'axios';
 
 import { name, version } from '../package.json';
-import { DataItem } from './proto/kyve/rdk/runtime/v1/runtime';
+import { DataItem } from './proto/kyverdk/runtime/v1/runtime';
 import { VoteType } from './proto/kyve/bundles/v1beta1/tx';
 
 type EmptyRequest = Record<string, never>;

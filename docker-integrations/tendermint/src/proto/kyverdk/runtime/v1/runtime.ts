@@ -9,184 +9,228 @@ import type {
   UntypedServiceImplementation,
 } from "@grpc/grpc-js";
 import _m0 from "protobufjs/minimal";
-import { VoteType, voteTypeFromJSON, voteTypeToJSON } from "../../kyve/bundles/v1beta1/tx";
+import { VoteType, voteTypeFromJSON, voteTypeToJSON } from "../../../kyve/bundles/v1beta1/tx";
 
-export const protobufPackage = "kyve.rdk.protocol.v1";
-
-/** Defines the vote enum */
-export enum VOTE {
-  VOTE_UNSPECIFIED = 0,
-  VOTE_VALID = 1,
-  VOTE_INVALID = 2,
-  VOTE_ABSTAIN = 3,
-  UNRECOGNIZED = -1,
-}
-
-export function vOTEFromJSON(object: any): VOTE {
-  switch (object) {
-    case 0:
-    case "VOTE_UNSPECIFIED":
-      return VOTE.VOTE_UNSPECIFIED;
-    case 1:
-    case "VOTE_VALID":
-      return VOTE.VOTE_VALID;
-    case 2:
-    case "VOTE_INVALID":
-      return VOTE.VOTE_INVALID;
-    case 3:
-    case "VOTE_ABSTAIN":
-      return VOTE.VOTE_ABSTAIN;
-    case -1:
-    case "UNRECOGNIZED":
-    default:
-      return VOTE.UNRECOGNIZED;
-  }
-}
-
-export function vOTEToJSON(object: VOTE): string {
-  switch (object) {
-    case VOTE.VOTE_UNSPECIFIED:
-      return "VOTE_UNSPECIFIED";
-    case VOTE.VOTE_VALID:
-      return "VOTE_VALID";
-    case VOTE.VOTE_INVALID:
-      return "VOTE_INVALID";
-    case VOTE.VOTE_ABSTAIN:
-      return "VOTE_ABSTAIN";
-    case VOTE.UNRECOGNIZED:
-    default:
-      return "UNRECOGNIZED";
-  }
-}
+export const protobufPackage = "kyverdk.runtime.v1";
 
 /**
  * The main data entity served by the gRPC service
  * Contains the block key and the block value as a serialized value
  */
 export interface DataItem {
+  /** The key of the data item */
   key: string;
+  /** The value of the data item */
   value: string;
 }
 
 /** Configuration entity containing serialized info about connection to the respective chain */
 export interface RuntimeConfig {
+  /** The serialized configuration */
   serialized_config: string;
 }
 
+/**
+ * GetRuntimeNameRequest
+ * Request returning the name of the runtime
+ * returns the runtime name as a string
+ */
 export interface GetRuntimeNameRequest {
 }
 
+/**
+ * GetRuntimeNameResponse
+ * Response returning the name of the runtime
+ * returns the runtime name as a string
+ */
 export interface GetRuntimeNameResponse {
+  /** The name of the runtime */
   name: string;
 }
 
 /**
- * getRuntimeName
+ * GetRuntimeVersionRequest
  * Request returning the version of the runtime
  * returns the runtime version as a string
  */
 export interface GetRuntimeVersionRequest {
 }
 
+/**
+ * GetRuntimeVersionResponse
+ * Response returning the version of the runtime
+ * returns the runtime version as a string
+ */
 export interface GetRuntimeVersionResponse {
+  /** The version of the runtime */
   version: string;
 }
 
 /**
- * validateSetConfig
+ * ValidateSetConfigRequest
  * Request validating a configuration string to connect to the respective chain
  * returns a validated serialized configuration object
  */
 export interface ValidateSetConfigRequest {
+  /** The raw configuration string */
   raw_config: string;
 }
 
+/**
+ * ValidateSetConfigResponse
+ * Response validating a configuration string to connect to the respective chain
+ * returns a validated serialized configuration object
+ */
 export interface ValidateSetConfigResponse {
+  /** The validated serialized configuration object */
   serialized_config: string;
 }
 
 /**
- * getDataItem
+ * GetDataItemRequest
  * Request retrieving and returning a block from the respective chain
  * Returns the requested block as a dataItem
  */
 export interface GetDataItemRequest {
-  config?: RuntimeConfig | undefined;
+  /** The configuration object */
+  config?:
+    | RuntimeConfig
+    | undefined;
+  /** The key of the data item */
   key: string;
 }
 
+/**
+ * GetDataItemResponse
+ * Response retrieving and returning a block from the respective chain
+ * Returns the requested block as a dataItem
+ */
 export interface GetDataItemResponse {
+  /** The data item */
   data_item?: DataItem | undefined;
 }
 
 /**
- * prevalidateDataItem
+ * PrevalidateDataItemRequest
  * Request pre-validating a dataItem that is about to be validated
  * returns the pre-validation result as a boolean
  */
 export interface PrevalidateDataItemRequest {
-  config?: RuntimeConfig | undefined;
+  /** The configuration object */
+  config?:
+    | RuntimeConfig
+    | undefined;
+  /** The data item to be pre-validated */
   data_item?: DataItem | undefined;
 }
 
+/**
+ * PrevalidateDataItemResponse
+ * Response pre-validating a dataItem that is about to be validated
+ * returns the pre-validation result as a boolean
+ */
 export interface PrevalidateDataItemResponse {
+  /** The pre-validation result */
   valid: boolean;
 }
 
 /**
- * transformDataItem
+ * TransformDataItemRequest
  * Request transforming the given data item into a preferred format
  * returns the transformed dataItem
  */
 export interface TransformDataItemRequest {
-  config?: RuntimeConfig | undefined;
+  /** The configuration object */
+  config?:
+    | RuntimeConfig
+    | undefined;
+  /** The data item to be transformed */
   data_item?: DataItem | undefined;
 }
 
+/**
+ * TransformDataItemResponse
+ * Response transforming the given data item into a preferred format
+ * returns the transformed dataItem
+ */
 export interface TransformDataItemResponse {
+  /** The transformed data item */
   transformed_data_item?: DataItem | undefined;
 }
 
 /**
- * validateDataItem
+ * ValidateDataItemRequest
  * Request validating a dataItem
  * returns the validation result as a boolean
  */
 export interface ValidateDataItemRequest {
-  config?: RuntimeConfig | undefined;
-  proposed_data_item?: DataItem | undefined;
+  /** The configuration object */
+  config?:
+    | RuntimeConfig
+    | undefined;
+  /** The proposed data item */
+  proposed_data_item?:
+    | DataItem
+    | undefined;
+  /** The data item to be validated */
   validation_data_item?: DataItem | undefined;
 }
 
+/**
+ * ValidateDataItemResponse
+ * Response validating a dataItem
+ * returns the validation result as a boolean
+ */
 export interface ValidateDataItemResponse {
+  /** The validation result as vote */
   vote: VoteType;
 }
 
 /**
- * summarizeDataBundle
+ * SummarizeDataBundleRequest
  * Request summarizing a dataBundle
  * returns the bundle summary as a string
  */
 export interface SummarizeDataBundleRequest {
-  config?: RuntimeConfig | undefined;
+  /** The configuration object */
+  config?:
+    | RuntimeConfig
+    | undefined;
+  /** The data items to be summarized */
   bundle: DataItem[];
 }
 
+/**
+ * SummarizeDataBundleResponse
+ * Response summarizing a dataBundle
+ * returns the bundle summary as a string
+ */
 export interface SummarizeDataBundleResponse {
+  /** The bundle summary */
   summary: string;
 }
 
 /**
- * nextKey
+ * NextKeyRequest
  * Request retrieving the next key on the chain
  * returns the key as a string
  */
 export interface NextKeyRequest {
-  config?: RuntimeConfig | undefined;
+  /** The configuration object */
+  config?:
+    | RuntimeConfig
+    | undefined;
+  /** The current key */
   key: string;
 }
 
+/**
+ * NextKeyResponse
+ * Response retrieving the next key on the chain
+ * returns the key as a string
+ */
 export interface NextKeyResponse {
+  /** The next key */
   next_key: string;
 }
 
@@ -1467,10 +1511,17 @@ export const NextKeyResponse = {
   },
 };
 
+/**
+ * Interface of Runtime.
+ *
+ * The Runtime implements the custom logic of a pool and defines how data
+ * items are fetched and which order they should have.
+ */
 export type RuntimeServiceService = typeof RuntimeServiceService;
 export const RuntimeServiceService = {
+  /** Returns the name of the runtime. Example "@kyvejs/tendermint" */
   getRuntimeName: {
-    path: "/kyve.rdk.protocol.v1.RuntimeService/GetRuntimeName",
+    path: "/kyverdk.runtime.v1.RuntimeService/GetRuntimeName",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: GetRuntimeNameRequest) => Buffer.from(GetRuntimeNameRequest.encode(value).finish()),
@@ -1478,8 +1529,9 @@ export const RuntimeServiceService = {
     responseSerialize: (value: GetRuntimeNameResponse) => Buffer.from(GetRuntimeNameResponse.encode(value).finish()),
     responseDeserialize: (value: Buffer) => GetRuntimeNameResponse.decode(value),
   },
+  /** Returns the version of the runtime. Example "1.2.0" */
   getRuntimeVersion: {
-    path: "/kyve.rdk.protocol.v1.RuntimeService/GetRuntimeVersion",
+    path: "/kyverdk.runtime.v1.RuntimeService/GetRuntimeVersion",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: GetRuntimeVersionRequest) => Buffer.from(GetRuntimeVersionRequest.encode(value).finish()),
@@ -1488,8 +1540,16 @@ export const RuntimeServiceService = {
       Buffer.from(GetRuntimeVersionResponse.encode(value).finish()),
     responseDeserialize: (value: Buffer) => GetRuntimeVersionResponse.decode(value),
   },
+  /**
+   * Parses the raw runtime config found on pool, validates it and finally sets
+   * the property "config" in the runtime. A raw config could be an ipfs link to the
+   * actual config or a stringified yaml or json string. This method should error if
+   * the specific runtime config is not parsable or invalid.
+   *
+   * Deterministic behavior is required
+   */
   validateSetConfig: {
-    path: "/kyve.rdk.protocol.v1.RuntimeService/ValidateSetConfig",
+    path: "/kyverdk.runtime.v1.RuntimeService/ValidateSetConfig",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: ValidateSetConfigRequest) => Buffer.from(ValidateSetConfigRequest.encode(value).finish()),
@@ -1498,8 +1558,13 @@ export const RuntimeServiceService = {
       Buffer.from(ValidateSetConfigResponse.encode(value).finish()),
     responseDeserialize: (value: Buffer) => ValidateSetConfigResponse.decode(value),
   },
+  /**
+   * Gets the data item from a specific key and returns both key and the value.
+   *
+   * Deterministic behavior is required
+   */
   getDataItem: {
-    path: "/kyve.rdk.protocol.v1.RuntimeService/GetDataItem",
+    path: "/kyverdk.runtime.v1.RuntimeService/GetDataItem",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: GetDataItemRequest) => Buffer.from(GetDataItemRequest.encode(value).finish()),
@@ -1507,8 +1572,17 @@ export const RuntimeServiceService = {
     responseSerialize: (value: GetDataItemResponse) => Buffer.from(GetDataItemResponse.encode(value).finish()),
     responseDeserialize: (value: Buffer) => GetDataItemResponse.decode(value),
   },
+  /**
+   * Prevalidates a data item right after is was retrieved from source.
+   * If the prevalidation fails the item gets rejected and never makes
+   * it to the local cache. If the prevalidation succeeds the item gets
+   * transformed and written to cache were it is used from submission
+   * of proposals or bundle validation.
+   *
+   * Deterministic behavior is required
+   */
   prevalidateDataItem: {
-    path: "/kyve.rdk.protocol.v1.RuntimeService/PrevalidateDataItem",
+    path: "/kyverdk.runtime.v1.RuntimeService/PrevalidateDataItem",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: PrevalidateDataItemRequest) =>
@@ -1518,8 +1592,14 @@ export const RuntimeServiceService = {
       Buffer.from(PrevalidateDataItemResponse.encode(value).finish()),
     responseDeserialize: (value: Buffer) => PrevalidateDataItemResponse.decode(value),
   },
+  /**
+   * Transforms a single data item and return it. Used for example
+   * to remove unecessary data or format the data in a better way.
+   *
+   * Deterministic behavior is required
+   */
   transformDataItem: {
-    path: "/kyve.rdk.protocol.v1.RuntimeService/TransformDataItem",
+    path: "/kyverdk.runtime.v1.RuntimeService/TransformDataItem",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: TransformDataItemRequest) => Buffer.from(TransformDataItemRequest.encode(value).finish()),
@@ -1528,8 +1608,13 @@ export const RuntimeServiceService = {
       Buffer.from(TransformDataItemResponse.encode(value).finish()),
     responseDeserialize: (value: Buffer) => TransformDataItemResponse.decode(value),
   },
+  /**
+   * Validates a single data item of a bundle proposal
+   *
+   * Deterministic behavior is required
+   */
   validateDataItem: {
-    path: "/kyve.rdk.protocol.v1.RuntimeService/ValidateDataItem",
+    path: "/kyverdk.runtime.v1.RuntimeService/ValidateDataItem",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: ValidateDataItemRequest) => Buffer.from(ValidateDataItemRequest.encode(value).finish()),
@@ -1538,8 +1623,16 @@ export const RuntimeServiceService = {
       Buffer.from(ValidateDataItemResponse.encode(value).finish()),
     responseDeserialize: (value: Buffer) => ValidateDataItemResponse.decode(value),
   },
+  /**
+   * Gets a formatted value string from a bundle. This produces a "summary" of
+   * a bundle which gets stored on-chain and therefore needs to be short.
+   *
+   * String should not be longer than 100 characters, else gas costs might be too expensive.
+   *
+   * Deterministic behavior is required
+   */
   summarizeDataBundle: {
-    path: "/kyve.rdk.protocol.v1.RuntimeService/SummarizeDataBundle",
+    path: "/kyverdk.runtime.v1.RuntimeService/SummarizeDataBundle",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: SummarizeDataBundleRequest) =>
@@ -1549,8 +1642,13 @@ export const RuntimeServiceService = {
       Buffer.from(SummarizeDataBundleResponse.encode(value).finish()),
     responseDeserialize: (value: Buffer) => SummarizeDataBundleResponse.decode(value),
   },
+  /**
+   * Gets the next key from the current key so that the data archived has an order.
+   *
+   * Deterministic behavior is required
+   */
   nextKey: {
-    path: "/kyve.rdk.protocol.v1.RuntimeService/NextKey",
+    path: "/kyverdk.runtime.v1.RuntimeService/NextKey",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: NextKeyRequest) => Buffer.from(NextKeyRequest.encode(value).finish()),
@@ -1561,18 +1659,67 @@ export const RuntimeServiceService = {
 } as const;
 
 export interface RuntimeServiceServer extends UntypedServiceImplementation {
+  /** Returns the name of the runtime. Example "@kyvejs/tendermint" */
   getRuntimeName: handleUnaryCall<GetRuntimeNameRequest, GetRuntimeNameResponse>;
+  /** Returns the version of the runtime. Example "1.2.0" */
   getRuntimeVersion: handleUnaryCall<GetRuntimeVersionRequest, GetRuntimeVersionResponse>;
+  /**
+   * Parses the raw runtime config found on pool, validates it and finally sets
+   * the property "config" in the runtime. A raw config could be an ipfs link to the
+   * actual config or a stringified yaml or json string. This method should error if
+   * the specific runtime config is not parsable or invalid.
+   *
+   * Deterministic behavior is required
+   */
   validateSetConfig: handleUnaryCall<ValidateSetConfigRequest, ValidateSetConfigResponse>;
+  /**
+   * Gets the data item from a specific key and returns both key and the value.
+   *
+   * Deterministic behavior is required
+   */
   getDataItem: handleUnaryCall<GetDataItemRequest, GetDataItemResponse>;
+  /**
+   * Prevalidates a data item right after is was retrieved from source.
+   * If the prevalidation fails the item gets rejected and never makes
+   * it to the local cache. If the prevalidation succeeds the item gets
+   * transformed and written to cache were it is used from submission
+   * of proposals or bundle validation.
+   *
+   * Deterministic behavior is required
+   */
   prevalidateDataItem: handleUnaryCall<PrevalidateDataItemRequest, PrevalidateDataItemResponse>;
+  /**
+   * Transforms a single data item and return it. Used for example
+   * to remove unecessary data or format the data in a better way.
+   *
+   * Deterministic behavior is required
+   */
   transformDataItem: handleUnaryCall<TransformDataItemRequest, TransformDataItemResponse>;
+  /**
+   * Validates a single data item of a bundle proposal
+   *
+   * Deterministic behavior is required
+   */
   validateDataItem: handleUnaryCall<ValidateDataItemRequest, ValidateDataItemResponse>;
+  /**
+   * Gets a formatted value string from a bundle. This produces a "summary" of
+   * a bundle which gets stored on-chain and therefore needs to be short.
+   *
+   * String should not be longer than 100 characters, else gas costs might be too expensive.
+   *
+   * Deterministic behavior is required
+   */
   summarizeDataBundle: handleUnaryCall<SummarizeDataBundleRequest, SummarizeDataBundleResponse>;
+  /**
+   * Gets the next key from the current key so that the data archived has an order.
+   *
+   * Deterministic behavior is required
+   */
   nextKey: handleUnaryCall<NextKeyRequest, NextKeyResponse>;
 }
 
 export interface RuntimeServiceClient extends Client {
+  /** Returns the name of the runtime. Example "@kyvejs/tendermint" */
   getRuntimeName(
     request: GetRuntimeNameRequest,
     callback: (error: ServiceError | null, response: GetRuntimeNameResponse) => void,
@@ -1588,6 +1735,7 @@ export interface RuntimeServiceClient extends Client {
     options: Partial<CallOptions>,
     callback: (error: ServiceError | null, response: GetRuntimeNameResponse) => void,
   ): ClientUnaryCall;
+  /** Returns the version of the runtime. Example "1.2.0" */
   getRuntimeVersion(
     request: GetRuntimeVersionRequest,
     callback: (error: ServiceError | null, response: GetRuntimeVersionResponse) => void,
@@ -1603,6 +1751,14 @@ export interface RuntimeServiceClient extends Client {
     options: Partial<CallOptions>,
     callback: (error: ServiceError | null, response: GetRuntimeVersionResponse) => void,
   ): ClientUnaryCall;
+  /**
+   * Parses the raw runtime config found on pool, validates it and finally sets
+   * the property "config" in the runtime. A raw config could be an ipfs link to the
+   * actual config or a stringified yaml or json string. This method should error if
+   * the specific runtime config is not parsable or invalid.
+   *
+   * Deterministic behavior is required
+   */
   validateSetConfig(
     request: ValidateSetConfigRequest,
     callback: (error: ServiceError | null, response: ValidateSetConfigResponse) => void,
@@ -1618,6 +1774,11 @@ export interface RuntimeServiceClient extends Client {
     options: Partial<CallOptions>,
     callback: (error: ServiceError | null, response: ValidateSetConfigResponse) => void,
   ): ClientUnaryCall;
+  /**
+   * Gets the data item from a specific key and returns both key and the value.
+   *
+   * Deterministic behavior is required
+   */
   getDataItem(
     request: GetDataItemRequest,
     callback: (error: ServiceError | null, response: GetDataItemResponse) => void,
@@ -1633,6 +1794,15 @@ export interface RuntimeServiceClient extends Client {
     options: Partial<CallOptions>,
     callback: (error: ServiceError | null, response: GetDataItemResponse) => void,
   ): ClientUnaryCall;
+  /**
+   * Prevalidates a data item right after is was retrieved from source.
+   * If the prevalidation fails the item gets rejected and never makes
+   * it to the local cache. If the prevalidation succeeds the item gets
+   * transformed and written to cache were it is used from submission
+   * of proposals or bundle validation.
+   *
+   * Deterministic behavior is required
+   */
   prevalidateDataItem(
     request: PrevalidateDataItemRequest,
     callback: (error: ServiceError | null, response: PrevalidateDataItemResponse) => void,
@@ -1648,6 +1818,12 @@ export interface RuntimeServiceClient extends Client {
     options: Partial<CallOptions>,
     callback: (error: ServiceError | null, response: PrevalidateDataItemResponse) => void,
   ): ClientUnaryCall;
+  /**
+   * Transforms a single data item and return it. Used for example
+   * to remove unecessary data or format the data in a better way.
+   *
+   * Deterministic behavior is required
+   */
   transformDataItem(
     request: TransformDataItemRequest,
     callback: (error: ServiceError | null, response: TransformDataItemResponse) => void,
@@ -1663,6 +1839,11 @@ export interface RuntimeServiceClient extends Client {
     options: Partial<CallOptions>,
     callback: (error: ServiceError | null, response: TransformDataItemResponse) => void,
   ): ClientUnaryCall;
+  /**
+   * Validates a single data item of a bundle proposal
+   *
+   * Deterministic behavior is required
+   */
   validateDataItem(
     request: ValidateDataItemRequest,
     callback: (error: ServiceError | null, response: ValidateDataItemResponse) => void,
@@ -1678,6 +1859,14 @@ export interface RuntimeServiceClient extends Client {
     options: Partial<CallOptions>,
     callback: (error: ServiceError | null, response: ValidateDataItemResponse) => void,
   ): ClientUnaryCall;
+  /**
+   * Gets a formatted value string from a bundle. This produces a "summary" of
+   * a bundle which gets stored on-chain and therefore needs to be short.
+   *
+   * String should not be longer than 100 characters, else gas costs might be too expensive.
+   *
+   * Deterministic behavior is required
+   */
   summarizeDataBundle(
     request: SummarizeDataBundleRequest,
     callback: (error: ServiceError | null, response: SummarizeDataBundleResponse) => void,
@@ -1693,6 +1882,11 @@ export interface RuntimeServiceClient extends Client {
     options: Partial<CallOptions>,
     callback: (error: ServiceError | null, response: SummarizeDataBundleResponse) => void,
   ): ClientUnaryCall;
+  /**
+   * Gets the next key from the current key so that the data archived has an order.
+   *
+   * Deterministic behavior is required
+   */
   nextKey(
     request: NextKeyRequest,
     callback: (error: ServiceError | null, response: NextKeyResponse) => void,
@@ -1712,7 +1906,7 @@ export interface RuntimeServiceClient extends Client {
 
 export const RuntimeServiceClient = makeGenericClientConstructor(
   RuntimeServiceService,
-  "kyve.rdk.protocol.v1.RuntimeService",
+  "kyverdk.runtime.v1.RuntimeService",
 ) as unknown as {
   new (address: string, credentials: ChannelCredentials, options?: Partial<ClientOptions>): RuntimeServiceClient;
   service: typeof RuntimeServiceService;

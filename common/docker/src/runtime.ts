@@ -11,7 +11,7 @@ import {
   SummarizeDataBundleResponse,
   NextKeyResponse,
   RuntimeServiceClient,
-} from './proto/protocol/v1/runtime';
+} from './proto/kyverdk/runtime/v1/runtime';
 
 // config is a serialized string
 type IConfig = string;

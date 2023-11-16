@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package kyve.rdk.runtime.v1;
+package kyverdk.runtime.v1;
 
 import "kyve/bundles/v1beta1/tx.proto";
 
