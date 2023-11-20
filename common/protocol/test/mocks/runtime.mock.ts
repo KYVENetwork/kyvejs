@@ -1,23 +1,31 @@
 import { DataItem, Validator, sha256FromJson } from "../../src";
 
+export const TestConfig = jest.fn().mockImplementation(() => {
+  return {
+    host: "localhost",
+    port: 50051,
+    useGrpc: false,
+    grpcServices: {},
+  };
+});
+
 export const TestRuntime = jest.fn().mockImplementation(() => {
   return {
-    name: "@kyve/evm",
-    version: "0.0.0",
+    getName: jest.fn(async () => "@kyve/evm"),
+    getVersion: jest.fn(async () => "0.0.0"),
     config: "config",
     validateSetConfig: jest.fn(),
-    getDataItem: jest.fn(async (_: Validator, key: string) => ({
+    getDataItem: jest.fn(async (key: string) => ({
       key,
       value: `${key}-value`,
     })),
-    prevalidateDataItem: jest.fn(async (_: Validator, __: DataItem) => true),
-    transformDataItem: jest.fn(async (_: Validator, item: DataItem) => ({
+    prevalidateDataItem: jest.fn(async (__: DataItem) => true),
+    transformDataItem: jest.fn(async (item: DataItem) => ({
       key: item.key,
       value: `${item.value}-transform`,
     })),
     validateDataItem: jest.fn(
       async (
-        _: Validator,
         proposedDataItem: DataItem,
         validationDataItem: DataItem
       ) => {
@@ -27,11 +35,29 @@ export const TestRuntime = jest.fn().mockImplementation(() => {
         return proposedDataItemHash === validationDataItemHash;
       }
     ),
-    summarizeDataBundle: jest.fn(async (_: Validator, bundle: DataItem[]) =>
+    summarizeDataBundle: jest.fn(async (bundle: DataItem[]) =>
       JSON.stringify(bundle)
     ),
-    nextKey: jest.fn(async (_: Validator, key: string) =>
+    nextKey: jest.fn(async (key: string) =>
       (parseInt(key) + 1).toString()
     ),
   };
 });
+
+export const newTestValidator = (): Validator => {
+  const v = new Validator(new TestConfig());
+  const runtime = new TestRuntime();
+  const runtimeServiceImpl = {
+    getRuntimeName: runtime.getRuntimeName,
+    getRuntimeVersion: runtime.getRuntimeVersion,
+    validateSetConfig: runtime.validateSetConfig,
+    getDataItem: runtime.getDataItem,
+    prevalidateDataItem: runtime.prevalidateDataItem,
+    transformDataItem: runtime.transformDataItem,
+    validateDataItem: runtime.validateDataItem,
+    summarizeDataBundle: runtime.summarizeDataBundle,
+    nextKey: runtime.nextKey,
+  };
+  v["runtime"] = runtime;
+  return v;
+}

@@ -1,20 +1,14 @@
-import { Logger } from "tslog";
-import {
-  DataItem,
-  ICompression,
-  IStorageProvider,
-  Validator,
-} from "../src/index";
-import { runCache } from "../src/methods/main/runCache";
-import { genesis_pool } from "./mocks/constants";
-import { client } from "./mocks/client.mock";
-import { lcd } from "./mocks/lcd.mock";
-import { TestCacheProvider } from "./mocks/cache.mock";
-import { setupMetrics } from "../src/methods";
-import { register } from "prom-client";
-import { TestRuntime } from "./mocks/runtime.mock";
-import { TestNormalStorageProvider } from "./mocks/storageProvider.mock";
-import { TestNormalCompression } from "./mocks/compression.mock";
+import { Logger } from 'tslog';
+import { DataItem, ICompression, IStorageProvider, Validator } from '../src';
+import { runCache, setupMetrics } from '../src/methods';
+import { genesis_pool } from './mocks/constants';
+import { client } from './mocks/client.mock';
+import { lcd } from './mocks/lcd.mock';
+import { TestCacheProvider } from './mocks/cache.mock';
+import { register } from 'prom-client';
+import { newTestValidator } from './mocks/runtime.mock';
+import { TestNormalStorageProvider } from './mocks/storageProvider.mock';
+import { TestNormalCompression } from './mocks/compression.mock';
 
 /*
 
@@ -45,7 +39,7 @@ describe("cache tests", () => {
   let compression: ICompression;
 
   beforeEach(() => {
-    v = new Validator(new TestRuntime());
+    v = newTestValidator()
 
     v["cacheProvider"] = new TestCacheProvider();
 
@@ -203,7 +197,6 @@ describe("cache tests", () => {
     for (let n = 0; n < parseInt(genesis_pool.data.max_bundle_size); n++) {
       expect(runtime.getDataItem).toHaveBeenNthCalledWith(
         n + 1,
-        v,
         n.toString()
       );
     }
@@ -219,8 +212,7 @@ describe("cache tests", () => {
       };
       expect(runtime.transformDataItem).toHaveBeenNthCalledWith(
         n + 1,
-        expect.any(Validator),
-        item
+          item
       );
     }
 
@@ -236,8 +228,7 @@ describe("cache tests", () => {
     for (let n = 0; n < parseInt(genesis_pool.data.max_bundle_size) - 1; n++) {
       expect(runtime.nextKey).toHaveBeenNthCalledWith(
         n + 1,
-        expect.any(Validator),
-        n.toString()
+          n.toString()
       );
     }
 
@@ -378,7 +369,6 @@ describe("cache tests", () => {
     for (let n = 0; n < parseInt(genesis_pool.data.max_bundle_size) + 50; n++) {
       expect(runtime.getDataItem).toHaveBeenNthCalledWith(
         n + 1,
-        v,
         (n + parseInt(genesis_pool.data.max_bundle_size)).toString()
       );
     }
@@ -394,8 +384,7 @@ describe("cache tests", () => {
       };
       expect(runtime.transformDataItem).toHaveBeenNthCalledWith(
         n + 1,
-        expect.any(Validator),
-        item
+          item
       );
     }
 
@@ -410,8 +399,7 @@ describe("cache tests", () => {
     for (let n = 0; n < parseInt(genesis_pool.data.max_bundle_size) + 50; n++) {
       expect(runtime.nextKey).toHaveBeenNthCalledWith(
         n + 1,
-        expect.any(Validator),
-        (n + parseInt(genesis_pool.data.max_bundle_size) - 1).toString()
+          (n + parseInt(genesis_pool.data.max_bundle_size) - 1).toString()
       );
     }
 
@@ -557,7 +545,6 @@ describe("cache tests", () => {
     for (let n = 0; n < parseInt(genesis_pool.data.max_bundle_size); n++) {
       expect(runtime.getDataItem).toHaveBeenNthCalledWith(
         n + 1,
-        v,
         (n + parseInt(genesis_pool.data.max_bundle_size) + 3).toString()
       );
     }
@@ -573,8 +560,7 @@ describe("cache tests", () => {
       };
       expect(runtime.transformDataItem).toHaveBeenNthCalledWith(
         n + 1,
-        expect.any(Validator),
-        item
+          item
       );
     }
 
@@ -589,8 +575,7 @@ describe("cache tests", () => {
     for (let n = 0; n < parseInt(genesis_pool.data.max_bundle_size) + 3; n++) {
       expect(runtime.nextKey).toHaveBeenNthCalledWith(
         n + 1,
-        expect.any(Validator),
-        (n + 100 - 1).toString()
+          (n + 100 - 1).toString()
       );
     }
 
@@ -722,7 +707,6 @@ describe("cache tests", () => {
     for (let n = 0; n < parseInt(genesis_pool.data.max_bundle_size); n++) {
       expect(runtime.getDataItem).toHaveBeenNthCalledWith(
         n + 1,
-        v,
         (n + parseInt(genesis_pool.data.max_bundle_size)).toString()
       );
     }
@@ -738,8 +722,7 @@ describe("cache tests", () => {
       };
       expect(runtime.transformDataItem).toHaveBeenNthCalledWith(
         n + 1,
-        expect.any(Validator),
-        item
+          item
       );
     }
 
@@ -754,8 +737,7 @@ describe("cache tests", () => {
     for (let n = 0; n < parseInt(genesis_pool.data.max_bundle_size); n++) {
       expect(runtime.nextKey).toHaveBeenNthCalledWith(
         n + 1,
-        expect.any(Validator),
-        (n + parseInt(genesis_pool.data.max_bundle_size) - 1).toString()
+          (n + parseInt(genesis_pool.data.max_bundle_size) - 1).toString()
       );
     }
 
@@ -775,14 +757,14 @@ describe("cache tests", () => {
     // ARRANGE
     v["runtime"].getDataItem = jest
       .fn()
-      .mockImplementationOnce((_: Validator, key: string) =>
+      .mockImplementationOnce((key: string) =>
         Promise.resolve({
           key,
           value: `${key}-value`,
         })
       )
       .mockRejectedValueOnce(new Error("network error"))
-      .mockImplementation((_: Validator, key: string) =>
+      .mockImplementation((key: string) =>
         Promise.resolve({
           key,
           value: `${key}-value`,
@@ -880,17 +862,14 @@ describe("cache tests", () => {
 
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       1,
-      expect.any(Validator),
       "0"
     );
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       2,
-      expect.any(Validator),
       "1"
     );
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       3,
-      expect.any(Validator),
       "1"
     );
 
@@ -903,8 +882,7 @@ describe("cache tests", () => {
       };
       expect(runtime.transformDataItem).toHaveBeenNthCalledWith(
         n + 1,
-        expect.any(Validator),
-        item
+          item
       );
     }
 
@@ -918,8 +896,7 @@ describe("cache tests", () => {
     for (let n = 0; n < 2 - 1; n++) {
       expect(runtime.nextKey).toHaveBeenNthCalledWith(
         n + 1,
-        expect.any(Validator),
-        n.toString()
+          n.toString()
       );
     }
 
@@ -939,21 +916,21 @@ describe("cache tests", () => {
     // ARRANGE
     v["runtime"].getDataItem = jest
       .fn()
-      .mockImplementationOnce((_: Validator, key: string) =>
+      .mockImplementationOnce((key: string) =>
         Promise.resolve({
           key,
           value: `${key}-value`,
         })
       )
       .mockRejectedValueOnce(new Error("network error"))
-      .mockImplementationOnce((_: Validator, key: string) =>
+      .mockImplementationOnce((key: string) =>
         Promise.resolve({
           key,
           value: `${key}-value`,
         })
       )
       .mockRejectedValueOnce(new Error("network error"))
-      .mockImplementation((_: Validator, key: string) =>
+      .mockImplementation((key: string) =>
         Promise.resolve({
           key,
           value: `${key}-value`,
@@ -1087,49 +1064,41 @@ describe("cache tests", () => {
 
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       1,
-      v,
       (0 + parseInt(genesis_pool.data.max_bundle_size) + 3).toString()
     );
 
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       2,
-      v,
       (1 + parseInt(genesis_pool.data.max_bundle_size) + 3).toString()
     );
 
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       3,
-      v,
       (1 + parseInt(genesis_pool.data.max_bundle_size) + 3).toString()
     );
 
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       4,
-      v,
       (2 + parseInt(genesis_pool.data.max_bundle_size) + 3).toString()
     );
 
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       5,
-      v,
       (2 + parseInt(genesis_pool.data.max_bundle_size) + 3).toString()
     );
 
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       6,
-      v,
       (3 + parseInt(genesis_pool.data.max_bundle_size) + 3).toString()
     );
 
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       7,
-      v,
       (4 + parseInt(genesis_pool.data.max_bundle_size) + 3).toString()
     );
 
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       8,
-      v,
       (5 + parseInt(genesis_pool.data.max_bundle_size) + 3).toString()
     );
 
@@ -1146,8 +1115,7 @@ describe("cache tests", () => {
       };
       expect(runtime.transformDataItem).toHaveBeenNthCalledWith(
         n + 1,
-        expect.any(Validator),
-        item
+          item
       );
     }
 
@@ -1162,8 +1130,7 @@ describe("cache tests", () => {
     for (let n = 0; n < parseInt(genesis_pool.data.max_bundle_size) + 3; n++) {
       expect(runtime.nextKey).toHaveBeenNthCalledWith(
         n + 1,
-        expect.any(Validator),
-        (n + 100 - 1).toString()
+          (n + 100 - 1).toString()
       );
     }
 
@@ -1183,20 +1150,20 @@ describe("cache tests", () => {
     // ARRANGE
     v["runtime"].transformDataItem = jest
       .fn()
-      .mockImplementationOnce((_: Validator, item: DataItem) =>
+      .mockImplementationOnce((item: DataItem) =>
         Promise.resolve({
           key: item.key,
           value: `${item.value}-transform`,
         })
       )
-      .mockImplementationOnce((_: Validator, item: DataItem) =>
+      .mockImplementationOnce((item: DataItem) =>
         Promise.resolve({
           key: item.key,
           value: `${item.value}-transform`,
         })
       )
       .mockRejectedValueOnce(new Error())
-      .mockImplementation((_: Validator, item: DataItem) =>
+      .mockImplementation((item: DataItem) =>
         Promise.resolve({
           key: item.key,
           value: `${item.value}-transform`,
@@ -1294,37 +1261,31 @@ describe("cache tests", () => {
 
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       1,
-      expect.any(Validator),
       "0"
     );
 
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       2,
-      expect.any(Validator),
       "1"
     );
 
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       3,
-      expect.any(Validator),
       "2"
     );
 
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       4,
-      expect.any(Validator),
       "2"
     );
 
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       5,
-      expect.any(Validator),
       "3"
     );
 
     expect(runtime.getDataItem).toHaveBeenNthCalledWith(
       6,
-      expect.any(Validator),
       "4"
     );
 
@@ -1332,7 +1293,6 @@ describe("cache tests", () => {
 
     expect(runtime.transformDataItem).toHaveBeenNthCalledWith(
       1,
-      expect.any(Validator),
       {
         key: "0",
         value: `0-value`,
@@ -1341,7 +1301,6 @@ describe("cache tests", () => {
 
     expect(runtime.transformDataItem).toHaveBeenNthCalledWith(
       2,
-      expect.any(Validator),
       {
         key: "1",
         value: `1-value`,
@@ -1350,7 +1309,6 @@ describe("cache tests", () => {
 
     expect(runtime.transformDataItem).toHaveBeenNthCalledWith(
       3,
-      expect.any(Validator),
       {
         key: "2",
         value: `2-value`,
@@ -1359,7 +1317,6 @@ describe("cache tests", () => {
 
     expect(runtime.transformDataItem).toHaveBeenNthCalledWith(
       4,
-      expect.any(Validator),
       {
         key: "2",
         value: `2-value`,
@@ -1368,7 +1325,6 @@ describe("cache tests", () => {
 
     expect(runtime.transformDataItem).toHaveBeenNthCalledWith(
       5,
-      expect.any(Validator),
       {
         key: "3",
         value: `3-value`,
@@ -1377,7 +1333,6 @@ describe("cache tests", () => {
 
     expect(runtime.transformDataItem).toHaveBeenNthCalledWith(
       6,
-      expect.any(Validator),
       {
         key: "4",
         value: `4-value`,
@@ -1394,8 +1349,7 @@ describe("cache tests", () => {
     for (let n = 0; n < 4; n++) {
       expect(runtime.nextKey).toHaveBeenNthCalledWith(
         n + 1,
-        expect.any(Validator),
-        n.toString()
+          n.toString()
       );
     }
 
@@ -1415,11 +1369,11 @@ describe("cache tests", () => {
     // ARRANGE
     v["runtime"].nextKey = jest
       .fn()
-      .mockImplementationOnce((_: Validator, key: string) =>
+      .mockImplementationOnce((key: string) =>
         Promise.resolve(parseInt(key) + 1).toString()
       )
       .mockRejectedValueOnce(new Error("network error"))
-      .mockImplementation((_: Validator, key: string) =>
+      .mockImplementation((key: string) =>
         Promise.resolve(parseInt(key) + 1).toString()
       );
 
@@ -1515,7 +1469,6 @@ describe("cache tests", () => {
 
     expect(runtime.nextKey).toHaveBeenNthCalledWith(
       1,
-      expect.any(Validator),
       "99"
     );
 
@@ -1634,13 +1587,12 @@ describe("cache tests", () => {
 
     expect(runtime.getDataItem).toHaveBeenCalledTimes(1);
 
-    expect(runtime.getDataItem).toHaveBeenNthCalledWith(1, v, "100");
+    expect(runtime.getDataItem).toHaveBeenNthCalledWith(1, "100");
 
     expect(runtime.transformDataItem).toHaveBeenCalledTimes(1);
 
     expect(runtime.transformDataItem).toHaveBeenNthCalledWith(
       1,
-      expect.any(Validator),
       {
         key: "100",
         value: `100-value`,
@@ -1653,7 +1605,6 @@ describe("cache tests", () => {
 
     expect(runtime.nextKey).toHaveBeenNthCalledWith(
       1,
-      expect.any(Validator),
       "99"
     );
 

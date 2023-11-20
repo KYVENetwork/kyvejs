@@ -1,9 +1,9 @@
-import { Logger } from "tslog";
-import { Validator } from "../../src/index";
-import { setupMetrics, isValidRuntime } from "../../src/methods";
-import { register } from "prom-client";
-import { TestRuntime } from "../mocks/runtime.mock";
-import { genesis_pool } from "../mocks/constants";
+import { Logger } from 'tslog';
+import { Validator } from '../../src';
+import { isValidRuntime, setupMetrics } from '../../src/methods';
+import { register } from 'prom-client';
+import { newTestValidator } from '../mocks/runtime.mock';
+import { genesis_pool } from '../mocks/constants';
 
 /*
 
@@ -19,7 +19,7 @@ describe("isValidRuntime", () => {
   let v: Validator;
 
   beforeEach(() => {
-    v = new Validator(new TestRuntime());
+    v = newTestValidator()
 
     // mock logger
     v.logger = new Logger();
@@ -49,7 +49,7 @@ describe("isValidRuntime", () => {
     v.pool!.data!.runtime = "@kyvejs/test";
 
     // local
-    v["runtime"].name = "@kyvejs/test";
+    v["runtime"].getName = jest.fn().mockReturnValue("@kyvejs/test");
 
     // ACT
     const result = isValidRuntime.call(v);
@@ -65,10 +65,10 @@ describe("isValidRuntime", () => {
     v.pool!.data!.runtime = "@kyvejs/test";
 
     // local
-    v["runtime"].name = "@kyvejs/test-2";
+    v["runtime"].getName = jest.fn().mockReturnValue("@kyvejs/test2");
 
     // ACT
-    const result = isValidRuntime.call(v);
+    const result = await isValidRuntime.call(v);
 
     // ASSERT
     expect(result).toBeFalsy();
@@ -84,7 +84,7 @@ describe("isValidRuntime", () => {
     v["runtime"] = null as any;
 
     // ACT
-    const result = isValidRuntime.call(v);
+    const result = await isValidRuntime.call(v);
 
     // ASSERT
     expect(result).toBeFalsy();

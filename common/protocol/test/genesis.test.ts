@@ -1,24 +1,23 @@
-import { Logger } from "tslog";
+import { Logger } from 'tslog';
 import {
   bundleToBytes,
+  ICacheProvider,
   ICompression,
   IStorageProvider,
-  Validator,
   sha256,
   standardizeJSON,
-  ICacheProvider,
-} from "../src/index";
-import { runNode } from "../src/methods/main/runNode";
-import { genesis_pool } from "./mocks/constants";
-import { client } from "./mocks/client.mock";
-import { lcd } from "./mocks/lcd.mock";
-import { TestNormalStorageProvider } from "./mocks/storageProvider.mock";
-import { TestCacheProvider } from "./mocks/cache.mock";
-import { TestNormalCompression } from "./mocks/compression.mock";
-import { setupMetrics } from "../src/methods";
-import { register } from "prom-client";
-import { TestRuntime } from "./mocks/runtime.mock";
-import { VoteType } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
+  Validator
+} from '../src';
+import { runNode, setupMetrics } from '../src/methods';
+import { genesis_pool } from './mocks/constants';
+import { client } from './mocks/client.mock';
+import { lcd } from './mocks/lcd.mock';
+import { TestNormalStorageProvider } from './mocks/storageProvider.mock';
+import { TestCacheProvider } from './mocks/cache.mock';
+import { TestNormalCompression } from './mocks/compression.mock';
+import { register } from 'prom-client';
+import { newTestValidator } from './mocks/runtime.mock';
+import { VoteType } from '@kyvejs/types/client/kyve/bundles/v1beta1/tx';
 
 /*
 
@@ -41,7 +40,7 @@ describe("genesis tests", () => {
   let compression: ICompression;
 
   beforeEach(() => {
-    v = new Validator(new TestRuntime());
+    v = newTestValidator()
 
     // mock cache provider
     cacheProvider = new TestCacheProvider();
@@ -230,7 +229,6 @@ describe("genesis tests", () => {
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
 
     expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
-      expect.any(Validator),
       bundle
     );
 
@@ -504,7 +502,6 @@ describe("genesis tests", () => {
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
     expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
-      expect.any(Validator),
       bundle
     );
 
@@ -513,7 +510,6 @@ describe("genesis tests", () => {
     for (let i = 0; i < bundle.length; i++) {
       expect(runtime.validateDataItem).toHaveBeenNthCalledWith(
         i + 1,
-        expect.any(Validator),
         standardizeJSON(bundle[i]),
         standardizeJSON(bundle[i])
       );

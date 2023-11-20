@@ -1,9 +1,9 @@
-import { Logger } from "tslog";
-import { Validator } from "../../src/index";
-import { setupMetrics, isValidVersion } from "../../src/methods";
-import { register } from "prom-client";
-import { TestRuntime } from "../mocks/runtime.mock";
-import { genesis_pool } from "../mocks/constants";
+import { Logger } from 'tslog';
+import { Validator } from '../../src/index';
+import { isValidVersion, setupMetrics } from '../../src/methods';
+import { register } from 'prom-client';
+import { newTestValidator } from '../mocks/runtime.mock';
+import { genesis_pool } from '../mocks/constants';
 
 /*
 
@@ -30,7 +30,7 @@ describe("isValidVersion", () => {
   let v: Validator;
 
   beforeEach(() => {
-    v = new Validator(new TestRuntime());
+    v = newTestValidator()
 
     // mock logger
     v.logger = new Logger();
@@ -60,7 +60,7 @@ describe("isValidVersion", () => {
     v.pool!.data!.protocol!.version = "1.0.0";
 
     // local
-    v["runtime"].version = "1.0.0";
+    v["runtime"].getVersion = jest.fn().mockReturnValue("1.0.0");
 
     // ACT
     const result = isValidVersion.call(v);
@@ -76,7 +76,7 @@ describe("isValidVersion", () => {
     v.pool!.data!.protocol!.version = "1.0.0-alpha.3";
 
     // local
-    v["runtime"].version = "1.0.0-alpha.3";
+    v["runtime"].getVersion = jest.fn().mockReturnValue("1.0.0-alpha.3");
 
     // ACT
     const result = isValidVersion.call(v);
@@ -92,10 +92,10 @@ describe("isValidVersion", () => {
     v.pool!.data!.protocol!.version = "1.0.0";
 
     // local
-    v["runtime"].version = "1.0.1";
+    v["runtime"].getVersion = jest.fn().mockReturnValue("1.0.1");
 
     // ACT
-    const result = isValidVersion.call(v);
+    const result = await isValidVersion.call(v);
 
     // ASSERT
     expect(result).toBeTruthy();
@@ -108,10 +108,10 @@ describe("isValidVersion", () => {
     v.pool!.data!.protocol!.version = "1.0.2";
 
     // local
-    v["runtime"].version = "1.0.1";
+    v["runtime"].getVersion = jest.fn().mockReturnValue("1.0.1");
 
     // ACT
-    const result = isValidVersion.call(v);
+    const result = await isValidVersion.call(v);
 
     // ASSERT
     expect(result).toBeFalsy();
@@ -124,10 +124,10 @@ describe("isValidVersion", () => {
     v.pool!.data!.protocol!.version = "1.0.0";
 
     // local
-    v["runtime"].version = "1.1.0";
+    v["runtime"].getVersion = jest.fn().mockReturnValue("1.1.0");
 
     // ACT
-    const result = isValidVersion.call(v);
+    const result = await isValidVersion.call(v);
 
     // ASSERT
     expect(result).toBeFalsy();
@@ -140,10 +140,10 @@ describe("isValidVersion", () => {
     v.pool!.data!.protocol!.version = "1.2.0";
 
     // local
-    v["runtime"].version = "1.1.0";
+    v["runtime"].getVersion = jest.fn().mockReturnValue("1.1.0");
 
     // ACT
-    const result = isValidVersion.call(v);
+    const result = await isValidVersion.call(v);
 
     // ASSERT
     expect(result).toBeFalsy();
@@ -156,10 +156,10 @@ describe("isValidVersion", () => {
     v.pool!.data!.protocol!.version = "1.0.0";
 
     // local
-    v["runtime"].version = "2.0.0";
+    v["runtime"].getVersion = jest.fn().mockReturnValue("2.0.0");
 
     // ACT
-    const result = isValidVersion.call(v);
+    const result = await isValidVersion.call(v);
 
     // ASSERT
     expect(result).toBeFalsy();
@@ -172,10 +172,10 @@ describe("isValidVersion", () => {
     v.pool!.data!.protocol!.version = "3.0.0";
 
     // local
-    v["runtime"].version = "2.0.0";
+    v["runtime"].getVersion = jest.fn().mockReturnValue("2.0.0");
 
     // ACT
-    const result = isValidVersion.call(v);
+    const result = await isValidVersion.call(v);
 
     // ASSERT
     expect(result).toBeFalsy();
@@ -188,10 +188,10 @@ describe("isValidVersion", () => {
     v.pool!.data!.protocol!.version = "1.0.0-alpha.5";
 
     // local
-    v["runtime"].version = "1.0.0-alpha.8";
+    v["runtime"].getVersion = jest.fn().mockReturnValue("1.0.0-alpha.8");
 
     // ACT
-    const result = isValidVersion.call(v);
+    const result = await isValidVersion.call(v);
 
     // ASSERT
     expect(result).toBeFalsy();
@@ -204,10 +204,10 @@ describe("isValidVersion", () => {
     v.pool!.data!.protocol!.version = "1.0.0-beta.5";
 
     // local
-    v["runtime"].version = "1.0.0-beta.0";
+    v["runtime"].getVersion = jest.fn().mockReturnValue("1.0.0-beta.0");
 
     // ACT
-    const result = isValidVersion.call(v);
+    const result = await isValidVersion.call(v);
 
     // ASSERT
     expect(result).toBeFalsy();
@@ -220,10 +220,10 @@ describe("isValidVersion", () => {
     v.pool!.data!.protocol!.version = "1.0.0";
 
     // local
-    v["runtime"].version = "2.1.0";
+    v["runtime"].getVersion = jest.fn().mockReturnValue("2.1.0");
 
     // ACT
-    const result = isValidVersion.call(v);
+    const result = await isValidVersion.call(v);
 
     // ASSERT
     expect(result).toBeFalsy();
@@ -236,10 +236,10 @@ describe("isValidVersion", () => {
     v.pool!.data!.protocol!.version = "1.0.0";
 
     // local
-    v["runtime"].version = "2.1.1";
+    v["runtime"].getVersion = jest.fn().mockReturnValue("2.1.1");
 
     // ACT
-    const result = isValidVersion.call(v);
+    const result = await isValidVersion.call(v);
 
     // ASSERT
     expect(result).toBeFalsy();
@@ -252,10 +252,10 @@ describe("isValidVersion", () => {
     v.pool!.data!.protocol!.version = "1.0.0-alpha.3";
 
     // local
-    v["runtime"].version = "2.1.1-alpha.5";
+    v["runtime"].getVersion = jest.fn().mockReturnValue("2.1.1-alpha.5");
 
     // ACT
-    const result = isValidVersion.call(v);
+    const result = await isValidVersion.call(v);
 
     // ASSERT
     expect(result).toBeFalsy();
@@ -271,7 +271,7 @@ describe("isValidVersion", () => {
     v["runtime"] = null as any;
 
     // ACT
-    const result = isValidVersion.call(v);
+    const result = await isValidVersion.call(v);
 
     // ASSERT
     expect(result).toBeFalsy();

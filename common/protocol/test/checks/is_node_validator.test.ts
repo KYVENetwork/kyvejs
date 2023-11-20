@@ -1,9 +1,9 @@
-import { Logger } from "tslog";
-import { Validator } from "../../src/index";
-import { setupMetrics, isNodeValidator } from "../../src/methods";
-import { register } from "prom-client";
-import { TestRuntime } from "../mocks/runtime.mock";
-import { genesis_pool } from "../mocks/constants";
+import { Logger } from 'tslog';
+import { Validator } from '../../src';
+import { isNodeValidator, setupMetrics } from '../../src/methods';
+import { register } from 'prom-client';
+import { newTestValidator } from '../mocks/runtime.mock';
+import { genesis_pool } from '../mocks/constants';
 
 /*
 
@@ -19,7 +19,7 @@ describe("isNodeValidator", () => {
   let v: Validator;
 
   beforeEach(() => {
-    v = new Validator(new TestRuntime());
+    v = newTestValidator()
 
     // mock logger
     v.logger = new Logger();

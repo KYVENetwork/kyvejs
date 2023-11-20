@@ -14,15 +14,15 @@ export class DirectCall implements Call {
 
   constructor(method: any, responseType: any) {
     this.listener = {
-      onReceiveMessage(message: any) {},
-      onReceiveStatus(status: grpc.StatusObject) {},
-      onReceiveMetadata(metadata: Metadata) {},
+      onReceiveMessage(_message: any) {},
+      onReceiveStatus(_status: grpc.StatusObject) {},
+      onReceiveMetadata(_metadata: Metadata) {},
     };
     this.method = method;
     this.responseType = responseType;
   }
 
-  cancelWithStatus(status: grpc.status, details: string): void {}
+  cancelWithStatus(_status: grpc.status, _details: string): void {}
 
   getCallNumber(): number {
     return 0;
@@ -34,11 +34,11 @@ export class DirectCall implements Call {
 
   halfClose(): void {}
 
-  sendMessageWithContext(context: MessageContext, message: Buffer): void {
+  sendMessageWithContext(_context: MessageContext, _message: Buffer): void {
     const unaryCall = { request: {} };
 
     // calls the grpc method directly without using grpc
-    this.method(unaryCall, (error: Error | null, response: any) => {
+    this.method(unaryCall, (_error: Error | null, response: any) => {
       const value = this.responseType.create(response);
       const msg = Buffer.Buffer.from(this.responseType.encode(value).finish());
 
@@ -51,9 +51,9 @@ export class DirectCall implements Call {
     });
   }
 
-  setCredentials(credentials: grpc.CallCredentials): void {}
+  setCredentials(_credentials: grpc.CallCredentials): void {}
 
-  start(metadata: Metadata, listener: grpc.InterceptingListener): void {
+  start(_metadata: Metadata, listener: grpc.InterceptingListener): void {
     this.listener = listener;
   }
 
@@ -72,10 +72,10 @@ export class DirectChannel implements grpc.Channel {
 
   createCall(
     call: string,
-    deadline: grpc.Deadline,
-    host: string | null | undefined,
-    parentCall: ServerSurfaceCall | null,
-    propagateFlags: number | null | undefined
+    _deadline: grpc.Deadline,
+    _host: string | null | undefined,
+    _parentCall: ServerSurfaceCall | null,
+    _propagateFlags: number | null | undefined
   ): Call {
     // Extract the method name from the path
     // Example:  /kyverdk.runtime.v1.RuntimeService/GetRuntimeName -> GetRuntimeName
@@ -99,7 +99,7 @@ export class DirectChannel implements grpc.Channel {
     return { id: 0, kind: "channel", name: "" };
   }
 
-  getConnectivityState(tryToConnect: boolean): grpc.connectivityState {
+  getConnectivityState(_tryToConnect: boolean): grpc.connectivityState {
     return grpc.connectivityState.READY;
   }
 
@@ -108,8 +108,8 @@ export class DirectChannel implements grpc.Channel {
   }
 
   watchConnectivityState(
-    currentState: grpc.connectivityState,
-    deadline: Date | number,
-    callback: (error?: Error) => void
+    _currentState: grpc.connectivityState,
+    _deadline: Date | number,
+    _callback: (error?: Error) => void
   ): void {}
 }

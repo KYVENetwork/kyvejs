@@ -4,15 +4,15 @@ import {
   IStorageProvider,
   Validator,
   sha256,
-} from "../src/index";
-import { runNode } from "../src/methods/main/runNode";
+} from '../src';
+import { runNode } from '../src/methods';
 import { genesis_pool } from "./mocks/constants";
 import { client } from "./mocks/client.mock";
 import { lcd } from "./mocks/lcd.mock";
 import { TestCacheProvider } from "./mocks/cache.mock";
 import { setupMetrics } from "../src/methods";
 import { register } from "prom-client";
-import { TestRuntime } from "./mocks/runtime.mock";
+import { newTestValidator, TestConfig, TestRuntime } from './mocks/runtime.mock';
 import { TestNormalStorageProvider } from "./mocks/storageProvider.mock";
 import { TestNormalCompression } from "./mocks/compression.mock";
 
@@ -44,7 +44,7 @@ describe("propose bundle tests", () => {
   let compression: ICompression;
 
   beforeEach(() => {
-    v = new Validator(new TestRuntime());
+    v = newTestValidator()
 
     v["cacheProvider"] = new TestCacheProvider();
 
@@ -255,7 +255,6 @@ describe("propose bundle tests", () => {
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
     expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
-      expect.any(Validator),
       bundle
     );
 
@@ -417,7 +416,6 @@ describe("propose bundle tests", () => {
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
     expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
-      expect.any(Validator),
       bundle
     );
 
@@ -703,7 +701,6 @@ describe("propose bundle tests", () => {
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
     expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
-      expect.any(Validator),
       bundle
     );
 
@@ -856,7 +853,6 @@ describe("propose bundle tests", () => {
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
     expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
-      expect.any(Validator),
       bundle
     );
 
@@ -1009,7 +1005,6 @@ describe("propose bundle tests", () => {
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
     expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
-      expect.any(Validator),
       bundle
     );
 
@@ -1171,7 +1166,6 @@ describe("propose bundle tests", () => {
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
     expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
-      expect.any(Validator),
       bundle
     );
 
@@ -1467,7 +1461,6 @@ describe("propose bundle tests", () => {
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
     expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
-      expect.any(Validator),
       bundle
     );
 
@@ -1613,7 +1606,6 @@ describe("propose bundle tests", () => {
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
     expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
-      expect.any(Validator),
       bundle
     );
 
@@ -1762,7 +1754,6 @@ describe("propose bundle tests", () => {
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
     expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
-      expect.any(Validator),
       bundle
     );
 
