@@ -8,8 +8,8 @@ import { version as protocolVersion } from "../package.json";
 import {
   parseCache,
   parseEndpoints,
-  parseValaccount,
   parsePoolId,
+  parseValaccount,
 } from "./commander";
 import {
   archiveDebugBundle,
@@ -19,6 +19,14 @@ import {
   continueRound,
   createBundleProposal,
   getBalancesForMetrics,
+  isDataAvailable,
+  isNodeValidator,
+  isPoolActive,
+  isStorageBalanceLow,
+  isStorageBalanceZero,
+  isValidRuntime,
+  isValidVersion,
+  parseProposedBundle,
   runCache,
   runNode,
   saveBundleDownload,
@@ -31,29 +39,22 @@ import {
   skipUploaderRole,
   submitBundleProposal,
   syncPoolState,
-  parseProposedBundle,
   validateBundleProposal,
-  isNodeValidator,
-  isPoolActive,
-  isValidRuntime,
-  isStorageBalanceZero,
-  isValidVersion,
-  isDataAvailable,
   voteBundleProposal,
   waitForAuthorization,
   waitForCacheContinuation,
   waitForNextBundleProposal,
   waitForUploadInterval,
-  isStorageBalanceLow,
 } from "./methods";
 
-import { ICacheProvider, IMetrics, IRuntime } from "./types";
+import { ICacheProvider, IMetrics, IRuntime, RunConfig } from "./types";
 import { IDLE_TIME, sleep, standardizeError } from "./utils";
 
 import { SupportedChains } from "@kyvejs/sdk/dist/constants";
 import { storageProviderFactory } from "./reactors/storageProviders";
 import { compressionFactory } from "./reactors/compression";
 import { cacheProviderFactory } from "./reactors/cacheProvider";
+import GrpcRuntime from "./runtime/runtime";
 
 /**
  * Main class of KYVE protocol nodes representing a validator node.
@@ -162,11 +163,11 @@ export class Validator {
    * runtime class here in order to run the
    *
    * @method constructor
-   * @param {IRuntime} runtime which implements the interface IRuntime
+   * @param {RunConfig} runConfig that defines the runtime
    */
-  constructor(runtime: IRuntime) {
+  constructor(runConfig: RunConfig) {
     // set provided runtime
-    this.runtime = runtime;
+    this.runtime = new GrpcRuntime(runConfig);
 
     // set @kyvejs/protocol version
     this.protocolVersion = protocolVersion;
