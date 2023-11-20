@@ -1,5 +1,5 @@
 import * as grpc from "@grpc/grpc-js";
-import { Metadata } from "@grpc/grpc-js";
+import { Metadata, ServiceError } from "@grpc/grpc-js";
 import { ChannelRef } from "@grpc/grpc-js/build/src/channelz";
 import { ServerSurfaceCall } from "@grpc/grpc-js/build/src/server-call";
 import { Call, MessageContext } from "@grpc/grpc-js/build/src/call-interface";
@@ -10,15 +10,17 @@ import * as Buffer from "buffer";
 export class DirectCall implements Call {
   private listener: grpc.InterceptingListener;
   private method: any;
+  private requestType: any;
   private responseType: any;
 
-  constructor(method: any, responseType: any) {
+  constructor(method: any, requestType: any, responseType: any) {
     this.listener = {
       onReceiveMessage(_message: any) {},
       onReceiveStatus(_status: grpc.StatusObject) {},
       onReceiveMetadata(_metadata: Metadata) {},
     };
     this.method = method;
+    this.requestType = requestType;
     this.responseType = responseType;
   }
 
@@ -34,21 +36,32 @@ export class DirectCall implements Call {
 
   halfClose(): void {}
 
-  sendMessageWithContext(_context: MessageContext, _message: Buffer): void {
-    const unaryCall = { request: {} };
+  sendMessageWithContext(_context: MessageContext, message: Buffer): void {
+    const payload = this.requestType.decode(message);
+    console.debug(`Payload: ${JSON.stringify(payload)}`);
 
     // calls the grpc method directly without using grpc
-    this.method(unaryCall, (_error: Error | null, response: any) => {
-      const value = this.responseType.create(response);
-      const msg = Buffer.Buffer.from(this.responseType.encode(value).finish());
+    this.method(
+      { request: payload },
+      (error: ServiceError | null, response: any) => {
+        if (error) {
+          this.listener.onReceiveStatus(error);
+          return;
+        }
 
-      this.listener.onReceiveMessage(msg);
-      this.listener.onReceiveStatus({
-        code: grpc.status.OK,
-        details: "",
-        metadata: new Metadata(),
-      });
-    });
+        const value = this.responseType.create(response);
+        const msg = Buffer.Buffer.from(
+          this.responseType.encode(value).finish()
+        );
+
+        this.listener.onReceiveMessage(msg);
+        this.listener.onReceiveStatus({
+          code: grpc.status.OK,
+          details: "",
+          metadata: new Metadata(),
+        });
+      }
+    );
   }
 
   setCredentials(_credentials: grpc.CallCredentials): void {}
@@ -62,10 +75,10 @@ export class DirectCall implements Call {
 
 // @ts-ignore
 export class DirectChannel implements grpc.Channel {
-  private grpcServices: {};
+  private services: {};
 
-  constructor(fakeService: {}) {
-    this.grpcServices = fakeService;
+  constructor(services: {}) {
+    this.services = services;
   }
 
   close(): void {}
@@ -85,14 +98,24 @@ export class DirectChannel implements grpc.Channel {
     const camelCaseCallName =
       callName.charAt(0).toLowerCase() + callName.slice(1);
 
+    // Get the request type from the runtime service
+    // Example: GetRuntimeName -> GetRuntimeNameRequest
+    // @ts-ignore
+    const requestType: any = runtime[`${callName}Request`];
+
     // Get the response type from the runtime service
     // Example: GetRuntimeName -> GetRuntimeNameResponse
     // @ts-ignore
     const responseType: any = runtime[`${callName}Response`];
 
     // @ts-ignore
-    const method = this.grpcServices[camelCaseCallName];
-    return new DirectCall(method, responseType);
+    const method = this.services[camelCaseCallName];
+
+    console.debug(
+      `Call method ${method.name} ${callName}Request -> ${callName}Response`
+    );
+
+    return new DirectCall(method, requestType, responseType);
   }
 
   getChannelzRef(): ChannelRef {

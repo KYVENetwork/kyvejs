@@ -1,9 +1,9 @@
-import { Logger } from 'tslog';
-import { Validator } from '../../src';
-import { isNodeValidator, setupMetrics } from '../../src/methods';
-import { register } from 'prom-client';
-import { newTestValidator } from '../mocks/runtime.mock';
-import { genesis_pool } from '../mocks/constants';
+import { Logger } from "tslog";
+import { Validator } from "../../src";
+import { isNodeValidator, setupMetrics } from "../../src/methods";
+import { register } from "prom-client";
+import { newTestValidator } from "../mocks/runtime.mock";
+import { genesis_pool } from "../mocks/constants";
 
 /*
 
@@ -19,7 +19,7 @@ describe("isNodeValidator", () => {
   let v: Validator;
 
   beforeEach(() => {
-    v = newTestValidator()
+    v = newTestValidator();
 
     // mock logger
     v.logger = new Logger();
@@ -31,7 +31,7 @@ describe("isNodeValidator", () => {
     v.logger.fatal = jest.fn();
 
     v.pool = {
-      ...genesis_pool,
+      ...genesis_pool
     } as any;
 
     setupMetrics.call(v);
@@ -47,7 +47,7 @@ describe("isNodeValidator", () => {
     v.pool.stakers = [
       "kyve1jq304cthpx0lwhpqzrdjrcza559ukyy3zsl2vd",
       "kyve1hvg7zsnrj6h29q9ss577mhrxa04rn94h7zjugq",
-      "kyve1ay22rr3kz659fupu0tcswlagq4ql6rwm4nuv0s",
+      "kyve1ay22rr3kz659fupu0tcswlagq4ql6rwm4nuv0s"
     ];
     v["staker"] = "kyve1jq304cthpx0lwhpqzrdjrcza559ukyy3zsl2vd";
 
@@ -63,7 +63,7 @@ describe("isNodeValidator", () => {
     v.pool.stakers = [
       "kyve1jq304cthpx0lwhpqzrdjrcza559ukyy3zsl2vd",
       "kyve1hvg7zsnrj6h29q9ss577mhrxa04rn94h7zjugq",
-      "kyve1ay22rr3kz659fupu0tcswlagq4ql6rwm4nuv0s",
+      "kyve1ay22rr3kz659fupu0tcswlagq4ql6rwm4nuv0s"
     ];
     v["staker"] = "kyve1u7ukf2nv6v5j5y2yqprm8yqruue2rlmrkx4xgq";
 

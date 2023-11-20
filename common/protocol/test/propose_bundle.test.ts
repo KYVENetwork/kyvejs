@@ -1,18 +1,12 @@
 import { Logger } from "tslog";
-import {
-  ICompression,
-  IStorageProvider,
-  Validator,
-  sha256,
-} from '../src';
-import { runNode } from '../src/methods';
+import { ICompression, IStorageProvider, sha256, Validator } from "../src";
+import { runNode, setupMetrics } from "../src/methods";
 import { genesis_pool } from "./mocks/constants";
 import { client } from "./mocks/client.mock";
 import { lcd } from "./mocks/lcd.mock";
 import { TestCacheProvider } from "./mocks/cache.mock";
-import { setupMetrics } from "../src/methods";
 import { register } from "prom-client";
-import { newTestValidator, TestConfig, TestRuntime } from './mocks/runtime.mock';
+import { newTestValidator } from "./mocks/runtime.mock";
 import { TestNormalStorageProvider } from "./mocks/storageProvider.mock";
 import { TestNormalCompression } from "./mocks/compression.mock";
 
@@ -44,7 +38,7 @@ describe("propose bundle tests", () => {
   let compression: ICompression;
 
   beforeEach(() => {
-    v = newTestValidator()
+    v = newTestValidator();
 
     v["cacheProvider"] = new TestCacheProvider();
 
@@ -110,7 +104,7 @@ describe("propose bundle tests", () => {
     // ARRANGE
     v["lcd"][0].kyve.query.v1beta1.canVote = jest.fn().mockResolvedValue({
       possible: false,
-      reason: "Already voted",
+      reason: "Already voted"
     });
 
     v["syncPoolState"] = jest.fn().mockImplementation(() => {
@@ -119,7 +113,7 @@ describe("propose bundle tests", () => {
         data: {
           ...genesis_pool.data,
           current_index: "100",
-          current_key: "99",
+          current_key: "99"
         },
         bundle_proposal: {
           ...genesis_pool.bundle_proposal,
@@ -133,28 +127,28 @@ describe("propose bundle tests", () => {
           to_key: "101",
           bundle_summary: "previous_test_value",
           updated_at: "0",
-          voters_valid: ["test_staker"],
-        },
+          voters_valid: ["test_staker"]
+        }
       } as any;
     });
 
     const bundle = [
       {
         key: "test_key_1",
-        value: "test_value_1",
+        value: "test_value_1"
       },
       {
         key: "test_key_2",
-        value: "test_value_2",
+        value: "test_value_2"
       },
       {
         key: "test_key_3",
-        value: "test_value_3",
+        value: "test_value_3"
       },
       {
         key: "test_key_4",
-        value: "test_value_4",
-      },
+        value: "test_value_4"
+      }
     ];
 
     await v["cacheProvider"].put("102", bundle[0]);
@@ -190,7 +184,7 @@ describe("propose bundle tests", () => {
       bundle_size: "4",
       from_key: "test_key_1",
       to_key: "test_key_4",
-      bundle_summary: JSON.stringify(bundle),
+      bundle_summary: JSON.stringify(bundle)
     });
 
     expect(txs.skipUploaderRole).toHaveBeenCalledTimes(0);
@@ -204,7 +198,7 @@ describe("propose bundle tests", () => {
       staker: "test_staker",
       pool_id: "0",
       voter: "test_valaddress",
-      storage_id: "another_test_storage_id",
+      storage_id: "another_test_storage_id"
     });
 
     expect(queries.canPropose).toHaveBeenCalledTimes(1);
@@ -212,7 +206,7 @@ describe("propose bundle tests", () => {
       staker: "test_staker",
       pool_id: "0",
       proposer: "test_valaddress",
-      from_index: "102",
+      from_index: "102"
     });
 
     // =========================
@@ -254,9 +248,7 @@ describe("propose bundle tests", () => {
     // =========================
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
-      bundle
-    );
+    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(bundle);
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(0);
 
@@ -278,7 +270,7 @@ describe("propose bundle tests", () => {
     // ARRANGE
     v["lcd"][0].kyve.query.v1beta1.canVote = jest.fn().mockResolvedValue({
       possible: false,
-      reason: "Already voted",
+      reason: "Already voted"
     });
 
     storageProvider = new TestNormalStorageProvider();
@@ -291,7 +283,7 @@ describe("propose bundle tests", () => {
         data: {
           ...genesis_pool.data,
           current_index: "100",
-          current_key: "99",
+          current_key: "99"
         },
         bundle_proposal: {
           ...genesis_pool.bundle_proposal,
@@ -305,28 +297,28 @@ describe("propose bundle tests", () => {
           to_key: "101",
           bundle_summary: "previous_test_value",
           updated_at: "0",
-          voters_valid: ["test_staker"],
-        },
+          voters_valid: ["test_staker"]
+        }
       } as any;
     });
 
     const bundle = [
       {
         key: "test_key_1",
-        value: "test_value_1",
+        value: "test_value_1"
       },
       {
         key: "test_key_2",
-        value: "test_value_2",
+        value: "test_value_2"
       },
       {
         key: "test_key_3",
-        value: "test_value_3",
+        value: "test_value_3"
       },
       {
         key: "test_key_4",
-        value: "test_value_4",
-      },
+        value: "test_value_4"
+      }
     ];
 
     await v["cacheProvider"].put("102", bundle[0]);
@@ -357,7 +349,7 @@ describe("propose bundle tests", () => {
     expect(txs.skipUploaderRole).toHaveBeenCalledWith({
       from_index: "102",
       pool_id: "0",
-      staker: "test_staker",
+      staker: "test_staker"
     });
 
     // =====================
@@ -369,7 +361,7 @@ describe("propose bundle tests", () => {
       staker: "test_staker",
       pool_id: "0",
       voter: "test_valaddress",
-      storage_id: "another_test_storage_id",
+      storage_id: "another_test_storage_id"
     });
 
     expect(queries.canPropose).toHaveBeenCalledTimes(1);
@@ -377,7 +369,7 @@ describe("propose bundle tests", () => {
       staker: "test_staker",
       pool_id: "0",
       proposer: "test_valaddress",
-      from_index: "102",
+      from_index: "102"
     });
 
     // =========================
@@ -415,9 +407,7 @@ describe("propose bundle tests", () => {
     // =========================
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
-      bundle
-    );
+    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(bundle);
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(0);
 
@@ -439,7 +429,7 @@ describe("propose bundle tests", () => {
     // ARRANGE
     v["lcd"][0].kyve.query.v1beta1.canVote = jest.fn().mockResolvedValue({
       possible: false,
-      reason: "Already voted",
+      reason: "Already voted"
     });
 
     v["syncPoolState"] = jest.fn().mockImplementation(() => {
@@ -448,7 +438,7 @@ describe("propose bundle tests", () => {
         data: {
           ...genesis_pool.data,
           current_index: "100",
-          current_key: "99",
+          current_key: "99"
         },
         bundle_proposal: {
           ...genesis_pool.bundle_proposal,
@@ -462,20 +452,20 @@ describe("propose bundle tests", () => {
           to_key: "101",
           bundle_summary: "previous_test_value",
           updated_at: "0",
-          voters_valid: ["test_staker"],
-        },
+          voters_valid: ["test_staker"]
+        }
       } as any;
     });
 
     const bundle = [
       {
         key: "test_key_1",
-        value: "test_value_1",
+        value: "test_value_1"
       },
       {
         key: "test_key_2",
-        value: "test_value_2",
-      },
+        value: "test_value_2"
+      }
     ];
 
     // ACT
@@ -502,7 +492,7 @@ describe("propose bundle tests", () => {
     expect(txs.skipUploaderRole).toHaveBeenLastCalledWith({
       staker: "test_staker",
       pool_id: "0",
-      from_index: "102",
+      from_index: "102"
     });
 
     // =====================
@@ -514,7 +504,7 @@ describe("propose bundle tests", () => {
       staker: "test_staker",
       pool_id: "0",
       voter: "test_valaddress",
-      storage_id: "another_test_storage_id",
+      storage_id: "another_test_storage_id"
     });
 
     expect(queries.canPropose).toHaveBeenCalledTimes(1);
@@ -522,7 +512,7 @@ describe("propose bundle tests", () => {
       staker: "test_staker",
       pool_id: "0",
       proposer: "test_valaddress",
-      from_index: "102",
+      from_index: "102"
     });
 
     // =========================
@@ -574,7 +564,7 @@ describe("propose bundle tests", () => {
     // ARRANGE
     v["lcd"][0].kyve.query.v1beta1.canVote = jest.fn().mockResolvedValue({
       possible: false,
-      reason: "Already voted",
+      reason: "Already voted"
     });
 
     v["syncPoolState"] = jest.fn().mockImplementation(() => {
@@ -583,7 +573,7 @@ describe("propose bundle tests", () => {
         data: {
           ...genesis_pool.data,
           current_index: "100",
-          current_key: "99",
+          current_key: "99"
         },
         bundle_proposal: {
           ...genesis_pool.bundle_proposal,
@@ -596,20 +586,20 @@ describe("propose bundle tests", () => {
           from_key: "",
           to_key: "",
           bundle_summary: "",
-          updated_at: "0",
-        },
+          updated_at: "0"
+        }
       } as any;
     });
 
     const bundle = [
       {
         key: "test_key_1",
-        value: "test_value_1",
+        value: "test_value_1"
       },
       {
         key: "test_key_2",
-        value: "test_value_2",
-      },
+        value: "test_value_2"
+      }
     ];
 
     await v["cacheProvider"].put("100", bundle[0]);
@@ -644,7 +634,7 @@ describe("propose bundle tests", () => {
       bundle_size: "2",
       from_key: "test_key_1",
       to_key: "test_key_2",
-      bundle_summary: JSON.stringify(bundle),
+      bundle_summary: JSON.stringify(bundle)
     });
 
     expect(txs.skipUploaderRole).toHaveBeenCalledTimes(0);
@@ -660,7 +650,7 @@ describe("propose bundle tests", () => {
       staker: "test_staker",
       pool_id: "0",
       proposer: "test_valaddress",
-      from_index: "100",
+      from_index: "100"
     });
 
     // =========================
@@ -700,9 +690,7 @@ describe("propose bundle tests", () => {
     // =========================
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
-      bundle
-    );
+    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(bundle);
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(0);
 
@@ -724,7 +712,7 @@ describe("propose bundle tests", () => {
     // ARRANGE
     v["lcd"][0].kyve.query.v1beta1.canVote = jest.fn().mockResolvedValue({
       possible: false,
-      reason: "Already voted",
+      reason: "Already voted"
     });
 
     storageProvider.saveBundle = jest.fn().mockRejectedValue(new Error());
@@ -735,7 +723,7 @@ describe("propose bundle tests", () => {
         data: {
           ...genesis_pool.data,
           current_index: "100",
-          current_key: "99",
+          current_key: "99"
         },
         bundle_proposal: {
           ...genesis_pool.bundle_proposal,
@@ -749,20 +737,20 @@ describe("propose bundle tests", () => {
           to_key: "101",
           bundle_summary: "previous_test_value",
           updated_at: "0",
-          voters_valid: ["test_staker"],
-        },
+          voters_valid: ["test_staker"]
+        }
       } as any;
     });
 
     const bundle = [
       {
         key: "test_key_1",
-        value: "test_value_1",
+        value: "test_value_1"
       },
       {
         key: "test_key_2",
-        value: "test_value_2",
-      },
+        value: "test_value_2"
+      }
     ];
 
     await v["cacheProvider"].put("102", bundle[0]);
@@ -792,7 +780,7 @@ describe("propose bundle tests", () => {
     expect(txs.skipUploaderRole).toHaveBeenLastCalledWith({
       staker: "test_staker",
       pool_id: "0",
-      from_index: "102",
+      from_index: "102"
     });
 
     // =====================
@@ -804,7 +792,7 @@ describe("propose bundle tests", () => {
       staker: "test_staker",
       pool_id: "0",
       voter: "test_valaddress",
-      storage_id: "another_test_storage_id",
+      storage_id: "another_test_storage_id"
     });
 
     expect(queries.canPropose).toHaveBeenCalledTimes(1);
@@ -812,7 +800,7 @@ describe("propose bundle tests", () => {
       staker: "test_staker",
       pool_id: "0",
       proposer: "test_valaddress",
-      from_index: "102",
+      from_index: "102"
     });
 
     // =========================
@@ -852,9 +840,7 @@ describe("propose bundle tests", () => {
     // =========================
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
-      bundle
-    );
+    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(bundle);
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(0);
 
@@ -876,7 +862,7 @@ describe("propose bundle tests", () => {
     // ARRANGE
     v["lcd"][0].kyve.query.v1beta1.canVote = jest.fn().mockResolvedValue({
       possible: false,
-      reason: "Already voted",
+      reason: "Already voted"
     });
 
     storageProvider.saveBundle = jest.fn().mockResolvedValue(null);
@@ -887,7 +873,7 @@ describe("propose bundle tests", () => {
         data: {
           ...genesis_pool.data,
           current_index: "100",
-          current_key: "99",
+          current_key: "99"
         },
         bundle_proposal: {
           ...genesis_pool.bundle_proposal,
@@ -901,20 +887,20 @@ describe("propose bundle tests", () => {
           to_key: "101",
           bundle_summary: "previous_test_value",
           updated_at: "0",
-          voters_valid: ["test_staker"],
-        },
+          voters_valid: ["test_staker"]
+        }
       } as any;
     });
 
     const bundle = [
       {
         key: "test_key_1",
-        value: "test_value_1",
+        value: "test_value_1"
       },
       {
         key: "test_key_2",
-        value: "test_value_2",
-      },
+        value: "test_value_2"
+      }
     ];
 
     await v["cacheProvider"].put("102", bundle[0]);
@@ -944,7 +930,7 @@ describe("propose bundle tests", () => {
     expect(txs.skipUploaderRole).toHaveBeenLastCalledWith({
       staker: "test_staker",
       pool_id: "0",
-      from_index: "102",
+      from_index: "102"
     });
 
     // =====================
@@ -956,7 +942,7 @@ describe("propose bundle tests", () => {
       staker: "test_staker",
       pool_id: "0",
       voter: "test_valaddress",
-      storage_id: "another_test_storage_id",
+      storage_id: "another_test_storage_id"
     });
 
     expect(queries.canPropose).toHaveBeenCalledTimes(1);
@@ -964,7 +950,7 @@ describe("propose bundle tests", () => {
       staker: "test_staker",
       pool_id: "0",
       proposer: "test_valaddress",
-      from_index: "102",
+      from_index: "102"
     });
 
     // =========================
@@ -1004,9 +990,7 @@ describe("propose bundle tests", () => {
     // =========================
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
-      bundle
-    );
+    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(bundle);
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(0);
 
@@ -1028,7 +1012,7 @@ describe("propose bundle tests", () => {
     // ARRANGE
     v["lcd"][0].kyve.query.v1beta1.canVote = jest.fn().mockResolvedValue({
       possible: false,
-      reason: "Already voted",
+      reason: "Already voted"
     });
 
     v["client"][0].kyve.bundles.v1beta1.submitBundleProposal = jest
@@ -1041,7 +1025,7 @@ describe("propose bundle tests", () => {
         data: {
           ...genesis_pool.data,
           current_index: "100",
-          current_key: "99",
+          current_key: "99"
         },
         bundle_proposal: {
           ...genesis_pool.bundle_proposal,
@@ -1055,20 +1039,20 @@ describe("propose bundle tests", () => {
           to_key: "101",
           bundle_summary: "previous_test_value",
           updated_at: "0",
-          voters_valid: ["test_staker"],
-        },
+          voters_valid: ["test_staker"]
+        }
       } as any;
     });
 
     const bundle = [
       {
         key: "test_key_1",
-        value: "test_value_1",
+        value: "test_value_1"
       },
       {
         key: "test_key_2",
-        value: "test_value_2",
-      },
+        value: "test_value_2"
+      }
     ];
 
     await v["cacheProvider"].put("102", bundle[0]);
@@ -1103,7 +1087,7 @@ describe("propose bundle tests", () => {
       bundle_size: "2",
       from_key: "test_key_1",
       to_key: "test_key_2",
-      bundle_summary: JSON.stringify(bundle),
+      bundle_summary: JSON.stringify(bundle)
     });
 
     expect(txs.skipUploaderRole).toHaveBeenCalledTimes(0);
@@ -1117,7 +1101,7 @@ describe("propose bundle tests", () => {
       staker: "test_staker",
       pool_id: "0",
       voter: "test_valaddress",
-      storage_id: "another_test_storage_id",
+      storage_id: "another_test_storage_id"
     });
 
     expect(queries.canPropose).toHaveBeenCalledTimes(1);
@@ -1125,7 +1109,7 @@ describe("propose bundle tests", () => {
       staker: "test_staker",
       pool_id: "0",
       proposer: "test_valaddress",
-      from_index: "102",
+      from_index: "102"
     });
 
     // =========================
@@ -1165,9 +1149,7 @@ describe("propose bundle tests", () => {
     // =========================
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
-      bundle
-    );
+    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(bundle);
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(0);
 
@@ -1189,7 +1171,7 @@ describe("propose bundle tests", () => {
     // ARRANGE
     v["lcd"][0].kyve.query.v1beta1.canVote = jest.fn().mockResolvedValue({
       possible: false,
-      reason: "Already voted",
+      reason: "Already voted"
     });
 
     v["client"][0].kyve.bundles.v1beta1.skipUploaderRole = jest
@@ -1202,7 +1184,7 @@ describe("propose bundle tests", () => {
         data: {
           ...genesis_pool.data,
           current_index: "100",
-          current_key: "99",
+          current_key: "99"
         },
         bundle_proposal: {
           ...genesis_pool.bundle_proposal,
@@ -1216,20 +1198,20 @@ describe("propose bundle tests", () => {
           to_key: "101",
           bundle_summary: "previous_test_value",
           updated_at: "0",
-          voters_valid: ["test_staker"],
-        },
+          voters_valid: ["test_staker"]
+        }
       } as any;
     });
 
     const bundle = [
       {
         key: "test_key_1",
-        value: "test_value_1",
+        value: "test_value_1"
       },
       {
         key: "test_key_2",
-        value: "test_value_2",
-      },
+        value: "test_value_2"
+      }
     ];
 
     // ACT
@@ -1256,7 +1238,7 @@ describe("propose bundle tests", () => {
     expect(txs.skipUploaderRole).toHaveBeenLastCalledWith({
       staker: "test_staker",
       pool_id: "0",
-      from_index: "102",
+      from_index: "102"
     });
 
     // =====================
@@ -1268,7 +1250,7 @@ describe("propose bundle tests", () => {
       staker: "test_staker",
       pool_id: "0",
       voter: "test_valaddress",
-      storage_id: "another_test_storage_id",
+      storage_id: "another_test_storage_id"
     });
 
     expect(queries.canPropose).toHaveBeenCalledTimes(1);
@@ -1276,7 +1258,7 @@ describe("propose bundle tests", () => {
       staker: "test_staker",
       pool_id: "0",
       proposer: "test_valaddress",
-      from_index: "102",
+      from_index: "102"
     });
 
     // =========================
@@ -1328,7 +1310,7 @@ describe("propose bundle tests", () => {
     // ARRANGE
     v["lcd"][0].kyve.query.v1beta1.canVote = jest.fn().mockResolvedValue({
       possible: false,
-      reason: "Already voted",
+      reason: "Already voted"
     });
 
     storageProvider.saveBundle = jest.fn().mockRejectedValue(new Error());
@@ -1343,7 +1325,7 @@ describe("propose bundle tests", () => {
         data: {
           ...genesis_pool.data,
           current_index: "100",
-          current_key: "99",
+          current_key: "99"
         },
         bundle_proposal: {
           ...genesis_pool.bundle_proposal,
@@ -1357,20 +1339,20 @@ describe("propose bundle tests", () => {
           to_key: "101",
           bundle_summary: "previous_test_value",
           updated_at: "0",
-          voters_valid: ["test_staker"],
-        },
+          voters_valid: ["test_staker"]
+        }
       } as any;
     });
 
     const bundle = [
       {
         key: "test_key_1",
-        value: "test_value_1",
+        value: "test_value_1"
       },
       {
         key: "test_key_2",
-        value: "test_value_2",
-      },
+        value: "test_value_2"
+      }
     ];
 
     await v["cacheProvider"].put("102", bundle[0]);
@@ -1400,7 +1382,7 @@ describe("propose bundle tests", () => {
     expect(txs.skipUploaderRole).toHaveBeenLastCalledWith({
       staker: "test_staker",
       pool_id: "0",
-      from_index: "102",
+      from_index: "102"
     });
 
     // =====================
@@ -1412,7 +1394,7 @@ describe("propose bundle tests", () => {
       staker: "test_staker",
       pool_id: "0",
       voter: "test_valaddress",
-      storage_id: "another_test_storage_id",
+      storage_id: "another_test_storage_id"
     });
 
     expect(queries.canPropose).toHaveBeenCalledTimes(1);
@@ -1420,7 +1402,7 @@ describe("propose bundle tests", () => {
       staker: "test_staker",
       pool_id: "0",
       proposer: "test_valaddress",
-      from_index: "102",
+      from_index: "102"
     });
 
     // =========================
@@ -1460,9 +1442,7 @@ describe("propose bundle tests", () => {
     // =========================
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
-      bundle
-    );
+    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(bundle);
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(0);
 
@@ -1484,7 +1464,7 @@ describe("propose bundle tests", () => {
     // ARRANGE
     v["lcd"][0].kyve.query.v1beta1.canVote = jest.fn().mockResolvedValue({
       possible: false,
-      reason: "Already voted",
+      reason: "Already voted"
     });
 
     v["runtime"].summarizeDataBundle = jest.fn().mockRejectedValue(new Error());
@@ -1495,7 +1475,7 @@ describe("propose bundle tests", () => {
         data: {
           ...genesis_pool.data,
           current_index: "100",
-          current_key: "99",
+          current_key: "99"
         },
         bundle_proposal: {
           ...genesis_pool.bundle_proposal,
@@ -1509,20 +1489,20 @@ describe("propose bundle tests", () => {
           to_key: "101",
           bundle_summary: "previous_test_value",
           updated_at: "0",
-          voters_valid: ["test_staker"],
-        },
+          voters_valid: ["test_staker"]
+        }
       } as any;
     });
 
     const bundle = [
       {
         key: "test_key_1",
-        value: "test_value_1",
+        value: "test_value_1"
       },
       {
         key: "test_key_2",
-        value: "test_value_2",
-      },
+        value: "test_value_2"
+      }
     ];
 
     await v["cacheProvider"].put("102", bundle[0]);
@@ -1552,7 +1532,7 @@ describe("propose bundle tests", () => {
     expect(txs.skipUploaderRole).toHaveBeenLastCalledWith({
       staker: "test_staker",
       pool_id: "0",
-      from_index: "102",
+      from_index: "102"
     });
 
     // =====================
@@ -1564,7 +1544,7 @@ describe("propose bundle tests", () => {
       staker: "test_staker",
       pool_id: "0",
       voter: "test_valaddress",
-      storage_id: "another_test_storage_id",
+      storage_id: "another_test_storage_id"
     });
 
     expect(queries.canPropose).toHaveBeenCalledTimes(1);
@@ -1572,7 +1552,7 @@ describe("propose bundle tests", () => {
       staker: "test_staker",
       pool_id: "0",
       proposer: "test_valaddress",
-      from_index: "102",
+      from_index: "102"
     });
 
     // =========================
@@ -1605,9 +1585,7 @@ describe("propose bundle tests", () => {
     // =========================
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
-      bundle
-    );
+    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(bundle);
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(0);
 
@@ -1629,7 +1607,7 @@ describe("propose bundle tests", () => {
     // ARRANGE
     v["lcd"][0].kyve.query.v1beta1.canVote = jest.fn().mockResolvedValue({
       possible: false,
-      reason: "Already voted",
+      reason: "Already voted"
     });
 
     compression.compress = jest.fn().mockRejectedValue(new Error());
@@ -1640,7 +1618,7 @@ describe("propose bundle tests", () => {
         data: {
           ...genesis_pool.data,
           current_index: "100",
-          current_key: "99",
+          current_key: "99"
         },
         bundle_proposal: {
           ...genesis_pool.bundle_proposal,
@@ -1654,20 +1632,20 @@ describe("propose bundle tests", () => {
           to_key: "101",
           bundle_summary: "previous_test_value",
           updated_at: "0",
-          voters_valid: ["test_staker"],
-        },
+          voters_valid: ["test_staker"]
+        }
       } as any;
     });
 
     const bundle = [
       {
         key: "test_key_1",
-        value: "test_value_1",
+        value: "test_value_1"
       },
       {
         key: "test_key_2",
-        value: "test_value_2",
-      },
+        value: "test_value_2"
+      }
     ];
 
     await v["cacheProvider"].put("102", bundle[0]);
@@ -1697,7 +1675,7 @@ describe("propose bundle tests", () => {
     expect(txs.skipUploaderRole).toHaveBeenLastCalledWith({
       staker: "test_staker",
       pool_id: "0",
-      from_index: "102",
+      from_index: "102"
     });
 
     // =====================
@@ -1709,7 +1687,7 @@ describe("propose bundle tests", () => {
       staker: "test_staker",
       pool_id: "0",
       voter: "test_valaddress",
-      storage_id: "another_test_storage_id",
+      storage_id: "another_test_storage_id"
     });
 
     expect(queries.canPropose).toHaveBeenCalledTimes(1);
@@ -1717,7 +1695,7 @@ describe("propose bundle tests", () => {
       staker: "test_staker",
       pool_id: "0",
       proposer: "test_valaddress",
-      from_index: "102",
+      from_index: "102"
     });
 
     // =========================
@@ -1753,9 +1731,7 @@ describe("propose bundle tests", () => {
     // =========================
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
-      bundle
-    );
+    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(bundle);
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(0);
 

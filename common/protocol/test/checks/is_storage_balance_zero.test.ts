@@ -1,10 +1,10 @@
-import { Logger } from 'tslog';
-import { IStorageProvider, Validator } from '../../src';
-import { isStorageBalanceZero, setupMetrics } from '../../src/methods';
-import { register } from 'prom-client';
-import { newTestValidator } from '../mocks/runtime.mock';
-import { genesis_pool } from '../mocks/constants';
-import { TestNormalStorageProvider } from '../mocks/storageProvider.mock';
+import { Logger } from "tslog";
+import { IStorageProvider, Validator } from "../../src";
+import { isStorageBalanceZero, setupMetrics } from "../../src/methods";
+import { register } from "prom-client";
+import { newTestValidator } from "../mocks/runtime.mock";
+import { genesis_pool } from "../mocks/constants";
+import { TestNormalStorageProvider } from "../mocks/storageProvider.mock";
 
 /*
 
@@ -23,7 +23,7 @@ describe("isStorageBalanceZero", () => {
   let storageProvider: IStorageProvider;
 
   beforeEach(() => {
-    v = newTestValidator()
+    v = newTestValidator();
 
     // mock logger
     v.logger = new Logger();
@@ -35,7 +35,7 @@ describe("isStorageBalanceZero", () => {
     v.logger.fatal = jest.fn();
 
     v.pool = {
-      ...genesis_pool,
+      ...genesis_pool
     } as any;
 
     setupMetrics.call(v);

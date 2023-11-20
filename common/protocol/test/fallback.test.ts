@@ -1,14 +1,14 @@
-import { Logger } from 'tslog';
-import { ICompression, IStorageProvider, sha256, Validator } from '../src';
-import { runNode, setupMetrics } from '../src/methods';
-import { genesis_pool } from './mocks/constants';
-import { client } from './mocks/client.mock';
-import { lcd } from './mocks/lcd.mock';
-import { TestNormalStorageProvider } from './mocks/storageProvider.mock';
-import { TestCacheProvider } from './mocks/cache.mock';
-import { TestNormalCompression } from './mocks/compression.mock';
-import { register } from 'prom-client';
-import { newTestValidator } from './mocks/runtime.mock';
+import { Logger } from "tslog";
+import { ICompression, IStorageProvider, sha256, Validator } from "../src";
+import { runNode, setupMetrics } from "../src/methods";
+import { genesis_pool } from "./mocks/constants";
+import { client } from "./mocks/client.mock";
+import { lcd } from "./mocks/lcd.mock";
+import { TestNormalStorageProvider } from "./mocks/storageProvider.mock";
+import { TestCacheProvider } from "./mocks/cache.mock";
+import { TestNormalCompression } from "./mocks/compression.mock";
+import { register } from "prom-client";
+import { newTestValidator } from "./mocks/runtime.mock";
 
 /*
 
@@ -34,7 +34,7 @@ describe("fallback tests", () => {
   let compression: ICompression;
 
   beforeEach(() => {
-    v = newTestValidator()
+    v = newTestValidator();
 
     v["cacheProvider"] = new TestCacheProvider();
 
@@ -103,7 +103,7 @@ describe("fallback tests", () => {
       .mockRejectedValueOnce(new Error())
       .mockResolvedValue({
         possible: true,
-        reason: "",
+        reason: ""
       });
 
     v["lcd"][0].kyve.query.v1beta1.canPropose = canProposeMock;
@@ -112,7 +112,7 @@ describe("fallback tests", () => {
       .fn()
       .mockImplementationOnce(() => {
         v.pool = {
-          ...genesis_pool,
+          ...genesis_pool
         } as any;
       })
       .mockImplementation(() => {
@@ -120,20 +120,20 @@ describe("fallback tests", () => {
           ...genesis_pool,
           bundle_proposal: {
             ...genesis_pool.bundle_proposal,
-            next_uploader: "test_staker",
-          },
+            next_uploader: "test_staker"
+          }
         } as any;
       });
 
     const bundle = [
       {
         key: "test_key_1",
-        value: "test_value_1",
+        value: "test_value_1"
       },
       {
         key: "test_key_2",
-        value: "test_value_2",
-      },
+        value: "test_value_2"
+      }
     ];
 
     await v["cacheProvider"].put("0", bundle[0]);
@@ -155,7 +155,7 @@ describe("fallback tests", () => {
     expect(txs.claimUploaderRole).toHaveBeenCalledTimes(1);
     expect(txs.claimUploaderRole).toHaveBeenLastCalledWith({
       staker: "test_staker",
-      pool_id: "0",
+      pool_id: "0"
     });
 
     expect(txs.voteBundleProposal).toHaveBeenCalledTimes(0);
@@ -171,7 +171,7 @@ describe("fallback tests", () => {
       bundle_size: "2",
       from_key: "test_key_1",
       to_key: "test_key_2",
-      bundle_summary: JSON.stringify(bundle),
+      bundle_summary: JSON.stringify(bundle)
     });
 
     expect(txs.skipUploaderRole).toHaveBeenCalledTimes(0);
@@ -187,13 +187,13 @@ describe("fallback tests", () => {
       staker: "test_staker",
       pool_id: "0",
       proposer: "test_valaddress",
-      from_index: "0",
+      from_index: "0"
     });
     expect(queries.canPropose).toHaveBeenNthCalledWith(2, {
       staker: "test_staker",
       pool_id: "0",
       proposer: "test_valaddress",
-      from_index: "0",
+      from_index: "0"
     });
 
     // =========================
@@ -234,9 +234,7 @@ describe("fallback tests", () => {
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
 
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
-      bundle
-    );
+    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(bundle);
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(0);
 
@@ -260,7 +258,7 @@ describe("fallback tests", () => {
       .mockRejectedValueOnce(new Error())
       .mockResolvedValue({
         possible: true,
-        reason: "",
+        reason: ""
       });
 
     v["lcd"][0].kyve.query.v1beta1.canPropose = canProposeMock;
@@ -269,7 +267,7 @@ describe("fallback tests", () => {
       .fn()
       .mockImplementationOnce(() => {
         v.pool = {
-          ...genesis_pool,
+          ...genesis_pool
         } as any;
       })
       .mockImplementation(() => {
@@ -277,20 +275,20 @@ describe("fallback tests", () => {
           ...genesis_pool,
           bundle_proposal: {
             ...genesis_pool.bundle_proposal,
-            next_uploader: "test_staker",
-          },
+            next_uploader: "test_staker"
+          }
         } as any;
       });
 
     const bundle = [
       {
         key: "test_key_1",
-        value: "test_value_1",
+        value: "test_value_1"
       },
       {
         key: "test_key_2",
-        value: "test_value_2",
-      },
+        value: "test_value_2"
+      }
     ];
 
     await v["cacheProvider"].put("0", bundle[0]);
@@ -313,7 +311,7 @@ describe("fallback tests", () => {
     expect(txs.claimUploaderRole).toHaveBeenCalledTimes(1);
     expect(txs.claimUploaderRole).toHaveBeenLastCalledWith({
       staker: "test_staker",
-      pool_id: "0",
+      pool_id: "0"
     });
 
     expect(txs.voteBundleProposal).toHaveBeenCalledTimes(0);
@@ -329,7 +327,7 @@ describe("fallback tests", () => {
       bundle_size: "2",
       from_key: "test_key_1",
       to_key: "test_key_2",
-      bundle_summary: JSON.stringify(bundle),
+      bundle_summary: JSON.stringify(bundle)
     });
 
     expect(txs.skipUploaderRole).toHaveBeenCalledTimes(0);
@@ -345,7 +343,7 @@ describe("fallback tests", () => {
       staker: "test_staker",
       pool_id: "0",
       proposer: "test_valaddress",
-      from_index: "0",
+      from_index: "0"
     });
 
     expect(queries2.canPropose).toHaveBeenCalledTimes(1);
@@ -353,7 +351,7 @@ describe("fallback tests", () => {
       staker: "test_staker",
       pool_id: "0",
       proposer: "test_valaddress",
-      from_index: "0",
+      from_index: "0"
     });
 
     // =========================
@@ -394,9 +392,7 @@ describe("fallback tests", () => {
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
 
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
-      bundle
-    );
+    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(bundle);
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(0);
 
@@ -420,7 +416,7 @@ describe("fallback tests", () => {
       .mockRejectedValueOnce(new Error())
       .mockResolvedValue({
         possible: true,
-        reason: "",
+        reason: ""
       });
 
     v["lcd"][0].kyve.query.v1beta1.canPropose = canProposeMock;
@@ -430,7 +426,7 @@ describe("fallback tests", () => {
       .mockRejectedValueOnce(new Error())
       .mockResolvedValue({
         possible: true,
-        reason: "",
+        reason: ""
       });
 
     v["lcd"][1].kyve.query.v1beta1.canPropose = canPropose2Mock;
@@ -439,7 +435,7 @@ describe("fallback tests", () => {
       .fn()
       .mockImplementationOnce(() => {
         v.pool = {
-          ...genesis_pool,
+          ...genesis_pool
         } as any;
       })
       .mockImplementation(() => {
@@ -447,20 +443,20 @@ describe("fallback tests", () => {
           ...genesis_pool,
           bundle_proposal: {
             ...genesis_pool.bundle_proposal,
-            next_uploader: "test_staker",
-          },
+            next_uploader: "test_staker"
+          }
         } as any;
       });
 
     const bundle = [
       {
         key: "test_key_1",
-        value: "test_value_1",
+        value: "test_value_1"
       },
       {
         key: "test_key_2",
-        value: "test_value_2",
-      },
+        value: "test_value_2"
+      }
     ];
 
     await v["cacheProvider"].put("0", bundle[0]);
@@ -483,7 +479,7 @@ describe("fallback tests", () => {
     expect(txs.claimUploaderRole).toHaveBeenCalledTimes(1);
     expect(txs.claimUploaderRole).toHaveBeenLastCalledWith({
       staker: "test_staker",
-      pool_id: "0",
+      pool_id: "0"
     });
 
     expect(txs.voteBundleProposal).toHaveBeenCalledTimes(0);
@@ -499,7 +495,7 @@ describe("fallback tests", () => {
       bundle_size: "2",
       from_key: "test_key_1",
       to_key: "test_key_2",
-      bundle_summary: JSON.stringify(bundle),
+      bundle_summary: JSON.stringify(bundle)
     });
 
     expect(txs.skipUploaderRole).toHaveBeenCalledTimes(0);
@@ -515,13 +511,13 @@ describe("fallback tests", () => {
       staker: "test_staker",
       pool_id: "0",
       proposer: "test_valaddress",
-      from_index: "0",
+      from_index: "0"
     });
     expect(queries.canPropose).toHaveBeenNthCalledWith(2, {
       staker: "test_staker",
       pool_id: "0",
       proposer: "test_valaddress",
-      from_index: "0",
+      from_index: "0"
     });
 
     expect(queries2.canPropose).toHaveBeenCalledTimes(1);
@@ -529,7 +525,7 @@ describe("fallback tests", () => {
       staker: "test_staker",
       pool_id: "0",
       proposer: "test_valaddress",
-      from_index: "0",
+      from_index: "0"
     });
 
     // =========================
@@ -570,9 +566,7 @@ describe("fallback tests", () => {
 
     expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
 
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
-      bundle
-    );
+    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(bundle);
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(0);
 
@@ -594,7 +588,7 @@ describe("fallback tests", () => {
 
     const canProposeMock = jest.fn().mockResolvedValue({
       possible: false,
-      reason: "",
+      reason: ""
     });
 
     v["lcd"][0].kyve.query.v1beta1.canPropose = canProposeMock;
@@ -603,7 +597,7 @@ describe("fallback tests", () => {
       .fn()
       .mockImplementationOnce(() => {
         v.pool = {
-          ...genesis_pool,
+          ...genesis_pool
         } as any;
       })
       .mockImplementation(() => {
@@ -611,20 +605,20 @@ describe("fallback tests", () => {
           ...genesis_pool,
           bundle_proposal: {
             ...genesis_pool.bundle_proposal,
-            next_uploader: "test_staker",
-          },
+            next_uploader: "test_staker"
+          }
         } as any;
       });
 
     const bundle = [
       {
         key: "test_key_1",
-        value: "test_value_1",
+        value: "test_value_1"
       },
       {
         key: "test_key_2",
-        value: "test_value_2",
-      },
+        value: "test_value_2"
+      }
     ];
 
     await v["cacheProvider"].put("0", bundle[0]);
@@ -646,7 +640,7 @@ describe("fallback tests", () => {
     expect(txs.claimUploaderRole).toHaveBeenCalledTimes(1);
     expect(txs.claimUploaderRole).toHaveBeenLastCalledWith({
       staker: "test_staker",
-      pool_id: "0",
+      pool_id: "0"
     });
 
     expect(txs.voteBundleProposal).toHaveBeenCalledTimes(0);
@@ -666,7 +660,7 @@ describe("fallback tests", () => {
       staker: "test_staker",
       pool_id: "0",
       proposer: "test_valaddress",
-      from_index: "0",
+      from_index: "0"
     });
 
     // =========================
@@ -720,7 +714,7 @@ describe("fallback tests", () => {
 
     const canProposeMock = jest.fn().mockResolvedValue({
       possible: false,
-      reason: "",
+      reason: ""
     });
 
     v["lcd"][0].kyve.query.v1beta1.canPropose = canProposeMock;
@@ -729,7 +723,7 @@ describe("fallback tests", () => {
       .fn()
       .mockImplementationOnce(() => {
         v.pool = {
-          ...genesis_pool,
+          ...genesis_pool
         } as any;
       })
       .mockImplementation(() => {
@@ -737,20 +731,20 @@ describe("fallback tests", () => {
           ...genesis_pool,
           bundle_proposal: {
             ...genesis_pool.bundle_proposal,
-            next_uploader: "test_staker",
-          },
+            next_uploader: "test_staker"
+          }
         } as any;
       });
 
     const bundle = [
       {
         key: "test_key_1",
-        value: "test_value_1",
+        value: "test_value_1"
       },
       {
         key: "test_key_2",
-        value: "test_value_2",
-      },
+        value: "test_value_2"
+      }
     ];
 
     await v["cacheProvider"].put("0", bundle[0]);
@@ -772,7 +766,7 @@ describe("fallback tests", () => {
     expect(txs.claimUploaderRole).toHaveBeenCalledTimes(1);
     expect(txs.claimUploaderRole).toHaveBeenLastCalledWith({
       staker: "test_staker",
-      pool_id: "0",
+      pool_id: "0"
     });
 
     expect(txs.voteBundleProposal).toHaveBeenCalledTimes(0);
@@ -792,7 +786,7 @@ describe("fallback tests", () => {
       staker: "test_staker",
       pool_id: "0",
       proposer: "test_valaddress",
-      from_index: "0",
+      from_index: "0"
     });
 
     // =========================
@@ -850,7 +844,7 @@ describe("fallback tests", () => {
 
     const canProposeMock = jest.fn().mockResolvedValue({
       possible: false,
-      reason: "",
+      reason: ""
     });
 
     v["lcd"][0].kyve.query.v1beta1.canPropose = canProposeMock;
@@ -859,7 +853,7 @@ describe("fallback tests", () => {
       .fn()
       .mockImplementationOnce(() => {
         v.pool = {
-          ...genesis_pool,
+          ...genesis_pool
         } as any;
       })
       .mockImplementation(() => {
@@ -867,20 +861,20 @@ describe("fallback tests", () => {
           ...genesis_pool,
           bundle_proposal: {
             ...genesis_pool.bundle_proposal,
-            next_uploader: "test_staker",
-          },
+            next_uploader: "test_staker"
+          }
         } as any;
       });
 
     const bundle = [
       {
         key: "test_key_1",
-        value: "test_value_1",
+        value: "test_value_1"
       },
       {
         key: "test_key_2",
-        value: "test_value_2",
-      },
+        value: "test_value_2"
+      }
     ];
 
     await v["cacheProvider"].put("0", bundle[0]);
@@ -902,7 +896,7 @@ describe("fallback tests", () => {
     expect(txs.claimUploaderRole).toHaveBeenCalledTimes(1);
     expect(txs.claimUploaderRole).toHaveBeenLastCalledWith({
       staker: "test_staker",
-      pool_id: "0",
+      pool_id: "0"
     });
 
     expect(txs.voteBundleProposal).toHaveBeenCalledTimes(0);
@@ -922,7 +916,7 @@ describe("fallback tests", () => {
       staker: "test_staker",
       pool_id: "0",
       proposer: "test_valaddress",
-      from_index: "0",
+      from_index: "0"
     });
 
     // =========================

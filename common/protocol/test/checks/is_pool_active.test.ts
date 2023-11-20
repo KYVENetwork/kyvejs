@@ -1,10 +1,10 @@
-import { Logger } from 'tslog';
-import { Validator } from '../../src';
-import { isPoolActive, setupMetrics } from '../../src/methods';
-import { register } from 'prom-client';
-import { newTestValidator } from '../mocks/runtime.mock';
-import { genesis_pool } from '../mocks/constants';
-import { PoolStatus } from '../../../types/lcd/kyve/pool/v1beta1/pool';
+import { Logger } from "tslog";
+import { Validator } from "../../src";
+import { isPoolActive, setupMetrics } from "../../src/methods";
+import { register } from "prom-client";
+import { newTestValidator } from "../mocks/runtime.mock";
+import { genesis_pool } from "../mocks/constants";
+import { PoolStatus } from "../../../types/lcd/kyve/pool/v1beta1/pool";
 
 /*
 
@@ -24,7 +24,7 @@ describe("isPoolActive", () => {
   let v: Validator;
 
   beforeEach(() => {
-    v = newTestValidator()
+    v = newTestValidator();
 
     // mock logger
     v.logger = new Logger();
@@ -36,7 +36,7 @@ describe("isPoolActive", () => {
     v.logger.fatal = jest.fn();
 
     v.pool = {
-      ...genesis_pool,
+      ...genesis_pool
     } as any;
 
     setupMetrics.call(v);

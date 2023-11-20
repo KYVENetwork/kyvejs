@@ -47,7 +47,7 @@ import {
   waitForUploadInterval,
 } from "./methods";
 
-import { ICacheProvider, IMetrics, IRuntime, RunConfig } from "./types";
+import { ICacheProvider, IMetrics, IRuntime, ProtocolConfig } from "./types";
 import { IDLE_TIME, sleep, standardizeError } from "./utils";
 
 import { SupportedChains } from "@kyvejs/sdk/dist/constants";
@@ -163,11 +163,11 @@ export class Validator {
    * runtime class here in order to run the
    *
    * @method constructor
-   * @param {RunConfig} runConfig that defines the runtime
+   * @param {ProtocolConfig} protocolConfig that defines the runtime
    */
-  constructor(runConfig: RunConfig) {
+  constructor(protocolConfig: ProtocolConfig) {
     // set provided runtime
-    this.runtime = new GrpcRuntime(runConfig);
+    this.runtime = new GrpcRuntime(protocolConfig);
 
     // set @kyvejs/protocol version
     this.protocolVersion = protocolVersion;

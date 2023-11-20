@@ -1,6 +1,6 @@
 import { randomBytes } from "crypto";
 import { gzipSync } from "zlib";
-import { ICompression } from "../../src/index";
+import { ICompression } from "../../src";
 import { Gzip } from "../../src/reactors/compression/Gzip";
 
 /*

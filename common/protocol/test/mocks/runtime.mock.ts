@@ -25,10 +25,7 @@ export const TestRuntime = jest.fn().mockImplementation(() => {
       value: `${item.value}-transform`,
     })),
     validateDataItem: jest.fn(
-      async (
-        proposedDataItem: DataItem,
-        validationDataItem: DataItem
-      ) => {
+      async (proposedDataItem: DataItem, validationDataItem: DataItem) => {
         const proposedDataItemHash = sha256FromJson(proposedDataItem);
         const validationDataItemHash = sha256FromJson(validationDataItem);
 
@@ -38,9 +35,7 @@ export const TestRuntime = jest.fn().mockImplementation(() => {
     summarizeDataBundle: jest.fn(async (bundle: DataItem[]) =>
       JSON.stringify(bundle)
     ),
-    nextKey: jest.fn(async (key: string) =>
-      (parseInt(key) + 1).toString()
-    ),
+    nextKey: jest.fn(async (key: string) => (parseInt(key) + 1).toString()),
   };
 });
 
@@ -60,4 +55,4 @@ export const newTestValidator = (): Validator => {
   };
   v["runtime"] = runtime;
   return v;
-}
+};

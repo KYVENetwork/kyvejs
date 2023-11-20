@@ -1,9 +1,9 @@
-import { Logger } from 'tslog';
-import { Validator } from '../../src/index';
-import { isValidVersion, setupMetrics } from '../../src/methods';
-import { register } from 'prom-client';
-import { newTestValidator } from '../mocks/runtime.mock';
-import { genesis_pool } from '../mocks/constants';
+import { Logger } from "tslog";
+import { Validator } from "../../src";
+import { isValidVersion, setupMetrics } from "../../src/methods";
+import { register } from "prom-client";
+import { newTestValidator } from "../mocks/runtime.mock";
+import { genesis_pool } from "../mocks/constants";
 
 /*
 
@@ -30,7 +30,7 @@ describe("isValidVersion", () => {
   let v: Validator;
 
   beforeEach(() => {
-    v = newTestValidator()
+    v = newTestValidator();
 
     // mock logger
     v.logger = new Logger();
@@ -42,7 +42,7 @@ describe("isValidVersion", () => {
     v.logger.fatal = jest.fn();
 
     v.pool = {
-      ...genesis_pool,
+      ...genesis_pool
     } as any;
 
     setupMetrics.call(v);
