@@ -1,6 +1,6 @@
 import * as grpc from '@grpc/grpc-js';
 
-import { RuntimeServiceService } from './proto/kyverdk/runtime/v1/runtime';
+import { RuntimeServiceServer, RuntimeServiceService } from './proto/kyverdk/runtime/v1/runtime';
 import { TendermintServer } from './server';
 import { ProtocolConfig, Validator } from '@kyvejs/protocol';
 
@@ -11,7 +11,7 @@ const runtimeServer: grpc.Server = new grpc.Server({
 });
 const runtimeService = new TendermintServer();
 
-const runtimeServiceImpl = {
+const runtimeServiceImpl: RuntimeServiceServer = {
   getRuntimeName: runtimeService.getRuntimeName,
   getRuntimeVersion: runtimeService.getRuntimeVersion,
   validateSetConfig: runtimeService.validateSetConfig,
@@ -27,8 +27,8 @@ const config: ProtocolConfig = {
   host: 'localhost',
   port: 50051,
   useGrpc: true,
-  services: {},
-}
+  services: undefined
+};
 
 if (process.env.RUN_IN_DOCKER_MODE === 'true') {
   runtimeServer.addService(RuntimeServiceService, runtimeServiceImpl);
@@ -47,7 +47,7 @@ if (process.env.RUN_IN_DOCKER_MODE === 'true') {
   process.on('SIGTERM', shutdown);
 
   runtimeServer.bindAsync(
-    '0.0.0.0:50051',
+    `0.0.0.0:${config.port}`,
     grpc.ServerCredentials.createInsecure(),
     (error: Error | null, port: number) => {
       if (error) {
