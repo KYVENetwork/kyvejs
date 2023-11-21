@@ -38,7 +38,6 @@ export class DirectCall implements Call {
 
   sendMessageWithContext(_context: MessageContext, message: Buffer): void {
     const payload = this.requestType.decode(message);
-    console.debug(`Payload: ${JSON.stringify(payload)}`);
 
     // calls the grpc method directly without using grpc
     this.method(
@@ -111,9 +110,9 @@ export class DirectChannel implements grpc.Channel {
     // @ts-ignore
     const method = this.services[camelCaseCallName];
 
-    console.debug(
-      `Call method ${method.name} ${callName}Request -> ${callName}Response`
-    );
+    // console.debug(
+    //   `Call method ${method.name} ${callName}Request -> ${callName}Response`
+    // );
 
     return new DirectCall(method, requestType, responseType);
   }
