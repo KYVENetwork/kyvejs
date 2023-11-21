@@ -29,6 +29,54 @@ import axios from "axios";
 export class TendermintServer implements RuntimeServiceServer {
   [name: string]: UntypedHandleCall;
 
+  getRuntimeName(
+    call: ServerUnaryCall<GetRuntimeNameRequest, GetRuntimeNameResponse>,
+    callback: sendUnaryData<GetRuntimeNameResponse>): void {
+    callback(null, GetRuntimeNameResponse.create({ name }));
+  }
+
+  getRuntimeVersion(
+    call: ServerUnaryCall<GetRuntimeVersionRequest, GetRuntimeVersionResponse>,
+    callback: sendUnaryData<GetRuntimeVersionResponse>): void {
+    callback(null, GetRuntimeVersionResponse.create({ version }));
+  }
+
+  validateSetConfig(
+    call: ServerUnaryCall<ValidateSetConfigRequest, ValidateSetConfigResponse>,
+    callback: sendUnaryData<ValidateSetConfigResponse>): void {
+    try {
+      const rawConfig = call.request.raw_config;
+      const config = JSON.parse(rawConfig);
+
+      if (!config.network) {
+        callback({
+          code: grpc.status.INVALID_ARGUMENT,
+          details: "Config does not have property \"network\" defined"
+        });
+        return;
+      }
+      if (!config.rpc) {
+        callback({
+          code: grpc.status.INVALID_ARGUMENT,
+          details: "Config does not have property \"rpc\" defined"
+        });
+        return;
+      }
+
+      if (process.env.KYVEJS_TENDERMINT_BSYNC_RPC) {
+        config.rpc = process.env.KYVEJS_TENDERMINT_BSYNC_RPC;
+      }
+
+      const serialized_config = JSON.stringify(config);
+      callback(null, { serialized_config });
+    } catch (error: any) {
+      callback({
+        code: grpc.status.INVALID_ARGUMENT,
+        details: error.message
+      });
+    }
+  }
+
   async getDataItem(
     call: ServerUnaryCall<GetDataItemRequest, GetDataItemResponse>,
     callback: sendUnaryData<GetDataItemResponse>): Promise<void> {
@@ -44,36 +92,6 @@ export class TendermintServer implements RuntimeServiceServer {
       const block = data.result.block;
 
       callback(null, GetDataItemResponse.create({ data_item: { key, value: JSON.stringify(block) } }));
-    } catch (error: any) {
-      callback({
-        code: grpc.status.INTERNAL,
-        details: error.message
-      });
-    }
-  }
-
-  getRuntimeName(
-    call: ServerUnaryCall<GetRuntimeNameRequest, GetRuntimeNameResponse>,
-    callback: sendUnaryData<GetRuntimeNameResponse>): void {
-    callback(null, GetRuntimeNameResponse.create({ name }));
-  }
-
-  getRuntimeVersion(
-    call: ServerUnaryCall<GetRuntimeVersionRequest, GetRuntimeVersionResponse>,
-    callback: sendUnaryData<GetRuntimeVersionResponse>): void {
-    callback(null, GetRuntimeVersionResponse.create({ version }));
-  }
-
-  nextKey(
-    call: ServerUnaryCall<NextKeyRequest, NextKeyResponse>,
-    callback: sendUnaryData<NextKeyResponse>): void {
-    try {
-      const key = call.request.key;
-
-      // Calculate the next key (current block height + 1)
-      const nextKey = (parseInt(key) + 1).toString();
-
-      callback(null, NextKeyResponse.create({ next_key: nextKey }));
     } catch (error: any) {
       callback({
         code: grpc.status.INTERNAL,
@@ -111,27 +129,6 @@ export class TendermintServer implements RuntimeServiceServer {
     }
   }
 
-  summarizeDataBundle(
-    call: ServerUnaryCall<SummarizeDataBundleRequest, SummarizeDataBundleResponse>,
-    callback: sendUnaryData<SummarizeDataBundleResponse>): void {
-    try {
-      // use latest block height as bundle summary
-      const summary = JSON.parse(call.request.bundle?.at(-1)?.value ?? "{}")?.header?.height ?? "";
-      callback(null, SummarizeDataBundleResponse.create({ summary }));
-    } catch (error: any) {
-      callback({
-        code: grpc.status.INTERNAL,
-        details: error.message
-      });
-    }
-  }
-
-  transformDataItem(
-    call: ServerUnaryCall<TransformDataItemRequest, TransformDataItemResponse>,
-    callback: sendUnaryData<TransformDataItemResponse>): void {
-    callback(null, TransformDataItemResponse.create({ transformed_data_item: call.request.data_item }));
-  }
-
   validateDataItem(
     call: ServerUnaryCall<ValidateDataItemRequest, ValidateDataItemResponse>,
     callback: sendUnaryData<ValidateDataItemResponse>): void {
@@ -161,37 +158,40 @@ export class TendermintServer implements RuntimeServiceServer {
     }
   }
 
-  validateSetConfig(
-    call: ServerUnaryCall<ValidateSetConfigRequest, ValidateSetConfigResponse>,
-    callback: sendUnaryData<ValidateSetConfigResponse>): void {
+  transformDataItem(
+    call: ServerUnaryCall<TransformDataItemRequest, TransformDataItemResponse>,
+    callback: sendUnaryData<TransformDataItemResponse>): void {
+    callback(null, TransformDataItemResponse.create({ transformed_data_item: call.request.data_item }));
+  }
+
+  summarizeDataBundle(
+    call: ServerUnaryCall<SummarizeDataBundleRequest, SummarizeDataBundleResponse>,
+    callback: sendUnaryData<SummarizeDataBundleResponse>): void {
     try {
-      const rawConfig = call.request.raw_config;
-      const config = JSON.parse(rawConfig);
-
-      if (!config.network) {
-        callback({
-          code: grpc.status.INVALID_ARGUMENT,
-          details: "Config does not have property \"network\" defined"
-        });
-        return;
-      }
-      if (!config.rpc) {
-        callback({
-          code: grpc.status.INVALID_ARGUMENT,
-          details: "Config does not have property \"rpc\" defined"
-        });
-        return;
-      }
-
-      if (process.env.KYVEJS_TENDERMINT_BSYNC_RPC) {
-        config.rpc = process.env.KYVEJS_TENDERMINT_BSYNC_RPC;
-      }
-
-      const serialized_config = JSON.stringify(config);
-      callback(null, { serialized_config });
+      // use latest block height as bundle summary
+      const summary = JSON.parse(call.request.bundle?.at(-1)?.value ?? "{}")?.header?.height ?? "";
+      callback(null, SummarizeDataBundleResponse.create({ summary }));
     } catch (error: any) {
       callback({
-        code: grpc.status.INVALID_ARGUMENT,
+        code: grpc.status.INTERNAL,
+        details: error.message
+      });
+    }
+  }
+
+  nextKey(
+    call: ServerUnaryCall<NextKeyRequest, NextKeyResponse>,
+    callback: sendUnaryData<NextKeyResponse>): void {
+    try {
+      const key = call.request.key;
+
+      // Calculate the next key (current block height + 1)
+      const nextKey = (parseInt(key) + 1).toString();
+
+      callback(null, NextKeyResponse.create({ next_key: nextKey }));
+    } catch (error: any) {
+      callback({
+        code: grpc.status.INTERNAL,
         details: error.message
       });
     }
