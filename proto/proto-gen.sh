@@ -54,8 +54,8 @@ run_protobuf_generator() {
 copy_files() {
   printf "📄 Copy generated files to folders...\n"
 
-  # find all folders in ./integrations that have a package.json and add proto folder
-  folders=$(find ../integrations -name package.json -exec dirname {} \;)
+  # find all folders in ./integrations that have a package.json (go just one level deep)
+  folders=$(find ../integrations -maxdepth 2 -name package.json -exec dirname {} \;)
 
   # add the common folder
   folders="$folders,../common/protocol"

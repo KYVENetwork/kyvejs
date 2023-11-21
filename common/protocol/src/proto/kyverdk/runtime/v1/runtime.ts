@@ -1,10 +1,5 @@
 /* eslint-disable */
-import {
-  ChannelCredentials,
-  Client,
-  makeGenericClientConstructor,
-  Metadata,
-} from "@grpc/grpc-js";
+import { ChannelCredentials, Client, makeGenericClientConstructor, Metadata } from "@grpc/grpc-js";
 import type {
   CallOptions,
   ClientOptions,
@@ -14,11 +9,7 @@ import type {
   UntypedServiceImplementation,
 } from "@grpc/grpc-js";
 import _m0 from "protobufjs/minimal";
-import {
-  VoteType,
-  voteTypeFromJSON,
-  voteTypeToJSON,
-} from "../../../kyve/bundles/v1beta1/tx";
+import { VoteType, voteTypeFromJSON, voteTypeToJSON } from "../../../kyve/bundles/v1beta1/tx";
 
 export const protobufPackage = "kyverdk.runtime.v1";
 
@@ -44,7 +35,8 @@ export interface RuntimeConfig {
  * Request returning the name of the runtime
  * returns the runtime name as a string
  */
-export interface GetRuntimeNameRequest {}
+export interface GetRuntimeNameRequest {
+}
 
 /**
  * GetRuntimeNameResponse
@@ -61,7 +53,8 @@ export interface GetRuntimeNameResponse {
  * Request returning the version of the runtime
  * returns the runtime version as a string
  */
-export interface GetRuntimeVersionRequest {}
+export interface GetRuntimeVersionRequest {
+}
 
 /**
  * GetRuntimeVersionResponse
@@ -100,7 +93,9 @@ export interface ValidateSetConfigResponse {
  */
 export interface GetDataItemRequest {
   /** The configuration object */
-  config?: RuntimeConfig | undefined;
+  config?:
+    | RuntimeConfig
+    | undefined;
   /** The key of the data item */
   key: string;
 }
@@ -122,7 +117,9 @@ export interface GetDataItemResponse {
  */
 export interface PrevalidateDataItemRequest {
   /** The configuration object */
-  config?: RuntimeConfig | undefined;
+  config?:
+    | RuntimeConfig
+    | undefined;
   /** The data item to be pre-validated */
   data_item?: DataItem | undefined;
 }
@@ -144,7 +141,9 @@ export interface PrevalidateDataItemResponse {
  */
 export interface TransformDataItemRequest {
   /** The configuration object */
-  config?: RuntimeConfig | undefined;
+  config?:
+    | RuntimeConfig
+    | undefined;
   /** The data item to be transformed */
   data_item?: DataItem | undefined;
 }
@@ -166,9 +165,13 @@ export interface TransformDataItemResponse {
  */
 export interface ValidateDataItemRequest {
   /** The configuration object */
-  config?: RuntimeConfig | undefined;
+  config?:
+    | RuntimeConfig
+    | undefined;
   /** The proposed data item */
-  proposed_data_item?: DataItem | undefined;
+  proposed_data_item?:
+    | DataItem
+    | undefined;
   /** The data item to be validated */
   validation_data_item?: DataItem | undefined;
 }
@@ -190,7 +193,9 @@ export interface ValidateDataItemResponse {
  */
 export interface SummarizeDataBundleRequest {
   /** The configuration object */
-  config?: RuntimeConfig | undefined;
+  config?:
+    | RuntimeConfig
+    | undefined;
   /** The data items to be summarized */
   bundle: DataItem[];
 }
@@ -212,7 +217,9 @@ export interface SummarizeDataBundleResponse {
  */
 export interface NextKeyRequest {
   /** The configuration object */
-  config?: RuntimeConfig | undefined;
+  config?:
+    | RuntimeConfig
+    | undefined;
   /** The current key */
   key: string;
 }
@@ -232,10 +239,7 @@ function createBaseDataItem(): DataItem {
 }
 
 export const DataItem = {
-  encode(
-    message: DataItem,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: DataItem, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.key !== "") {
       writer.uint32(10).string(message.key);
     }
@@ -246,8 +250,7 @@ export const DataItem = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): DataItem {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseDataItem();
     while (reader.pos < end) {
@@ -310,10 +313,7 @@ function createBaseRuntimeConfig(): RuntimeConfig {
 }
 
 export const RuntimeConfig = {
-  encode(
-    message: RuntimeConfig,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: RuntimeConfig, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.serialized_config !== "") {
       writer.uint32(10).string(message.serialized_config);
     }
@@ -321,8 +321,7 @@ export const RuntimeConfig = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): RuntimeConfig {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseRuntimeConfig();
     while (reader.pos < end) {
@@ -345,11 +344,7 @@ export const RuntimeConfig = {
   },
 
   fromJSON(object: any): RuntimeConfig {
-    return {
-      serialized_config: isSet(object.serialized_config)
-        ? globalThis.String(object.serialized_config)
-        : "",
-    };
+    return { serialized_config: isSet(object.serialized_config) ? globalThis.String(object.serialized_config) : "" };
   },
 
   toJSON(message: RuntimeConfig): unknown {
@@ -360,14 +355,10 @@ export const RuntimeConfig = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<RuntimeConfig>, I>>(
-    base?: I
-  ): RuntimeConfig {
+  create<I extends Exact<DeepPartial<RuntimeConfig>, I>>(base?: I): RuntimeConfig {
     return RuntimeConfig.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<RuntimeConfig>, I>>(
-    object: I
-  ): RuntimeConfig {
+  fromPartial<I extends Exact<DeepPartial<RuntimeConfig>, I>>(object: I): RuntimeConfig {
     const message = createBaseRuntimeConfig();
     message.serialized_config = object.serialized_config ?? "";
     return message;
@@ -379,19 +370,12 @@ function createBaseGetRuntimeNameRequest(): GetRuntimeNameRequest {
 }
 
 export const GetRuntimeNameRequest = {
-  encode(
-    _: GetRuntimeNameRequest,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(_: GetRuntimeNameRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): GetRuntimeNameRequest {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): GetRuntimeNameRequest {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseGetRuntimeNameRequest();
     while (reader.pos < end) {
@@ -415,14 +399,10 @@ export const GetRuntimeNameRequest = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<GetRuntimeNameRequest>, I>>(
-    base?: I
-  ): GetRuntimeNameRequest {
+  create<I extends Exact<DeepPartial<GetRuntimeNameRequest>, I>>(base?: I): GetRuntimeNameRequest {
     return GetRuntimeNameRequest.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<GetRuntimeNameRequest>, I>>(
-    _: I
-  ): GetRuntimeNameRequest {
+  fromPartial<I extends Exact<DeepPartial<GetRuntimeNameRequest>, I>>(_: I): GetRuntimeNameRequest {
     const message = createBaseGetRuntimeNameRequest();
     return message;
   },
@@ -433,22 +413,15 @@ function createBaseGetRuntimeNameResponse(): GetRuntimeNameResponse {
 }
 
 export const GetRuntimeNameResponse = {
-  encode(
-    message: GetRuntimeNameResponse,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: GetRuntimeNameResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.name !== "") {
       writer.uint32(10).string(message.name);
     }
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): GetRuntimeNameResponse {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): GetRuntimeNameResponse {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseGetRuntimeNameResponse();
     while (reader.pos < end) {
@@ -482,14 +455,10 @@ export const GetRuntimeNameResponse = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<GetRuntimeNameResponse>, I>>(
-    base?: I
-  ): GetRuntimeNameResponse {
+  create<I extends Exact<DeepPartial<GetRuntimeNameResponse>, I>>(base?: I): GetRuntimeNameResponse {
     return GetRuntimeNameResponse.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<GetRuntimeNameResponse>, I>>(
-    object: I
-  ): GetRuntimeNameResponse {
+  fromPartial<I extends Exact<DeepPartial<GetRuntimeNameResponse>, I>>(object: I): GetRuntimeNameResponse {
     const message = createBaseGetRuntimeNameResponse();
     message.name = object.name ?? "";
     return message;
@@ -501,19 +470,12 @@ function createBaseGetRuntimeVersionRequest(): GetRuntimeVersionRequest {
 }
 
 export const GetRuntimeVersionRequest = {
-  encode(
-    _: GetRuntimeVersionRequest,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(_: GetRuntimeVersionRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): GetRuntimeVersionRequest {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): GetRuntimeVersionRequest {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseGetRuntimeVersionRequest();
     while (reader.pos < end) {
@@ -537,14 +499,10 @@ export const GetRuntimeVersionRequest = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<GetRuntimeVersionRequest>, I>>(
-    base?: I
-  ): GetRuntimeVersionRequest {
+  create<I extends Exact<DeepPartial<GetRuntimeVersionRequest>, I>>(base?: I): GetRuntimeVersionRequest {
     return GetRuntimeVersionRequest.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<GetRuntimeVersionRequest>, I>>(
-    _: I
-  ): GetRuntimeVersionRequest {
+  fromPartial<I extends Exact<DeepPartial<GetRuntimeVersionRequest>, I>>(_: I): GetRuntimeVersionRequest {
     const message = createBaseGetRuntimeVersionRequest();
     return message;
   },
@@ -555,22 +513,15 @@ function createBaseGetRuntimeVersionResponse(): GetRuntimeVersionResponse {
 }
 
 export const GetRuntimeVersionResponse = {
-  encode(
-    message: GetRuntimeVersionResponse,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: GetRuntimeVersionResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.version !== "") {
       writer.uint32(10).string(message.version);
     }
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): GetRuntimeVersionResponse {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): GetRuntimeVersionResponse {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseGetRuntimeVersionResponse();
     while (reader.pos < end) {
@@ -593,9 +544,7 @@ export const GetRuntimeVersionResponse = {
   },
 
   fromJSON(object: any): GetRuntimeVersionResponse {
-    return {
-      version: isSet(object.version) ? globalThis.String(object.version) : "",
-    };
+    return { version: isSet(object.version) ? globalThis.String(object.version) : "" };
   },
 
   toJSON(message: GetRuntimeVersionResponse): unknown {
@@ -606,14 +555,10 @@ export const GetRuntimeVersionResponse = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<GetRuntimeVersionResponse>, I>>(
-    base?: I
-  ): GetRuntimeVersionResponse {
+  create<I extends Exact<DeepPartial<GetRuntimeVersionResponse>, I>>(base?: I): GetRuntimeVersionResponse {
     return GetRuntimeVersionResponse.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<GetRuntimeVersionResponse>, I>>(
-    object: I
-  ): GetRuntimeVersionResponse {
+  fromPartial<I extends Exact<DeepPartial<GetRuntimeVersionResponse>, I>>(object: I): GetRuntimeVersionResponse {
     const message = createBaseGetRuntimeVersionResponse();
     message.version = object.version ?? "";
     return message;
@@ -625,22 +570,15 @@ function createBaseValidateSetConfigRequest(): ValidateSetConfigRequest {
 }
 
 export const ValidateSetConfigRequest = {
-  encode(
-    message: ValidateSetConfigRequest,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: ValidateSetConfigRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.raw_config !== "") {
       writer.uint32(10).string(message.raw_config);
     }
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): ValidateSetConfigRequest {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): ValidateSetConfigRequest {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseValidateSetConfigRequest();
     while (reader.pos < end) {
@@ -663,11 +601,7 @@ export const ValidateSetConfigRequest = {
   },
 
   fromJSON(object: any): ValidateSetConfigRequest {
-    return {
-      raw_config: isSet(object.raw_config)
-        ? globalThis.String(object.raw_config)
-        : "",
-    };
+    return { raw_config: isSet(object.raw_config) ? globalThis.String(object.raw_config) : "" };
   },
 
   toJSON(message: ValidateSetConfigRequest): unknown {
@@ -678,14 +612,10 @@ export const ValidateSetConfigRequest = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<ValidateSetConfigRequest>, I>>(
-    base?: I
-  ): ValidateSetConfigRequest {
+  create<I extends Exact<DeepPartial<ValidateSetConfigRequest>, I>>(base?: I): ValidateSetConfigRequest {
     return ValidateSetConfigRequest.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<ValidateSetConfigRequest>, I>>(
-    object: I
-  ): ValidateSetConfigRequest {
+  fromPartial<I extends Exact<DeepPartial<ValidateSetConfigRequest>, I>>(object: I): ValidateSetConfigRequest {
     const message = createBaseValidateSetConfigRequest();
     message.raw_config = object.raw_config ?? "";
     return message;
@@ -697,22 +627,15 @@ function createBaseValidateSetConfigResponse(): ValidateSetConfigResponse {
 }
 
 export const ValidateSetConfigResponse = {
-  encode(
-    message: ValidateSetConfigResponse,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: ValidateSetConfigResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.serialized_config !== "") {
       writer.uint32(10).string(message.serialized_config);
     }
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): ValidateSetConfigResponse {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): ValidateSetConfigResponse {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseValidateSetConfigResponse();
     while (reader.pos < end) {
@@ -735,11 +658,7 @@ export const ValidateSetConfigResponse = {
   },
 
   fromJSON(object: any): ValidateSetConfigResponse {
-    return {
-      serialized_config: isSet(object.serialized_config)
-        ? globalThis.String(object.serialized_config)
-        : "",
-    };
+    return { serialized_config: isSet(object.serialized_config) ? globalThis.String(object.serialized_config) : "" };
   },
 
   toJSON(message: ValidateSetConfigResponse): unknown {
@@ -750,14 +669,10 @@ export const ValidateSetConfigResponse = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<ValidateSetConfigResponse>, I>>(
-    base?: I
-  ): ValidateSetConfigResponse {
+  create<I extends Exact<DeepPartial<ValidateSetConfigResponse>, I>>(base?: I): ValidateSetConfigResponse {
     return ValidateSetConfigResponse.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<ValidateSetConfigResponse>, I>>(
-    object: I
-  ): ValidateSetConfigResponse {
+  fromPartial<I extends Exact<DeepPartial<ValidateSetConfigResponse>, I>>(object: I): ValidateSetConfigResponse {
     const message = createBaseValidateSetConfigResponse();
     message.serialized_config = object.serialized_config ?? "";
     return message;
@@ -769,10 +684,7 @@ function createBaseGetDataItemRequest(): GetDataItemRequest {
 }
 
 export const GetDataItemRequest = {
-  encode(
-    message: GetDataItemRequest,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: GetDataItemRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.config !== undefined) {
       RuntimeConfig.encode(message.config, writer.uint32(10).fork()).ldelim();
     }
@@ -783,8 +695,7 @@ export const GetDataItemRequest = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): GetDataItemRequest {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseGetDataItemRequest();
     while (reader.pos < end) {
@@ -815,9 +726,7 @@ export const GetDataItemRequest = {
 
   fromJSON(object: any): GetDataItemRequest {
     return {
-      config: isSet(object.config)
-        ? RuntimeConfig.fromJSON(object.config)
-        : undefined,
+      config: isSet(object.config) ? RuntimeConfig.fromJSON(object.config) : undefined,
       key: isSet(object.key) ? globalThis.String(object.key) : "",
     };
   },
@@ -833,19 +742,14 @@ export const GetDataItemRequest = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<GetDataItemRequest>, I>>(
-    base?: I
-  ): GetDataItemRequest {
+  create<I extends Exact<DeepPartial<GetDataItemRequest>, I>>(base?: I): GetDataItemRequest {
     return GetDataItemRequest.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<GetDataItemRequest>, I>>(
-    object: I
-  ): GetDataItemRequest {
+  fromPartial<I extends Exact<DeepPartial<GetDataItemRequest>, I>>(object: I): GetDataItemRequest {
     const message = createBaseGetDataItemRequest();
-    message.config =
-      object.config !== undefined && object.config !== null
-        ? RuntimeConfig.fromPartial(object.config)
-        : undefined;
+    message.config = (object.config !== undefined && object.config !== null)
+      ? RuntimeConfig.fromPartial(object.config)
+      : undefined;
     message.key = object.key ?? "";
     return message;
   },
@@ -856,10 +760,7 @@ function createBaseGetDataItemResponse(): GetDataItemResponse {
 }
 
 export const GetDataItemResponse = {
-  encode(
-    message: GetDataItemResponse,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: GetDataItemResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.data_item !== undefined) {
       DataItem.encode(message.data_item, writer.uint32(10).fork()).ldelim();
     }
@@ -867,8 +768,7 @@ export const GetDataItemResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): GetDataItemResponse {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseGetDataItemResponse();
     while (reader.pos < end) {
@@ -891,11 +791,7 @@ export const GetDataItemResponse = {
   },
 
   fromJSON(object: any): GetDataItemResponse {
-    return {
-      data_item: isSet(object.data_item)
-        ? DataItem.fromJSON(object.data_item)
-        : undefined,
-    };
+    return { data_item: isSet(object.data_item) ? DataItem.fromJSON(object.data_item) : undefined };
   },
 
   toJSON(message: GetDataItemResponse): unknown {
@@ -906,19 +802,14 @@ export const GetDataItemResponse = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<GetDataItemResponse>, I>>(
-    base?: I
-  ): GetDataItemResponse {
+  create<I extends Exact<DeepPartial<GetDataItemResponse>, I>>(base?: I): GetDataItemResponse {
     return GetDataItemResponse.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<GetDataItemResponse>, I>>(
-    object: I
-  ): GetDataItemResponse {
+  fromPartial<I extends Exact<DeepPartial<GetDataItemResponse>, I>>(object: I): GetDataItemResponse {
     const message = createBaseGetDataItemResponse();
-    message.data_item =
-      object.data_item !== undefined && object.data_item !== null
-        ? DataItem.fromPartial(object.data_item)
-        : undefined;
+    message.data_item = (object.data_item !== undefined && object.data_item !== null)
+      ? DataItem.fromPartial(object.data_item)
+      : undefined;
     return message;
   },
 };
@@ -928,10 +819,7 @@ function createBasePrevalidateDataItemRequest(): PrevalidateDataItemRequest {
 }
 
 export const PrevalidateDataItemRequest = {
-  encode(
-    message: PrevalidateDataItemRequest,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: PrevalidateDataItemRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.config !== undefined) {
       RuntimeConfig.encode(message.config, writer.uint32(10).fork()).ldelim();
     }
@@ -941,12 +829,8 @@ export const PrevalidateDataItemRequest = {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): PrevalidateDataItemRequest {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): PrevalidateDataItemRequest {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBasePrevalidateDataItemRequest();
     while (reader.pos < end) {
@@ -977,12 +861,8 @@ export const PrevalidateDataItemRequest = {
 
   fromJSON(object: any): PrevalidateDataItemRequest {
     return {
-      config: isSet(object.config)
-        ? RuntimeConfig.fromJSON(object.config)
-        : undefined,
-      data_item: isSet(object.data_item)
-        ? DataItem.fromJSON(object.data_item)
-        : undefined,
+      config: isSet(object.config) ? RuntimeConfig.fromJSON(object.config) : undefined,
+      data_item: isSet(object.data_item) ? DataItem.fromJSON(object.data_item) : undefined,
     };
   },
 
@@ -997,23 +877,17 @@ export const PrevalidateDataItemRequest = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<PrevalidateDataItemRequest>, I>>(
-    base?: I
-  ): PrevalidateDataItemRequest {
+  create<I extends Exact<DeepPartial<PrevalidateDataItemRequest>, I>>(base?: I): PrevalidateDataItemRequest {
     return PrevalidateDataItemRequest.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<PrevalidateDataItemRequest>, I>>(
-    object: I
-  ): PrevalidateDataItemRequest {
+  fromPartial<I extends Exact<DeepPartial<PrevalidateDataItemRequest>, I>>(object: I): PrevalidateDataItemRequest {
     const message = createBasePrevalidateDataItemRequest();
-    message.config =
-      object.config !== undefined && object.config !== null
-        ? RuntimeConfig.fromPartial(object.config)
-        : undefined;
-    message.data_item =
-      object.data_item !== undefined && object.data_item !== null
-        ? DataItem.fromPartial(object.data_item)
-        : undefined;
+    message.config = (object.config !== undefined && object.config !== null)
+      ? RuntimeConfig.fromPartial(object.config)
+      : undefined;
+    message.data_item = (object.data_item !== undefined && object.data_item !== null)
+      ? DataItem.fromPartial(object.data_item)
+      : undefined;
     return message;
   },
 };
@@ -1023,22 +897,15 @@ function createBasePrevalidateDataItemResponse(): PrevalidateDataItemResponse {
 }
 
 export const PrevalidateDataItemResponse = {
-  encode(
-    message: PrevalidateDataItemResponse,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: PrevalidateDataItemResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.valid === true) {
       writer.uint32(8).bool(message.valid);
     }
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): PrevalidateDataItemResponse {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): PrevalidateDataItemResponse {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBasePrevalidateDataItemResponse();
     while (reader.pos < end) {
@@ -1061,9 +928,7 @@ export const PrevalidateDataItemResponse = {
   },
 
   fromJSON(object: any): PrevalidateDataItemResponse {
-    return {
-      valid: isSet(object.valid) ? globalThis.Boolean(object.valid) : false,
-    };
+    return { valid: isSet(object.valid) ? globalThis.Boolean(object.valid) : false };
   },
 
   toJSON(message: PrevalidateDataItemResponse): unknown {
@@ -1074,14 +939,10 @@ export const PrevalidateDataItemResponse = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<PrevalidateDataItemResponse>, I>>(
-    base?: I
-  ): PrevalidateDataItemResponse {
+  create<I extends Exact<DeepPartial<PrevalidateDataItemResponse>, I>>(base?: I): PrevalidateDataItemResponse {
     return PrevalidateDataItemResponse.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<PrevalidateDataItemResponse>, I>>(
-    object: I
-  ): PrevalidateDataItemResponse {
+  fromPartial<I extends Exact<DeepPartial<PrevalidateDataItemResponse>, I>>(object: I): PrevalidateDataItemResponse {
     const message = createBasePrevalidateDataItemResponse();
     message.valid = object.valid ?? false;
     return message;
@@ -1093,10 +954,7 @@ function createBaseTransformDataItemRequest(): TransformDataItemRequest {
 }
 
 export const TransformDataItemRequest = {
-  encode(
-    message: TransformDataItemRequest,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: TransformDataItemRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.config !== undefined) {
       RuntimeConfig.encode(message.config, writer.uint32(10).fork()).ldelim();
     }
@@ -1106,12 +964,8 @@ export const TransformDataItemRequest = {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): TransformDataItemRequest {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): TransformDataItemRequest {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseTransformDataItemRequest();
     while (reader.pos < end) {
@@ -1142,12 +996,8 @@ export const TransformDataItemRequest = {
 
   fromJSON(object: any): TransformDataItemRequest {
     return {
-      config: isSet(object.config)
-        ? RuntimeConfig.fromJSON(object.config)
-        : undefined,
-      data_item: isSet(object.data_item)
-        ? DataItem.fromJSON(object.data_item)
-        : undefined,
+      config: isSet(object.config) ? RuntimeConfig.fromJSON(object.config) : undefined,
+      data_item: isSet(object.data_item) ? DataItem.fromJSON(object.data_item) : undefined,
     };
   },
 
@@ -1162,23 +1012,17 @@ export const TransformDataItemRequest = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<TransformDataItemRequest>, I>>(
-    base?: I
-  ): TransformDataItemRequest {
+  create<I extends Exact<DeepPartial<TransformDataItemRequest>, I>>(base?: I): TransformDataItemRequest {
     return TransformDataItemRequest.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<TransformDataItemRequest>, I>>(
-    object: I
-  ): TransformDataItemRequest {
+  fromPartial<I extends Exact<DeepPartial<TransformDataItemRequest>, I>>(object: I): TransformDataItemRequest {
     const message = createBaseTransformDataItemRequest();
-    message.config =
-      object.config !== undefined && object.config !== null
-        ? RuntimeConfig.fromPartial(object.config)
-        : undefined;
-    message.data_item =
-      object.data_item !== undefined && object.data_item !== null
-        ? DataItem.fromPartial(object.data_item)
-        : undefined;
+    message.config = (object.config !== undefined && object.config !== null)
+      ? RuntimeConfig.fromPartial(object.config)
+      : undefined;
+    message.data_item = (object.data_item !== undefined && object.data_item !== null)
+      ? DataItem.fromPartial(object.data_item)
+      : undefined;
     return message;
   },
 };
@@ -1188,25 +1032,15 @@ function createBaseTransformDataItemResponse(): TransformDataItemResponse {
 }
 
 export const TransformDataItemResponse = {
-  encode(
-    message: TransformDataItemResponse,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: TransformDataItemResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.transformed_data_item !== undefined) {
-      DataItem.encode(
-        message.transformed_data_item,
-        writer.uint32(10).fork()
-      ).ldelim();
+      DataItem.encode(message.transformed_data_item, writer.uint32(10).fork()).ldelim();
     }
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): TransformDataItemResponse {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): TransformDataItemResponse {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseTransformDataItemResponse();
     while (reader.pos < end) {
@@ -1217,10 +1051,7 @@ export const TransformDataItemResponse = {
             break;
           }
 
-          message.transformed_data_item = DataItem.decode(
-            reader,
-            reader.uint32()
-          );
+          message.transformed_data_item = DataItem.decode(reader, reader.uint32());
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -1242,25 +1073,18 @@ export const TransformDataItemResponse = {
   toJSON(message: TransformDataItemResponse): unknown {
     const obj: any = {};
     if (message.transformed_data_item !== undefined) {
-      obj.transformed_data_item = DataItem.toJSON(
-        message.transformed_data_item
-      );
+      obj.transformed_data_item = DataItem.toJSON(message.transformed_data_item);
     }
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<TransformDataItemResponse>, I>>(
-    base?: I
-  ): TransformDataItemResponse {
+  create<I extends Exact<DeepPartial<TransformDataItemResponse>, I>>(base?: I): TransformDataItemResponse {
     return TransformDataItemResponse.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<TransformDataItemResponse>, I>>(
-    object: I
-  ): TransformDataItemResponse {
+  fromPartial<I extends Exact<DeepPartial<TransformDataItemResponse>, I>>(object: I): TransformDataItemResponse {
     const message = createBaseTransformDataItemResponse();
     message.transformed_data_item =
-      object.transformed_data_item !== undefined &&
-      object.transformed_data_item !== null
+      (object.transformed_data_item !== undefined && object.transformed_data_item !== null)
         ? DataItem.fromPartial(object.transformed_data_item)
         : undefined;
     return message;
@@ -1268,42 +1092,25 @@ export const TransformDataItemResponse = {
 };
 
 function createBaseValidateDataItemRequest(): ValidateDataItemRequest {
-  return {
-    config: undefined,
-    proposed_data_item: undefined,
-    validation_data_item: undefined,
-  };
+  return { config: undefined, proposed_data_item: undefined, validation_data_item: undefined };
 }
 
 export const ValidateDataItemRequest = {
-  encode(
-    message: ValidateDataItemRequest,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: ValidateDataItemRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.config !== undefined) {
       RuntimeConfig.encode(message.config, writer.uint32(10).fork()).ldelim();
     }
     if (message.proposed_data_item !== undefined) {
-      DataItem.encode(
-        message.proposed_data_item,
-        writer.uint32(18).fork()
-      ).ldelim();
+      DataItem.encode(message.proposed_data_item, writer.uint32(18).fork()).ldelim();
     }
     if (message.validation_data_item !== undefined) {
-      DataItem.encode(
-        message.validation_data_item,
-        writer.uint32(26).fork()
-      ).ldelim();
+      DataItem.encode(message.validation_data_item, writer.uint32(26).fork()).ldelim();
     }
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): ValidateDataItemRequest {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): ValidateDataItemRequest {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseValidateDataItemRequest();
     while (reader.pos < end) {
@@ -1328,10 +1135,7 @@ export const ValidateDataItemRequest = {
             break;
           }
 
-          message.validation_data_item = DataItem.decode(
-            reader,
-            reader.uint32()
-          );
+          message.validation_data_item = DataItem.decode(reader, reader.uint32());
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -1344,12 +1148,8 @@ export const ValidateDataItemRequest = {
 
   fromJSON(object: any): ValidateDataItemRequest {
     return {
-      config: isSet(object.config)
-        ? RuntimeConfig.fromJSON(object.config)
-        : undefined,
-      proposed_data_item: isSet(object.proposed_data_item)
-        ? DataItem.fromJSON(object.proposed_data_item)
-        : undefined,
+      config: isSet(object.config) ? RuntimeConfig.fromJSON(object.config) : undefined,
+      proposed_data_item: isSet(object.proposed_data_item) ? DataItem.fromJSON(object.proposed_data_item) : undefined,
       validation_data_item: isSet(object.validation_data_item)
         ? DataItem.fromJSON(object.validation_data_item)
         : undefined,
@@ -1370,29 +1170,20 @@ export const ValidateDataItemRequest = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<ValidateDataItemRequest>, I>>(
-    base?: I
-  ): ValidateDataItemRequest {
+  create<I extends Exact<DeepPartial<ValidateDataItemRequest>, I>>(base?: I): ValidateDataItemRequest {
     return ValidateDataItemRequest.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<ValidateDataItemRequest>, I>>(
-    object: I
-  ): ValidateDataItemRequest {
+  fromPartial<I extends Exact<DeepPartial<ValidateDataItemRequest>, I>>(object: I): ValidateDataItemRequest {
     const message = createBaseValidateDataItemRequest();
-    message.config =
-      object.config !== undefined && object.config !== null
-        ? RuntimeConfig.fromPartial(object.config)
-        : undefined;
-    message.proposed_data_item =
-      object.proposed_data_item !== undefined &&
-      object.proposed_data_item !== null
-        ? DataItem.fromPartial(object.proposed_data_item)
-        : undefined;
-    message.validation_data_item =
-      object.validation_data_item !== undefined &&
-      object.validation_data_item !== null
-        ? DataItem.fromPartial(object.validation_data_item)
-        : undefined;
+    message.config = (object.config !== undefined && object.config !== null)
+      ? RuntimeConfig.fromPartial(object.config)
+      : undefined;
+    message.proposed_data_item = (object.proposed_data_item !== undefined && object.proposed_data_item !== null)
+      ? DataItem.fromPartial(object.proposed_data_item)
+      : undefined;
+    message.validation_data_item = (object.validation_data_item !== undefined && object.validation_data_item !== null)
+      ? DataItem.fromPartial(object.validation_data_item)
+      : undefined;
     return message;
   },
 };
@@ -1402,22 +1193,15 @@ function createBaseValidateDataItemResponse(): ValidateDataItemResponse {
 }
 
 export const ValidateDataItemResponse = {
-  encode(
-    message: ValidateDataItemResponse,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: ValidateDataItemResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.vote !== 0) {
       writer.uint32(8).int32(message.vote);
     }
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): ValidateDataItemResponse {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): ValidateDataItemResponse {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseValidateDataItemResponse();
     while (reader.pos < end) {
@@ -1451,14 +1235,10 @@ export const ValidateDataItemResponse = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<ValidateDataItemResponse>, I>>(
-    base?: I
-  ): ValidateDataItemResponse {
+  create<I extends Exact<DeepPartial<ValidateDataItemResponse>, I>>(base?: I): ValidateDataItemResponse {
     return ValidateDataItemResponse.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<ValidateDataItemResponse>, I>>(
-    object: I
-  ): ValidateDataItemResponse {
+  fromPartial<I extends Exact<DeepPartial<ValidateDataItemResponse>, I>>(object: I): ValidateDataItemResponse {
     const message = createBaseValidateDataItemResponse();
     message.vote = object.vote ?? 0;
     return message;
@@ -1470,10 +1250,7 @@ function createBaseSummarizeDataBundleRequest(): SummarizeDataBundleRequest {
 }
 
 export const SummarizeDataBundleRequest = {
-  encode(
-    message: SummarizeDataBundleRequest,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: SummarizeDataBundleRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.config !== undefined) {
       RuntimeConfig.encode(message.config, writer.uint32(10).fork()).ldelim();
     }
@@ -1483,12 +1260,8 @@ export const SummarizeDataBundleRequest = {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): SummarizeDataBundleRequest {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): SummarizeDataBundleRequest {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseSummarizeDataBundleRequest();
     while (reader.pos < end) {
@@ -1519,12 +1292,8 @@ export const SummarizeDataBundleRequest = {
 
   fromJSON(object: any): SummarizeDataBundleRequest {
     return {
-      config: isSet(object.config)
-        ? RuntimeConfig.fromJSON(object.config)
-        : undefined,
-      bundle: globalThis.Array.isArray(object?.bundle)
-        ? object.bundle.map((e: any) => DataItem.fromJSON(e))
-        : [],
+      config: isSet(object.config) ? RuntimeConfig.fromJSON(object.config) : undefined,
+      bundle: globalThis.Array.isArray(object?.bundle) ? object.bundle.map((e: any) => DataItem.fromJSON(e)) : [],
     };
   },
 
@@ -1539,19 +1308,14 @@ export const SummarizeDataBundleRequest = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<SummarizeDataBundleRequest>, I>>(
-    base?: I
-  ): SummarizeDataBundleRequest {
+  create<I extends Exact<DeepPartial<SummarizeDataBundleRequest>, I>>(base?: I): SummarizeDataBundleRequest {
     return SummarizeDataBundleRequest.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<SummarizeDataBundleRequest>, I>>(
-    object: I
-  ): SummarizeDataBundleRequest {
+  fromPartial<I extends Exact<DeepPartial<SummarizeDataBundleRequest>, I>>(object: I): SummarizeDataBundleRequest {
     const message = createBaseSummarizeDataBundleRequest();
-    message.config =
-      object.config !== undefined && object.config !== null
-        ? RuntimeConfig.fromPartial(object.config)
-        : undefined;
+    message.config = (object.config !== undefined && object.config !== null)
+      ? RuntimeConfig.fromPartial(object.config)
+      : undefined;
     message.bundle = object.bundle?.map((e) => DataItem.fromPartial(e)) || [];
     return message;
   },
@@ -1562,22 +1326,15 @@ function createBaseSummarizeDataBundleResponse(): SummarizeDataBundleResponse {
 }
 
 export const SummarizeDataBundleResponse = {
-  encode(
-    message: SummarizeDataBundleResponse,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: SummarizeDataBundleResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.summary !== "") {
       writer.uint32(10).string(message.summary);
     }
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): SummarizeDataBundleResponse {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): SummarizeDataBundleResponse {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseSummarizeDataBundleResponse();
     while (reader.pos < end) {
@@ -1600,9 +1357,7 @@ export const SummarizeDataBundleResponse = {
   },
 
   fromJSON(object: any): SummarizeDataBundleResponse {
-    return {
-      summary: isSet(object.summary) ? globalThis.String(object.summary) : "",
-    };
+    return { summary: isSet(object.summary) ? globalThis.String(object.summary) : "" };
   },
 
   toJSON(message: SummarizeDataBundleResponse): unknown {
@@ -1613,14 +1368,10 @@ export const SummarizeDataBundleResponse = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<SummarizeDataBundleResponse>, I>>(
-    base?: I
-  ): SummarizeDataBundleResponse {
+  create<I extends Exact<DeepPartial<SummarizeDataBundleResponse>, I>>(base?: I): SummarizeDataBundleResponse {
     return SummarizeDataBundleResponse.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<SummarizeDataBundleResponse>, I>>(
-    object: I
-  ): SummarizeDataBundleResponse {
+  fromPartial<I extends Exact<DeepPartial<SummarizeDataBundleResponse>, I>>(object: I): SummarizeDataBundleResponse {
     const message = createBaseSummarizeDataBundleResponse();
     message.summary = object.summary ?? "";
     return message;
@@ -1632,10 +1383,7 @@ function createBaseNextKeyRequest(): NextKeyRequest {
 }
 
 export const NextKeyRequest = {
-  encode(
-    message: NextKeyRequest,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: NextKeyRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.config !== undefined) {
       RuntimeConfig.encode(message.config, writer.uint32(10).fork()).ldelim();
     }
@@ -1646,8 +1394,7 @@ export const NextKeyRequest = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): NextKeyRequest {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseNextKeyRequest();
     while (reader.pos < end) {
@@ -1678,9 +1425,7 @@ export const NextKeyRequest = {
 
   fromJSON(object: any): NextKeyRequest {
     return {
-      config: isSet(object.config)
-        ? RuntimeConfig.fromJSON(object.config)
-        : undefined,
+      config: isSet(object.config) ? RuntimeConfig.fromJSON(object.config) : undefined,
       key: isSet(object.key) ? globalThis.String(object.key) : "",
     };
   },
@@ -1696,19 +1441,14 @@ export const NextKeyRequest = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<NextKeyRequest>, I>>(
-    base?: I
-  ): NextKeyRequest {
+  create<I extends Exact<DeepPartial<NextKeyRequest>, I>>(base?: I): NextKeyRequest {
     return NextKeyRequest.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<NextKeyRequest>, I>>(
-    object: I
-  ): NextKeyRequest {
+  fromPartial<I extends Exact<DeepPartial<NextKeyRequest>, I>>(object: I): NextKeyRequest {
     const message = createBaseNextKeyRequest();
-    message.config =
-      object.config !== undefined && object.config !== null
-        ? RuntimeConfig.fromPartial(object.config)
-        : undefined;
+    message.config = (object.config !== undefined && object.config !== null)
+      ? RuntimeConfig.fromPartial(object.config)
+      : undefined;
     message.key = object.key ?? "";
     return message;
   },
@@ -1719,10 +1459,7 @@ function createBaseNextKeyResponse(): NextKeyResponse {
 }
 
 export const NextKeyResponse = {
-  encode(
-    message: NextKeyResponse,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: NextKeyResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.next_key !== "") {
       writer.uint32(10).string(message.next_key);
     }
@@ -1730,8 +1467,7 @@ export const NextKeyResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): NextKeyResponse {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseNextKeyResponse();
     while (reader.pos < end) {
@@ -1754,11 +1490,7 @@ export const NextKeyResponse = {
   },
 
   fromJSON(object: any): NextKeyResponse {
-    return {
-      next_key: isSet(object.next_key)
-        ? globalThis.String(object.next_key)
-        : "",
-    };
+    return { next_key: isSet(object.next_key) ? globalThis.String(object.next_key) : "" };
   },
 
   toJSON(message: NextKeyResponse): unknown {
@@ -1769,14 +1501,10 @@ export const NextKeyResponse = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<NextKeyResponse>, I>>(
-    base?: I
-  ): NextKeyResponse {
+  create<I extends Exact<DeepPartial<NextKeyResponse>, I>>(base?: I): NextKeyResponse {
     return NextKeyResponse.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<NextKeyResponse>, I>>(
-    object: I
-  ): NextKeyResponse {
+  fromPartial<I extends Exact<DeepPartial<NextKeyResponse>, I>>(object: I): NextKeyResponse {
     const message = createBaseNextKeyResponse();
     message.next_key = object.next_key ?? "";
     return message;
@@ -1796,27 +1524,21 @@ export const RuntimeServiceService = {
     path: "/kyverdk.runtime.v1.RuntimeService/GetRuntimeName",
     requestStream: false,
     responseStream: false,
-    requestSerialize: (value: GetRuntimeNameRequest) =>
-      Buffer.from(GetRuntimeNameRequest.encode(value).finish()),
+    requestSerialize: (value: GetRuntimeNameRequest) => Buffer.from(GetRuntimeNameRequest.encode(value).finish()),
     requestDeserialize: (value: Buffer) => GetRuntimeNameRequest.decode(value),
-    responseSerialize: (value: GetRuntimeNameResponse) =>
-      Buffer.from(GetRuntimeNameResponse.encode(value).finish()),
-    responseDeserialize: (value: Buffer) =>
-      GetRuntimeNameResponse.decode(value),
+    responseSerialize: (value: GetRuntimeNameResponse) => Buffer.from(GetRuntimeNameResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer) => GetRuntimeNameResponse.decode(value),
   },
   /** Returns the version of the runtime. Example "1.2.0" */
   getRuntimeVersion: {
     path: "/kyverdk.runtime.v1.RuntimeService/GetRuntimeVersion",
     requestStream: false,
     responseStream: false,
-    requestSerialize: (value: GetRuntimeVersionRequest) =>
-      Buffer.from(GetRuntimeVersionRequest.encode(value).finish()),
-    requestDeserialize: (value: Buffer) =>
-      GetRuntimeVersionRequest.decode(value),
+    requestSerialize: (value: GetRuntimeVersionRequest) => Buffer.from(GetRuntimeVersionRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer) => GetRuntimeVersionRequest.decode(value),
     responseSerialize: (value: GetRuntimeVersionResponse) =>
       Buffer.from(GetRuntimeVersionResponse.encode(value).finish()),
-    responseDeserialize: (value: Buffer) =>
-      GetRuntimeVersionResponse.decode(value),
+    responseDeserialize: (value: Buffer) => GetRuntimeVersionResponse.decode(value),
   },
   /**
    * Parses the raw runtime config found on pool, validates it and finally sets
@@ -1830,14 +1552,11 @@ export const RuntimeServiceService = {
     path: "/kyverdk.runtime.v1.RuntimeService/ValidateSetConfig",
     requestStream: false,
     responseStream: false,
-    requestSerialize: (value: ValidateSetConfigRequest) =>
-      Buffer.from(ValidateSetConfigRequest.encode(value).finish()),
-    requestDeserialize: (value: Buffer) =>
-      ValidateSetConfigRequest.decode(value),
+    requestSerialize: (value: ValidateSetConfigRequest) => Buffer.from(ValidateSetConfigRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer) => ValidateSetConfigRequest.decode(value),
     responseSerialize: (value: ValidateSetConfigResponse) =>
       Buffer.from(ValidateSetConfigResponse.encode(value).finish()),
-    responseDeserialize: (value: Buffer) =>
-      ValidateSetConfigResponse.decode(value),
+    responseDeserialize: (value: Buffer) => ValidateSetConfigResponse.decode(value),
   },
   /**
    * Gets the data item from a specific key and returns both key and the value.
@@ -1848,11 +1567,9 @@ export const RuntimeServiceService = {
     path: "/kyverdk.runtime.v1.RuntimeService/GetDataItem",
     requestStream: false,
     responseStream: false,
-    requestSerialize: (value: GetDataItemRequest) =>
-      Buffer.from(GetDataItemRequest.encode(value).finish()),
+    requestSerialize: (value: GetDataItemRequest) => Buffer.from(GetDataItemRequest.encode(value).finish()),
     requestDeserialize: (value: Buffer) => GetDataItemRequest.decode(value),
-    responseSerialize: (value: GetDataItemResponse) =>
-      Buffer.from(GetDataItemResponse.encode(value).finish()),
+    responseSerialize: (value: GetDataItemResponse) => Buffer.from(GetDataItemResponse.encode(value).finish()),
     responseDeserialize: (value: Buffer) => GetDataItemResponse.decode(value),
   },
   /**
@@ -1870,12 +1587,10 @@ export const RuntimeServiceService = {
     responseStream: false,
     requestSerialize: (value: PrevalidateDataItemRequest) =>
       Buffer.from(PrevalidateDataItemRequest.encode(value).finish()),
-    requestDeserialize: (value: Buffer) =>
-      PrevalidateDataItemRequest.decode(value),
+    requestDeserialize: (value: Buffer) => PrevalidateDataItemRequest.decode(value),
     responseSerialize: (value: PrevalidateDataItemResponse) =>
       Buffer.from(PrevalidateDataItemResponse.encode(value).finish()),
-    responseDeserialize: (value: Buffer) =>
-      PrevalidateDataItemResponse.decode(value),
+    responseDeserialize: (value: Buffer) => PrevalidateDataItemResponse.decode(value),
   },
   /**
    * Transforms a single data item and return it. Used for example
@@ -1887,14 +1602,11 @@ export const RuntimeServiceService = {
     path: "/kyverdk.runtime.v1.RuntimeService/TransformDataItem",
     requestStream: false,
     responseStream: false,
-    requestSerialize: (value: TransformDataItemRequest) =>
-      Buffer.from(TransformDataItemRequest.encode(value).finish()),
-    requestDeserialize: (value: Buffer) =>
-      TransformDataItemRequest.decode(value),
+    requestSerialize: (value: TransformDataItemRequest) => Buffer.from(TransformDataItemRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer) => TransformDataItemRequest.decode(value),
     responseSerialize: (value: TransformDataItemResponse) =>
       Buffer.from(TransformDataItemResponse.encode(value).finish()),
-    responseDeserialize: (value: Buffer) =>
-      TransformDataItemResponse.decode(value),
+    responseDeserialize: (value: Buffer) => TransformDataItemResponse.decode(value),
   },
   /**
    * Validates a single data item of a bundle proposal
@@ -1905,14 +1617,11 @@ export const RuntimeServiceService = {
     path: "/kyverdk.runtime.v1.RuntimeService/ValidateDataItem",
     requestStream: false,
     responseStream: false,
-    requestSerialize: (value: ValidateDataItemRequest) =>
-      Buffer.from(ValidateDataItemRequest.encode(value).finish()),
-    requestDeserialize: (value: Buffer) =>
-      ValidateDataItemRequest.decode(value),
+    requestSerialize: (value: ValidateDataItemRequest) => Buffer.from(ValidateDataItemRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer) => ValidateDataItemRequest.decode(value),
     responseSerialize: (value: ValidateDataItemResponse) =>
       Buffer.from(ValidateDataItemResponse.encode(value).finish()),
-    responseDeserialize: (value: Buffer) =>
-      ValidateDataItemResponse.decode(value),
+    responseDeserialize: (value: Buffer) => ValidateDataItemResponse.decode(value),
   },
   /**
    * Gets a formatted value string from a bundle. This produces a "summary" of
@@ -1928,12 +1637,10 @@ export const RuntimeServiceService = {
     responseStream: false,
     requestSerialize: (value: SummarizeDataBundleRequest) =>
       Buffer.from(SummarizeDataBundleRequest.encode(value).finish()),
-    requestDeserialize: (value: Buffer) =>
-      SummarizeDataBundleRequest.decode(value),
+    requestDeserialize: (value: Buffer) => SummarizeDataBundleRequest.decode(value),
     responseSerialize: (value: SummarizeDataBundleResponse) =>
       Buffer.from(SummarizeDataBundleResponse.encode(value).finish()),
-    responseDeserialize: (value: Buffer) =>
-      SummarizeDataBundleResponse.decode(value),
+    responseDeserialize: (value: Buffer) => SummarizeDataBundleResponse.decode(value),
   },
   /**
    * Gets the next key from the current key so that the data archived has an order.
@@ -1944,26 +1651,18 @@ export const RuntimeServiceService = {
     path: "/kyverdk.runtime.v1.RuntimeService/NextKey",
     requestStream: false,
     responseStream: false,
-    requestSerialize: (value: NextKeyRequest) =>
-      Buffer.from(NextKeyRequest.encode(value).finish()),
+    requestSerialize: (value: NextKeyRequest) => Buffer.from(NextKeyRequest.encode(value).finish()),
     requestDeserialize: (value: Buffer) => NextKeyRequest.decode(value),
-    responseSerialize: (value: NextKeyResponse) =>
-      Buffer.from(NextKeyResponse.encode(value).finish()),
+    responseSerialize: (value: NextKeyResponse) => Buffer.from(NextKeyResponse.encode(value).finish()),
     responseDeserialize: (value: Buffer) => NextKeyResponse.decode(value),
   },
 } as const;
 
 export interface RuntimeServiceServer extends UntypedServiceImplementation {
   /** Returns the name of the runtime. Example "@kyvejs/tendermint" */
-  getRuntimeName: handleUnaryCall<
-    GetRuntimeNameRequest,
-    GetRuntimeNameResponse
-  >;
+  getRuntimeName: handleUnaryCall<GetRuntimeNameRequest, GetRuntimeNameResponse>;
   /** Returns the version of the runtime. Example "1.2.0" */
-  getRuntimeVersion: handleUnaryCall<
-    GetRuntimeVersionRequest,
-    GetRuntimeVersionResponse
-  >;
+  getRuntimeVersion: handleUnaryCall<GetRuntimeVersionRequest, GetRuntimeVersionResponse>;
   /**
    * Parses the raw runtime config found on pool, validates it and finally sets
    * the property "config" in the runtime. A raw config could be an ipfs link to the
@@ -1972,10 +1671,7 @@ export interface RuntimeServiceServer extends UntypedServiceImplementation {
    *
    * Deterministic behavior is required
    */
-  validateSetConfig: handleUnaryCall<
-    ValidateSetConfigRequest,
-    ValidateSetConfigResponse
-  >;
+  validateSetConfig: handleUnaryCall<ValidateSetConfigRequest, ValidateSetConfigResponse>;
   /**
    * Gets the data item from a specific key and returns both key and the value.
    *
@@ -1991,29 +1687,20 @@ export interface RuntimeServiceServer extends UntypedServiceImplementation {
    *
    * Deterministic behavior is required
    */
-  prevalidateDataItem: handleUnaryCall<
-    PrevalidateDataItemRequest,
-    PrevalidateDataItemResponse
-  >;
+  prevalidateDataItem: handleUnaryCall<PrevalidateDataItemRequest, PrevalidateDataItemResponse>;
   /**
    * Transforms a single data item and return it. Used for example
    * to remove unecessary data or format the data in a better way.
    *
    * Deterministic behavior is required
    */
-  transformDataItem: handleUnaryCall<
-    TransformDataItemRequest,
-    TransformDataItemResponse
-  >;
+  transformDataItem: handleUnaryCall<TransformDataItemRequest, TransformDataItemResponse>;
   /**
    * Validates a single data item of a bundle proposal
    *
    * Deterministic behavior is required
    */
-  validateDataItem: handleUnaryCall<
-    ValidateDataItemRequest,
-    ValidateDataItemResponse
-  >;
+  validateDataItem: handleUnaryCall<ValidateDataItemRequest, ValidateDataItemResponse>;
   /**
    * Gets a formatted value string from a bundle. This produces a "summary" of
    * a bundle which gets stored on-chain and therefore needs to be short.
@@ -2022,10 +1709,7 @@ export interface RuntimeServiceServer extends UntypedServiceImplementation {
    *
    * Deterministic behavior is required
    */
-  summarizeDataBundle: handleUnaryCall<
-    SummarizeDataBundleRequest,
-    SummarizeDataBundleResponse
-  >;
+  summarizeDataBundle: handleUnaryCall<SummarizeDataBundleRequest, SummarizeDataBundleResponse>;
   /**
    * Gets the next key from the current key so that the data archived has an order.
    *
@@ -2038,52 +1722,34 @@ export interface RuntimeServiceClient extends Client {
   /** Returns the name of the runtime. Example "@kyvejs/tendermint" */
   getRuntimeName(
     request: GetRuntimeNameRequest,
-    callback: (
-      error: ServiceError | null,
-      response: GetRuntimeNameResponse
-    ) => void
+    callback: (error: ServiceError | null, response: GetRuntimeNameResponse) => void,
   ): ClientUnaryCall;
   getRuntimeName(
     request: GetRuntimeNameRequest,
     metadata: Metadata,
-    callback: (
-      error: ServiceError | null,
-      response: GetRuntimeNameResponse
-    ) => void
+    callback: (error: ServiceError | null, response: GetRuntimeNameResponse) => void,
   ): ClientUnaryCall;
   getRuntimeName(
     request: GetRuntimeNameRequest,
     metadata: Metadata,
     options: Partial<CallOptions>,
-    callback: (
-      error: ServiceError | null,
-      response: GetRuntimeNameResponse
-    ) => void
+    callback: (error: ServiceError | null, response: GetRuntimeNameResponse) => void,
   ): ClientUnaryCall;
   /** Returns the version of the runtime. Example "1.2.0" */
   getRuntimeVersion(
     request: GetRuntimeVersionRequest,
-    callback: (
-      error: ServiceError | null,
-      response: GetRuntimeVersionResponse
-    ) => void
+    callback: (error: ServiceError | null, response: GetRuntimeVersionResponse) => void,
   ): ClientUnaryCall;
   getRuntimeVersion(
     request: GetRuntimeVersionRequest,
     metadata: Metadata,
-    callback: (
-      error: ServiceError | null,
-      response: GetRuntimeVersionResponse
-    ) => void
+    callback: (error: ServiceError | null, response: GetRuntimeVersionResponse) => void,
   ): ClientUnaryCall;
   getRuntimeVersion(
     request: GetRuntimeVersionRequest,
     metadata: Metadata,
     options: Partial<CallOptions>,
-    callback: (
-      error: ServiceError | null,
-      response: GetRuntimeVersionResponse
-    ) => void
+    callback: (error: ServiceError | null, response: GetRuntimeVersionResponse) => void,
   ): ClientUnaryCall;
   /**
    * Parses the raw runtime config found on pool, validates it and finally sets
@@ -2095,27 +1761,18 @@ export interface RuntimeServiceClient extends Client {
    */
   validateSetConfig(
     request: ValidateSetConfigRequest,
-    callback: (
-      error: ServiceError | null,
-      response: ValidateSetConfigResponse
-    ) => void
+    callback: (error: ServiceError | null, response: ValidateSetConfigResponse) => void,
   ): ClientUnaryCall;
   validateSetConfig(
     request: ValidateSetConfigRequest,
     metadata: Metadata,
-    callback: (
-      error: ServiceError | null,
-      response: ValidateSetConfigResponse
-    ) => void
+    callback: (error: ServiceError | null, response: ValidateSetConfigResponse) => void,
   ): ClientUnaryCall;
   validateSetConfig(
     request: ValidateSetConfigRequest,
     metadata: Metadata,
     options: Partial<CallOptions>,
-    callback: (
-      error: ServiceError | null,
-      response: ValidateSetConfigResponse
-    ) => void
+    callback: (error: ServiceError | null, response: ValidateSetConfigResponse) => void,
   ): ClientUnaryCall;
   /**
    * Gets the data item from a specific key and returns both key and the value.
@@ -2124,27 +1781,18 @@ export interface RuntimeServiceClient extends Client {
    */
   getDataItem(
     request: GetDataItemRequest,
-    callback: (
-      error: ServiceError | null,
-      response: GetDataItemResponse
-    ) => void
+    callback: (error: ServiceError | null, response: GetDataItemResponse) => void,
   ): ClientUnaryCall;
   getDataItem(
     request: GetDataItemRequest,
     metadata: Metadata,
-    callback: (
-      error: ServiceError | null,
-      response: GetDataItemResponse
-    ) => void
+    callback: (error: ServiceError | null, response: GetDataItemResponse) => void,
   ): ClientUnaryCall;
   getDataItem(
     request: GetDataItemRequest,
     metadata: Metadata,
     options: Partial<CallOptions>,
-    callback: (
-      error: ServiceError | null,
-      response: GetDataItemResponse
-    ) => void
+    callback: (error: ServiceError | null, response: GetDataItemResponse) => void,
   ): ClientUnaryCall;
   /**
    * Prevalidates a data item right after is was retrieved from source.
@@ -2157,27 +1805,18 @@ export interface RuntimeServiceClient extends Client {
    */
   prevalidateDataItem(
     request: PrevalidateDataItemRequest,
-    callback: (
-      error: ServiceError | null,
-      response: PrevalidateDataItemResponse
-    ) => void
+    callback: (error: ServiceError | null, response: PrevalidateDataItemResponse) => void,
   ): ClientUnaryCall;
   prevalidateDataItem(
     request: PrevalidateDataItemRequest,
     metadata: Metadata,
-    callback: (
-      error: ServiceError | null,
-      response: PrevalidateDataItemResponse
-    ) => void
+    callback: (error: ServiceError | null, response: PrevalidateDataItemResponse) => void,
   ): ClientUnaryCall;
   prevalidateDataItem(
     request: PrevalidateDataItemRequest,
     metadata: Metadata,
     options: Partial<CallOptions>,
-    callback: (
-      error: ServiceError | null,
-      response: PrevalidateDataItemResponse
-    ) => void
+    callback: (error: ServiceError | null, response: PrevalidateDataItemResponse) => void,
   ): ClientUnaryCall;
   /**
    * Transforms a single data item and return it. Used for example
@@ -2187,27 +1826,18 @@ export interface RuntimeServiceClient extends Client {
    */
   transformDataItem(
     request: TransformDataItemRequest,
-    callback: (
-      error: ServiceError | null,
-      response: TransformDataItemResponse
-    ) => void
+    callback: (error: ServiceError | null, response: TransformDataItemResponse) => void,
   ): ClientUnaryCall;
   transformDataItem(
     request: TransformDataItemRequest,
     metadata: Metadata,
-    callback: (
-      error: ServiceError | null,
-      response: TransformDataItemResponse
-    ) => void
+    callback: (error: ServiceError | null, response: TransformDataItemResponse) => void,
   ): ClientUnaryCall;
   transformDataItem(
     request: TransformDataItemRequest,
     metadata: Metadata,
     options: Partial<CallOptions>,
-    callback: (
-      error: ServiceError | null,
-      response: TransformDataItemResponse
-    ) => void
+    callback: (error: ServiceError | null, response: TransformDataItemResponse) => void,
   ): ClientUnaryCall;
   /**
    * Validates a single data item of a bundle proposal
@@ -2216,27 +1846,18 @@ export interface RuntimeServiceClient extends Client {
    */
   validateDataItem(
     request: ValidateDataItemRequest,
-    callback: (
-      error: ServiceError | null,
-      response: ValidateDataItemResponse
-    ) => void
+    callback: (error: ServiceError | null, response: ValidateDataItemResponse) => void,
   ): ClientUnaryCall;
   validateDataItem(
     request: ValidateDataItemRequest,
     metadata: Metadata,
-    callback: (
-      error: ServiceError | null,
-      response: ValidateDataItemResponse
-    ) => void
+    callback: (error: ServiceError | null, response: ValidateDataItemResponse) => void,
   ): ClientUnaryCall;
   validateDataItem(
     request: ValidateDataItemRequest,
     metadata: Metadata,
     options: Partial<CallOptions>,
-    callback: (
-      error: ServiceError | null,
-      response: ValidateDataItemResponse
-    ) => void
+    callback: (error: ServiceError | null, response: ValidateDataItemResponse) => void,
   ): ClientUnaryCall;
   /**
    * Gets a formatted value string from a bundle. This produces a "summary" of
@@ -2248,27 +1869,18 @@ export interface RuntimeServiceClient extends Client {
    */
   summarizeDataBundle(
     request: SummarizeDataBundleRequest,
-    callback: (
-      error: ServiceError | null,
-      response: SummarizeDataBundleResponse
-    ) => void
+    callback: (error: ServiceError | null, response: SummarizeDataBundleResponse) => void,
   ): ClientUnaryCall;
   summarizeDataBundle(
     request: SummarizeDataBundleRequest,
     metadata: Metadata,
-    callback: (
-      error: ServiceError | null,
-      response: SummarizeDataBundleResponse
-    ) => void
+    callback: (error: ServiceError | null, response: SummarizeDataBundleResponse) => void,
   ): ClientUnaryCall;
   summarizeDataBundle(
     request: SummarizeDataBundleRequest,
     metadata: Metadata,
     options: Partial<CallOptions>,
-    callback: (
-      error: ServiceError | null,
-      response: SummarizeDataBundleResponse
-    ) => void
+    callback: (error: ServiceError | null, response: SummarizeDataBundleResponse) => void,
   ): ClientUnaryCall;
   /**
    * Gets the next key from the current key so that the data archived has an order.
@@ -2277,58 +1889,40 @@ export interface RuntimeServiceClient extends Client {
    */
   nextKey(
     request: NextKeyRequest,
-    callback: (error: ServiceError | null, response: NextKeyResponse) => void
+    callback: (error: ServiceError | null, response: NextKeyResponse) => void,
   ): ClientUnaryCall;
   nextKey(
     request: NextKeyRequest,
     metadata: Metadata,
-    callback: (error: ServiceError | null, response: NextKeyResponse) => void
+    callback: (error: ServiceError | null, response: NextKeyResponse) => void,
   ): ClientUnaryCall;
   nextKey(
     request: NextKeyRequest,
     metadata: Metadata,
     options: Partial<CallOptions>,
-    callback: (error: ServiceError | null, response: NextKeyResponse) => void
+    callback: (error: ServiceError | null, response: NextKeyResponse) => void,
   ): ClientUnaryCall;
 }
 
 export const RuntimeServiceClient = makeGenericClientConstructor(
   RuntimeServiceService,
-  "kyverdk.runtime.v1.RuntimeService"
+  "kyverdk.runtime.v1.RuntimeService",
 ) as unknown as {
-  new (
-    address: string,
-    credentials: ChannelCredentials,
-    options?: Partial<ClientOptions>
-  ): RuntimeServiceClient;
+  new (address: string, credentials: ChannelCredentials, options?: Partial<ClientOptions>): RuntimeServiceClient;
   service: typeof RuntimeServiceService;
 };
 
-type Builtin =
-  | Date
-  | Function
-  | Uint8Array
-  | string
-  | number
-  | boolean
-  | undefined;
+type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
-export type DeepPartial<T> = T extends Builtin
-  ? T
-  : T extends globalThis.Array<infer U>
-  ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
+export type DeepPartial<T> = T extends Builtin ? T
+  : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
+  : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
+  : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 
 type KeysOfUnion<T> = T extends T ? keyof T : never;
-export type Exact<P, I extends P> = P extends Builtin
-  ? P
-  : P & { [K in keyof P]: Exact<P[K], I[K]> } & {
-      [K in Exclude<keyof I, KeysOfUnion<P>>]: never;
-    };
+export type Exact<P, I extends P> = P extends Builtin ? P
+  : P & { [K in keyof P]: Exact<P[K], I[K]> } & { [K in Exclude<keyof I, KeysOfUnion<P>>]: never };
 
 function isSet(value: any): boolean {
   return value !== null && value !== undefined;

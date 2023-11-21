@@ -12,7 +12,7 @@ import {
   RuntimeServiceClient,
   DataItem,
 } from "../proto/kyverdk/runtime/v1/runtime";
-import { DirectChannel } from "./direction-connection";
+import { DirectChannel } from "./direct-channel";
 import { IRuntime, ProtocolConfig } from "../types";
 import { ClientOptions } from "@grpc/grpc-js";
 

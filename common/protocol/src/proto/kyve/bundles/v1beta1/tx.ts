@@ -1,10 +1,5 @@
 /* eslint-disable */
-import {
-  ChannelCredentials,
-  Client,
-  makeGenericClientConstructor,
-  Metadata,
-} from "@grpc/grpc-js";
+import { ChannelCredentials, Client, makeGenericClientConstructor, Metadata } from "@grpc/grpc-js";
 import type {
   CallOptions,
   ClientOptions,
@@ -95,7 +90,8 @@ export interface MsgSubmitBundleProposal {
 }
 
 /** MsgSubmitBundleProposalResponse defines the Msg/SubmitBundleProposal response type. */
-export interface MsgSubmitBundleProposalResponse {}
+export interface MsgSubmitBundleProposalResponse {
+}
 
 /** MsgVoteBundleProposal defines a SDK message for voting on a bundle proposal. */
 export interface MsgVoteBundleProposal {
@@ -112,7 +108,8 @@ export interface MsgVoteBundleProposal {
 }
 
 /** MsgVoteBundleProposalResponse defines the Msg/VoteBundleProposal response type. */
-export interface MsgVoteBundleProposalResponse {}
+export interface MsgVoteBundleProposalResponse {
+}
 
 /** MsgClaimUploaderRole defines a SDK message for claiming the uploader role. */
 export interface MsgClaimUploaderRole {
@@ -125,7 +122,8 @@ export interface MsgClaimUploaderRole {
 }
 
 /** MsgClaimUploaderRoleResponse defines the Msg/ClaimUploaderRole response type. */
-export interface MsgClaimUploaderRoleResponse {}
+export interface MsgClaimUploaderRoleResponse {
+}
 
 /** MsgSubmitBundleProposal defines a SDK message for submitting a bundle proposal. */
 export interface MsgSkipUploaderRole {
@@ -140,7 +138,8 @@ export interface MsgSkipUploaderRole {
 }
 
 /** MsgSubmitBundleProposalResponse defines the Msg/SubmitBundleProposal response type. */
-export interface MsgSkipUploaderRoleResponse {}
+export interface MsgSkipUploaderRoleResponse {
+}
 
 /** MsgUpdateParams defines a SDK message for updating the module parameters. */
 export interface MsgUpdateParams {
@@ -151,7 +150,8 @@ export interface MsgUpdateParams {
 }
 
 /** MsgUpdateParamsResponse defines the Msg/UpdateParams response type. */
-export interface MsgUpdateParamsResponse {}
+export interface MsgUpdateParamsResponse {
+}
 
 function createBaseMsgSubmitBundleProposal(): MsgSubmitBundleProposal {
   return {
@@ -170,10 +170,7 @@ function createBaseMsgSubmitBundleProposal(): MsgSubmitBundleProposal {
 }
 
 export const MsgSubmitBundleProposal = {
-  encode(
-    message: MsgSubmitBundleProposal,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: MsgSubmitBundleProposal, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
     }
@@ -210,12 +207,8 @@ export const MsgSubmitBundleProposal = {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): MsgSubmitBundleProposal {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgSubmitBundleProposal {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgSubmitBundleProposal();
     while (reader.pos < end) {
@@ -312,28 +305,14 @@ export const MsgSubmitBundleProposal = {
       creator: isSet(object.creator) ? globalThis.String(object.creator) : "",
       staker: isSet(object.staker) ? globalThis.String(object.staker) : "",
       pool_id: isSet(object.pool_id) ? globalThis.String(object.pool_id) : "0",
-      storage_id: isSet(object.storage_id)
-        ? globalThis.String(object.storage_id)
-        : "",
-      data_size: isSet(object.data_size)
-        ? globalThis.String(object.data_size)
-        : "0",
-      data_hash: isSet(object.data_hash)
-        ? globalThis.String(object.data_hash)
-        : "",
-      from_index: isSet(object.from_index)
-        ? globalThis.String(object.from_index)
-        : "0",
-      bundle_size: isSet(object.bundle_size)
-        ? globalThis.String(object.bundle_size)
-        : "0",
-      from_key: isSet(object.from_key)
-        ? globalThis.String(object.from_key)
-        : "",
+      storage_id: isSet(object.storage_id) ? globalThis.String(object.storage_id) : "",
+      data_size: isSet(object.data_size) ? globalThis.String(object.data_size) : "0",
+      data_hash: isSet(object.data_hash) ? globalThis.String(object.data_hash) : "",
+      from_index: isSet(object.from_index) ? globalThis.String(object.from_index) : "0",
+      bundle_size: isSet(object.bundle_size) ? globalThis.String(object.bundle_size) : "0",
+      from_key: isSet(object.from_key) ? globalThis.String(object.from_key) : "",
       to_key: isSet(object.to_key) ? globalThis.String(object.to_key) : "",
-      bundle_summary: isSet(object.bundle_summary)
-        ? globalThis.String(object.bundle_summary)
-        : "",
+      bundle_summary: isSet(object.bundle_summary) ? globalThis.String(object.bundle_summary) : "",
     };
   },
 
@@ -375,14 +354,10 @@ export const MsgSubmitBundleProposal = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<MsgSubmitBundleProposal>, I>>(
-    base?: I
-  ): MsgSubmitBundleProposal {
+  create<I extends Exact<DeepPartial<MsgSubmitBundleProposal>, I>>(base?: I): MsgSubmitBundleProposal {
     return MsgSubmitBundleProposal.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<MsgSubmitBundleProposal>, I>>(
-    object: I
-  ): MsgSubmitBundleProposal {
+  fromPartial<I extends Exact<DeepPartial<MsgSubmitBundleProposal>, I>>(object: I): MsgSubmitBundleProposal {
     const message = createBaseMsgSubmitBundleProposal();
     message.creator = object.creator ?? "";
     message.staker = object.staker ?? "";
@@ -404,19 +379,12 @@ function createBaseMsgSubmitBundleProposalResponse(): MsgSubmitBundleProposalRes
 }
 
 export const MsgSubmitBundleProposalResponse = {
-  encode(
-    _: MsgSubmitBundleProposalResponse,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(_: MsgSubmitBundleProposalResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): MsgSubmitBundleProposalResponse {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgSubmitBundleProposalResponse {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgSubmitBundleProposalResponse();
     while (reader.pos < end) {
@@ -440,14 +408,10 @@ export const MsgSubmitBundleProposalResponse = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<MsgSubmitBundleProposalResponse>, I>>(
-    base?: I
-  ): MsgSubmitBundleProposalResponse {
+  create<I extends Exact<DeepPartial<MsgSubmitBundleProposalResponse>, I>>(base?: I): MsgSubmitBundleProposalResponse {
     return MsgSubmitBundleProposalResponse.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<MsgSubmitBundleProposalResponse>, I>>(
-    _: I
-  ): MsgSubmitBundleProposalResponse {
+  fromPartial<I extends Exact<DeepPartial<MsgSubmitBundleProposalResponse>, I>>(_: I): MsgSubmitBundleProposalResponse {
     const message = createBaseMsgSubmitBundleProposalResponse();
     return message;
   },
@@ -458,10 +422,7 @@ function createBaseMsgVoteBundleProposal(): MsgVoteBundleProposal {
 }
 
 export const MsgVoteBundleProposal = {
-  encode(
-    message: MsgVoteBundleProposal,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: MsgVoteBundleProposal, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
     }
@@ -480,12 +441,8 @@ export const MsgVoteBundleProposal = {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): MsgVoteBundleProposal {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgVoteBundleProposal {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgVoteBundleProposal();
     while (reader.pos < end) {
@@ -540,9 +497,7 @@ export const MsgVoteBundleProposal = {
       creator: isSet(object.creator) ? globalThis.String(object.creator) : "",
       staker: isSet(object.staker) ? globalThis.String(object.staker) : "",
       pool_id: isSet(object.pool_id) ? globalThis.String(object.pool_id) : "0",
-      storage_id: isSet(object.storage_id)
-        ? globalThis.String(object.storage_id)
-        : "",
+      storage_id: isSet(object.storage_id) ? globalThis.String(object.storage_id) : "",
       vote: isSet(object.vote) ? voteTypeFromJSON(object.vote) : 0,
     };
   },
@@ -567,14 +522,10 @@ export const MsgVoteBundleProposal = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<MsgVoteBundleProposal>, I>>(
-    base?: I
-  ): MsgVoteBundleProposal {
+  create<I extends Exact<DeepPartial<MsgVoteBundleProposal>, I>>(base?: I): MsgVoteBundleProposal {
     return MsgVoteBundleProposal.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<MsgVoteBundleProposal>, I>>(
-    object: I
-  ): MsgVoteBundleProposal {
+  fromPartial<I extends Exact<DeepPartial<MsgVoteBundleProposal>, I>>(object: I): MsgVoteBundleProposal {
     const message = createBaseMsgVoteBundleProposal();
     message.creator = object.creator ?? "";
     message.staker = object.staker ?? "";
@@ -590,19 +541,12 @@ function createBaseMsgVoteBundleProposalResponse(): MsgVoteBundleProposalRespons
 }
 
 export const MsgVoteBundleProposalResponse = {
-  encode(
-    _: MsgVoteBundleProposalResponse,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(_: MsgVoteBundleProposalResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): MsgVoteBundleProposalResponse {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgVoteBundleProposalResponse {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgVoteBundleProposalResponse();
     while (reader.pos < end) {
@@ -626,14 +570,10 @@ export const MsgVoteBundleProposalResponse = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<MsgVoteBundleProposalResponse>, I>>(
-    base?: I
-  ): MsgVoteBundleProposalResponse {
+  create<I extends Exact<DeepPartial<MsgVoteBundleProposalResponse>, I>>(base?: I): MsgVoteBundleProposalResponse {
     return MsgVoteBundleProposalResponse.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<MsgVoteBundleProposalResponse>, I>>(
-    _: I
-  ): MsgVoteBundleProposalResponse {
+  fromPartial<I extends Exact<DeepPartial<MsgVoteBundleProposalResponse>, I>>(_: I): MsgVoteBundleProposalResponse {
     const message = createBaseMsgVoteBundleProposalResponse();
     return message;
   },
@@ -644,10 +584,7 @@ function createBaseMsgClaimUploaderRole(): MsgClaimUploaderRole {
 }
 
 export const MsgClaimUploaderRole = {
-  encode(
-    message: MsgClaimUploaderRole,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: MsgClaimUploaderRole, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
     }
@@ -660,12 +597,8 @@ export const MsgClaimUploaderRole = {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): MsgClaimUploaderRole {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgClaimUploaderRole {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgClaimUploaderRole();
     while (reader.pos < end) {
@@ -723,14 +656,10 @@ export const MsgClaimUploaderRole = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<MsgClaimUploaderRole>, I>>(
-    base?: I
-  ): MsgClaimUploaderRole {
+  create<I extends Exact<DeepPartial<MsgClaimUploaderRole>, I>>(base?: I): MsgClaimUploaderRole {
     return MsgClaimUploaderRole.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<MsgClaimUploaderRole>, I>>(
-    object: I
-  ): MsgClaimUploaderRole {
+  fromPartial<I extends Exact<DeepPartial<MsgClaimUploaderRole>, I>>(object: I): MsgClaimUploaderRole {
     const message = createBaseMsgClaimUploaderRole();
     message.creator = object.creator ?? "";
     message.staker = object.staker ?? "";
@@ -744,19 +673,12 @@ function createBaseMsgClaimUploaderRoleResponse(): MsgClaimUploaderRoleResponse 
 }
 
 export const MsgClaimUploaderRoleResponse = {
-  encode(
-    _: MsgClaimUploaderRoleResponse,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(_: MsgClaimUploaderRoleResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): MsgClaimUploaderRoleResponse {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgClaimUploaderRoleResponse {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgClaimUploaderRoleResponse();
     while (reader.pos < end) {
@@ -780,14 +702,10 @@ export const MsgClaimUploaderRoleResponse = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<MsgClaimUploaderRoleResponse>, I>>(
-    base?: I
-  ): MsgClaimUploaderRoleResponse {
+  create<I extends Exact<DeepPartial<MsgClaimUploaderRoleResponse>, I>>(base?: I): MsgClaimUploaderRoleResponse {
     return MsgClaimUploaderRoleResponse.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<MsgClaimUploaderRoleResponse>, I>>(
-    _: I
-  ): MsgClaimUploaderRoleResponse {
+  fromPartial<I extends Exact<DeepPartial<MsgClaimUploaderRoleResponse>, I>>(_: I): MsgClaimUploaderRoleResponse {
     const message = createBaseMsgClaimUploaderRoleResponse();
     return message;
   },
@@ -798,10 +716,7 @@ function createBaseMsgSkipUploaderRole(): MsgSkipUploaderRole {
 }
 
 export const MsgSkipUploaderRole = {
-  encode(
-    message: MsgSkipUploaderRole,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: MsgSkipUploaderRole, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
     }
@@ -818,8 +733,7 @@ export const MsgSkipUploaderRole = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgSkipUploaderRole {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgSkipUploaderRole();
     while (reader.pos < end) {
@@ -867,9 +781,7 @@ export const MsgSkipUploaderRole = {
       creator: isSet(object.creator) ? globalThis.String(object.creator) : "",
       staker: isSet(object.staker) ? globalThis.String(object.staker) : "",
       pool_id: isSet(object.pool_id) ? globalThis.String(object.pool_id) : "0",
-      from_index: isSet(object.from_index)
-        ? globalThis.String(object.from_index)
-        : "0",
+      from_index: isSet(object.from_index) ? globalThis.String(object.from_index) : "0",
     };
   },
 
@@ -890,14 +802,10 @@ export const MsgSkipUploaderRole = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<MsgSkipUploaderRole>, I>>(
-    base?: I
-  ): MsgSkipUploaderRole {
+  create<I extends Exact<DeepPartial<MsgSkipUploaderRole>, I>>(base?: I): MsgSkipUploaderRole {
     return MsgSkipUploaderRole.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<MsgSkipUploaderRole>, I>>(
-    object: I
-  ): MsgSkipUploaderRole {
+  fromPartial<I extends Exact<DeepPartial<MsgSkipUploaderRole>, I>>(object: I): MsgSkipUploaderRole {
     const message = createBaseMsgSkipUploaderRole();
     message.creator = object.creator ?? "";
     message.staker = object.staker ?? "";
@@ -912,19 +820,12 @@ function createBaseMsgSkipUploaderRoleResponse(): MsgSkipUploaderRoleResponse {
 }
 
 export const MsgSkipUploaderRoleResponse = {
-  encode(
-    _: MsgSkipUploaderRoleResponse,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(_: MsgSkipUploaderRoleResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): MsgSkipUploaderRoleResponse {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgSkipUploaderRoleResponse {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgSkipUploaderRoleResponse();
     while (reader.pos < end) {
@@ -948,14 +849,10 @@ export const MsgSkipUploaderRoleResponse = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<MsgSkipUploaderRoleResponse>, I>>(
-    base?: I
-  ): MsgSkipUploaderRoleResponse {
+  create<I extends Exact<DeepPartial<MsgSkipUploaderRoleResponse>, I>>(base?: I): MsgSkipUploaderRoleResponse {
     return MsgSkipUploaderRoleResponse.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<MsgSkipUploaderRoleResponse>, I>>(
-    _: I
-  ): MsgSkipUploaderRoleResponse {
+  fromPartial<I extends Exact<DeepPartial<MsgSkipUploaderRoleResponse>, I>>(_: I): MsgSkipUploaderRoleResponse {
     const message = createBaseMsgSkipUploaderRoleResponse();
     return message;
   },
@@ -966,10 +863,7 @@ function createBaseMsgUpdateParams(): MsgUpdateParams {
 }
 
 export const MsgUpdateParams = {
-  encode(
-    message: MsgUpdateParams,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: MsgUpdateParams, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.authority !== "") {
       writer.uint32(10).string(message.authority);
     }
@@ -980,8 +874,7 @@ export const MsgUpdateParams = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgUpdateParams {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgUpdateParams();
     while (reader.pos < end) {
@@ -1012,9 +905,7 @@ export const MsgUpdateParams = {
 
   fromJSON(object: any): MsgUpdateParams {
     return {
-      authority: isSet(object.authority)
-        ? globalThis.String(object.authority)
-        : "",
+      authority: isSet(object.authority) ? globalThis.String(object.authority) : "",
       payload: isSet(object.payload) ? globalThis.String(object.payload) : "",
     };
   },
@@ -1030,14 +921,10 @@ export const MsgUpdateParams = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<MsgUpdateParams>, I>>(
-    base?: I
-  ): MsgUpdateParams {
+  create<I extends Exact<DeepPartial<MsgUpdateParams>, I>>(base?: I): MsgUpdateParams {
     return MsgUpdateParams.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<MsgUpdateParams>, I>>(
-    object: I
-  ): MsgUpdateParams {
+  fromPartial<I extends Exact<DeepPartial<MsgUpdateParams>, I>>(object: I): MsgUpdateParams {
     const message = createBaseMsgUpdateParams();
     message.authority = object.authority ?? "";
     message.payload = object.payload ?? "";
@@ -1050,19 +937,12 @@ function createBaseMsgUpdateParamsResponse(): MsgUpdateParamsResponse {
 }
 
 export const MsgUpdateParamsResponse = {
-  encode(
-    _: MsgUpdateParamsResponse,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(_: MsgUpdateParamsResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): MsgUpdateParamsResponse {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgUpdateParamsResponse {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgUpdateParamsResponse();
     while (reader.pos < end) {
@@ -1086,14 +966,10 @@ export const MsgUpdateParamsResponse = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<MsgUpdateParamsResponse>, I>>(
-    base?: I
-  ): MsgUpdateParamsResponse {
+  create<I extends Exact<DeepPartial<MsgUpdateParamsResponse>, I>>(base?: I): MsgUpdateParamsResponse {
     return MsgUpdateParamsResponse.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<MsgUpdateParamsResponse>, I>>(
-    _: I
-  ): MsgUpdateParamsResponse {
+  fromPartial<I extends Exact<DeepPartial<MsgUpdateParamsResponse>, I>>(_: I): MsgUpdateParamsResponse {
     const message = createBaseMsgUpdateParamsResponse();
     return message;
   },
@@ -1107,53 +983,44 @@ export const MsgService = {
     path: "/kyve.bundles.v1beta1.Msg/SubmitBundleProposal",
     requestStream: false,
     responseStream: false,
-    requestSerialize: (value: MsgSubmitBundleProposal) =>
-      Buffer.from(MsgSubmitBundleProposal.encode(value).finish()),
-    requestDeserialize: (value: Buffer) =>
-      MsgSubmitBundleProposal.decode(value),
+    requestSerialize: (value: MsgSubmitBundleProposal) => Buffer.from(MsgSubmitBundleProposal.encode(value).finish()),
+    requestDeserialize: (value: Buffer) => MsgSubmitBundleProposal.decode(value),
     responseSerialize: (value: MsgSubmitBundleProposalResponse) =>
       Buffer.from(MsgSubmitBundleProposalResponse.encode(value).finish()),
-    responseDeserialize: (value: Buffer) =>
-      MsgSubmitBundleProposalResponse.decode(value),
+    responseDeserialize: (value: Buffer) => MsgSubmitBundleProposalResponse.decode(value),
   },
   /** VoteBundleProposal ... */
   voteBundleProposal: {
     path: "/kyve.bundles.v1beta1.Msg/VoteBundleProposal",
     requestStream: false,
     responseStream: false,
-    requestSerialize: (value: MsgVoteBundleProposal) =>
-      Buffer.from(MsgVoteBundleProposal.encode(value).finish()),
+    requestSerialize: (value: MsgVoteBundleProposal) => Buffer.from(MsgVoteBundleProposal.encode(value).finish()),
     requestDeserialize: (value: Buffer) => MsgVoteBundleProposal.decode(value),
     responseSerialize: (value: MsgVoteBundleProposalResponse) =>
       Buffer.from(MsgVoteBundleProposalResponse.encode(value).finish()),
-    responseDeserialize: (value: Buffer) =>
-      MsgVoteBundleProposalResponse.decode(value),
+    responseDeserialize: (value: Buffer) => MsgVoteBundleProposalResponse.decode(value),
   },
   /** ClaimUploaderRole ... */
   claimUploaderRole: {
     path: "/kyve.bundles.v1beta1.Msg/ClaimUploaderRole",
     requestStream: false,
     responseStream: false,
-    requestSerialize: (value: MsgClaimUploaderRole) =>
-      Buffer.from(MsgClaimUploaderRole.encode(value).finish()),
+    requestSerialize: (value: MsgClaimUploaderRole) => Buffer.from(MsgClaimUploaderRole.encode(value).finish()),
     requestDeserialize: (value: Buffer) => MsgClaimUploaderRole.decode(value),
     responseSerialize: (value: MsgClaimUploaderRoleResponse) =>
       Buffer.from(MsgClaimUploaderRoleResponse.encode(value).finish()),
-    responseDeserialize: (value: Buffer) =>
-      MsgClaimUploaderRoleResponse.decode(value),
+    responseDeserialize: (value: Buffer) => MsgClaimUploaderRoleResponse.decode(value),
   },
   /** SkipUploaderRole ... */
   skipUploaderRole: {
     path: "/kyve.bundles.v1beta1.Msg/SkipUploaderRole",
     requestStream: false,
     responseStream: false,
-    requestSerialize: (value: MsgSkipUploaderRole) =>
-      Buffer.from(MsgSkipUploaderRole.encode(value).finish()),
+    requestSerialize: (value: MsgSkipUploaderRole) => Buffer.from(MsgSkipUploaderRole.encode(value).finish()),
     requestDeserialize: (value: Buffer) => MsgSkipUploaderRole.decode(value),
     responseSerialize: (value: MsgSkipUploaderRoleResponse) =>
       Buffer.from(MsgSkipUploaderRoleResponse.encode(value).finish()),
-    responseDeserialize: (value: Buffer) =>
-      MsgSkipUploaderRoleResponse.decode(value),
+    responseDeserialize: (value: Buffer) => MsgSkipUploaderRoleResponse.decode(value),
   },
   /**
    * UpdateParams defines a governance operation for updating the x/bundles module
@@ -1163,37 +1030,22 @@ export const MsgService = {
     path: "/kyve.bundles.v1beta1.Msg/UpdateParams",
     requestStream: false,
     responseStream: false,
-    requestSerialize: (value: MsgUpdateParams) =>
-      Buffer.from(MsgUpdateParams.encode(value).finish()),
+    requestSerialize: (value: MsgUpdateParams) => Buffer.from(MsgUpdateParams.encode(value).finish()),
     requestDeserialize: (value: Buffer) => MsgUpdateParams.decode(value),
-    responseSerialize: (value: MsgUpdateParamsResponse) =>
-      Buffer.from(MsgUpdateParamsResponse.encode(value).finish()),
-    responseDeserialize: (value: Buffer) =>
-      MsgUpdateParamsResponse.decode(value),
+    responseSerialize: (value: MsgUpdateParamsResponse) => Buffer.from(MsgUpdateParamsResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer) => MsgUpdateParamsResponse.decode(value),
   },
 } as const;
 
 export interface MsgServer extends UntypedServiceImplementation {
   /** SubmitBundleProposal ... */
-  submitBundleProposal: handleUnaryCall<
-    MsgSubmitBundleProposal,
-    MsgSubmitBundleProposalResponse
-  >;
+  submitBundleProposal: handleUnaryCall<MsgSubmitBundleProposal, MsgSubmitBundleProposalResponse>;
   /** VoteBundleProposal ... */
-  voteBundleProposal: handleUnaryCall<
-    MsgVoteBundleProposal,
-    MsgVoteBundleProposalResponse
-  >;
+  voteBundleProposal: handleUnaryCall<MsgVoteBundleProposal, MsgVoteBundleProposalResponse>;
   /** ClaimUploaderRole ... */
-  claimUploaderRole: handleUnaryCall<
-    MsgClaimUploaderRole,
-    MsgClaimUploaderRoleResponse
-  >;
+  claimUploaderRole: handleUnaryCall<MsgClaimUploaderRole, MsgClaimUploaderRoleResponse>;
   /** SkipUploaderRole ... */
-  skipUploaderRole: handleUnaryCall<
-    MsgSkipUploaderRole,
-    MsgSkipUploaderRoleResponse
-  >;
+  skipUploaderRole: handleUnaryCall<MsgSkipUploaderRole, MsgSkipUploaderRoleResponse>;
   /**
    * UpdateParams defines a governance operation for updating the x/bundles module
    * parameters. The authority is hard-coded to the x/gov module account.
@@ -1205,102 +1057,66 @@ export interface MsgClient extends Client {
   /** SubmitBundleProposal ... */
   submitBundleProposal(
     request: MsgSubmitBundleProposal,
-    callback: (
-      error: ServiceError | null,
-      response: MsgSubmitBundleProposalResponse
-    ) => void
+    callback: (error: ServiceError | null, response: MsgSubmitBundleProposalResponse) => void,
   ): ClientUnaryCall;
   submitBundleProposal(
     request: MsgSubmitBundleProposal,
     metadata: Metadata,
-    callback: (
-      error: ServiceError | null,
-      response: MsgSubmitBundleProposalResponse
-    ) => void
+    callback: (error: ServiceError | null, response: MsgSubmitBundleProposalResponse) => void,
   ): ClientUnaryCall;
   submitBundleProposal(
     request: MsgSubmitBundleProposal,
     metadata: Metadata,
     options: Partial<CallOptions>,
-    callback: (
-      error: ServiceError | null,
-      response: MsgSubmitBundleProposalResponse
-    ) => void
+    callback: (error: ServiceError | null, response: MsgSubmitBundleProposalResponse) => void,
   ): ClientUnaryCall;
   /** VoteBundleProposal ... */
   voteBundleProposal(
     request: MsgVoteBundleProposal,
-    callback: (
-      error: ServiceError | null,
-      response: MsgVoteBundleProposalResponse
-    ) => void
+    callback: (error: ServiceError | null, response: MsgVoteBundleProposalResponse) => void,
   ): ClientUnaryCall;
   voteBundleProposal(
     request: MsgVoteBundleProposal,
     metadata: Metadata,
-    callback: (
-      error: ServiceError | null,
-      response: MsgVoteBundleProposalResponse
-    ) => void
+    callback: (error: ServiceError | null, response: MsgVoteBundleProposalResponse) => void,
   ): ClientUnaryCall;
   voteBundleProposal(
     request: MsgVoteBundleProposal,
     metadata: Metadata,
     options: Partial<CallOptions>,
-    callback: (
-      error: ServiceError | null,
-      response: MsgVoteBundleProposalResponse
-    ) => void
+    callback: (error: ServiceError | null, response: MsgVoteBundleProposalResponse) => void,
   ): ClientUnaryCall;
   /** ClaimUploaderRole ... */
   claimUploaderRole(
     request: MsgClaimUploaderRole,
-    callback: (
-      error: ServiceError | null,
-      response: MsgClaimUploaderRoleResponse
-    ) => void
+    callback: (error: ServiceError | null, response: MsgClaimUploaderRoleResponse) => void,
   ): ClientUnaryCall;
   claimUploaderRole(
     request: MsgClaimUploaderRole,
     metadata: Metadata,
-    callback: (
-      error: ServiceError | null,
-      response: MsgClaimUploaderRoleResponse
-    ) => void
+    callback: (error: ServiceError | null, response: MsgClaimUploaderRoleResponse) => void,
   ): ClientUnaryCall;
   claimUploaderRole(
     request: MsgClaimUploaderRole,
     metadata: Metadata,
     options: Partial<CallOptions>,
-    callback: (
-      error: ServiceError | null,
-      response: MsgClaimUploaderRoleResponse
-    ) => void
+    callback: (error: ServiceError | null, response: MsgClaimUploaderRoleResponse) => void,
   ): ClientUnaryCall;
   /** SkipUploaderRole ... */
   skipUploaderRole(
     request: MsgSkipUploaderRole,
-    callback: (
-      error: ServiceError | null,
-      response: MsgSkipUploaderRoleResponse
-    ) => void
+    callback: (error: ServiceError | null, response: MsgSkipUploaderRoleResponse) => void,
   ): ClientUnaryCall;
   skipUploaderRole(
     request: MsgSkipUploaderRole,
     metadata: Metadata,
-    callback: (
-      error: ServiceError | null,
-      response: MsgSkipUploaderRoleResponse
-    ) => void
+    callback: (error: ServiceError | null, response: MsgSkipUploaderRoleResponse) => void,
   ): ClientUnaryCall;
   skipUploaderRole(
     request: MsgSkipUploaderRole,
     metadata: Metadata,
     options: Partial<CallOptions>,
-    callback: (
-      error: ServiceError | null,
-      response: MsgSkipUploaderRoleResponse
-    ) => void
+    callback: (error: ServiceError | null, response: MsgSkipUploaderRoleResponse) => void,
   ): ClientUnaryCall;
   /**
    * UpdateParams defines a governance operation for updating the x/bundles module
@@ -1308,67 +1124,37 @@ export interface MsgClient extends Client {
    */
   updateParams(
     request: MsgUpdateParams,
-    callback: (
-      error: ServiceError | null,
-      response: MsgUpdateParamsResponse
-    ) => void
+    callback: (error: ServiceError | null, response: MsgUpdateParamsResponse) => void,
   ): ClientUnaryCall;
   updateParams(
     request: MsgUpdateParams,
     metadata: Metadata,
-    callback: (
-      error: ServiceError | null,
-      response: MsgUpdateParamsResponse
-    ) => void
+    callback: (error: ServiceError | null, response: MsgUpdateParamsResponse) => void,
   ): ClientUnaryCall;
   updateParams(
     request: MsgUpdateParams,
     metadata: Metadata,
     options: Partial<CallOptions>,
-    callback: (
-      error: ServiceError | null,
-      response: MsgUpdateParamsResponse
-    ) => void
+    callback: (error: ServiceError | null, response: MsgUpdateParamsResponse) => void,
   ): ClientUnaryCall;
 }
 
-export const MsgClient = makeGenericClientConstructor(
-  MsgService,
-  "kyve.bundles.v1beta1.Msg"
-) as unknown as {
-  new (
-    address: string,
-    credentials: ChannelCredentials,
-    options?: Partial<ClientOptions>
-  ): MsgClient;
+export const MsgClient = makeGenericClientConstructor(MsgService, "kyve.bundles.v1beta1.Msg") as unknown as {
+  new (address: string, credentials: ChannelCredentials, options?: Partial<ClientOptions>): MsgClient;
   service: typeof MsgService;
 };
 
-type Builtin =
-  | Date
-  | Function
-  | Uint8Array
-  | string
-  | number
-  | boolean
-  | undefined;
+type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
-export type DeepPartial<T> = T extends Builtin
-  ? T
-  : T extends globalThis.Array<infer U>
-  ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
+export type DeepPartial<T> = T extends Builtin ? T
+  : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
+  : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
+  : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 
 type KeysOfUnion<T> = T extends T ? keyof T : never;
-export type Exact<P, I extends P> = P extends Builtin
-  ? P
-  : P & { [K in keyof P]: Exact<P[K], I[K]> } & {
-      [K in Exclude<keyof I, KeysOfUnion<P>>]: never;
-    };
+export type Exact<P, I extends P> = P extends Builtin ? P
+  : P & { [K in keyof P]: Exact<P[K], I[K]> } & { [K in Exclude<keyof I, KeysOfUnion<P>>]: never };
 
 function longToString(long: Long) {
   return long.toString();
