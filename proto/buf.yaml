@@ -1,5 +1,5 @@
 version: v1
-name: buf.build/rapha/kyve
+name: buf.build/rapha/kyverdk
 deps:
   - buf.build/rapha/kyve
 breaking:

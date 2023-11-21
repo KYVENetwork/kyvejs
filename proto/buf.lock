@@ -24,5 +24,5 @@ deps:
   - remote: buf.build
     owner: rapha
     repository: kyve
-    commit: 9199214a842c4c4eab6be679ae70947c
-    digest: shake256:7d32cc3f21c3fbb2c61ccc38493ec5e04773869f6f22fab8c7ae30988aa7b524dea155e99e5875b9c9dcc71b5ed9420f6dca8b34b2f7809106e724e048c6c256
+    commit: 46722cea4b264be1b047f011903153e5
+    digest: shake256:86bd4d55c880d1ac710a0e9f5f9454e4aec224496e465e28613e9be50efdcc529abacfeccbd959bd4291920251c6fd1ae92ca91a79dc2e568a84d515db96ab7a
