@@ -104,7 +104,7 @@ describe("cache tests", () => {
   test("start caching from a pool which is in genesis state", async () => {
     // ARRANGE
     v.pool = {
-      ...genesis_pool
+      ...genesis_pool,
     } as any;
 
     // ACT
@@ -155,7 +155,7 @@ describe("cache tests", () => {
     for (let n = 0; n < parseInt(genesis_pool.data.max_bundle_size); n++) {
       const item = {
         key: n.toString(),
-        value: `${n}-value-transform`
+        value: `${n}-value-transform`,
       };
       expect(cacheProvider.put).toHaveBeenNthCalledWith(
         n + 1,
@@ -205,7 +205,7 @@ describe("cache tests", () => {
     for (let n = 0; n < parseInt(genesis_pool.data.max_bundle_size); n++) {
       const item = {
         key: n.toString(),
-        value: `${n}-value`
+        value: `${n}-value`,
       };
       expect(runtime.transformDataItem).toHaveBeenNthCalledWith(n + 1, item);
     }
@@ -242,7 +242,7 @@ describe("cache tests", () => {
       data: {
         ...genesis_pool.data,
         current_key: "99",
-        current_index: "100"
+        current_index: "100",
       },
       bundle_proposal: {
         ...genesis_pool.bundle_proposal,
@@ -256,8 +256,8 @@ describe("cache tests", () => {
         to_key: "149",
         bundle_summary: "test_summary",
         updated_at: "0",
-        voters_valid: ["test_staker"]
-      }
+        voters_valid: ["test_staker"],
+      },
     } as any;
 
     // ACT
@@ -310,7 +310,7 @@ describe("cache tests", () => {
         key: (n + parseInt(genesis_pool.data.max_bundle_size)).toString(),
         value: `${
           n + parseInt(genesis_pool.data.max_bundle_size)
-        }-value-transform`
+        }-value-transform`,
       };
       expect(cacheProvider.put).toHaveBeenNthCalledWith(
         n + 1,
@@ -371,7 +371,7 @@ describe("cache tests", () => {
     for (let n = 0; n < parseInt(genesis_pool.data.max_bundle_size) + 50; n++) {
       const item = {
         key: (n + parseInt(genesis_pool.data.max_bundle_size)).toString(),
-        value: `${n + parseInt(genesis_pool.data.max_bundle_size)}-value`
+        value: `${n + parseInt(genesis_pool.data.max_bundle_size)}-value`,
       };
       expect(runtime.transformDataItem).toHaveBeenNthCalledWith(n + 1, item);
     }
@@ -415,7 +415,7 @@ describe("cache tests", () => {
       data: {
         ...genesis_pool.data,
         current_key: "99",
-        current_index: "100"
+        current_index: "100",
       },
       bundle_proposal: {
         ...genesis_pool.bundle_proposal,
@@ -429,8 +429,8 @@ describe("cache tests", () => {
         to_key: "102",
         bundle_summary: "test_summary",
         updated_at: "0",
-        voters_valid: ["test_staker"]
-      }
+        voters_valid: ["test_staker"],
+      },
     } as any;
 
     // ACT
@@ -483,7 +483,7 @@ describe("cache tests", () => {
         key: (n + parseInt(genesis_pool.data.max_bundle_size) + 3).toString(),
         value: `${
           n + parseInt(genesis_pool.data.max_bundle_size) + 3
-        }-value-transform`
+        }-value-transform`,
       };
       expect(cacheProvider.put).toHaveBeenNthCalledWith(
         n + 1,
@@ -544,7 +544,7 @@ describe("cache tests", () => {
     for (let n = 0; n < parseInt(genesis_pool.data.max_bundle_size); n++) {
       const item = {
         key: (n + parseInt(genesis_pool.data.max_bundle_size) + 3).toString(),
-        value: `${n + parseInt(genesis_pool.data.max_bundle_size) + 3}-value`
+        value: `${n + parseInt(genesis_pool.data.max_bundle_size) + 3}-value`,
       };
       expect(runtime.transformDataItem).toHaveBeenNthCalledWith(n + 1, item);
     }
@@ -583,7 +583,7 @@ describe("cache tests", () => {
       data: {
         ...genesis_pool.data,
         current_key: "99",
-        current_index: "100"
+        current_index: "100",
       },
       bundle_proposal: {
         ...genesis_pool.bundle_proposal,
@@ -596,8 +596,8 @@ describe("cache tests", () => {
         from_key: "",
         to_key: "",
         bundle_summary: "",
-        updated_at: "0"
-      }
+        updated_at: "0",
+      },
     } as any;
 
     // ACT
@@ -650,7 +650,7 @@ describe("cache tests", () => {
         key: (n + parseInt(genesis_pool.data.max_bundle_size)).toString(),
         value: `${
           n + parseInt(genesis_pool.data.max_bundle_size)
-        }-value-transform`
+        }-value-transform`,
       };
       expect(cacheProvider.put).toHaveBeenNthCalledWith(
         n + 1,
@@ -703,7 +703,7 @@ describe("cache tests", () => {
     for (let n = 0; n < parseInt(genesis_pool.data.max_bundle_size); n++) {
       const item = {
         key: (n + parseInt(genesis_pool.data.max_bundle_size)).toString(),
-        value: `${n + parseInt(genesis_pool.data.max_bundle_size)}-value`
+        value: `${n + parseInt(genesis_pool.data.max_bundle_size)}-value`,
       };
       expect(runtime.transformDataItem).toHaveBeenNthCalledWith(n + 1, item);
     }
@@ -742,14 +742,14 @@ describe("cache tests", () => {
       .mockImplementationOnce((key: string) =>
         Promise.resolve({
           key,
-          value: `${key}-value`
+          value: `${key}-value`,
         })
       )
       .mockRejectedValueOnce(new Error("network error"))
       .mockImplementation((key: string) =>
         Promise.resolve({
           key,
-          value: `${key}-value`
+          value: `${key}-value`,
         })
       );
 
@@ -757,8 +757,8 @@ describe("cache tests", () => {
       ...genesis_pool,
       data: {
         ...genesis_pool.data,
-        max_bundle_size: "2"
-      }
+        max_bundle_size: "2",
+      },
     } as any;
 
     // ACT
@@ -807,7 +807,7 @@ describe("cache tests", () => {
     for (let n = 0; n < 2; n++) {
       const item = {
         key: n.toString(),
-        value: `${n}-value-transform`
+        value: `${n}-value-transform`,
       };
       expect(cacheProvider.put).toHaveBeenNthCalledWith(
         n + 1,
@@ -851,7 +851,7 @@ describe("cache tests", () => {
     for (let n = 0; n < 2; n++) {
       const item = {
         key: n.toString(),
-        value: `${n}-value`
+        value: `${n}-value`,
       };
       expect(runtime.transformDataItem).toHaveBeenNthCalledWith(n + 1, item);
     }
@@ -886,21 +886,21 @@ describe("cache tests", () => {
       .mockImplementationOnce((key: string) =>
         Promise.resolve({
           key,
-          value: `${key}-value`
+          value: `${key}-value`,
         })
       )
       .mockRejectedValueOnce(new Error("network error"))
       .mockImplementationOnce((key: string) =>
         Promise.resolve({
           key,
-          value: `${key}-value`
+          value: `${key}-value`,
         })
       )
       .mockRejectedValueOnce(new Error("network error"))
       .mockImplementation((key: string) =>
         Promise.resolve({
           key,
-          value: `${key}-value`
+          value: `${key}-value`,
         })
       );
 
@@ -914,7 +914,7 @@ describe("cache tests", () => {
       data: {
         ...genesis_pool.data,
         current_key: "99",
-        current_index: "100"
+        current_index: "100",
       },
       bundle_proposal: {
         ...genesis_pool.bundle_proposal,
@@ -928,8 +928,8 @@ describe("cache tests", () => {
         to_key: "102",
         bundle_summary: "test_summary",
         updated_at: "0",
-        voters_valid: ["test_staker"]
-      }
+        voters_valid: ["test_staker"],
+      },
     } as any;
 
     // ACT
@@ -982,7 +982,7 @@ describe("cache tests", () => {
         key: (n + parseInt(genesis_pool.data.max_bundle_size) + 3).toString(),
         value: `${
           n + parseInt(genesis_pool.data.max_bundle_size) + 3
-        }-value-transform`
+        }-value-transform`,
       };
       expect(cacheProvider.put).toHaveBeenNthCalledWith(
         n + 1,
@@ -1078,7 +1078,7 @@ describe("cache tests", () => {
     for (let n = 0; n < parseInt(genesis_pool.data.max_bundle_size); n++) {
       const item = {
         key: (n + parseInt(genesis_pool.data.max_bundle_size) + 3).toString(),
-        value: `${n + parseInt(genesis_pool.data.max_bundle_size) + 3}-value`
+        value: `${n + parseInt(genesis_pool.data.max_bundle_size) + 3}-value`,
       };
       expect(runtime.transformDataItem).toHaveBeenNthCalledWith(n + 1, item);
     }
@@ -1117,20 +1117,20 @@ describe("cache tests", () => {
       .mockImplementationOnce((item: DataItem) =>
         Promise.resolve({
           key: item.key,
-          value: `${item.value}-transform`
+          value: `${item.value}-transform`,
         })
       )
       .mockImplementationOnce((item: DataItem) =>
         Promise.resolve({
           key: item.key,
-          value: `${item.value}-transform`
+          value: `${item.value}-transform`,
         })
       )
       .mockRejectedValueOnce(new Error())
       .mockImplementation((item: DataItem) =>
         Promise.resolve({
           key: item.key,
-          value: `${item.value}-transform`
+          value: `${item.value}-transform`,
         })
       );
 
@@ -1138,8 +1138,8 @@ describe("cache tests", () => {
       ...genesis_pool,
       data: {
         ...genesis_pool.data,
-        max_bundle_size: "5"
-      }
+        max_bundle_size: "5",
+      },
     } as any;
 
     // ACT
@@ -1188,7 +1188,7 @@ describe("cache tests", () => {
     for (let n = 0; n < 5; n++) {
       const item = {
         key: n.toString(),
-        value: `${n}-value-transform`
+        value: `${n}-value-transform`,
       };
       expect(cacheProvider.put).toHaveBeenNthCalledWith(
         n + 1,
@@ -1239,32 +1239,32 @@ describe("cache tests", () => {
 
     expect(runtime.transformDataItem).toHaveBeenNthCalledWith(1, {
       key: "0",
-      value: `0-value`
+      value: `0-value`,
     });
 
     expect(runtime.transformDataItem).toHaveBeenNthCalledWith(2, {
       key: "1",
-      value: `1-value`
+      value: `1-value`,
     });
 
     expect(runtime.transformDataItem).toHaveBeenNthCalledWith(3, {
       key: "2",
-      value: `2-value`
+      value: `2-value`,
     });
 
     expect(runtime.transformDataItem).toHaveBeenNthCalledWith(4, {
       key: "2",
-      value: `2-value`
+      value: `2-value`,
     });
 
     expect(runtime.transformDataItem).toHaveBeenNthCalledWith(5, {
       key: "3",
-      value: `3-value`
+      value: `3-value`,
     });
 
     expect(runtime.transformDataItem).toHaveBeenNthCalledWith(6, {
       key: "4",
-      value: `4-value`
+      value: `4-value`,
     });
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(0);
@@ -1306,8 +1306,8 @@ describe("cache tests", () => {
       ...genesis_pool,
       data: {
         ...genesis_pool.data,
-        max_bundle_size: "2"
-      }
+        max_bundle_size: "2",
+      },
     } as any;
 
     // ACT
@@ -1415,7 +1415,7 @@ describe("cache tests", () => {
       data: {
         ...genesis_pool.data,
         current_key: "99",
-        current_index: "100"
+        current_index: "100",
       },
       bundle_proposal: {
         ...genesis_pool.bundle_proposal,
@@ -1429,8 +1429,8 @@ describe("cache tests", () => {
         to_key: "149",
         bundle_summary: "test_summary",
         updated_at: "0",
-        voters_valid: ["test_staker"]
-      }
+        voters_valid: ["test_staker"],
+      },
     } as any;
 
     // ACT
@@ -1515,7 +1515,7 @@ describe("cache tests", () => {
 
     expect(runtime.transformDataItem).toHaveBeenNthCalledWith(1, {
       key: "100",
-      value: `100-value`
+      value: `100-value`,
     });
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(0);

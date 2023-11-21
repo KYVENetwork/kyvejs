@@ -1,5 +1,12 @@
 import { Logger } from "tslog";
-import { bundleToBytes, ICompression, IStorageProvider, sha256, standardizeJSON, Validator } from "../src";
+import {
+  bundleToBytes,
+  ICompression,
+  IStorageProvider,
+  sha256,
+  standardizeJSON,
+  Validator,
+} from "../src";
 import { runNode, setupMetrics } from "../src/methods";
 import { genesis_pool } from "./mocks/constants";
 import { client } from "./mocks/client.mock";
@@ -115,7 +122,7 @@ describe("invalid votes tests", () => {
 
     const bundle = [
       { key: "test_key_1", value: "test_value_1" },
-      { key: "test_key_2", value: "test_value_2" }
+      { key: "test_key_2", value: "test_value_2" },
     ];
 
     const bundleBytes = bundleToBytes(bundle);
@@ -138,8 +145,8 @@ describe("invalid votes tests", () => {
           to_key: "test_key_2",
           bundle_summary: JSON.stringify(bundle),
           updated_at: "0",
-          voters_valid: ["another_test_staker"]
-        }
+          voters_valid: ["another_test_staker"],
+        },
       } as any;
     });
 
@@ -147,11 +154,11 @@ describe("invalid votes tests", () => {
       .fn()
       .mockResolvedValueOnce({
         key: "test_key_1",
-        value: "test_value_1"
+        value: "test_value_1",
       })
       .mockResolvedValueOnce({
         key: "test_key_2",
-        value: "test_value_2"
+        value: "test_value_2",
       });
 
     // ACT
@@ -175,10 +182,10 @@ describe("invalid votes tests", () => {
         staker: "test_staker",
         pool_id: "0",
         storage_id: "another_test_storage_id",
-        vote: VoteType.VOTE_TYPE_INVALID
+        vote: VoteType.VOTE_TYPE_INVALID,
       },
       {
-        fee: 1.6
+        fee: 1.6,
       }
     );
 
@@ -195,7 +202,7 @@ describe("invalid votes tests", () => {
       staker: "test_staker",
       pool_id: "0",
       voter: "test_valaddress",
-      storage_id: "another_test_storage_id"
+      storage_id: "another_test_storage_id",
     });
 
     expect(queries.canPropose).toHaveBeenCalledTimes(0);
@@ -256,7 +263,7 @@ describe("invalid votes tests", () => {
     // ARRANGE
     const bundle = [
       { key: "test_key_1", value: "test_value_1" },
-      { key: "test_key_2", value: "test_value_2" }
+      { key: "test_key_2", value: "test_value_2" },
     ];
 
     const bundleBytes = bundleToBytes(bundle);
@@ -279,8 +286,8 @@ describe("invalid votes tests", () => {
           to_key: "test_key_2",
           bundleSummary: JSON.stringify(bundle),
           updated_at: "0",
-          voters_valid: ["another_test_staker"]
-        }
+          voters_valid: ["another_test_staker"],
+        },
       } as any;
     });
 
@@ -288,11 +295,11 @@ describe("invalid votes tests", () => {
       .fn()
       .mockResolvedValueOnce({
         key: "test_key_1",
-        value: "test_value_1"
+        value: "test_value_1",
       })
       .mockResolvedValueOnce({
         key: "test_key_2",
-        value: "test_value_2"
+        value: "test_value_2",
       });
 
     // ACT
@@ -316,10 +323,10 @@ describe("invalid votes tests", () => {
         staker: "test_staker",
         pool_id: "0",
         storage_id: "another_test_storage_id",
-        vote: VoteType.VOTE_TYPE_INVALID
+        vote: VoteType.VOTE_TYPE_INVALID,
       },
       {
-        fee: 1.6
+        fee: 1.6,
       }
     );
 
@@ -336,7 +343,7 @@ describe("invalid votes tests", () => {
       staker: "test_staker",
       pool_id: "0",
       voter: "test_valaddress",
-      storage_id: "another_test_storage_id"
+      storage_id: "another_test_storage_id",
     });
 
     expect(queries.canPropose).toHaveBeenCalledTimes(0);
@@ -390,7 +397,7 @@ describe("invalid votes tests", () => {
     // ARRANGE
     const bundle = [
       { key: "test_key_1", value: "test_value_1" },
-      { key: "test_key_2", value: "test_value_2" }
+      { key: "test_key_2", value: "test_value_2" },
     ];
 
     const bundleBytes = bundleToBytes(bundle);
@@ -413,8 +420,8 @@ describe("invalid votes tests", () => {
           to_key: "invalid_to_key",
           bundle_summary: JSON.stringify(bundle),
           updated_at: "0",
-          voters_valid: ["another_test_staker"]
-        }
+          voters_valid: ["another_test_staker"],
+        },
       } as any;
     });
 
@@ -422,11 +429,11 @@ describe("invalid votes tests", () => {
       .fn()
       .mockResolvedValueOnce({
         key: "test_key_1",
-        value: "test_value_1"
+        value: "test_value_1",
       })
       .mockResolvedValueOnce({
         key: "test_key_2",
-        value: "test_value_2"
+        value: "test_value_2",
       });
 
     // ACT
@@ -450,10 +457,10 @@ describe("invalid votes tests", () => {
         staker: "test_staker",
         pool_id: "0",
         storage_id: "another_test_storage_id",
-        vote: VoteType.VOTE_TYPE_INVALID
+        vote: VoteType.VOTE_TYPE_INVALID,
       },
       {
-        fee: 1.6
+        fee: 1.6,
       }
     );
 
@@ -470,7 +477,7 @@ describe("invalid votes tests", () => {
       staker: "test_staker",
       pool_id: "0",
       voter: "test_valaddress",
-      storage_id: "another_test_storage_id"
+      storage_id: "another_test_storage_id",
     });
 
     expect(queries.canPropose).toHaveBeenCalledTimes(0);
@@ -526,7 +533,7 @@ describe("invalid votes tests", () => {
     // ARRANGE
     const bundle = [
       { key: "test_key_1", value: "test_value_1" },
-      { key: "test_key_2", value: "test_value_2" }
+      { key: "test_key_2", value: "test_value_2" },
     ];
 
     const bundleBytes = bundleToBytes(bundle);
@@ -549,8 +556,8 @@ describe("invalid votes tests", () => {
           to_key: "invalid_to_key",
           bundle_summary: JSON.stringify(bundle),
           updated_at: "0",
-          voters_valid: ["another_test_staker"]
-        }
+          voters_valid: ["another_test_staker"],
+        },
       } as any;
     });
 
@@ -558,11 +565,11 @@ describe("invalid votes tests", () => {
       .fn()
       .mockResolvedValueOnce({
         key: "test_key_1",
-        value: "test_value_1"
+        value: "test_value_1",
       })
       .mockResolvedValueOnce({
         key: "test_key_2",
-        value: "test_value_2"
+        value: "test_value_2",
       });
 
     // ACT
@@ -586,10 +593,10 @@ describe("invalid votes tests", () => {
         staker: "test_staker",
         pool_id: "0",
         storage_id: "another_test_storage_id",
-        vote: VoteType.VOTE_TYPE_INVALID
+        vote: VoteType.VOTE_TYPE_INVALID,
       },
       {
-        fee: 1.6
+        fee: 1.6,
       }
     );
 
@@ -606,7 +613,7 @@ describe("invalid votes tests", () => {
       staker: "test_staker",
       pool_id: "0",
       voter: "test_valaddress",
-      storage_id: "another_test_storage_id"
+      storage_id: "another_test_storage_id",
     });
 
     expect(queries.canPropose).toHaveBeenCalledTimes(0);
@@ -662,7 +669,7 @@ describe("invalid votes tests", () => {
     // ARRANGE
     const bundle = [
       { key: "test_key_1", value: "test_value_1" },
-      { key: "test_key_2", value: "test_value_2" }
+      { key: "test_key_2", value: "test_value_2" },
     ];
 
     const bundleBytes = bundleToBytes(bundle);
@@ -685,8 +692,8 @@ describe("invalid votes tests", () => {
           to_key: "test_key_2",
           bundle_summary: "invalid_test_value",
           updated_at: "0",
-          voters_valid: ["another_test_staker"]
-        }
+          voters_valid: ["another_test_staker"],
+        },
       } as any;
     });
 
@@ -694,11 +701,11 @@ describe("invalid votes tests", () => {
       .fn()
       .mockResolvedValueOnce({
         key: "test_key_1",
-        value: "test_value_1"
+        value: "test_value_1",
       })
       .mockResolvedValueOnce({
         key: "test_key_2",
-        value: "test_value_2"
+        value: "test_value_2",
       });
 
     // ACT
@@ -722,10 +729,10 @@ describe("invalid votes tests", () => {
         staker: "test_staker",
         pool_id: "0",
         storage_id: "another_test_storage_id",
-        vote: VoteType.VOTE_TYPE_INVALID
+        vote: VoteType.VOTE_TYPE_INVALID,
       },
       {
-        fee: 1.6
+        fee: 1.6,
       }
     );
 
@@ -742,7 +749,7 @@ describe("invalid votes tests", () => {
       staker: "test_staker",
       pool_id: "0",
       voter: "test_valaddress",
-      storage_id: "another_test_storage_id"
+      storage_id: "another_test_storage_id",
     });
 
     expect(queries.canPropose).toHaveBeenCalledTimes(0);
@@ -810,7 +817,7 @@ describe("invalid votes tests", () => {
     // ARRANGE
     const bundle = [
       { key: "test_key_1", value: "test_value_1" },
-      { key: "test_key_2", value: "test_value_2" }
+      { key: "test_key_2", value: "test_value_2" },
     ];
 
     const bundleBytes = bundleToBytes(bundle);
@@ -833,8 +840,8 @@ describe("invalid votes tests", () => {
           to_key: "test_key_2",
           bundle_summary: "test_value_2",
           updated_at: "0",
-          voters_valid: ["another_test_staker"]
-        }
+          voters_valid: ["another_test_staker"],
+        },
       } as any;
     });
 
@@ -842,11 +849,11 @@ describe("invalid votes tests", () => {
       .fn()
       .mockResolvedValueOnce({
         key: "test_key_1",
-        value: "test_value_1"
+        value: "test_value_1",
       })
       .mockResolvedValueOnce({
         key: "test_key_2",
-        value: "test_value_2"
+        value: "test_value_2",
       });
 
     // ACT
@@ -870,10 +877,10 @@ describe("invalid votes tests", () => {
         staker: "test_staker",
         pool_id: "0",
         storage_id: "another_test_storage_id",
-        vote: VoteType.VOTE_TYPE_ABSTAIN
+        vote: VoteType.VOTE_TYPE_ABSTAIN,
       },
       {
-        fee: 1.6
+        fee: 1.6,
       }
     );
 
@@ -890,7 +897,7 @@ describe("invalid votes tests", () => {
       staker: "test_staker",
       pool_id: "0",
       voter: "test_valaddress",
-      storage_id: "another_test_storage_id"
+      storage_id: "another_test_storage_id",
     });
 
     expect(queries.canPropose).toHaveBeenCalledTimes(0);
@@ -950,7 +957,7 @@ describe("invalid votes tests", () => {
 
     const bundle = [
       { key: "test_key_1", value: "test_value_1" },
-      { key: "test_key_2", value: "test_value_2" }
+      { key: "test_key_2", value: "test_value_2" },
     ];
 
     const bundleBytes = bundleToBytes(bundle);
@@ -974,8 +981,8 @@ describe("invalid votes tests", () => {
           bundle_summary: JSON.stringify(bundle),
           updated_at: "0",
           voters_valid: ["another_test_staker"],
-          voters_abstain: ["test_staker"]
-        }
+          voters_abstain: ["test_staker"],
+        },
       } as any;
     });
 
@@ -983,11 +990,11 @@ describe("invalid votes tests", () => {
       .fn()
       .mockResolvedValueOnce({
         key: "test_key_1",
-        value: "test_value_1"
+        value: "test_value_1",
       })
       .mockResolvedValueOnce({
         key: "test_key_2",
-        value: "test_value_2"
+        value: "test_value_2",
       });
 
     // ACT
@@ -1011,10 +1018,10 @@ describe("invalid votes tests", () => {
         staker: "test_staker",
         pool_id: "0",
         storage_id: "another_test_storage_id",
-        vote: VoteType.VOTE_TYPE_INVALID
+        vote: VoteType.VOTE_TYPE_INVALID,
       },
       {
-        fee: 1.6
+        fee: 1.6,
       }
     );
 
@@ -1031,7 +1038,7 @@ describe("invalid votes tests", () => {
       staker: "test_staker",
       pool_id: "0",
       voter: "test_valaddress",
-      storage_id: "another_test_storage_id"
+      storage_id: "another_test_storage_id",
     });
 
     expect(queries.canPropose).toHaveBeenCalledTimes(0);
@@ -1098,14 +1105,14 @@ describe("invalid votes tests", () => {
 
     const canVoteMock = jest.fn().mockResolvedValue({
       possible: false,
-      reaseon: "already voted invalid"
+      reaseon: "already voted invalid",
     });
 
     v["lcd"][0].kyve.query.v1beta1.canVote = canVoteMock;
 
     const bundle = [
       { key: "test_key_1", value: "test_value_1" },
-      { key: "test_key_2", value: "test_value_2" }
+      { key: "test_key_2", value: "test_value_2" },
     ];
 
     const bundleBytes = bundleToBytes(bundle);
@@ -1129,8 +1136,8 @@ describe("invalid votes tests", () => {
           bundle_summary: JSON.stringify(bundle),
           updated_at: "0",
           voters_valid: ["another_test_staker"],
-          voters_invalid: ["test_staker"]
-        }
+          voters_invalid: ["test_staker"],
+        },
       } as any;
     });
 
@@ -1138,11 +1145,11 @@ describe("invalid votes tests", () => {
       .fn()
       .mockResolvedValueOnce({
         key: "test_key_1",
-        value: "test_value_1"
+        value: "test_value_1",
       })
       .mockResolvedValueOnce({
         key: "test_key_2",
-        value: "test_value_2"
+        value: "test_value_2",
       });
 
     // ACT
@@ -1175,7 +1182,7 @@ describe("invalid votes tests", () => {
       staker: "test_staker",
       pool_id: "0",
       voter: "test_valaddress",
-      storage_id: "another_test_storage_id"
+      storage_id: "another_test_storage_id",
     });
 
     expect(queries.canPropose).toHaveBeenCalledTimes(0);
@@ -1230,13 +1237,13 @@ describe("invalid votes tests", () => {
 
     const canVoteMock = jest.fn().mockResolvedValue({
       possible: false,
-      reaseon: "already voted valid"
+      reaseon: "already voted valid",
     });
     v["lcd"][0].kyve.query.v1beta1.canVote = canVoteMock;
 
     const bundle = [
       { key: "test_key_1", value: "test_value_1" },
-      { key: "test_key_2", value: "test_value_2" }
+      { key: "test_key_2", value: "test_value_2" },
     ];
 
     const bundleBytes = bundleToBytes(bundle);
@@ -1259,8 +1266,8 @@ describe("invalid votes tests", () => {
           to_key: "test_key_2",
           bundle_summary: JSON.stringify(bundle),
           updated_at: "0",
-          voters_valid: ["another_test_staker", "test_staker"]
-        }
+          voters_valid: ["another_test_staker", "test_staker"],
+        },
       } as any;
     });
 
@@ -1268,11 +1275,11 @@ describe("invalid votes tests", () => {
       .fn()
       .mockResolvedValueOnce({
         key: "test_key_1",
-        value: "test_value_1"
+        value: "test_value_1",
       })
       .mockResolvedValueOnce({
         key: "test_key_2",
-        value: "test_value_2"
+        value: "test_value_2",
       });
 
     // ACT
@@ -1305,7 +1312,7 @@ describe("invalid votes tests", () => {
       staker: "test_staker",
       pool_id: "0",
       voter: "test_valaddress",
-      storage_id: "another_test_storage_id"
+      storage_id: "another_test_storage_id",
     });
 
     expect(queries.canPropose).toHaveBeenCalledTimes(0);
@@ -1358,7 +1365,7 @@ describe("invalid votes tests", () => {
 
     const bundle = [
       { key: "test_key_1", value: "test_value_1" },
-      { key: "test_key_2", value: "test_value_2" }
+      { key: "test_key_2", value: "test_value_2" },
     ];
 
     const bundleBytes = bundleToBytes(bundle);
@@ -1381,8 +1388,8 @@ describe("invalid votes tests", () => {
           to_key: "test_key_2",
           bundle_summary: JSON.stringify(bundle),
           updated_at: "0",
-          voters_valid: ["another_test_staker"]
-        }
+          voters_valid: ["another_test_staker"],
+        },
       } as any;
     });
 
@@ -1391,11 +1398,11 @@ describe("invalid votes tests", () => {
       .mockRejectedValueOnce(new Error("not found"))
       .mockResolvedValueOnce({
         key: "test_key_1",
-        value: "test_value_1"
+        value: "test_value_1",
       })
       .mockResolvedValueOnce({
         key: "test_key_2",
-        value: "test_value_2"
+        value: "test_value_2",
       });
 
     // ACT
@@ -1420,10 +1427,10 @@ describe("invalid votes tests", () => {
         staker: "test_staker",
         pool_id: "0",
         storage_id: "another_test_storage_id",
-        vote: VoteType.VOTE_TYPE_ABSTAIN
+        vote: VoteType.VOTE_TYPE_ABSTAIN,
       },
       {
-        fee: 1.6
+        fee: 1.6,
       }
     );
     expect(txs.voteBundleProposal).toHaveBeenNthCalledWith(
@@ -1432,10 +1439,10 @@ describe("invalid votes tests", () => {
         staker: "test_staker",
         pool_id: "0",
         storage_id: "another_test_storage_id",
-        vote: VoteType.VOTE_TYPE_INVALID
+        vote: VoteType.VOTE_TYPE_INVALID,
       },
       {
-        fee: 1.6
+        fee: 1.6,
       }
     );
 
@@ -1452,7 +1459,7 @@ describe("invalid votes tests", () => {
       staker: "test_staker",
       pool_id: "0",
       voter: "test_valaddress",
-      storage_id: "another_test_storage_id"
+      storage_id: "another_test_storage_id",
     });
 
     expect(queries.canPropose).toHaveBeenCalledTimes(0);
@@ -1518,7 +1525,7 @@ describe("invalid votes tests", () => {
 
     const bundle = [
       { key: "test_key_1", value: "test_value_1" },
-      { key: "test_key_2", value: "test_value_2" }
+      { key: "test_key_2", value: "test_value_2" },
     ];
 
     const bundleBytes = bundleToBytes(bundle);
@@ -1541,8 +1548,8 @@ describe("invalid votes tests", () => {
           to_key: "test_key_2",
           bundle_summary: JSON.stringify(bundle),
           updated_at: "0",
-          voters_valid: ["another_test_staker"]
-        }
+          voters_valid: ["another_test_staker"],
+        },
       } as any;
     });
 
@@ -1550,11 +1557,11 @@ describe("invalid votes tests", () => {
       .fn()
       .mockResolvedValueOnce({
         key: "test_key_1",
-        value: "test_value_1"
+        value: "test_value_1",
       })
       .mockResolvedValueOnce({
         key: "test_key_2",
-        value: "test_value_2"
+        value: "test_value_2",
       });
 
     storageProvider.retrieveBundle = jest
@@ -1562,7 +1569,7 @@ describe("invalid votes tests", () => {
       .mockRejectedValueOnce(new Error())
       .mockResolvedValue({
         storageId: "test_storage_id",
-        storageData: compressedBundle
+        storageData: compressedBundle,
       });
 
     // ACT
@@ -1587,10 +1594,10 @@ describe("invalid votes tests", () => {
         staker: "test_staker",
         pool_id: "0",
         storage_id: "another_test_storage_id",
-        vote: VoteType.VOTE_TYPE_ABSTAIN
+        vote: VoteType.VOTE_TYPE_ABSTAIN,
       },
       {
-        fee: 1.6
+        fee: 1.6,
       }
     );
     expect(txs.voteBundleProposal).toHaveBeenNthCalledWith(
@@ -1599,10 +1606,10 @@ describe("invalid votes tests", () => {
         staker: "test_staker",
         pool_id: "0",
         storage_id: "another_test_storage_id",
-        vote: VoteType.VOTE_TYPE_INVALID
+        vote: VoteType.VOTE_TYPE_INVALID,
       },
       {
-        fee: 1.6
+        fee: 1.6,
       }
     );
 
@@ -1619,7 +1626,7 @@ describe("invalid votes tests", () => {
       staker: "test_staker",
       pool_id: "0",
       voter: "test_valaddress",
-      storage_id: "another_test_storage_id"
+      storage_id: "another_test_storage_id",
     });
 
     expect(queries.canPropose).toHaveBeenCalledTimes(0);
@@ -1700,13 +1707,13 @@ describe("invalid votes tests", () => {
       .mockResolvedValue({
         txHash: "vote_bundle_proposal_test_hash",
         execute: jest.fn().mockResolvedValue({
-          code: 0
-        })
+          code: 0,
+        }),
       });
 
     const bundle = [
       { key: "test_key_1", value: "test_value_1" },
-      { key: "test_key_2", value: "test_value_2" }
+      { key: "test_key_2", value: "test_value_2" },
     ];
 
     const bundleBytes = bundleToBytes(bundle);
@@ -1729,8 +1736,8 @@ describe("invalid votes tests", () => {
           to_key: "test_key_2",
           bundle_summary: JSON.stringify(bundle),
           updated_at: "0",
-          voters_valid: ["another_test_staker"]
-        }
+          voters_valid: ["another_test_staker"],
+        },
       } as any;
     });
 
@@ -1738,19 +1745,19 @@ describe("invalid votes tests", () => {
       .fn()
       .mockResolvedValueOnce({
         key: "test_key_1",
-        value: "test_value_1"
+        value: "test_value_1",
       })
       .mockResolvedValueOnce({
         key: "test_key_2",
-        value: "test_value_2"
+        value: "test_value_2",
       })
       .mockResolvedValueOnce({
         key: "test_key_1",
-        value: "test_value_1"
+        value: "test_value_1",
       })
       .mockResolvedValueOnce({
         key: "test_key_2",
-        value: "test_value_2"
+        value: "test_value_2",
       });
 
     // ACT
@@ -1775,10 +1782,10 @@ describe("invalid votes tests", () => {
         staker: "test_staker",
         pool_id: "0",
         storage_id: "another_test_storage_id",
-        vote: VoteType.VOTE_TYPE_INVALID
+        vote: VoteType.VOTE_TYPE_INVALID,
       },
       {
-        fee: 1.6
+        fee: 1.6,
       }
     );
     expect(txs.voteBundleProposal).toHaveBeenNthCalledWith(
@@ -1787,10 +1794,10 @@ describe("invalid votes tests", () => {
         staker: "test_staker",
         pool_id: "0",
         storage_id: "another_test_storage_id",
-        vote: VoteType.VOTE_TYPE_INVALID
+        vote: VoteType.VOTE_TYPE_INVALID,
       },
       {
-        fee: 1.6
+        fee: 1.6,
       }
     );
 
@@ -1807,13 +1814,13 @@ describe("invalid votes tests", () => {
       staker: "test_staker",
       pool_id: "0",
       voter: "test_valaddress",
-      storage_id: "another_test_storage_id"
+      storage_id: "another_test_storage_id",
     });
     expect(queries.canVote).toHaveBeenNthCalledWith(2, {
       staker: "test_staker",
       pool_id: "0",
       voter: "test_valaddress",
-      storage_id: "another_test_storage_id"
+      storage_id: "another_test_storage_id",
     });
 
     expect(queries.canPropose).toHaveBeenCalledTimes(0);
@@ -1896,7 +1903,7 @@ describe("invalid votes tests", () => {
 
     storageProvider.retrieveBundle = jest.fn().mockResolvedValue({
       storageId: "another_test_storage_id",
-      storageData: compressedBundle
+      storageData: compressedBundle,
     });
 
     v["syncPoolState"] = jest.fn().mockImplementation(() => {
@@ -1914,8 +1921,8 @@ describe("invalid votes tests", () => {
           to_key: "test_key_1",
           bundle_summary: JSON.stringify(bundle),
           updated_at: "0",
-          voters_valid: ["another_test_staker"]
-        }
+          voters_valid: ["another_test_staker"],
+        },
       } as any;
     });
 
@@ -1940,10 +1947,10 @@ describe("invalid votes tests", () => {
         staker: "test_staker",
         pool_id: "0",
         storage_id: "another_test_storage_id",
-        vote: VoteType.VOTE_TYPE_INVALID
+        vote: VoteType.VOTE_TYPE_INVALID,
       },
       {
-        fee: 1.6
+        fee: 1.6,
       }
     );
 
@@ -1960,7 +1967,7 @@ describe("invalid votes tests", () => {
       staker: "test_staker",
       pool_id: "0",
       voter: "test_valaddress",
-      storage_id: "another_test_storage_id"
+      storage_id: "another_test_storage_id",
     });
 
     expect(queries.canPropose).toHaveBeenCalledTimes(0);

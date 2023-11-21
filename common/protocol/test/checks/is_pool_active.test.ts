@@ -36,7 +36,7 @@ describe("isPoolActive", () => {
     v.logger.fatal = jest.fn();
 
     v.pool = {
-      ...genesis_pool
+      ...genesis_pool,
     } as any;
 
     setupMetrics.call(v);

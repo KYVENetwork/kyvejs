@@ -6,7 +6,7 @@ import {
   IStorageProvider,
   sha256,
   standardizeJSON,
-  Validator
+  Validator,
 } from "../src";
 import { runNode, setupMetrics } from "../src/methods";
 import { genesis_pool } from "./mocks/constants";
@@ -112,7 +112,7 @@ describe("genesis tests", () => {
       .fn()
       .mockImplementationOnce(() => {
         v.pool = {
-          ...genesis_pool
+          ...genesis_pool,
         } as any;
       })
       .mockImplementation(() => {
@@ -120,20 +120,20 @@ describe("genesis tests", () => {
           ...genesis_pool,
           bundle_proposal: {
             ...genesis_pool.bundle_proposal,
-            next_uploader: "test_staker"
-          }
+            next_uploader: "test_staker",
+          },
         } as any;
       });
 
     const bundle = [
       {
         key: "test_key_1",
-        value: "test_value_1"
+        value: "test_value_1",
       },
       {
         key: "test_key_2",
-        value: "test_value_2"
-      }
+        value: "test_value_2",
+      },
     ];
 
     await v["cacheProvider"].put("0", bundle[0]);
@@ -155,7 +155,7 @@ describe("genesis tests", () => {
     expect(txs.claimUploaderRole).toHaveBeenCalledTimes(1);
     expect(txs.claimUploaderRole).toHaveBeenLastCalledWith({
       staker: "test_staker",
-      pool_id: "0"
+      pool_id: "0",
     });
 
     expect(txs.voteBundleProposal).toHaveBeenCalledTimes(0);
@@ -171,7 +171,7 @@ describe("genesis tests", () => {
       bundle_size: "2",
       from_key: "test_key_1",
       to_key: "test_key_2",
-      bundle_summary: JSON.stringify(bundle)
+      bundle_summary: JSON.stringify(bundle),
     });
 
     expect(txs.skipUploaderRole).toHaveBeenCalledTimes(0);
@@ -187,7 +187,7 @@ describe("genesis tests", () => {
       staker: "test_staker",
       pool_id: "0",
       proposer: "test_valaddress",
-      from_index: "0"
+      from_index: "0",
     });
 
     // =========================
@@ -248,7 +248,7 @@ describe("genesis tests", () => {
       .fn()
       .mockImplementationOnce(() => {
         v.pool = {
-          ...genesis_pool
+          ...genesis_pool,
         } as any;
       })
       .mockImplementation(() => {
@@ -256,8 +256,8 @@ describe("genesis tests", () => {
           ...genesis_pool,
           bundle_proposal: {
             ...genesis_pool.bundle_proposal,
-            next_uploader: "test_staker"
-          }
+            next_uploader: "test_staker",
+          },
         } as any;
       });
 
@@ -281,7 +281,7 @@ describe("genesis tests", () => {
     expect(txs.claimUploaderRole).toHaveBeenCalledTimes(1);
     expect(txs.claimUploaderRole).toHaveBeenLastCalledWith({
       staker: "test_staker",
-      pool_id: "0"
+      pool_id: "0",
     });
 
     expect(txs.voteBundleProposal).toHaveBeenCalledTimes(0);
@@ -292,7 +292,7 @@ describe("genesis tests", () => {
     expect(txs.skipUploaderRole).toHaveBeenLastCalledWith({
       staker: "test_staker",
       pool_id: "0",
-      from_index: "0"
+      from_index: "0",
     });
 
     // =====================
@@ -306,7 +306,7 @@ describe("genesis tests", () => {
       staker: "test_staker",
       pool_id: "0",
       proposer: "test_valaddress",
-      from_index: "0"
+      from_index: "0",
     });
 
     // =========================
@@ -357,19 +357,19 @@ describe("genesis tests", () => {
       .mockResolvedValue({
         txHash: "test_hash",
         execute: jest.fn().mockResolvedValue({
-          code: 1
-        })
+          code: 1,
+        }),
       });
 
     const bundle = [
       {
         key: "test_key_1",
-        value: "test_value_1"
+        value: "test_value_1",
       },
       {
         key: "test_key_2",
-        value: "test_value_2"
-      }
+        value: "test_value_2",
+      },
     ];
 
     const bundleBytes = bundleToBytes(bundle);
@@ -381,7 +381,7 @@ describe("genesis tests", () => {
       .fn()
       .mockImplementationOnce(() => {
         v.pool = {
-          ...genesis_pool
+          ...genesis_pool,
         } as any;
       })
       .mockImplementation(() => {
@@ -399,8 +399,8 @@ describe("genesis tests", () => {
             to_key: "test_key_2",
             bundle_summary: JSON.stringify(bundle),
             updated_at: "0",
-            voters_valid: ["another_test_staker"]
-          }
+            voters_valid: ["another_test_staker"],
+          },
         } as any;
       });
 
@@ -408,11 +408,11 @@ describe("genesis tests", () => {
       .fn()
       .mockResolvedValueOnce({
         key: "test_key_1",
-        value: "test_value_1"
+        value: "test_value_1",
       })
       .mockResolvedValueOnce({
         key: "test_key_2",
-        value: "test_value_2"
+        value: "test_value_2",
       });
 
     // ACT
@@ -431,7 +431,7 @@ describe("genesis tests", () => {
     expect(txs.claimUploaderRole).toHaveBeenCalledTimes(1);
     expect(txs.claimUploaderRole).toHaveBeenLastCalledWith({
       staker: "test_staker",
-      pool_id: "0"
+      pool_id: "0",
     });
 
     expect(txs.voteBundleProposal).toHaveBeenCalledTimes(1);
@@ -440,10 +440,10 @@ describe("genesis tests", () => {
         staker: "test_staker",
         pool_id: "0",
         storage_id: "another_test_storage_id",
-        vote: VoteType.VOTE_TYPE_VALID
+        vote: VoteType.VOTE_TYPE_VALID,
       },
       {
-        fee: 1.6
+        fee: 1.6,
       }
     );
 
@@ -460,7 +460,7 @@ describe("genesis tests", () => {
       staker: "test_staker",
       pool_id: "0",
       voter: "test_valaddress",
-      storage_id: "another_test_storage_id"
+      storage_id: "another_test_storage_id",
     });
 
     expect(queries.canPropose).toHaveBeenCalledTimes(0);
