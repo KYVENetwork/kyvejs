@@ -27,7 +27,7 @@ const config: ProtocolConfig = {
   host: 'localhost',
   port: 50051,
   useGrpc: true,
-  services: {},
+  services: undefined,
 }
 
 if (process.env.RUN_IN_DOCKER_MODE === 'true') {
