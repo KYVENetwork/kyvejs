@@ -4,18 +4,9 @@
 
 - [Introduction](#introduction)
 - [Use cases](#use-cases)
-- [Integrations currently live](#integrations-currently-live)
-  - [Mainnet](#mainnet)
-  - [Testnet](#testnet)
-  - [Devnet](#devnet)
 - [Binary Installation](#binary-installation)
   - [Build from source](#build-from-source)
   - [Download prebuilt binary](#download-prebuilt-binary)
-- [Run a node](#run-a-node)
-  - [Cosmos Hub](#cosmos-hub)
-    - [Requirements](#requirements)
-    - [Step 1: Start gaia node](#step-1-start-gaia-node)
-    - [Step 2: Start kyve node](#step-2-start-kyve-node)
 - [Creating a pool with the runtime](#creating-a-pool-with-the-runtime)
   - [Config](#config)
   - [Create Pool governance proposal](#create-pool-governance-proposal)
@@ -34,6 +25,13 @@ Since storage pools which use this runtime archive validated and historical stat
 
 This runtime requires the node operator to run a tendermint node which is used as the source and the KYVE protocol node. Depending
 on which tendermint chain gets archived the minimum hardware requirements are at least the min requirements of that tendermint node.
+
+This architecture diagram summarizes the setup of the Cosmos Hub integration on KYVE:
+
+![tendermint-bsync](assets/tendermint-ssync.png)
+
+Here this runtime is responsible for communicating with the tendermint application (purple) - in this case gaia, and forwarding the data to the KYVE core protocol. The KYVE core then handles the communication with the pool. This entire process (yellow) is the KYVE protocol node. The resulting
+data are the blocks from the tendermint application - validated and permanently stored on a storage provider like Arweave.
 
 ## Binary Installation
 
