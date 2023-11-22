@@ -17,6 +17,7 @@
   "scripts": {
     "build": "rimraf dist && tsc",
     "build:binaries": "yarn build && rimraf out && pkg --no-bytecode --public-packages '*' --output out/kysor package.json",
+    "build:docker": "docker build -t kyvejs/kysor .",
     "start": "node ./dist/src/index.js",
     "format": "prettier --write .",
     "deploy": "yarn build && yarn npm publish",
