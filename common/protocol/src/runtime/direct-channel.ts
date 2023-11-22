@@ -72,6 +72,27 @@ export class DirectCall implements Call {
   startRead(): void {}
 }
 
+/*
+ * DirectChannel can be used to call grpc methods directly without using grpc.
+ * This is used to run the runtime service in the same process as the client.
+ * It emulates the legacy mode of the runtime service without grpc/docker.
+ *
+ * Requirements:
+ * - The integration must be written in typescript as well
+ * - The integration must provide the server method to the protocol
+ * - The grpc/proto naming convention must be the following:
+ *   - Method name: <methodName>
+ *   - Request type: <MethodName>Request
+ *   - Response type: <MethodName>Response
+ *
+ * Example:
+ * ```proto
+ * rpc GetRuntimeName(GetRuntimeNameRequest) returns (GetRuntimeNameResponse);
+ * ```
+ * ```typescript
+ * getRuntimeName(request: GetRuntimeNameRequest): GetRuntimeNameResponse {}
+ * ```
+ */
 // @ts-ignore
 export class DirectChannel implements grpc.Channel {
   private services: {};

@@ -3,9 +3,6 @@
 #################  Build Stage 1 #################
 FROM node:lts AS build
 
-# Set the architecture argument
-ARG TARGETARCH
-
 # Set the working directory
 WORKDIR /usr/src/app
 

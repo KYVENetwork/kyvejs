@@ -1,3 +1,4 @@
+// This is the entry point for the protocol if used with grpc (within docker)
 import { ProtocolConfig } from "./types";
 import { Validator } from "./index";
 
@@ -7,5 +8,4 @@ const config: Partial<ProtocolConfig> = {
   useGrpc: true,
   services: undefined,
 };
-
 new Validator(config).bootstrap();

@@ -12,9 +12,8 @@
   "publishConfig": {
     "access": "public"
   },
-  "bin": "./dist/src/start.js",
+  "bin": "./dist/src/index.js",
   "pkg": {
-    "scripts": "./dist/src/start.js",
     "targets": [
       "latest-linux-x64"
     ],

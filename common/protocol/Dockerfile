@@ -3,9 +3,6 @@
 #################  Build Stage 1 #################
 FROM node:lts AS build
 
-# Set the architecture argument
-ARG TARGETARCH
-
 # Set the working directory
 WORKDIR /usr/src/app
 
@@ -15,8 +12,11 @@ COPY package.json tsconfig.json ./
 # Install dependencies
 RUN yarn install
 
-# Copy common files
+# Copy source files
 COPY ./src ./src
+
+# Override the entrypoint to use the docker entrypoint
+COPY ./src/entrypoint_docker.ts ./src/entrypoint.ts
 
 # Build the docker core
 RUN yarn run build:binaries
@@ -33,4 +33,15 @@ WORKDIR /usr/src/app
 COPY --from=build /usr/src/app/out/protocol ./
 
 # Set the command to run when the container starts
-CMD ["./protocol"]
+CMD /bin/bash -c "set -a; . .env; set +a; \
+    ./protocol start \
+    --pool \$POOL \
+    --storage-priv \$STORAGE_PRIV \
+    --request-backoff \$REQUEST_BACKOFF \
+    --cache \$CACHE \
+    --metrics \$METRICS \
+    --valaccount VALACCOUNT \
+    --chain-id \$CHAIN_ID \
+    --rpc \$RPC \
+    --rest \$REST \
+    --debug \$DEBUG"
