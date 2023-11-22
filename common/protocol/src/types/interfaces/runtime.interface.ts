@@ -1,5 +1,4 @@
-import { Validator } from "../..";
-import { DataItem } from "..";
+import { DataItem, PrevalidateDataItemResponse } from '../../proto/kyverdk/runtime/v1/runtime';
 
 /**
  * Interface of Runtime.
@@ -75,7 +74,7 @@ export interface IRuntime {
    * @param {DataItem} item data item which gets prevalidated
    * @return {Promise<boolean>}
    */
-  prevalidateDataItem(item: DataItem): Promise<boolean>;
+  preValidateDataItem(item: DataItem): Promise<PrevalidateDataItemResponse>;
 
   /**
    * Transforms a single data item and return it. Used for example

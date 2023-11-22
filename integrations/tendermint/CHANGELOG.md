@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.1.0](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint@1.0.11...@kyvejs/tendermint@1.1.0) (2023-11-16)
+
+### Features
+
+- improve logging of debug information ([#90](https://github.com/KYVENetwork/kyvejs/issues/90)) ([ba3c1d6](https://github.com/KYVENetwork/kyvejs/commit/ba3c1d63060f38c112d7b5102341a0c9000d7d54))
+
 ## [1.0.11](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint@1.0.10...@kyvejs/tendermint@1.0.11) (2023-10-24)
 
 ### Bug Fixes

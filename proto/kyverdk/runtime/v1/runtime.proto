@@ -173,6 +173,8 @@ message PrevalidateDataItemRequest {
 message PrevalidateDataItemResponse {
   // The pre-validation result
   bool valid = 1;
+  // The pre-validation error message
+  string error = 2;
 }
 
 /* TransformDataItemRequest

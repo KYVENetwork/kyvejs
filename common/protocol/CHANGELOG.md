@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.1.0](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/protocol@1.0.14...@kyvejs/protocol@1.1.0) (2023-11-16)
+
+### Features
+
+- improve logging of debug information ([#90](https://github.com/KYVENetwork/kyvejs/issues/90)) ([ba3c1d6](https://github.com/KYVENetwork/kyvejs/commit/ba3c1d63060f38c112d7b5102341a0c9000d7d54))
+- made prerelease for types and sdk ([#96](https://github.com/KYVENetwork/kyvejs/issues/96)) ([38508c5](https://github.com/KYVENetwork/kyvejs/commit/38508c50d1d86e98339650626e21a1bc9017d9f5))
+- migrate decimals and korellia-2 ([#98](https://github.com/KYVENetwork/kyvejs/issues/98)) ([75f0626](https://github.com/KYVENetwork/kyvejs/commit/75f0626095a11e3a0d0137f5aa30d1d40f1a6674))
+
 ## [1.0.14](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/protocol@1.0.13...@kyvejs/protocol@1.0.14) (2023-10-24)
 
 ### Bug Fixes

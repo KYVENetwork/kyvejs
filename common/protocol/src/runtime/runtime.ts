@@ -119,12 +119,12 @@ export default class GrpcRuntime implements IRuntime {
     });
   }
 
-  async prevalidateDataItem(item: DataItem): Promise<boolean> {
+  async preValidateDataItem(item: DataItem): Promise<PrevalidateDataItemResponse> {
     const request_item = {
       key: item.key,
       value: JSON.stringify(item.value),
     };
-    return new Promise<boolean>((resolve, reject) => {
+    return new Promise<PrevalidateDataItemResponse>((resolve, reject) => {
       this.grpcClient.prevalidateDataItem(
         {
           config: {
@@ -137,7 +137,7 @@ export default class GrpcRuntime implements IRuntime {
             // Handle the error here if needed
             reject(error);
           } else {
-            resolve(runtimeResponse.valid);
+            resolve(runtimeResponse);
           }
         }
       );

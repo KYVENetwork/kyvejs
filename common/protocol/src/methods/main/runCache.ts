@@ -1,6 +1,7 @@
-import { DataItem, Validator } from "../..";
+import { Validator } from "../..";
 import { callWithBackoffStrategy, sleep, standardizeError } from "../../utils";
 import clone from "clone";
+import { DataItem } from '../../proto/kyverdk/runtime/v1/runtime';
 
 /**
  * runCache is the other main execution thread for collecting data items
@@ -164,16 +165,25 @@ export async function runCache(this: Validator): Promise<void> {
               this.m.runtime_get_data_item_successful.inc();
 
               // prevalidate data item and reject if it fails
-              this.logger.debug(
-                `this.runtime.prevalidateDataItem($this.runtime.serializedConfig,$ITEM)`
-              );
-
-              const valid = await this.runtime.prevalidateDataItem(data);
-
-              if (!valid) {
-                throw new Error(
-                  `Prevalidation of data item with key ${nextKey} failed.`
+              try {
+                this.logger.debug(
+                  `this.runtime.prevalidateDataItem($ITEM)`
                 );
+                const response = await this.runtime.preValidateDataItem(data);
+
+                if (!response.valid) {
+                  this.logger.error(standardizeError(response.error));
+                  this.logger.error(
+                    `Prevalidation of data item with key ${nextKey} failed, only voting abstain from now on. Please check if you have configured your data source correctly.`
+                  );
+                  throw new Error();
+                }
+              } catch (err) {
+                this.logger.error(standardizeError(err));
+                this.logger.error(
+                  `Prevalidation of data item with key ${nextKey} failed, only voting abstain from now on. Please check if you have configured your data source correctly.`
+                );
+                throw new Error();
               }
 
               // transform data item

@@ -72,7 +72,7 @@ describe("isDataAvailable", () => {
   test("assert prevalidateDataItem fails", async () => {
     // ARRANGE
     v.pool.data!.current_key = "0";
-    v["runtime"].prevalidateDataItem = jest.fn().mockRejectedValue(new Error());
+    v["runtime"].preValidateDataItem = jest.fn().mockRejectedValue(new Error());
 
     // ACT
     const result = await isDataAvailable.call(v);
@@ -84,7 +84,7 @@ describe("isDataAvailable", () => {
   test("assert prevalidateDataItem fails", async () => {
     // ARRANGE
     v.pool.data!.current_key = "0";
-    v["runtime"].prevalidateDataItem = jest.fn().mockResolvedValue(false);
+    v["runtime"].preValidateDataItem = jest.fn().mockResolvedValue(false);
 
     // ACT
     const result = await isDataAvailable.call(v);

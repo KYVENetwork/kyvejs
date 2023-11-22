@@ -52,6 +52,7 @@ KYVE, the Web3 data lake solution, is a protocol that enables data providers to 
 **Integrations:**
 
 - [@kyvejs/tendermint](integrations/tendermint/README.md) - The official KYVE Tendermint sync integration
+- [@kyvejs/tendermint-ssync](integrations/tendermint-ssync/README.md) - The official KYVE Tendermint state-sync integration
 - [@kyvejs/tendermint-bsync](integrations/tendermint-bsync/README.md) - The official KYVE Tendermint block sync integration
 - [@kyvejs/tendermint-ssync](integrations/tendermint-ssync/README.md) - The official KYVE Tendermint block sync integration
 

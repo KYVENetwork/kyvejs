@@ -132,6 +132,8 @@ export interface PrevalidateDataItemRequest {
 export interface PrevalidateDataItemResponse {
   /** The pre-validation result */
   valid: boolean;
+  /** The pre-validation error message */
+  error: string;
 }
 
 /**
@@ -893,13 +895,16 @@ export const PrevalidateDataItemRequest = {
 };
 
 function createBasePrevalidateDataItemResponse(): PrevalidateDataItemResponse {
-  return { valid: false };
+  return { valid: false, error: "" };
 }
 
 export const PrevalidateDataItemResponse = {
   encode(message: PrevalidateDataItemResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.valid === true) {
       writer.uint32(8).bool(message.valid);
+    }
+    if (message.error !== "") {
+      writer.uint32(18).string(message.error);
     }
     return writer;
   },
@@ -918,6 +923,13 @@ export const PrevalidateDataItemResponse = {
 
           message.valid = reader.bool();
           continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.error = reader.string();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -928,13 +940,19 @@ export const PrevalidateDataItemResponse = {
   },
 
   fromJSON(object: any): PrevalidateDataItemResponse {
-    return { valid: isSet(object.valid) ? globalThis.Boolean(object.valid) : false };
+    return {
+      valid: isSet(object.valid) ? globalThis.Boolean(object.valid) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : "",
+    };
   },
 
   toJSON(message: PrevalidateDataItemResponse): unknown {
     const obj: any = {};
     if (message.valid === true) {
       obj.valid = message.valid;
+    }
+    if (message.error !== "") {
+      obj.error = message.error;
     }
     return obj;
   },
@@ -945,6 +963,7 @@ export const PrevalidateDataItemResponse = {
   fromPartial<I extends Exact<DeepPartial<PrevalidateDataItemResponse>, I>>(object: I): PrevalidateDataItemResponse {
     const message = createBasePrevalidateDataItemResponse();
     message.valid = object.valid ?? false;
+    message.error = object.error ?? "";
     return message;
   },
 };

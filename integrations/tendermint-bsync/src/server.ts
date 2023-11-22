@@ -18,12 +18,12 @@ import {
   ValidateDataItemResponse,
   ValidateSetConfigRequest,
   ValidateSetConfigResponse
-} from "./proto/kyverdk/runtime/v1/runtime";
-import * as grpc from "@grpc/grpc-js";
-import { UntypedHandleCall } from "@grpc/grpc-js";
-import { sendUnaryData, ServerUnaryCall } from "@grpc/grpc-js/build/src/server-call";
-import { name, version } from "../package.json";
-import axios from "axios";
+} from './proto/kyverdk/runtime/v1/runtime';
+import * as grpc from '@grpc/grpc-js';
+import { UntypedHandleCall } from '@grpc/grpc-js';
+import { sendUnaryData, ServerUnaryCall } from '@grpc/grpc-js/build/src/server-call';
+import { name, version } from '../package.json';
+import axios from 'axios';
 import { VoteType } from './proto/kyve/bundles/v1beta1/tx';
 
 export class TendermintServer implements RuntimeServiceServer {
@@ -51,14 +51,14 @@ export class TendermintServer implements RuntimeServiceServer {
       if (!config.network) {
         callback({
           code: grpc.status.INVALID_ARGUMENT,
-          details: "Config does not have property \"network\" defined"
+          details: 'Config does not have property "network" defined'
         });
         return;
       }
       if (!config.rpc) {
         callback({
           code: grpc.status.INVALID_ARGUMENT,
-          details: "Config does not have property \"rpc\" defined"
+          details: 'Config does not have property "rpc" defined'
         });
         return;
       }
@@ -106,7 +106,13 @@ export class TendermintServer implements RuntimeServiceServer {
     try {
       // check if block is defined
       if (!call.request.data_item?.value) {
-        callback(null, PrevalidateDataItemResponse.create({ valid: false }));
+        const response = PrevalidateDataItemResponse.create(
+          {
+            valid: false,
+            error: 'Value in data item is not defined'
+          });
+        callback(null, response);
+        return
       }
 
       const item = {
@@ -114,11 +120,28 @@ export class TendermintServer implements RuntimeServiceServer {
         value: JSON.parse(call.request.data_item!.value)
       };
 
+      // check if block height matches
+      if (item.key !== item.value.header.height) {
+        const response = PrevalidateDataItemResponse.create(
+          {
+            valid: false,
+            error: `Block height does not match: key${item.key} value:${item.value.header.height}`
+          });
+        callback(null, response);
+        return
+      }
+
       const config = JSON.parse(call.request.config!.serialized_config);
 
       // check if network matches
       if (config.network !== item.value.header.chain_id) {
-        callback(null, PrevalidateDataItemResponse.create({ valid: false }));
+        const response = PrevalidateDataItemResponse.create(
+          {
+            valid: false,
+            error: 'Chain ID does not match'
+          });
+        callback(null, response);
+        return
       }
       callback(null, PrevalidateDataItemResponse.create({ valid: true }));
     } catch (error: any) {
@@ -136,7 +159,7 @@ export class TendermintServer implements RuntimeServiceServer {
       const request_proposed_data_item = call.request.proposed_data_item;
       const request_validation_data_item = call.request.validation_data_item;
       if (request_proposed_data_item === undefined || request_validation_data_item === undefined) {
-        const error = new Error("proposed_data_item or validation_data_item is undefined");
+        const error = new Error('proposed_data_item or validation_data_item is undefined');
         callback({
           code: grpc.status.INTERNAL,
           details: error.message
@@ -169,7 +192,7 @@ export class TendermintServer implements RuntimeServiceServer {
     callback: sendUnaryData<SummarizeDataBundleResponse>): void {
     try {
       // use latest block height as bundle summary
-      const summary = JSON.parse(call.request.bundle?.at(-1)?.value ?? "{}")?.header?.height ?? "";
+      const summary = JSON.parse(call.request.bundle?.at(-1)?.value ?? '{}')?.header?.height ?? '';
       callback(null, SummarizeDataBundleResponse.create({ summary }));
     } catch (error: any) {
       callback({
