@@ -24,7 +24,7 @@ export default class GrpcRuntime implements IRuntime {
 
   public config!: IConfig;
 
-  constructor(protocolConfig: ProtocolConfig) {
+  constructor(protocolConfig: Partial<ProtocolConfig>) {
     const options: Partial<ClientOptions> = {};
     if (!protocolConfig.useGrpc) {
       if (protocolConfig.services === undefined) {

@@ -165,7 +165,7 @@ export class Validator {
    * @method constructor
    * @param {ProtocolConfig} protocolConfig that defines the runtime
    */
-  constructor(protocolConfig: ProtocolConfig) {
+  constructor(protocolConfig: Partial<ProtocolConfig>) {
     // set provided runtime
     this.runtime = new GrpcRuntime(protocolConfig);
 
@@ -478,3 +478,6 @@ export * from "./types";
 
 // export utils
 export * from "./utils";
+
+// export start
+export * from "./start";
