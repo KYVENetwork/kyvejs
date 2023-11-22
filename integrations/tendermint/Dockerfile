@@ -3,33 +3,30 @@
 #################  Build Stage 1 #################
 FROM node:lts AS build
 
-# Set the architecture argument
-ARG TARGETARCH
-
-# Determine the binary architecture based on the target architecture and write it to a temporary file
-RUN if [ "$TARGETARCH" = "arm64" ]; then \
-      echo BINARYARCH="arm64" >> /etc/environment; \
-    elif [ "$TARGETARCH" = "amd64" ]; then \
-      echo BINARYARCH="x86" >> /etc/environment; \
-    fi
-
 # Set the working directory
 WORKDIR /usr/src/app
 
 # Copy necessary files for installing dependencies
 COPY package.json tsconfig.json ./
 
-# Install dependencies
-RUN yarn install --frozen-lockfile
+# Remove line with @kyvejs/protocol from package.json
+# because we don't need it when running in docker
+RUN sed -i '/@kyvejs\/protocol/d' package.json
 
-# Copy common files
+# Install dependencies
+RUN yarn install
+
+# Copy source files
 COPY ./src ./src
 
+# Overwrite index.ts with index-docker.ts
+COPY ./src/index-docker.ts ./src/index.ts
+
 # Build the docker core
-RUN TARGET=latest-${TARGETOS}-${BINARYARCH} yarn run build:binaries
+RUN yarn run build:docker:binaries
 
 ################## Build Stage 2 ##################
-#Create a slim runtime image with only the necessary files for execution
+# Create a slim runtime image with only the necessary files for execution
 #################  Build Stage 2 #################
 FROM node:slim AS runtime
 
@@ -40,7 +37,7 @@ EXPOSE 50051
 WORKDIR /usr/src/app
 
 # Copy the compiled output from the build stage
-COPY --from=build /usr/src/app/out/kyve* ./
+COPY --from=build /usr/src/app/out/tendermint ./tendermint
 
 # Set the command to run when the container starts
-CMD ["./kyve"]
+CMD ["./tendermint"]

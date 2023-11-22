@@ -1,7 +1,9 @@
-import * as grpc from "@grpc/grpc-js";
-import { sendUnaryData, ServerUnaryCall, UntypedHandleCall } from "@grpc/grpc-js";
-
-import { name, version } from "../package.json";
+import * as grpc from '@grpc/grpc-js';
+import { sendUnaryData, ServerUnaryCall, UntypedHandleCall } from '@grpc/grpc-js';
+import Ajv from 'ajv';
+import block_schema from './schemas/block.json';
+import block_results_schema from './schemas/block_result.json';
+import { name, version } from '../package.json';
 import {
   GetDataItemRequest,
   GetDataItemResponse,
@@ -22,10 +24,11 @@ import {
   ValidateDataItemResponse,
   ValidateSetConfigRequest,
   ValidateSetConfigResponse
-} from "./proto/kyverdk/runtime/v1/runtime";
-import axios from "axios";
-import { VOTE } from "@kyvejs/protocol";
+} from './proto/kyverdk/runtime/v1/runtime';
+import axios from 'axios';
+import { VoteType } from './proto/kyve/bundles/v1beta1/tx';
 
+const ajv = new Ajv();
 
 export class TendermintServer implements RuntimeServiceServer {
   [name: string]: UntypedHandleCall;
@@ -45,14 +48,14 @@ export class TendermintServer implements RuntimeServiceServer {
       if (!config.network) {
         callback({
           code: grpc.status.INVALID_ARGUMENT,
-          details: "Config does not have property \"network\" defined"
+          details: 'Config does not have property "network" defined'
         });
         return;
       }
       if (!config.rpc) {
         callback({
           code: grpc.status.INVALID_ARGUMENT,
-          details: "Config does not have property \"rpc\" defined"
+          details: 'Config does not have property "rpc" defined'
         });
         return;
       }
@@ -122,29 +125,75 @@ export class TendermintServer implements RuntimeServiceServer {
 
       // Check if data item is defined
       if (!item.value) {
-        callback(null, PrevalidateDataItemResponse.create({ valid: false }));
+        const response = PrevalidateDataItemResponse.create(
+          { valid: false, error: 'Value in data item is not defined' });
+        callback(null, response);
         return;
       }
 
-      // Check if block and block results are defined
-      if (!item.value.block || !item.value.block_results) {
-        callback(null, PrevalidateDataItemResponse.create({ valid: false }));
+      // Check if block is defined
+      if (!item.value.block) {
+        const response = PrevalidateDataItemResponse.create(
+          { valid: false, error: 'Block in data item is not defined' });
+        callback(null, response);
+        return;
+      }
+
+      // Check if block results is defined
+      if (!item.value.block_results) {
+        const response = PrevalidateDataItemResponse.create(
+          { valid: false, error: 'Block results in data item is not defined' });
+        callback(null, response);
+        return;
+      }
+
+      // Check if block height matches
+      if (item.key !== item.value.block.block.header.height) {
+        const response = PrevalidateDataItemResponse.create(
+          {
+            valid: false,
+            error: `Block height does not match: key${item.key} value:${item.value.block.block.header.height}`
+          });
+        callback(null, response);
+        return;
+      }
+
+      // Check if block results height matches
+      if (item.key !== item.value.block_results.height) {
+        const response = PrevalidateDataItemResponse.create(
+          {
+            valid: false,
+            error: `Block results height does not match: key${item.key} value:${item.value.block_results.height}`
+          });
+        callback(null, response);
         return;
       }
 
       // Check if network matches
       if (config.network !== item.value.block.block.header.chain_id) {
-        callback(null, PrevalidateDataItemResponse.create({ valid: false }));
+        const response = PrevalidateDataItemResponse.create(
+          { valid: false, error: 'Chain ID does not match' });
+        callback(null, response);
         return;
       }
 
-      // Check if block height matches
-      if (item.key !== item.value.block.block.header.height.toString()) {
-        callback(null, PrevalidateDataItemResponse.create({ valid: false }));
+      // validate block schema
+      const block_validate = ajv.compile(block_schema);
+      if (!block_validate(item.value.block)) {
+        const response = PrevalidateDataItemResponse.create(
+          { valid: false, error: `Block schema validation failed: ${block_validate.errors}` });
+        callback(null, response);
         return;
       }
 
-      // Perform additional validation if needed
+      // validate block_results schema
+      const block_results_validate = ajv.compile(block_results_schema);
+      if (!block_results_validate(item.value.block_results)) {
+        const response = PrevalidateDataItemResponse.create(
+          { valid: false, error: `Block results schema validation failed: ${block_results_validate.errors}` });
+        callback(null, response);
+        return;
+      }
 
       // If all checks pass, the data item is prevalidated
       callback(null, PrevalidateDataItemResponse.create({ valid: true }));
@@ -202,10 +251,10 @@ export class TendermintServer implements RuntimeServiceServer {
                   .sort(compareEventAttribute)
                   .map(({ index, ...attribute }: any) => attribute);
 
-                if (event.type === "fungible_token_packet") {
+                if (event.type === 'fungible_token_packet') {
                   event.attributes = event.attributes.map((attribute: any) => {
-                    if (attribute.key === "YWNrbm93bGVkZ2VtZW50") {
-                      attribute.value = "";
+                    if (attribute.key === 'YWNrbm93bGVkZ2VtZW50') {
+                      attribute.value = '';
                     }
 
                     return attribute;
@@ -251,13 +300,13 @@ export class TendermintServer implements RuntimeServiceServer {
       if (
         JSON.stringify(proposedDataItem) === JSON.stringify(validationDataItem)
       ) {
-        callback(null, ValidateDataItemResponse.create({ vote: VOTE.VOTE_TYPE_VALID }));
+        callback(null, ValidateDataItemResponse.create({ vote: VoteType.VOTE_TYPE_VALID }));
         return;
       }
 
       // prevent nondeterministic misbehaviour due to osmosis-1 specific problems
       if (
-        validationDataItem.value.block.block.header.chain_id === "osmosis-1"
+        validationDataItem.value.block.block.header.chain_id === 'osmosis-1'
       ) {
         // remove nondeterministic begin_block_events to prevent incorrect invalid vote
         delete validationDataItem.value.block_results.begin_block_events;
@@ -268,13 +317,13 @@ export class TendermintServer implements RuntimeServiceServer {
           JSON.stringify(validationDataItem)
         ) {
           // vote abstain if begin_block_events are not equal
-          callback(null, ValidateDataItemResponse.create({ vote: VOTE.VOTE_TYPE_ABSTAIN }));
+          callback(null, ValidateDataItemResponse.create({ vote: VoteType.VOTE_TYPE_ABSTAIN }));
           return;
         }
       }
 
       // vote invalid if data does not match
-      callback(null, ValidateDataItemResponse.create({ vote: VOTE.VOTE_TYPE_INVALID }));
+      callback(null, ValidateDataItemResponse.create({ vote: VoteType.VOTE_TYPE_INVALID }));
     } catch (error: any) {
       callback({
         code: grpc.status.INTERNAL,
@@ -294,7 +343,7 @@ export class TendermintServer implements RuntimeServiceServer {
 
       // Get the latest block height from the last item in the bundle
       const latestBlockHeight =
-        bundle[bundle.length - 1]?.value?.block?.block?.header?.height || "";
+        bundle[bundle.length - 1]?.value?.block?.block?.header?.height || '';
 
       callback(null, SummarizeDataBundleResponse.create({ summary: latestBlockHeight.toString() }));
     } catch (error: any) {

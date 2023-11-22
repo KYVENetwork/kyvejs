@@ -37,7 +37,7 @@ EXPOSE 50051
 WORKDIR /usr/src/app
 
 # Copy the compiled output from the build stage
-COPY --from=build /usr/src/app/out/kyve-linux-x64 ./tendermint-bsync
+COPY --from=build /usr/src/app/out/tendermint-bsync ./tendermint-bsync
 
 # Set the command to run when the container starts
 CMD ["./tendermint-bsync"]

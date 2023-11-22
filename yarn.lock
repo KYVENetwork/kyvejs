@@ -1930,6 +1930,31 @@
     big-integer "^1.6.48"
     utility-types "^3.10.0"
 
+"@kyvejs/sdk@1.1.0-rc1":
+  version "1.1.0-rc1"
+  resolved "https://registry.yarnpkg.com/@kyvejs/sdk/-/sdk-1.1.0-rc1.tgz#905a8e5043a2aeec93cb1095c7d91458b9642e86"
+  integrity sha512-fbgc92paR0Ky3HSI50EJS6POQM0iSmmf3aUAQyfmhjb9VuPvgDK3GD8+k+eSv/fEDceAKMhc7v48b4IeGfWBHw==
+  dependencies:
+    "@cosmjs/amino" "^0.31.3"
+    "@cosmjs/crypto" "^0.31.3"
+    "@cosmjs/encoding" "^0.31.3"
+    "@cosmjs/proto-signing" "^0.31.3"
+    "@cosmjs/stargate" "^0.31.3"
+    "@cosmjs/tendermint-rpc" "^0.31.3"
+    "@cosmostation/extension-client" "^0.0.6"
+    "@keplr-wallet/cosmos" "^0.12.39"
+    "@kyvejs/types" "1.2.0-rc0"
+    axios "0.25.0"
+    bech32 "2.0.0"
+    bignumber.js "9.1.2"
+    humanize-number "0.0.2"
+    qs "^6.10.5"
+
+"@kyvejs/types@1.2.0-rc0":
+  version "1.2.0-rc0"
+  resolved "https://registry.yarnpkg.com/@kyvejs/types/-/types-1.2.0-rc0.tgz#950bf317dae721ecbac1fe5954c75ac9ac3fecdb"
+  integrity sha512-hkIRqMrMf7csjDjlnw5NVMPC6VtXMMvL+otnak0HiZumDVgElByn0ieshCjipsPOJM4Ly+hT2hYJQVnPoFQpYQ==
+
 "@lerna/child-process@7.1.4":
   version "7.1.4"
   resolved "https://registry.yarnpkg.com/@lerna/child-process/-/child-process-7.1.4.tgz#5ab64540b01a339ecc6787f4f06d29aee99d71d5"
