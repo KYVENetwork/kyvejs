@@ -1,7 +1,6 @@
 import { BigNumber } from "bignumber.js";
 import crypto from "crypto";
-
-import { DataItem } from "..";
+import { DataItem } from "../proto/kyverdk/runtime/v1/runtime";
 
 const INFINITY_LOOP = true;
 /**

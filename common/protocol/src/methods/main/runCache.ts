@@ -1,7 +1,7 @@
 import { Validator } from "../..";
 import { callWithBackoffStrategy, sleep, standardizeError } from "../../utils";
 import clone from "clone";
-import { DataItem } from '../../proto/kyverdk/runtime/v1/runtime';
+import { DataItem } from "../../proto/kyverdk/runtime/v1/runtime";
 
 /**
  * runCache is the other main execution thread for collecting data items
@@ -166,9 +166,7 @@ export async function runCache(this: Validator): Promise<void> {
 
               // prevalidate data item and reject if it fails
               try {
-                this.logger.debug(
-                  `this.runtime.prevalidateDataItem($ITEM)`
-                );
+                this.logger.debug(`this.runtime.prevalidateDataItem($ITEM)`);
                 const response = await this.runtime.preValidateDataItem(data);
 
                 if (!response.valid) {

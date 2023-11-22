@@ -1,4 +1,4 @@
-import { DataItem } from "..";
+import { DataItem } from "../../proto/kyverdk/runtime/v1/runtime";
 
 /**
  * Interface of Cache.

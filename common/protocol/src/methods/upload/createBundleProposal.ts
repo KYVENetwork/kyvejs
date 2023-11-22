@@ -1,12 +1,13 @@
 import BigNumber from "bignumber.js";
 import { Validator } from "../..";
-import { BundleTag, DataItem } from "../../types";
+import { BundleTag } from "../../types";
 import {
   bundleToBytes,
   MAX_BUNDLE_BYTE_SIZE,
   sha256,
   standardizeError,
 } from "../../utils";
+import { DataItem } from "../../proto/kyverdk/runtime/v1/runtime";
 
 /**
  * createBundleProposal assembles a bundle proposal by loading

@@ -1,4 +1,7 @@
-import { DataItem, PrevalidateDataItemResponse } from '../../proto/kyverdk/runtime/v1/runtime';
+import {
+  DataItem,
+  PrevalidateDataItemResponse,
+} from "../../proto/kyverdk/runtime/v1/runtime";
 
 /**
  * Interface of Runtime.
