@@ -23,8 +23,8 @@ import * as grpc from "@grpc/grpc-js";
 import { UntypedHandleCall } from "@grpc/grpc-js";
 import { sendUnaryData, ServerUnaryCall } from "@grpc/grpc-js/build/src/server-call";
 import { name, version } from "../package.json";
-import { VOTE } from "@kyvejs/protocol";
 import axios from "axios";
+import { VoteType } from './proto/kyve/bundles/v1beta1/tx';
 
 export class TendermintServer implements RuntimeServiceServer {
   [name: string]: UntypedHandleCall;
@@ -146,10 +146,10 @@ export class TendermintServer implements RuntimeServiceServer {
 
       // apply equal comparison
       if (JSON.stringify(request_proposed_data_item) === JSON.stringify(request_validation_data_item)) {
-        callback(null, { vote: VOTE.VOTE_TYPE_VALID });
+        callback(null, { vote: VoteType.VOTE_TYPE_VALID });
         return;
       }
-      callback(null, { vote: VOTE.VOTE_TYPE_INVALID });
+      callback(null, { vote: VoteType.VOTE_TYPE_INVALID });
     } catch (error: any) {
       callback({
         code: grpc.status.INTERNAL,

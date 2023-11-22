@@ -5,6 +5,8 @@
   "scripts": {
     "build": "rimraf dist && tsc",
     "build:binaries": "yarn build && rimraf out && pkg --no-bytecode --public-packages '*' --output out/kyve package.json && node ../../common/protocol/dist/src/scripts/checksum.js",
+    "build:docker": "docker build -t kyve/tendermint-bsync .",
+    "build:docker:binaries": "yarn build && rimraf out && pkg --no-bytecode --public-packages '*' --output out/kyve package.json",
     "start": "node ./dist/src/index.js",
     "format": "prettier --write ."
   },
@@ -23,6 +25,7 @@
   },
   "dependencies": {
     "@kyvejs/protocol": "1.0.14",
+    "@grpc/grpc-js": "^1.9.2",
     "axios": "^0.27.2",
     "dotenv": "^16.3.1"
   },
