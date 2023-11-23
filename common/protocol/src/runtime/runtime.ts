@@ -18,6 +18,7 @@ import { ClientOptions } from "@grpc/grpc-js";
 
 // config is a serialized string
 type IConfig = string;
+const maxMessageSize: number = 2 * 1024 * 1024 * 1024; // 2 GB
 
 export default class GrpcRuntime implements IRuntime {
   private grpcClient: RuntimeServiceClient;
@@ -25,7 +26,10 @@ export default class GrpcRuntime implements IRuntime {
   public config!: IConfig;
 
   constructor(protocolConfig: Partial<ProtocolConfig>) {
-    const options: Partial<ClientOptions> = {};
+    const options: Partial<ClientOptions> = {
+      'grpc.max_send_message_length': maxMessageSize,
+      'grpc.max_receive_message_length': maxMessageSize,
+    };
     if (!protocolConfig.useGrpc) {
       if (protocolConfig.services === undefined) {
         throw new Error("runConfig.services is undefined");

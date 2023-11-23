@@ -29,13 +29,10 @@ export async function isDataAvailable(this: Validator): Promise<boolean> {
 
     // prevalidate data item and reject if it fails
     this.logger.debug(`this.runtime.prevalidateDataItem($ITEM)`);
-
     const response = await this.runtime.preValidateDataItem(dataItem);
 
     if (!response.valid) {
-      throw new Error(
-        `Prevalidation of data item with key ${nextKey} failed. Reason: ${response.error}`
-      );
+      throw new Error(`Prevalidation of data item with key ${nextKey} failed. Reason: ${response.error}`);
     }
 
     // transform data item
