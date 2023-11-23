@@ -73,11 +73,11 @@ export interface IRuntime {
    *
    * Deterministic behavior is required
    *
-   * @method preValidateDataItem
+   * @method prevalidateDataItem
    * @param {DataItem} item data item which gets prevalidated
    * @return {Promise<boolean>}
    */
-  preValidateDataItem(item: DataItem): Promise<PrevalidateDataItemResponse>;
+  prevalidateDataItem(item: DataItem): Promise<PrevalidateDataItemResponse>;
 
   /**
    * Transforms a single data item and return it. Used for example

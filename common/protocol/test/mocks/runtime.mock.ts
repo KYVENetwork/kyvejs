@@ -1,28 +1,25 @@
-import { DataItem, Validator, sha256FromJson } from "../../src";
-
-export const TestConfig = jest.fn().mockImplementation(() => {
-  return {
-    host: "localhost",
-    port: 50051,
-    useGrpc: false,
-    grpcServices: {},
-  };
-});
+import { ProtocolConfig, sha256FromJson, Validator } from '../../src';
+import {
+  DataItem,
+  PrevalidateDataItemResponse,
+  RuntimeServiceServer
+} from '../../src/proto/kyverdk/runtime/v1/runtime';
 
 export const TestRuntime = jest.fn().mockImplementation(() => {
   return {
-    getName: jest.fn(async () => "@kyve/evm"),
-    getVersion: jest.fn(async () => "0.0.0"),
-    config: "config",
+    getName: jest.fn(async () => '@kyve/evm'),
+    getVersion: jest.fn(async () => '0.0.0'),
+    config: 'config',
     validateSetConfig: jest.fn(),
     getDataItem: jest.fn(async (key: string) => ({
       key,
-      value: `${key}-value`,
+      value: `${key}-value`
     })),
-    prevalidateDataItem: jest.fn(async (__: DataItem) => true),
+    prevalidateDataItem: jest.fn(async (__: DataItem) =>
+      PrevalidateDataItemResponse.create({ valid: true })),
     transformDataItem: jest.fn(async (item: DataItem) => ({
       key: item.key,
-      value: `${item.value}-transform`,
+      value: `${item.value}-transform`
     })),
     validateDataItem: jest.fn(
       async (proposedDataItem: DataItem, validationDataItem: DataItem) => {
@@ -35,14 +32,13 @@ export const TestRuntime = jest.fn().mockImplementation(() => {
     summarizeDataBundle: jest.fn(async (bundle: DataItem[]) =>
       JSON.stringify(bundle)
     ),
-    nextKey: jest.fn(async (key: string) => (parseInt(key) + 1).toString()),
+    nextKey: jest.fn(async (key: string) => (parseInt(key) + 1).toString())
   };
 });
 
 export const newTestValidator = (): Validator => {
-  const v = new Validator(new TestConfig());
   const runtime = new TestRuntime();
-  const runtimeServiceImpl = {
+  const runtimeServices: RuntimeServiceServer = {
     getRuntimeName: runtime.getRuntimeName,
     getRuntimeVersion: runtime.getRuntimeVersion,
     validateSetConfig: runtime.validateSetConfig,
@@ -51,8 +47,13 @@ export const newTestValidator = (): Validator => {
     transformDataItem: runtime.transformDataItem,
     validateDataItem: runtime.validateDataItem,
     summarizeDataBundle: runtime.summarizeDataBundle,
-    nextKey: runtime.nextKey,
+    nextKey: runtime.nextKey
   };
-  v["runtime"] = runtime;
+  const config: Partial<ProtocolConfig> = ({
+    useGrpc: false,
+    services: runtimeServices
+  });
+  const v = new Validator(config);
+  v['runtime'] = runtime;
   return v;
 };

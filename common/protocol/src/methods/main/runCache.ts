@@ -167,7 +167,7 @@ export async function runCache(this: Validator): Promise<void> {
               // prevalidate data item and reject if it fails
               try {
                 this.logger.debug(`this.runtime.prevalidateDataItem($ITEM)`);
-                const response = await this.runtime.preValidateDataItem(data);
+                const response = await this.runtime.prevalidateDataItem(data);
 
                 if (!response.valid) {
                   this.logger.error(standardizeError(response.error));

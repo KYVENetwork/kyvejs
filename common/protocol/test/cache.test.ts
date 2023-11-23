@@ -1,5 +1,5 @@
 import { Logger } from "tslog";
-import { DataItem, ICompression, IStorageProvider, Validator } from "../src";
+import { ICompression, IStorageProvider, Validator } from "../src";
 import { runCache, setupMetrics } from "../src/methods";
 import { genesis_pool } from "./mocks/constants";
 import { client } from "./mocks/client.mock";
@@ -9,6 +9,7 @@ import { register } from "prom-client";
 import { newTestValidator } from "./mocks/runtime.mock";
 import { TestNormalStorageProvider } from "./mocks/storageProvider.mock";
 import { TestNormalCompression } from "./mocks/compression.mock";
+import { DataItem } from '../src/proto/kyverdk/runtime/v1/runtime';
 
 /*
 

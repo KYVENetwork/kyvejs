@@ -5,19 +5,20 @@ version: '3'
 ######################
 
 services:
-  # ----------------------------------------
-  # KYVE PROTOCOL
-  # Core of the KYVE protocol validation
-  # ----------------------------------------
+  # ------------------------------------------------
+  # KYVE PROTOCOL ARCHWAY SSYNC
+  # Core of the KYVE protocol validation for Archway
+  # ------------------------------------------------
   protocol-archway-ssync:
     build:
       context: common/protocol
+#    Uncomment the following line to use a local .env file instead of the environment variables
 #    volumes:
 #      - .env:/usr/src/app/.env
     environment:
-      - HOST=archway-ssync # archway-ssync
-      - VALACCOUNT=dismiss subway apart pill embark have exercise little enhance expose garage vapor
-      - POOL=4
+      - VALACCOUNT= # <-- ADD THIS - Mnemonic of the validator account
+      - HOST=archway-ssync # same as the name of the service
+      - POOL=4  # Pool id -> see here: https://app.kaon.kyve.network/#/pools/4
       - STORAGE_PRIV=""
       - REQUEST_BACKOFF=50
       - CACHE=jsonfile
@@ -30,13 +31,20 @@ services:
     depends_on:
       - archway-ssync
 
+  # ------------------------------------------------
+  # KYVE PROTOCOL DYDX
+  # Core of the KYVE protocol validation for dYdX
+  # ------------------------------------------------
   protocol-dydx:
     build:
       context: common/protocol
+    #    Uncomment the following line to use a local .env file instead of the environment variables
+    #    volumes:
+    #      - .env:/usr/src/app/.env
     environment:
-      - HOST=dydx # dydx
-      - VALACCOUNT=immune present rib armed ripple enable six child evoke radar upon ginger
-      - POOL=8
+      - VALACCOUNT= # <-- ADD THIS - Mnemonic of the validator account
+      - HOST=dydx   # same as the name of the service
+      - POOL=8      # Pool id -> see here: https://app.kaon.kyve.network/#/pools/8
       - STORAGE_PRIV=""
       - REQUEST_BACKOFF=50
       - CACHE=jsonfile
@@ -49,13 +57,17 @@ services:
     depends_on:
       - dydx
 
+  # ------------------------------------------------
+  # KYVE PROTOCOL COSMOSHUB BSYNC
+  # Core of the KYVE protocol validation for Cosmos Hub
+  # ------------------------------------------------
   protocol-cosmoshub-bsync:
     build:
       context: common/protocol
     environment:
-      - HOST=cosmoshub-bsync
-      - VALACCOUNT=artist final stage coffee coach stable quantum feed catch bridge pond like ranch steel insane hold vital horse catalog battle company suspect satoshi famous
-      - POOL=0
+      - VALACCOUNT=           # <-- ADD THIS - Mnemonic of the validator account
+      - HOST=cosmoshub-bsync  # same as the name of the service
+      - POOL=0                # Pool id -> see here: https://app.kaon.kyve.network/#/pools/0
       - STORAGE_PRIV=""
       - REQUEST_BACKOFF=50
       - CACHE=jsonfile
@@ -70,27 +82,27 @@ services:
 
   # ----------------------------------------
   # KYVE TENDERMINT INTEGRATION
-  # GRPC server for Tendermint integration
+  # GRPC server for dYdX validation
   # ----------------------------------------
   dydx:
     build:
       context: integrations/tendermint
     environment:
-      - KYVEJS_TENDERMINT_RPC=https://rpc.cosmos.directory/dydx
+      - KYVEJS_TENDERMINT_RPC=https://rpc.cosmos.directory/dydx # <-- ADD THIS - RPC endpoint of the chain
 
   # ----------------------------------------
   # KYVE TENDERMINT BSYNC INTEGRATION
-  # GRPC server for Tendermint bsync integration
+  # GRPC server for cosmoshub-bsync validation
   # ----------------------------------------
   cosmoshub-bsync:
     build:
       context: integrations/tendermint-bsync
     environment:
-      - KYVEJS_TENDERMINT_BSYNC_RPC=https://g.w.lavanet.xyz:443/gateway/cos5/rpc-http/1d87fa61650d165d2c044c14b8db25f0
+      - KYVEJS_TENDERMINT_BSYNC_RPC=https://rpc.cosmos.directory/cosmoshub # <-- ADD THIS - RPC endpoint of the chain
 
   # ----------------------------------------
   # KYVE TENDERMINT SSYNC INTEGRATION
-  # GRPC server for Tendermint ssync integration
+  # GRPC server for archway-ssync validation
   # ----------------------------------------
   archway-ssync:
     build:

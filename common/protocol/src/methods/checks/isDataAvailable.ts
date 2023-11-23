@@ -29,7 +29,7 @@ export async function isDataAvailable(this: Validator): Promise<boolean> {
 
     // prevalidate data item and reject if it fails
     this.logger.debug(`this.runtime.prevalidateDataItem($ITEM)`);
-    const response = await this.runtime.preValidateDataItem(dataItem);
+    const response = await this.runtime.prevalidateDataItem(dataItem);
 
     if (!response.valid) {
       throw new Error(

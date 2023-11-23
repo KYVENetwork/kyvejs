@@ -123,7 +123,7 @@ export default class GrpcRuntime implements IRuntime {
     });
   }
 
-  async preValidateDataItem(
+  async prevalidateDataItem(
     item: DataItem
   ): Promise<PrevalidateDataItemResponse> {
     const request_item = {
