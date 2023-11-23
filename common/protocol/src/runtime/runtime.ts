@@ -27,8 +27,8 @@ export default class GrpcRuntime implements IRuntime {
 
   constructor(protocolConfig: Partial<ProtocolConfig>) {
     const options: Partial<ClientOptions> = {
-      'grpc.max_send_message_length': maxMessageSize,
-      'grpc.max_receive_message_length': maxMessageSize,
+      "grpc.max_send_message_length": maxMessageSize,
+      "grpc.max_receive_message_length": maxMessageSize,
     };
     if (!protocolConfig.useGrpc) {
       if (protocolConfig.services === undefined) {

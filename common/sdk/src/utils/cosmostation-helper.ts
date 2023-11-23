@@ -1,9 +1,9 @@
 import { StdSignDoc } from "@cosmjs/amino/build/signdoc";
 import { makeSignDoc } from "@cosmjs/proto-signing";
 import {
-  AccountData,
-  OfflineDirectSigner,
-} from "@cosmjs/proto-signing/build/signer";
+  AccountData, DirectSignResponse,
+  OfflineDirectSigner
+} from '@cosmjs/proto-signing/build/signer';
 import {
   AddChainParams,
   RequestAccountResponse,
@@ -83,7 +83,7 @@ export class CosmostationSigner implements OfflineDirectSigner {
     ];
   }
 
-  async signDirect(signerAddress: string, signDoc: SignDoc) {
+  async signDirect(signerAddress: string, signDoc: SignDoc): Promise<DirectSignResponse> {
     const signedResult = await cosmostationMethods.signDirect(
       this.config.chainId,
       {
