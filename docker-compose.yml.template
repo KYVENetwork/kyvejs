@@ -1,0 +1,101 @@
+version: '3'
+
+######################
+# SERVICES TO LAUNCH #
+######################
+
+services:
+  # ----------------------------------------
+  # KYVE PROTOCOL
+  # Core of the KYVE protocol validation
+  # ----------------------------------------
+  protocol-archway-ssync:
+    build:
+      context: common/protocol
+#    volumes:
+#      - .env:/usr/src/app/.env
+    environment:
+      - HOST=archway-ssync # archway-ssync
+      - VALACCOUNT=dismiss subway apart pill embark have exercise little enhance expose garage vapor
+      - POOL=4
+      - STORAGE_PRIV=""
+      - REQUEST_BACKOFF=50
+      - CACHE=jsonfile
+      - METRICS=false
+      - METRICS_PORT=8080
+      - CHAIN_ID=kaon-1
+      - RPC=https://rpc-eu-1.kaon.kyve.network
+      - REST=https://api-eu-1.kaon.kyve.network
+      - DEBUG=false
+    depends_on:
+      - archway-ssync
+
+  protocol-dydx:
+    build:
+      context: common/protocol
+    environment:
+      - HOST=dydx # dydx
+      - VALACCOUNT=immune present rib armed ripple enable six child evoke radar upon ginger
+      - POOL=8
+      - STORAGE_PRIV=""
+      - REQUEST_BACKOFF=50
+      - CACHE=jsonfile
+      - METRICS=false
+      - METRICS_PORT=8080
+      - CHAIN_ID=kaon-1
+      - RPC=https://rpc-eu-1.kaon.kyve.network
+      - REST=https://api-eu-1.kaon.kyve.network
+      - DEBUG=false
+    depends_on:
+      - dydx
+
+  protocol-cosmoshub-bsync:
+    build:
+      context: common/protocol
+    environment:
+      - HOST=cosmoshub-bsync
+      - VALACCOUNT=artist final stage coffee coach stable quantum feed catch bridge pond like ranch steel insane hold vital horse catalog battle company suspect satoshi famous
+      - POOL=0
+      - STORAGE_PRIV=""
+      - REQUEST_BACKOFF=50
+      - CACHE=jsonfile
+      - METRICS=false
+      - METRICS_PORT=8080
+      - CHAIN_ID=kaon-1
+      - RPC=https://rpc-eu-1.kaon.kyve.network
+      - REST=https://api-eu-1.kaon.kyve.network
+      - DEBUG=false
+    depends_on:
+      - cosmoshub-bsync
+
+  # ----------------------------------------
+  # KYVE TENDERMINT INTEGRATION
+  # GRPC server for Tendermint integration
+  # ----------------------------------------
+  dydx:
+    build:
+      context: integrations/tendermint
+    environment:
+      - KYVEJS_TENDERMINT_RPC=https://rpc.cosmos.directory/dydx
+
+  # ----------------------------------------
+  # KYVE TENDERMINT BSYNC INTEGRATION
+  # GRPC server for Tendermint bsync integration
+  # ----------------------------------------
+  cosmoshub-bsync:
+    build:
+      context: integrations/tendermint-bsync
+    environment:
+      - KYVEJS_TENDERMINT_BSYNC_RPC=https://g.w.lavanet.xyz:443/gateway/cos5/rpc-http/1d87fa61650d165d2c044c14b8db25f0
+
+  # ----------------------------------------
+  # KYVE TENDERMINT SSYNC INTEGRATION
+  # GRPC server for Tendermint ssync integration
+  # ----------------------------------------
+  archway-ssync:
+    build:
+      context: integrations/tendermint-ssync
+    environment:
+      - KYVEJS_TENDERMINT_SSYNC_API=http://host.docker.internal:7878
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
