@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import JSZip from "jszip";
 import { createReadStream, readdirSync, writeFileSync } from "fs";
 
 export const getChecksum = (path: string): Promise<string> => {
@@ -19,13 +20,24 @@ export const getChecksum = (path: string): Promise<string> => {
 };
 
 const main = async () => {
-  const files = readdirSync(`./out/`);
+  let files = readdirSync(`./out/`);
   let result = "";
+
+  const zip = new JSZip();
+
+  for (const file of files) {
+    zip.file(`./out/${file}`);
+
+    const content = await zip.generateAsync({ type: "nodebuffer" });
+    writeFileSync(`./out/${file}.zip`, content);
+  }
+
+  files = readdirSync(`./out/`);
 
   for (const file of files) {
     const checksum = await getChecksum(`./out/${file}`);
 
-    console.log(`${file} -> ${checksum}`);
+    console.log(`${checksum} ${file}`);
     result += `${checksum} ${file}\n`;
   }
 
