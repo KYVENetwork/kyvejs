@@ -32,8 +32,16 @@ export async function syncPoolState(
             id: this.poolId.toString(),
           });
           this.pool = pool!;
-
           this.m.query_pool_successful.inc();
+
+          // perform validation checks
+          if (!this.isValidRuntime()) {
+            process.exit(1);
+          }
+
+          if (!this.isValidVersion()) {
+            process.exit(1);
+          }
 
           // if config link has changed sync the config
           if (prevConfig !== this.pool.data!.config) {

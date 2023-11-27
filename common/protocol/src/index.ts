@@ -308,15 +308,6 @@ export class Validator {
     await this.setupSDK();
     await this.syncPoolState(true);
 
-    // perform validation checks
-    if (!this.isValidRuntime()) {
-      process.exit(1);
-    }
-
-    if (!this.isValidVersion()) {
-      process.exit(1);
-    }
-
     if (await this.isStorageBalanceZero()) {
       process.exit(1);
     }
@@ -324,10 +315,6 @@ export class Validator {
     // until data is not available we wait and idle
     while (!(await this.isDataAvailable())) {
       await sleep(IDLE_TIME);
-    }
-
-    if (!(await this.isDataAvailable())) {
-      process.exit(1);
     }
 
     await this.setupValidator();
