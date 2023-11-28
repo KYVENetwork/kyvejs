@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.1.0](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint-ssync@1.0.0...@kyvejs/tendermint-ssync@1.1.0) (2023-11-28)
+
+### Features
+
+- improve logging of debug information ([#90](https://github.com/KYVENetwork/kyvejs/issues/90)) ([ba3c1d6](https://github.com/KYVENetwork/kyvejs/commit/ba3c1d63060f38c112d7b5102341a0c9000d7d54))
+- support chain v1.4.0 ([#105](https://github.com/KYVENetwork/kyvejs/issues/105)) ([503b71f](https://github.com/KYVENetwork/kyvejs/commit/503b71f40ed4d32c68d2bff34cfcf88120944c73))
+
 # [1.1.0](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint-ssync@1.0.0...@kyvejs/tendermint-ssync@1.1.0) (2023-11-16)
 
 ### Features

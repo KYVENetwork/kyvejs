@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.2.0](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/types@1.2.0-rc0...@kyvejs/types@1.2.0) (2023-11-28)
+
+### Features
+
+- support chain v1.4.0 ([#105](https://github.com/KYVENetwork/kyvejs/issues/105)) ([503b71f](https://github.com/KYVENetwork/kyvejs/commit/503b71f40ed4d32c68d2bff34cfcf88120944c73))
+
 # [1.2.0](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/types@1.2.0-rc0...@kyvejs/types@1.2.0) (2023-11-16)
 
 **Note:** Version bump only for package @kyvejs/types

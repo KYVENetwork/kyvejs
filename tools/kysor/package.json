@@ -1,7 +1,7 @@
 {
   "name": "@kyve/kysor",
   "description": "The Cosmovisor for KYVE protocol nodes",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "homepage": "https://github.com/KYVENetwork/kysor#readme",
@@ -38,8 +38,8 @@
   },
   "dependencies": {
     "@iarna/toml": "^2.2.5",
-    "@kyvejs/sdk": "1.0.5",
-    "@kyvejs/types": "1.1.0",
+    "@kyvejs/sdk": "1.1.0",
+    "@kyvejs/types": "1.2.0",
     "axios": "^0.27.2",
     "bignumber.js": "^9.1.0",
     "commander": "^9.4.0",
