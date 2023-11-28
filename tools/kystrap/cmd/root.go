@@ -30,8 +30,8 @@ func promptOption() (option, error) {
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "kystrapper",
-	Short: "Kystrapper is a CLI tool to bootstrap KYVE integrations",
+	Use:   "kystrap",
+	Short: "kystrap is a CLI tool to bootstrap KYVE integrations",
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	RunE: func(cmd *cobra.Command, args []string) error {
@@ -51,7 +51,7 @@ var rootCmd = &cobra.Command{
 		case help:
 			return cmd.Help()
 		case create:
-			return CmdCreateIntegration().RunE(cmd, args)
+			return CmdCreateIntegration().Execute()
 		default:
 			return nil
 		}
@@ -73,7 +73,7 @@ func init() {
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 
-	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.kystrapper.yaml)")
+	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.kystrap.yaml)")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.

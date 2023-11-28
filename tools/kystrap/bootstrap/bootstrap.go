@@ -2,7 +2,7 @@ package bootstrap
 
 import (
 	"errors"
-	"github.com/KYVENetwork/kyvejs/tools/kystrapper/types"
+	"github.com/KYVENetwork/kyvejs/tools/kystrap/types"
 	"github.com/spf13/viper"
 	"os"
 	"path/filepath"

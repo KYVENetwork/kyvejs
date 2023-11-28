@@ -1,4 +1,4 @@
-module github.com/KYVENetwork/kyvejs/tools/kystrapper
+module github.com/KYVENetwork/kyvejs/tools/kystrap
 
 go 1.21.4
 

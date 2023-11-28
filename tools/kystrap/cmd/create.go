@@ -2,8 +2,8 @@ package cmd
 
 import (
 	"errors"
-	"github.com/KYVENetwork/kyvejs/tools/kystrapper/bootstrap"
-	"github.com/KYVENetwork/kyvejs/tools/kystrapper/types"
+	"github.com/KYVENetwork/kyvejs/tools/kystrap/bootstrap"
+	"github.com/KYVENetwork/kyvejs/tools/kystrap/types"
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 )
@@ -65,6 +65,11 @@ func CmdCreateIntegration() *cobra.Command {
 		Use:   "create",
 		Short: "Create a new runtime integration",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			outputDir, err := cmd.Flags().GetString(flagOutputDir)
+			if err != nil {
+				return err
+			}
+
 			language, err := promptLanguage(flagLanguage, cmd.Flags().Changed(yesFlag))
 			if err != nil {
 				return err
@@ -72,11 +77,6 @@ func CmdCreateIntegration() *cobra.Command {
 
 			defaultName, _ := cmd.Flags().GetString(flagName)
 			name, err := promptName(defaultName, cmd.Flags().Changed(yesFlag))
-			if err != nil {
-				return err
-			}
-
-			outputDir, err := cmd.Flags().GetString(flagOutputDir)
 			if err != nil {
 				return err
 			}
