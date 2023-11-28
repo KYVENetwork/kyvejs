@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func promptLanguage(defaultVal types.Language) (types.Language, error) {
+func promptLanguage(defaultVal types.Language, skipPrompt bool) (types.Language, error) {
 	var items = []types.Language{types.Go, types.Python, types.Typescript}
 	var position = 0
 	if defaultVal != "" {
@@ -25,11 +25,17 @@ func promptLanguage(defaultVal types.Language) (types.Language, error) {
 		CursorPos: position,
 	}
 
+	if skipPrompt {
+		if defaultVal == "" {
+			return "", errors.New("no language specified")
+		}
+		return defaultVal, nil
+	}
 	_, result, err := prompt.Run()
 	return types.Language(result), err
 }
 
-func promptName(defaultVal string) (string, error) {
+func promptName(defaultVal string, skipPromp bool) (string, error) {
 	validate := func(input string) error {
 		if len(input) < 3 {
 			return errors.New("name must be at least 3 characters long")
@@ -40,6 +46,10 @@ func promptName(defaultVal string) (string, error) {
 		Label:    "Set a name for your integration",
 		Validate: validate,
 		Default:  defaultVal,
+	}
+
+	if skipPromp {
+		return defaultVal, validate(defaultVal)
 	}
 
 	result, err := prompt.Run()
@@ -54,16 +64,13 @@ func CmdCreateIntegration() *cobra.Command {
 		Use:   "create",
 		Short: "Create a new runtime integration",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			language, err := promptLanguage(flagLanguage)
+			language, err := promptLanguage(flagLanguage, cmd.Flags().Changed(yesFlag))
 			if err != nil {
 				return err
 			}
 
-			defaultName, err := cmd.Flags().GetString(flagName)
-			if err != nil {
-				return err
-			}
-			name, err := promptName(defaultName)
+			defaultName, _ := cmd.Flags().GetString(flagName)
+			name, err := promptName(defaultName, cmd.Flags().Changed(yesFlag))
 			if err != nil {
 				return err
 			}
@@ -71,8 +78,8 @@ func CmdCreateIntegration() *cobra.Command {
 			return bootstrap.CreateIntegration("out", language, name)
 		},
 	}
-	cmd.Flags().VarP(&flagLanguage, "language", "l", "The Language for your integration")
-	cmd.Flags().StringP(flagName, "n", "", "The name for your integration")
+	cmd.Flags().VarP(&flagLanguage, "language", "l", "language for your integration")
+	cmd.Flags().StringP(flagName, "n", "", "name for your integration")
 	return cmd
 }
 

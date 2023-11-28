@@ -1,29 +1,67 @@
 package cmd
 
 import (
+	"github.com/manifoldco/promptui"
 	"os"
 
 	"github.com/spf13/cobra"
 )
 
+type option string
+
+const (
+	help   option = "show help"
+	create option = "bootstrap integration"
+)
+
+const yesFlag = "yes"
+
+func promptOption() (option, error) {
+	var items = []option{create, help}
+
+	prompt := promptui.Select{
+		Label: "What do you want to do?",
+		Items: items,
+	}
+
+	_, result, err := prompt.Run()
+	return option(result), err
+}
+
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "kystrapper",
-	Short: "A brief description of your application",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Kystrapper is a CLI tool to bootstrap KYVE integrations",
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) { },
+	RunE: func(cmd *cobra.Command, args []string) error {
+		option := help
+
+		// Check if the yes flag is set
+		// -> if not ask the user what to do
+		if !cmd.Flags().Changed(yesFlag) {
+			var err error
+			option, err = promptOption()
+			if err != nil {
+				return err
+			}
+		}
+
+		switch option {
+		case help:
+			return cmd.Help()
+		case create:
+			return CmdCreateIntegration().RunE(cmd, args)
+		default:
+			return nil
+		}
+	},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
+	rootCmd.CompletionOptions.DisableDefaultCmd = true
 	err := rootCmd.Execute()
 	if err != nil {
 		os.Exit(1)
@@ -39,5 +77,5 @@ func init() {
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	rootCmd.PersistentFlags().BoolP(yesFlag, "y", false, "Skip all prompts and use default values")
 }
