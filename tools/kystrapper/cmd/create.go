@@ -59,6 +59,7 @@ func promptName(defaultVal string, skipPromp bool) (string, error) {
 func CmdCreateIntegration() *cobra.Command {
 	var flagLanguage types.Language
 	const flagName = "name"
+	const flagOutputDir = "output"
 
 	cmd := &cobra.Command{
 		Use:   "create",
@@ -75,11 +76,16 @@ func CmdCreateIntegration() *cobra.Command {
 				return err
 			}
 
-			return bootstrap.CreateIntegration("out", language, name)
+			outputDir, err := cmd.Flags().GetString(flagOutputDir)
+			if err != nil {
+				return err
+			}
+			return bootstrap.CreateIntegration(outputDir, language, name)
 		},
 	}
 	cmd.Flags().VarP(&flagLanguage, "language", "l", "language for your integration")
 	cmd.Flags().StringP(flagName, "n", "", "name for your integration")
+	cmd.Flags().StringP(flagOutputDir, "o", "out", "output directory for your integration")
 	return cmd
 }
 

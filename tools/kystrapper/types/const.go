@@ -1,5 +1,6 @@
 package types
 
 const (
-	TemplatesDir = "templates"
+	TemplatesDir       = "templates"
+	TemplateStringFile = "template-strings"
 )

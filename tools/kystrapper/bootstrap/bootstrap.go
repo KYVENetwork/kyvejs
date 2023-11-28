@@ -3,25 +3,29 @@ package bootstrap
 import (
 	"errors"
 	"github.com/KYVENetwork/kyvejs/tools/kystrapper/types"
+	"github.com/spf13/viper"
 	"os"
 	"path/filepath"
 	"strings"
 	"text/template"
 )
 
-type templateData struct {
-	Name      string
-	GoVersion string
-}
-
-func newData(name string) *templateData {
-	return &templateData{
-		Name:      strings.ToLower(name),
-		GoVersion: "1.21.4",
+func readConfig(name string) error {
+	viper.SetConfigName(types.TemplateStringFile)
+	viper.AddConfigPath(".")
+	if err := viper.ReadInConfig(); err != nil {
+		return err
 	}
+	viper.Set("name", name)
+	return nil
 }
 
 func CreateIntegration(outputDir string, language types.Language, name string) error {
+	// Read the config file
+	if err := readConfig(name); err != nil {
+		return err
+	}
+
 	// Get all files in the template folder
 	templateDir := filepath.Join(types.TemplatesDir, strings.ToLower(language.String()))
 	templateFiles, err := os.ReadDir(templateDir)
@@ -43,7 +47,7 @@ func CreateIntegration(outputDir string, language types.Language, name string) e
 	}
 
 	// Data for the templates
-	data := newData(name)
+	data := viper.GetViper().AllSettings()
 
 	for _, fileInfo := range templateFiles {
 		// Build the full path to the template file

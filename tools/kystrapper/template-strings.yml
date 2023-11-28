@@ -1,0 +1,12 @@
+---
+name: "<undefined>"
+lang:
+  go:
+      path: "templates/go"
+      goversion: "1.21.4"
+  python:
+      path: "templates/python"
+      pythonVersion: "3.7.3"
+  typescript:
+      path: "templates/typescript"
+      typescriptVersion: "3.5.3"
