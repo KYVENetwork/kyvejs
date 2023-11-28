@@ -9,7 +9,7 @@ import (
 )
 
 func promptLanguage(defaultVal types.Language, skipPrompt bool) (types.Language, error) {
-	var items = []types.Language{types.Go, types.Python, types.Typescript}
+	var items = types.Languages
 	var position = 0
 	if defaultVal != "" {
 		for i, item := range items {

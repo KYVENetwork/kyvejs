@@ -9,10 +9,6 @@ import (
 	"text/template"
 )
 
-const (
-	templatesDir = "templates"
-)
-
 type templateData struct {
 	Name      string
 	GoVersion string
@@ -27,7 +23,7 @@ func newData(name string) *templateData {
 
 func CreateIntegration(outputDir string, language types.Language, name string) error {
 	// Get all files in the template folder
-	templateDir := filepath.Join(templatesDir, strings.ToLower(language.String()))
+	templateDir := filepath.Join(types.TemplatesDir, strings.ToLower(language.String()))
 	templateFiles, err := os.ReadDir(templateDir)
 	if err != nil {
 		return err
@@ -53,17 +49,24 @@ func CreateIntegration(outputDir string, language types.Language, name string) e
 		// Build the full path to the template file
 		templatePath := filepath.Join(templateDir, fileInfo.Name())
 
+		// Check if the file is a directory
+		if fileInfo.IsDir() {
+			// Create the directory in the output folder
+			err = os.MkdirAll(filepath.Join(outputPath, fileInfo.Name()), os.ModePerm)
+			if err != nil {
+				return err
+			}
+			continue
+		}
+
 		// Read the template file
 		content, err := os.ReadFile(templatePath)
 		if err != nil {
 			return err
 		}
 
-		// Convert the file content to a string
-		templateText := string(content)
-
 		// Parse the template
-		tmpl, err := template.New("").Parse(templateText)
+		tmpl, err := template.New("").Parse(string(content))
 		if err != nil {
 			return err
 		}
