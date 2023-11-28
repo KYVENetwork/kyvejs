@@ -1,5 +1,6 @@
 ---
 name: "<set-by-cmd-tool>"
+version: "1.0.0"
 lang:
   go:
       path: "templates/go"

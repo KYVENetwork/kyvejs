@@ -1,4 +1,12 @@
-#!/bin/bash
+#!/bin/sh
 
+# Build docker image
 docker build --tag kystrap .
-docker run -it --rm --user "$(id -u):$(id -g)" -v $(pwd)/../../integrations:/app/out kystrap $(echo "$@")
+
+# Run docker image
+docker run \
+  -it                                   `# Interactive mode` \
+  --rm                                  `# Remove container after run` \
+  --user "$(id -u):$(id -g)"            `# Run as current user` \
+  -v $(pwd)/../../integrations:/app/out `# Mount integrations folder` \
+  kystrap $(echo "$@")                   # Pass all arguments to kystrap
