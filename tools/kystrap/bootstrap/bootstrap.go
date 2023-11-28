@@ -2,6 +2,7 @@ package bootstrap
 
 import (
 	"errors"
+	"fmt"
 	"github.com/KYVENetwork/kyvejs/tools/kystrap/types"
 	"github.com/spf13/viper"
 	"os"
@@ -72,7 +73,7 @@ func CreateIntegration(outputDir string, language types.Language, name string) e
 		// Parse the template
 		tmpl, err := template.New("").Parse(string(content))
 		if err != nil {
-			return err
+			return errors.New(fmt.Sprintf("failed to parse template for file %s with error:\n%s", fileInfo.Name(), err.Error()))
 		}
 
 		// Create the output file
@@ -84,7 +85,7 @@ func CreateIntegration(outputDir string, language types.Language, name string) e
 		// Execute the template
 		err = tmpl.Execute(outputFile, data)
 		if err != nil {
-			return err
+			return errors.New(fmt.Sprintf("failed to create template for file %s with error:\n%s", fileInfo.Name(), err.Error()))
 		}
 	}
 	return nil
