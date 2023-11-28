@@ -29,15 +29,6 @@ export async function runNode(this: Validator): Promise<void> {
     await this.syncPoolState();
     await this.getBalancesForMetrics();
 
-    // perform basic validation checks, if one fails exit
-    if (!this.isValidRuntime()) {
-      process.exit(1);
-    }
-
-    if (!this.isValidVersion()) {
-      process.exit(1);
-    }
-
     if (!this.isNodeValidator()) {
       process.exit(1);
     }

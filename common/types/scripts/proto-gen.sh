@@ -2,7 +2,7 @@
 
 # Variables
 KYVE_CHAIN_REPO="git@github.com:KYVENetwork/chain.git"
-KYVE_CHAIN_VERSION="main"
+KYVE_CHAIN_VERSION="v1.4.0"
 
 echo "Cloning chain repo version ${KYVE_CHAIN_VERSION}"
 mkdir -p ./tmp
