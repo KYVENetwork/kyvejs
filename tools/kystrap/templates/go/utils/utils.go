@@ -10,6 +10,7 @@ func GetJsonFromUrl(url string) (map[string]interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
+	//goland:noinspection ALL
 	defer resp.Body.Close()
 
 	var data map[string]interface{}

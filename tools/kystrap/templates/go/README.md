@@ -1,6 +1,6 @@
-# Tendermint Go gRPC Runtime
+# {{ .name }} Runtime Server
 
-This is a Go gRPC runtime for the [Tendermint](https://tendermint.com/) blockchain consensus engine.
+This is the {{ .name }} runtime server.
 
 ## Usage
 

@@ -3,8 +3,8 @@ name: "<set-by-cmd-tool>"
 version: "1.0.0"
 lang:
   go:
-    goversion: "1.21.4"
+    version:
+      minor: "1.21"
+      patch: "1.21.4"
   python:
-    pythonversion: "3.7.3"
   typescript:
-    typescriptversion: "3.5.3"

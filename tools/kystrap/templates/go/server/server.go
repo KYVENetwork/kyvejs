@@ -4,13 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	bundlestypes "github.com/KYVENetwork/chain/x/bundles/types"
 	pb "github.com/KYVENetwork/kyvejs/integrations/{{ .name }}/proto/kyverdk/runtime/v1"
-	"github.com/KYVENetwork/kyvejs/integrations/{{ .name }}/utils"
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"os"
+	"log"
+	"net"
 	"reflect"
-	"sort"
 	"strconv"
 )
 
@@ -189,13 +190,13 @@ func (t *{{ .name | ToTitle }}Server) ValidateDataItem(ctx context.Context, req 
 
 	// Check if the proposedDataItem and validationDataItem are equal
 	if !reflect.DeepEqual(proposed, validation) {
-		return &pb.ValidateDataItemResponse{Vote: int32(pb.VOTE_VALID)}, nil
+		return &pb.ValidateDataItemResponse{Vote: bundlestypes.VOTE_TYPE_VALID}, nil
 	}
 
 	// TODO: add custom validation logic here
 
 	// Vote Invalid if proposedDataItem and validationDataItem do not match
-	return &pb.ValidateDataItemResponse{Vote: int32(pb.VOTE_INVALID)}, nil
+	return &pb.ValidateDataItemResponse{Vote: bundlestypes.VOTE_TYPE_INVALID}, nil
 }
 
 // SummarizeDataBundle gets a formatted value string from a bundle. This produces a "summary" of
@@ -236,4 +237,26 @@ func (t *{{ .name | ToTitle }}Server) NextKey(ctx context.Context, req *pb.NextK
 	nextKey := parsedKey + 1
 
 	return &pb.NextKeyResponse{NextKey: strconv.Itoa(nextKey)}, nil
+}
+
+func StartServer() {
+	// Initialize the gRPC server and listen on port 50051
+	fmt.Println("Initializing {{ .name | ToTitle }} runtime...")
+	listener, err := net.Listen("tcp", ":50051")
+	if err != nil {
+		log.Fatalf("Failed to listen on port 50051: %v", err)
+	}
+
+	// Create a new gRPC server instance
+	server := grpc.NewServer()
+
+	// Register the Tendermint service with the gRPC server
+	pb.RegisterRuntimeServiceServer(server, &{{ .name | ToTitle }}Server{})
+
+	// Start serving incoming connections
+	fmt.Printf("{{ .name | ToTitle }} gRPC Server is running...\nPress Ctrl + C to exit.\n")
+	err = server.Serve(listener)
+	if err != nil {
+		log.Fatalf("Failed to serve gRPC server: %v", err)
+	}
 }
