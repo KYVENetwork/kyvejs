@@ -62,7 +62,7 @@ export class {{ .name | ToTitle }}Server implements RuntimeServiceServer {
 
       // TODO: make changes to config if necessary
       // Example:
-      // if (process.env.KYVEJS_{{ .name }}_API) {
+      // if (process.env.KYVEJS_{{ .name | ToUpper }}_API) {
       //   config.rpc = process.env.KYVEJS_{{ .name }}_API;
       // }
 

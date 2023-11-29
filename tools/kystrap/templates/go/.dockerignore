@@ -1,0 +1,6 @@
+**/out
+.git
+.env
+*.md
+LICENSE
+Dockerfile
