@@ -18,13 +18,16 @@ COPY server ./server
 RUN BINARY_NAME=kyve-runtime make build
 
 # Final stage to run the binary
-FROM alpine:latest
+FROM ubuntu:latest
+
+# Set the working directory
+WORKDIR /app
 
 # Copy the compiled binary from the build stage
-COPY --from=build /app/build/kyve-runtime /app/kyve-runtime
+COPY --from=build /app/build/kyve-runtime ./kyve-runtime
 
 # Expose gRPC port
 EXPOSE 50051
 
 # Run the server
-CMD ["/app/kyve-runtime"]
+CMD ["./kyve-runtime"]

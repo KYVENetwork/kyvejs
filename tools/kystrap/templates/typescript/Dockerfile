@@ -30,7 +30,7 @@ EXPOSE 50051
 WORKDIR /usr/src/app
 
 # Copy the compiled output from the build stage
-COPY --from=build /usr/src/app/out/{{ .name }} ./{{ .name }}
+COPY --from=build /usr/src/app/out/{{ .name }} ./kyve-runtime
 
 # Set the command to run when the container starts
-CMD ["./{{ .name }}"]
+CMD ["./kyve-runtime"]
