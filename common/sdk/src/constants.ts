@@ -106,7 +106,6 @@ export const KYVE_KEPLR_CONFIG: ChainInfo = {
   bech32Config: Bech32Address.defaultBech32Config("kyve"),
   currencies: [],
   feeCurrencies: [],
-  coinType: COIN_TYPE,
   features: ["ibc-transfer", "ibc-go"],
 };
 
@@ -142,6 +141,5 @@ export const KYVE_LEAP_CONFIG: ChainInfo = {
   bech32Config: Bech32Address.defaultBech32Config("kyve"),
   currencies: [],
   feeCurrencies: [],
-  coinType: 118,
   features: ["ibc-transfer", "ibc-go"],
 };

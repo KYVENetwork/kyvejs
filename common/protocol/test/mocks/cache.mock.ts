@@ -1,4 +1,4 @@
-import { DataItem } from '../../src/proto/kyverdk/runtime/v1/runtime';
+import { DataItem } from "../../src/proto/kyverdk/runtime/v1/runtime";
 
 export const TestCacheProvider = jest.fn().mockImplementation(() => {
   let cache: any = {};

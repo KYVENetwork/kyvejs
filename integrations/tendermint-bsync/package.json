@@ -4,7 +4,7 @@
   "license": "MIT",
   "scripts": {
     "build": "rimraf dist && tsc",
-    "build:binaries": "yarn build && rimraf out && pkg package.json && node ../../common/protocol/dist/src/scripts/checksum.js",
+    "build:binaries": "yarn build && rimraf out && pkg --compress GZip package.json && node ../../common/protocol/dist/src/scripts/checksum.js",
     "build:docker": "docker build -t kyve/tendermint-bsync .",
     "build:docker:binaries": "yarn build && rimraf out && pkg --target latest-linux-x64 package.json",
     "start": "node ./dist/src/index.js",

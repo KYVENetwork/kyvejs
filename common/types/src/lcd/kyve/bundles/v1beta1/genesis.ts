@@ -1,6 +1,6 @@
 /* eslint-disable */
 import _m0 from "protobufjs/minimal";
-import { BundleProposal, FinalizedBundle, RoundRobinProgress } from "./bundles";
+import { BundleProposal, BundleVersionMap, FinalizedBundle, RoundRobinProgress } from "./bundles";
 import { Params } from "./params";
 
 export const protobufPackage = "kyve.bundles.v1beta1";
@@ -17,10 +17,18 @@ export interface GenesisState {
   finalized_bundle_list: FinalizedBundle[];
   /** round_robin_progress_list ... */
   round_robin_progress_list: RoundRobinProgress[];
+  /** bundle_version_map ... */
+  bundle_version_map?: BundleVersionMap | undefined;
 }
 
 function createBaseGenesisState(): GenesisState {
-  return { params: undefined, bundle_proposal_list: [], finalized_bundle_list: [], round_robin_progress_list: [] };
+  return {
+    params: undefined,
+    bundle_proposal_list: [],
+    finalized_bundle_list: [],
+    round_robin_progress_list: [],
+    bundle_version_map: undefined,
+  };
 }
 
 export const GenesisState = {
@@ -36,6 +44,9 @@ export const GenesisState = {
     }
     for (const v of message.round_robin_progress_list) {
       RoundRobinProgress.encode(v!, writer.uint32(34).fork()).ldelim();
+    }
+    if (message.bundle_version_map !== undefined) {
+      BundleVersionMap.encode(message.bundle_version_map, writer.uint32(42).fork()).ldelim();
     }
     return writer;
   },
@@ -75,6 +86,13 @@ export const GenesisState = {
 
           message.round_robin_progress_list.push(RoundRobinProgress.decode(reader, reader.uint32()));
           continue;
+        case 5:
+          if (tag !== 42) {
+            break;
+          }
+
+          message.bundle_version_map = BundleVersionMap.decode(reader, reader.uint32());
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -96,6 +114,9 @@ export const GenesisState = {
       round_robin_progress_list: globalThis.Array.isArray(object?.round_robin_progress_list)
         ? object.round_robin_progress_list.map((e: any) => RoundRobinProgress.fromJSON(e))
         : [],
+      bundle_version_map: isSet(object.bundle_version_map)
+        ? BundleVersionMap.fromJSON(object.bundle_version_map)
+        : undefined,
     };
   },
 
@@ -113,6 +134,9 @@ export const GenesisState = {
     if (message.round_robin_progress_list?.length) {
       obj.round_robin_progress_list = message.round_robin_progress_list.map((e) => RoundRobinProgress.toJSON(e));
     }
+    if (message.bundle_version_map !== undefined) {
+      obj.bundle_version_map = BundleVersionMap.toJSON(message.bundle_version_map);
+    }
     return obj;
   },
 
@@ -128,6 +152,9 @@ export const GenesisState = {
     message.finalized_bundle_list = object.finalized_bundle_list?.map((e) => FinalizedBundle.fromPartial(e)) || [];
     message.round_robin_progress_list =
       object.round_robin_progress_list?.map((e) => RoundRobinProgress.fromPartial(e)) || [];
+    message.bundle_version_map = (object.bundle_version_map !== undefined && object.bundle_version_map !== null)
+      ? BundleVersionMap.fromPartial(object.bundle_version_map)
+      : undefined;
     return message;
   },
 };

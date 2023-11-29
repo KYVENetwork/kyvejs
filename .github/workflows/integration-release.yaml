@@ -1,12 +1,12 @@
 name: Create release binaries
 on:
   push:
-    branches: [ main ]
+    branches: [main]
     tags:
-      - '*'
+      - "*"
 jobs:
   prepare:
-    name: 'Check integrations for release'
+    name: "Check integrations for release"
     runs-on: ubuntu-latest
     outputs:
       output: ${{ steps.set_env.outputs.test }}
@@ -14,7 +14,7 @@ jobs:
       - name: Checkout the repository
         uses: actions/checkout@main
         with:
-          ref: 'main'
+          ref: "main"
       - name: fetch tags
         run: git fetch --tags
       - name: collect integrations names
@@ -43,7 +43,7 @@ jobs:
   build:
     if: needs.prepare.outputs.output != '[]'
     runs-on: ubuntu-latest
-    name: 'Integrations build & release'
+    name: "Integrations build & release"
     needs: prepare
     strategy:
       matrix:
@@ -52,7 +52,7 @@ jobs:
       - name: Checkout the repository
         uses: actions/checkout@main
         with:
-          ref: 'main'
+          ref: "main"
       - name: set integration name
         run: echo "INTEGRATION_NAME=$(echo ${{ matrix.tag }} | awk -F'[/@]' '{print $3}' | sed 's/ *$//g')" >> $GITHUB_ENV
       - name: install yarn
@@ -66,13 +66,6 @@ jobs:
           cd integrations/${{ env.INTEGRATION_NAME }}
           ls
           yarn build:binaries
-          cd out
-          zip kyve-linux-arm64.zip kyve-linux-arm64
-          rm  kyve-linux-arm64
-          zip kyve-linux-x64.zip kyve-linux-x64
-          rm kyve-linux-x64
-          zip kyve-macos-x64.zip kyve-macos-x64
-          rm kyve-macos-x64
           cd ..
       - name: Generate Release Body
         run: npx extract-changelog-release  ${{ github.workspace }}/integrations/${{env.INTEGRATION_NAME}}/CHANGELOG.md > RELEASE_BODY.md
