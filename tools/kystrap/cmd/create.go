@@ -76,7 +76,7 @@ func promptLinkToGithub() error {
 }
 
 func CmdCreateIntegration() *cobra.Command {
-	var flagLanguage types.Language
+	const flagLanguage = "language"
 	const flagName = "name"
 	const flagOutputDir = "output"
 
@@ -89,7 +89,12 @@ func CmdCreateIntegration() *cobra.Command {
 				return err
 			}
 
-			language, err := promptLanguage(flagLanguage, cmd.Flags().Changed(yesFlag))
+			var defaultLanguage types.Language
+			defaultLanguageStr, _ := cmd.Flags().GetString(flagLanguage)
+			if defaultLanguageStr != "" {
+				defaultLanguage = types.NewLanguage(defaultLanguageStr)
+			}
+			language, err := promptLanguage(defaultLanguage, cmd.Flags().Changed(yesFlag))
 			if err != nil {
 				return err
 			}
@@ -105,7 +110,7 @@ func CmdCreateIntegration() *cobra.Command {
 			return bootstrap.CreateIntegration(outputDir, language, name)
 		},
 	}
-	cmd.Flags().VarP(&flagLanguage, "language", "l",
+	cmd.Flags().StringP(flagLanguage, "l", "",
 		fmt.Sprintf("language for your integration (%s)", strings.Join(types.LanguagesStringSlice(), ", ")))
 	cmd.Flags().StringP(flagName, "n", "", "name for your integration")
 	cmd.Flags().StringP(flagOutputDir, "o", "out", "output directory for your integration")
