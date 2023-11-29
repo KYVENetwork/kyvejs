@@ -43,7 +43,6 @@ KYVE, the Web3 data lake solution, is a protocol that enables data providers to 
 - [@kyvejs/types](common/types/README.md) - holds all types for the KYVE application in typescript
 - [@kyvejs/sdk](common/sdk/README.md) - development kit for communicating with the KYVE blockchain
 - [@kyvejs/protocol](common/protocol/README.md) - core functionality for running validators on the KYVE network
-- [@kyvejs/docker](common/docker/README.md) - core functionality facilitating dockerising KYVE functionality and communicating with dockerised runtimes via gRPC
 
 **Tools:**
 
@@ -54,7 +53,6 @@ KYVE, the Web3 data lake solution, is a protocol that enables data providers to 
 - [@kyvejs/tendermint](integrations/tendermint/README.md) - The official KYVE Tendermint sync integration
 - [@kyvejs/tendermint-ssync](integrations/tendermint-ssync/README.md) - The official KYVE Tendermint state-sync integration
 - [@kyvejs/tendermint-bsync](integrations/tendermint-bsync/README.md) - The official KYVE Tendermint block sync integration
-- [@kyvejs/tendermint-ssync](integrations/tendermint-ssync/README.md) - The official KYVE Tendermint block sync integration
 
 ## Build Integration Binaries
 
@@ -88,7 +86,9 @@ yarn build:binaries
 
 The binaries can then be found in the `/out` folder
 
-## Dockerized Execution
+## Dockerized Execution (alpha)
+
+**This is still in alpha and not recommended for production use!**
 
 The easiest way to run a KYVE integration is by using the provided Docker images via docker compose. 
 
