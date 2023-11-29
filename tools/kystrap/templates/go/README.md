@@ -1,6 +1,6 @@
-# {{ .name }} Runtime Server
+# {{ .name | ToTitle }} Runtime Server
 
-This is the {{ .name }} runtime server.
+This is the {{ .name | ToTitle }} runtime server.
 
 ## Usage
 

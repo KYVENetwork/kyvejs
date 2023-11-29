@@ -11,6 +11,8 @@ import (
 	"strings"
 )
 
+var regexpAlphaNumericAndDash = regexp.MustCompile(`^[a-zA-Z0-9-]+$`)
+
 func promptLanguage(defaultVal types.Language, skipPrompt bool) (types.Language, error) {
 	var items = types.Languages
 	var position = 0
@@ -38,15 +40,13 @@ func promptLanguage(defaultVal types.Language, skipPrompt bool) (types.Language,
 	return types.NewLanguage(result), err
 }
 
-var regexpAlphaNumericDashUnderscore = regexp.MustCompile(`^[a-zA-Z0-9_-]+$`)
-
 func promptName(defaultVal string, skipPromp bool) (string, error) {
 	validate := func(input string) error {
 		if len(input) < 3 {
 			return errors.New("name must be at least 3 characters long")
 		}
-		if !regexpAlphaNumericDashUnderscore.MatchString(input) {
-			return errors.New("name must only contain alphanumeric characters, underscores and dashes")
+		if !regexpAlphaNumericAndDash.MatchString(input) {
+			return errors.New("name must only contain alphanumeric characters and dashes")
 		}
 		return nil
 	}
@@ -57,11 +57,11 @@ func promptName(defaultVal string, skipPromp bool) (string, error) {
 	}
 
 	if skipPromp {
-		return defaultVal, validate(defaultVal)
+		return strings.ToLower(defaultVal), validate(defaultVal)
 	}
 
 	result, err := prompt.Run()
-	return result, err
+	return strings.ToLower(result), err
 }
 
 func promptLinkToGithub() error {
@@ -107,7 +107,12 @@ func CmdCreateIntegration() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			return bootstrap.CreateIntegration(outputDir, language, name)
+			err = bootstrap.CreateIntegration(outputDir, language, name)
+			if err != nil {
+				return err
+			}
+			fmt.Printf("✅ Successfully created integration in `%s/%s`\n", outputDir, name)
+			return nil
 		},
 	}
 	cmd.Flags().StringP(flagLanguage, "l", "",

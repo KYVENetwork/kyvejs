@@ -14,9 +14,20 @@ import (
 )
 
 var funcMap = template.FuncMap{
-	"ToUpper": strings.ToUpper,
-	"ToLower": strings.ToLower,
-	"ToTitle": cases.Title(language.English).String,
+	"ToUpper": strings.ToUpper,                      // THIS-here is an example -> THIS-HERE IS AN EXAMPLE
+	"ToLower": strings.ToLower,                      // THIS-here is an example -> this-here is an example
+	"ToTitle": cases.Title(language.English).String, // THIS-here is an example -> This-Here Is An Example
+	"ToPascal": func(s string) string { // THIS-here is an example -> ThisHereIsAnExample
+		// remove dashes and underscores
+		s = strings.ReplaceAll(s, "-", " ")
+		s = strings.ReplaceAll(s, "_", " ")
+
+		// convert to title case
+		s = cases.Title(language.English).String(s)
+
+		// remove spaces
+		return strings.ReplaceAll(s, " ", "")
+	},
 }
 
 func readConfig(name string) error {

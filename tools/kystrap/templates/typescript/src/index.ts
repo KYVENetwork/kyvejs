@@ -1,14 +1,14 @@
 import * as grpc from '@grpc/grpc-js';
 
 import { RuntimeServiceService } from './proto/kyverdk/runtime/v1/runtime';
-import { {{ .name | ToTitle }}Server } from './server';
+import { {{ .name | ToPascal }}Server } from './server';
 
 const maxMessageSize: number = 2 * 1024 * 1024 * 1024; // 2 GB
 const runtimeServer: grpc.Server = new grpc.Server({
   'grpc.max_receive_message_length': maxMessageSize,
   'grpc.max_send_message_length': maxMessageSize
 });
-const runtimeService = new {{ .name | ToTitle }}Server();
+const runtimeService = new {{ .name | ToPascal }}Server();
 
 runtimeServer.addService(RuntimeServiceService, runtimeService);
 

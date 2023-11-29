@@ -15,7 +15,7 @@ import (
 	"strconv"
 )
 
-type {{ .name | ToTitle }}Server struct {
+type {{ .name | ToPascal }}Server struct {
 	pb.RuntimeServiceServer
 }
 
@@ -26,25 +26,25 @@ type Config struct {
 	// Rpc string `json:"rpc"`
 }
 
-type {{ .name | ToTitle }}ItemValue struct {
+type {{ .name | ToPascal }}ItemValue struct {
 	// TODO: Define data properties here
 	// Example:
 	// Block string `json:"block"`
 }
 
-type {{ .name | ToTitle }}TransformedItemValue struct {
+type {{ .name | ToPascal }}TransformedItemValue struct {
 	// TODO: Define data properties here
 	// Example:
 	// Block string `json:"block"`
 }
 
 // GetRuntimeName returns the name of the runtime. Example "@kyvejs/tendermint"
-func (t *{{ .name | ToTitle }}Server) GetRuntimeName(ctx context.Context, req *pb.GetRuntimeNameRequest) (*pb.GetRuntimeNameResponse, error) {
+func (t *{{ .name | ToPascal }}Server) GetRuntimeName(ctx context.Context, req *pb.GetRuntimeNameRequest) (*pb.GetRuntimeNameResponse, error) {
 	return &pb.GetRuntimeNameResponse{Name: "@docker/tendermint-go"}, nil
 }
 
 // GetRuntimeVersion returns the version of the runtime. Example "1.2.0"
-func (t *{{ .name | ToTitle }}Server) GetRuntimeVersion(ctx context.Context, req *pb.GetRuntimeVersionRequest) (*pb.GetRuntimeVersionResponse, error) {
+func (t *{{ .name | ToPascal }}Server) GetRuntimeVersion(ctx context.Context, req *pb.GetRuntimeVersionRequest) (*pb.GetRuntimeVersionResponse, error) {
 	return &pb.GetRuntimeVersionResponse{Version: "0.0.1"}, nil
 }
 
@@ -54,7 +54,7 @@ func (t *{{ .name | ToTitle }}Server) GetRuntimeVersion(ctx context.Context, req
 // the specific runtime config is not parsable or invalid.
 //
 // Deterministic behavior is required
-func (t *{{ .name | ToTitle }}Server) ValidateSetConfig(ctx context.Context, req *pb.ValidateSetConfigRequest) (*pb.ValidateSetConfigResponse, error) {
+func (t *{{ .name | ToPascal }}Server) ValidateSetConfig(ctx context.Context, req *pb.ValidateSetConfigRequest) (*pb.ValidateSetConfigResponse, error) {
 	rawConfig := req.GetRawConfig()
 	var config Config
 	err := json.Unmarshal([]byte(rawConfig), &config)
@@ -84,7 +84,7 @@ func (t *{{ .name | ToTitle }}Server) ValidateSetConfig(ctx context.Context, req
 // GetDataItem gets the data item from a specific key and returns both key and the value.
 //
 // Deterministic behavior is required
-func (t *{{ .name | ToTitle }}Server) GetDataItem(ctx context.Context, req *pb.GetDataItemRequest) (*pb.GetDataItemResponse, error) {
+func (t *{{ .name | ToPascal }}Server) GetDataItem(ctx context.Context, req *pb.GetDataItemRequest) (*pb.GetDataItemResponse, error) {
 	var config Config
 	err := json.Unmarshal([]byte(req.GetConfig().GetSerializedConfig()), &config)
 	if err != nil {
@@ -103,7 +103,7 @@ func (t *{{ .name | ToTitle }}Server) GetDataItem(ctx context.Context, req *pb.G
 	//	 "block":         blockResponse["result"],
 	// }
 
-	var value = map[string]{{ .name | ToTitle }}ItemValue{}
+	var value = map[string]{{ .name | ToPascal }}ItemValue{}
 
 	parsedJson, err := json.Marshal(value)
 	if err != nil {
@@ -120,14 +120,14 @@ func (t *{{ .name | ToTitle }}Server) GetDataItem(ctx context.Context, req *pb.G
 // of proposals or bundle validation.
 //
 // Deterministic behavior is required
-func (t *{{ .name | ToTitle }}Server) PrevalidateDataItem(ctx context.Context, req *pb.PrevalidateDataItemRequest) (*pb.PrevalidateDataItemResponse, error) {
+func (t *{{ .name | ToPascal }}Server) PrevalidateDataItem(ctx context.Context, req *pb.PrevalidateDataItemRequest) (*pb.PrevalidateDataItemResponse, error) {
 	var config map[string]string
 	err := json.Unmarshal([]byte(req.GetConfig().GetSerializedConfig()), &config)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Error unmarshalling serializedConfig JSON string: %v", err)
 	}
 
-	var itemValue {{ .name | ToTitle }}ItemValue
+	var itemValue {{ .name | ToPascal }}ItemValue
 	err = json.Unmarshal([]byte(req.GetDataItem().GetValue()), &itemValue)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Error unmarshalling data item: %v", err)
@@ -146,8 +146,8 @@ func (t *{{ .name | ToTitle }}Server) PrevalidateDataItem(ctx context.Context, r
 // to remove unecessary data or format the data in a better way.
 //
 // Deterministic behavior is required
-func (t *{{ .name | ToTitle }}Server) TransformDataItem(ctx context.Context, req *pb.TransformDataItemRequest) (*pb.TransformDataItemResponse, error) {
-	var itemValue {{ .name | ToTitle }}ItemValue
+func (t *{{ .name | ToPascal }}Server) TransformDataItem(ctx context.Context, req *pb.TransformDataItemRequest) (*pb.TransformDataItemResponse, error) {
+	var itemValue {{ .name | ToPascal }}ItemValue
 	err := json.Unmarshal([]byte(req.GetDataItem().GetValue()), &itemValue)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Error unmarshalling data item: %v", err)
@@ -173,12 +173,12 @@ func (t *{{ .name | ToTitle }}Server) TransformDataItem(ctx context.Context, req
 // ValidateDataItem validates a single data item of a bundle proposal
 //
 // Deterministic behavior is required
-func (t *{{ .name | ToTitle }}Server) ValidateDataItem(ctx context.Context, req *pb.ValidateDataItemRequest) (*pb.ValidateDataItemResponse, error) {
+func (t *{{ .name | ToPascal }}Server) ValidateDataItem(ctx context.Context, req *pb.ValidateDataItemRequest) (*pb.ValidateDataItemResponse, error) {
 	requestProposedDataItem := req.GetProposedDataItem()
 	requestValidationDataItem := req.GetValidationDataItem()
 
-	var proposed GogoTransformedItemValue
-	var validation GogoTransformedItemValue
+	var proposed {{ .name | ToPascal }}TransformedItemValue
+	var validation {{ .name | ToPascal }}TransformedItemValue
 	err := json.Unmarshal([]byte(requestProposedDataItem.GetValue()), &proposed)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Error unmarshalling proposedDataItem: %v", err)
@@ -205,7 +205,7 @@ func (t *{{ .name | ToTitle }}Server) ValidateDataItem(ctx context.Context, req 
 // String should not be longer than 100 characters, else gas costs might be too expensive.
 //
 // Deterministic behavior is required
-func (t *{{ .name | ToTitle }}Server) SummarizeDataBundle(ctx context.Context, req *pb.SummarizeDataBundleRequest) (*pb.SummarizeDataBundleResponse, error) {
+func (t *{{ .name | ToPascal }}Server) SummarizeDataBundle(ctx context.Context, req *pb.SummarizeDataBundleRequest) (*pb.SummarizeDataBundleResponse, error) {
 	var summary = ""
 
 	// TODO: summarize the data bundle
@@ -226,7 +226,7 @@ func (t *{{ .name | ToTitle }}Server) SummarizeDataBundle(ctx context.Context, r
 // NextKey gets the next key from the current key so that the data archived has an order.
 //
 // Deterministic behavior is required
-func (t *{{ .name | ToTitle }}Server) NextKey(ctx context.Context, req *pb.NextKeyRequest) (*pb.NextKeyResponse, error) {
+func (t *{{ .name | ToPascal }}Server) NextKey(ctx context.Context, req *pb.NextKeyRequest) (*pb.NextKeyResponse, error) {
 	key := req.GetKey()
 	parsedKey, err := strconv.Atoi(key)
 	if err != nil {
@@ -251,7 +251,7 @@ func StartServer() {
 	server := grpc.NewServer()
 
 	// Register the Tendermint service with the gRPC server
-	pb.RegisterRuntimeServiceServer(server, &{{ .name | ToTitle }}Server{})
+	pb.RegisterRuntimeServiceServer(server, &{{ .name | ToPascal }}Server{})
 
 	// Start serving incoming connections
 	fmt.Printf("{{ .name | ToTitle }} gRPC Server is running...\nPress Ctrl + C to exit.\n")

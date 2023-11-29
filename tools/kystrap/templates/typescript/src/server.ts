@@ -25,7 +25,7 @@ import {
 import axios from 'axios';
 import { VoteType } from "./proto/kyve/bundles/v1beta1/tx";
 
-export class {{ .name | ToTitle }}Server implements RuntimeServiceServer {
+export class {{ .name | ToPascal }}Server implements RuntimeServiceServer {
   [name: string]: UntypedHandleCall;
 
   /** Returns the name of the runtime. Example "@kyvejs/tendermint" */
