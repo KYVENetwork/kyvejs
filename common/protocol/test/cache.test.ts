@@ -9,7 +9,7 @@ import { register } from "prom-client";
 import { newTestValidator } from "./mocks/runtime.mock";
 import { TestNormalStorageProvider } from "./mocks/storageProvider.mock";
 import { TestNormalCompression } from "./mocks/compression.mock";
-import { DataItem } from '../src/proto/kyverdk/runtime/v1/runtime';
+import { DataItem } from "../src/proto/kyverdk/runtime/v1/runtime";
 
 /*
 
