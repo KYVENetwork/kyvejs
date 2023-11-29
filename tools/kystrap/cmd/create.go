@@ -2,11 +2,13 @@ package cmd
 
 import (
 	"errors"
+	"fmt"
 	"github.com/KYVENetwork/kyvejs/tools/kystrap/bootstrap"
 	"github.com/KYVENetwork/kyvejs/tools/kystrap/types"
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 	"regexp"
+	"strings"
 )
 
 func promptLanguage(defaultVal types.Language, skipPrompt bool) (types.Language, error) {
@@ -33,7 +35,7 @@ func promptLanguage(defaultVal types.Language, skipPrompt bool) (types.Language,
 		return defaultVal, nil
 	}
 	_, result, err := prompt.Run()
-	return types.Language(result), err
+	return types.NewLanguage(result), err
 }
 
 var regexpAlphaNumericDashUnderscore = regexp.MustCompile(`^[a-zA-Z0-9_-]+$`)
@@ -62,6 +64,17 @@ func promptName(defaultVal string, skipPromp bool) (string, error) {
 	return result, err
 }
 
+func promptLinkToGithub() error {
+	const githubUrl = "https://github.com/KYVENetwork/kyvejs/issues/new"
+	prompt := promptui.Prompt{
+		Label:     fmt.Sprintf("Please create an issue on %s", githubUrl),
+		IsConfirm: true,
+		Default:   "y",
+	}
+	_, err := prompt.Run()
+	return err
+}
+
 func CmdCreateIntegration() *cobra.Command {
 	var flagLanguage types.Language
 	const flagName = "name"
@@ -80,6 +93,9 @@ func CmdCreateIntegration() *cobra.Command {
 			if err != nil {
 				return err
 			}
+			if language.IsRequestOtherLanguage() {
+				return promptLinkToGithub()
+			}
 
 			defaultName, _ := cmd.Flags().GetString(flagName)
 			name, err := promptName(defaultName, cmd.Flags().Changed(yesFlag))
@@ -89,7 +105,8 @@ func CmdCreateIntegration() *cobra.Command {
 			return bootstrap.CreateIntegration(outputDir, language, name)
 		},
 	}
-	cmd.Flags().VarP(&flagLanguage, "language", "l", "language for your integration")
+	cmd.Flags().VarP(&flagLanguage, "language", "l",
+		fmt.Sprintf("language for your integration (%s)", strings.Join(types.LanguagesStringSlice(), ", ")))
 	cmd.Flags().StringP(flagName, "n", "", "name for your integration")
 	cmd.Flags().StringP(flagOutputDir, "o", "out", "output directory for your integration")
 	return cmd
