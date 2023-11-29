@@ -51,25 +51,85 @@ run_protobuf_generator() {
   printf "✅ Completed generating proto files!\n\n"
 }
 
-copy_files() {
-  printf "📄 Copy generated files to folders...\n"
+copy_go_files() {
+  printf "  🇬 Go\n"
 
-  # find all folders in ./integrations that have a package.json (go just one level deep)
+  # find all go folders in ./integrations by checking if they have a go.mod (go just one level deep)
+  folders=$(find ../integrations -maxdepth 2 -name go.mod -exec dirname {} \;)
+
+  # find all go folders in ./tools/kystrap/templates by checking if they have a go.mod (go just one level deep)
+  folders="$folders,$(find ../tools/kystrap/templates -maxdepth 2 -name go.mod -exec dirname {} \;)"
+
+  # remove all old files in the proto folders
+  for folder in $(echo "$folders" | tr "," "\n"); do
+    printf "    🧹 Cleaning %s\n" "$folder/proto/*"
+    rm -rf "$folder"/proto/*
+  done
+
+  # copy the new files to the proto folders
+  for folder in $(echo "$folders" | tr "," "\n"); do
+    printf "    📁 Copying files to %s\n" "$folder/proto/"
+    mkdir -p "$folder/proto"
+    cp -r "$OUTPUT_FOLDER"/go/* "$folder/proto/"
+  done
+}
+
+copy_typescript_files() {
+  printf "  🇹 Typescript\n"
+
+  # find all typescript folders in ./integrations by checking if they have a package.json (go just one level deep)
   folders=$(find ../integrations -maxdepth 2 -name package.json -exec dirname {} \;)
+
+  # find all typescript folders in ./tools/kystrap/templates by checking if they have a package.json (go just one level deep)
+  folders="$folders,$(find ../tools/kystrap/templates -maxdepth 2 -name package.json -exec dirname {} \;)"
 
   # add the common folder
   folders="$folders,../common/protocol"
 
+  # remove all old files in the proto folders
   for folder in $(echo "$folders" | tr "," "\n"); do
-    printf "  🧹 Cleaning %s\n" "$folder/src/proto/*"
-    rm -rf "$folder/src/proto/*"
+    printf "    🧹 Cleaning %s\n" "$folder/src/proto/*"
+    rm -rf "$folder"/src/proto/*
   done
 
+  # copy the new files to the proto folders
   for folder in $(echo "$folders" | tr "," "\n"); do
-    printf "  📁 Copying files to %s\n" "$folder/src/proto/"
+    printf "    📁 Copying files to %s\n" "$folder/src/proto/"
     mkdir -p "$folder/src/proto"
-    cp -r "$OUTPUT_FOLDER"/* "$folder/src/proto/"
+    cp -r "$OUTPUT_FOLDER"/ts/* "$folder/src/proto/"
   done
+}
+
+copy_python_files() {
+  printf "  🐍 Python\n"
+
+  # find all python folders in ./integrations by checking if they have a setup.py (go just one level deep)
+  folders=$(find ../integrations -maxdepth 2 -name setup.py -exec dirname {} \;)
+
+  # find all python folders in ./tools/kystrap/templates by checking if they have a setup.py (go just one level deep)
+  folders="$folders,$(find ../tools/kystrap/templates -maxdepth 2 -name setup.py -exec dirname {} \;)"
+
+  # remove all old files in the proto folders
+  for folder in $(echo "$folders" | tr "," "\n"); do
+    printf "    🧹 Cleaning %s\n" "$folder/proto/*"
+    rm -rf "$folder"/proto/*
+  done
+
+  # copy the new files to the proto folders
+  for folder in $(echo "$folders" | tr "," "\n"); do
+    printf "    📁 Copying files to %s\n" "$folder/proto/"
+    mkdir -p "$folder/proto"
+    cp -r "$OUTPUT_FOLDER"/python/* "$folder/proto/"
+  done
+}
+
+copy_files() {
+  printf "📄 Copy generated files to folders...\n"
+
+  copy_typescript_files
+  copy_go_files
+  copy_python_files
+
   printf "✅ Completed copying files!\n\n"
 }
 

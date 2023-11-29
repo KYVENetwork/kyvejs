@@ -3,11 +3,8 @@ name: "<set-by-cmd-tool>"
 version: "1.0.0"
 lang:
   go:
-      path: "templates/go"
-      goversion: "1.21.4"
+    goversion: "1.21.4"
   python:
-      path: "templates/python"
-      pythonVersion: "3.7.3"
+    pythonversion: "3.7.3"
   typescript:
-      path: "templates/typescript"
-      typescriptVersion: "3.5.3"
+    typescriptversion: "3.5.3"

@@ -6,6 +6,7 @@ import (
 	"github.com/KYVENetwork/kyvejs/tools/kystrap/types"
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
+	"regexp"
 )
 
 func promptLanguage(defaultVal types.Language, skipPrompt bool) (types.Language, error) {
@@ -35,10 +36,15 @@ func promptLanguage(defaultVal types.Language, skipPrompt bool) (types.Language,
 	return types.Language(result), err
 }
 
+var regexpAlphaNumericDashUnderscore = regexp.MustCompile(`^[a-zA-Z0-9_-]+$`)
+
 func promptName(defaultVal string, skipPromp bool) (string, error) {
 	validate := func(input string) error {
 		if len(input) < 3 {
 			return errors.New("name must be at least 3 characters long")
+		}
+		if !regexpAlphaNumericDashUnderscore.MatchString(input) {
+			return errors.New("name must only contain alphanumeric characters, underscores and dashes")
 		}
 		return nil
 	}
