@@ -1,2 +1,2 @@
-RUNTIME_NAME = '@docker/tendermint-python'
-RUNTIME_VERSION = '0.0.1'
+RUNTIME_NAME = '@kyvejs/{{ .name | ToPascal }}'
+RUNTIME_VERSION = '{{ .version }}'

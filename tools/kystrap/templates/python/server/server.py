@@ -9,7 +9,7 @@ from proto.kyve.bundles.v1beta1 import VoteType
 from proto.kyverdk.runtime.v1 import *
 
 
-class TendermintServer(RuntimeServiceBase):
+class {{ .name | ToPascal }}Server(RuntimeServiceBase):
 
     async def get_runtime_name(
             self, get_runtime_name_request: "GetRuntimeNameRequest"
