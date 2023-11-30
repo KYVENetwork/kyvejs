@@ -1,6 +1,11 @@
+import json
+
 import grpclib.server
+from grpclib import Status, GRPCError
+from grpclib.const import Status as StatusCode
 
 import settings
+from proto.kyve.bundles.v1beta1 import VoteType
 from proto.kyverdk.runtime.v1 import *
 
 
@@ -29,7 +34,34 @@ class TendermintServer(RuntimeServiceBase):
 
         Deterministic behavior is required
         """
-        raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
+        try:
+            config = json.loads(validate_set_config_request.raw_config)
+
+            # TODO: validate config
+            # Example:
+            # if not config.get("rpc"):
+            #     raise grpclib.GRPCError(
+            #         grpclib.Status(grpclib.StatusCode.INVALID_ARGUMENT),
+            #         "Config does not have property 'rpc' defined"
+            #     )
+
+            # TODO: make changes to config if necessary
+            # Example:
+            # if os.environ.get(f"KYVEJS_{{ .name }}_API"):
+            #     config["rpc"] = os.environ[f"KYVEJS_{{ .name }}_API"]
+
+            serialized_config = json.dumps(config)
+            return ValidateSetConfigResponse(serialized_config)
+        except json.JSONDecodeError as error:
+            raise grpclib.GRPCError(
+                Status(StatusCode.INVALID_ARGUMENT),
+                f"Error parsing JSON: {error.msg}"
+            )
+        except Exception as error:
+            raise GRPCError(
+                Status(StatusCode.INVALID_ARGUMENT),
+                str(error)
+            )
 
     async def get_data_item(
             self, get_data_item_request: "GetDataItemRequest"
@@ -39,7 +71,33 @@ class TendermintServer(RuntimeServiceBase):
 
         Deterministic behavior is required
         """
-        raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
+        try:
+            config = json.loads(get_data_item_request.config.serialized_config)
+            key = get_data_item_request.key
+
+            # TODO: get the data item for your_name with the given key
+            # Example:
+            # response = await axios.get(f"{config['rpc']}/block?height={key}")
+            # value = response.data
+            value = {}
+
+            # Construct the DataItem message
+            data_item = DataItem(
+                key=key,
+                value=json.dumps(value),
+            )
+
+            return GetDataItemResponse(data_item=data_item)
+        except json.JSONDecodeError as error:
+            raise GRPCError(
+                Status(StatusCode.INTERNAL),
+                f"Error parsing JSON: {error.msg}"
+            )
+        except Exception as error:
+            raise GRPCError(
+                Status(StatusCode.INTERNAL),
+                str(error)
+            )
 
     async def prevalidate_data_item(
             self, prevalidate_data_item_request: "PrevalidateDataItemRequest"
@@ -53,7 +111,33 @@ class TendermintServer(RuntimeServiceBase):
 
         Deterministic behavior is required
         """
-        raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
+        try:
+            config = json.loads(prevalidate_data_item_request.config.serialized_config)
+            request_item = prevalidate_data_item_request.data_item
+            data_item = DataItem(
+                key=request_item.key,
+                value=json.loads(request_item.value),
+            )
+
+            # Check if data item is defined
+            if data_item.value is None:
+                response = PrevalidateDataItemResponse(valid=False, error='Value in data item is not defined')
+                return response
+
+            # TODO: check if data item is valid
+
+            # If all checks pass, the data item is prevalidated
+            return PrevalidateDataItemResponse(valid=True)
+        except json.JSONDecodeError as error:
+            raise GRPCError(
+                Status(StatusCode.INTERNAL),
+                f"Error parsing JSON: {error.msg}"
+            )
+        except Exception as error:
+            raise GRPCError(
+                Status(StatusCode.INTERNAL),
+                str(error)
+            )
 
     async def transform_data_item(
             self, transform_data_item_request: "TransformDataItemRequest"
@@ -64,7 +148,32 @@ class TendermintServer(RuntimeServiceBase):
 
         Deterministic behavior is required
         """
-        raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
+        try:
+            request_item = transform_data_item_request.data_item
+            data_item = DataItem(
+                key=request_item.key,
+                value=json.dumps(request_item.value),
+            )
+
+            # TODO: transform the data item so that it can be saved
+
+            # Construct the data_item to return
+            transformed_data_item = DataItem(
+                key=data_item.key,
+                value=json.dumps(data_item.value),
+            )
+
+            return TransformDataItemResponse(transformed_data_item=transformed_data_item)
+        except json.JSONDecodeError as error:
+            raise GRPCError(
+                Status(StatusCode.INTERNAL),
+                f"Error parsing JSON: {error.msg}"
+            )
+        except Exception as error:
+            raise GRPCError(
+                Status(StatusCode.INTERNAL),
+                str(error)
+            )
 
     async def validate_data_item(
             self, validate_data_item_request: "ValidateDataItemRequest"
@@ -74,7 +183,35 @@ class TendermintServer(RuntimeServiceBase):
 
         Deterministic behavior is required
         """
-        raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
+        try:
+            request_proposed_data_item = validate_data_item_request.proposed_data_item
+            request_validation_data_item = validate_data_item_request.validation_data_item
+            proposed_data_item = DataItem(
+                key=request_proposed_data_item.key,
+                value=json.loads(request_proposed_data_item.value),
+            )
+            validation_data_item = DataItem(
+                key=request_validation_data_item.key,
+                value=json.loads(request_validation_data_item.value),
+            )
+
+            if proposed_data_item == validation_data_item:
+                return ValidateDataItemResponse(vote=VoteType.VOTE_TYPE_VALID)
+
+            # TODO: add custom validation logic here
+
+            # Default response if the validation fails
+            return ValidateDataItemResponse(vote=VoteType.VOTE_TYPE_INVALID)
+        except json.JSONDecodeError as error:
+            raise GRPCError(
+                Status(StatusCode.INTERNAL),
+                f"Error parsing JSON: {error.msg}"
+            )
+        except Exception as error:
+            raise GRPCError(
+                Status(StatusCode.INTERNAL),
+                str(error)
+            )
 
     async def summarize_data_bundle(
             self, summarize_data_bundle_request: "SummarizeDataBundleRequest"
@@ -87,7 +224,35 @@ class TendermintServer(RuntimeServiceBase):
 
         Deterministic behavior is required
         """
-        raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
+        try:
+            grpc_bundle = summarize_data_bundle_request.bundle
+
+            if not grpc_bundle:
+                return SummarizeDataBundleResponse(summary='')
+
+            bundle_value = json.loads(grpc_bundle[-1].value)
+            if bundle_value is None:
+                return SummarizeDataBundleResponse(summary='')
+
+            # TODO: summarize the data bundle
+            # Example:
+            # if (bundle_value.get('block')
+            #         and bundle_value['block'].get('header')
+            #         and bundle_value['block']['header'].get('height')):
+            #     summary = bundle_value['block']['header']['height']
+            summary = ''
+
+            return SummarizeDataBundleResponse(summary=summary)
+        except json.JSONDecodeError as error:
+            raise GRPCError(
+                Status(StatusCode.INTERNAL),
+                f"Error parsing JSON: {error.msg}"
+            )
+        except Exception as error:
+            raise GRPCError(
+                Status(StatusCode.INTERNAL),
+                str(error)
+            )
 
     async def next_key(self, next_key_request: "NextKeyRequest") -> "NextKeyResponse":
         """
@@ -95,241 +260,16 @@ class TendermintServer(RuntimeServiceBase):
 
         Deterministic behavior is required
         """
-        raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
+        try:
+            key = next_key_request.key
 
-    #
-    # async def GetRuntimeVersion(self,
-    #                             stream: 'grpclib.server.Stream['
-    #                                     'pb.GetRuntimeVersionRequest, '
-    #                                     'pb.GetRuntimeVersionResponse]'
-    #                             ) -> None:
-    #     await stream.recv_message()
-    #     await stream.send_message(pb.GetRuntimeVersionResponse(version=settings.RUNTIME_VERSION))
+            # TODO: calculate the next key
+            next_key = str(int(key) + 1)
 
-    # def ValidateSetConfig(self, request, context):
-    #     try:
-    #         raw_config = request.raw_config
-    #         config = json.loads(raw_config)
-    #
-    #         if "network" not in config:
-    #             context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
-    #             context.set_details("Config does not have property 'network' defined")
-    #             return pb.EmptyRequest()
-    #
-    #         if "rpc" not in config:
-    #             context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
-    #             context.set_details("Config does not have property 'rpc' defined")
-    #             return pb.EmptyRequest()
-    #
-    #         if "KYVEJS_TENDERMINT_RPC" in os.environ:
-    #             config["rpc"] = os.environ["KYVEJS_TENDERMINT_RPC"]
-    #
-    #         serialized_config = json.dumps(config)
-    #         return pb.ValidateSetConfigResponse(
-    #             serialized_config=serialized_config
-    #         )
-    #     except Exception as e:
-    #         context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
-    #         context.set_details(str(e))
-    #
-    # def GetDataItem(self, request, context):
-    #     try:
-    #         config = json.loads(request.config.serialized_config)
-    #         key = request.key
-    #
-    #         # Fetch block from the RPC at the given block height
-    #         block_response = requests.get(f"{config['rpc']}/block?height={key}")
-    #         block = block_response.json()["result"]
-    #
-    #         # Fetch block results from the RPC at the given block height
-    #         block_results_response = requests.get(
-    #             f"{config['rpc']}/block_results?height={key}"
-    #         )
-    #         block_results = block_results_response.json()["result"]
-    #
-    #         # Construct the Value message
-    #         value = {"block": block, "block_results": block_results}
-    #
-    #         # Construct the DataItem message
-    #         data_item = pb.DataItem(key=key, value=json.dumps(value))
-    #
-    #         return pb.GetDataItemResponse(data_item=data_item)
-    #     except Exception as e:
-    #         print(e)
-    #         context.set_code(grpc.StatusCode.INTERNAL)
-    #         context.set_details(str(e))
-    #
-    # def PrevalidateDataItem(self, request, context):
-    #     try:
-    #         config = json.loads(request.config.serialized_config)
-    #         data_item = {
-    #             "key": request.data_item.key,
-    #             "value": json.loads(request.data_item.value),
-    #         }
-    #
-    #         if not data_item:
-    #             return pb.PrevalidateDataItemResponse(valid=False)
-    #
-    #         if not (
-    #                 data_item["value"].get("block")
-    #                 and data_item["value"].get("block_results")
-    #         ):
-    #             return pb.PrevalidateDataItemResponse(valid=False)
-    #
-    #         if (
-    #                 config["network"]
-    #                 != data_item["value"]["block"]["block"]["header"]["chain_id"]
-    #         ):
-    #             return pb.PrevalidateDataItemResponse(valid=False)
-    #
-    #         if (
-    #                 data_item["key"]
-    #                 != data_item["value"]["block"]["block"]["header"]["height"]
-    #         ):
-    #             return pb.PrevalidateDataItemResponse(valid=False)
-    #
-    #         # Perform additional validation if needed
-    #
-    #         return pb.PrevalidateDataItemResponse(valid=True)
-    #     except Exception as e:
-    #         context.set_code(grpc.StatusCode.INTERNAL)
-    #         context.set_details(str(e))
-    #
-    # def TransformDataItem(self, request, context):
-    #     try:
-    #         item = {
-    #             "key": request.data_item.key,
-    #             "value": json.loads(request.data_item.value),
-    #         }
-    #
-    #         if (
-    #                 "begin_block_events" in item["value"]["block_results"]
-    #                 and item["value"]["block_results"]["begin_block_events"]
-    #         ):
-    #             item["value"]["block_results"]["begin_block_events"] = [
-    #                 {
-    #                     **event,
-    #                     "attributes": sorted(
-    #                         event["attributes"], key=lambda x: x["key"].lower()
-    #                     ),
-    #                 }
-    #                 for event in item["value"]["block_results"]["begin_block_events"]
-    #             ]
-    #
-    #         if (
-    #                 "end_block_events" in item["value"]["block_results"]
-    #                 and item["value"]["block_results"]["end_block_events"]
-    #         ):
-    #             item["value"]["block_results"]["end_block_events"] = [
-    #                 {
-    #                     **event,
-    #                     "attributes": sorted(
-    #                         event["attributes"], key=lambda x: x["key"].lower()
-    #                     ),
-    #                 }
-    #                 for event in item["value"]["block_results"]["end_block_events"]
-    #             ]
-    #
-    #         if (
-    #                 "txs_results" in item["value"]["block_results"]
-    #                 and item["value"]["block_results"]["txs_results"]
-    #         ):
-    #             item["value"]["block_results"]["txs_results"] = [
-    #                 {
-    #                     **tx_result,
-    #                     "log": None,
-    #                     "events": [
-    #                         {
-    #                             **event,
-    #                             "attributes": sorted(
-    #                                 event["attributes"], key=lambda x: x["key"].lower()
-    #                             )
-    #                             if "attributes" in event
-    #                             else event.get("attributes"),
-    #                         }
-    #                         for event in tx_result.get("events", [])
-    #                     ],
-    #                 }
-    #                 for tx_result in item["value"]["block_results"]["txs_results"]
-    #             ]
-    #
-    #             # Additional handling for event type 'fungible_token_packet'
-    #             for event in item["value"]["block_results"]["txs_results"]["events"]:
-    #                 if event.get("type") == "fungible_token_packet":
-    #                     event["attributes"] = [
-    #                         {
-    #                             "key": attribute["key"],
-    #                             "value": ""
-    #                             if attribute["key"] == "YWNrbm93bGVkZ2VtZW50"
-    #                             else attribute["value"],
-    #                         }
-    #                         for attribute in event.get("attributes", [])
-    #                     ]
-    #
-    #         # Construct the data_item to return
-    #         transformed_data_item = pb.DataItem(
-    #             key=item["key"], value=json.dumps(item["value"])
-    #         )
-    #
-    #         return pb.TransformDataItemResponse(
-    #             transformed_data_item=transformed_data_item
-    #         )
-    #     except Exception as e:
-    #         context.set_code(grpc.StatusCode.INTERNAL)
-    #         context.set_details(str(e))
-    #
-    # def ValidateDataItem(self, request, context):
-    #     try:
-    #         proposed_data_item = json.loads(request.proposed_data_item.value)
-    #         validation_data_item = json.loads(request.validation_data_item.value)
-    #
-    #         if json.dumps(proposed_data_item) == json.dumps(validation_data_item):
-    #             return pb.ValidateDataItemResponse(vote=pb.VOTE.VALID)
-    #
-    #         if (
-    #                 validation_data_item["block"]["block"]["header"]["chain_id"]
-    #                 == "osmosis-1"
-    #         ):
-    #             # Remove nondeterministic begin_block_events to prevent incorrect invalid vote
-    #             validation_data_item["block_results"]["begin_block_events"] = None
-    #             proposed_data_item["block_results"]["begin_block_events"] = None
-    #
-    #             if json.dumps(proposed_data_item) == json.dumps(validation_data_item):
-    #                 # Vote abstain if begin_block_events are not equal
-    #                 return pb.ValidateDataItemResponse(
-    #                     vote=pb.VOTE.ABSTAIN
-    #                 )
-    #
-    #         # Vote invalid if data does not match
-    #         return pb.ValidateDataItemResponse(vote=pb.VOTE.INVALID)
-    #     except Exception as e:
-    #         context.set_code(grpc.StatusCode.INTERNAL)
-    #         context.set_details(str(e))
-    #
-    # def SummarizeDataBundle(self, request, context):
-    #     try:
-    #         bundle = [json.loads(item.value) for item in request.bundle]
-    #
-    #         # Get the latest block height from the last item in the bundle
-    #         latest_block_height = (
-    #             bundle[-1]["block"]["block"]["header"]["height"] if bundle else ""
-    #         )
-    #
-    #         return pb.SummarizeDataBundleResponse(
-    #             summary=str(latest_block_height)
-    #         )
-    #     except Exception as e:
-    #         context.set_code(grpc.StatusCode.INTERNAL)
-    #         context.set_details(str(e))
-    #
-    # def NextKey(self, request, context):
-    #     try:
-    #         key = request.key
-    #
-    #         # Calculate the next key (current block height + 1)
-    #         next_key = str(int(key) + 1)
-    #
-    #         return pb.NextKeyResponse(next_key=next_key)
-    #     except Exception as e:
-    #         context.set_code(grpc.StatusCode.INTERNAL)
-    #         context.set_details(str(e))
+            return NextKeyResponse(next_key=next_key)
+        except Exception as error:
+            raise GRPCError(
+                Status(StatusCode.INTERNAL),
+                str(error)
+            )
+
