@@ -16,3 +16,7 @@ plugins:
     out: out/go
     opt:
       - paths=source_relative
+  - name: python
+    out: out/python
+  - name: python_grpc
+    out: out/python

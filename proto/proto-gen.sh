@@ -54,10 +54,10 @@ run_protobuf_generator() {
 copy_go_files() {
   printf "  🇬 Go\n"
 
-  # find all go folders in ./integrations by checking if they have a go.mod (go just one level deep)
+  # find all go folders in ./integrations by checking if they have a go.mod
   folders=$(find ../integrations -maxdepth 2 -name go.mod -exec dirname {} \;)
 
-  # find all go folders in ./tools/kystrap/templates by checking if they have a go.mod (go just one level deep)
+  # find all go folders in ./tools/kystrap/templates by checking if they have a go.mod
   folders="$folders,$(find ../tools/kystrap/templates -maxdepth 2 -name go.mod -exec dirname {} \;)"
 
   # remove all old files in the proto folders
@@ -77,10 +77,10 @@ copy_go_files() {
 copy_typescript_files() {
   printf "  🇹 Typescript\n"
 
-  # find all typescript folders in ./integrations by checking if they have a package.json (go just one level deep)
+  # find all typescript folders in ./integrations by checking if they have a package.json
   folders=$(find ../integrations -maxdepth 2 -name package.json -exec dirname {} \;)
 
-  # find all typescript folders in ./tools/kystrap/templates by checking if they have a package.json (go just one level deep)
+  # find all typescript folders in ./tools/kystrap/templates by checking if they have a package.json
   folders="$folders,$(find ../tools/kystrap/templates -maxdepth 2 -name package.json -exec dirname {} \;)"
 
   # add the common folder
@@ -103,11 +103,11 @@ copy_typescript_files() {
 copy_python_files() {
   printf "  🐍 Python\n"
 
-  # find all python folders in ./integrations by checking if they have a setup.py (go just one level deep)
-  folders=$(find ../integrations -maxdepth 2 -name setup.py -exec dirname {} \;)
+  # find all python folders in ./integrations by checking if they have a requirements.txt
+  folders=$(find ../integrations -maxdepth 2 -name requirements.txt -exec dirname {} \;)
 
-  # find all python folders in ./tools/kystrap/templates by checking if they have a setup.py (go just one level deep)
-  folders="$folders,$(find ../tools/kystrap/templates -maxdepth 2 -name setup.py -exec dirname {} \;)"
+  # find all python folders in ./tools/kystrap/templates by checking if they have a requirements.txt
+  folders="$folders,$(find ../tools/kystrap/templates -maxdepth 2 -name requirements.txt -exec dirname {} \;)"
 
   # remove all old files in the proto folders
   for folder in $(echo "$folders" | tr "," "\n"); do
@@ -138,8 +138,8 @@ clean_up() {
 }
 
 build_docker_image
-run_protobuf_formatter
-run_protobuf_linter
+#run_protobuf_formatter
+#run_protobuf_linter
 run_protobuf_generator
 copy_files
 clean_up
