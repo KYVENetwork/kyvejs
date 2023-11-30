@@ -19,15 +19,14 @@ RUN go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.3.0
 ###################################################################################
 FROM nikolaik/python-nodejs:python3.12-nodejs21
 
-# install protoc for plugin `python` in buf.gen.yaml
-RUN apt-get update && apt-get upgrade -y
-RUN apt-get install -y protobuf-compiler
-
-# Install protobuf and grpcio-tools for plugin `python_grpc` in buf.gen.yaml
-RUN python -m pip install protobuf grpclib
-
 # Install ts-proto for plugin `ts_proto` in buf.gen.yaml
 RUN npm install -g ts-proto
+
+# Install betterproto for plugin `python_betterproto` in buf.gen.yaml
+# Use a beta version of betterproto because 2.0.0 is not released yet
+# -> https://github.com/danielgtaylor/python-betterproto
+RUN python -m pip install "betterproto[compiler]==2.0.0b6"
+
 
 COPY --from=BUF_BUILDER /usr/local/bin /usr/local/bin
 COPY --from=GO_BUILDER /go/bin/* /usr/local/bin/
