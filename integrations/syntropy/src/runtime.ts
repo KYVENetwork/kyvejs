@@ -1,4 +1,4 @@
-import { DataItem, IRuntime, Validator, VOTE } from '@kyvejs/protocol';
+import { DataItem, IRuntime, sleep, Validator, VOTE } from '@kyvejs/protocol';
 import { name, version } from '../package.json';
 import axios from 'axios';
 
@@ -32,13 +32,19 @@ export default class Syntropy implements IRuntime {
   }
 
   async getDataItem(_: Validator, key: string): Promise<DataItem> {
-    // fetch block from rpc at given block height
-    const { data } = await axios.get(`${this.config.api}/get_item/${key}`);
-
-    return { key, value: data };
+    const fromKey = parseInt(key);
+    const toKey = fromKey + this.config.interval;
+    console.log(
+      `getDataItem:`,
+      `${this.config.api}/get_item/${fromKey}/${toKey}`
+    );
+    const { data } = await axios.get(
+      `${this.config.api}/get_item/${fromKey}/${toKey}`
+    );
+    return { key, value: data || [] };
   }
 
-  async prevalidateDataItem(_: Validator, item: DataItem): Promise<boolean> {
+  async prevalidateDataItem(_: Validator, __: DataItem): Promise<boolean> {
     return true;
   }
 
@@ -51,13 +57,16 @@ export default class Syntropy implements IRuntime {
     proposedDataItem: DataItem,
     validationDataItem: DataItem
   ): Promise<number> {
-    // TODO
+    if (proposedDataItem.value.length !== validationDataItem.value.length) {
+      return VOTE.VOTE_TYPE_ABSTAIN;
+    }
+
     if (
       JSON.stringify(proposedDataItem) === JSON.stringify(validationDataItem)
     ) {
       return VOTE.VOTE_TYPE_VALID;
     }
-    // vote invalid if data does not match
+
     return VOTE.VOTE_TYPE_INVALID;
   }
 
@@ -66,6 +75,16 @@ export default class Syntropy implements IRuntime {
   }
 
   async nextKey(_: Validator, key: string): Promise<string> {
-    return (parseInt(key) + this.config.interval).toString();
+    const nextKey = parseInt(key) + this.config.interval;
+    let now = Math.floor(Date.now() / 1000);
+
+    // we only return the next key if it is in the past
+    while (nextKey > now) {
+      console.log('sleep', nextKey, now);
+      await sleep(1000);
+      now = Math.floor(Date.now() / 1000);
+    }
+
+    return nextKey.toString();
   }
 }
