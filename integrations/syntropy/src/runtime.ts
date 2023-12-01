@@ -79,7 +79,7 @@ export default class Syntropy implements IRuntime {
     let now = Math.floor(Date.now() / 1000);
 
     // we only return the next key if it is in the past
-    while (nextKey > now) {
+    while (nextKey + this.config.interval > now) {
       console.log('sleep', nextKey, now);
       await sleep(1000);
       now = Math.floor(Date.now() / 1000);
