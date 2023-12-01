@@ -1,10 +1,11 @@
 import { DataItem, IRuntime, Validator, VOTE } from '@kyvejs/protocol';
 import { name, version } from '../package.json';
-import axios from "axios";
+import axios from 'axios';
 
 // Syntropy config
 interface IConfig {
-  rpc: string;
+  api: string;
+  interval: number;
 }
 
 export default class Syntropy implements IRuntime {
@@ -15,12 +16,16 @@ export default class Syntropy implements IRuntime {
   async validateSetConfig(rawConfig: string): Promise<void> {
     const config: IConfig = JSON.parse(rawConfig);
 
-    if (!config.rpc) {
-      throw new Error(`Config does not have property "rpc" defined`);
+    if (!config.api) {
+      throw new Error(`Config does not have property "api" defined`);
     }
 
-    if (process.env.KYVEJS_SYNTROPY_RPC) {
-      config.rpc = process.env.KYVEJS_SYNTROPY_RPC;
+    if (!config.interval) {
+      throw new Error(`Config does not have property "interval" defined`);
+    }
+
+    if (process.env.KYVEJS_SYNTROPY_API) {
+      config.api = process.env.KYVEJS_SYNTROPY_API;
     }
 
     this.config = config;
@@ -28,25 +33,21 @@ export default class Syntropy implements IRuntime {
 
   async getDataItem(_: Validator, key: string): Promise<DataItem> {
     // fetch block from rpc at given block height
-    const { data } = await axios.get(`${this.config.rpc}/get_item/${key}`);
+    const { data } = await axios.get(`${this.config.api}/get_item/${key}`);
 
     return { key, value: data };
   }
 
   async prevalidateDataItem(_: Validator, item: DataItem): Promise<boolean> {
-    // TODO
-
     return true;
   }
 
   async transformDataItem(_: Validator, item: DataItem): Promise<DataItem> {
-    // TODO
-
     return item;
   }
 
   async validateDataItem(
-    v: Validator,
+    _: Validator,
     proposedDataItem: DataItem,
     validationDataItem: DataItem
   ): Promise<number> {
@@ -60,13 +61,11 @@ export default class Syntropy implements IRuntime {
     return VOTE.VOTE_TYPE_INVALID;
   }
 
-  async summarizeDataBundle(_: Validator, bundle: DataItem[]): Promise<string> {
-    // TODO
-    return bundle.at(-1) ?? '';
+  async summarizeDataBundle(_: Validator, __: DataItem[]): Promise<string> {
+    return '';
   }
 
   async nextKey(_: Validator, key: string): Promise<string> {
-    // TODO
-    return (parseInt(key) + 1).toString();
+    return (parseInt(key) + this.config.interval).toString();
   }
 }
