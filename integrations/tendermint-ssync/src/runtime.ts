@@ -115,6 +115,11 @@ export default class TendermintSSync implements IRuntime {
       throw new Error(`Value in data item is not defined: ${item.value}`);
     }
 
+    // throw error if chunk is missing
+    if (!item.value.chunk) {
+      throw new Error(`Value in data item has no snapshot chunk`);
+    } 
+
     if (chunkIndex > 0) {
       // throw error if one of those values is not null
       if (
