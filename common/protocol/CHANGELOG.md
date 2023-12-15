@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.1](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/protocol@1.1.0...@kyvejs/protocol@1.1.1) (2023-12-15)
+
+### Bug Fixes
+
+- remove unecessary logs ([#109](https://github.com/KYVENetwork/kyvejs/issues/109)) ([6915fda](https://github.com/KYVENetwork/kyvejs/commit/6915fda81b5debce1ca0451857d2fbbd35acdcd5))
+- zip archives of binaries ([#106](https://github.com/KYVENetwork/kyvejs/issues/106)) ([b6d8290](https://github.com/KYVENetwork/kyvejs/commit/b6d829042a9f7304603a25b9716b948923fc07dd))
+
 # [1.1.0](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/protocol@1.0.14...@kyvejs/protocol@1.1.0) (2023-11-28)
 
 ### Features

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.1](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint-ssync@1.1.0...@kyvejs/tendermint-ssync@1.1.1) (2023-12-15)
+
+### Bug Fixes
+
+- add prevalidation for snapshot chunk ([#108](https://github.com/KYVENetwork/kyvejs/issues/108)) ([3cba83d](https://github.com/KYVENetwork/kyvejs/commit/3cba83dec15bc293d6e8c01c4628d96b8a99b12c))
+
 # [1.1.0](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint-ssync@1.0.0...@kyvejs/tendermint-ssync@1.1.0) (2023-11-28)
 
 ### Features
