@@ -292,6 +292,7 @@ export const run = async (options: any) => {
             dir: path.resolve(
               path.join(HOME, `upgrades`, `pool-${pool.id}`, version, `bin`)
             ),
+            defaultFileMode: 0o555,
           }
         );
 
