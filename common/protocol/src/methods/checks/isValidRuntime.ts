@@ -10,8 +10,6 @@ import { Validator, standardizeError } from "../..";
  */
 export function isValidRuntime(this: Validator): boolean {
   try {
-    this.logger.debug(`Comparing pool runtime with protocol node runtime`);
-
     if (this.pool.data!.runtime !== this.runtime.name) {
       this.logger.fatal(
         `Specified pool does not match the integration runtime! Exiting ...`
@@ -22,8 +20,6 @@ export function isValidRuntime(this: Validator): boolean {
 
       return false;
     }
-
-    this.logger.info(`Validator running on runtime = ${this.runtime.name}`);
 
     return true;
   } catch (err) {
