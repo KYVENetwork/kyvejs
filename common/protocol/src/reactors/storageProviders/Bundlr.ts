@@ -26,7 +26,7 @@ export class Bundlr implements IStorageProvider {
 
   private get bundlrClient(): BundlrClient {
     return new BundlrClient(
-      "http://node1.bundlr.network",
+      "https://up.arweave.net",
       "arweave",
       this.bundlrKeyfile
     );
