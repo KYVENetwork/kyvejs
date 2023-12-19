@@ -138,8 +138,8 @@ clean_up() {
 }
 
 build_docker_image
-#run_protobuf_formatter
-#run_protobuf_linter
+run_protobuf_formatter
+run_protobuf_linter
 run_protobuf_generator
 copy_files
 clean_up
