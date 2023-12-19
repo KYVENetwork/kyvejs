@@ -548,17 +548,21 @@ class RuntimeServiceBase(ServiceBase):
                 GetRuntimeNameRequest,
                 GetRuntimeNameResponse,
             ),
-            "/kyverdk.runtime.v1.RuntimeService/GetRuntimeVersion": grpclib.const.Handler(
-                self.__rpc_get_runtime_version,
-                grpclib.const.Cardinality.UNARY_UNARY,
-                GetRuntimeVersionRequest,
-                GetRuntimeVersionResponse,
+            "/kyverdk.runtime.v1.RuntimeService/GetRuntimeVersion": (
+                grpclib.const.Handler(
+                    self.__rpc_get_runtime_version,
+                    grpclib.const.Cardinality.UNARY_UNARY,
+                    GetRuntimeVersionRequest,
+                    GetRuntimeVersionResponse,
+                )
             ),
-            "/kyverdk.runtime.v1.RuntimeService/ValidateSetConfig": grpclib.const.Handler(
-                self.__rpc_validate_set_config,
-                grpclib.const.Cardinality.UNARY_UNARY,
-                ValidateSetConfigRequest,
-                ValidateSetConfigResponse,
+            "/kyverdk.runtime.v1.RuntimeService/ValidateSetConfig": (
+                grpclib.const.Handler(
+                    self.__rpc_validate_set_config,
+                    grpclib.const.Cardinality.UNARY_UNARY,
+                    ValidateSetConfigRequest,
+                    ValidateSetConfigResponse,
+                )
             ),
             "/kyverdk.runtime.v1.RuntimeService/GetDataItem": grpclib.const.Handler(
                 self.__rpc_get_data_item,
@@ -566,29 +570,37 @@ class RuntimeServiceBase(ServiceBase):
                 GetDataItemRequest,
                 GetDataItemResponse,
             ),
-            "/kyverdk.runtime.v1.RuntimeService/PrevalidateDataItem": grpclib.const.Handler(
-                self.__rpc_prevalidate_data_item,
-                grpclib.const.Cardinality.UNARY_UNARY,
-                PrevalidateDataItemRequest,
-                PrevalidateDataItemResponse,
+            "/kyverdk.runtime.v1.RuntimeService/PrevalidateDataItem": (
+                grpclib.const.Handler(
+                    self.__rpc_prevalidate_data_item,
+                    grpclib.const.Cardinality.UNARY_UNARY,
+                    PrevalidateDataItemRequest,
+                    PrevalidateDataItemResponse,
+                )
             ),
-            "/kyverdk.runtime.v1.RuntimeService/TransformDataItem": grpclib.const.Handler(
-                self.__rpc_transform_data_item,
-                grpclib.const.Cardinality.UNARY_UNARY,
-                TransformDataItemRequest,
-                TransformDataItemResponse,
+            "/kyverdk.runtime.v1.RuntimeService/TransformDataItem": (
+                grpclib.const.Handler(
+                    self.__rpc_transform_data_item,
+                    grpclib.const.Cardinality.UNARY_UNARY,
+                    TransformDataItemRequest,
+                    TransformDataItemResponse,
+                )
             ),
-            "/kyverdk.runtime.v1.RuntimeService/ValidateDataItem": grpclib.const.Handler(
-                self.__rpc_validate_data_item,
-                grpclib.const.Cardinality.UNARY_UNARY,
-                ValidateDataItemRequest,
-                ValidateDataItemResponse,
+            "/kyverdk.runtime.v1.RuntimeService/ValidateDataItem": (
+                grpclib.const.Handler(
+                    self.__rpc_validate_data_item,
+                    grpclib.const.Cardinality.UNARY_UNARY,
+                    ValidateDataItemRequest,
+                    ValidateDataItemResponse,
+                )
             ),
-            "/kyverdk.runtime.v1.RuntimeService/SummarizeDataBundle": grpclib.const.Handler(
-                self.__rpc_summarize_data_bundle,
-                grpclib.const.Cardinality.UNARY_UNARY,
-                SummarizeDataBundleRequest,
-                SummarizeDataBundleResponse,
+            "/kyverdk.runtime.v1.RuntimeService/SummarizeDataBundle": (
+                grpclib.const.Handler(
+                    self.__rpc_summarize_data_bundle,
+                    grpclib.const.Cardinality.UNARY_UNARY,
+                    SummarizeDataBundleRequest,
+                    SummarizeDataBundleResponse,
+                )
             ),
             "/kyverdk.runtime.v1.RuntimeService/NextKey": grpclib.const.Handler(
                 self.__rpc_next_key,

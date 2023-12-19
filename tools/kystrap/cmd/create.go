@@ -111,7 +111,7 @@ func CmdCreateIntegration() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			fmt.Printf("✅ Successfully created integration in `%s/%s`\n", outputDir, name)
+			fmt.Printf("✅ Successfully created integration in `%s`\n", name)
 			return nil
 		},
 	}
