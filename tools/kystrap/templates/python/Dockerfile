@@ -4,12 +4,16 @@ FROM python:3.12
 # Set the working directory inside the container
 WORKDIR /app
 
-# Copy the Python code and protobuf files to the container
+# Copy the dependencies file to the working directory
 COPY requirements.txt ./
-COPY ./src ./src
 
 # Install the required Python packages
 RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the Python code and protobuf files to the container
+COPY main.py settings.py ./
+COPY proto ./proto
+COPY server ./server
 
 # Expose the gRPC port
 EXPOSE 50051
