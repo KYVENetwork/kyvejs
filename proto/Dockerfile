@@ -27,6 +27,9 @@ RUN npm install -g ts-proto
 # -> https://github.com/danielgtaylor/python-betterproto
 RUN python -m pip install "betterproto[compiler]==2.0.0b6"
 
+# Create cache directory
+RUN mkdir /.cache
+RUN chmod 777 /.cache
 
 COPY --from=BUF_BUILDER /usr/local/bin /usr/local/bin
 COPY --from=GO_BUILDER /go/bin/* /usr/local/bin/
