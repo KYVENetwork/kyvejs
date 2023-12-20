@@ -10,14 +10,14 @@ import (
 type option string
 
 const (
-	help   option = "show help"
 	create option = "bootstrap integration"
+	test   option = "test integration"
 )
 
 const yesFlag = "yes"
 
 func promptOption() (option, error) {
-	var items = []option{create, help}
+	var items = []option{create, test}
 
 	prompt := promptui.Select{
 		Label: "What do you want to do?",
@@ -32,10 +32,8 @@ func promptOption() (option, error) {
 var rootCmd = &cobra.Command{
 	Use:   "kystrap",
 	Short: "kystrap is a CLI tool to bootstrap KYVE integrations",
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
 	RunE: func(cmd *cobra.Command, args []string) error {
-		option := help
+		option := create
 
 		// Check if the yes flag is set
 		// -> if not ask the user what to do
@@ -48,10 +46,10 @@ var rootCmd = &cobra.Command{
 		}
 
 		switch option {
-		case help:
-			return cmd.Help()
 		case create:
 			return CmdCreateIntegration().Execute()
+		case test:
+			return CmdTestIntegration().Execute()
 		default:
 			return nil
 		}
@@ -77,5 +75,5 @@ func init() {
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
-	rootCmd.PersistentFlags().BoolP(yesFlag, "y", false, "Skip all prompts and use default values")
+	rootCmd.PersistentFlags().BoolP(yesFlag, "y", false, "Skip all prompts and use provided or default values")
 }

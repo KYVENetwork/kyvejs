@@ -4,6 +4,7 @@ cd proto || exit 1
 
 # Variables
 OUTPUT_FOLDER="out"
+DESCRIPTOR_FILE="protobuf.descriptor.bin"
 
 build_docker_image() {
   printf "🏗️ Building docker image...\n"
@@ -49,6 +50,17 @@ run_protobuf_generator() {
     exit 1
   fi
   printf "✅ Completed generating proto files!\n\n"
+}
+
+run_protobuf_builder() {
+  printf "🛠️ Building proto descriptor...\n"
+  docker run --rm \
+    --volume "$(pwd)":/workspace \
+    --workdir /workspace \
+    --user "$(id -u):$(id -g)" \
+    kyve-protocol-proto \
+    buf build \
+    -o "$OUTPUT_FOLDER"/"$DESCRIPTOR_FILE" || exit 1
 }
 
 copy_go_files() {
@@ -123,12 +135,19 @@ copy_python_files() {
   done
 }
 
+copy_descriptor_file() {
+  printf "  📄 Descriptor\n"
+  printf "    📁 Copy descriptor to ../tools/kystrap/%s\n" "${DESCRIPTOR_FILE}"
+  cp "$OUTPUT_FOLDER"/"$DESCRIPTOR_FILE" ../tools/kystrap/"$DESCRIPTOR_FILE"
+}
+
 copy_files() {
   printf "📄 Copy generated files to folders...\n"
 
   copy_typescript_files
   copy_go_files
   copy_python_files
+  copy_descriptor_file
 
   printf "✅ Completed copying files!\n\n"
 }
@@ -141,5 +160,6 @@ build_docker_image
 run_protobuf_formatter
 run_protobuf_linter
 run_protobuf_generator
+run_protobuf_builder
 copy_files
 clean_up

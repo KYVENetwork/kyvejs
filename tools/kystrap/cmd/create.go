@@ -40,7 +40,7 @@ func promptLanguage(defaultVal types.Language, skipPrompt bool) (types.Language,
 	return types.NewLanguage(result), err
 }
 
-func promptName(defaultVal string, skipPromp bool) (string, error) {
+func promptName(defaultVal string, skipPrompt bool) (string, error) {
 	validate := func(input string) error {
 		if len(input) < 3 {
 			return errors.New("name must be at least 3 characters long")
@@ -56,7 +56,7 @@ func promptName(defaultVal string, skipPromp bool) (string, error) {
 		Default:  defaultVal,
 	}
 
-	if skipPromp {
+	if skipPrompt {
 		return strings.ToLower(defaultVal), validate(defaultVal)
 	}
 

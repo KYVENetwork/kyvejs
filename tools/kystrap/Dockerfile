@@ -29,5 +29,6 @@ COPY --from=build /app/kystrap .
 # Copy the template files
 COPY ./templates /app/templates
 COPY ./template-strings.yml /app/template-strings.yml
+COPY ./protobuf.descriptor.bin /app/protobuf.descriptor.bin
 
 ENTRYPOINT ["./kystrap"]
