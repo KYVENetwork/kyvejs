@@ -321,6 +321,7 @@ func runTestIntegration(
 		data = fmt.Sprintf(`{%s}`, data)
 
 		if !json.Valid([]byte(data)) {
+			execution.success = false
 			printError(cmd, errors.New("invalid JSON"))
 			return nil
 		}
