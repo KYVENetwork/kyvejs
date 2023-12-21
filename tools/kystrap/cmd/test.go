@@ -210,10 +210,10 @@ func printRequest(cmd *cobra.Command, data string) {
 func printResponse(cmd *cobra.Command, h *grpcurl.DefaultEventHandler, data string) {
 	if h.Status.Err() != nil {
 		cmd.PrintErrln("⬅️ Response")
-		cmd.PrintErrf("%s %s (error code: %s)\n", promptui.IconBad, h.Status.Message(), h.Status.Code())
+		cmd.PrintErrf("%s %d %s - %s\n", promptui.IconBad, h.Status.Code(), h.Status.Code(), h.Status.Message())
 	} else {
 		cmd.Printf("⬅️ Response\n%s", data)
-		cmd.Printf("%s %s %s\n", promptui.IconGood, h.Status.Code(), h.Status.Message())
+		cmd.Printf("%s %d %s %s\n", promptui.IconGood, h.Status.Code(), h.Status.Code(), h.Status.Message())
 	}
 }
 
