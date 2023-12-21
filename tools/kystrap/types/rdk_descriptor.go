@@ -7,6 +7,11 @@ import (
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
+const (
+	ServiceName            = "kyverdk.runtime.v1.RuntimeService"
+	ProtobufDescriptorFile = "protobuf.descriptor.bin"
+)
+
 type RdkDescriptor struct {
 	DescriptorSource  grpcurl.DescriptorSource
 	ServiceDescriptor desc.Descriptor
@@ -32,7 +37,7 @@ func (r *RdkDescriptor) MethodNames() []string {
 }
 
 func parseProtobufDescriptor() error {
-	sets, err := grpcurl.DescriptorSourceFromProtoSets("protobuf.descriptor.bin")
+	sets, err := grpcurl.DescriptorSourceFromProtoSets(ProtobufDescriptorFile)
 	if err != nil {
 		return err
 	}
@@ -43,12 +48,12 @@ func parseProtobufDescriptor() error {
 	}
 	var kyverdk string
 	for _, service := range services {
-		if service == "kyverdk.runtime.v1.RuntimeService" {
+		if service == ServiceName {
 			kyverdk = service
 		}
 	}
 	if kyverdk == "" {
-		return fmt.Errorf("kyverdk.runtime.v1.RuntimeService not found")
+		return fmt.Errorf("%s not found", ServiceName)
 	}
 
 	serviceDescriptor, err := sets.FindSymbol(kyverdk)
