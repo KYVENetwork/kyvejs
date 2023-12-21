@@ -94,7 +94,7 @@ func CmdCreateIntegration() *cobra.Command {
 			if defaultLanguageStr != "" {
 				defaultLanguage = types.NewLanguage(defaultLanguageStr)
 			}
-			language, err := promptLanguage(defaultLanguage, cmd.Flags().Changed(yesFlag))
+			language, err := promptLanguage(defaultLanguage, cmd.Flags().Changed(flagYes))
 			if err != nil {
 				return err
 			}
@@ -103,7 +103,7 @@ func CmdCreateIntegration() *cobra.Command {
 			}
 
 			defaultName, _ := cmd.Flags().GetString(flagName)
-			name, err := promptName(defaultName, cmd.Flags().Changed(yesFlag))
+			name, err := promptName(defaultName, cmd.Flags().Changed(flagYes))
 			if err != nil {
 				return err
 			}

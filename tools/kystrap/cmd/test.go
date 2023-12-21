@@ -175,7 +175,10 @@ func dial(address string) (*grpc.ClientConn, error) {
 }
 
 func printMethodDescription(cmd *cobra.Command, method protoreflect.MethodDescriptor) {
-	cmd.Println()
+	if printSimpleOutput(cmd) {
+		return
+	}
+
 	cmd.Printf("📜 Expected format for %s\n", method.Name())
 	fields := method.Input().Fields()
 	for i := 0; i < fields.Len(); i++ {
@@ -194,21 +197,37 @@ func printMethodDescription(cmd *cobra.Command, method protoreflect.MethodDescri
 }
 
 func printRequest(cmd *cobra.Command, data string) {
+	if printSimpleOutput(cmd) {
+		return
+	}
+
 	cmd.Printf("➡️ Request\n%s\n\n", data)
 }
 
 func printResponse(cmd *cobra.Command, h *grpcurl.DefaultEventHandler, data string) {
-	if h.Status.Err() != nil {
-		cmd.PrintErrln("⬅️ Response")
-		cmd.PrintErrf("%s %d %s - %s\n", promptui.IconBad, h.Status.Code(), h.Status.Code(), h.Status.Message())
+	if printSimpleOutput(cmd) {
+		if h.Status.Err() != nil {
+			cmd.PrintErrf("%s %d %s - %s\n", promptui.IconBad, h.Status.Code(), h.Status.Code(), h.Status.Message())
+		} else {
+			cmd.Printf(data)
+		}
 	} else {
-		cmd.Printf("⬅️ Response\n%s", data)
-		cmd.Printf("%s %d %s %s\n", promptui.IconGood, h.Status.Code(), h.Status.Code(), h.Status.Message())
+		if h.Status.Err() != nil {
+			cmd.PrintErrln("⬅️ Response")
+			cmd.PrintErrf("%s %d %s - %s\n", promptui.IconBad, h.Status.Code(), h.Status.Code(), h.Status.Message())
+		} else {
+			cmd.Printf("⬅️ Response\n%s", data)
+			cmd.Printf("%s %d %s %s\n", promptui.IconGood, h.Status.Code(), h.Status.Code(), h.Status.Message())
+		}
 	}
 }
 
 func printError(cmd *cobra.Command, err error) {
-	cmd.Printf("%s %s\n", promptui.IconBad, err.Error())
+	if printSimpleOutput(cmd) {
+		cmd.PrintErr(err)
+		return
+	}
+	cmd.PrintErrf("%s %s\n", promptui.IconBad, err.Error())
 }
 
 func performMethodCall(cmd *cobra.Command, address string, method protoreflect.MethodDescriptor, data string) (bool, error) {
@@ -258,7 +277,6 @@ func performMethodCall(cmd *cobra.Command, address string, method protoreflect.M
 		printRequest(cmd, data)
 		printResponse(cmd, h, out.String())
 	} else {
-		cmd.Println()
 		printRequest(cmd, data)
 		printResponse(cmd, h, out.String())
 	}
@@ -311,6 +329,12 @@ func runTestIntegration(
 	success, err := performMethodCall(cmd, execution.address, execution.method, data)
 	execution.success = success
 	return err
+}
+
+const flagSimple = "simple"
+
+func printSimpleOutput(cmd *cobra.Command) bool {
+	return cmd.Flags().Changed(flagSimple)
 }
 
 func CmdTestIntegration() *cobra.Command {
@@ -382,6 +406,7 @@ func CmdTestIntegration() *cobra.Command {
 	cmd.Flags().StringP(flagMethod, "m", "", "gRPC method that you want to test")
 	cmd.Flags().StringP(flagData, "d", "", "data that you want to send with the gRPC method call")
 	cmd.Flags().StringP(flagAddress, "a", "", "address and port of the runtime server (ex: localhost:50051)")
+	cmd.Flags().BoolP(flagSimple, "s", false, "simple output (only prints the response)")
 	return cmd
 }
 

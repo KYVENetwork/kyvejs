@@ -14,10 +14,10 @@ const (
 	test   option = "test integration"
 )
 
-const yesFlag = "yes"
+const flagYes = "yes"
 
 func skipPrompts(cmd *cobra.Command) bool {
-	return cmd.Flags().Changed(yesFlag)
+	return cmd.Flags().Changed(flagYes)
 }
 
 func promptOption() (option, error) {
@@ -79,6 +79,6 @@ func init() {
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
-	rootCmd.PersistentFlags().BoolP(yesFlag, "y", false, "Skip all prompts and use provided or default values")
+	rootCmd.PersistentFlags().BoolP(flagYes, "y", false, "Skip all prompts and use provided or default values")
 	rootCmd.SetErrPrefix(promptui.IconBad)
 }
