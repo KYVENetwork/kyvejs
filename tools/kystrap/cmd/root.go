@@ -80,4 +80,5 @@ func init() {
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 	rootCmd.PersistentFlags().BoolP(yesFlag, "y", false, "Skip all prompts and use provided or default values")
+	rootCmd.SetErrPrefix(promptui.IconBad)
 }

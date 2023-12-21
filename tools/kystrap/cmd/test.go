@@ -14,6 +14,7 @@ import (
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/reflect/protoreflect"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -22,6 +23,16 @@ type executionInfo struct {
 	method   protoreflect.MethodDescriptor
 	position int
 	success  bool
+	host     string
+}
+
+func newExecutionInfo() executionInfo {
+	return executionInfo{
+		method:   nil,
+		position: 0,
+		success:  false,
+		host:     "localhost:50051",
+	}
 }
 
 func findDescriptorMethod(name string) protoreflect.MethodDescriptor {
@@ -45,6 +56,28 @@ func setPosition(execution *executionInfo) {
 			}
 		}
 	}
+}
+
+var addressRegex = regexp.MustCompile(`^([a-zA-Z0-9-]+\.)*[a-zA-Z0-9-]+:([0-9]+)+$`)
+
+func promptAddress(execution *executionInfo) error {
+	validate := func(input string) error {
+		if !addressRegex.MatchString(input) {
+			return errors.New("invalid address... must be in the format host:port")
+		}
+		return nil
+	}
+	prompt := promptui.Prompt{
+		Label:    "Enter the host and port of the runtime server",
+		Default:  execution.host,
+		Validate: validate,
+	}
+	result, err := prompt.Run()
+	if err != nil {
+		return err
+	}
+	execution.host = result
+	return nil
 }
 
 func promptMethod(execution *executionInfo) error {
@@ -132,7 +165,7 @@ func promptAction(isYesNo bool) (action, error) {
 	return action(result), nil
 }
 
-func dial() (*grpc.ClientConn, error) {
+func dial(host string) (*grpc.ClientConn, error) {
 	dialTime := 10 * time.Second
 	ctx, cancel := context.WithTimeout(context.Background(), dialTime)
 	defer cancel()
@@ -144,9 +177,7 @@ func dial() (*grpc.ClientConn, error) {
 
 	network := "tcp"
 
-	target := "localhost:50051"
-
-	cc, err := grpcurl.BlockingDial(ctx, network, target, creds, opts...)
+	cc, err := grpcurl.BlockingDial(ctx, network, host, creds, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -190,8 +221,8 @@ func printError(cmd *cobra.Command, err error) {
 	cmd.Printf("%s %s\n", promptui.IconBad, err.Error())
 }
 
-func performMethodCall(cmd *cobra.Command, method protoreflect.MethodDescriptor, data string) (bool, error) {
-	cc, err := dial()
+func performMethodCall(cmd *cobra.Command, address string, method protoreflect.MethodDescriptor, data string) (bool, error) {
+	cc, err := dial(address)
 	if err != nil {
 		return false, err
 	}
@@ -216,9 +247,8 @@ func performMethodCall(cmd *cobra.Command, method protoreflect.MethodDescriptor,
 
 	out := new(bytes.Buffer)
 	h := &grpcurl.DefaultEventHandler{
-		Out:            out,
-		Formatter:      formatter,
-		VerbosityLevel: 0,
+		Out:       out,
+		Formatter: formatter,
 	}
 
 	err = grpcurl.InvokeRPC(ctx, types.Rdk.DescriptorSource, cc, string(method.FullName()), nil, h, rf.Next)
@@ -288,7 +318,7 @@ func runTestIntegration(
 		}
 	}
 
-	success, err := performMethodCall(cmd, execution.method, data)
+	success, err := performMethodCall(cmd, execution.host, execution.method, data)
 	execution.success = success
 	return err
 }
@@ -296,23 +326,35 @@ func runTestIntegration(
 func CmdTestIntegration() *cobra.Command {
 	const flagMethod = "method"
 	const flagData = "data"
+	const flagHost = "host"
 
 	cmd := &cobra.Command{
 		Use:   "test",
 		Short: "Test a runtime integration",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			execution := executionInfo{}
-			defaultMethod, _ := cmd.Flags().GetString(flagMethod)
-			if defaultMethod != "" {
-				execution.method = findDescriptorMethod(defaultMethod)
+			execution := newExecutionInfo()
+			method, _ := cmd.Flags().GetString(flagMethod)
+			data, _ := cmd.Flags().GetString(flagData)
+			host, _ := cmd.Flags().GetString(flagHost)
+
+			if method != "" {
+				execution.method = findDescriptorMethod(method)
 				if execution.method == nil {
-					return errors.New(fmt.Sprintf("invalid gRPC method %s", defaultMethod))
+					return errors.New(fmt.Sprintf("invalid gRPC method %s", method))
 				}
 				setPosition(&execution)
 			}
 
-			defaultData, _ := cmd.Flags().GetString(flagData)
-			err := runTestIntegration(cmd, &execution, defaultData)
+			if host != "" {
+				execution.host = host
+			} else if !skipPrompts(cmd) {
+				err := promptAddress(&execution)
+				if err != nil {
+					return err
+				}
+			}
+
+			err := runTestIntegration(cmd, &execution, data)
 			if err != nil {
 				return err
 			}
@@ -349,6 +391,7 @@ func CmdTestIntegration() *cobra.Command {
 	}
 	cmd.Flags().StringP(flagMethod, "m", "", "gRPC method that you want to test")
 	cmd.Flags().StringP(flagData, "d", "", "data that you want to send with the gRPC method call")
+	cmd.Flags().StringP(flagHost, "H", "", "host and port of the runtime server (ex: localhost:50051)")
 	return cmd
 }
 
