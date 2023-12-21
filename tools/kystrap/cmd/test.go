@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -13,7 +14,6 @@ import (
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/reflect/protoreflect"
-	"os"
 	"strings"
 	"time"
 )
@@ -67,15 +67,41 @@ func promptMethod(execution *executionInfo, skipPrompt bool) error {
 	return nil
 }
 
-func promptInput(field protoreflect.FieldDescriptor, skipPrompt bool) (string, error) {
-	if skipPrompt {
-		return "", nil
+func promptInput(field protoreflect.FieldDescriptor, fieldLabel string) (string, error) {
+	if field.Message() != nil {
+		var data string
+		for i := 0; i < field.Message().Fields().Len(); i++ {
+			subField := field.Message().Fields().Get(i)
+			input, err := promptInput(subField, fmt.Sprintf("%s -> %s", fieldLabel, subField.Name()))
+			if err != nil {
+				return "", err
+			}
+
+			// add comma between fields
+			if data != "" {
+				data += ", "
+			}
+			data += input
+		}
+		if field.IsList() {
+			return fmt.Sprintf(`"%s": [%s]`, field.Name(), data), nil
+		}
+		if field.IsMap() || field.Message() != nil {
+			return fmt.Sprintf(`"%s": {%s}`, field.Name(), data), nil
+		}
+		return fmt.Sprintf(`"%s": "%s"`, field.Name(), data), nil
 	}
 	prompt := promptui.Prompt{
-		Label: field.Name(),
+		Label: fieldLabel,
 	}
 	result, err := prompt.Run()
-	return result, err
+	if err != nil {
+		return "", err
+	}
+	if field.IsList() || field.IsMap() || field.Message() != nil {
+		return fmt.Sprintf(`"%s": %s`, field.Name(), result), err
+	}
+	return fmt.Sprintf(`"%s": "%s"`, field.Name(), result), err
 }
 
 type action string
@@ -134,6 +160,25 @@ func dial() (*grpc.ClientConn, error) {
 	return cc, nil
 }
 
+func printMethodDescription(cmd *cobra.Command, method protoreflect.MethodDescriptor) {
+	cmd.Println()
+	cmd.Printf("📜 Expected format for %s\n", method.Name())
+	fields := method.Input().Fields()
+	for i := 0; i < fields.Len(); i++ {
+		field := fields.Get(i)
+		if field.Message() != nil {
+			cmd.Printf("  - %s:\n", field.Name())
+			for j := 0; j < field.Message().Fields().Len(); j++ {
+				subField := field.Message().Fields().Get(j)
+				cmd.Printf("    - %s (%s)\n", subField.Name(), subField.Kind())
+			}
+			continue
+		}
+		cmd.Printf("  - %s (%s)\n", field.Name(), field.Kind())
+	}
+	cmd.Println()
+}
+
 func performMethodCall(cmd *cobra.Command, method protoreflect.MethodDescriptor, data string) (bool, error) {
 	cc, err := dial()
 	if err != nil {
@@ -146,7 +191,6 @@ func performMethodCall(cmd *cobra.Command, method protoreflect.MethodDescriptor,
 	ctx, cancel := context.WithTimeout(context.Background(), dialTime)
 	defer cancel()
 
-	//in := os.Stdin
 	in := strings.NewReader(data)
 
 	options := grpcurl.FormatOptions{
@@ -159,8 +203,9 @@ func performMethodCall(cmd *cobra.Command, method protoreflect.MethodDescriptor,
 		return false, err
 	}
 
+	out := new(bytes.Buffer)
 	h := &grpcurl.DefaultEventHandler{
-		Out:            os.Stdout,
+		Out:            out,
 		Formatter:      formatter,
 		VerbosityLevel: 0,
 	}
@@ -170,6 +215,7 @@ func performMethodCall(cmd *cobra.Command, method protoreflect.MethodDescriptor,
 		if errStatus, ok := status.FromError(err); ok {
 			h.Status = errStatus
 		} else if strings.HasPrefix(err.Error(), "error getting request data:") {
+			printMethodDescription(cmd, method)
 			cmd.PrintErrln(err.Error())
 			return false, nil
 		} else {
@@ -177,7 +223,10 @@ func performMethodCall(cmd *cobra.Command, method protoreflect.MethodDescriptor,
 		}
 	}
 	if h.Status.Err() != nil {
-		cmd.PrintErrln(h.Status.Message())
+		printMethodDescription(cmd, method)
+		cmd.PrintErrf("%s %s (error code: %s)\n", promptui.IconBad, h.Status.Message(), h.Status.Code())
+	} else {
+		cmd.Printf("➡️ Request\n%s\n\n⬅️ Response\n%s\n%s %s %s", data, out, promptui.IconGood, h.Status.Code(), h.Status.Message())
 	}
 	return h.Status.Err() == nil, nil
 }
@@ -200,16 +249,20 @@ func runTestIntegration(
 		fields := execution.method.Input().Fields()
 		for i := 0; i < fields.Len(); i++ {
 			field := fields.Get(i)
-			input, err := promptInput(field, skipPromptInput)
-			if err != nil {
-				return err
+			var input string
+			var err error
+			if !skipPromptInput {
+				input, err = promptInput(field, string(field.Name()))
+				if err != nil {
+					return err
+				}
 			}
 
 			// separate fields with comma
 			if data != "" {
 				data += ", "
 			}
-			data += fmt.Sprintf(`"%s": "%s"`, field.Name(), input)
+			data += input
 		}
 		data = fmt.Sprintf(`{%s}`, data)
 
@@ -249,10 +302,12 @@ func CmdTestIntegration() *cobra.Command {
 				return err
 			}
 
+			// if yes flag is set, don't prompt for action
 			if cmd.Flags().Changed(yesFlag) {
 				return nil
 			}
 
+			// prompt for action until the user exits or an error occurs
 			for {
 				cmd.Println()
 				actionResult, err := promptAction(execution.success)
