@@ -11,11 +11,18 @@ import (
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"os"
 	"strings"
 	"time"
 )
+
+type executionInfo struct {
+	method   protoreflect.MethodDescriptor
+	position int
+	success  bool
+}
 
 func findDescriptorMethod(name string) protoreflect.MethodDescriptor {
 	if name == "" {
@@ -30,46 +37,34 @@ func findDescriptorMethod(name string) protoreflect.MethodDescriptor {
 	return nil
 }
 
-func getPosition(value string) (int, error) {
-	var position = 0
-	if value != "" {
-		method := findDescriptorMethod(value)
-		if method == nil {
-			return 0, errors.New(fmt.Sprintf("invalid value %s", value))
-		}
+func setPosition(execution *executionInfo) {
+	if execution.method != nil {
 		for i := 0; i < types.Rdk.Methods.Len(); i++ {
-			if types.Rdk.Methods.Get(i).FullName() == method.FullName() {
-				position = i
+			if types.Rdk.Methods.Get(i).FullName() == execution.method.FullName() {
+				execution.position = i
 			}
 		}
 	}
-	return position, nil
 }
 
-func promptMethod(defaultVal string, skipPrompt bool) (protoreflect.MethodDescriptor, error) {
-	if skipPrompt || defaultVal != "" {
-		if defaultVal == "" {
-			return nil, errors.New("no method specified")
-		}
-		method := findDescriptorMethod(defaultVal)
-		if method == nil {
-			return nil, errors.New(fmt.Sprintf("invalid value %s", defaultVal))
-		}
-		return method, nil
+func promptMethod(execution *executionInfo, skipPrompt bool) error {
+	if skipPrompt && execution.method == nil {
+		return errors.New("no gRPC method specified")
 	}
 
-	position, err := getPosition(defaultVal)
-	if err != nil {
-		return nil, err
-	}
 	prompt := promptui.Select{
 		Label:     "Which method do you want to test?",
 		Items:     types.Rdk.MethodNames(),
-		CursorPos: position,
+		CursorPos: execution.position,
 		Size:      types.Rdk.Methods.Len(),
 	}
-	_, result, err := prompt.Run()
-	return findDescriptorMethod(result), err
+	position, result, err := prompt.Run()
+	if err != nil {
+		return err
+	}
+	execution.method = findDescriptorMethod(result)
+	execution.position = position
+	return nil
 }
 
 func promptInput(field protoreflect.FieldDescriptor, skipPrompt bool) (string, error) {
@@ -144,6 +139,7 @@ func performMethodCall(cmd *cobra.Command, method protoreflect.MethodDescriptor,
 	if err != nil {
 		return false, err
 	}
+	//goland:noinspection GoUnhandledErrorResult
 	defer cc.Close()
 
 	dialTime := 10 * time.Second
@@ -164,13 +160,21 @@ func performMethodCall(cmd *cobra.Command, method protoreflect.MethodDescriptor,
 	}
 
 	h := &grpcurl.DefaultEventHandler{
-		Out:       os.Stdout,
-		Formatter: formatter,
+		Out:            os.Stdout,
+		Formatter:      formatter,
+		VerbosityLevel: 0,
 	}
 
 	err = grpcurl.InvokeRPC(ctx, types.Rdk.DescriptorSource, cc, string(method.FullName()), nil, h, rf.Next)
 	if err != nil {
-		return false, err
+		if errStatus, ok := status.FromError(err); ok {
+			h.Status = errStatus
+		} else if strings.HasPrefix(err.Error(), "error getting request data:") {
+			cmd.PrintErrln(err.Error())
+			return false, nil
+		} else {
+			return false, err
+		}
 	}
 	if h.Status.Err() != nil {
 		cmd.PrintErrln(h.Status.Message())
@@ -180,23 +184,25 @@ func performMethodCall(cmd *cobra.Command, method protoreflect.MethodDescriptor,
 
 func runTestIntegration(
 	cmd *cobra.Command,
-	defaultMethod string,
+	execution *executionInfo,
 	data string,
 	skipPromptMethod bool,
 	skipPromptInput bool,
-) (protoreflect.MethodDescriptor, bool, error) {
-	method, err := promptMethod(defaultMethod, skipPromptMethod)
-	if err != nil {
-		return nil, false, err
+) error {
+	if execution.method == nil {
+		err := promptMethod(execution, skipPromptMethod)
+		if err != nil {
+			return err
+		}
 	}
 
 	if data == "" {
-		fields := method.Input().Fields()
+		fields := execution.method.Input().Fields()
 		for i := 0; i < fields.Len(); i++ {
 			field := fields.Get(i)
 			input, err := promptInput(field, skipPromptInput)
 			if err != nil {
-				return nil, false, err
+				return err
 			}
 
 			// separate fields with comma
@@ -209,12 +215,13 @@ func runTestIntegration(
 
 		if !json.Valid([]byte(data)) {
 			cmd.PrintErrln("invalid json")
-			return nil, false, nil
+			return nil
 		}
 	}
 
-	success, err := performMethodCall(cmd, method, data)
-	return method, success, err
+	success, err := performMethodCall(cmd, execution.method, data)
+	execution.success = success
+	return err
 }
 
 func CmdTestIntegration() *cobra.Command {
@@ -225,10 +232,19 @@ func CmdTestIntegration() *cobra.Command {
 		Use:   "test",
 		Short: "Test a runtime integration",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			execution := executionInfo{}
 			defaultMethod, _ := cmd.Flags().GetString(flagMethod)
+			if defaultMethod != "" {
+				execution.method = findDescriptorMethod(defaultMethod)
+				if execution.method == nil {
+					return errors.New(fmt.Sprintf("invalid gRPC method %s", defaultMethod))
+				}
+				setPosition(&execution)
+			}
+
 			defaultData, _ := cmd.Flags().GetString(flagData)
 			skip := cmd.Flags().Changed(yesFlag)
-			method, success, err := runTestIntegration(cmd, defaultMethod, defaultData, skip, skip)
+			err := runTestIntegration(cmd, &execution, defaultData, skip, skip)
 			if err != nil {
 				return err
 			}
@@ -239,18 +255,19 @@ func CmdTestIntegration() *cobra.Command {
 
 			for {
 				cmd.Println()
-				actionResult, err := promptAction(success)
+				actionResult, err := promptAction(execution.success)
 				if err != nil {
 					return err
 				}
 				switch actionResult {
 				case actionRetry:
-					method, success, err = runTestIntegration(cmd, string(method.Name()), "", true, false)
+					err = runTestIntegration(cmd, &execution, "", true, false)
 					if err != nil {
 						return err
 					}
 				case actionTestAnother:
-					method, success, err = runTestIntegration(cmd, "", "", false, false)
+					execution.method = nil
+					err = runTestIntegration(cmd, &execution, "", false, false)
 					if err != nil {
 						return err
 					}
