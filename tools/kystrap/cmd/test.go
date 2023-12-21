@@ -47,11 +47,7 @@ func setPosition(execution *executionInfo) {
 	}
 }
 
-func promptMethod(execution *executionInfo, skipPrompt bool) error {
-	if skipPrompt && execution.method == nil {
-		return errors.New("no gRPC method specified")
-	}
-
+func promptMethod(execution *executionInfo) error {
 	prompt := promptui.Select{
 		Label:     "Which method do you want to test?",
 		Items:     types.Rdk.MethodNames(),
@@ -83,10 +79,7 @@ func promptInput(field protoreflect.FieldDescriptor, fieldLabel string) (string,
 			}
 			data += input
 		}
-		if field.IsList() {
-			return fmt.Sprintf(`"%s": [%s]`, field.Name(), data), nil
-		}
-		if field.IsMap() || field.Message() != nil {
+		if field.IsList() || field.IsMap() || field.Message() != nil {
 			return fmt.Sprintf(`"%s": {%s}`, field.Name(), data), nil
 		}
 		return fmt.Sprintf(`"%s": "%s"`, field.Name(), data), nil
@@ -179,6 +172,24 @@ func printMethodDescription(cmd *cobra.Command, method protoreflect.MethodDescri
 	cmd.Println()
 }
 
+func printRequest(cmd *cobra.Command, data string) {
+	cmd.Printf("➡️ Request\n%s\n\n", data)
+}
+
+func printResponse(cmd *cobra.Command, h *grpcurl.DefaultEventHandler, data string) {
+	if h.Status.Err() != nil {
+		cmd.PrintErrln("⬅️ Response")
+		cmd.PrintErrf("%s %s (error code: %s)\n", promptui.IconBad, h.Status.Message(), h.Status.Code())
+	} else {
+		cmd.Printf("⬅️ Response\n%s", data)
+		cmd.Printf("%s %s %s\n", promptui.IconGood, h.Status.Code(), h.Status.Message())
+	}
+}
+
+func printError(cmd *cobra.Command, err error) {
+	cmd.Printf("%s %s\n", promptui.IconBad, err.Error())
+}
+
 func performMethodCall(cmd *cobra.Command, method protoreflect.MethodDescriptor, data string) (bool, error) {
 	cc, err := dial()
 	if err != nil {
@@ -216,7 +227,7 @@ func performMethodCall(cmd *cobra.Command, method protoreflect.MethodDescriptor,
 			h.Status = errStatus
 		} else if strings.HasPrefix(err.Error(), "error getting request data:") {
 			printMethodDescription(cmd, method)
-			cmd.PrintErrln(err.Error())
+			cmd.PrintErrf("%s %s\n", promptui.IconBad, err.Error())
 			return false, nil
 		} else {
 			return false, err
@@ -224,9 +235,12 @@ func performMethodCall(cmd *cobra.Command, method protoreflect.MethodDescriptor,
 	}
 	if h.Status.Err() != nil {
 		printMethodDescription(cmd, method)
-		cmd.PrintErrf("%s %s (error code: %s)\n", promptui.IconBad, h.Status.Message(), h.Status.Code())
+		printRequest(cmd, data)
+		printResponse(cmd, h, out.String())
 	} else {
-		cmd.Printf("➡️ Request\n%s\n\n⬅️ Response\n%s\n%s %s %s", data, out, promptui.IconGood, h.Status.Code(), h.Status.Message())
+		cmd.Println()
+		printRequest(cmd, data)
+		printResponse(cmd, h, out.String())
 	}
 	return h.Status.Err() == nil, nil
 }
@@ -239,23 +253,27 @@ func runTestIntegration(
 	skipPromptInput bool,
 ) error {
 	if execution.method == nil {
-		err := promptMethod(execution, skipPromptMethod)
+		if skipPromptMethod {
+			return errors.New("no gRPC method specified")
+		}
+
+		err := promptMethod(execution)
 		if err != nil {
 			return err
 		}
 	}
 
 	if data == "" {
+		if skipPromptInput {
+			return errors.New("no data specified")
+		}
+
 		fields := execution.method.Input().Fields()
 		for i := 0; i < fields.Len(); i++ {
 			field := fields.Get(i)
-			var input string
-			var err error
-			if !skipPromptInput {
-				input, err = promptInput(field, string(field.Name()))
-				if err != nil {
-					return err
-				}
+			input, err := promptInput(field, string(field.Name()))
+			if err != nil {
+				return err
 			}
 
 			// separate fields with comma
@@ -267,7 +285,7 @@ func runTestIntegration(
 		data = fmt.Sprintf(`{%s}`, data)
 
 		if !json.Valid([]byte(data)) {
-			cmd.PrintErrln("invalid json")
+			printError(cmd, errors.New("invalid JSON"))
 			return nil
 		}
 	}
