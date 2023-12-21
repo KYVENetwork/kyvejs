@@ -23,7 +23,7 @@ type executionInfo struct {
 	method   protoreflect.MethodDescriptor
 	position int
 	success  bool
-	host     string
+	address  string
 }
 
 func newExecutionInfo() executionInfo {
@@ -31,7 +31,7 @@ func newExecutionInfo() executionInfo {
 		method:   nil,
 		position: 0,
 		success:  false,
-		host:     "localhost:50051",
+		address:  "localhost:50051",
 	}
 }
 
@@ -63,20 +63,20 @@ var addressRegex = regexp.MustCompile(`^([a-zA-Z0-9-]+\.)*[a-zA-Z0-9-]+:([0-9]+)
 func promptAddress(execution *executionInfo) error {
 	validate := func(input string) error {
 		if !addressRegex.MatchString(input) {
-			return errors.New("invalid address... must be in the format host:port")
+			return errors.New("invalid address... must be in the format address:port")
 		}
 		return nil
 	}
 	prompt := promptui.Prompt{
-		Label:    "Enter the host and port of the runtime server",
-		Default:  execution.host,
+		Label:    "Enter the address and port of the runtime server",
+		Default:  execution.address,
 		Validate: validate,
 	}
 	result, err := prompt.Run()
 	if err != nil {
 		return err
 	}
-	execution.host = result
+	execution.address = result
 	return nil
 }
 
@@ -138,25 +138,15 @@ const (
 	actionExit        action = "Exit"
 )
 
-func promptAction(isYesNo bool) (action, error) {
-	if isYesNo {
-		prompt := promptui.Prompt{
-			Label:     "Continue",
-			IsConfirm: true,
-			Default:   "y",
-		}
-		result, err := prompt.Run()
-		if err != nil {
-			return actionExit, err
-		}
-		if strings.ToLower(result) == "y" || result == "" {
-			return actionTestAnother, nil
-		}
-		return actionExit, nil
+func promptAction(wasSuccess bool) (action, error) {
+	position := 0
+	if wasSuccess {
+		position = 1
 	}
 	prompt := promptui.Select{
-		Label: "What now?",
-		Items: []action{actionRetry, actionTestAnother, actionExit},
+		Label:     "What now?",
+		Items:     []action{actionRetry, actionTestAnother, actionExit},
+		CursorPos: position,
 	}
 	_, result, err := prompt.Run()
 	if err != nil {
@@ -165,7 +155,7 @@ func promptAction(isYesNo bool) (action, error) {
 	return action(result), nil
 }
 
-func dial(host string) (*grpc.ClientConn, error) {
+func dial(address string) (*grpc.ClientConn, error) {
 	dialTime := 10 * time.Second
 	ctx, cancel := context.WithTimeout(context.Background(), dialTime)
 	defer cancel()
@@ -177,7 +167,7 @@ func dial(host string) (*grpc.ClientConn, error) {
 
 	network := "tcp"
 
-	cc, err := grpcurl.BlockingDial(ctx, network, host, creds, opts...)
+	cc, err := grpcurl.BlockingDial(ctx, network, address, creds, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -318,7 +308,7 @@ func runTestIntegration(
 		}
 	}
 
-	success, err := performMethodCall(cmd, execution.host, execution.method, data)
+	success, err := performMethodCall(cmd, execution.address, execution.method, data)
 	execution.success = success
 	return err
 }
@@ -326,7 +316,7 @@ func runTestIntegration(
 func CmdTestIntegration() *cobra.Command {
 	const flagMethod = "method"
 	const flagData = "data"
-	const flagHost = "host"
+	const flagAddress = "address"
 
 	cmd := &cobra.Command{
 		Use:   "test",
@@ -335,7 +325,7 @@ func CmdTestIntegration() *cobra.Command {
 			execution := newExecutionInfo()
 			method, _ := cmd.Flags().GetString(flagMethod)
 			data, _ := cmd.Flags().GetString(flagData)
-			host, _ := cmd.Flags().GetString(flagHost)
+			address, _ := cmd.Flags().GetString(flagAddress)
 
 			if method != "" {
 				execution.method = findDescriptorMethod(method)
@@ -345,8 +335,8 @@ func CmdTestIntegration() *cobra.Command {
 				setPosition(&execution)
 			}
 
-			if host != "" {
-				execution.host = host
+			if address != "" {
+				execution.address = address
 			} else if !skipPrompts(cmd) {
 				err := promptAddress(&execution)
 				if err != nil {
@@ -391,7 +381,7 @@ func CmdTestIntegration() *cobra.Command {
 	}
 	cmd.Flags().StringP(flagMethod, "m", "", "gRPC method that you want to test")
 	cmd.Flags().StringP(flagData, "d", "", "data that you want to send with the gRPC method call")
-	cmd.Flags().StringP(flagHost, "H", "", "host and port of the runtime server (ex: localhost:50051)")
+	cmd.Flags().StringP(flagAddress, "a", "", "address and port of the runtime server (ex: localhost:50051)")
 	return cmd
 }
 
