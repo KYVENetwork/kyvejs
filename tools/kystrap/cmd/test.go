@@ -227,7 +227,7 @@ func performMethodCall(cmd *cobra.Command, method protoreflect.MethodDescriptor,
 			h.Status = errStatus
 		} else if strings.HasPrefix(err.Error(), "error getting request data:") {
 			printMethodDescription(cmd, method)
-			cmd.PrintErrf("%s %s\n", promptui.IconBad, err.Error())
+			printError(cmd, err)
 			return false, nil
 		} else {
 			return false, err
@@ -249,11 +249,9 @@ func runTestIntegration(
 	cmd *cobra.Command,
 	execution *executionInfo,
 	data string,
-	skipPromptMethod bool,
-	skipPromptInput bool,
 ) error {
 	if execution.method == nil {
-		if skipPromptMethod {
+		if skipPrompts(cmd) {
 			return errors.New("no gRPC method specified")
 		}
 
@@ -264,7 +262,7 @@ func runTestIntegration(
 	}
 
 	if data == "" {
-		if skipPromptInput {
+		if skipPrompts(cmd) {
 			return errors.New("no data specified")
 		}
 
@@ -314,14 +312,13 @@ func CmdTestIntegration() *cobra.Command {
 			}
 
 			defaultData, _ := cmd.Flags().GetString(flagData)
-			skip := cmd.Flags().Changed(yesFlag)
-			err := runTestIntegration(cmd, &execution, defaultData, skip, skip)
+			err := runTestIntegration(cmd, &execution, defaultData)
 			if err != nil {
 				return err
 			}
 
-			// if yes flag is set, don't prompt for action
-			if cmd.Flags().Changed(yesFlag) {
+			// if yes flag is set, don't prompt for actions
+			if skipPrompts(cmd) {
 				return nil
 			}
 
@@ -334,13 +331,13 @@ func CmdTestIntegration() *cobra.Command {
 				}
 				switch actionResult {
 				case actionRetry:
-					err = runTestIntegration(cmd, &execution, "", true, false)
+					err = runTestIntegration(cmd, &execution, "")
 					if err != nil {
 						return err
 					}
 				case actionTestAnother:
 					execution.method = nil
-					err = runTestIntegration(cmd, &execution, "", false, false)
+					err = runTestIntegration(cmd, &execution, "")
 					if err != nil {
 						return err
 					}

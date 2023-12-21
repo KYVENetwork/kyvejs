@@ -16,6 +16,10 @@ const (
 
 const yesFlag = "yes"
 
+func skipPrompts(cmd *cobra.Command) bool {
+	return cmd.Flags().Changed(yesFlag)
+}
+
 func promptOption() (option, error) {
 	var items = []option{create, test}
 
@@ -37,7 +41,7 @@ var rootCmd = &cobra.Command{
 
 		// Check if the yes flag is set
 		// -> if not ask the user what to do
-		if !cmd.Flags().Changed(yesFlag) {
+		if !skipPrompts(cmd) {
 			var err error
 			option, err = promptOption()
 			if err != nil {
