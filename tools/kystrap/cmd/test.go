@@ -1,22 +1,15 @@
 package cmd
 
 import (
-	"bytes"
-	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/KYVENetwork/kyvejs/tools/kystrap/grpcall"
 	"github.com/KYVENetwork/kyvejs/tools/kystrap/types"
-	"github.com/fullstorydev/grpcurl"
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
-	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"regexp"
 	"strings"
-	"time"
 )
 
 type executionInfo struct {
@@ -153,135 +146,7 @@ func promptAction(wasSuccess bool) (action, error) {
 	return action(result), nil
 }
 
-func printMethodDescription(cmd *cobra.Command, method protoreflect.MethodDescriptor) {
-	if isSimpleOutput(cmd) {
-		return
-	}
-
-	cmd.Printf("📜 Expected format for %s\n", method.Name())
-	fields := method.Input().Fields()
-	for i := 0; i < fields.Len(); i++ {
-		field := fields.Get(i)
-		if field.Message() != nil {
-			cmd.Printf("  - %s:\n", field.Name())
-			for j := 0; j < field.Message().Fields().Len(); j++ {
-				subField := field.Message().Fields().Get(j)
-				cmd.Printf("    - %s (%s)\n", subField.Name(), subField.Kind())
-			}
-			continue
-		}
-		cmd.Printf("  - %s (%s)\n", field.Name(), field.Kind())
-	}
-	cmd.Println()
-}
-
-func printRequest(cmd *cobra.Command, data string) {
-	if isSimpleOutput(cmd) {
-		return
-	}
-
-	cmd.Printf("➡️ Request\n%s\n\n", data)
-}
-
-func printResponse(cmd *cobra.Command, h *grpcurl.DefaultEventHandler, data string) {
-	if isSimpleOutput(cmd) {
-		if h.Status.Err() != nil {
-			cmd.PrintErrf("%s %d %s - %s\n", promptui.IconBad, h.Status.Code(), h.Status.Code(), h.Status.Message())
-		} else {
-			cmd.Printf(data)
-		}
-	} else {
-		if h.Status.Err() != nil {
-			cmd.PrintErrln("⬅️ Response")
-			cmd.PrintErrf("%s %d %s - %s\n", promptui.IconBad, h.Status.Code(), h.Status.Code(), h.Status.Message())
-		} else {
-			cmd.Printf("⬅️ Response\n%s", data)
-			cmd.Printf("%s %d %s %s\n", promptui.IconGood, h.Status.Code(), h.Status.Code(), h.Status.Message())
-		}
-	}
-}
-
-func printError(cmd *cobra.Command, err error) {
-	if isSimpleOutput(cmd) {
-		cmd.PrintErr(err)
-		return
-	}
-	cmd.PrintErrf("%s %s\n", promptui.IconBad, err.Error())
-}
-
-func dial(address string) (*grpc.ClientConn, error) {
-	dialTime := 10 * time.Second
-	ctx, cancel := context.WithTimeout(context.Background(), dialTime)
-	defer cancel()
-	var opts []grpc.DialOption
-	var creds credentials.TransportCredentials
-
-	grpcurlUA := "kystrap"
-	opts = append(opts, grpc.WithUserAgent(grpcurlUA))
-
-	network := "tcp"
-
-	cc, err := grpcurl.BlockingDial(ctx, network, address, creds, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return cc, nil
-}
-
-func performMethodCall(cmd *cobra.Command, address string, method protoreflect.MethodDescriptor, data string) (bool, error) {
-	cc, err := dial(address)
-	if err != nil {
-		return false, err
-	}
-	//goland:noinspection GoUnhandledErrorResult
-	defer cc.Close()
-
-	dialTime := 10 * time.Second
-	ctx, cancel := context.WithTimeout(context.Background(), dialTime)
-	defer cancel()
-
-	in := strings.NewReader(data)
-
-	options := grpcurl.FormatOptions{
-		EmitJSONDefaultFields: true,
-		AllowUnknownFields:    true,
-	}
-
-	rf, formatter, err := grpcurl.RequestParserAndFormatter(grpcurl.FormatJSON, types.Rdk.DescriptorSource, in, options)
-	if err != nil {
-		return false, err
-	}
-
-	out := new(bytes.Buffer)
-	h := &grpcurl.DefaultEventHandler{
-		Out:       out,
-		Formatter: formatter,
-	}
-
-	err = grpcurl.InvokeRPC(ctx, types.Rdk.DescriptorSource, cc, string(method.FullName()), nil, h, rf.Next)
-	if err != nil {
-		if errStatus, ok := status.FromError(err); ok {
-			h.Status = errStatus
-		} else if strings.HasPrefix(err.Error(), "error getting request data:") {
-			printMethodDescription(cmd, method)
-			printError(cmd, err)
-			return false, nil
-		} else {
-			return false, err
-		}
-	}
-	if h.Status.Err() != nil {
-		printMethodDescription(cmd, method)
-		printRequest(cmd, data)
-		printResponse(cmd, h, out.String())
-	} else {
-		printRequest(cmd, data)
-		printResponse(cmd, h, out.String())
-	}
-	return h.Status.Err() == nil, nil
-}
-
-func runMethodCall(
+func runMethodPrompts(
 	cmd *cobra.Command,
 	execution *executionInfo,
 	data string,
@@ -317,15 +182,10 @@ func runMethodCall(
 			data += input
 		}
 		data = fmt.Sprintf(`{%s}`, data)
-
-		if !json.Valid([]byte(data)) {
-			execution.success = false
-			printError(cmd, errors.New("invalid JSON"))
-			return nil
-		}
 	}
 
-	success, err := performMethodCall(cmd, execution.address, execution.method, data)
+	caller := grpcall.NewGrpcCaller(execution.address, isSimpleOutput(cmd), cmd)
+	success, err := caller.PerformMethodCall(execution.method, data)
 	execution.success = success
 	return err
 }
@@ -367,12 +227,12 @@ func CmdTestIntegration() *cobra.Command {
 				}
 			}
 
-			err := runMethodCall(cmd, &execution, data)
+			err := runMethodPrompts(cmd, &execution, data)
 			if err != nil {
 				return err
 			}
 
-			// if yes flag is set, don't prompt for actions
+			// if yes flag is set, don't prompt for further actions
 			if skipPrompts(cmd) {
 				return nil
 			}
@@ -386,13 +246,13 @@ func CmdTestIntegration() *cobra.Command {
 				}
 				switch actionResult {
 				case actionRetry:
-					err = runMethodCall(cmd, &execution, "")
+					err = runMethodPrompts(cmd, &execution, "")
 					if err != nil {
 						return err
 					}
 				case actionTestAnother:
 					execution.method = nil
-					err = runMethodCall(cmd, &execution, "")
+					err = runMethodPrompts(cmd, &execution, "")
 					if err != nil {
 						return err
 					}
