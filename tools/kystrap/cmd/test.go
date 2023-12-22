@@ -48,7 +48,8 @@ func findDescriptorMethod(name string) protoreflect.MethodDescriptor {
 	return nil
 }
 
-func setPosition(execution *executionInfo) {
+// setMethodPosition sets the position of the method in the list of methods
+func setMethodPosition(execution *executionInfo) {
 	if execution.method != nil {
 		for i := 0; i < types.Rdk.Methods.Len(); i++ {
 			if types.Rdk.Methods.Get(i).FullName() == execution.method.FullName() {
@@ -124,9 +125,6 @@ func promptInput(field protoreflect.FieldDescriptor, fieldLabel string) (string,
 	if err != nil {
 		return "", err
 	}
-	if field.IsList() || field.IsMap() || field.Message() != nil {
-		return fmt.Sprintf(`"%s": %s`, field.Name(), result), err
-	}
 	return fmt.Sprintf(`"%s": "%s"`, field.Name(), result), err
 }
 
@@ -155,27 +153,8 @@ func promptAction(wasSuccess bool) (action, error) {
 	return action(result), nil
 }
 
-func dial(address string) (*grpc.ClientConn, error) {
-	dialTime := 10 * time.Second
-	ctx, cancel := context.WithTimeout(context.Background(), dialTime)
-	defer cancel()
-	var opts []grpc.DialOption
-	var creds credentials.TransportCredentials
-
-	grpcurlUA := "kystrap"
-	opts = append(opts, grpc.WithUserAgent(grpcurlUA))
-
-	network := "tcp"
-
-	cc, err := grpcurl.BlockingDial(ctx, network, address, creds, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return cc, nil
-}
-
 func printMethodDescription(cmd *cobra.Command, method protoreflect.MethodDescriptor) {
-	if printSimpleOutput(cmd) {
+	if isSimpleOutput(cmd) {
 		return
 	}
 
@@ -197,7 +176,7 @@ func printMethodDescription(cmd *cobra.Command, method protoreflect.MethodDescri
 }
 
 func printRequest(cmd *cobra.Command, data string) {
-	if printSimpleOutput(cmd) {
+	if isSimpleOutput(cmd) {
 		return
 	}
 
@@ -205,7 +184,7 @@ func printRequest(cmd *cobra.Command, data string) {
 }
 
 func printResponse(cmd *cobra.Command, h *grpcurl.DefaultEventHandler, data string) {
-	if printSimpleOutput(cmd) {
+	if isSimpleOutput(cmd) {
 		if h.Status.Err() != nil {
 			cmd.PrintErrf("%s %d %s - %s\n", promptui.IconBad, h.Status.Code(), h.Status.Code(), h.Status.Message())
 		} else {
@@ -223,11 +202,30 @@ func printResponse(cmd *cobra.Command, h *grpcurl.DefaultEventHandler, data stri
 }
 
 func printError(cmd *cobra.Command, err error) {
-	if printSimpleOutput(cmd) {
+	if isSimpleOutput(cmd) {
 		cmd.PrintErr(err)
 		return
 	}
 	cmd.PrintErrf("%s %s\n", promptui.IconBad, err.Error())
+}
+
+func dial(address string) (*grpc.ClientConn, error) {
+	dialTime := 10 * time.Second
+	ctx, cancel := context.WithTimeout(context.Background(), dialTime)
+	defer cancel()
+	var opts []grpc.DialOption
+	var creds credentials.TransportCredentials
+
+	grpcurlUA := "kystrap"
+	opts = append(opts, grpc.WithUserAgent(grpcurlUA))
+
+	network := "tcp"
+
+	cc, err := grpcurl.BlockingDial(ctx, network, address, creds, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return cc, nil
 }
 
 func performMethodCall(cmd *cobra.Command, address string, method protoreflect.MethodDescriptor, data string) (bool, error) {
@@ -283,7 +281,7 @@ func performMethodCall(cmd *cobra.Command, address string, method protoreflect.M
 	return h.Status.Err() == nil, nil
 }
 
-func runTestIntegration(
+func runMethodCall(
 	cmd *cobra.Command,
 	execution *executionInfo,
 	data string,
@@ -334,7 +332,7 @@ func runTestIntegration(
 
 const flagSimple = "simple"
 
-func printSimpleOutput(cmd *cobra.Command) bool {
+func isSimpleOutput(cmd *cobra.Command) bool {
 	return cmd.Flags().Changed(flagSimple)
 }
 
@@ -357,7 +355,7 @@ func CmdTestIntegration() *cobra.Command {
 				if execution.method == nil {
 					return errors.New(fmt.Sprintf("invalid gRPC method %s", method))
 				}
-				setPosition(&execution)
+				setMethodPosition(&execution)
 			}
 
 			if address != "" {
@@ -369,7 +367,7 @@ func CmdTestIntegration() *cobra.Command {
 				}
 			}
 
-			err := runTestIntegration(cmd, &execution, data)
+			err := runMethodCall(cmd, &execution, data)
 			if err != nil {
 				return err
 			}
@@ -388,13 +386,13 @@ func CmdTestIntegration() *cobra.Command {
 				}
 				switch actionResult {
 				case actionRetry:
-					err = runTestIntegration(cmd, &execution, "")
+					err = runMethodCall(cmd, &execution, "")
 					if err != nil {
 						return err
 					}
 				case actionTestAnother:
 					execution.method = nil
-					err = runTestIntegration(cmd, &execution, "")
+					err = runMethodCall(cmd, &execution, "")
 					if err != nil {
 						return err
 					}
