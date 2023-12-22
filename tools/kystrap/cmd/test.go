@@ -163,10 +163,6 @@ func runMethodPrompts(
 	}
 
 	if data == "" {
-		if skipPrompts(cmd) {
-			return errors.New("no data specified")
-		}
-
 		fields := execution.method.Input().Fields()
 		for i := 0; i < fields.Len(); i++ {
 			field := fields.Get(i)

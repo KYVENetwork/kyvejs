@@ -126,6 +126,10 @@ reviewed and approved your PR it can be merged and used.
 
 **NOTE**: The usage of [Conventional Commits](https://conventionalcommits.org) is required when creating PRs and committing to this repository
 
+### How to write a KYVE integration
+
+[Develop a new KYVE integration](./tools/kystrap/README.md)
+
 ## How to release
 
 In order to release new changes which got merged into `main` lerna can be used. Lerna will look into every change and create a new release tag if necessary. After the user has approved the new version tags (bumped according to [Semantic Versioning](https://semver.org/)) lerna will push those new tags to `main`, starting the CI/CD pipeline and creating the releases.

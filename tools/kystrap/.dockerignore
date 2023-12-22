@@ -1,3 +1,6 @@
 .idea
 **/out
+
+# Ignore source files not needed to build released binaries
 start.sh
+README.md
