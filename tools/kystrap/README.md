@@ -31,7 +31,7 @@ You can then test all gRPC methods that your integration needs to implement.
 <br>
 **Examples for testing:**
 
-You can use the wizard in non-interactive mode to test your integration.
+You can use the wizard in interactive or non-interactive mode to test your integration.
 ```bash
 # test command structure
 yarn bootstrap:integration test -a <host>:<port> -m <method> -d <data>
