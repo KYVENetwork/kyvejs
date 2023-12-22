@@ -40,12 +40,12 @@ type {{ .name | ToPascal }}TransformedItemValue struct {
 
 // GetRuntimeName returns the name of the runtime. Example "@kyvejs/tendermint"
 func (t *{{ .name | ToPascal }}Server) GetRuntimeName(ctx context.Context, req *pb.GetRuntimeNameRequest) (*pb.GetRuntimeNameResponse, error) {
-	return &pb.GetRuntimeNameResponse{Name: "@docker/tendermint-go"}, nil
+	return &pb.GetRuntimeNameResponse{Name: "@kyvejs/{{ .name | ToLower }}"}, nil
 }
 
 // GetRuntimeVersion returns the version of the runtime. Example "1.2.0"
 func (t *{{ .name | ToPascal }}Server) GetRuntimeVersion(ctx context.Context, req *pb.GetRuntimeVersionRequest) (*pb.GetRuntimeVersionResponse, error) {
-	return &pb.GetRuntimeVersionResponse{Version: "0.0.1"}, nil
+	return &pb.GetRuntimeVersionResponse{Version: "{{ .version }}"}, nil
 }
 
 // ValidateSetConfig parses the raw runtime config found on pool, validates it and finally sets

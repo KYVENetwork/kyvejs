@@ -22,7 +22,7 @@ This is the {{ .name | ToTitle }} runtime server.
 * Running the runtime container::
 
     ```bash
-      make run-container
+      make docker-run
     ```
 
 
