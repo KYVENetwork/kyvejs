@@ -73,7 +73,7 @@ var _ = Describe(fmt.Sprintf("e2e Tests"), Ordered, func() {
 	})
 
 	AfterAll(func() {
-		//_ = interchain.Close()
+		_ = interchain.Close()
 	})
 
 	It("Test block production", func() {

@@ -11,6 +11,7 @@ import (
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/archive"
+
 	"io"
 	"os"
 	"path/filepath"
@@ -107,6 +108,11 @@ func DockerBuild() {
 	if err != nil {
 		panic(err)
 	}
+
+	err = buildImage(cli, "testapi", "testapi")
+	if err != nil {
+		panic(err)
+	}
 }
 
 func DockerCleanup(cli *client.Client) {
@@ -134,14 +140,23 @@ func DockerCleanup(cli *client.Client) {
 	}
 }
 
-func runDocker(ctx context.Context, cli *client.Client, image string, env []string, networkId string) error {
+func runDocker(
+	ctx context.Context,
+	cli *client.Client,
+	image string,
+	env []string,
+	networkId string,
+	binds []string,
+) error {
 	r, err := cli.ContainerCreate(
 		ctx,
 		&container.Config{
 			Image: image,
 			Env:   env,
 		},
-		nil,
+		&container.HostConfig{
+			Binds: binds,
+		},
 		&network.NetworkingConfig{
 			EndpointsConfig: map[string]*network.EndpointSettings{
 				networkId: {},
@@ -159,6 +174,17 @@ func runDocker(ctx context.Context, cli *client.Client, image string, env []stri
 		return err
 	}
 	return nil
+}
+
+func getTestDataBinds(path string) ([]string, error) {
+	path, err := filepath.Abs(fmt.Sprintf("%s/testdata", path))
+	if err != nil {
+		return nil, err
+	}
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		return nil, errors.New("testdata does not exist")
+	}
+	return []string{fmt.Sprintf("%s:/app/api:ro", path)}, nil
 }
 
 var (
@@ -182,8 +208,7 @@ func DockerRun(cli *client.Client, networkId string) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
 	defer cancel()
 
-	//env := append(protocolEnv, fmt.Sprintf("HOST=%s", networkId))
-
+	// Find the first validator container to get the RPC and REST endpoints
 	valContainer := ""
 	containers, err := cli.ContainerList(ctx, types.ContainerListOptions{})
 	if err != nil {
@@ -192,6 +217,11 @@ func DockerRun(cli *client.Client, networkId string) {
 	for _, cont := range containers {
 		if strings.Contains(cont.Names[0], "val") && strings.Contains(cont.Names[0], "kyve") {
 			valContainer = cont.Names[0]
+
+			// Remove slash if it exists at the beginning
+			if valContainer[0] == '/' {
+				valContainer = valContainer[1:]
+			}
 			break
 		}
 	}
@@ -199,47 +229,24 @@ func DockerRun(cli *client.Client, networkId string) {
 		panic("validator container not found")
 	}
 
-	env := append(protocolEnv, fmt.Sprintf("RPC=http:/%s:26657", valContainer))
-	env = append(env, fmt.Sprintf("REST=http:/%s:1317", valContainer))
+	env := append(protocolEnv, fmt.Sprintf("RPC=http://%s:26657", valContainer))
+	env = append(env, fmt.Sprintf("REST=http://%s:1317", valContainer))
 
-	err = runDocker(ctx, cli, "protocol", env, networkId)
+	err = runDocker(ctx, cli, "protocol", env, networkId, nil)
 	if err != nil {
 		panic(err)
 	}
 
-	err = runDocker(ctx, cli, "tendermint", []string{}, networkId)
+	err = runDocker(ctx, cli, "tendermint", []string{}, networkId, nil)
 	if err != nil {
 		panic(err)
 	}
 
-	//runBusyBox(ctx, cli, networkId)
-}
-
-// TODO: remove
-func runBusyBox(ctx context.Context, cli *client.Client, networkId string) {
-	r, err := cli.ContainerCreate(
-		ctx,
-		&container.Config{
-			Image:        "busybox",
-			AttachStderr: true,
-			AttachStdout: true,
-			AttachStdin:  true,
-			Tty:          true,
-		},
-		nil,
-		&network.NetworkingConfig{
-			EndpointsConfig: map[string]*network.EndpointSettings{
-				networkId: {},
-			},
-		},
-		nil,
-		"busybox",
-	)
+	binds, err := getTestDataBinds("../integrations/tendermint")
 	if err != nil {
 		panic(err)
 	}
-
-	err = cli.ContainerStart(ctx, r.ID, types.ContainerStartOptions{})
+	err = runDocker(ctx, cli, "testapi", []string{}, networkId, binds)
 	if err != nil {
 		panic(err)
 	}

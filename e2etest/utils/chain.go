@@ -37,69 +37,69 @@ var MainnetConfig = ibc.ChainConfig{
 	EncodingConfig:      nil,
 }
 
-//func ModifyGenesis(config ibc.ChainConfig, genbz []byte) ([]byte, error) {
-//	genesis := make(map[string]interface{})
-//	_ = json.Unmarshal(genbz, &genesis)
-//
-//	balances, _ := dyno.GetSlice(genesis, "app_state", "bank", "balances")
-//	balances = append(balances, bankTypes.Balance{
-//		Address: "kyve1e29j95xmsw3zmvtrk4st8e89z5n72v7nf70ma4",
-//		Coins:   sdk.NewCoins(sdk.NewCoin(config.Denom, math.NewInt(165_000_000_000_000))),
-//	})
-//	_ = dyno.Set(genesis, balances, "app_state", "bank", "balances")
-//
-//	_ = dyno.Set(genesis, math.LegacyMustNewDecFromStr("0.5"),
-//		"app_state", "global", "params", "min_initial_deposit_ratio",
-//	)
-//
-//	_ = dyno.Set(genesis, "10s",
-//		"app_state", "gov", "voting_params", "voting_period",
-//	)
-//	_ = dyno.Set(genesis, "0",
-//		"app_state", "gov", "deposit_params", "min_deposit", 0, "amount",
-//	)
-//	_ = dyno.Set(genesis, config.Denom,
-//		"app_state", "gov", "deposit_params", "min_deposit", 0, "denom",
-//	)
-//
-//	_ = dyno.Set(genesis, "0.169600000000000000",
-//		"app_state", "pool", "params", "protocol_inflation_share",
-//	)
-//	_ = dyno.Set(genesis, "0.050000000000000000",
-//		"app_state", "pool", "params", "pool_inflation_payout_rate",
-//	)
-//
-//	newGenesis, _ := json.Marshal(genesis)
-//	return newGenesis, nil
-//}
-
-func ModifyGenesis(config ibc.ChainConfig, genbz []byte) ([]byte, error) {
-	genesis := make(map[string]interface{})
-	_ = json.Unmarshal(genbz, &genesis)
-
+func mergeWithConfigOverrides(genesis map[string]interface{}) error {
 	yamlFile, err := os.ReadFile("data/config.yml")
 	if err != nil {
-		return nil, err
+		return err
 	}
 	var yamlObj interface{}
 	err = yaml.Unmarshal(yamlFile, &yamlObj)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	jsonData, err := json.Marshal(yamlObj)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	var jsonObj map[string]interface{}
 	err = json.Unmarshal(jsonData, &jsonObj)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	poolObj := jsonObj["genesis"].(map[string]interface{})["app_state"].(map[string]interface{})["pool"].(map[string]interface{})
+	appState := jsonObj["genesis"].(map[string]interface{})["app_state"]
+	poolObj := appState.(map[string]interface{})["pool"].(map[string]interface{})
 	err = dyno.Set(genesis, poolObj, "app_state", "pool")
+	if err != nil {
+		return err
+	}
+
+	stakerList := appState.(map[string]interface{})["stakers"].(map[string]interface{})["staker_list"]
+	err = dyno.Set(genesis, stakerList, "app_state", "stakers", "staker_list")
+	if err != nil {
+		return err
+	}
+	valaccountList := appState.(map[string]interface{})["stakers"].(map[string]interface{})["valaccount_list"]
+	err = dyno.Set(genesis, valaccountList, "app_state", "stakers", "valaccount_list")
+	if err != nil {
+		return err
+	}
+
+	funderList := appState.(map[string]interface{})["funders"].(map[string]interface{})["funder_list"]
+	err = dyno.Set(genesis, funderList, "app_state", "funders", "funder_list")
+	if err != nil {
+		return err
+	}
+	fundingList := appState.(map[string]interface{})["funders"].(map[string]interface{})["funding_list"]
+	err = dyno.Set(genesis, fundingList, "app_state", "funders", "funding_list")
+	if err != nil {
+		return err
+	}
+	fundingStateList := appState.(map[string]interface{})["funders"].(map[string]interface{})["funding_state_list"]
+	err = dyno.Set(genesis, fundingStateList, "app_state", "funders", "funding_state_list")
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func ModifyGenesis(config ibc.ChainConfig, genbz []byte) ([]byte, error) {
+	genesis := make(map[string]interface{})
+	_ = json.Unmarshal(genbz, &genesis)
+
+	err := mergeWithConfigOverrides(genesis)
 	if err != nil {
 		return nil, err
 	}
@@ -108,23 +108,15 @@ func ModifyGenesis(config ibc.ChainConfig, genbz []byte) ([]byte, error) {
 	balances = append(balances, bankTypes.Balance{
 		Address: "kyve1e29j95xmsw3zmvtrk4st8e89z5n72v7nf70ma4",
 		Coins:   sdk.NewCoins(sdk.NewCoin(config.Denom, math.NewInt(165_000_000_000_000))),
+	}, bankTypes.Balance{
+		Address: "kyve1jq304cthpx0lwhpqzrdjrcza559ukyy3zsl2vd", // Alice
+		Coins:   sdk.NewCoins(sdk.NewCoin(config.Denom, math.NewInt(100_000_000))),
+	}, bankTypes.Balance{
+		Address: "kyve1aw5gtwz50g7u60geulppjwqlev2klqgvhnzu6k", // Alice's valaccount
+		Coins:   sdk.NewCoins(sdk.NewCoin(config.Denom, math.NewInt(100_000_000))),
 	})
 	_ = dyno.Set(genesis, balances, "app_state", "bank", "balances")
 
 	newGenesis, _ := json.Marshal(genesis)
 	return newGenesis, nil
 }
-
-//func ModifyGenesis(config ibc.ChainConfig, genbz []byte) ([]byte, error) {
-//	yamlFile, err := os.ReadFile("data/config.yml")
-//	if err != nil {
-//		return nil, err
-//	}
-//	var cfg interface{}
-//	err = yaml.Unmarshal(yamlFile, &cfg)
-//	if err != nil {
-//		return nil, err
-//	}
-//
-//	return json.Marshal(cfg)
-//}

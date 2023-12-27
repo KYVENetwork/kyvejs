@@ -5,7 +5,7 @@ genesis:
         protocol_inflation_share: "0.04"
       pool_count: "2"
       pool_list:
-        - config: "{\"network\":\"kyve-1\",\"rpc\":\"https://rpc-eu-1.kyve.network\"}"
+        - config: "{\"network\":\"dydx-mainnet-1\",\"rpc\":\"http://testapi:8080\"}"
           current_compression_id: "1"
           current_index: "0"
           current_key: ""
@@ -13,15 +13,15 @@ genesis:
           current_summary: ""
           id: "0"
           logo: ""
-          max_bundle_size: "100"
-          min_delegation: "100000000000"
+          max_bundle_size: "2"
+          min_delegation: "0"
           name: "KYVE // Mainnet"
           inflation_share_weight: "2500000000"
           disabled: false
           runtime: '@kyvejs/tendermint'
           start_key: "1"
           total_bundles: "0"
-          upload_interval: "60"
+          upload_interval: "10"
           protocol:
             version: "1.0.0"
             binaries: "{\"kyve-linux-arm64\":\"https://github.com/KYVENetwork/kyvejs/releases/download/%40kyvejs%2Ftendermint-bsync%401.0.0/kyve-linux-arm64.zip\",\"kyve-linux-x64\":\"https://github.com/KYVENetwork/kyvejs/releases/download/%40kyvejs%2Ftendermint-bsync%401.0.0/kyve-linux-x64.zip\",\"kyve-macos-x64\":\"https://github.com/KYVENetwork/kyvejs/releases/download/%40kyvejs%2Ftendermint-bsync%401.0.0/kyve-macos-x64.zip\"}"
@@ -31,29 +31,36 @@ genesis:
             binaries: ""
             scheduled_at: "0"
             duration: "0"
-        - config: "{\"network\":\"kyve-1\",\"rpc\":\"https://rpc-eu-1.kyve.network\"}"
-          current_compression_id: "1"
-          current_index: "0"
-          current_key: ""
-          current_storage_provider_id: "3"
-          current_summary: ""
-          id: "1"
-          logo: ""
-          max_bundle_size: "100"
-          min_delegation: "100000000000"
-          name: "KYVE // Blub"
-          inflation_share_weight: "2500000000"
-          disabled: false
-          runtime: '@kyvejs/tendermint-bsync'
-          start_key: "1"
-          total_bundles: "0"
-          upload_interval: "60"
-          protocol:
-            version: "1.0.0"
-            binaries: "{\"kyve-linux-arm64\":\"https://github.com/KYVENetwork/kyvejs/releases/download/%40kyvejs%2Ftendermint-bsync%401.0.0/kyve-linux-arm64.zip\",\"kyve-linux-x64\":\"https://github.com/KYVENetwork/kyvejs/releases/download/%40kyvejs%2Ftendermint-bsync%401.0.0/kyve-linux-x64.zip\",\"kyve-macos-x64\":\"https://github.com/KYVENetwork/kyvejs/releases/download/%40kyvejs%2Ftendermint-bsync%401.0.0/kyve-macos-x64.zip\"}"
-            last_upgrade: "0"
-          upgrade_plan:
-            version: ""
-            binaries: ""
-            scheduled_at: "0"
-            duration: "0"
+    stakers:
+      staker_list:
+        - address: kyve1jq304cthpx0lwhpqzrdjrcza559ukyy3zsl2vd
+          commission: '0.050000000000000000'
+          commission_rewards: '155370271'
+          details: 'Local staker'
+          identity: E2F682FDCE16CE9D
+          moniker: lolka666
+          security_contact: ''
+          website: ''
+      valaccount_list:
+        - is_leaving: false
+          points: '0'
+          pool_id: '0'
+          staker: kyve1jq304cthpx0lwhpqzrdjrcza559ukyy3zsl2vd
+          valaddress: kyve1aw5gtwz50g7u60geulppjwqlev2klqgvhnzu6k
+    funders:
+      funder_list:
+        - address: "kyve1jq304cthpx0lwhpqzrdjrcza559ukyy3zsl2vd"
+          contact: "https://twitter.com/kyvenetwork"
+          moniker: "Alice"
+          description: "Alice is the first funder of the KYVE network."
+          website: "https://kyve.network"
+          identity: "0657A086E5201562"
+      funding_list:
+        - pool_id: 0
+          funder_address: "kyve1jq304cthpx0lwhpqzrdjrcza559ukyy3zsl2vd"
+          amount: 5000000000000
+          amount_per_bundle: 230000000
+          total_funded: 2200400000000
+      funding_state_list:
+        - pool_id: 0
+          active_funder_addresses: [ "kyve1jq304cthpx0lwhpqzrdjrcza559ukyy3zsl2vd" ]
