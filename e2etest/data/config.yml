@@ -1,15 +1,19 @@
 genesis:
   app_state:
-    pool:
+    bundles:
       params:
-        protocol_inflation_share: "0.04"
-      pool_count: "2"
+        max_points: "6"
+        network_fee: "0.010000000000000000"
+        storage_cost: "0.019230000000000000"
+        upload_timeout: "40"
+    pool:
+      pool_count: "1"
       pool_list:
         - config: "{\"network\":\"dydx-mainnet-1\",\"rpc\":\"http://testapi:8080\"}"
           current_compression_id: "1"
           current_index: "0"
           current_key: ""
-          current_storage_provider_id: "3"
+          current_storage_provider_id: "4"
           current_summary: ""
           id: "0"
           logo: ""
@@ -21,7 +25,7 @@ genesis:
           runtime: '@kyvejs/tendermint'
           start_key: "1"
           total_bundles: "0"
-          upload_interval: "10"
+          upload_interval: "30"
           protocol:
             version: "1.0.0"
             binaries: "{\"kyve-linux-arm64\":\"https://github.com/KYVENetwork/kyvejs/releases/download/%40kyvejs%2Ftendermint-bsync%401.0.0/kyve-linux-arm64.zip\",\"kyve-linux-x64\":\"https://github.com/KYVENetwork/kyvejs/releases/download/%40kyvejs%2Ftendermint-bsync%401.0.0/kyve-linux-x64.zip\",\"kyve-macos-x64\":\"https://github.com/KYVENetwork/kyvejs/releases/download/%40kyvejs%2Ftendermint-bsync%401.0.0/kyve-macos-x64.zip\"}"
@@ -36,9 +40,25 @@ genesis:
         - address: kyve1jq304cthpx0lwhpqzrdjrcza559ukyy3zsl2vd
           commission: '0.050000000000000000'
           commission_rewards: '155370271'
-          details: 'Local staker'
+          details: 'Alice staker'
           identity: E2F682FDCE16CE9D
-          moniker: lolka666
+          moniker: alice
+          security_contact: ''
+          website: ''
+        - address: kyve1hvg7zsnrj6h29q9ss577mhrxa04rn94h7zjugq
+          commission: '0.050000000000000000'
+          commission_rewards: '155370271'
+          details: 'Bob staker'
+          identity: C45E04E869534A66
+          moniker: bob
+          security_contact: ''
+          website: ''
+        - address: kyve1khwd59xmxs26fxwc9sqkwpuy9jxym3a485rzgf
+          commission: '0.050000000000000000'
+          commission_rewards: '155370271'
+          details: 'Viktor staker'
+          identity: 8358D3174763D23C
+          moniker: viktor
           security_contact: ''
           website: ''
       valaccount_list:
@@ -47,6 +67,59 @@ genesis:
           pool_id: '0'
           staker: kyve1jq304cthpx0lwhpqzrdjrcza559ukyy3zsl2vd
           valaddress: kyve1aw5gtwz50g7u60geulppjwqlev2klqgvhnzu6k
+        - is_leaving: false
+          points: '0'
+          pool_id: '0'
+          staker: kyve1hvg7zsnrj6h29q9ss577mhrxa04rn94h7zjugq
+          valaddress: kyve15azz593mwcg6k2uxdt974ax5q2j6dxa8vhnx4m
+        - is_leaving: false
+          points: '0'
+          pool_id: '0'
+          staker: kyve1khwd59xmxs26fxwc9sqkwpuy9jxym3a485rzgf
+          valaddress: kyve1fsll7rjlx49z5gnfj03pagaql3z4z2ejnalmnx
+    delegation:
+      delegator_list:
+        - delegator: kyve1jq304cthpx0lwhpqzrdjrcza559ukyy3zsl2vd
+          initial_amount: "100000000"
+          k_index: "0"
+          staker: kyve1jq304cthpx0lwhpqzrdjrcza559ukyy3zsl2vd
+        - delegator: kyve1hvg7zsnrj6h29q9ss577mhrxa04rn94h7zjugq
+          initial_amount: "100000000"
+          k_index: "0"
+          staker: kyve1hvg7zsnrj6h29q9ss577mhrxa04rn94h7zjugq
+        - delegator: kyve1khwd59xmxs26fxwc9sqkwpuy9jxym3a485rzgf
+          initial_amount: "100000000"
+          k_index: "0"
+          staker: kyve1khwd59xmxs26fxwc9sqkwpuy9jxym3a485rzgf
+      delegation_entry_list:
+        - k_index: "0"
+          staker: kyve1jq304cthpx0lwhpqzrdjrcza559ukyy3zsl2vd
+          value: "0"
+        - k_index: "0"
+          staker: kyve1hvg7zsnrj6h29q9ss577mhrxa04rn94h7zjugq
+          value: "0"
+        - k_index: "0"
+          staker: kyve1khwd59xmxs26fxwc9sqkwpuy9jxym3a485rzgf
+          value: "0"
+      delegation_data_list:
+        - current_rewards: "0"
+          delegator_count: "1"
+          latest_index_k: "0"
+          latest_index_was_undelegation: false
+          staker: kyve1jq304cthpx0lwhpqzrdjrcza559ukyy3zsl2vd
+          total_delegation: "100000000"
+        - current_rewards: "0"
+          delegator_count: "1"
+          latest_index_k: "0"
+          latest_index_was_undelegation: false
+          staker: kyve1hvg7zsnrj6h29q9ss577mhrxa04rn94h7zjugq
+          total_delegation: "100000000"
+        - current_rewards: "0"
+          delegator_count: "1"
+          latest_index_k: "0"
+          latest_index_was_undelegation: false
+          staker: kyve1khwd59xmxs26fxwc9sqkwpuy9jxym3a485rzgf
+          total_delegation: "100000000"
     funders:
       funder_list:
         - address: "kyve1jq304cthpx0lwhpqzrdjrcza559ukyy3zsl2vd"
