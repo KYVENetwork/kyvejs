@@ -2,6 +2,7 @@ package e2etest
 
 import (
 	"context"
+	"cosmossdk.io/math"
 	"fmt"
 	"github.com/KYVENetwork/kyvejs/e2etest/utils"
 	"github.com/docker/docker/client"
@@ -64,16 +65,22 @@ var _ = Describe(fmt.Sprintf("e2e Tests"), Ordered, func() {
 		})
 		Expect(err).To(BeNil())
 
-		utils.DockerRun(client, network)
-
 		//wallets := interchaintest.GetAndFundTestUsers(
 		//	GinkgoT(), ctx, GinkgoT().Name(), math.NewInt(10_000_000_000), kyve,
 		//)
 		//kyveWallet = wallets[0].(*cosmos.CosmosWallet)
+
+		for _, mnemonic := range utils.Mnemonics {
+			_, err = interchaintest.GetAndFundTestUserWithMnemonic(ctx, "e2e-test", mnemonic, math.NewInt(10_000_000_000_000), kyve)
+			Expect(err).To(BeNil())
+		}
+
+		utils.DockerRun(client, network)
 	})
 
 	AfterAll(func() {
 		_ = interchain.Close()
+		utils.DockerCleanup(client)
 	})
 
 	It("Test block production", func() {

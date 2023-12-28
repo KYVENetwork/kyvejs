@@ -91,6 +91,7 @@ func buildImage(dockerClient *client.Client, buildPath string, tag string) error
 	return nil
 }
 
+// TODO: make async
 func DockerBuild() {
 	cli, err := client.NewClientWithOpts(client.FromEnv)
 	if err != nil {
@@ -140,30 +141,41 @@ func DockerCleanup(cli *client.Client) {
 	}
 }
 
+type ContainerConfig struct {
+	image     string
+	name      string
+	networkId string
+	env       []string
+	binds     []string
+	volumes   []string
+}
+
 func runDocker(
 	ctx context.Context,
 	cli *client.Client,
-	image string,
-	env []string,
-	networkId string,
-	binds []string,
+	config ContainerConfig,
 ) error {
+	volumesMap := map[string]struct{}{}
+	for _, volume := range config.volumes {
+		volumesMap[volume] = struct{}{}
+	}
 	r, err := cli.ContainerCreate(
 		ctx,
 		&container.Config{
-			Image: image,
-			Env:   env,
+			Image:   config.image,
+			Env:     config.env,
+			Volumes: volumesMap,
 		},
 		&container.HostConfig{
-			Binds: binds,
+			Binds: config.binds,
 		},
 		&network.NetworkingConfig{
 			EndpointsConfig: map[string]*network.EndpointSettings{
-				networkId: {},
+				config.networkId: {},
 			},
 		},
 		nil,
-		image,
+		config.name,
 	)
 	if err != nil {
 		return err
@@ -189,15 +201,15 @@ func getTestDataBinds(path string) ([]string, error) {
 
 var (
 	protocolEnv = []string{
-		"VALACCOUNT=artist final stage coffee coach stable quantum feed catch bridge pond like ranch steel insane hold vital horse catalog battle company suspect satoshi famous",
+		fmt.Sprintf("VALACCOUNT=%s", AliceValaccountMnemonic),
 		"HOST=tendermint",
 		"POOL=0",
 		"STORAGE_PRIV=",
-		"REQUEST_BACKOFF=50",
+		"REQUEST_BACKOFF=5",
 		"CACHE=jsonfile",
 		"METRICS=false",
 		"METRICS_PORT=8080",
-		"CHAIN_ID=kaon-1",
+		"CHAIN_ID=kyve-1",
 		//"RPC=https://rpc-eu-1.kaon.kyve.network",
 		//"REST=https://api-eu-1.kaon.kyve.network",
 		"DEBUG=false",
@@ -229,24 +241,56 @@ func DockerRun(cli *client.Client, networkId string) {
 		panic("validator container not found")
 	}
 
-	env := append(protocolEnv, fmt.Sprintf("RPC=http://%s:26657", valContainer))
-	env = append(env, fmt.Sprintf("REST=http://%s:1317", valContainer))
-
-	err = runDocker(ctx, cli, "protocol", env, networkId, nil)
-	if err != nil {
-		panic(err)
-	}
-
-	err = runDocker(ctx, cli, "tendermint", []string{}, networkId, nil)
-	if err != nil {
-		panic(err)
-	}
-
 	binds, err := getTestDataBinds("../integrations/tendermint")
 	if err != nil {
 		panic(err)
 	}
-	err = runDocker(ctx, cli, "testapi", []string{}, networkId, binds)
+	testapiConfig := ContainerConfig{
+		image:     "testapi",
+		name:      "testapi",
+		networkId: networkId,
+		binds:     binds,
+	}
+	err = runDocker(ctx, cli, testapiConfig)
+	if err != nil {
+		panic(err)
+	}
+
+	integrationConfig := ContainerConfig{
+		image:     "tendermint",
+		name:      "tendermint",
+		networkId: networkId,
+	}
+	err = runDocker(ctx, cli, integrationConfig)
+	if err != nil {
+		panic(err)
+	}
+
+	env := append(protocolEnv, fmt.Sprintf("RPC=http://%s:26657", valContainer))
+	env = append(env, fmt.Sprintf("REST=http://%s:1317", valContainer))
+
+	protocolConfig := ContainerConfig{
+		image:     "protocol",
+		name:      "protocol-alice",
+		networkId: networkId,
+		env:       env,
+		volumes:   []string{"/app/localstorage"},
+	}
+	err = runDocker(ctx, cli, protocolConfig)
+	if err != nil {
+		panic(err)
+	}
+
+	protocolConfig.name = "protocol-bob"
+	protocolConfig.env[0] = fmt.Sprintf("VALACCOUNT=%s", BobValaccountMnemonic)
+	err = runDocker(ctx, cli, protocolConfig)
+	if err != nil {
+		panic(err)
+	}
+
+	protocolConfig.name = "protocol-viktor"
+	protocolConfig.env[0] = fmt.Sprintf("VALACCOUNT=%s", ViktorValaccountMnemonic)
+	err = runDocker(ctx, cli, protocolConfig)
 	if err != nil {
 		panic(err)
 	}
