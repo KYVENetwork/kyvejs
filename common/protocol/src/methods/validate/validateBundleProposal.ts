@@ -237,14 +237,50 @@ export async function validateBundleProposal(
           this.logger.debug(
             `this.runtime.validateDataItem($THIS, $PROPOSED_DATA_ITEM, $VALIDATION_DATA_ITEM)`
           );
-          const vote = await this.runtime.validateDataItem(
-            this,
-            proposedBundle[i],
-            validationBundle[i]
-          );
+          const vote = await this.runtime
+            .validateDataItem(this, proposedBundle[i], validationBundle[i])
+            .catch((err) => {
+              this.logger.error(
+                `Unexpected error validating data item with runtime. Voting abstain ...`
+              );
+              this.logger.error(standardizeError(err));
+
+              this.archiveDebugBundle(
+                VoteType.VOTE_TYPE_ABSTAIN,
+                proposedBundle,
+                validationBundle,
+                {
+                  reason: "unexpected error validating data item with runtime",
+                  err: err,
+                  proposed: proposedBundle[i],
+                  validation: validationBundle[i],
+                }
+              );
+
+              return null;
+            });
+
+          // vote abstain if vote is null
+          if (vote === null) {
+            const success = await this.voteBundleProposal(
+              this.pool.bundle_proposal!.storage_id,
+              VoteType.VOTE_TYPE_ABSTAIN
+            );
+            return success;
+          }
 
           // vote abstain if data item validation returned abstain
           if (vote === VoteType.VOTE_TYPE_ABSTAIN) {
+            // archive local abstain bundle for debug purposes
+            this.archiveDebugBundle(
+              VoteType.VOTE_TYPE_ABSTAIN,
+              proposedBundle,
+              validationBundle,
+              {
+                reason: "custom runtime validation returned abstain",
+              }
+            );
+
             const success = await this.voteBundleProposal(
               this.pool.bundle_proposal!.storage_id,
               VoteType.VOTE_TYPE_ABSTAIN
@@ -275,19 +311,31 @@ export async function validateBundleProposal(
         `Finished validating bundle by custom runtime validation. Result = ${valid}`
       );
 
+      let bundleSummary;
+
       // only continue with bundle summary validation if proposed bundle is valid
       if (valid) {
         // vote invalid if bundle summary does not match with proposed summary
         this.logger.debug(`Validating bundle proposal by bundle summary`);
         this.logger.debug(`this.runtime.summarizeDataBundle($PROPOSED_BUNDLE)`);
 
-        const bundleSummary = await this.runtime
+        bundleSummary = await this.runtime
           .summarizeDataBundle(this, proposedBundle)
           .catch((err) => {
             this.logger.error(
               `Unexpected error summarizing bundle with runtime. Voting abstain ...`
             );
             this.logger.error(standardizeError(err));
+
+            this.archiveDebugBundle(
+              VoteType.VOTE_TYPE_ABSTAIN,
+              proposedBundle,
+              validationBundle,
+              {
+                reason: "unexpected error summarizing bundle with runtime",
+                err: err,
+              }
+            );
 
             return null;
           });
@@ -312,21 +360,20 @@ export async function validateBundleProposal(
         this.logger.debug(
           `Finished validating bundle by bundle summary. Result = ${valid}`
         );
+      }
 
-        if (!valid) {
-          // archive local invalid bundle for debug purposes
-          this.archiveDebugBundle(
-            VoteType.VOTE_TYPE_INVALID,
-            proposedBundle,
-            validationBundle,
-            {
-              reason:
-                "custom data item validation failed or bundle summary mismatches",
-              proposed: this.pool.bundle_proposal!.bundle_summary,
-              validation: bundleSummary,
-            }
-          );
-        }
+      if (!valid) {
+        // archive local invalid bundle for debug purposes
+        this.archiveDebugBundle(
+          VoteType.VOTE_TYPE_INVALID,
+          proposedBundle,
+          validationBundle,
+          {
+            reason: "custom runtime validation returned invalid",
+            proposed: this.pool.bundle_proposal!.bundle_summary,
+            validation: bundleSummary,
+          }
+        );
       }
 
       // vote with either valid or invalid
