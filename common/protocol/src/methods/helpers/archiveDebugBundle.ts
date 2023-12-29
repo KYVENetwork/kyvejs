@@ -25,6 +25,8 @@ export function archiveDebugBundle(
   metadata: object
 ): void {
   try {
+    this.logger.info("Archiving debug bundle");
+
     // if "debug" folder under target path does not exist create it
     if (!existsSync(path.join(this.home, `debug`))) {
       mkdirSync(path.join(this.home, `debug`), { recursive: true });
@@ -89,10 +91,9 @@ export function archiveDebugBundle(
     const zipPath = path.join(
       this.home,
       `debug`,
-      `${voteType}_${Math.floor(Date.now() / 1000)}_${storageId.slice(
-        0,
-        6
-      )}.zip`
+      `${voteType}_${this.pool.id}_${Math.floor(
+        Date.now() / 1000
+      )}_${storageId.slice(0, 6)}.zip`
     );
 
     // save zip file
@@ -101,6 +102,10 @@ export function archiveDebugBundle(
       .pipe(createWriteStream(zipPath))
       .on("finish", () => {
         this.logger.info("Successfully saved debug information");
+      })
+      .on("error", (err) => {
+        this.logger.error("Failed to save debug information");
+        this.logger.error(standardizeError(err));
       });
   } catch (err) {
     this.logger.error("Failed to save debug information");
