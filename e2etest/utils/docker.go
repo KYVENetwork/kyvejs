@@ -9,6 +9,7 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/network"
+	"github.com/docker/docker/api/types/volume"
 	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/archive"
 
@@ -17,6 +18,11 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+)
+
+const (
+	kyveStorageName = "kyvestorage"
+	kyveStoragePath = "/tmp/kyvestorage"
 )
 
 type ErrorLine struct {
@@ -139,6 +145,11 @@ func DockerCleanup(cli *client.Client) {
 			panic(err)
 		}
 	}
+
+	err = cli.VolumeRemove(ctx, kyveStorageName, true)
+	if err != nil {
+		panic(err)
+	}
 }
 
 type ContainerConfig struct {
@@ -147,7 +158,6 @@ type ContainerConfig struct {
 	networkId string
 	env       []string
 	binds     []string
-	volumes   []string
 }
 
 func runDocker(
@@ -155,16 +165,11 @@ func runDocker(
 	cli *client.Client,
 	config ContainerConfig,
 ) error {
-	volumesMap := map[string]struct{}{}
-	for _, volume := range config.volumes {
-		volumesMap[volume] = struct{}{}
-	}
 	r, err := cli.ContainerCreate(
 		ctx,
 		&container.Config{
-			Image:   config.image,
-			Env:     config.env,
-			Volumes: volumesMap,
+			Image: config.image,
+			Env:   config.env,
 		},
 		&container.HostConfig{
 			Binds: config.binds,
@@ -269,12 +274,17 @@ func DockerRun(cli *client.Client, networkId string) {
 	env := append(protocolEnv, fmt.Sprintf("RPC=http://%s:26657", valContainer))
 	env = append(env, fmt.Sprintf("REST=http://%s:1317", valContainer))
 
+	vol, err := cli.VolumeCreate(ctx, volume.CreateOptions{Name: kyveStorageName})
+	if err != nil {
+		panic(err)
+	}
+
 	protocolConfig := ContainerConfig{
 		image:     "protocol",
 		name:      "protocol-alice",
 		networkId: networkId,
 		env:       env,
-		volumes:   []string{"/app/localstorage"},
+		binds:     []string{fmt.Sprintf("%s:%s", vol.Name, kyveStoragePath)},
 	}
 	err = runDocker(ctx, cli, protocolConfig)
 	if err != nil {

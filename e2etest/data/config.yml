@@ -5,7 +5,7 @@ genesis:
         max_points: "6"
         network_fee: "0.010000000000000000"
         storage_cost: "0.019230000000000000"
-        upload_timeout: "40"
+        upload_timeout: "10"
     pool:
       pool_count: "1"
       pool_list:
@@ -25,7 +25,7 @@ genesis:
           runtime: '@kyvejs/tendermint'
           start_key: "1"
           total_bundles: "0"
-          upload_interval: "30"
+          upload_interval: "10"
           protocol:
             version: "1.0.0"
             binaries: "{\"kyve-linux-arm64\":\"https://github.com/KYVENetwork/kyvejs/releases/download/%40kyvejs%2Ftendermint-bsync%401.0.0/kyve-linux-arm64.zip\",\"kyve-linux-x64\":\"https://github.com/KYVENetwork/kyvejs/releases/download/%40kyvejs%2Ftendermint-bsync%401.0.0/kyve-linux-x64.zip\",\"kyve-macos-x64\":\"https://github.com/KYVENetwork/kyvejs/releases/download/%40kyvejs%2Ftendermint-bsync%401.0.0/kyve-macos-x64.zip\"}"
@@ -121,19 +121,6 @@ genesis:
           staker: kyve1khwd59xmxs26fxwc9sqkwpuy9jxym3a485rzgf
           total_delegation: "100000000"
     funders:
-      funder_list:
-        - address: "kyve1jq304cthpx0lwhpqzrdjrcza559ukyy3zsl2vd"
-          contact: "https://twitter.com/kyvenetwork"
-          moniker: "Alice"
-          description: "Alice is the first funder of the KYVE network."
-          website: "https://kyve.network"
-          identity: "0657A086E5201562"
-      funding_list:
-        - pool_id: 0
-          funder_address: "kyve1jq304cthpx0lwhpqzrdjrcza559ukyy3zsl2vd"
-          amount: 5000000000000
-          amount_per_bundle: 230000000
-          total_funded: 2200400000000
       funding_state_list:
         - pool_id: 0
           active_funder_addresses: [ "kyve1jq304cthpx0lwhpqzrdjrcza559ukyy3zsl2vd" ]
