@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/api/types/volume"
 	"github.com/docker/docker/client"
@@ -23,6 +24,7 @@ import (
 const (
 	kyveStorageName = "kyvestorage"
 	kyveStoragePath = "/tmp/kyvestorage"
+	cleanupLabel    = "kyve-e2e-test"
 )
 
 type ErrorLine struct {
@@ -80,6 +82,7 @@ func buildImage(dockerClient *client.Client, buildPath string, tag string) error
 		Dockerfile: "Dockerfile",
 		Tags:       []string{tag},
 		Remove:     true,
+		Labels:     map[string]string{cleanupLabel: ""},
 	}
 	res, err := dockerClient.ImageBuild(ctx, tar, opts)
 	if err != nil {
@@ -126,12 +129,11 @@ func DockerCleanup(cli *client.Client) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*60*5)
 	defer cancel()
 
-	// TODO: filter by label or name
 	containers, err := cli.ContainerList(ctx, types.ContainerListOptions{
 		All: true,
-		//Filters: filters.NewArgs(
-		//	filters.Arg("label", CleanupLabel+"="+t.Name()),
-		//),
+		Filters: filters.NewArgs(
+			filters.Arg("label", fmt.Sprintf("%s=", cleanupLabel)),
+		),
 	})
 	if err != nil {
 		panic(err)
@@ -225,6 +227,7 @@ func DockerRun(cli *client.Client, networkId string) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
 	defer cancel()
 
+	// TODO: use client.GetNode()... something like that
 	// Find the first validator container to get the RPC and REST endpoints
 	valContainer := ""
 	containers, err := cli.ContainerList(ctx, types.ContainerListOptions{})
