@@ -73,8 +73,8 @@ var _ = Describe(fmt.Sprintf("e2e Tests"), Ordered, func() {
 		ctx = context.Background()
 		client, network = interchaintest.DockerSetup(GinkgoT())
 
-		utils.DockerCleanup(client)
-		utils.DockerBuild()
+		err = utils.DockerBuild()
+		Expect(err).To(BeNil())
 
 		err = interchain.Build(ctx, nil, interchaintest.InterchainBuildOptions{
 			TestName:         GinkgoT().Name(),
@@ -107,8 +107,15 @@ var _ = Describe(fmt.Sprintf("e2e Tests"), Ordered, func() {
 	})
 
 	AfterAll(func() {
-		_ = interchain.Close()
-		utils.DockerCleanup(client)
+		err := interchain.Close()
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		err = utils.DockerCleanup(client)
+		if err != nil {
+			fmt.Println(err)
+		}
 	})
 
 	It("Test finalized bundles", func() {

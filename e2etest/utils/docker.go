@@ -22,9 +22,19 @@ import (
 )
 
 const (
+	// kyveStorageName is the name of the volume used for kyve storage
 	kyveStorageName = "kyvestorage"
+	// kyveStoragePath is the path where kyve stores its data inside the container
 	kyveStoragePath = "/tmp/kyvestorage"
-	cleanupLabel    = "kyve-e2e-test"
+	// cleanupLabel is the label used to identify containers and volumes that should be cleaned up
+	cleanupLabel = "kyve-e2e-test"
+
+	// protocolPath is the path to the protocol folder
+	protocolPath = "../common/protocol"
+	// testapiPath is the path to the testapi folder
+	testapiPath = "testapi"
+	// integrationPath is the path to the integrations folder
+	integrationPath = "../integrations"
 )
 
 type ErrorLine struct {
@@ -100,32 +110,72 @@ func buildImage(dockerClient *client.Client, buildPath string, tag string) error
 	return nil
 }
 
-// TODO: make async
-func DockerBuild() {
+type BuildData struct {
+	Path string
+	Tag  string
+}
+
+func buildImageAsync(dockerClient *client.Client, image BuildData, errCh chan<- error) {
+	go func() {
+		err := buildImage(dockerClient, image.Path, image.Tag)
+		errCh <- err
+	}()
+}
+
+func DockerBuild() error {
 	cli, err := client.NewClientWithOpts(client.FromEnv)
 	if err != nil {
-		panic(fmt.Errorf("failed to create docker client: %v", err))
+		return fmt.Errorf("failed to create docker client: %v", err)
 	}
 	//goland:noinspection GoUnhandledErrorResult
 	defer cli.Close()
 
-	err = buildImage(cli, "../common/protocol", "protocol")
+	// First, cleanup any old containers and volumes
+	err = DockerCleanup(cli)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
-	err = buildImage(cli, "../integrations/tendermint", "tendermint")
-	if err != nil {
-		panic(err)
+	images := []BuildData{
+		{protocolPath, "protocol"},
+		{testapiPath, "testapi"},
 	}
 
-	err = buildImage(cli, "testapi", "testapi")
+	// Find all subfolders in the integrations folder and build them
+	integrationsPath, err := filepath.Abs(integrationPath)
 	if err != nil {
-		panic(err)
+		return err
 	}
+	integrations, err := os.ReadDir(integrationsPath)
+	if err != nil {
+		return err
+	}
+	for _, integration := range integrations {
+		if integration.IsDir() {
+			images = append(images, BuildData{
+				Path: filepath.Join(integrationsPath, integration.Name()),
+				Tag:  fmt.Sprintf("integration-%s", integration.Name()),
+			})
+		}
+	}
+
+	errChs := make([]chan error, len(images))
+
+	for i, img := range images {
+		errChs[i] = make(chan error)
+		buildImageAsync(cli, img, errChs[i])
+	}
+
+	for _, errCh := range errChs {
+		err := <-errCh
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
-func DockerCleanup(cli *client.Client) {
+func DockerCleanup(cli *client.Client) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*60*5)
 	defer cancel()
 
@@ -136,7 +186,7 @@ func DockerCleanup(cli *client.Client) {
 		),
 	})
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	for _, cont := range containers {
@@ -144,14 +194,11 @@ func DockerCleanup(cli *client.Client) {
 			Force: true,
 		})
 		if err != nil {
-			panic(err)
+			return err
 		}
 	}
 
-	err = cli.VolumeRemove(ctx, kyveStorageName, true)
-	if err != nil {
-		panic(err)
-	}
+	return cli.VolumeRemove(ctx, kyveStorageName, true)
 }
 
 type ContainerConfig struct {
