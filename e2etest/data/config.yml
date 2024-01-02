@@ -9,7 +9,7 @@ genesis:
     pool:
       pool_count: "1"
       pool_list:
-        - config: "{\"network\":\"dydx-mainnet-1\",\"rpc\":\"http://testapi:8080\"}"
+        - config: "{\"network\":\"dydx-mainnet-1\",\"rpc\":\"http://testapi-integration-tendermint:8080\"}"
           current_compression_id: "1"
           current_index: "0"
           current_key: ""

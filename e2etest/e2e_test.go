@@ -20,9 +20,9 @@ import (
 	"time"
 )
 
-func TestKyveJsIntegrations(t *testing.T) {
+func TestIntegrations(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, fmt.Sprint("Kyvejs e2e Tests"))
+	RunSpecs(t, fmt.Sprint("Kyvejs integration tests"))
 }
 
 func getFinalizedBundles(client querytypes.QueryBundlesClient) *querytypes.QueryFinalizedBundlesResponse {
@@ -50,7 +50,10 @@ var _ = Describe(fmt.Sprintf("e2e Tests"), Ordered, func() {
 	var broadcaster *cosmos.Broadcaster
 	var queryBundlesClient querytypes.QueryBundlesClient
 
+	// TODO: remove this var
 	var kyveWallet *cosmos.CosmosWallet
+
+	var protocolRunner *utils.ProtocolRunner
 
 	BeforeAll(func() {
 		numFullNodes := 0
@@ -73,7 +76,8 @@ var _ = Describe(fmt.Sprintf("e2e Tests"), Ordered, func() {
 		ctx = context.Background()
 		client, network = interchaintest.DockerSetup(GinkgoT())
 
-		err = utils.DockerBuild()
+		protocolRunner = utils.NewProtocolRunner()
+		err = protocolRunner.Build()
 		Expect(err).To(BeNil())
 
 		err = interchain.Build(ctx, nil, interchaintest.InterchainBuildOptions{
@@ -93,17 +97,18 @@ var _ = Describe(fmt.Sprintf("e2e Tests"), Ordered, func() {
 			Client: kyveChain.GetNode().Client,
 		})
 
-		wallets := interchaintest.GetAndFundTestUsers(
-			GinkgoT(), ctx, "testuser", math.NewInt(10_000_000_000), kyveChain,
-		)
-		kyveWallet = wallets[0].(*cosmos.CosmosWallet)
+		//wallets := interchaintest.GetAndFundTestUsers(
+		//	GinkgoT(), ctx, "testuser", math.NewInt(10_000_000_000), kyveChain,
+		//)
+		//kyveWallet = wallets[0].(*cosmos.CosmosWallet)
 
 		for _, mnemonic := range utils.Mnemonics {
 			_, err = interchaintest.GetAndFundTestUserWithMnemonic(ctx, "e2e-test", mnemonic, math.NewInt(10_000_000_000_000), kyveChain)
 			Expect(err).To(BeNil())
 		}
 
-		utils.DockerRun(client, network)
+		err = protocolRunner.Run(client, network, kyveChain.GetAPIAddress(), kyveChain.GetRPCAddress())
+		Expect(err).To(BeNil())
 	})
 
 	AfterAll(func() {
@@ -112,7 +117,7 @@ var _ = Describe(fmt.Sprintf("e2e Tests"), Ordered, func() {
 			fmt.Println(err)
 		}
 
-		err = utils.DockerCleanup(client)
+		err = protocolRunner.Cleanup(client)
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -126,13 +131,16 @@ var _ = Describe(fmt.Sprintf("e2e Tests"), Ordered, func() {
 			return len(bundles.FinalizedBundles) == waitForBundles, nil
 		})
 		if err != nil {
+			// If the test times out, print the finalized bundles
 			fmt.Println(getFinalizedBundles(queryBundlesClient))
+			Fail(err.Error())
 		}
-		Expect(err).To(BeNil())
 
+		// TODO: remove this check
 		bundles := getFinalizedBundles(queryBundlesClient)
 		Expect(len(bundles.FinalizedBundles)).To(Equal(waitForBundles))
 
+		// TODO: remove this check
 		Expect(kyveWallet).NotTo(BeNil())
 	})
 })
