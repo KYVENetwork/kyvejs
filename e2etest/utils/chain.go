@@ -63,13 +63,13 @@ type Account struct {
 	Name     string
 }
 
-var Mnemonics = []string{
-	Alice.Mnemonic,
-	AliceValaccount.Mnemonic,
-	Bob.Mnemonic,
-	BobValaccount.Mnemonic,
-	Viktor.Mnemonic,
-	ViktorValaccount.Mnemonic,
+var Accounts = []Account{
+	Alice,
+	AliceValaccount,
+	Bob,
+	BobValaccount,
+	Viktor,
+	ViktorValaccount,
 }
 
 var MainnetConfig = ibc.ChainConfig{
@@ -81,16 +81,15 @@ var MainnetConfig = ibc.ChainConfig{
 		Version:    version,
 		UidGid:     uidGid,
 	}},
-	Bin:                 "kyved",
-	Bech32Prefix:        "kyve",
-	Denom:               "ukyve",
-	GasPrices:           "0.02ukyve",
-	GasAdjustment:       5,
-	TrustingPeriod:      "112h",
-	NoHostMount:         false,
-	ModifyGenesis:       ModifyGenesis,
-	ConfigFileOverrides: nil,
-	EncodingConfig:      nil,
+	Bin:            "kyved",
+	Bech32Prefix:   "kyve",
+	Denom:          "ukyve",
+	GasPrices:      "0.02ukyve",
+	GasAdjustment:  5,
+	TrustingPeriod: "112h",
+	NoHostMount:    false,
+	ModifyGenesis:  modifyGenesis,
+	//PreGenesis:     preGenesis,
 }
 
 func mergeWithConfigOverrides(genesis map[string]interface{}) error {
@@ -147,14 +146,14 @@ func mergeWithConfigOverrides(genesis map[string]interface{}) error {
 	return nil
 }
 
-func ModifyGenesis(config ibc.ChainConfig, genbz []byte) ([]byte, error) {
+func modifyGenesis(config ibc.ChainConfig, genbz []byte) ([]byte, error) {
 	genesis := make(map[string]interface{})
 	_ = json.Unmarshal(genbz, &genesis)
 
-	err := mergeWithConfigOverrides(genesis)
-	if err != nil {
-		return nil, err
-	}
+	//err := mergeWithConfigOverrides(genesis)
+	//if err != nil {
+	//	return nil, err
+	//}
 
 	balances, _ := dyno.GetSlice(genesis, "app_state", "bank", "balances")
 	balances = append(balances, bankTypes.Balance{
@@ -165,4 +164,19 @@ func ModifyGenesis(config ibc.ChainConfig, genbz []byte) ([]byte, error) {
 
 	newGenesis, _ := json.Marshal(genesis)
 	return newGenesis, nil
+}
+
+func init() {
+	accountAddressPrefix := "kyve"
+	accountPubKeyPrefix := accountAddressPrefix + "pub"
+	validatorAddressPrefix := accountAddressPrefix + "valoper"
+	validatorPubKeyPrefix := accountAddressPrefix + "valoperpub"
+	consNodeAddressPrefix := accountAddressPrefix + "valcons"
+	consNodePubKeyPrefix := accountAddressPrefix + "valconspub"
+
+	config := sdk.GetConfig()
+	config.SetBech32PrefixForAccount(accountAddressPrefix, accountPubKeyPrefix)
+	config.SetBech32PrefixForValidator(validatorAddressPrefix, validatorPubKeyPrefix)
+	config.SetBech32PrefixForConsensusNode(consNodeAddressPrefix, consNodePubKeyPrefix)
+	config.Seal()
 }
