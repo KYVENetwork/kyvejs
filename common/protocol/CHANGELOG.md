@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.2](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/protocol@1.1.1...@kyvejs/protocol@1.1.2) (2024-01-03)
+
+### Bug Fixes
+
+- abort if different bundle round was returned from api ([#113](https://github.com/KYVENetwork/kyvejs/issues/113)) ([ccac962](https://github.com/KYVENetwork/kyvejs/commit/ccac96240ddd4550d15d0970f7e4ffb33feeb188))
+- archive debug bundle on invalid vote and added unit tests ([#112](https://github.com/KYVENetwork/kyvejs/issues/112)) ([800d4a1](https://github.com/KYVENetwork/kyvejs/commit/800d4a1e9b1897d8572c178769c87c8f4b0e1599))
+
 ## [1.1.1](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/protocol@1.1.0...@kyvejs/protocol@1.1.1) (2023-12-15)
 
 ### Bug Fixes
