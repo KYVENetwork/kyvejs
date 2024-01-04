@@ -24,23 +24,12 @@ func TestIntegrations(t *testing.T) {
 
 var _ = Describe(fmt.Sprintf("Protocol e2e Tests"), Ordered, func() {
 	var interchain *interchaintest.Interchain
-	var executor *utils.Executor
+	var executor = utils.NewExecutor()
 	var protocolRunner = utils.NewProtocolRunner()
 	var testConfigs []*utils.TestConfig
-
-	var getTestConfig = func(name string) *utils.TestConfig {
-		for _, testConfig := range testConfigs {
-			if testConfig.Integration == name {
-				return testConfig
-			}
-		}
-		Fail(fmt.Sprintf("Test config for integration %s not found", name))
-		return nil
-	}
+	var integrationNames = protocolRunner.GetIntegrationDirs()
 
 	BeforeAll(func() {
-		integrationNames := protocolRunner.GetIntegrationDirs()
-
 		var ctx = context.Background()
 		for _, integration := range integrationNames {
 			testConfigs = append(testConfigs, &utils.TestConfig{
@@ -86,11 +75,12 @@ var _ = Describe(fmt.Sprintf("Protocol e2e Tests"), Ordered, func() {
 				WithGas(flags.DefaultGasLimit * 10)
 		})
 
-		executor = utils.NewExecutor(kyveChain, broadcaster)
+		executor.Init(kyveChain, broadcaster)
 
+		// Stake Alice's token to give her voting power
 		executor.DelegateToValidator(ctx, testConfigs[0].Alice.ProtocolNode, 9_000_000_000_000)
 
-		// Create one pool for every integration
+		// Create one pool for every integration (per gov proposal)
 		for _, name := range integrationNames {
 			executor.CreatePool(name, testConfigs[0].Alice.ProtocolNode)
 		}
@@ -102,7 +92,7 @@ var _ = Describe(fmt.Sprintf("Protocol e2e Tests"), Ordered, func() {
 
 		// Start the protocol nodes and all dependencies
 		protocolRunner.Init(network, kyveChain.GetAPIAddress(), kyveChain.GetRPCAddress())
-		err = protocolRunner.Run(client, network)
+		err = protocolRunner.RunProtocolIntegrations(client, network)
 		Expect(err).To(BeNil())
 
 		// Wait for all pools to be created (gov proposals)
@@ -139,32 +129,48 @@ var _ = Describe(fmt.Sprintf("Protocol e2e Tests"), Ordered, func() {
 		}
 	})
 
-	for _, integration := range protocolRunner.GetIntegrationDirs() {
-		Describe(fmt.Sprintf("Test protocol integration %s", integration), func() {
-			It(fmt.Sprintf("Test finalized bundles for %s", integration), func() {
-				testConfig := getTestConfig(integration)
-
-				err := protocolRunner.RunProtocolNodes(testConfig)
-				Expect(err).To(BeNil())
-
-				// Join the pool with 3 protocol nodes
-				executor.JoinPool(testConfig.Alice.ProtocolNode, testConfig.Alice.Valaccount, testConfig.PoolId)
-				executor.JoinPool(testConfig.Bob.ProtocolNode, testConfig.Bob.Valaccount, testConfig.PoolId)
-				executor.JoinPool(testConfig.Viktor.ProtocolNode, testConfig.Viktor.Valaccount, testConfig.PoolId)
-
-				// Wait for 4 finalized bundles to be created
-				waitForBundles := 4
-				err = testutil.WaitForCondition(10*time.Minute, 5*time.Second, func() (bool, error) {
-					return len(executor.GetFinalizedBundles(testConfig.PoolId).FinalizedBundles) == waitForBundles, nil
-				})
-				Expect(err).To(
-					BeNil(),
-					fmt.Sprintf("Failed to wait for %d finalized bundles\n"+
-						"Finaziled Bundles: %s",
-						waitForBundles,
-						executor.GetFinalizedBundles(testConfig.PoolId)),
-				)
-			})
-		})
+	for _, integration := range integrationNames {
+		generateProtocolNodeTest(protocolRunner, executor, integration, &testConfigs)
 	}
 })
+
+func generateProtocolNodeTest(protocolRunner *utils.ProtocolRunner, executor *utils.Executor, integration string, testConfigs *[]*utils.TestConfig) {
+	var getTestConfig = func(name string) *utils.TestConfig {
+		for _, testConfig := range *testConfigs {
+			if testConfig.Integration == name {
+				return testConfig
+			}
+		}
+		Fail(fmt.Sprintf("Test config for integration %s not found", name))
+		return nil
+	}
+
+	Describe(fmt.Sprintf("Test protocol integration %s", integration), func() {
+		It(fmt.Sprintf("Test finalized bundles for %s", integration), func() {
+			testConfig := getTestConfig(integration)
+
+			err := protocolRunner.RunProtocolNodes(testConfig)
+			Expect(err).To(BeNil())
+			//goland:noinspection GoUnhandledErrorResult
+			defer protocolRunner.StopProtocolNodes(testConfig)
+
+			// Join the pool with 3 protocol nodes
+			executor.JoinPool(testConfig.Alice.ProtocolNode, testConfig.Alice.Valaccount, testConfig.PoolId)
+			executor.JoinPool(testConfig.Bob.ProtocolNode, testConfig.Bob.Valaccount, testConfig.PoolId)
+			executor.JoinPool(testConfig.Viktor.ProtocolNode, testConfig.Viktor.Valaccount, testConfig.PoolId)
+
+			// Wait for 4 finalized bundles to be created
+			waitForBundles := 4
+			err = testutil.WaitForCondition(10*time.Minute, 5*time.Second, func() (bool, error) {
+				return len(executor.GetFinalizedBundles(testConfig.PoolId).FinalizedBundles) == waitForBundles, nil
+			})
+			Expect(err).To(
+				BeNil(),
+				fmt.Sprintf("Failed to wait for %d finalized bundles\n"+
+					"Finaziled Bundles: %s",
+					waitForBundles,
+					executor.GetFinalizedBundles(testConfig.PoolId)),
+			)
+		})
+	})
+}

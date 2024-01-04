@@ -55,6 +55,13 @@ func NewProtocolRunner() *ProtocolRunner {
 	return &ProtocolRunner{}
 }
 
+func (pc *ProtocolRunner) Init(networkId string, restAddress string, rpcAddress string) {
+	pc.networkId = networkId
+	pc.restAddress = restAddress
+	pc.rpcAddress = rpcAddress
+	pc.isInitialized = true
+}
+
 type dockerConfig struct {
 	path  string
 	tag   string
@@ -360,6 +367,10 @@ func kyveStorageVolumeName(integrationTag string) string {
 	return fmt.Sprintf("%s-%s", kyveStorageName, integrationTag)
 }
 
+func protocolContainerName(protocolConfig dockerConfig, integrationConfig *dockerConfig, pc ProtocolConfig) string {
+	return fmt.Sprintf("%s-%s-%s", protocolConfig.tag, integrationConfig.tag, pc.ProtocolNode.KeyName())
+}
+
 func (pc *ProtocolRunner) getVolume(integrationTag string) string {
 	volName := kyveStorageVolumeName(integrationTag)
 	for _, vol := range pc.dockerVolumes {
@@ -370,7 +381,7 @@ func (pc *ProtocolRunner) getVolume(integrationTag string) string {
 	panic(fmt.Sprintf("volume %s not found", volName))
 }
 
-func (pc *ProtocolRunner) Run(cli *client.Client, networkId string) error {
+func (pc *ProtocolRunner) RunProtocolIntegrations(cli *client.Client, networkId string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10*time.Duration(len(pc.integrationConfigs)))
 	defer cancel()
 
@@ -394,32 +405,8 @@ func (pc *ProtocolRunner) Run(cli *client.Client, networkId string) error {
 		if err != nil {
 			return err
 		}
-
-		//testConfig, err := integrationConfig.findTestConfig(testConfigs)
-		//if err != nil {
-		//	return err
-		//}
-
-		//// Run protocol with multiple protocol nodes
-		//for _, cfg := range testConfig.GetProtocolConfigs() {
-		//	containerName = fmt.Sprintf("%s-%s-%s", pc.protocolConfig.tag, integrationConfig.tag, cfg.ProtocolNode.KeyName())
-		//	env := getProtocolEnv(cfg.Valaccount.Mnemonic(), rpcAddress, restAddress, integrationConfig.tag)
-		//	protocolConfig := pc.protocolConfig.toContainerConfig(containerName, networkId, env)
-		//	protocolConfig.binds = []string{fmt.Sprintf("%s:%s", pc.getVolume(integrationConfig.tag), kyveStorageMountProtocol)}
-		//	err = runDocker(ctx, cli, protocolConfig)
-		//	if err != nil {
-		//		return err
-		//	}
-		//}
 	}
 	return nil
-}
-
-func (pc *ProtocolRunner) Init(networkId string, restAddress string, rpcAddress string) {
-	pc.networkId = networkId
-	pc.restAddress = restAddress
-	pc.rpcAddress = rpcAddress
-	pc.isInitialized = true
 }
 
 func (pc *ProtocolRunner) findDockerConfig(testConfig *TestConfig) (*dockerConfig, error) {
@@ -453,7 +440,7 @@ func (pc *ProtocolRunner) RunProtocolNodes(testConfig *TestConfig) error {
 
 	// Run protocol with multiple protocol nodes
 	for _, cfg := range testConfig.GetProtocolConfigs() {
-		containerName := fmt.Sprintf("%s-%s-%s", pc.protocolConfig.tag, integrationConfig.tag, cfg.ProtocolNode.KeyName())
+		containerName := protocolContainerName(pc.protocolConfig, integrationConfig, cfg)
 		env := getProtocolEnv(cfg.Valaccount.Mnemonic(), pc.rpcAddress, pc.restAddress, integrationConfig.tag)
 		protocolConfig := pc.protocolConfig.toContainerConfig(containerName, pc.networkId, env)
 		protocolConfig.binds = []string{fmt.Sprintf("%s:%s", pc.getVolume(integrationConfig.tag), kyveStorageMountProtocol)}
@@ -465,10 +452,44 @@ func (pc *ProtocolRunner) RunProtocolNodes(testConfig *TestConfig) error {
 	return nil
 }
 
-func (pc *ProtocolRunner) GetIntegrationContainerNames() []string {
-	names := make([]string, len(pc.integrationConfigs))
-	for i, config := range pc.integrationConfigs {
-		names[i] = config.tag
+func (pc *ProtocolRunner) StopProtocolNodes(testConfig *TestConfig) error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*60)
+	defer cancel()
+
+	cli, err := client.NewClientWithOpts()
+	if err != nil {
+		return fmt.Errorf("failed to create docker client: %v", err)
 	}
-	return names
+	//goland:noinspection GoUnhandledErrorResult
+	defer cli.Close()
+
+	containers, err := cli.ContainerList(ctx, types.ContainerListOptions{
+		All: true,
+		Filters: filters.NewArgs(
+			filters.Arg("label", fmt.Sprintf("%s=", cleanupLabel)),
+		),
+	})
+	if err != nil {
+		return err
+	}
+
+	integrationConfig, err := pc.findDockerConfig(testConfig)
+	if err != nil {
+		return err
+	}
+
+	for _, cfg := range testConfig.GetProtocolConfigs() {
+		containerName := protocolContainerName(pc.protocolConfig, integrationConfig, cfg)
+		for _, cont := range containers {
+			if cont.Names[0] == fmt.Sprintf("/%s", containerName) {
+				err = cli.ContainerRemove(ctx, cont.ID, types.ContainerRemoveOptions{
+					Force: true,
+				})
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
+	return nil
 }

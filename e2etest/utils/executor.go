@@ -58,12 +58,14 @@ type Executor struct {
 	Q           Querier
 }
 
-func NewExecutor(kyveChain *cosmos.CosmosChain, broadcaster *cosmos.Broadcaster) *Executor {
-	return &Executor{
-		KyveChain:   kyveChain,
-		Broadcaster: broadcaster,
-		Q:           NewQuerier(kyveChain),
-	}
+func NewExecutor() *Executor {
+	return &Executor{}
+}
+
+func (e *Executor) Init(kyveChain *cosmos.CosmosChain, broadcaster *cosmos.Broadcaster) {
+	e.KyveChain = kyveChain
+	e.Broadcaster = broadcaster
+	e.Q = NewQuerier(kyveChain)
 }
 
 func (e *Executor) ExpectTxSuccess(tx sdk.TxResponse, err error) {
@@ -79,6 +81,8 @@ func (e *Executor) ExpectTxSuccess(tx sdk.TxResponse, err error) {
 func (e *Executor) DelegateToValidator(ctx context.Context, wallet ibc.Wallet, amount int64) {
 	ctx, cancel := context.WithTimeout(context.Background(), defaultTxTimeout)
 	defer cancel()
+
+	fmt.Println(fmt.Sprintf("%s is delegating %d to validator", wallet.FormattedAddress(), amount))
 
 	valResponse, err := e.Q.StakingClient.Validators(ctx, &stakingtypes.QueryValidatorsRequest{})
 	Expect(err).To(BeNil())
@@ -97,6 +101,8 @@ func (e *Executor) DelegateToValidator(ctx context.Context, wallet ibc.Wallet, a
 func (e *Executor) CreatePool(name string, voter ibc.Wallet) {
 	ctx, cancel := context.WithTimeout(context.Background(), 2*defaultQueryTimeout+defaultTxTimeout)
 	defer cancel()
+
+	fmt.Println(fmt.Sprintf("%s is creating pool %s", voter.FormattedAddress(), name))
 
 	govAuthority, err := e.KyveChain.GetModuleAddress(ctx, govmodule.ModuleName)
 	Expect(err).To(BeNil())
@@ -146,6 +152,8 @@ func (e *Executor) CreateProtocolNode(creator ibc.Wallet) {
 	ctx, cancel := context.WithTimeout(context.Background(), defaultTxTimeout)
 	defer cancel()
 
+	fmt.Println(fmt.Sprintf("%s is creating protocol node", creator.FormattedAddress()))
+
 	createStakerMsg := &stakerstypes.MsgCreateStaker{
 		Creator: creator.FormattedAddress(),
 		Amount:  100_000_000,
@@ -159,6 +167,11 @@ func (e *Executor) CreateProtocolNode(creator ibc.Wallet) {
 }
 
 func (e *Executor) JoinPool(creator ibc.Wallet, valAccount ibc.Wallet, poolId uint64) {
+	ctx, cancel := context.WithTimeout(context.Background(), defaultTxTimeout)
+	defer cancel()
+
+	fmt.Println(fmt.Sprintf("%s is joining pool %d", creator.FormattedAddress(), poolId))
+
 	joinPoolMsg := &stakerstypes.MsgJoinPool{
 		Creator:    creator.FormattedAddress(),
 		PoolId:     poolId,
@@ -166,7 +179,7 @@ func (e *Executor) JoinPool(creator ibc.Wallet, valAccount ibc.Wallet, poolId ui
 		Amount:     1_000_000_000,
 	}
 	e.ExpectTxSuccess(cosmos.BroadcastTx(
-		context.Background(),
+		ctx,
 		e.Broadcaster,
 		creator,
 		joinPoolMsg,
