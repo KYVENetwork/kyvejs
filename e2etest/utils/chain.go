@@ -23,7 +23,7 @@ const (
 	// uidGid is the uid:gid is needed to run the kyve chain container
 	uidGid = "1025:1025"
 	// consensusSpeed is the speed at which the kyve chain will produce blocks
-	consensusSpeed = "500ms"
+	consensusSpeed = 500 * time.Millisecond
 	// GovVotingPeriod is the voting period for governance proposals
 	GovVotingPeriod = 10 * time.Second
 )
@@ -205,10 +205,10 @@ func configFileOverrides() testutil.Toml {
 	override := make(testutil.Toml)
 	override["config/config.toml"] = testutil.Toml{
 		"consensus": testutil.Toml{
-			"timeout_propose":   consensusSpeed,
-			"timeout_prevote":   consensusSpeed,
-			"timeout_precommit": consensusSpeed,
-			"timeout_commit":    consensusSpeed,
+			"timeout_propose":   consensusSpeed.String(),
+			"timeout_prevote":   consensusSpeed.String(),
+			"timeout_precommit": consensusSpeed.String(),
+			"timeout_commit":    consensusSpeed.String(),
 		},
 	}
 	return override

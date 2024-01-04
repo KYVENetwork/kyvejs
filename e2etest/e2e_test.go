@@ -3,12 +3,10 @@ package e2etest
 import (
 	"context"
 	"fmt"
-	stakerstypes "github.com/KYVENetwork/chain/x/stakers/types"
 	"github.com/KYVENetwork/kyvejs/e2etest/utils"
 	sdkclient "github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
-	"github.com/docker/docker/client"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/strangelove-ventures/interchaintest/v7"
@@ -26,12 +24,12 @@ func TestIntegrations(t *testing.T) {
 }
 
 var _ = Describe(fmt.Sprintf("Protocol e2e Tests"), Ordered, func() {
-	var client *client.Client
 	var interchain *interchaintest.Interchain
 	var executor *utils.Executor
 
 	var protocolRunner = utils.NewProtocolRunner()
 	var wallets = make(map[string]ibc.Wallet, len(utils.Accounts))
+	var poolMapping = make(map[string]uint64)
 
 	BeforeAll(func() {
 		var ctx = context.Background()
@@ -80,13 +78,14 @@ var _ = Describe(fmt.Sprintf("Protocol e2e Tests"), Ordered, func() {
 		executor.DelegateToValidator(ctx, wallets[utils.Alice.Name], 9_000_000_000_000)
 
 		// Create one pool for every integration
-		for _, name := range protocolRunner.GetIntegrationDirs() {
-			executor.CreatePool(ctx, name, wallets[utils.Alice.Name])
+		integrationNames := protocolRunner.GetIntegrationDirs()
+		for _, name := range integrationNames {
+			executor.CreatePool(name, wallets[utils.Alice.Name])
 		}
 
 		// Create 3 protocol nodes
 		for _, account := range []utils.Account{utils.Alice, utils.Bob, utils.Viktor} {
-			executor.CreateProtocolNode(ctx, wallets[account.Name])
+			executor.CreateProtocolNode(wallets[account.Name])
 		}
 
 		// Start the protocol nodes and all dependencies
@@ -94,11 +93,23 @@ var _ = Describe(fmt.Sprintf("Protocol e2e Tests"), Ordered, func() {
 		Expect(err).To(BeNil())
 
 		// Wait for all pools to be created (gov proposals)
-		expectedPoolCnt := len(protocolRunner.GetIntegrationDirs())
+		expectedPoolCnt := len(integrationNames)
 		err = testutil.WaitForCondition(utils.GovVotingPeriod, 1*time.Second, func() (bool, error) {
-			return len(executor.GetPools().Pools) == expectedPoolCnt, nil
+			pools := executor.GetPools().Pools
+			if len(pools) == expectedPoolCnt {
+				for _, pool := range pools {
+					for _, integration := range integrationNames {
+						if pool.GetData().Name == integration {
+							poolMapping[integration] = pool.Id
+						}
+					}
+				}
+				return true, nil
+			}
+			return false, nil
 		})
 		Expect(err).To(BeNil())
+		Expect(len(poolMapping)).To(Equal(expectedPoolCnt))
 	})
 
 	AfterAll(func() {
@@ -107,39 +118,35 @@ var _ = Describe(fmt.Sprintf("Protocol e2e Tests"), Ordered, func() {
 			fmt.Println(err)
 		}
 
-		err = protocolRunner.Cleanup(client)
+		err = protocolRunner.Cleanup()
 		if err != nil {
 			fmt.Println(err)
 		}
 	})
 
-	for i, name := range protocolRunner.GetIntegrationDirs() {
-		Describe(fmt.Sprintf("Test protocol integration %s", name), func() {
-			It(fmt.Sprintf("Test finalized bundles for %s", name), func() {
-				joinPoolMsg := &stakerstypes.MsgJoinPool{
-					Creator:    wallets[utils.Alice.Name].FormattedAddress(),
-					PoolId:     uint64(i),
-					Valaddress: wallets[utils.AliceValaccount.Name].FormattedAddress(),
-					Amount:     1_000,
+	for _, integration := range protocolRunner.GetIntegrationDirs() {
+		Describe(fmt.Sprintf("Test protocol integration %s", integration), func() {
+			It(fmt.Sprintf("Test finalized bundles for %s", integration), func() {
+				var accounts = [][]utils.Account{
+					{utils.Alice, utils.AliceValaccount},
+					{utils.Bob, utils.BobValaccount},
+					{utils.Viktor, utils.ViktorValaccount},
 				}
-				executor.ExpectTxSuccess(cosmos.BroadcastTx(
-					context.Background(),
-					executor.Broadcaster,
-					wallets[utils.Alice.Name],
-					joinPoolMsg,
-				))
+				for _, account := range accounts {
+					executor.JoinPool(wallets[account[0].Name], wallets[account[1].Name], poolMapping[integration])
+				}
 
 				// Wait for 4 finalized bundles to be created
 				waitForBundles := 4
 				err := testutil.WaitForCondition(10*time.Minute, 5*time.Second, func() (bool, error) {
-					return len(executor.GetFinalizedBundles(0).FinalizedBundles) == waitForBundles, nil
+					return len(executor.GetFinalizedBundles(poolMapping[integration]).FinalizedBundles) == waitForBundles, nil
 				})
 				Expect(err).To(
 					BeNil(),
 					fmt.Sprintf("Failed to wait for %d finalized bundles\n"+
 						"Finaziled Bundles: %s",
 						waitForBundles,
-						executor.GetFinalizedBundles(0)),
+						executor.GetFinalizedBundles(poolMapping[integration])),
 				)
 			})
 		})

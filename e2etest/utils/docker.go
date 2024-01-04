@@ -184,18 +184,18 @@ func (pc *ProtocolRunner) GetIntegrationDirs() []string {
 }
 
 func (pc *ProtocolRunner) Build() error {
+	// First, cleanup any old containers and volumes
+	err := pc.Cleanup()
+	if err != nil {
+		return err
+	}
+
 	cli, err := client.NewClientWithOpts()
 	if err != nil {
 		return fmt.Errorf("failed to create docker client: %v", err)
 	}
 	//goland:noinspection GoUnhandledErrorResult
 	defer cli.Close()
-
-	// First, cleanup any old containers and volumes
-	err = pc.Cleanup(cli)
-	if err != nil {
-		return err
-	}
 
 	// Define protocol and testapi configs
 	pc.protocolConfig = dockerConfig{path: protocolPath, tag: "protocol"}
@@ -230,8 +230,10 @@ func (pc *ProtocolRunner) Build() error {
 		})
 	}
 
-	errChs := make([]chan error, len(pc.integrationConfigs))
-	for i, img := range pc.integrationConfigs {
+	// Build all the images concurrently
+	configs := append([]dockerConfig{pc.protocolConfig, pc.testapiConfig}, pc.integrationConfigs...)
+	errChs := make([]chan error, len(configs))
+	for i, img := range configs {
 		errChs[i] = make(chan error)
 		buildImageAsync(cli, img, errChs[i])
 	}
@@ -245,9 +247,16 @@ func (pc *ProtocolRunner) Build() error {
 	return nil
 }
 
-func (pc *ProtocolRunner) Cleanup(cli *client.Client) error {
+func (pc *ProtocolRunner) Cleanup() error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*60*5)
 	defer cancel()
+
+	cli, err := client.NewClientWithOpts()
+	if err != nil {
+		return fmt.Errorf("failed to create docker client: %v", err)
+	}
+	//goland:noinspection GoUnhandledErrorResult
+	defer cli.Close()
 
 	containers, err := cli.ContainerList(ctx, types.ContainerListOptions{
 		All: true,
