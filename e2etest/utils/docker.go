@@ -43,6 +43,12 @@ type ProtocolRunner struct {
 	testapiConfig      dockerConfig
 	integrationConfigs []dockerConfig
 	dockerVolumes      []volume.Volume
+
+	// Available after Init
+	isInitialized bool
+	networkId     string
+	restAddress   string
+	rpcAddress    string
 }
 
 func NewProtocolRunner() *ProtocolRunner {
@@ -173,10 +179,6 @@ func (pc *ProtocolRunner) GetIntegrationDirs() []string {
 	var integrationDirs []string
 	for _, integration := range integrations {
 		if integration.IsDir() {
-			// TODO: remove this check once the tendermint integration is ready
-			if integration.Name() != "tendermint" {
-				continue
-			}
 			integrationDirs = append(integrationDirs, integration.Name())
 		}
 	}
@@ -213,7 +215,7 @@ func (pc *ProtocolRunner) Build() error {
 			return err
 		}
 
-		tag := fmt.Sprintf("integration-%s", integration)
+		tag := integrationTag(integration)
 
 		// Create the volumes that will be shared between the integration and testapi containers
 		vol, err := cli.VolumeCreate(ctx, volume.CreateOptions{
@@ -350,6 +352,10 @@ func getProtocolEnv(valaccount string, rpcAddress string, restAddress string, ho
 	}
 }
 
+func integrationTag(integrationName string) string {
+	return fmt.Sprintf("integration-%s", integrationName)
+}
+
 func kyveStorageVolumeName(integrationTag string) string {
 	return fmt.Sprintf("%s-%s", kyveStorageName, integrationTag)
 }
@@ -364,7 +370,7 @@ func (pc *ProtocolRunner) getVolume(integrationTag string) string {
 	panic(fmt.Sprintf("volume %s not found", volName))
 }
 
-func (pc *ProtocolRunner) Run(cli *client.Client, networkId string, restAddress string, rpcAddress string) error {
+func (pc *ProtocolRunner) Run(cli *client.Client, networkId string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10*time.Duration(len(pc.integrationConfigs)))
 	defer cancel()
 
@@ -374,6 +380,7 @@ func (pc *ProtocolRunner) Run(cli *client.Client, networkId string, restAddress 
 			return err
 		}
 
+		// Run testapi
 		containerName := fmt.Sprintf("%s-%s", pc.testapiConfig.tag, integrationConfig.tag)
 		testapiConfig := pc.testapiConfig.toContainerConfig(containerName, networkId, nil)
 		testapiConfig.binds = []string{fmt.Sprintf("%s:%s:ro", dataPath, kyveStorageMountApi)}
@@ -382,20 +389,77 @@ func (pc *ProtocolRunner) Run(cli *client.Client, networkId string, restAddress 
 			return err
 		}
 
+		// Run integration
 		err = runDocker(ctx, cli, integrationConfig.toContainerConfig("", networkId, nil))
 		if err != nil {
 			return err
 		}
 
-		for _, account := range []Account{AliceValaccount, BobValaccount, ViktorValaccount} {
-			containerName = fmt.Sprintf("%s-%s-%s", pc.protocolConfig.tag, integrationConfig.tag, account.Name)
-			env := getProtocolEnv(account.Mnemonic, rpcAddress, restAddress, integrationConfig.tag)
-			protocolConfig := pc.protocolConfig.toContainerConfig(containerName, networkId, env)
-			protocolConfig.binds = []string{fmt.Sprintf("%s:%s", pc.getVolume(integrationConfig.tag), kyveStorageMountProtocol)}
-			err = runDocker(ctx, cli, protocolConfig)
-			if err != nil {
-				return err
-			}
+		//testConfig, err := integrationConfig.findTestConfig(testConfigs)
+		//if err != nil {
+		//	return err
+		//}
+
+		//// Run protocol with multiple protocol nodes
+		//for _, cfg := range testConfig.GetProtocolConfigs() {
+		//	containerName = fmt.Sprintf("%s-%s-%s", pc.protocolConfig.tag, integrationConfig.tag, cfg.ProtocolNode.KeyName())
+		//	env := getProtocolEnv(cfg.Valaccount.Mnemonic(), rpcAddress, restAddress, integrationConfig.tag)
+		//	protocolConfig := pc.protocolConfig.toContainerConfig(containerName, networkId, env)
+		//	protocolConfig.binds = []string{fmt.Sprintf("%s:%s", pc.getVolume(integrationConfig.tag), kyveStorageMountProtocol)}
+		//	err = runDocker(ctx, cli, protocolConfig)
+		//	if err != nil {
+		//		return err
+		//	}
+		//}
+	}
+	return nil
+}
+
+func (pc *ProtocolRunner) Init(networkId string, restAddress string, rpcAddress string) {
+	pc.networkId = networkId
+	pc.restAddress = restAddress
+	pc.rpcAddress = rpcAddress
+	pc.isInitialized = true
+}
+
+func (pc *ProtocolRunner) findDockerConfig(testConfig *TestConfig) (*dockerConfig, error) {
+	for _, dc := range pc.integrationConfigs {
+		if dc.tag == integrationTag(testConfig.Integration) {
+			return &dc, nil
+		}
+	}
+	return nil, errors.New(fmt.Sprintf("test config for integration %s not found", testConfig.Integration))
+}
+
+func (pc *ProtocolRunner) RunProtocolNodes(testConfig *TestConfig) error {
+	if !pc.isInitialized {
+		return errors.New("protocol runner not initialized")
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10*time.Duration(len(pc.integrationConfigs)))
+	defer cancel()
+
+	cli, err := client.NewClientWithOpts()
+	if err != nil {
+		return fmt.Errorf("failed to create docker client: %v", err)
+	}
+	//goland:noinspection GoUnhandledErrorResult
+	defer cli.Close()
+
+	integrationConfig, err := pc.findDockerConfig(testConfig)
+	if err != nil {
+		return err
+	}
+
+	// Run protocol with multiple protocol nodes
+	for _, cfg := range testConfig.GetProtocolConfigs() {
+		containerName := fmt.Sprintf("%s-%s-%s", pc.protocolConfig.tag, integrationConfig.tag, cfg.ProtocolNode.KeyName())
+		env := getProtocolEnv(cfg.Valaccount.Mnemonic(), pc.rpcAddress, pc.restAddress, integrationConfig.tag)
+		protocolConfig := pc.protocolConfig.toContainerConfig(containerName, pc.networkId, env)
+		protocolConfig.binds = []string{fmt.Sprintf("%s:%s", pc.getVolume(integrationConfig.tag), kyveStorageMountProtocol)}
+		err = runDocker(ctx, cli, protocolConfig)
+		if err != nil {
+			return err
 		}
 	}
 	return nil

@@ -13,6 +13,7 @@ import (
 	govmodule "github.com/cosmos/cosmos-sdk/x/gov/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/strangelove-ventures/interchaintest/v7/chain/cosmos"
 	"github.com/strangelove-ventures/interchaintest/v7/ibc"
@@ -54,15 +55,13 @@ func NewQuerier(kyveChain *cosmos.CosmosChain) Querier {
 type Executor struct {
 	KyveChain   *cosmos.CosmosChain
 	Broadcaster *cosmos.Broadcaster
-	Wallets     map[string]ibc.Wallet
 	Q           Querier
 }
 
-func NewExecutor(kyveChain *cosmos.CosmosChain, broadcaster *cosmos.Broadcaster, wallets map[string]ibc.Wallet) *Executor {
+func NewExecutor(kyveChain *cosmos.CosmosChain, broadcaster *cosmos.Broadcaster) *Executor {
 	return &Executor{
 		KyveChain:   kyveChain,
 		Broadcaster: broadcaster,
-		Wallets:     wallets,
 		Q:           NewQuerier(kyveChain),
 	}
 }
@@ -70,7 +69,11 @@ func NewExecutor(kyveChain *cosmos.CosmosChain, broadcaster *cosmos.Broadcaster,
 func (e *Executor) ExpectTxSuccess(tx sdk.TxResponse, err error) {
 	ExpectWithOffset(1, err).To(BeNil())
 	ExpectWithOffset(1, tx.Code).To(Equal(uint32(0)), fmt.Sprintf("tx failed with code %d: %s", tx.Code, tx.RawLog))
-	ExpectWithOffset(1, tx.Height).ToNot(Equal(int64(0)), "tx was not successful for some reason")
+
+	if tx.Height == int64(0) {
+		res, _, _ := e.KyveChain.GetNode().ExecQuery(context.Background(), "tx", tx.TxHash)
+		Fail(fmt.Sprintf("tx was not successful for some reason: %s", res), 1)
+	}
 }
 
 func (e *Executor) DelegateToValidator(ctx context.Context, wallet ibc.Wallet, amount int64) {

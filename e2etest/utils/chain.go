@@ -9,6 +9,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdktestutil "github.com/cosmos/cosmos-sdk/types/module/testutil"
+	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	"github.com/cosmos/go-bip39"
 	"github.com/icza/dyno"
 	"github.com/strangelove-ventures/interchaintest/v7"
 	"github.com/strangelove-ventures/interchaintest/v7/chain/cosmos"
@@ -23,68 +25,56 @@ const (
 	// uidGid is the uid:gid is needed to run the kyve chain container
 	uidGid = "1025:1025"
 	// consensusSpeed is the speed at which the kyve chain will produce blocks
-	consensusSpeed = 500 * time.Millisecond
+	consensusSpeed = 200 * time.Millisecond
 	// GovVotingPeriod is the voting period for governance proposals
-	GovVotingPeriod = 10 * time.Second
+	GovVotingPeriod = 1 * time.Second
 )
 
-var (
-	// Alice is a protocol validator main account
-	Alice = Account{
-		Mnemonic: "worry grief loyal smoke pencil arrow trap focus high pioneer tomato hedgehog essence purchase dove pond knee custom phone gentle sunset addict mother fabric",
-		Address:  "kyve1jq304cthpx0lwhpqzrdjrcza559ukyy3zsl2vd",
-		Name:     "alice",
-	}
-	// AliceValaccount is a protocol validator valaccount
-	AliceValaccount = Account{
-		Mnemonic: "artist final stage coffee coach stable quantum feed catch bridge pond like ranch steel insane hold vital horse catalog battle company suspect satoshi famous",
-		Address:  "kyve1aw5gtwz50g7u60geulppjwqlev2klqgvhnzu6k",
-		Name:     "alice-valaccount",
-	}
-	// Bob is a protocol validator main account
-	Bob = Account{
-		Mnemonic: "crash sick toilet stumble join cash erode glory door weird diagram away lizard solid segment apple urge joy annual able tank define candy demise",
-		Address:  "kyve1hvg7zsnrj6h29q9ss577mhrxa04rn94h7zjugq",
-		Name:     "bob",
-	}
-	// BobValaccount is a protocol validator valaccount
-	BobValaccount = Account{
-		Mnemonic: "rebuild resist mix bulb glass draw guess soda interest auto giggle noble cave boat wheat enact laugh bunker piano can flush stem crumble lunar",
-		Address:  "kyve15azz593mwcg6k2uxdt974ax5q2j6dxa8vhnx4m",
-		Name:     "bob-valaccount",
-	}
-	// Viktor is a protocol validator main account
-	Viktor = Account{
-		Mnemonic: "surround burst truly again vanish warrior arctic cave share marriage rib surge",
-		Address:  "kyve1khwd59xmxs26fxwc9sqkwpuy9jxym3a485rzgf",
-		Name:     "viktor",
-	}
-	// ViktorValaccount is a protocol validator valaccount
-	ViktorValaccount = Account{
-		Mnemonic: "art beyond rather game prepare depend slice entry ignore fashion replace front",
-		Address:  "kyve1fsll7rjlx49z5gnfj03pagaql3z4z2ejnalmnx",
-		Name:     "viktor-valaccount",
-	}
-)
-
-type Account struct {
-	Mnemonic string
-	Address  string
-	Name     string
+type ProtocolConfig struct {
+	ProtocolNode ibc.Wallet
+	Valaccount   ibc.Wallet
 }
 
-var Accounts = []Account{
-	Alice,
-	AliceValaccount,
-	Bob,
-	BobValaccount,
-	Viktor,
-	ViktorValaccount,
+type TestConfig struct {
+	Alice       ProtocolConfig
+	Bob         ProtocolConfig
+	Viktor      ProtocolConfig
+	PoolId      uint64
+	Integration string
+}
+
+func (tc *TestConfig) GetProtocolConfigs() []ProtocolConfig {
+	return []ProtocolConfig{tc.Alice, tc.Bob, tc.Viktor}
+}
+
+type mnemonicGenerator struct {
+	keys map[string]string
+}
+
+func (g *mnemonicGenerator) getMnemonic(keyName string) string {
+	if g.keys == nil {
+		g.keys = make(map[string]string)
+	} else if mnemonic, ok := g.keys[keyName]; ok {
+		return mnemonic
+	}
+	entropy, _ := bip39.NewEntropy(256)
+	mnemonic, _ := bip39.NewMnemonic(entropy)
+	g.keys[keyName] = mnemonic
+	return mnemonic
 }
 
 type GenesisWrapper struct {
-	Chain   *cosmos.CosmosChain
-	Wallets map[string]ibc.Wallet
+	Chain       *cosmos.CosmosChain
+	TestConfigs []*TestConfig
+
+	mg *mnemonicGenerator
+}
+
+func NewGenesisWrapper(testConfigs []*TestConfig) *GenesisWrapper {
+	return &GenesisWrapper{
+		TestConfigs: testConfigs,
+		mg:          &mnemonicGenerator{},
+	}
 }
 
 func kyveEncoding() *sdktestutil.TestEncodingConfig {
@@ -134,34 +124,66 @@ func KyveChainSpec(
 
 func preGenesis(ctx context.Context, gw *GenesisWrapper) func(ibc.ChainConfig) error {
 	return func(cc ibc.ChainConfig) (err error) {
-		gw.Wallets, err = createWallets(ctx, gw.Chain.GetNode())
+		alice, err := createWallet(ctx, gw, "alice", 10_000_000_000_000)
+		if err != nil {
+			return err
+		}
+		bob, err := createWallet(ctx, gw, "bob", 10_000_000_000_000)
+		if err != nil {
+			return err
+		}
+		viktor, err := createWallet(ctx, gw, "viktor", 10_000_000_000_000)
+		if err != nil {
+			return err
+		}
+		for _, testConfig := range gw.TestConfigs {
+			keyName := fmt.Sprintf("alice-valaccount-%s", testConfig.Integration)
+			val, err := createWallet(ctx, gw, keyName, 10_000_000)
+			if err != nil {
+				return err
+			}
+			testConfig.Alice.ProtocolNode = alice
+			testConfig.Alice.Valaccount = val
+
+			keyName = fmt.Sprintf("bob-valaccount-%s", testConfig.Integration)
+			val, err = createWallet(ctx, gw, keyName, 10_000_000)
+			if err != nil {
+				return err
+			}
+			testConfig.Bob.ProtocolNode = bob
+			testConfig.Bob.Valaccount = val
+
+			keyName = fmt.Sprintf("viktor-valaccount-%s", testConfig.Integration)
+			val, err = createWallet(ctx, gw, keyName, 10_000_000)
+			if err != nil {
+				return err
+			}
+			testConfig.Viktor.ProtocolNode = viktor
+			testConfig.Viktor.Valaccount = val
+		}
 		return err
 	}
 }
 
-func createWallets(ctx context.Context, val *cosmos.ChainNode) (map[string]ibc.Wallet, error) {
-	chainCfg := val.Chain.Config()
-	wallets := make(map[string]ibc.Wallet, len(Accounts))
+func createWallet(ctx context.Context, gw *GenesisWrapper, name string, amount int64) (ibc.Wallet, error) {
+	chainCfg := gw.Chain.Config()
 
-	for _, account := range Accounts {
-		wallet, err := val.Chain.BuildWallet(ctx, account.Name, account.Mnemonic)
-		if err != nil {
-			return nil, fmt.Errorf("failed to create wallet: %w", err)
-		}
-
-		genesisWallet := ibc.WalletAmount{
-			Address: wallet.FormattedAddress(),
-			Denom:   chainCfg.Denom,
-			Amount:  math.NewInt(10_000_000_000_000),
-		}
-
-		err = val.AddGenesisAccount(ctx, genesisWallet.Address, []types.Coin{types.NewCoin(genesisWallet.Denom, genesisWallet.Amount)})
-		if err != nil {
-			return nil, err
-		}
-		wallets[account.Name] = wallet
+	wallet, err := gw.Chain.GetNode().Chain.BuildWallet(ctx, name, gw.mg.getMnemonic(name))
+	if err != nil {
+		return nil, fmt.Errorf("failed to create wallet: %w", err)
 	}
-	return wallets, nil
+
+	genesisWallet := ibc.WalletAmount{
+		Address: wallet.FormattedAddress(),
+		Denom:   chainCfg.Denom,
+		Amount:  math.NewInt(amount),
+	}
+
+	err = gw.Chain.GetNode().AddGenesisAccount(ctx, genesisWallet.Address, []types.Coin{types.NewCoin(genesisWallet.Denom, genesisWallet.Amount)})
+	if err != nil {
+		return nil, err
+	}
+	return wallet, nil
 }
 
 func modifyGenesis(_ *GenesisWrapper) func(config ibc.ChainConfig, genbz []byte) ([]byte, error) {
@@ -172,6 +194,10 @@ func modifyGenesis(_ *GenesisWrapper) func(config ibc.ChainConfig, genbz []byte)
 		}
 
 		if err := modifyGovParams(config, genesis); err != nil {
+			return nil, err
+		}
+
+		if err := modifyTeamBalance(config, genesis); err != nil {
 			return nil, err
 		}
 
@@ -197,6 +223,21 @@ func modifyGovParams(config ibc.ChainConfig, genesis map[string]interface{}) err
 	}
 	if err := dyno.Set(params, "0", "quorum"); err != nil {
 		return fmt.Errorf("failed to set quorum in genesis json: %w", err)
+	}
+	return nil
+}
+
+func modifyTeamBalance(config ibc.ChainConfig, genesis map[string]interface{}) error {
+	balances, err := dyno.GetSlice(genesis, "app_state", "bank", "balances")
+	if err != nil {
+		return fmt.Errorf("failed to get balances from genesis json: %w", err)
+	}
+	balances = append(balances, banktypes.Balance{
+		Address: "kyve1e29j95xmsw3zmvtrk4st8e89z5n72v7nf70ma4",
+		Coins:   sdk.NewCoins(sdk.NewCoin(config.Denom, math.NewInt(165_000_000_000_000))),
+	})
+	if err := dyno.Set(genesis, balances, "app_state", "bank", "balances"); err != nil {
+		return err
 	}
 	return nil
 }
