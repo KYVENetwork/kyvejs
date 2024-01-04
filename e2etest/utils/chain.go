@@ -14,6 +14,7 @@ import (
 	"github.com/strangelove-ventures/interchaintest/v7/chain/cosmos"
 	"github.com/strangelove-ventures/interchaintest/v7/ibc"
 	"github.com/strangelove-ventures/interchaintest/v7/testutil"
+	"time"
 )
 
 const (
@@ -22,7 +23,9 @@ const (
 	// uidGid is the uid:gid is needed to run the kyve chain container
 	uidGid = "1025:1025"
 	// consensusSpeed is the speed at which the kyve chain will produce blocks
-	consensusSpeed = "200ms"
+	consensusSpeed = "500ms"
+	// GovVotingPeriod is the voting period for governance proposals
+	GovVotingPeriod = 10 * time.Second
 )
 
 var (
@@ -84,7 +87,7 @@ type GenesisWrapper struct {
 	Wallets map[string]ibc.Wallet
 }
 
-func KyveEncoding() *sdktestutil.TestEncodingConfig {
+func kyveEncoding() *sdktestutil.TestEncodingConfig {
 	testCfg := sdktestutil.TestEncodingConfig{}
 	cfg := app.MakeEncodingConfig()
 
@@ -116,7 +119,7 @@ func KyveChainSpec(
 			GasAdjustment:       5,
 			TrustingPeriod:      "112h",
 			NoHostMount:         false,
-			EncodingConfig:      KyveEncoding(),
+			EncodingConfig:      kyveEncoding(),
 			PreGenesis:          preGenesis(ctx, gw),
 			ModifyGenesis:       modifyGenesis(gw),
 			ConfigFileOverrides: configFileOverrides(),
@@ -161,7 +164,7 @@ func createWallets(ctx context.Context, val *cosmos.ChainNode) (map[string]ibc.W
 	return wallets, nil
 }
 
-func modifyGenesis(gw *GenesisWrapper) func(config ibc.ChainConfig, genbz []byte) ([]byte, error) {
+func modifyGenesis(_ *GenesisWrapper) func(config ibc.ChainConfig, genbz []byte) ([]byte, error) {
 	return func(config ibc.ChainConfig, genbz []byte) ([]byte, error) {
 		genesis := make(map[string]interface{})
 		if err := json.Unmarshal(genbz, &genesis); err != nil {
@@ -186,11 +189,14 @@ func modifyGovParams(config ibc.ChainConfig, genesis map[string]interface{}) err
 	if err != nil {
 		return fmt.Errorf("failed to get params from genesis json: %w", err)
 	}
-	if err := dyno.Set(params, "10s", "voting_period"); err != nil {
+	if err := dyno.Set(params, GovVotingPeriod.String(), "voting_period"); err != nil {
 		return fmt.Errorf("failed to set voting_period in genesis json: %w", err)
 	}
 	if err := dyno.Set(params, sdk.Coins{sdk.Coin{Denom: config.Denom, Amount: math.NewInt(0)}}, "min_deposit"); err != nil {
 		return fmt.Errorf("failed to set min_deposit in genesis json: %w", err)
+	}
+	if err := dyno.Set(params, "0", "quorum"); err != nil {
+		return fmt.Errorf("failed to set quorum in genesis json: %w", err)
 	}
 	return nil
 }
