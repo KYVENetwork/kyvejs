@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.3](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/protocol@1.1.2...@kyvejs/protocol@1.1.3) (2024-01-05)
+
+### Bug Fixes
+
+- disable debug bundle because of memory issue ([#114](https://github.com/KYVENetwork/kyvejs/issues/114)) ([dae9858](https://github.com/KYVENetwork/kyvejs/commit/dae9858226d2da0fbf31070964888d2e2853f3b0))
+
 ## [1.1.2](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/protocol@1.1.1...@kyvejs/protocol@1.1.2) (2024-01-03)
 
 ### Bug Fixes
