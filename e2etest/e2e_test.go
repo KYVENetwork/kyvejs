@@ -32,7 +32,10 @@ var _ = Describe(fmt.Sprintf("Protocol e2e Tests"), Ordered, func() {
 	BeforeAll(func() {
 		var ctx = context.Background()
 		for _, integration := range integrationNames {
+			poolConfig, err := protocolRunner.GetTestDataPoolConfig(integration)
+			Expect(err).To(BeNil())
 			testConfigs = append(testConfigs, &utils.TestConfig{
+				PoolConfig:  poolConfig,
 				Integration: integration,
 			})
 		}
@@ -81,8 +84,8 @@ var _ = Describe(fmt.Sprintf("Protocol e2e Tests"), Ordered, func() {
 		executor.DelegateToValidator(ctx, testConfigs[0].Alice.ProtocolNode, 9_000_000_000_000)
 
 		// Create one pool for every integration (per gov proposal)
-		for _, name := range integrationNames {
-			executor.CreatePool(name, testConfigs[0].Alice.ProtocolNode)
+		for _, cfg := range testConfigs {
+			executor.CreatePool(cfg.Integration, cfg.PoolConfig, testConfigs[0].Alice.ProtocolNode)
 		}
 
 		// Create 3 protocol nodes

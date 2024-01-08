@@ -28,6 +28,8 @@ const (
 	consensusSpeed = 200 * time.Millisecond
 	// GovVotingPeriod is the voting period for governance proposals
 	GovVotingPeriod = 1 * time.Second
+	// BundlesUploadTimeout is the timeout for uploading bundles
+	BundlesUploadTimeout = 10 * time.Second
 )
 
 type ProtocolConfig struct {
@@ -40,6 +42,7 @@ type TestConfig struct {
 	Bob         ProtocolConfig
 	Viktor      ProtocolConfig
 	PoolId      uint64
+	PoolConfig  string // serialized pool config in json format
 	Integration string
 }
 
@@ -78,15 +81,15 @@ func NewGenesisWrapper(testConfigs []*TestConfig) *GenesisWrapper {
 }
 
 func kyveEncoding() *sdktestutil.TestEncodingConfig {
-	testCfg := sdktestutil.TestEncodingConfig{}
+	encodingConfig := sdktestutil.TestEncodingConfig{}
 	cfg := app.MakeEncodingConfig()
 
-	testCfg.Codec = cfg.Marshaler
-	testCfg.TxConfig = cfg.TxConfig
-	testCfg.InterfaceRegistry = cfg.InterfaceRegistry
-	testCfg.Amino = cfg.Amino
+	encodingConfig.Codec = cfg.Marshaler
+	encodingConfig.TxConfig = cfg.TxConfig
+	encodingConfig.InterfaceRegistry = cfg.InterfaceRegistry
+	encodingConfig.Amino = cfg.Amino
 
-	return &testCfg
+	return &encodingConfig
 }
 
 func KyveChainSpec(
@@ -197,6 +200,10 @@ func modifyGenesis(_ *GenesisWrapper) func(config ibc.ChainConfig, genbz []byte)
 			return nil, err
 		}
 
+		if err := modifyBundlesParams(config, genesis); err != nil {
+			return nil, err
+		}
+
 		if err := modifyTeamBalance(config, genesis); err != nil {
 			return nil, err
 		}
@@ -223,6 +230,17 @@ func modifyGovParams(config ibc.ChainConfig, genesis map[string]interface{}) err
 	}
 	if err := dyno.Set(params, "0", "quorum"); err != nil {
 		return fmt.Errorf("failed to set quorum in genesis json: %w", err)
+	}
+	return nil
+}
+
+func modifyBundlesParams(_ ibc.ChainConfig, genesis map[string]interface{}) error {
+	params, err := dyno.GetMapS(genesis, "app_state", "bundles", "params")
+	if err != nil {
+		return fmt.Errorf("failed to get params from genesis json: %w", err)
+	}
+	if err := dyno.Set(params, int(BundlesUploadTimeout.Seconds()), "upload_timeout"); err != nil {
+		return fmt.Errorf("failed to set upload_timeout in genesis json: %w", err)
 	}
 	return nil
 }

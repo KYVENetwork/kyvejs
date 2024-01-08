@@ -98,7 +98,7 @@ func (e *Executor) DelegateToValidator(ctx context.Context, wallet ibc.Wallet, a
 	))
 }
 
-func (e *Executor) CreatePool(name string, voter ibc.Wallet) {
+func (e *Executor) CreatePool(name string, config string, voter ibc.Wallet) {
 	ctx, cancel := context.WithTimeout(context.Background(), 2*defaultQueryTimeout+defaultTxTimeout)
 	defer cancel()
 
@@ -111,7 +111,7 @@ func (e *Executor) CreatePool(name string, voter ibc.Wallet) {
 		Name:                 name,
 		Runtime:              fmt.Sprintf("@kyvejs/%s", name),
 		Logo:                 "ar://Tewyv2P5VEG8EJ6AUQORdqNTectY9hlOrWPK8wwo-aU",
-		Config:               `{"network":"dydx-mainnet-1","rpc":"http://testapi-integration-tendermint:8080"}`,
+		Config:               config,
 		StartKey:             "1",
 		UploadInterval:       20,
 		InflationShareWeight: 2500000000,
@@ -170,7 +170,7 @@ func (e *Executor) JoinPool(creator ibc.Wallet, valAccount ibc.Wallet, poolId ui
 	ctx, cancel := context.WithTimeout(context.Background(), defaultTxTimeout)
 	defer cancel()
 
-	fmt.Println(fmt.Sprintf("%s is joining pool %d", creator.FormattedAddress(), poolId))
+	fmt.Println(fmt.Sprintf("%s is joining pool %d with %s", creator.FormattedAddress(), poolId, valAccount.FormattedAddress()))
 
 	joinPoolMsg := &stakerstypes.MsgJoinPool{
 		Creator:    creator.FormattedAddress(),

@@ -13,7 +13,7 @@ import (
 	"github.com/docker/docker/api/types/volume"
 	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/archive"
-
+	"gopkg.in/yaml.v3"
 	"io"
 	"os"
 	"path/filepath"
@@ -167,9 +167,39 @@ func getTestDataPath(path string) (string, error) {
 		return "", err
 	}
 	if _, err := os.Stat(path); os.IsNotExist(err) {
-		return "", errors.New(fmt.Sprintf("testdata does not exist at %s", path))
+		return "", errors.New(fmt.Sprintf("%s does not exist", path))
 	}
 	return path, nil
+}
+
+func (pc *ProtocolRunner) GetTestDataPoolConfig(integrationName string) (string, error) {
+	path, err := filepath.Abs(fmt.Sprintf("%s/%s/testdata/config.yml", integrationsPath, integrationName))
+	if err != nil {
+		return "", err
+	}
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		return "", errors.New(fmt.Sprintf("%s does not exist", path))
+	}
+
+	// Read the config.yml file
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return "", err
+	}
+
+	// Unmarshal the yaml
+	var obj interface{}
+	err = yaml.Unmarshal(data, &obj)
+	if err != nil {
+		return "", err
+	}
+
+	// Convert to json
+	jsonData, err := json.Marshal(obj)
+	if err != nil {
+		return "", err
+	}
+	return string(jsonData), nil
 }
 
 // GetIntegrationDirs returns a list of all integration folder names
@@ -218,6 +248,11 @@ func (pc *ProtocolRunner) Build() error {
 	for _, integration := range integrations {
 		// Ensure that the testdata folder exists
 		_, err := getTestDataPath(filepath.Join(integrationsPath, integration))
+		if err != nil {
+			return err
+		}
+		// Ensure that the config file for the pool exists
+		_, err = pc.GetTestDataPoolConfig(filepath.Join(integrationsPath, integration))
 		if err != nil {
 			return err
 		}
@@ -342,15 +377,21 @@ func runDocker(
 	return nil
 }
 
-func getProtocolEnv(valaccount string, rpcAddress string, restAddress string, host string) []string {
+func getProtocolEnv(
+	valaccount string,
+	rpcAddress string,
+	restAddress string,
+	host string,
+	poolId uint64,
+) []string {
 	return []string{
 		fmt.Sprintf("VALACCOUNT=%s", valaccount),
 		fmt.Sprintf("RPC=%s", rpcAddress),
 		fmt.Sprintf("REST=%s", restAddress),
 		fmt.Sprintf("HOST=%s", host),
-		"POOL=0",
+		fmt.Sprintf("POOL=%d", poolId),
 		"STORAGE_PRIV=",
-		"REQUEST_BACKOFF=5",
+		"REQUEST_BACKOFF=1",
 		"CACHE=jsonfile",
 		"METRICS=false",
 		"METRICS_PORT=8080",
@@ -441,7 +482,7 @@ func (pc *ProtocolRunner) RunProtocolNodes(testConfig *TestConfig) error {
 	// Run protocol with multiple protocol nodes
 	for _, cfg := range testConfig.GetProtocolConfigs() {
 		containerName := protocolContainerName(pc.protocolConfig, integrationConfig, cfg)
-		env := getProtocolEnv(cfg.Valaccount.Mnemonic(), pc.rpcAddress, pc.restAddress, integrationConfig.tag)
+		env := getProtocolEnv(cfg.Valaccount.Mnemonic(), pc.rpcAddress, pc.restAddress, integrationConfig.tag, testConfig.PoolId)
 		protocolConfig := pc.protocolConfig.toContainerConfig(containerName, pc.networkId, env)
 		protocolConfig.binds = []string{fmt.Sprintf("%s:%s", pc.getVolume(integrationConfig.tag), kyveStorageMountProtocol)}
 		err = runDocker(ctx, cli, protocolConfig)
