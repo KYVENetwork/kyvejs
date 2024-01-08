@@ -1,0 +1,5 @@
+---
+startKey: 18634500
+config:
+  network: cosmoshub-4
+  rpc: http://testapi-integration-tendermint-bsync:8080

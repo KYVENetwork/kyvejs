@@ -1,6 +1,8 @@
 **/node_modules/
 **/dist
 **/out
+**/logs
+testdata
 .git
 npm-debug.log
 .coverage

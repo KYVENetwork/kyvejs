@@ -1,0 +1,4 @@
+---
+config:
+  network: dydx-mainnet-1
+  rpc: http://testapi-integration-tendermint:8080
