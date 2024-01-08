@@ -25,7 +25,7 @@ const (
 	// uidGid is the uid:gid is needed to run the kyve chain container
 	uidGid = "1025:1025"
 	// consensusSpeed is the speed at which the kyve chain will produce blocks
-	consensusSpeed = 200 * time.Millisecond
+	consensusSpeed = 500 * time.Millisecond
 	// GovVotingPeriod is the voting period for governance proposals
 	GovVotingPeriod = 1 * time.Second
 	// BundlesUploadTimeout is the timeout for uploading bundles
@@ -37,12 +37,17 @@ type ProtocolConfig struct {
 	Valaccount   ibc.Wallet
 }
 
+type PoolConfig struct {
+	StartKey string `yaml:"startKey"`
+	Config   string `yaml:"config"`
+}
+
 type TestConfig struct {
 	Alice       ProtocolConfig
 	Bob         ProtocolConfig
 	Viktor      ProtocolConfig
 	PoolId      uint64
-	PoolConfig  string // serialized pool config in json format
+	PoolConfig  PoolConfig
 	Integration string
 }
 
@@ -50,33 +55,20 @@ func (tc *TestConfig) GetProtocolConfigs() []ProtocolConfig {
 	return []ProtocolConfig{tc.Alice, tc.Bob, tc.Viktor}
 }
 
-type mnemonicGenerator struct {
-	keys map[string]string
-}
-
-func (g *mnemonicGenerator) getMnemonic(keyName string) string {
-	if g.keys == nil {
-		g.keys = make(map[string]string)
-	} else if mnemonic, ok := g.keys[keyName]; ok {
-		return mnemonic
-	}
+func getRandomMnemonic() string {
 	entropy, _ := bip39.NewEntropy(256)
 	mnemonic, _ := bip39.NewMnemonic(entropy)
-	g.keys[keyName] = mnemonic
 	return mnemonic
 }
 
 type GenesisWrapper struct {
 	Chain       *cosmos.CosmosChain
 	TestConfigs []*TestConfig
-
-	mg *mnemonicGenerator
 }
 
 func NewGenesisWrapper(testConfigs []*TestConfig) *GenesisWrapper {
 	return &GenesisWrapper{
 		TestConfigs: testConfigs,
-		mg:          &mnemonicGenerator{},
 	}
 }
 
@@ -171,7 +163,7 @@ func preGenesis(ctx context.Context, gw *GenesisWrapper) func(ibc.ChainConfig) e
 func createWallet(ctx context.Context, gw *GenesisWrapper, name string, amount int64) (ibc.Wallet, error) {
 	chainCfg := gw.Chain.Config()
 
-	wallet, err := gw.Chain.GetNode().Chain.BuildWallet(ctx, name, gw.mg.getMnemonic(name))
+	wallet, err := gw.Chain.GetNode().Chain.BuildWallet(ctx, name, getRandomMnemonic())
 	if err != nil {
 		return nil, fmt.Errorf("failed to create wallet: %w", err)
 	}

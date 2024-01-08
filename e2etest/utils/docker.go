@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/creasty/defaults"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
@@ -172,34 +173,50 @@ func getTestDataPath(path string) (string, error) {
 	return path, nil
 }
 
-func (pc *ProtocolRunner) GetTestDataPoolConfig(integrationName string) (string, error) {
+type poolConfigYml struct {
+	StartKey string                 `default:"1" yaml:"startKey"`
+	Config   map[string]interface{} `default:"{}" yaml:"config"`
+}
+
+func (pc *ProtocolRunner) GetPoolConfigFromTestData(integrationName string) (*PoolConfig, error) {
 	path, err := filepath.Abs(fmt.Sprintf("%s/%s/testdata/config.yml", integrationsPath, integrationName))
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	if _, err := os.Stat(path); os.IsNotExist(err) {
-		return "", errors.New(fmt.Sprintf("%s does not exist", path))
+		return nil, errors.New(fmt.Sprintf("%s does not exist", path))
 	}
 
 	// Read the config.yml file
 	data, err := os.ReadFile(path)
 	if err != nil {
-		return "", err
+		return nil, err
+	}
+
+	var obj poolConfigYml
+
+	// Set default values from struct tags
+	err = defaults.Set(&obj)
+	if err != nil {
+		return nil, err
 	}
 
 	// Unmarshal the yaml
-	var obj interface{}
 	err = yaml.Unmarshal(data, &obj)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	// Convert to json
-	jsonData, err := json.Marshal(obj)
+	jsonData, err := json.Marshal(obj.Config)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	return string(jsonData), nil
+
+	return &PoolConfig{
+		StartKey: obj.StartKey,
+		Config:   string(jsonData),
+	}, nil
 }
 
 // GetIntegrationDirs returns a list of all integration folder names
@@ -252,7 +269,7 @@ func (pc *ProtocolRunner) Build() error {
 			return err
 		}
 		// Ensure that the config file for the pool exists
-		_, err = pc.GetTestDataPoolConfig(filepath.Join(integrationsPath, integration))
+		_, err = pc.GetPoolConfigFromTestData(filepath.Join(integrationsPath, integration))
 		if err != nil {
 			return err
 		}
@@ -383,20 +400,25 @@ func getProtocolEnv(
 	restAddress string,
 	host string,
 	poolId uint64,
+	debug bool,
 ) []string {
+	debugFlag := "DEBUG="
+	if debug {
+		debugFlag = "DEBUG=--debug" // set to --debug to enable debug logging
+	}
 	return []string{
 		fmt.Sprintf("VALACCOUNT=%s", valaccount),
 		fmt.Sprintf("RPC=%s", rpcAddress),
 		fmt.Sprintf("REST=%s", restAddress),
 		fmt.Sprintf("HOST=%s", host),
 		fmt.Sprintf("POOL=%d", poolId),
+		debugFlag,
 		"STORAGE_PRIV=",
 		"REQUEST_BACKOFF=1",
 		"CACHE=jsonfile",
 		"METRICS=false",
 		"METRICS_PORT=8080",
 		"CHAIN_ID=kyve-1",
-		"DEBUG=", // set to --debug to enable debug logging TODO: fix this flag
 	}
 }
 
@@ -482,7 +504,7 @@ func (pc *ProtocolRunner) RunProtocolNodes(testConfig *TestConfig) error {
 	// Run protocol with multiple protocol nodes
 	for _, cfg := range testConfig.GetProtocolConfigs() {
 		containerName := protocolContainerName(pc.protocolConfig, integrationConfig, cfg)
-		env := getProtocolEnv(cfg.Valaccount.Mnemonic(), pc.rpcAddress, pc.restAddress, integrationConfig.tag, testConfig.PoolId)
+		env := getProtocolEnv(cfg.Valaccount.Mnemonic(), pc.rpcAddress, pc.restAddress, integrationConfig.tag, testConfig.PoolId, true)
 		protocolConfig := pc.protocolConfig.toContainerConfig(containerName, pc.networkId, env)
 		protocolConfig.binds = []string{fmt.Sprintf("%s:%s", pc.getVolume(integrationConfig.tag), kyveStorageMountProtocol)}
 		err = runDocker(ctx, cli, protocolConfig)

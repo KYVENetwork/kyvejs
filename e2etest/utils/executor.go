@@ -98,7 +98,7 @@ func (e *Executor) DelegateToValidator(ctx context.Context, wallet ibc.Wallet, a
 	))
 }
 
-func (e *Executor) CreatePool(name string, config string, voter ibc.Wallet) {
+func (e *Executor) CreatePool(name string, pc PoolConfig, voter ibc.Wallet) {
 	ctx, cancel := context.WithTimeout(context.Background(), 2*defaultQueryTimeout+defaultTxTimeout)
 	defer cancel()
 
@@ -111,8 +111,8 @@ func (e *Executor) CreatePool(name string, config string, voter ibc.Wallet) {
 		Name:                 name,
 		Runtime:              fmt.Sprintf("@kyvejs/%s", name),
 		Logo:                 "ar://Tewyv2P5VEG8EJ6AUQORdqNTectY9hlOrWPK8wwo-aU",
-		Config:               config,
-		StartKey:             "1",
+		Config:               pc.Config,
+		StartKey:             pc.StartKey,
 		UploadInterval:       20,
 		InflationShareWeight: 2500000000,
 		MinDelegation:        100,

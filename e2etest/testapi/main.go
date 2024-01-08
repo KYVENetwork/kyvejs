@@ -184,6 +184,8 @@ func main() {
 					}
 				}
 
+				fmt.Println(fmt.Sprintf("No data found for %s: %s", endpoint.Path(), strings.Join(keys, ", ")))
+
 				// Send not found
 				w.WriteHeader(http.StatusNotFound)
 			})

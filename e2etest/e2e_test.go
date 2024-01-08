@@ -32,10 +32,10 @@ var _ = Describe(fmt.Sprintf("Protocol e2e Tests"), Ordered, func() {
 	BeforeAll(func() {
 		var ctx = context.Background()
 		for _, integration := range integrationNames {
-			poolConfig, err := protocolRunner.GetTestDataPoolConfig(integration)
+			poolConfig, err := protocolRunner.GetPoolConfigFromTestData(integration)
 			Expect(err).To(BeNil())
 			testConfigs = append(testConfigs, &utils.TestConfig{
-				PoolConfig:  poolConfig,
+				PoolConfig:  *poolConfig,
 				Integration: integration,
 			})
 		}
@@ -93,7 +93,7 @@ var _ = Describe(fmt.Sprintf("Protocol e2e Tests"), Ordered, func() {
 		executor.CreateProtocolNode(testConfigs[0].Bob.ProtocolNode)
 		executor.CreateProtocolNode(testConfigs[0].Viktor.ProtocolNode)
 
-		// Start the protocol nodes and all dependencies
+		// Start the integration containers and dependencies
 		protocolRunner.Init(network, kyveChain.GetAPIAddress(), kyveChain.GetRPCAddress())
 		err = protocolRunner.RunProtocolIntegrations(client, network)
 		Expect(err).To(BeNil())
@@ -164,7 +164,7 @@ func generateProtocolNodeTest(protocolRunner *utils.ProtocolRunner, executor *ut
 
 			// Wait for 4 finalized bundles to be created
 			waitForBundles := 4
-			err = testutil.WaitForCondition(10*time.Minute, 5*time.Second, func() (bool, error) {
+			err = testutil.WaitForCondition(5*time.Minute, 5*time.Second, func() (bool, error) {
 				return len(executor.GetFinalizedBundles(testConfig.PoolId).FinalizedBundles) == waitForBundles, nil
 			})
 			Expect(err).To(
