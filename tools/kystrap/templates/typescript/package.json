@@ -4,19 +4,12 @@
   "license": "Apache-2.0",
   "scripts": {
     "build": "rimraf dist && tsc",
-    "build:binaries": "yarn build && rimraf out && pkg package.json && node ../../common/protocol/dist/src/scripts/checksum.js",
-    "build:docker:binaries": "yarn build && rimraf out && pkg --target latest-linux-x64 package.json",
     "start": "ts-node ./src/index.ts",
     "format": "prettier --write ."
   },
   "bin": "./dist/src/index.js",
   "pkg": {
     "scripts": "./dist/src/index.js",
-    "targets": [
-      "latest-linux-x64",
-      "latest-linux-arm64",
-      "latest-macos-x64"
-    ],
     "outputPath": "out",
     "noBytecode": true,
     "publicPackages": [

@@ -14,19 +14,14 @@ Running the runtime
 yarn start
 ```
 
-Building the runtime binary
-```bash
-yarn build
-```
-
 ## Usage with Docker
 
 Building the Docker image
 ```bash
-docker build -t kyve/{{ .name }} .
+make docker-image
 ```
 
 Running the runtime container
 ```bash
-docker run --rm -p 50051:50051 kyve/{{ .name }}
+make docker-run
 ```

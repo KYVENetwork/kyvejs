@@ -9,7 +9,11 @@ COPY go.mod go.sum ./
 RUN go mod download
 
 # Copy source files
-COPY . ./
+COPY bootstrap ./bootstrap
+COPY cmd ./cmd
+COPY grpcall ./grpcall
+COPY types ./types
+COPY main.go ./
 
 # Build the Go app
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o kystrap .
