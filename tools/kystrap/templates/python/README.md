@@ -2,6 +2,11 @@
 
 This is the {{ .name | ToTitle }} runtime server.
 
+## Requirements
+- Make
+- Docker
+- Python 3 (only for development)
+
 ## Usage
 
 Setup
@@ -23,10 +28,10 @@ python main.py
 
 Building the Docker image
 ```bash
-docker build -t kyve/{{ .name }} .
+make docker-image
 ```
 
 Running the runtime container
 ```bash
-docker run --rm -p 50051:50051 kyve/{{ .name }}
+make docker-run
 ```

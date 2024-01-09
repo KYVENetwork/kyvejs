@@ -2,6 +2,11 @@
 
 This is the {{ .name | ToTitle }} runtime server.
 
+## Requirements
+- Make
+- Docker
+- Go (only for development)
+
 ## Usage
 
 Setup
