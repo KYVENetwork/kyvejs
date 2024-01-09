@@ -19,4 +19,4 @@ COPY server ./server
 EXPOSE 50051
 
 # Run the Python script
-CMD ["python", "main.py"]
+CMD ["python", "-u", "main.py"]

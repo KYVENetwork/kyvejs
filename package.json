@@ -27,7 +27,7 @@
     "graph": "yarn nx graph",
     "build": "lerna run build",
     "build:binaries": "lerna run build:binaries --concurrency 1",
-    "generate:protos": "bash proto/proto-gen.sh",
+    "generate:protos": "sh proto/proto-gen.sh",
     "bootstrap:integration": "sh tools/kystrap/start.sh create",
     "pub": "lerna run build && lerna publish",
     "build:changed": "lerna run --since origin/master --include-dependents build",

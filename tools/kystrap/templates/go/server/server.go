@@ -3,14 +3,10 @@ package server
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	bundlestypes "github.com/KYVENetwork/chain/x/bundles/types"
 	pb "github.com/KYVENetwork/kyvejs/integrations/{{ .name }}/proto/kyverdk/runtime/v1"
-	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"log"
-	"net"
 	"reflect"
 	"strconv"
 )
@@ -237,26 +233,4 @@ func (t *{{ .name | ToPascal }}Server) NextKey(ctx context.Context, req *pb.Next
 	nextKey := parsedKey + 1
 
 	return &pb.NextKeyResponse{NextKey: strconv.Itoa(nextKey)}, nil
-}
-
-func StartServer() {
-	// Initialize the gRPC server and listen on port 50051
-	fmt.Println("Initializing {{ .name | ToTitle }} runtime...")
-	listener, err := net.Listen("tcp", ":50051")
-	if err != nil {
-		log.Fatalf("Failed to listen on port 50051: %v", err)
-	}
-
-	// Create a new gRPC server instance
-	server := grpc.NewServer()
-
-	// Register the Tendermint service with the gRPC server
-	pb.RegisterRuntimeServiceServer(server, &{{ .name | ToPascal }}Server{})
-
-	// Start serving incoming connections
-	fmt.Printf("{{ .name | ToTitle }} gRPC Server is running...\nPress Ctrl + C to exit.\n")
-	err = server.Serve(listener)
-	if err != nil {
-		log.Fatalf("Failed to serve gRPC server: %v", err)
-	}
 }
