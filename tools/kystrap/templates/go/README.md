@@ -4,25 +4,29 @@ This is the {{ .name | ToTitle }} runtime server.
 
 ## Usage
 
-* Running the runtime::
-    ```bash
-      go run main.go
-    ```
+Setup
+```bash
+go mod tidy
+```
 
-* Building the runtime binary::
-    ```bash
-      make build
-    ```
+Running the runtime
+```bash
+go run main.go
+```
+
+Building the runtime binary
+```bash
+make build
+```
   
-* Building the Docker image::
-    ```bash
-      make docker-image
-    ```
+## Usage with Docker
 
-* Running the runtime container::
+Building the Docker image
+```bash
+make docker-image
+```
 
-    ```bash
-      make docker-run
-    ```
-
-
+Running the runtime container
+```bash
+make docker-run
+```

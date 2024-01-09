@@ -6,17 +6,17 @@ This is the {{ .name | ToTitle }} runtime server.
 
 Setup
 ```bash
-yarn install
+# Install virtualenv
+python -m venv venv
+source venv/bin/activate
+
+# Install dependencies
+pip install -r requirements.txt
 ```
 
 Running the runtime
 ```bash
-yarn start
-```
-
-Building the runtime binary
-```bash
-yarn build
+python main.py
 ```
 
 ## Usage with Docker

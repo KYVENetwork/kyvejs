@@ -5,9 +5,8 @@
   "scripts": {
     "build": "rimraf dist && tsc",
     "build:binaries": "yarn build && rimraf out && pkg package.json && node ../../common/protocol/dist/src/scripts/checksum.js",
-    "build:docker": "docker build -t kyve/{{ .name }} .",
     "build:docker:binaries": "yarn build && rimraf out && pkg --target latest-linux-x64 package.json",
-    "start": "node ./dist/src/index.js",
+    "start": "ts-node ./src/index.ts",
     "format": "prettier --write ."
   },
   "bin": "./dist/src/index.js",
