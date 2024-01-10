@@ -22,19 +22,22 @@ func TestIntegrations(t *testing.T) {
 	RunSpecs(t, fmt.Sprint("Kyvejs integration tests"))
 }
 
-var _ = Describe(fmt.Sprintf("Protocol e2e Tests"), Ordered, func() {
-	var interchain *interchaintest.Interchain
-	var executor = utils.NewExecutor()
-	var protocolRunner = utils.NewProtocolRunner()
-	var testConfigs []*utils.TestConfig
-	var integrationNames = protocolRunner.GetIntegrationDirs()
+const testName = "Kyvejs e2e tests"
 
-	BeforeAll(func() {
+var interchain *interchaintest.Interchain
+var executor = utils.NewExecutor()
+var protocolRunner = utils.NewProtocolRunner()
+var testConfigs = &[]*utils.TestConfig{}
+var integrationNames = protocolRunner.GetIntegrationDirs()
+
+var _ = SynchronizedBeforeSuite(
+	//runs *only* on process #1
+	func() {
 		var ctx = context.Background()
 		for _, integration := range integrationNames {
 			poolConfig, err := protocolRunner.GetPoolConfigFromTestData(integration)
 			Expect(err).To(BeNil())
-			testConfigs = append(testConfigs, &utils.TestConfig{
+			*testConfigs = append(*testConfigs, &utils.TestConfig{
 				PoolConfig:  *poolConfig,
 				Integration: integration,
 			})
@@ -48,7 +51,7 @@ var _ = Describe(fmt.Sprintf("Protocol e2e Tests"), Ordered, func() {
 			[]*interchaintest.ChainSpec{utils.KyveChainSpec(ctx, genesisWrapper, numValidators, numFullNodes)},
 		)
 
-		chains, err := factory.Chains(GinkgoT().Name())
+		chains, err := factory.Chains(testName)
 		Expect(err).To(BeNil())
 		kyveChain := chains[0].(*cosmos.CosmosChain)
 		genesisWrapper.Chain = kyveChain
@@ -61,12 +64,18 @@ var _ = Describe(fmt.Sprintf("Protocol e2e Tests"), Ordered, func() {
 		Expect(err).To(BeNil())
 
 		err = interchain.Build(ctx, nil, interchaintest.InterchainBuildOptions{
-			TestName:         GinkgoT().Name(),
+			TestName:         testName,
 			Client:           client,
 			NetworkID:        network,
 			SkipPathCreation: true,
 		})
 		Expect(err).To(BeNil())
+		DeferCleanup(func() {
+			err := interchain.Close()
+			if err != nil {
+				fmt.Println(err)
+			}
+		})
 
 		broadcaster := cosmos.NewBroadcaster(GinkgoT(), kyveChain)
 		broadcaster.ConfigureClientContextOptions(func(clientContext sdkclient.Context) sdkclient.Context {
@@ -81,19 +90,25 @@ var _ = Describe(fmt.Sprintf("Protocol e2e Tests"), Ordered, func() {
 		// Init executor and protocol runner
 		executor.Init(kyveChain, broadcaster)
 		protocolRunner.Init(network, kyveChain.GetAPIAddress(), kyveChain.GetRPCAddress())
+		DeferCleanup(func() {
+			err = protocolRunner.Cleanup()
+			if err != nil {
+				fmt.Println(err)
+			}
+		})
 
 		// Stake Alice's token to give her voting power
-		executor.DelegateToValidator(ctx, testConfigs[0].Alice.ProtocolNode, 9_000_000_000_000)
+		executor.DelegateToValidator(ctx, (*testConfigs)[0].Alice.ProtocolNode, 9_000_000_000_000)
 
 		// Create one pool for every integration (per gov proposal)
-		for _, cfg := range testConfigs {
-			executor.CreatePool(cfg.Integration, cfg.PoolConfig, testConfigs[0].Alice.ProtocolNode)
+		for _, cfg := range *testConfigs {
+			executor.CreatePool(cfg.Integration, cfg.PoolConfig, (*testConfigs)[0].Alice.ProtocolNode)
 		}
 
 		// Create 3 protocol nodes
-		executor.CreateProtocolNode(testConfigs[0].Alice.ProtocolNode)
-		executor.CreateProtocolNode(testConfigs[0].Bob.ProtocolNode)
-		executor.CreateProtocolNode(testConfigs[0].Viktor.ProtocolNode)
+		executor.CreateProtocolNode((*testConfigs)[0].Alice.ProtocolNode)
+		executor.CreateProtocolNode((*testConfigs)[0].Bob.ProtocolNode)
+		executor.CreateProtocolNode((*testConfigs)[0].Viktor.ProtocolNode)
 
 		// Wait for all pools to be created (gov proposals)
 		expectedPoolCnt := len(integrationNames)
@@ -102,7 +117,7 @@ var _ = Describe(fmt.Sprintf("Protocol e2e Tests"), Ordered, func() {
 			configuredConfigs := map[string]interface{}{}
 			if len(pools) == expectedPoolCnt {
 				for _, pool := range pools {
-					for _, testConfig := range testConfigs {
+					for _, testConfig := range *testConfigs {
 						if pool.GetData().Name == testConfig.Integration {
 							testConfig.PoolId = pool.GetData().Id
 							configuredConfigs[testConfig.Integration] = nil
@@ -115,62 +130,49 @@ var _ = Describe(fmt.Sprintf("Protocol e2e Tests"), Ordered, func() {
 			return false, nil
 		})
 		Expect(err).To(BeNil())
-	})
+	}, func() {})
 
-	AfterAll(func() {
-		err := interchain.Close()
-		if err != nil {
-			fmt.Println(err)
-		}
-
-		err = protocolRunner.Cleanup()
-		if err != nil {
-			fmt.Println(err)
-		}
-	})
-
+var _ = Describe(fmt.Sprintf("Protocol e2e Tests"), func() {
 	for _, integration := range integrationNames {
-		generateProtocolNodeTest(protocolRunner, executor, integration, &testConfigs)
+		generateProtocolNodeTest(integration)
 	}
 })
 
-func generateProtocolNodeTest(protocolRunner *utils.ProtocolRunner, executor *utils.Executor, integration string, testConfigs *[]*utils.TestConfig) {
-	var getTestConfig = func(name string) *utils.TestConfig {
+func generateProtocolNodeTest(integration string) {
+	var getTestConfig = func(name string) utils.TestConfig {
 		for _, testConfig := range *testConfigs {
 			if testConfig.Integration == name {
-				return testConfig
+				return *testConfig
 			}
 		}
 		Fail(fmt.Sprintf("Test config for integration %s not found", name))
-		return nil
+		return utils.TestConfig{}
 	}
 
-	Describe(fmt.Sprintf("Test protocol integration %s", integration), func() {
-		It(fmt.Sprintf("Test finalized bundles for %s", integration), func() {
-			testConfig := getTestConfig(integration)
+	It(fmt.Sprintf("Test finalized bundles for %s", integration), func() {
+		testConfig := getTestConfig(integration)
 
-			err := protocolRunner.RunProtocolNodes(testConfig)
-			Expect(err).To(BeNil())
-			//goland:noinspection GoUnhandledErrorResult
-			defer protocolRunner.StopProtocolNodes(testConfig)
+		err := protocolRunner.RunProtocolNodes(testConfig)
+		Expect(err).To(BeNil())
+		//goland:noinspection GoUnhandledErrorResult
+		defer protocolRunner.StopProtocolNodes(testConfig)
 
-			// Join the pool with 3 protocol nodes
-			executor.JoinPool(testConfig.Alice.ProtocolNode, testConfig.Alice.Valaccount, testConfig.PoolId)
-			executor.JoinPool(testConfig.Bob.ProtocolNode, testConfig.Bob.Valaccount, testConfig.PoolId)
-			executor.JoinPool(testConfig.Viktor.ProtocolNode, testConfig.Viktor.Valaccount, testConfig.PoolId)
+		// Join the pool with 3 protocol nodes
+		executor.JoinPool(testConfig.Alice.ProtocolNode, testConfig.Alice.Valaccount, testConfig.PoolId)
+		executor.JoinPool(testConfig.Bob.ProtocolNode, testConfig.Bob.Valaccount, testConfig.PoolId)
+		executor.JoinPool(testConfig.Viktor.ProtocolNode, testConfig.Viktor.Valaccount, testConfig.PoolId)
 
-			// Wait for 4 finalized bundles to be created
-			waitForBundles := 4
-			err = testutil.WaitForCondition(5*time.Minute, 5*time.Second, func() (bool, error) {
-				return len(executor.GetFinalizedBundles(testConfig.PoolId).FinalizedBundles) == waitForBundles, nil
-			})
-			Expect(err).To(
-				BeNil(),
-				fmt.Sprintf("Failed to wait for %d finalized bundles\n"+
-					"Finaziled Bundles: %s",
-					waitForBundles,
-					executor.GetFinalizedBundles(testConfig.PoolId)),
-			)
+		// Wait for 4 finalized bundles to be created
+		waitForBundles := 4
+		err = testutil.WaitForCondition(5*time.Minute, 5*time.Second, func() (bool, error) {
+			return len(executor.GetFinalizedBundles(testConfig.PoolId).FinalizedBundles) == waitForBundles, nil
 		})
+		Expect(err).To(
+			BeNil(),
+			fmt.Sprintf("Failed to wait for %d finalized bundles\n"+
+				"Finaziled Bundles: %s",
+				waitForBundles,
+				executor.GetFinalizedBundles(testConfig.PoolId)),
+		)
 	})
 }

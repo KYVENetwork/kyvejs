@@ -63,10 +63,10 @@ func getRandomMnemonic() string {
 
 type GenesisWrapper struct {
 	Chain       *cosmos.CosmosChain
-	TestConfigs []*TestConfig
+	TestConfigs *[]*TestConfig
 }
 
-func NewGenesisWrapper(testConfigs []*TestConfig) *GenesisWrapper {
+func NewGenesisWrapper(testConfigs *[]*TestConfig) *GenesisWrapper {
 	return &GenesisWrapper{
 		TestConfigs: testConfigs,
 	}
@@ -131,7 +131,7 @@ func preGenesis(ctx context.Context, gw *GenesisWrapper) func(ibc.ChainConfig) e
 		if err != nil {
 			return err
 		}
-		for _, testConfig := range gw.TestConfigs {
+		for _, testConfig := range *gw.TestConfigs {
 			keyName := fmt.Sprintf("alice-valaccount-%s", testConfig.Integration)
 			val, err := createWallet(ctx, gw, keyName, 10_000_000)
 			if err != nil {

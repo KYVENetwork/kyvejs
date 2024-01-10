@@ -449,7 +449,7 @@ func (pc *ProtocolRunner) getVolume(integrationTag string) string {
 	panic(fmt.Sprintf("volume %s not found", volName))
 }
 
-func (pc *ProtocolRunner) findDockerConfig(testConfig *TestConfig) (*dockerConfig, error) {
+func (pc *ProtocolRunner) findDockerConfig(testConfig TestConfig) (*dockerConfig, error) {
 	for _, dc := range pc.integrationConfigs {
 		if dc.tag == integrationTag(testConfig.Integration) {
 			return &dc, nil
@@ -458,7 +458,7 @@ func (pc *ProtocolRunner) findDockerConfig(testConfig *TestConfig) (*dockerConfi
 	return nil, errors.New(fmt.Sprintf("test config for integration %s not found", testConfig.Integration))
 }
 
-func (pc *ProtocolRunner) RunProtocolNodes(testConfig *TestConfig) error {
+func (pc *ProtocolRunner) RunProtocolNodes(testConfig TestConfig) error {
 	if !pc.isInitialized {
 		return errors.New("protocol runner not initialized")
 	}
@@ -512,7 +512,7 @@ func (pc *ProtocolRunner) RunProtocolNodes(testConfig *TestConfig) error {
 	return nil
 }
 
-func (pc *ProtocolRunner) StopProtocolNodes(testConfig *TestConfig) error {
+func (pc *ProtocolRunner) StopProtocolNodes(testConfig TestConfig) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*60)
 	defer cancel()
 
