@@ -10,5 +10,5 @@ async def serve(*, host='0.0.0.0', port=50051):
     # Note: graceful_exit isn't supported in Windows
     with graceful_exit([server]):
         await server.start(host, port)
-        print(f'Serving on {host}:{port}')
+        print(f'🌐 {{ .name | ToPascal }}Server is running on http://{host}:{port}\nPress Ctrl + C to exit.')
         await server.wait_closed()

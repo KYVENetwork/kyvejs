@@ -52,15 +52,19 @@ fi
 # Run docker image
 if [ "$NON_INTERACTIVE" = true ]; then
   docker run \
-    --rm                                  `# Remove container after run` \
-    --user "$(id -u):$(id -g)"            `# Run as current user` \
-    -v "$INTEGRATIONS_DIR":/app/out       `# Mount integrations folder` \
-    kystrap $(echo "$@")                   # Pass all arguments to kystrap
+    --rm                                          `# Remove container after run` \
+    --user "$(id -u):$(id -g)"                    `# Run as current user` \
+    --net="host"                                  `# Use host network` \
+    --add-host=host.docker.internal:host-gateway  `# Add host.docker.internal to /etc/hosts` \
+    -v "$INTEGRATIONS_DIR":/app/out               `# Mount integrations folder` \
+    kystrap $(echo "$@")                           # Pass all arguments to kystrap
 else
   docker run \
-    -it                                   `# Run in interactive mode` \
-    --rm                                  `# Remove container after run` \
-    --user "$(id -u):$(id -g)"            `# Run as current user` \
-    -v "$INTEGRATIONS_DIR":/app/out       `# Mount integrations folder` \
-    kystrap $(echo "$@")                   # Pass all arguments to kystrap
+    -it                                           `# Run in interactive mode` \
+    --rm                                          `# Remove container after run` \
+    --user "$(id -u):$(id -g)"                    `# Run as current user` \
+    --net="host"                                  `# Use host network` \
+    --add-host=host.docker.internal:host-gateway  `# Add host.docker.internal to /etc/hosts` \
+    -v "$INTEGRATIONS_DIR":/app/out               `# Mount integrations folder` \
+    kystrap $(echo "$@")                           # Pass all arguments to kystrap
 fi

@@ -24,7 +24,7 @@ func newExecutionInfo() executionInfo {
 		method:   nil,
 		position: 0,
 		success:  false,
-		address:  "localhost:50051",
+		address:  "host.docker.internal:50051",
 	}
 }
 

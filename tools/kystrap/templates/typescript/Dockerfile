@@ -14,9 +14,10 @@ RUN yarn install
 
 # Copy source files
 COPY ./src ./src
+COPY Makefile ./
 
-# Build the docker core
-RUN yarn run build:docker:binaries
+# Build binary
+RUN BINARY_NAME=kyve-runtime make build
 
 ################## Build Stage 2 ##################
 # Create a slim runtime image with only the necessary files for execution
@@ -30,7 +31,7 @@ EXPOSE 50051
 WORKDIR /usr/src/app
 
 # Copy the compiled output from the build stage
-COPY --from=build /usr/src/app/out/{{ .name }} ./kyve-runtime
+COPY --from=build /usr/src/app/kyve-runtime ./kyve-runtime
 
 # Set the command to run when the container starts
 CMD ["./kyve-runtime"]

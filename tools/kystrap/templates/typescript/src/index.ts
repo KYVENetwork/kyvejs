@@ -32,7 +32,7 @@ runtimeServer.bindAsync(
     if (error) {
       console.error('Error binding server:', error);
     } else {
-      console.log(`Server running at http://0.0.0.0:${port}`);
+      console.log(`🌐 {{ .name | ToPascal }}Server is running on http://0.0.0.0:${port}\nPress Ctrl + C to exit.`);
       runtimeServer.start();
     }
   }

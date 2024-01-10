@@ -29,5 +29,5 @@ COPY --from=build /app/build/kyve-runtime ./kyve-runtime
 # Expose gRPC port
 EXPOSE 50051
 
-# Run the server
+# Set the command to run when the container starts
 CMD ["./kyve-runtime"]
