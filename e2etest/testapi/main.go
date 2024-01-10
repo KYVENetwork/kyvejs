@@ -8,6 +8,8 @@ import (
 	"strings"
 )
 
+const dataDir = "api"
+
 type DataType string
 
 const (
@@ -40,15 +42,16 @@ func (e Endpoint) hasSingleDataEntry() bool {
 }
 
 func (e Endpoint) Path() string {
+	path := strings.TrimPrefix(e.basePath, dataDir)
 	if e.hasSingleDataEntry() {
-		return fmt.Sprintf("/%s", e.basePath)
+		return fmt.Sprintf("%s", path)
 	}
 	for _, dataEntry := range *e.Data {
 		if dataEntry.HasQueryParam {
-			return fmt.Sprintf("/%s", e.basePath)
+			return fmt.Sprintf("%s", path)
 		}
 	}
-	return fmt.Sprintf("/%s/", e.basePath)
+	return fmt.Sprintf("%s/", path)
 }
 
 func (e Endpoint) CheckConsistency() error {
@@ -90,46 +93,52 @@ func addToEndpoints(endpoints *[]Endpoint, path string, dataEntry DataEntry) {
 	*endpoints = append(*endpoints, Endpoint{basePath: path, Data: &[]DataEntry{dataEntry}})
 }
 
+func readDirRecursively(path string, endpoints *[]Endpoint) error {
+	dir, err := os.ReadDir(path)
+	if err != nil {
+		return err
+	}
+	for _, d := range dir {
+		fullPath := path + "/" + d.Name()
+		if d.Type().IsDir() {
+			err := readDirRecursively(fullPath, endpoints)
+			if err != nil {
+				return err
+			}
+		} else if d.Type().IsRegular() {
+			split := strings.Split(d.Name(), ".")
+			if split[len(split)-1] != "json" {
+				continue
+			}
+			key := split[0]
+
+			file, err := os.ReadFile(fullPath)
+			if err != nil {
+				return err
+			}
+
+			data, dt, err := unmarshalJSON(file)
+			if err != nil {
+				return err
+			}
+
+			addToEndpoints(endpoints, path, DataEntry{
+				Key:           key,
+				Data:          data,
+				DataType:      dt,
+				HasQueryParam: strings.HasPrefix(key, "?"),
+			})
+		}
+	}
+	return nil
+}
+
 func readEndpoints() ([]Endpoint, error) {
 	var endpoints []Endpoint
 
-	dir, err := os.ReadDir("api")
+	err := readDirRecursively(dataDir, &endpoints)
 	if err != nil {
 		return nil, err
-	}
-	for _, d := range dir {
-		if d.Type().IsDir() {
-			subdir, err := os.ReadDir("api/" + d.Name())
-			if err != nil {
-				return nil, err
-			}
-			for _, f := range subdir {
-				if f.Type().IsRegular() {
-					split := strings.Split(f.Name(), ".")
-					if split[len(split)-1] != "json" {
-						continue
-					}
-					key := split[0]
-
-					file, err := os.ReadFile("api/" + d.Name() + "/" + f.Name())
-					if err != nil {
-						return nil, err
-					}
-
-					data, dt, err := unmarshalJSON(file)
-					if err != nil {
-						return nil, err
-					}
-
-					addToEndpoints(&endpoints, d.Name(), DataEntry{
-						Key:           key,
-						Data:          data,
-						DataType:      dt,
-						HasQueryParam: strings.HasPrefix(key, "?"),
-					})
-				}
-			}
-		}
 	}
 
 	for _, endpoint := range endpoints {
@@ -174,7 +183,11 @@ func main() {
 				for _, key := range keys {
 					for _, entry := range *endpoint.Data {
 						if entry.Key == key {
-							fmt.Println(fmt.Sprintf("Sending data for %s%s", endpoint.Path(), key))
+							if endpoint.hasSingleDataEntry() {
+								fmt.Println(fmt.Sprintf("Sending data for %s", endpoint.Path()))
+							} else {
+								fmt.Println(fmt.Sprintf("Sending data for %s/%s", endpoint.Path(), strings.Join(keys, ", ")))
+							}
 							err := json.NewEncoder(w).Encode(entry.Data)
 							if err != nil {
 								panic(err)
@@ -184,15 +197,43 @@ func main() {
 					}
 				}
 
-				fmt.Println(fmt.Sprintf("No data found for %s: %s", endpoint.Path(), strings.Join(keys, ", ")))
+				if endpoint.hasSingleDataEntry() {
+					fmt.Println(fmt.Sprintf("No data found for %s", endpoint.Path()))
+				} else {
+					fmt.Println(fmt.Sprintf("No data found for %s/%s", endpoint.Path(), strings.Join(keys, ", ")))
+				}
 
 				// Send not found
 				w.WriteHeader(http.StatusNotFound)
+				_, _ = w.Write([]byte("404: Page not found"))
 			})
 		}(endpoint)
 	}
 
-	fmt.Println("Starting server at port 8080")
+	// Add default handler
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println(fmt.Sprintf("No endpoint registered for %s", r.URL.Path))
+
+		// Send not found
+		w.WriteHeader(http.StatusNotFound)
+		_, _ = w.Write([]byte("404: Page not found"))
+	})
+
+	// Print server info
+	fmt.Println("Starting server on http://localhost:8080\n\nExposed endpoints:")
+	for _, endpoint := range endpoints {
+		fmt.Println(fmt.Sprintf("http://localhost:8080%s", endpoint.Path()))
+		if !endpoint.hasSingleDataEntry() {
+			var keys []string
+			for _, dataEntry := range *endpoint.Data {
+				keys = append(keys, dataEntry.Key)
+			}
+			fmt.Println(fmt.Sprintf("  %s", strings.Join(keys, " ")))
+		}
+		fmt.Println()
+	}
+
+	// Start server
 	if err := http.ListenAndServe(":8080", nil); err != nil {
 		panic(err)
 	}
