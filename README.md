@@ -128,7 +128,25 @@ reviewed and approved your PR it can be merged and used.
 
 ### How to write a KYVE integration
 
-[Develop a new KYVE integration](./tools/kystrap/README.md)
+**Prerequisites:**
+- Docker
+- yarn (optional)
+
+#### Bootstrap a new integration
+
+Run the following command to start the integration wizard:
+
+```bash
+# with yarn
+yarn bootstrap:integration
+```
+```bash
+# or without yarn
+sh ./tools/kystrap/start.sh
+```
+
+Follow the instructions to create a new integration.
+The wizard will create a new folder in `integrations` with the integration name you provided.
 
 ## How to release
 
