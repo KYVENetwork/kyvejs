@@ -78,7 +78,9 @@ var _ = Describe(fmt.Sprintf("Protocol e2e Tests"), Ordered, func() {
 				WithGas(flags.DefaultGasLimit * 10)
 		})
 
+		// Init executor and protocol runner
 		executor.Init(kyveChain, broadcaster)
+		protocolRunner.Init(network, kyveChain.GetAPIAddress(), kyveChain.GetRPCAddress())
 
 		// Stake Alice's token to give her voting power
 		executor.DelegateToValidator(ctx, testConfigs[0].Alice.ProtocolNode, 9_000_000_000_000)
@@ -92,11 +94,6 @@ var _ = Describe(fmt.Sprintf("Protocol e2e Tests"), Ordered, func() {
 		executor.CreateProtocolNode(testConfigs[0].Alice.ProtocolNode)
 		executor.CreateProtocolNode(testConfigs[0].Bob.ProtocolNode)
 		executor.CreateProtocolNode(testConfigs[0].Viktor.ProtocolNode)
-
-		// Start the integration containers and dependencies
-		protocolRunner.Init(network, kyveChain.GetAPIAddress(), kyveChain.GetRPCAddress())
-		err = protocolRunner.RunProtocolIntegrations(client, network)
-		Expect(err).To(BeNil())
 
 		// Wait for all pools to be created (gov proposals)
 		expectedPoolCnt := len(integrationNames)

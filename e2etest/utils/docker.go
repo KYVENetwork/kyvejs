@@ -18,6 +18,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"slices"
 	"time"
 )
 
@@ -430,8 +431,12 @@ func kyveStorageVolumeName(integrationTag string) string {
 	return fmt.Sprintf("%s-%s", kyveStorageName, integrationTag)
 }
 
-func protocolContainerName(protocolConfig dockerConfig, integrationConfig *dockerConfig, pc ProtocolConfig) string {
-	return fmt.Sprintf("%s-%s-%s", protocolConfig.tag, integrationConfig.tag, pc.ProtocolNode.KeyName())
+func (pc *ProtocolRunner) protocolContainerName(integrationConfig *dockerConfig, ps ProtocolConfig) string {
+	return fmt.Sprintf("%s-%s-%s", pc.protocolConfig.tag, integrationConfig.tag, ps.ProtocolNode.KeyName())
+}
+
+func (pc *ProtocolRunner) testapiContainerName(integrationConfig *dockerConfig) string {
+	return fmt.Sprintf("%s-%s", pc.testapiConfig.tag, integrationConfig.tag)
 }
 
 func (pc *ProtocolRunner) getVolume(integrationTag string) string {
@@ -442,34 +447,6 @@ func (pc *ProtocolRunner) getVolume(integrationTag string) string {
 		}
 	}
 	panic(fmt.Sprintf("volume %s not found", volName))
-}
-
-func (pc *ProtocolRunner) RunProtocolIntegrations(cli *client.Client, networkId string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10*time.Duration(len(pc.integrationConfigs)))
-	defer cancel()
-
-	for _, integrationConfig := range pc.integrationConfigs {
-		dataPath, err := getTestDataPath(integrationConfig.path)
-		if err != nil {
-			return err
-		}
-
-		// Run testapi
-		containerName := fmt.Sprintf("%s-%s", pc.testapiConfig.tag, integrationConfig.tag)
-		testapiConfig := pc.testapiConfig.toContainerConfig(containerName, networkId, nil)
-		testapiConfig.binds = []string{fmt.Sprintf("%s:%s:ro", dataPath, kyveStorageMountApi)}
-		err = runDocker(ctx, cli, testapiConfig)
-		if err != nil {
-			return err
-		}
-
-		// Run integration
-		err = runDocker(ctx, cli, integrationConfig.toContainerConfig("", networkId, nil))
-		if err != nil {
-			return err
-		}
-	}
-	return nil
 }
 
 func (pc *ProtocolRunner) findDockerConfig(testConfig *TestConfig) (*dockerConfig, error) {
@@ -501,9 +478,29 @@ func (pc *ProtocolRunner) RunProtocolNodes(testConfig *TestConfig) error {
 		return err
 	}
 
+	dataPath, err := getTestDataPath(integrationConfig.path)
+	if err != nil {
+		return err
+	}
+
+	// Run testapi
+	containerName := pc.testapiContainerName(integrationConfig)
+	testapiConfig := pc.testapiConfig.toContainerConfig(containerName, pc.networkId, nil)
+	testapiConfig.binds = []string{fmt.Sprintf("%s:%s:ro", dataPath, kyveStorageMountApi)}
+	err = runDocker(ctx, cli, testapiConfig)
+	if err != nil {
+		return err
+	}
+
+	// Run integration
+	err = runDocker(ctx, cli, integrationConfig.toContainerConfig("", pc.networkId, nil))
+	if err != nil {
+		return err
+	}
+
 	// Run protocol with multiple protocol nodes
 	for _, cfg := range testConfig.GetProtocolConfigs() {
-		containerName := protocolContainerName(pc.protocolConfig, integrationConfig, cfg)
+		containerName = pc.protocolContainerName(integrationConfig, cfg)
 		env := getProtocolEnv(cfg.Valaccount.Mnemonic(), pc.rpcAddress, pc.restAddress, integrationConfig.tag, testConfig.PoolId, true)
 		protocolConfig := pc.protocolConfig.toContainerConfig(containerName, pc.networkId, env)
 		protocolConfig.binds = []string{fmt.Sprintf("%s:%s", pc.getVolume(integrationConfig.tag), kyveStorageMountProtocol)}
@@ -526,6 +523,7 @@ func (pc *ProtocolRunner) StopProtocolNodes(testConfig *TestConfig) error {
 	//goland:noinspection GoUnhandledErrorResult
 	defer cli.Close()
 
+	// Get all containers with the cleanup label
 	containers, err := cli.ContainerList(ctx, types.ContainerListOptions{
 		All: true,
 		Filters: filters.NewArgs(
@@ -541,18 +539,26 @@ func (pc *ProtocolRunner) StopProtocolNodes(testConfig *TestConfig) error {
 		return err
 	}
 
+	// Collect all containers that should be removed
+	testapiContName := pc.testapiContainerName(integrationConfig)
+	integrationContName := integrationConfig.tag
+	toBeRemoved := []string{"/" + testapiContName, "/" + integrationContName}
 	for _, cfg := range testConfig.GetProtocolConfigs() {
-		containerName := protocolContainerName(pc.protocolConfig, integrationConfig, cfg)
-		for _, cont := range containers {
-			if cont.Names[0] == fmt.Sprintf("/%s", containerName) {
-				err = cli.ContainerRemove(ctx, cont.ID, types.ContainerRemoveOptions{
-					Force: true,
-				})
-				if err != nil {
-					return err
-				}
+		pcContName := pc.protocolContainerName(integrationConfig, cfg)
+		toBeRemoved = append(toBeRemoved, "/"+pcContName)
+	}
+
+	// Remove the containers
+	for _, cont := range containers {
+		if slices.Contains(toBeRemoved, cont.Names[0]) {
+			err = cli.ContainerRemove(ctx, cont.ID, types.ContainerRemoveOptions{
+				Force: true,
+			})
+			if err != nil {
+				return err
 			}
 		}
 	}
+
 	return nil
 }
