@@ -2,12 +2,12 @@
 
 This is the {{ .name | ToTitle }} runtime server.
 
-## Requirements
-- Make
-- Docker
-- Python 3 (only for development)
+## Development
 
-## Usage
+### Requirements
+- Docker
+- Python 3
+- Make (optional)
 
 Setup
 ```bash
@@ -24,14 +24,13 @@ Running the runtime
 python main.py
 ```
 
-## Usage with Docker
+### Test the runtime
 
-Building the Docker image
+Start the runtime container and the kystrap container
 ```bash
-make docker-image
+docker compose up --build   # --build is only needed if you changed the runtime
 ```
-
-Running the runtime container
+Open another terminal and run
 ```bash
-make docker-run
+docker exec -it $(docker ps -qf "name={{ .name |ToLower }}-kystrap") ./kystrap test -a runtime:50051
 ```

@@ -18,5 +18,5 @@ COPY server ./server
 # Expose the gRPC port
 EXPOSE 50051
 
-# Run the Python script
+# Set the command to run when the container starts
 CMD ["python", "-u", "main.py"]
