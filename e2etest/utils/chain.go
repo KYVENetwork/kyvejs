@@ -32,25 +32,6 @@ const (
 	BundlesUploadTimeout = 10 * time.Second
 )
 
-type ProtocolConfig struct {
-	ProtocolNode ibc.Wallet
-	Valaccount   ibc.Wallet
-}
-
-type PoolConfig struct {
-	StartKey string `yaml:"startKey"`
-	Config   string `yaml:"config"`
-}
-
-type TestConfig struct {
-	Alice       ProtocolConfig
-	Bob         ProtocolConfig
-	Viktor      ProtocolConfig
-	PoolId      uint64
-	PoolConfig  PoolConfig
-	Integration string
-}
-
 func (tc *TestConfig) GetProtocolConfigs() []ProtocolConfig {
 	return []ProtocolConfig{tc.Alice, tc.Bob, tc.Viktor}
 }
@@ -132,7 +113,7 @@ func preGenesis(ctx context.Context, gw *GenesisWrapper) func(ibc.ChainConfig) e
 			return err
 		}
 		for _, testConfig := range *gw.TestConfigs {
-			keyName := fmt.Sprintf("alice-valaccount-%s", testConfig.Integration)
+			keyName := fmt.Sprintf("alice-valaccount-%s", testConfig.Integration.Name)
 			val, err := createWallet(ctx, gw, keyName, 10_000_000)
 			if err != nil {
 				return err
@@ -140,7 +121,7 @@ func preGenesis(ctx context.Context, gw *GenesisWrapper) func(ibc.ChainConfig) e
 			testConfig.Alice.ProtocolNode = alice
 			testConfig.Alice.Valaccount = val
 
-			keyName = fmt.Sprintf("bob-valaccount-%s", testConfig.Integration)
+			keyName = fmt.Sprintf("bob-valaccount-%s", testConfig.Integration.Name)
 			val, err = createWallet(ctx, gw, keyName, 10_000_000)
 			if err != nil {
 				return err
@@ -148,7 +129,7 @@ func preGenesis(ctx context.Context, gw *GenesisWrapper) func(ibc.ChainConfig) e
 			testConfig.Bob.ProtocolNode = bob
 			testConfig.Bob.Valaccount = val
 
-			keyName = fmt.Sprintf("viktor-valaccount-%s", testConfig.Integration)
+			keyName = fmt.Sprintf("viktor-valaccount-%s", testConfig.Integration.Name)
 			val, err = createWallet(ctx, gw, keyName, 10_000_000)
 			if err != nil {
 				return err

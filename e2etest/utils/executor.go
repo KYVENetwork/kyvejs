@@ -56,21 +56,21 @@ type Executor struct {
 	KyveChain   *cosmos.CosmosChain
 	Broadcaster *cosmos.Broadcaster
 	Q           Querier
+	g           *WithT
 }
 
-func NewExecutor() *Executor {
-	return &Executor{}
-}
-
-func (e *Executor) Init(kyveChain *cosmos.CosmosChain, broadcaster *cosmos.Broadcaster) {
-	e.KyveChain = kyveChain
-	e.Broadcaster = broadcaster
-	e.Q = NewQuerier(kyveChain)
+func NewExecutor(g *WithT, kyveChain *cosmos.CosmosChain, broadcaster *cosmos.Broadcaster) *Executor {
+	return &Executor{
+		KyveChain:   kyveChain,
+		Broadcaster: broadcaster,
+		Q:           NewQuerier(kyveChain),
+		g:           g,
+	}
 }
 
 func (e *Executor) ExpectTxSuccess(tx sdk.TxResponse, err error) {
-	ExpectWithOffset(1, err).To(BeNil())
-	ExpectWithOffset(1, tx.Code).To(Equal(uint32(0)), fmt.Sprintf("tx failed with code %d: %s", tx.Code, tx.RawLog))
+	e.g.ExpectWithOffset(1, err).To(BeNil())
+	e.g.ExpectWithOffset(1, tx.Code).To(Equal(uint32(0)), fmt.Sprintf("tx failed with code %d: %s", tx.Code, tx.RawLog))
 
 	if tx.Height == int64(0) {
 		res, _, _ := e.KyveChain.GetNode().ExecQuery(context.Background(), "tx", tx.TxHash)
@@ -85,7 +85,7 @@ func (e *Executor) DelegateToValidator(ctx context.Context, wallet ibc.Wallet, a
 	fmt.Println(fmt.Sprintf("%s is delegating %d to validator", wallet.FormattedAddress(), amount))
 
 	valResponse, err := e.Q.StakingClient.Validators(ctx, &stakingtypes.QueryValidatorsRequest{})
-	Expect(err).To(BeNil())
+	e.g.Expect(err).To(BeNil())
 	e.ExpectTxSuccess(cosmos.BroadcastTx(
 		ctx,
 		e.Broadcaster,
@@ -105,7 +105,7 @@ func (e *Executor) CreatePool(name string, pc PoolConfig, voter ibc.Wallet) {
 	fmt.Println(fmt.Sprintf("%s is creating pool %s", voter.FormattedAddress(), name))
 
 	govAuthority, err := e.KyveChain.GetModuleAddress(ctx, govmodule.ModuleName)
-	Expect(err).To(BeNil())
+	e.g.Expect(err).To(BeNil())
 	govPropMsg := pooltypes.MsgCreatePool{
 		Authority:            govAuthority,
 		Name:                 name,
@@ -130,11 +130,11 @@ func (e *Executor) CreatePool(name string, pc PoolConfig, voter ibc.Wallet) {
 		fmt.Sprintf("Create pool %s", name),
 		fmt.Sprintf("Create pool %s", name),
 	)
-	Expect(err).To(BeNil())
+	e.g.Expect(err).To(BeNil())
 
 	nextPropId := uint64(1)
 	proposals, err := e.Q.GovClient.Proposals(ctx, &govtypes.QueryProposalsRequest{Pagination: &sdkquery.PageRequest{Reverse: true, Limit: 1}})
-	Expect(err).To(BeNil())
+	e.g.Expect(err).To(BeNil())
 	if len(proposals.Proposals) == 1 {
 		nextPropId = proposals.Proposals[0].Id + 1
 	}
@@ -193,7 +193,7 @@ func (e *Executor) GetFinalizedBundles(poolId uint64) *querytypes.QueryFinalized
 	params := &querytypes.QueryFinalizedBundlesRequest{PoolId: poolId}
 
 	res, err := e.Q.Query.BundlesClient.FinalizedBundlesQuery(ctx, params)
-	Expect(err).To(BeNil())
+	e.g.Expect(err).To(BeNil())
 
 	return res
 }
@@ -205,7 +205,7 @@ func (e *Executor) GetPools() *querytypes.QueryPoolsResponse {
 	params := &querytypes.QueryPoolsRequest{}
 
 	res, err := e.Q.Query.PoolClient.Pools(ctx, params)
-	Expect(err).To(BeNil())
+	e.g.Expect(err).To(BeNil())
 
 	return res
 }
@@ -217,7 +217,7 @@ func (e *Executor) GetPool(poolId int) *querytypes.QueryPoolResponse {
 	params := &querytypes.QueryPoolRequest{Id: uint64(poolId)}
 
 	res, err := e.Q.Query.PoolClient.Pool(ctx, params)
-	Expect(err).To(BeNil())
+	e.g.Expect(err).To(BeNil())
 
 	return res
 }

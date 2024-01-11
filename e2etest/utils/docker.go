@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/creasty/defaults"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
@@ -14,7 +13,6 @@ import (
 	"github.com/docker/docker/api/types/volume"
 	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/archive"
-	"gopkg.in/yaml.v3"
 	"io"
 	"os"
 	"path/filepath"
@@ -36,50 +34,24 @@ const (
 	protocolPath = "../common/protocol"
 	// testapiPath is the path to the testapi folder
 	testapiPath = "testapi"
-	// integrationsPath is the path to the integrations folder
-	integrationsPath = "../integrations"
 )
 
-type ProtocolRunner struct {
-	protocolConfig     dockerConfig
-	testapiConfig      dockerConfig
-	integrationConfigs []dockerConfig
-	dockerVolumes      []volume.Volume
-
-	// Available after Init
-	isInitialized bool
-	networkId     string
-	restAddress   string
-	rpcAddress    string
-}
-
-func NewProtocolRunner() *ProtocolRunner {
-	return &ProtocolRunner{}
-}
-
-func (pc *ProtocolRunner) Init(networkId string, restAddress string, rpcAddress string) {
-	pc.networkId = networkId
-	pc.restAddress = restAddress
-	pc.rpcAddress = rpcAddress
-	pc.isInitialized = true
-}
-
-type dockerConfig struct {
+type DockerImage struct {
 	path  string
 	tag   string
 	binds []string
 }
 
-func (c dockerConfig) toContainerConfig(name string, networkId string, env []string) ContainerConfig {
+func (di DockerImage) toContainerConfig(name string, networkId string, env []string) ContainerConfig {
 	if name == "" {
-		name = c.tag
+		name = di.tag
 	}
 	return ContainerConfig{
-		image:     c.tag,
+		image:     di.tag,
 		name:      name,
 		networkId: networkId,
 		env:       env,
-		binds:     c.binds,
+		binds:     di.binds,
 	}
 }
 
@@ -156,7 +128,7 @@ func buildImage(dockerClient *client.Client, buildPath string, tag string) error
 	return nil
 }
 
-func buildImageAsync(dockerClient *client.Client, image dockerConfig, errCh chan<- error) {
+func buildImageAsync(dockerClient *client.Client, image DockerImage, errCh chan<- error) {
 	go func() {
 		err := buildImage(dockerClient, image.path, image.tag)
 		errCh <- err
@@ -174,73 +146,14 @@ func getTestDataPath(path string) (string, error) {
 	return path, nil
 }
 
-type poolConfigYml struct {
-	StartKey string                 `default:"1" yaml:"startKey"`
-	Config   map[string]interface{} `default:"{}" yaml:"config"`
+type ProtocolBuilder struct {
 }
 
-func (pc *ProtocolRunner) GetPoolConfigFromTestData(integrationName string) (*PoolConfig, error) {
-	path, err := filepath.Abs(fmt.Sprintf("%s/%s/testdata/config.yml", integrationsPath, integrationName))
-	if err != nil {
-		return nil, err
-	}
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		return nil, errors.New(fmt.Sprintf("%s does not exist", path))
-	}
-
-	// Read the config.yml file
-	data, err := os.ReadFile(path)
-	if err != nil {
-		return nil, err
-	}
-
-	var obj poolConfigYml
-
-	// Set default values from struct tags
-	err = defaults.Set(&obj)
-	if err != nil {
-		return nil, err
-	}
-
-	// Unmarshal the yaml
-	err = yaml.Unmarshal(data, &obj)
-	if err != nil {
-		return nil, err
-	}
-
-	// Convert to json
-	jsonData, err := json.Marshal(obj.Config)
-	if err != nil {
-		return nil, err
-	}
-
-	return &PoolConfig{
-		StartKey: obj.StartKey,
-		Config:   string(jsonData),
-	}, nil
+func NewProtocolBuilder() *ProtocolBuilder {
+	return &ProtocolBuilder{}
 }
 
-// GetIntegrationDirs returns a list of all integration folder names
-func (pc *ProtocolRunner) GetIntegrationDirs() []string {
-	path, err := filepath.Abs(integrationsPath)
-	if err != nil {
-		panic(err)
-	}
-	integrations, err := os.ReadDir(path)
-	if err != nil {
-		panic(err)
-	}
-
-	var integrationDirs []string
-	for _, integration := range integrations {
-		if integration.IsDir() {
-			integrationDirs = append(integrationDirs, integration.Name())
-		}
-	}
-	return integrationDirs
-}
-
-func (pc *ProtocolRunner) Build() error {
+func (pc *ProtocolBuilder) Build(testConfigs *[]*TestConfig) error {
 	// First, cleanup any old containers and volumes
 	err := pc.Cleanup()
 	if err != nil {
@@ -255,45 +168,31 @@ func (pc *ProtocolRunner) Build() error {
 	defer cli.Close()
 
 	// Define protocol and testapi configs
-	pc.protocolConfig = dockerConfig{path: protocolPath, tag: "protocol"}
-	pc.testapiConfig = dockerConfig{path: testapiPath, tag: "testapi"}
+	protocolConfig := DockerImage{path: protocolPath, tag: "protocol"}
+	testapiConfig := DockerImage{path: testapiPath, tag: "testapi"}
+	var integrationConfigs []DockerImage
 
 	// Find all subfolders in the integrations folder and build them
-	integrations := pc.GetIntegrationDirs()
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5*time.Duration(len(integrations)))
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5*time.Duration(len(*testConfigs)))
 	defer cancel()
 
-	for _, integration := range integrations {
-		// Ensure that the testdata folder exists
-		_, err := getTestDataPath(filepath.Join(integrationsPath, integration))
-		if err != nil {
-			return err
-		}
-		// Ensure that the config file for the pool exists
-		_, err = pc.GetPoolConfigFromTestData(filepath.Join(integrationsPath, integration))
-		if err != nil {
-			return err
-		}
-
-		tag := integrationTag(integration)
-
+	for _, cfg := range *testConfigs {
 		// Create the volumes that will be shared between the integration and testapi containers
-		vol, err := cli.VolumeCreate(ctx, volume.CreateOptions{
-			Name:   kyveStorageVolumeName(tag),
+		_, err = cli.VolumeCreate(ctx, volume.CreateOptions{
+			Name:   kyveStorageVolumeName(cfg.Integration),
 			Labels: map[string]string{cleanupLabel: ""},
 		})
 		if err != nil {
 			return err
 		}
-		pc.dockerVolumes = append(pc.dockerVolumes, vol)
-		pc.integrationConfigs = append(pc.integrationConfigs, dockerConfig{
-			path: filepath.Join(integrationsPath, integration),
-			tag:  tag,
+		integrationConfigs = append(integrationConfigs, DockerImage{
+			path: cfg.Integration.Path,
+			tag:  integrationTag(cfg.Integration),
 		})
 	}
 
 	// Build all the images concurrently
-	configs := append([]dockerConfig{pc.protocolConfig, pc.testapiConfig}, pc.integrationConfigs...)
+	configs := append([]DockerImage{protocolConfig, testapiConfig}, integrationConfigs...)
 	errChs := make([]chan error, len(configs))
 	for i, img := range configs {
 		errChs[i] = make(chan error)
@@ -309,7 +208,7 @@ func (pc *ProtocolRunner) Build() error {
 	return nil
 }
 
-func (pc *ProtocolRunner) Cleanup() error {
+func (pc *ProtocolBuilder) Cleanup() error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*60*5)
 	defer cancel()
 
@@ -352,6 +251,30 @@ func (pc *ProtocolRunner) Cleanup() error {
 		}
 	}
 	return nil
+}
+
+type ProtocolRunner struct {
+	protocolConfig    DockerImage
+	testapiConfig     DockerImage
+	integrationConfig DockerImage
+	testConfig        TestConfig
+	sharedVolume      string
+	networkId         string
+	restAddress       string
+	rpcAddress        string
+}
+
+func NewProtocolRunner(testConfig TestConfig, networkId string, restAddress string, rpcAddress string) *ProtocolRunner {
+	return &ProtocolRunner{
+		protocolConfig:    DockerImage{path: protocolPath, tag: "protocol"},
+		testapiConfig:     DockerImage{path: testapiPath, tag: "testapi"},
+		integrationConfig: DockerImage{path: testConfig.Integration.Path, tag: integrationTag(testConfig.Integration)},
+		testConfig:        testConfig,
+		sharedVolume:      kyveStorageVolumeName(testConfig.Integration),
+		networkId:         networkId,
+		restAddress:       restAddress,
+		rpcAddress:        rpcAddress,
+	}
 }
 
 type ContainerConfig struct {
@@ -423,47 +346,24 @@ func getProtocolEnv(
 	}
 }
 
-func integrationTag(integrationName string) string {
-	return fmt.Sprintf("integration-%s", integrationName)
+func integrationTag(integration Integration) string {
+	return fmt.Sprintf("integration-%s", integration.Name)
 }
 
-func kyveStorageVolumeName(integrationTag string) string {
-	return fmt.Sprintf("%s-%s", kyveStorageName, integrationTag)
+func kyveStorageVolumeName(integration Integration) string {
+	return fmt.Sprintf("%s-%s", kyveStorageName, integrationTag(integration))
 }
 
-func (pc *ProtocolRunner) protocolContainerName(integrationConfig *dockerConfig, ps ProtocolConfig) string {
-	return fmt.Sprintf("%s-%s-%s", pc.protocolConfig.tag, integrationConfig.tag, ps.ProtocolNode.KeyName())
+func (pc *ProtocolRunner) protocolContainerName(ps ProtocolConfig) string {
+	return fmt.Sprintf("%s-%s-%s", pc.protocolConfig.tag, pc.integrationConfig.tag, ps.ProtocolNode.KeyName())
 }
 
-func (pc *ProtocolRunner) testapiContainerName(integrationConfig *dockerConfig) string {
-	return fmt.Sprintf("%s-%s", pc.testapiConfig.tag, integrationConfig.tag)
+func (pc *ProtocolRunner) testapiContainerName() string {
+	return fmt.Sprintf("%s-%s", pc.testapiConfig.tag, pc.integrationConfig.tag)
 }
 
-func (pc *ProtocolRunner) getVolume(integrationTag string) string {
-	volName := kyveStorageVolumeName(integrationTag)
-	for _, vol := range pc.dockerVolumes {
-		if vol.Name == volName {
-			return vol.Name
-		}
-	}
-	panic(fmt.Sprintf("volume %s not found", volName))
-}
-
-func (pc *ProtocolRunner) findDockerConfig(testConfig TestConfig) (*dockerConfig, error) {
-	for _, dc := range pc.integrationConfigs {
-		if dc.tag == integrationTag(testConfig.Integration) {
-			return &dc, nil
-		}
-	}
-	return nil, errors.New(fmt.Sprintf("test config for integration %s not found", testConfig.Integration))
-}
-
-func (pc *ProtocolRunner) RunProtocolNodes(testConfig TestConfig) error {
-	if !pc.isInitialized {
-		return errors.New("protocol runner not initialized")
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10*time.Duration(len(pc.integrationConfigs)))
+func (pc *ProtocolRunner) RunProtocolNodes() error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*1030)
 	defer cancel()
 
 	cli, err := client.NewClientWithOpts()
@@ -473,19 +373,13 @@ func (pc *ProtocolRunner) RunProtocolNodes(testConfig TestConfig) error {
 	//goland:noinspection GoUnhandledErrorResult
 	defer cli.Close()
 
-	integrationConfig, err := pc.findDockerConfig(testConfig)
-	if err != nil {
-		return err
-	}
-
-	dataPath, err := getTestDataPath(integrationConfig.path)
+	dataPath, err := getTestDataPath(pc.integrationConfig.path)
 	if err != nil {
 		return err
 	}
 
 	// Run testapi
-	containerName := pc.testapiContainerName(integrationConfig)
-	testapiConfig := pc.testapiConfig.toContainerConfig(containerName, pc.networkId, nil)
+	testapiConfig := pc.testapiConfig.toContainerConfig(pc.testapiContainerName(), pc.networkId, nil)
 	testapiConfig.binds = []string{fmt.Sprintf("%s:%s:ro", dataPath, kyveStorageMountApi)}
 	err = runDocker(ctx, cli, testapiConfig)
 	if err != nil {
@@ -493,17 +387,17 @@ func (pc *ProtocolRunner) RunProtocolNodes(testConfig TestConfig) error {
 	}
 
 	// Run integration
-	err = runDocker(ctx, cli, integrationConfig.toContainerConfig("", pc.networkId, nil))
+	err = runDocker(ctx, cli, pc.integrationConfig.toContainerConfig("", pc.networkId, nil))
 	if err != nil {
 		return err
 	}
 
 	// Run protocol with multiple protocol nodes
-	for _, cfg := range testConfig.GetProtocolConfigs() {
-		containerName = pc.protocolContainerName(integrationConfig, cfg)
-		env := getProtocolEnv(cfg.Valaccount.Mnemonic(), pc.rpcAddress, pc.restAddress, integrationConfig.tag, testConfig.PoolId, true)
+	for _, cfg := range pc.testConfig.GetProtocolConfigs() {
+		containerName := pc.protocolContainerName(cfg)
+		env := getProtocolEnv(cfg.Valaccount.Mnemonic(), pc.rpcAddress, pc.restAddress, pc.integrationConfig.tag, pc.testConfig.PoolId, true)
 		protocolConfig := pc.protocolConfig.toContainerConfig(containerName, pc.networkId, env)
-		protocolConfig.binds = []string{fmt.Sprintf("%s:%s", pc.getVolume(integrationConfig.tag), kyveStorageMountProtocol)}
+		protocolConfig.binds = []string{fmt.Sprintf("%s:%s", pc.sharedVolume, kyveStorageMountProtocol)}
 		err = runDocker(ctx, cli, protocolConfig)
 		if err != nil {
 			return err
@@ -512,7 +406,7 @@ func (pc *ProtocolRunner) RunProtocolNodes(testConfig TestConfig) error {
 	return nil
 }
 
-func (pc *ProtocolRunner) StopProtocolNodes(testConfig TestConfig) error {
+func (pc *ProtocolRunner) StopProtocolNodes() error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*60)
 	defer cancel()
 
@@ -534,17 +428,12 @@ func (pc *ProtocolRunner) StopProtocolNodes(testConfig TestConfig) error {
 		return err
 	}
 
-	integrationConfig, err := pc.findDockerConfig(testConfig)
-	if err != nil {
-		return err
-	}
-
 	// Collect all containers that should be removed
-	testapiContName := pc.testapiContainerName(integrationConfig)
-	integrationContName := integrationConfig.tag
+	testapiContName := pc.testapiContainerName()
+	integrationContName := pc.integrationConfig.tag
 	toBeRemoved := []string{"/" + testapiContName, "/" + integrationContName}
-	for _, cfg := range testConfig.GetProtocolConfigs() {
-		pcContName := pc.protocolContainerName(integrationConfig, cfg)
+	for _, cfg := range pc.testConfig.GetProtocolConfigs() {
+		pcContName := pc.protocolContainerName(cfg)
 		toBeRemoved = append(toBeRemoved, "/"+pcContName)
 	}
 
@@ -559,6 +448,5 @@ func (pc *ProtocolRunner) StopProtocolNodes(testConfig TestConfig) error {
 			}
 		}
 	}
-
 	return nil
 }
