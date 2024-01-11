@@ -153,7 +153,7 @@ func NewProtocolBuilder() *ProtocolBuilder {
 	return &ProtocolBuilder{}
 }
 
-func (pc *ProtocolBuilder) Build(testConfigs *[]*TestConfig) error {
+func (pc *ProtocolBuilder) Build(testConfigs []*TestConfig) error {
 	// First, cleanup any old containers and volumes
 	err := pc.Cleanup()
 	if err != nil {
@@ -173,10 +173,10 @@ func (pc *ProtocolBuilder) Build(testConfigs *[]*TestConfig) error {
 	var integrationConfigs []DockerImage
 
 	// Find all subfolders in the integrations folder and build them
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5*time.Duration(len(*testConfigs)))
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5*time.Duration(len(testConfigs)))
 	defer cancel()
 
-	for _, cfg := range *testConfigs {
+	for _, cfg := range testConfigs {
 		// Create the volumes that will be shared between the integration and testapi containers
 		_, err = cli.VolumeCreate(ctx, volume.CreateOptions{
 			Name:   kyveStorageVolumeName(cfg.Integration),

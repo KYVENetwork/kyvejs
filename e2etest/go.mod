@@ -8,7 +8,6 @@ require (
 	github.com/cosmos/cosmos-sdk v0.47.6
 	github.com/docker/docker v24.0.7+incompatible
 	github.com/icza/dyno v0.0.0-20220812133438-f0b6f8a18845
-	github.com/onsi/ginkgo/v2 v2.13.2
 	github.com/onsi/gomega v1.30.0
 	github.com/strangelove-ventures/interchaintest/v7 v7.0.0
 	go.uber.org/zap v1.26.0
@@ -168,6 +167,7 @@ require (
 	github.com/multiformats/go-multicodec v0.8.1 // indirect
 	github.com/multiformats/go-multihash v0.2.1 // indirect
 	github.com/multiformats/go-varint v0.0.7 // indirect
+	github.com/onsi/ginkgo/v2 v2.13.2 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.1.0-rc2 // indirect
 	github.com/opencontainers/runc v1.1.3 // indirect

@@ -13,7 +13,6 @@ import (
 	govmodule "github.com/cosmos/cosmos-sdk/x/gov/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/strangelove-ventures/interchaintest/v7/chain/cosmos"
 	"github.com/strangelove-ventures/interchaintest/v7/ibc"
@@ -74,7 +73,7 @@ func (e *Executor) ExpectTxSuccess(tx sdk.TxResponse, err error) {
 
 	if tx.Height == int64(0) {
 		res, _, _ := e.KyveChain.GetNode().ExecQuery(context.Background(), "tx", tx.TxHash)
-		Fail(fmt.Sprintf("tx was not successful for some reason: %s", res), 1)
+		e.g.ExpectWithOffset(1, tx.Height).To(Equal(int64(0)), fmt.Sprintf("tx was not successful for some reason: %s", res))
 	}
 }
 

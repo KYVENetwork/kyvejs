@@ -106,7 +106,7 @@ func getIntegrationDirs() []Integration {
 	return integrationDirs
 }
 
-func GetTestConfigs() *[]*TestConfig {
+func GetTestConfigs() []*TestConfig {
 	var testConfigs []*TestConfig
 	for _, integration := range getIntegrationDirs() {
 		testConfigs = append(testConfigs, &TestConfig{
@@ -114,5 +114,5 @@ func GetTestConfigs() *[]*TestConfig {
 			Integration: integration,
 		})
 	}
-	return &testConfigs
+	return testConfigs
 }

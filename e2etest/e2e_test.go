@@ -18,7 +18,7 @@ import (
 
 const testName = "Kyvejs e2e tests"
 
-func setup(t *testing.T) (*[]*utils.TestConfig, string, *cosmos.CosmosChain, *interchaintest.Interchain, *utils.ProtocolBuilder, *utils.Executor) {
+func setup(t *testing.T) ([]utils.TestConfig, string, *cosmos.CosmosChain, *interchaintest.Interchain, *utils.ProtocolBuilder, *utils.Executor) {
 	var ctx = context.Background()
 	var g = NewWithT(t)
 
@@ -41,9 +41,11 @@ func setup(t *testing.T) (*[]*utils.TestConfig, string, *cosmos.CosmosChain, *in
 
 	client, network := interchaintest.DockerSetup(t)
 
+	// Build the docker images
 	protocolBuilder := utils.NewProtocolBuilder()
 	g.Expect(protocolBuilder.Build(testConfigs)).To(BeNil())
 
+	// Start the chain
 	err = interchain.Build(ctx, nil, interchaintest.InterchainBuildOptions{
 		TestName:         testName,
 		Client:           client,
@@ -65,26 +67,21 @@ func setup(t *testing.T) (*[]*utils.TestConfig, string, *cosmos.CosmosChain, *in
 	executor := utils.NewExecutor(g, kyveChain, broadcaster)
 
 	// Stake Alice's token to give her voting power
-	executor.DelegateToValidator(ctx, (*testConfigs)[0].Alice.ProtocolNode, 9_000_000_000_000)
+	executor.DelegateToValidator(ctx, testConfigs[0].Alice.ProtocolNode, 9_000_000_000_000)
 
 	// Create one pool for every integration (per gov proposal)
-	for _, cfg := range *testConfigs {
-		executor.CreatePool(cfg.Integration.Name, cfg.PoolConfig, (*testConfigs)[0].Alice.ProtocolNode)
+	for _, cfg := range testConfigs {
+		executor.CreatePool(cfg.Integration.Name, cfg.PoolConfig, testConfigs[0].Alice.ProtocolNode)
 	}
 
-	// Create 3 protocol nodes
-	executor.CreateProtocolNode((*testConfigs)[0].Alice.ProtocolNode)
-	executor.CreateProtocolNode((*testConfigs)[0].Bob.ProtocolNode)
-	executor.CreateProtocolNode((*testConfigs)[0].Viktor.ProtocolNode)
-
 	// Wait for all pools to be created (gov proposals)
-	expectedPoolCnt := len(*testConfigs)
+	expectedPoolCnt := len(testConfigs)
 	err = testutil.WaitForCondition(utils.GovVotingPeriod, 1*time.Second, func() (bool, error) {
 		pools := executor.GetPools().Pools
 		configuredConfigs := map[string]interface{}{}
 		if len(pools) == expectedPoolCnt {
 			for _, pool := range pools {
-				for _, testConfig := range *testConfigs {
+				for _, testConfig := range testConfigs {
 					if pool.GetData().Name == testConfig.Integration.Name {
 						testConfig.PoolId = pool.GetData().Id
 						configuredConfigs[testConfig.Integration.Name] = nil
@@ -98,14 +95,20 @@ func setup(t *testing.T) (*[]*utils.TestConfig, string, *cosmos.CosmosChain, *in
 	})
 	g.Expect(err).To(BeNil())
 
-	return testConfigs, network, kyveChain, interchain, protocolBuilder, executor
+	var tcfgs []utils.TestConfig
+	for _, cfg := range testConfigs {
+		tcfgs = append(tcfgs, *cfg)
+	}
+
+	return tcfgs, network, kyveChain, interchain, protocolBuilder, executor
 }
 
 func TestProtocolNode(t *testing.T) {
 	g := NewWithT(t)
 	testConfigs, network, kyveChain, interchain, protocolBuilder, executor := setup(t)
 
-	defer func() {
+	t.Parallel()
+	t.Cleanup(func() {
 		err := interchain.Close()
 		if err != nil {
 			fmt.Println(err)
@@ -115,13 +118,15 @@ func TestProtocolNode(t *testing.T) {
 		if err != nil {
 			fmt.Println(err)
 		}
-	}()
+	})
 
-	for _, testConfig := range *testConfigs {
+	for _, tc := range testConfigs {
+		testConfig := tc // This needs to be here because of the golang loopvar issue (should be fixed with go 1.22)
 		t.Run(fmt.Sprintf("Test protol runtime for %s", testConfig.Integration.Name), func(t *testing.T) {
-			t.Parallel() // This will run the test in parallel
+			// This will run the test in parallel
+			t.Parallel()
 
-			protocolRunner := utils.NewProtocolRunner(*testConfig, network, kyveChain.GetAPIAddress(), kyveChain.GetRPCAddress())
+			protocolRunner := utils.NewProtocolRunner(testConfig, network, kyveChain.GetAPIAddress(), kyveChain.GetRPCAddress())
 
 			g.Expect(protocolRunner.RunProtocolNodes()).To(BeNil())
 			//goland:noinspection GoUnhandledErrorResult
@@ -131,6 +136,11 @@ func TestProtocolNode(t *testing.T) {
 					fmt.Println(err)
 				}
 			}()
+
+			// Create 3 protocol nodes
+			executor.CreateProtocolNode(testConfig.Alice.ProtocolNode)
+			executor.CreateProtocolNode(testConfig.Bob.ProtocolNode)
+			executor.CreateProtocolNode(testConfig.Viktor.ProtocolNode)
 
 			// Join the pool with 3 protocol nodes
 			executor.JoinPool(testConfig.Alice.ProtocolNode, testConfig.Alice.Valaccount, testConfig.PoolId)

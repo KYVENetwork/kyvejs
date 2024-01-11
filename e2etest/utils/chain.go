@@ -44,10 +44,10 @@ func getRandomMnemonic() string {
 
 type GenesisWrapper struct {
 	Chain       *cosmos.CosmosChain
-	TestConfigs *[]*TestConfig
+	TestConfigs []*TestConfig
 }
 
-func NewGenesisWrapper(testConfigs *[]*TestConfig) *GenesisWrapper {
+func NewGenesisWrapper(testConfigs []*TestConfig) *GenesisWrapper {
 	return &GenesisWrapper{
 		TestConfigs: testConfigs,
 	}
@@ -100,20 +100,13 @@ func KyveChainSpec(
 
 func preGenesis(ctx context.Context, gw *GenesisWrapper) func(ibc.ChainConfig) error {
 	return func(cc ibc.ChainConfig) (err error) {
-		alice, err := createWallet(ctx, gw, "alice", 10_000_000_000_000)
-		if err != nil {
-			return err
-		}
-		bob, err := createWallet(ctx, gw, "bob", 10_000_000_000_000)
-		if err != nil {
-			return err
-		}
-		viktor, err := createWallet(ctx, gw, "viktor", 10_000_000_000_000)
-		if err != nil {
-			return err
-		}
-		for _, testConfig := range *gw.TestConfigs {
-			keyName := fmt.Sprintf("alice-valaccount-%s", testConfig.Integration.Name)
+		for _, testConfig := range gw.TestConfigs {
+			keyName := fmt.Sprintf("alice-%s", testConfig.Integration.Name)
+			alice, err := createWallet(ctx, gw, keyName, 10_000_000_000_000)
+			if err != nil {
+				return err
+			}
+			keyName = fmt.Sprintf("alice-valaccount-%s", testConfig.Integration.Name)
 			val, err := createWallet(ctx, gw, keyName, 10_000_000)
 			if err != nil {
 				return err
@@ -121,6 +114,11 @@ func preGenesis(ctx context.Context, gw *GenesisWrapper) func(ibc.ChainConfig) e
 			testConfig.Alice.ProtocolNode = alice
 			testConfig.Alice.Valaccount = val
 
+			keyName = fmt.Sprintf("bob-%s", testConfig.Integration.Name)
+			bob, err := createWallet(ctx, gw, keyName, 10_000_000_000_000)
+			if err != nil {
+				return err
+			}
 			keyName = fmt.Sprintf("bob-valaccount-%s", testConfig.Integration.Name)
 			val, err = createWallet(ctx, gw, keyName, 10_000_000)
 			if err != nil {
@@ -129,6 +127,11 @@ func preGenesis(ctx context.Context, gw *GenesisWrapper) func(ibc.ChainConfig) e
 			testConfig.Bob.ProtocolNode = bob
 			testConfig.Bob.Valaccount = val
 
+			keyName = fmt.Sprintf("viktor-%s", testConfig.Integration.Name)
+			viktor, err := createWallet(ctx, gw, keyName, 10_000_000_000_000)
+			if err != nil {
+				return err
+			}
 			keyName = fmt.Sprintf("viktor-valaccount-%s", testConfig.Integration.Name)
 			val, err = createWallet(ctx, gw, keyName, 10_000_000)
 			if err != nil {
