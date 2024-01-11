@@ -18,9 +18,9 @@ import (
 
 const testName = "Kyvejs e2e tests"
 
-func TestProtocolNode(t *testing.T) {
-	g := NewWithT(t)
+func setup(t *testing.T) (*[]*utils.TestConfig, string, *cosmos.CosmosChain, *interchaintest.Interchain, *utils.ProtocolBuilder, *utils.Executor) {
 	var ctx = context.Background()
+	var g = NewWithT(t)
 
 	var testConfigs = utils.GetTestConfigs()
 	var genesisWrapper = utils.NewGenesisWrapper(testConfigs)
@@ -42,13 +42,6 @@ func TestProtocolNode(t *testing.T) {
 	client, network := interchaintest.DockerSetup(t)
 
 	protocolBuilder := utils.NewProtocolBuilder()
-	defer func() {
-		err := protocolBuilder.Cleanup()
-		if err != nil {
-			fmt.Println(err)
-		}
-	}()
-
 	g.Expect(protocolBuilder.Build(testConfigs)).To(BeNil())
 
 	err = interchain.Build(ctx, nil, interchaintest.InterchainBuildOptions{
@@ -58,12 +51,6 @@ func TestProtocolNode(t *testing.T) {
 		SkipPathCreation: true,
 	})
 	g.Expect(err).To(BeNil())
-	defer func() {
-		err := interchain.Close()
-		if err != nil {
-			fmt.Println(err)
-		}
-	}()
 
 	broadcaster := cosmos.NewBroadcaster(t, kyveChain)
 	broadcaster.ConfigureClientContextOptions(func(clientContext sdkclient.Context) sdkclient.Context {
@@ -111,6 +98,25 @@ func TestProtocolNode(t *testing.T) {
 	})
 	g.Expect(err).To(BeNil())
 
+	return testConfigs, network, kyveChain, interchain, protocolBuilder, executor
+}
+
+func TestProtocolNode(t *testing.T) {
+	g := NewWithT(t)
+	testConfigs, network, kyveChain, interchain, protocolBuilder, executor := setup(t)
+
+	defer func() {
+		err := interchain.Close()
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		err = protocolBuilder.Cleanup()
+		if err != nil {
+			fmt.Println(err)
+		}
+	}()
+
 	for _, testConfig := range *testConfigs {
 		t.Run(fmt.Sprintf("Test protol runtime for %s", testConfig.Integration.Name), func(t *testing.T) {
 			t.Parallel() // This will run the test in parallel
@@ -133,7 +139,7 @@ func TestProtocolNode(t *testing.T) {
 
 			// Wait for 4 finalized bundles to be created
 			waitForBundles := 4
-			err = testutil.WaitForCondition(5*time.Minute, 5*time.Second, func() (bool, error) {
+			err := testutil.WaitForCondition(5*time.Minute, 5*time.Second, func() (bool, error) {
 				return len(executor.GetFinalizedBundles(testConfig.PoolId).FinalizedBundles) == waitForBundles, nil
 			})
 			g.Expect(err).To(
