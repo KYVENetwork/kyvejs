@@ -17,5 +17,5 @@ jobs:
           go-version-file: 'e2etest/go.mod'
       # Run e2e tests
       - name: Run e2e tests
-        run: go test ./...
+        run: go test -v ./...
         working-directory: e2etest
