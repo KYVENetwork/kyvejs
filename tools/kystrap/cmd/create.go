@@ -3,19 +3,20 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"regexp"
+	"strings"
+
 	"github.com/KYVENetwork/kyvejs/tools/kystrap/bootstrap"
 	"github.com/KYVENetwork/kyvejs/tools/kystrap/types"
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
-	"regexp"
-	"strings"
 )
 
 var regexpAlphaNumericAndDash = regexp.MustCompile(`^[a-zA-Z0-9-]+$`)
 
 func promptLanguage(defaultVal types.Language, skipPrompt bool) (types.Language, error) {
-	var items = types.Languages
-	var position = 0
+	items := types.Languages
+	position := 0
 	if defaultVal != "" {
 		for i, item := range items {
 			if item == defaultVal {

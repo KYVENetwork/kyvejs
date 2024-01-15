@@ -3,13 +3,14 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"regexp"
+	"strings"
+
 	"github.com/KYVENetwork/kyvejs/tools/kystrap/grpcall"
 	"github.com/KYVENetwork/kyvejs/tools/kystrap/types"
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 	"google.golang.org/protobuf/reflect/protoreflect"
-	"regexp"
-	"strings"
 )
 
 type executionInfo struct {
@@ -209,7 +210,7 @@ func CmdTestIntegration() *cobra.Command {
 			if method != "" {
 				execution.method = findDescriptorMethod(method)
 				if execution.method == nil {
-					return errors.New(fmt.Sprintf("invalid gRPC method %s", method))
+					return fmt.Errorf("invalid gRPC method %s", method)
 				}
 				setMethodPosition(&execution)
 			}

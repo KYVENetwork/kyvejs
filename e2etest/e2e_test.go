@@ -3,6 +3,9 @@ package e2etest
 import (
 	"context"
 	"fmt"
+	"testing"
+	"time"
+
 	"github.com/KYVENetwork/kyvejs/e2etest/utils"
 	sdkclient "github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -13,18 +16,16 @@ import (
 	"github.com/strangelove-ventures/interchaintest/v7/testutil"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zaptest"
-	"testing"
-	"time"
 )
 
 const testName = "Kyvejs e2e tests"
 
 func setup(t *testing.T, log *zap.Logger) ([]utils.TestConfig, string, *cosmos.CosmosChain, *interchaintest.Interchain, *utils.ProtocolBuilder, *utils.Executor) {
-	var ctx = context.Background()
-	var g = NewWithT(t)
+	ctx := context.Background()
+	g := NewWithT(t)
 
-	var testConfigs = utils.GetTestConfigs()
-	var genesisWrapper = utils.NewGenesisWrapper(testConfigs)
+	testConfigs := utils.GetTestConfigs()
+	genesisWrapper := utils.NewGenesisWrapper(testConfigs)
 
 	numFullNodes := 0
 	numValidators := 2
@@ -68,7 +69,7 @@ func setup(t *testing.T, log *zap.Logger) ([]utils.TestConfig, string, *cosmos.C
 	executor := utils.NewExecutor(g, log, kyveChain, broadcaster)
 
 	// Stake Alice's token to give her voting power
-	executor.DelegateToValidator(ctx, testConfigs[0].Alice.ProtocolNode, 9_000_000_000_000)
+	executor.DelegateToValidator(testConfigs[0].Alice.ProtocolNode, 9_000_000_000_000)
 
 	// Create one pool for every integration (per gov proposal)
 	for _, cfg := range testConfigs {
@@ -105,8 +106,8 @@ func setup(t *testing.T, log *zap.Logger) ([]utils.TestConfig, string, *cosmos.C
 }
 
 func TestProtocolNode(t *testing.T) {
-	var g = NewWithT(t)
-	var log = zaptest.NewLogger(t)
+	g := NewWithT(t)
+	log := zaptest.NewLogger(t)
 	testConfigs, network, kyveChain, interchain, protocolBuilder, executor := setup(t, log)
 
 	t.Parallel()

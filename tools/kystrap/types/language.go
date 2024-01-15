@@ -1,10 +1,10 @@
 package types
 
 import (
-	"errors"
+	"os"
+
 	"golang.org/x/text/cases"
 	lang "golang.org/x/text/language"
-	"os"
 )
 
 var toTitle = cases.Title(lang.English)
@@ -33,17 +33,6 @@ func (l Language) Type() string {
 
 func (l Language) String() string {
 	return string(l)
-}
-
-func (l Language) Set(val string) error {
-	var newLang = NewLanguage(val)
-	for _, language := range Languages {
-		if language == newLang {
-			l = language
-			return nil
-		}
-	}
-	return errors.New("invalid language")
 }
 
 func (l Language) IsRequestOtherLanguage() bool {

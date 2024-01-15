@@ -29,14 +29,6 @@ type Endpoint struct {
 	Data     *[]DataEntry
 }
 
-func (de DataEntry) isList() bool {
-	return de.DataType == List
-}
-
-func (de DataEntry) isObject() bool {
-	return de.DataType == Object
-}
-
 func (e Endpoint) hasSingleDataEntry() bool {
 	return len(*e.Data) == 1
 }
@@ -44,11 +36,11 @@ func (e Endpoint) hasSingleDataEntry() bool {
 func (e Endpoint) Path() string {
 	path := strings.TrimPrefix(e.basePath, dataDir)
 	if e.hasSingleDataEntry() {
-		return fmt.Sprintf("%s", path)
+		return path
 	}
 	for _, dataEntry := range *e.Data {
 		if dataEntry.HasQueryParam {
-			return fmt.Sprintf("%s", path)
+			return path
 		}
 	}
 	return fmt.Sprintf("%s/", path)
@@ -184,9 +176,9 @@ func main() {
 					for _, entry := range *endpoint.Data {
 						if entry.Key == key {
 							if endpoint.hasSingleDataEntry() {
-								fmt.Println(fmt.Sprintf("Sending data for %s", endpoint.Path()))
+								fmt.Printf("Sending data for %s\n", endpoint.Path())
 							} else {
-								fmt.Println(fmt.Sprintf("Sending data for %s/%s", endpoint.Path(), strings.Join(keys, ", ")))
+								fmt.Printf("Sending data for %s/%s\n", endpoint.Path(), strings.Join(keys, ", "))
 							}
 							err := json.NewEncoder(w).Encode(entry.Data)
 							if err != nil {
@@ -198,9 +190,9 @@ func main() {
 				}
 
 				if endpoint.hasSingleDataEntry() {
-					fmt.Println(fmt.Sprintf("No data found for %s", endpoint.Path()))
+					fmt.Printf("No data found for %s\n", endpoint.Path())
 				} else {
-					fmt.Println(fmt.Sprintf("No data found for %s/%s", endpoint.Path(), strings.Join(keys, ", ")))
+					fmt.Printf("No data found for %s/%s\n", endpoint.Path(), strings.Join(keys, ", "))
 				}
 
 				// Send not found
@@ -212,7 +204,7 @@ func main() {
 
 	// Add default handler
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Println(fmt.Sprintf("No endpoint registered for %s", r.URL.Path))
+		fmt.Printf("No endpoint registered for %s\n", r.URL.Path)
 
 		// Send not found
 		w.WriteHeader(http.StatusNotFound)
@@ -222,13 +214,13 @@ func main() {
 	// Print server info
 	fmt.Println("Starting server on http://localhost:8080\n\nExposed endpoints:")
 	for _, endpoint := range endpoints {
-		fmt.Println(fmt.Sprintf("http://localhost:8080%s", endpoint.Path()))
+		fmt.Printf("http://localhost:8080%s\n", endpoint.Path())
 		if !endpoint.hasSingleDataEntry() {
 			var keys []string
 			for _, dataEntry := range *endpoint.Data {
 				keys = append(keys, dataEntry.Key)
 			}
-			fmt.Println(fmt.Sprintf("  %s", strings.Join(keys, " ")))
+			fmt.Printf("  %s\n", strings.Join(keys, " "))
 		}
 		fmt.Println()
 	}

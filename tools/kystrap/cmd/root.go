@@ -1,8 +1,9 @@
 package cmd
 
 import (
-	"github.com/manifoldco/promptui"
 	"os"
+
+	"github.com/manifoldco/promptui"
 
 	"github.com/spf13/cobra"
 )
@@ -21,7 +22,7 @@ func skipPrompts(cmd *cobra.Command) bool {
 }
 
 func promptOption() (option, error) {
-	var items = []option{create, test}
+	items := []option{create, test}
 
 	prompt := promptui.Select{
 		Label: "What do you want to do?",

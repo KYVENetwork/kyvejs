@@ -2,8 +2,11 @@ package utils
 
 import (
 	"context"
-	"cosmossdk.io/math"
 	"fmt"
+	"time"
+
+	"cosmossdk.io/math"
+
 	pooltypes "github.com/KYVENetwork/chain/x/pool/types"
 	querytypes "github.com/KYVENetwork/chain/x/query/types"
 	stakerstypes "github.com/KYVENetwork/chain/x/stakers/types"
@@ -17,7 +20,6 @@ import (
 	"github.com/strangelove-ventures/interchaintest/v7/chain/cosmos"
 	"github.com/strangelove-ventures/interchaintest/v7/ibc"
 	"go.uber.org/zap"
-	"time"
 )
 
 const (
@@ -80,7 +82,7 @@ func (e *Executor) ExpectTxSuccess(tx sdk.TxResponse, err error) {
 	}
 }
 
-func (e *Executor) DelegateToValidator(ctx context.Context, wallet ibc.Wallet, amount int64) {
+func (e *Executor) DelegateToValidator(wallet ibc.Wallet, amount int64) {
 	ctx, cancel := context.WithTimeout(context.Background(), defaultTxTimeout)
 	defer cancel()
 

@@ -3,11 +3,12 @@ package utils
 import (
 	"encoding/json"
 	"fmt"
+	"os"
+	"path/filepath"
+
 	"github.com/creasty/defaults"
 	"github.com/strangelove-ventures/interchaintest/v7/ibc"
 	"gopkg.in/yaml.v3"
-	"os"
-	"path/filepath"
 )
 
 // integrationsPath is the path to the integrations folder

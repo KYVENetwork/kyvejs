@@ -6,6 +6,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
+	"os"
+	"path/filepath"
+	"slices"
+	"time"
+
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
@@ -14,11 +20,6 @@ import (
 	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/archive"
 	"go.uber.org/zap"
-	"io"
-	"os"
-	"path/filepath"
-	"slices"
-	"time"
 )
 
 const (
@@ -43,9 +44,8 @@ const (
 )
 
 type DockerImage struct {
-	path  string
-	tag   string
-	binds []string
+	path string
+	tag  string
 }
 
 type ProtocolBuilder struct {
@@ -206,7 +206,7 @@ func (pc *ProtocolBuilder) Cleanup() error {
 	//goland:noinspection GoUnhandledErrorResult
 	defer cli.Close()
 
-	var labelFilters = []string{fmt.Sprintf("%s=", cleanupLabel), fmt.Sprintf("%s=%s", interchainCleanupLabel, pc.testName)}
+	labelFilters := []string{fmt.Sprintf("%s=", cleanupLabel), fmt.Sprintf("%s=%s", interchainCleanupLabel, pc.testName)}
 
 	var containers []types.Container
 	for _, label := range labelFilters {

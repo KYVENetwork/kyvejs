@@ -3,14 +3,15 @@ package bootstrap
 import (
 	"errors"
 	"fmt"
-	"github.com/KYVENetwork/kyvejs/tools/kystrap/types"
-	"github.com/spf13/viper"
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
 	"os"
 	"path/filepath"
 	"strings"
 	"text/template"
+
+	"github.com/KYVENetwork/kyvejs/tools/kystrap/types"
+	"github.com/spf13/viper"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 var funcMap = template.FuncMap{
@@ -56,13 +57,13 @@ func createFile(path string, outputPath string, data map[string]any, fileInfo os
 	// Parse the template
 	tmpl, err := template.New("").Funcs(funcMap).Parse(string(content))
 	if err != nil {
-		return errors.New(fmt.Sprintf("failed to parse template for file %s with error:\n%s", fileInfo.Name(), err.Error()))
+		return fmt.Errorf("failed to parse template for file %s with error:\n%s", fileInfo.Name(), err.Error())
 	}
 
 	// Create the output file
 	outputFile, err := os.Create(outputPath)
 	if err != nil {
-		return errors.New(fmt.Sprintf("failed to create file %s with error:\n%s", fileInfo.Name(), err.Error()))
+		return fmt.Errorf("failed to create file %s with error:\n%s", fileInfo.Name(), err.Error())
 	}
 	//goland:noinspection GoUnhandledErrorResult
 	defer outputFile.Close()
@@ -70,7 +71,7 @@ func createFile(path string, outputPath string, data map[string]any, fileInfo os
 	// Execute the template
 	err = tmpl.Execute(outputFile, data)
 	if err != nil {
-		return errors.New(fmt.Sprintf("failed to create template for file %s with error:\n%s", fileInfo.Name(), err.Error()))
+		return fmt.Errorf("failed to create template for file %s with error:\n%s", fileInfo.Name(), err.Error())
 	}
 	return nil
 }
