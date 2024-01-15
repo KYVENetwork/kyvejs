@@ -30,6 +30,8 @@ const (
 	kyveStorageMountApi = "/app/api"
 	// cleanupLabel is the label used to identify containers and volumes that should be cleaned up
 	cleanupLabel = "kyve-e2e-test"
+	// interchainCleanupLabel is the label used to identify containers and volumes that should be cleaned up from interchaintest
+	interchainCleanupLabel = "ibc-test"
 	// protocolPath is the path to the protocol folder
 	protocolPath = "../common/protocol"
 	// testapiPath is the path to the testapi folder
@@ -46,26 +48,15 @@ type DockerImage struct {
 	binds []string
 }
 
-func (di DockerImage) toContainerConfig(name string, networkId string, env []string) ContainerConfig {
-	if name == "" {
-		name = di.tag
-	}
-	return ContainerConfig{
-		image:     di.tag,
-		name:      name,
-		networkId: networkId,
-		env:       env,
-		binds:     di.binds,
-	}
-}
-
 type ProtocolBuilder struct {
-	log *zap.Logger
+	testName string
+	log      *zap.Logger
 }
 
-func NewProtocolBuilder(log *zap.Logger) *ProtocolBuilder {
+func NewProtocolBuilder(testName string, log *zap.Logger) *ProtocolBuilder {
 	return &ProtocolBuilder{
-		log: log,
+		testName: testName,
+		log:      log,
 	}
 }
 
@@ -215,16 +206,19 @@ func (pc *ProtocolBuilder) Cleanup() error {
 	//goland:noinspection GoUnhandledErrorResult
 	defer cli.Close()
 
-	containers, err := cli.ContainerList(ctx, types.ContainerListOptions{
-		All: true,
-		Filters: filters.NewArgs(
-			filters.Arg("label", fmt.Sprintf("%s=", cleanupLabel)),
-		),
-	})
-	if err != nil {
-		return err
-	}
+	var labelFilters = []string{fmt.Sprintf("%s=", cleanupLabel), fmt.Sprintf("%s=%s", interchainCleanupLabel, pc.testName)}
 
+	var containers []types.Container
+	for _, label := range labelFilters {
+		c, err := cli.ContainerList(ctx, types.ContainerListOptions{
+			All:     true,
+			Filters: filters.NewArgs(filters.Arg("label", label)),
+		})
+		if err != nil {
+			return err
+		}
+		containers = append(containers, c...)
+	}
 	for _, cont := range containers {
 		err = cli.ContainerRemove(ctx, cont.ID, types.ContainerRemoveOptions{
 			Force: true,
@@ -234,13 +228,17 @@ func (pc *ProtocolBuilder) Cleanup() error {
 		}
 	}
 
-	volumes, err := cli.VolumeList(ctx, volume.ListOptions{Filters: filters.NewArgs(
-		filters.Arg("label", fmt.Sprintf("%s=", cleanupLabel)),
-	)})
-	if err != nil {
-		return err
+	var volumes []*volume.Volume
+	for _, label := range labelFilters {
+		v, err := cli.VolumeList(ctx, volume.ListOptions{Filters: filters.NewArgs(
+			filters.Arg("label", label),
+		)})
+		if err != nil {
+			return err
+		}
+		volumes = append(volumes, v.Volumes...)
 	}
-	for _, vol := range volumes.Volumes {
+	for _, vol := range volumes {
 		err = cli.VolumeRemove(ctx, vol.Name, true)
 		if err != nil {
 			return err

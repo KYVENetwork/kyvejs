@@ -43,7 +43,7 @@ func setup(t *testing.T, log *zap.Logger) ([]utils.TestConfig, string, *cosmos.C
 	client, network := interchaintest.DockerSetup(t)
 
 	// Build the docker images
-	protocolBuilder := utils.NewProtocolBuilder(log)
+	protocolBuilder := utils.NewProtocolBuilder(testName, log)
 	g.Expect(protocolBuilder.Build(testConfigs)).To(BeNil())
 
 	// Start the chain
@@ -131,7 +131,6 @@ func TestProtocolNode(t *testing.T) {
 			protocolRunner := utils.NewProtocolRunner(testConfig, network, kyveChain.GetAPIAddress(), kyveChain.GetRPCAddress())
 
 			g.Expect(protocolRunner.RunProtocolNodes()).To(BeNil())
-			//goland:noinspection GoUnhandledErrorResult
 			defer func() {
 				err := protocolRunner.StopProtocolNodes()
 				if err != nil {
