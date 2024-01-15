@@ -13,6 +13,7 @@ import (
 	"github.com/docker/docker/api/types/volume"
 	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/archive"
+	"go.uber.org/zap"
 	"io"
 	"os"
 	"path/filepath"
@@ -29,7 +30,6 @@ const (
 	kyveStorageMountApi = "/app/api"
 	// cleanupLabel is the label used to identify containers and volumes that should be cleaned up
 	cleanupLabel = "kyve-e2e-test"
-
 	// protocolPath is the path to the protocol folder
 	protocolPath = "../common/protocol"
 	// testapiPath is the path to the testapi folder
@@ -55,6 +55,16 @@ func (di DockerImage) toContainerConfig(name string, networkId string, env []str
 	}
 }
 
+type ProtocolBuilder struct {
+	log *zap.Logger
+}
+
+func NewProtocolBuilder(log *zap.Logger) *ProtocolBuilder {
+	return &ProtocolBuilder{
+		log: log,
+	}
+}
+
 type ErrorLine struct {
 	Error       string      `json:"error"`
 	ErrorDetail ErrorDetail `json:"errorDetail"`
@@ -64,13 +74,13 @@ type ErrorDetail struct {
 	Message string `json:"message"`
 }
 
-func printBuild(rd io.Reader) error {
+func (pc *ProtocolBuilder) printBuild(rd io.Reader) error {
 	var lastLine string
 
 	scanner := bufio.NewScanner(rd)
 	for scanner.Scan() {
 		lastLine = scanner.Text()
-		fmt.Println(scanner.Text())
+		pc.log.Debug(scanner.Text())
 	}
 
 	errLine := &ErrorLine{}
@@ -89,7 +99,7 @@ func printBuild(rd io.Reader) error {
 	return nil
 }
 
-func buildImage(dockerClient *client.Client, buildPath string, tag string) error {
+func (pc *ProtocolBuilder) buildImage(dockerClient *client.Client, buildPath string, tag string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*60*5)
 	defer cancel()
 
@@ -120,7 +130,7 @@ func buildImage(dockerClient *client.Client, buildPath string, tag string) error
 	//goland:noinspection GoUnhandledErrorResult
 	defer res.Body.Close()
 
-	err = printBuild(res.Body)
+	err = pc.printBuild(res.Body)
 	if err != nil {
 		return err
 	}
@@ -128,29 +138,11 @@ func buildImage(dockerClient *client.Client, buildPath string, tag string) error
 	return nil
 }
 
-func buildImageAsync(dockerClient *client.Client, image DockerImage, errCh chan<- error) {
+func (pc *ProtocolBuilder) buildImageAsync(dockerClient *client.Client, image DockerImage, errCh chan<- error) {
 	go func() {
-		err := buildImage(dockerClient, image.path, image.tag)
+		err := pc.buildImage(dockerClient, image.path, image.tag)
 		errCh <- err
 	}()
-}
-
-func getTestDataPath(path string) (string, error) {
-	path, err := filepath.Abs(fmt.Sprintf("%s/testdata", path))
-	if err != nil {
-		return "", err
-	}
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		return "", errors.New(fmt.Sprintf("%s does not exist", path))
-	}
-	return path, nil
-}
-
-type ProtocolBuilder struct {
-}
-
-func NewProtocolBuilder() *ProtocolBuilder {
-	return &ProtocolBuilder{}
 }
 
 func (pc *ProtocolBuilder) Build(testConfigs []*TestConfig) error {
@@ -196,7 +188,7 @@ func (pc *ProtocolBuilder) Build(testConfigs []*TestConfig) error {
 	errChs := make([]chan error, len(configs))
 	for i, img := range configs {
 		errChs[i] = make(chan error)
-		buildImageAsync(cli, img, errChs[i])
+		pc.buildImageAsync(cli, img, errChs[i])
 	}
 
 	for _, errCh := range errChs {
@@ -373,14 +365,9 @@ func (pc *ProtocolRunner) RunProtocolNodes() error {
 	//goland:noinspection GoUnhandledErrorResult
 	defer cli.Close()
 
-	dataPath, err := getTestDataPath(pc.integrationConfig.path)
-	if err != nil {
-		return err
-	}
-
 	// Run testapi
 	testapiConfig := pc.testapiConfig.toContainerConfig(pc.testapiContainerName(), pc.networkId, nil)
-	testapiConfig.binds = []string{fmt.Sprintf("%s:%s:ro", dataPath, kyveStorageMountApi)}
+	testapiConfig.binds = []string{fmt.Sprintf("%s:%s:ro", pc.testConfig.Integration.TestDataPath, kyveStorageMountApi)}
 	err = runDocker(ctx, cli, testapiConfig)
 	if err != nil {
 		return err

@@ -29,8 +29,9 @@ type PoolConfig struct {
 }
 
 type Integration struct {
-	Name string
-	Path string
+	Name         string
+	Path         string
+	TestDataPath string
 }
 
 type TestConfig struct {
@@ -43,7 +44,7 @@ type TestConfig struct {
 }
 
 func getPoolConfig(integration Integration) PoolConfig {
-	path, err := filepath.Abs(fmt.Sprintf("%s/testdata/config.yml", integration.Path))
+	path, err := filepath.Abs(fmt.Sprintf("%s/config.yml", integration.TestDataPath))
 	if err != nil {
 		panic(err)
 	}
@@ -83,8 +84,19 @@ func getPoolConfig(integration Integration) PoolConfig {
 	}
 }
 
+func getTestdataPath(path string) string {
+	path, err := filepath.Abs(fmt.Sprintf("%s/testdata", path))
+	if err != nil {
+		panic(err)
+	}
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		panic(fmt.Sprintf("%s does not exist", path))
+	}
+	return path
+}
+
 // GetIntegrationDirs returns a list of all integration folder names
-func getIntegrationDirs() []Integration {
+func getIntegrations() []Integration {
 	path, err := filepath.Abs(integrationsPath)
 	if err != nil {
 		panic(err)
@@ -97,9 +109,11 @@ func getIntegrationDirs() []Integration {
 	var integrationDirs []Integration
 	for _, entry := range dirEntries {
 		if entry.IsDir() {
+			integrationPath := filepath.Join(path, entry.Name())
 			integrationDirs = append(integrationDirs, Integration{
-				Path: filepath.Join(path, entry.Name()),
-				Name: entry.Name(),
+				Path:         integrationPath,
+				Name:         entry.Name(),
+				TestDataPath: getTestdataPath(integrationPath),
 			})
 		}
 	}
@@ -108,7 +122,7 @@ func getIntegrationDirs() []Integration {
 
 func GetTestConfigs() []*TestConfig {
 	var testConfigs []*TestConfig
-	for _, integration := range getIntegrationDirs() {
+	for _, integration := range getIntegrations() {
 		testConfigs = append(testConfigs, &TestConfig{
 			PoolConfig:  getPoolConfig(integration),
 			Integration: integration,

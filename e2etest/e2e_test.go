@@ -11,6 +11,7 @@ import (
 	"github.com/strangelove-ventures/interchaintest/v7"
 	"github.com/strangelove-ventures/interchaintest/v7/chain/cosmos"
 	"github.com/strangelove-ventures/interchaintest/v7/testutil"
+	"go.uber.org/zap"
 	"go.uber.org/zap/zaptest"
 	"testing"
 	"time"
@@ -18,7 +19,7 @@ import (
 
 const testName = "Kyvejs e2e tests"
 
-func setup(t *testing.T) ([]utils.TestConfig, string, *cosmos.CosmosChain, *interchaintest.Interchain, *utils.ProtocolBuilder, *utils.Executor) {
+func setup(t *testing.T, log *zap.Logger) ([]utils.TestConfig, string, *cosmos.CosmosChain, *interchaintest.Interchain, *utils.ProtocolBuilder, *utils.Executor) {
 	var ctx = context.Background()
 	var g = NewWithT(t)
 
@@ -28,7 +29,7 @@ func setup(t *testing.T) ([]utils.TestConfig, string, *cosmos.CosmosChain, *inte
 	numFullNodes := 0
 	numValidators := 2
 	factory := interchaintest.NewBuiltinChainFactory(
-		zaptest.NewLogger(t),
+		log,
 		[]*interchaintest.ChainSpec{utils.KyveChainSpec(ctx, genesisWrapper, numValidators, numFullNodes)},
 	)
 
@@ -42,7 +43,7 @@ func setup(t *testing.T) ([]utils.TestConfig, string, *cosmos.CosmosChain, *inte
 	client, network := interchaintest.DockerSetup(t)
 
 	// Build the docker images
-	protocolBuilder := utils.NewProtocolBuilder()
+	protocolBuilder := utils.NewProtocolBuilder(log)
 	g.Expect(protocolBuilder.Build(testConfigs)).To(BeNil())
 
 	// Start the chain
@@ -64,7 +65,7 @@ func setup(t *testing.T) ([]utils.TestConfig, string, *cosmos.CosmosChain, *inte
 			WithGas(flags.DefaultGasLimit * 10)
 	})
 
-	executor := utils.NewExecutor(g, kyveChain, broadcaster)
+	executor := utils.NewExecutor(g, log, kyveChain, broadcaster)
 
 	// Stake Alice's token to give her voting power
 	executor.DelegateToValidator(ctx, testConfigs[0].Alice.ProtocolNode, 9_000_000_000_000)
@@ -104,19 +105,20 @@ func setup(t *testing.T) ([]utils.TestConfig, string, *cosmos.CosmosChain, *inte
 }
 
 func TestProtocolNode(t *testing.T) {
-	g := NewWithT(t)
-	testConfigs, network, kyveChain, interchain, protocolBuilder, executor := setup(t)
+	var g = NewWithT(t)
+	var log = zaptest.NewLogger(t)
+	testConfigs, network, kyveChain, interchain, protocolBuilder, executor := setup(t, log)
 
 	t.Parallel()
 	t.Cleanup(func() {
 		err := interchain.Close()
 		if err != nil {
-			fmt.Println(err)
+			log.Error(err.Error())
 		}
 
 		err = protocolBuilder.Cleanup()
 		if err != nil {
-			fmt.Println(err)
+			log.Error(err.Error())
 		}
 	})
 
@@ -133,7 +135,7 @@ func TestProtocolNode(t *testing.T) {
 			defer func() {
 				err := protocolRunner.StopProtocolNodes()
 				if err != nil {
-					fmt.Println(err)
+					log.Error(err.Error())
 				}
 			}()
 

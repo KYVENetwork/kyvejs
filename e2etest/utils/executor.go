@@ -16,6 +16,7 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/strangelove-ventures/interchaintest/v7/chain/cosmos"
 	"github.com/strangelove-ventures/interchaintest/v7/ibc"
+	"go.uber.org/zap"
 	"time"
 )
 
@@ -52,18 +53,20 @@ func NewQuerier(kyveChain *cosmos.CosmosChain) Querier {
 }
 
 type Executor struct {
-	KyveChain   *cosmos.CosmosChain
-	Broadcaster *cosmos.Broadcaster
-	Q           Querier
+	kyveChain   *cosmos.CosmosChain
+	broadcaster *cosmos.Broadcaster
+	q           Querier
 	g           *WithT
+	log         *zap.Logger
 }
 
-func NewExecutor(g *WithT, kyveChain *cosmos.CosmosChain, broadcaster *cosmos.Broadcaster) *Executor {
+func NewExecutor(g *WithT, log *zap.Logger, kyveChain *cosmos.CosmosChain, broadcaster *cosmos.Broadcaster) *Executor {
 	return &Executor{
-		KyveChain:   kyveChain,
-		Broadcaster: broadcaster,
-		Q:           NewQuerier(kyveChain),
+		kyveChain:   kyveChain,
+		broadcaster: broadcaster,
+		q:           NewQuerier(kyveChain),
 		g:           g,
+		log:         log,
 	}
 }
 
@@ -72,7 +75,7 @@ func (e *Executor) ExpectTxSuccess(tx sdk.TxResponse, err error) {
 	e.g.ExpectWithOffset(1, tx.Code).To(Equal(uint32(0)), fmt.Sprintf("tx failed with code %d: %s", tx.Code, tx.RawLog))
 
 	if tx.Height == int64(0) {
-		res, _, _ := e.KyveChain.GetNode().ExecQuery(context.Background(), "tx", tx.TxHash)
+		res, _, _ := e.kyveChain.GetNode().ExecQuery(context.Background(), "tx", tx.TxHash)
 		e.g.ExpectWithOffset(1, tx.Height).To(Equal(int64(0)), fmt.Sprintf("tx was not successful for some reason: %s", res))
 	}
 }
@@ -81,18 +84,18 @@ func (e *Executor) DelegateToValidator(ctx context.Context, wallet ibc.Wallet, a
 	ctx, cancel := context.WithTimeout(context.Background(), defaultTxTimeout)
 	defer cancel()
 
-	fmt.Println(fmt.Sprintf("%s is delegating %d to validator", wallet.FormattedAddress(), amount))
+	e.log.Debug(fmt.Sprintf("%s is delegating %d to validator", wallet.FormattedAddress(), amount))
 
-	valResponse, err := e.Q.StakingClient.Validators(ctx, &stakingtypes.QueryValidatorsRequest{})
+	valResponse, err := e.q.StakingClient.Validators(ctx, &stakingtypes.QueryValidatorsRequest{})
 	e.g.Expect(err).To(BeNil())
 	e.ExpectTxSuccess(cosmos.BroadcastTx(
 		ctx,
-		e.Broadcaster,
+		e.broadcaster,
 		wallet,
 		&stakingtypes.MsgDelegate{
 			DelegatorAddress: wallet.FormattedAddress(),
 			ValidatorAddress: valResponse.Validators[0].OperatorAddress,
-			Amount:           sdk.Coin{Denom: e.KyveChain.Config().Denom, Amount: math.NewInt(amount)},
+			Amount:           sdk.Coin{Denom: e.kyveChain.Config().Denom, Amount: math.NewInt(amount)},
 		},
 	))
 }
@@ -101,9 +104,9 @@ func (e *Executor) CreatePool(name string, pc PoolConfig, voter ibc.Wallet) {
 	ctx, cancel := context.WithTimeout(context.Background(), 2*defaultQueryTimeout+defaultTxTimeout)
 	defer cancel()
 
-	fmt.Println(fmt.Sprintf("%s is creating pool %s", voter.FormattedAddress(), name))
+	e.log.Debug(fmt.Sprintf("%s is creating pool %s", voter.FormattedAddress(), name))
 
-	govAuthority, err := e.KyveChain.GetModuleAddress(ctx, govmodule.ModuleName)
+	govAuthority, err := e.kyveChain.GetModuleAddress(ctx, govmodule.ModuleName)
 	e.g.Expect(err).To(BeNil())
 	govPropMsg := pooltypes.MsgCreatePool{
 		Authority:            govAuthority,
@@ -123,7 +126,7 @@ func (e *Executor) CreatePool(name string, pc PoolConfig, voter ibc.Wallet) {
 	}
 	proposalMsg, err := govtypes.NewMsgSubmitProposal(
 		[]sdk.Msg{&govPropMsg},
-		sdk.Coins{sdk.Coin{Denom: e.KyveChain.Config().Denom, Amount: math.NewInt(1000)}},
+		sdk.Coins{sdk.Coin{Denom: e.kyveChain.Config().Denom, Amount: math.NewInt(1000)}},
 		voter.FormattedAddress(),
 		"",
 		fmt.Sprintf("Create pool %s", name),
@@ -132,7 +135,7 @@ func (e *Executor) CreatePool(name string, pc PoolConfig, voter ibc.Wallet) {
 	e.g.Expect(err).To(BeNil())
 
 	nextPropId := uint64(1)
-	proposals, err := e.Q.GovClient.Proposals(ctx, &govtypes.QueryProposalsRequest{Pagination: &sdkquery.PageRequest{Reverse: true, Limit: 1}})
+	proposals, err := e.q.GovClient.Proposals(ctx, &govtypes.QueryProposalsRequest{Pagination: &sdkquery.PageRequest{Reverse: true, Limit: 1}})
 	e.g.Expect(err).To(BeNil())
 	if len(proposals.Proposals) == 1 {
 		nextPropId = proposals.Proposals[0].Id + 1
@@ -140,7 +143,7 @@ func (e *Executor) CreatePool(name string, pc PoolConfig, voter ibc.Wallet) {
 	voteMsg := govtypes.NewMsgVote(voter.Address(), nextPropId, govtypes.OptionYes, "")
 	e.ExpectTxSuccess(cosmos.BroadcastTx(
 		ctx,
-		e.Broadcaster,
+		e.broadcaster,
 		voter,
 		proposalMsg,
 		voteMsg,
@@ -151,7 +154,7 @@ func (e *Executor) CreateProtocolNode(creator ibc.Wallet) {
 	ctx, cancel := context.WithTimeout(context.Background(), defaultTxTimeout)
 	defer cancel()
 
-	fmt.Println(fmt.Sprintf("%s is creating protocol node", creator.FormattedAddress()))
+	e.log.Debug(fmt.Sprintf("%s is creating protocol node", creator.FormattedAddress()))
 
 	createStakerMsg := &stakerstypes.MsgCreateStaker{
 		Creator: creator.FormattedAddress(),
@@ -159,7 +162,7 @@ func (e *Executor) CreateProtocolNode(creator ibc.Wallet) {
 	}
 	e.ExpectTxSuccess(cosmos.BroadcastTx(
 		ctx,
-		e.Broadcaster,
+		e.broadcaster,
 		creator,
 		createStakerMsg,
 	))
@@ -169,7 +172,7 @@ func (e *Executor) JoinPool(creator ibc.Wallet, valAccount ibc.Wallet, poolId ui
 	ctx, cancel := context.WithTimeout(context.Background(), defaultTxTimeout)
 	defer cancel()
 
-	fmt.Println(fmt.Sprintf("%s is joining pool %d with %s", creator.FormattedAddress(), poolId, valAccount.FormattedAddress()))
+	e.log.Debug(fmt.Sprintf("%s is joining pool %d with %s", creator.FormattedAddress(), poolId, valAccount.FormattedAddress()))
 
 	joinPoolMsg := &stakerstypes.MsgJoinPool{
 		Creator:    creator.FormattedAddress(),
@@ -179,7 +182,7 @@ func (e *Executor) JoinPool(creator ibc.Wallet, valAccount ibc.Wallet, poolId ui
 	}
 	e.ExpectTxSuccess(cosmos.BroadcastTx(
 		ctx,
-		e.Broadcaster,
+		e.broadcaster,
 		creator,
 		joinPoolMsg,
 	))
@@ -191,7 +194,7 @@ func (e *Executor) GetFinalizedBundles(poolId uint64) *querytypes.QueryFinalized
 
 	params := &querytypes.QueryFinalizedBundlesRequest{PoolId: poolId}
 
-	res, err := e.Q.Query.BundlesClient.FinalizedBundlesQuery(ctx, params)
+	res, err := e.q.Query.BundlesClient.FinalizedBundlesQuery(ctx, params)
 	e.g.Expect(err).To(BeNil())
 
 	return res
@@ -203,7 +206,7 @@ func (e *Executor) GetPools() *querytypes.QueryPoolsResponse {
 
 	params := &querytypes.QueryPoolsRequest{}
 
-	res, err := e.Q.Query.PoolClient.Pools(ctx, params)
+	res, err := e.q.Query.PoolClient.Pools(ctx, params)
 	e.g.Expect(err).To(BeNil())
 
 	return res
@@ -215,7 +218,7 @@ func (e *Executor) GetPool(poolId int) *querytypes.QueryPoolResponse {
 
 	params := &querytypes.QueryPoolRequest{Id: uint64(poolId)}
 
-	res, err := e.Q.Query.PoolClient.Pool(ctx, params)
+	res, err := e.q.Query.PoolClient.Pool(ctx, params)
 	e.g.Expect(err).To(BeNil())
 
 	return res
