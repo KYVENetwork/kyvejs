@@ -10,8 +10,6 @@ import { Validator, standardizeError } from "../..";
  */
 export async function isValidRuntime(this: Validator): Promise<boolean> {
   try {
-    this.logger.debug(`Comparing pool runtime with protocol node runtime`);
-
     const name = await this.runtime.getName();
 
     if (this.pool.data!.runtime !== name) {
@@ -24,8 +22,6 @@ export async function isValidRuntime(this: Validator): Promise<boolean> {
 
       return false;
     }
-
-    this.logger.info(`Validator running on runtime = ${name}`);
 
     return true;
   } catch (err) {
