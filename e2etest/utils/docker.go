@@ -378,7 +378,7 @@ func NewProtocolRunner(testConfig TestConfig, networkId string, restAddress stri
 			image:     testapiImage.tag,
 			name:      fmt.Sprintf("%s-%s", testapiImage.tag, integrationImage),
 			networkId: networkId,
-			binds:     []string{fmt.Sprintf("%s:%s:ro", testConfig.Integration.TestDataPath, kyveStorageMountApi)},
+			binds:     []string{fmt.Sprintf("%s:%s:ro", testConfig.Integration.TestDataApiPath, kyveStorageMountApi)},
 		},
 		integrationConfig: ContainerConfig{
 			image:     integrationImage,

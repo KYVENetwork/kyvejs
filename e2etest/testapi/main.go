@@ -22,6 +22,7 @@ type DataEntry struct {
 	Data interface{}
 	DataType
 	HasQueryParam bool
+	IsJson        bool
 }
 
 type Endpoint struct {
@@ -99,9 +100,7 @@ func readDirRecursively(path string, endpoints *[]Endpoint) error {
 			}
 		} else if d.Type().IsRegular() {
 			split := strings.Split(d.Name(), ".")
-			if split[len(split)-1] != "json" {
-				continue
-			}
+			isJson := len(split) == 2 && split[len(split)-1] == "json"
 			key := split[0]
 
 			file, err := os.ReadFile(fullPath)
@@ -109,9 +108,16 @@ func readDirRecursively(path string, endpoints *[]Endpoint) error {
 				return err
 			}
 
-			data, dt, err := unmarshalJSON(file)
-			if err != nil {
-				return err
+			var data interface{}
+			var dt DataType
+			if isJson {
+				data, dt, err = unmarshalJSON(file)
+				if err != nil {
+					return err
+				}
+			} else {
+				data = file
+				dt = Object
 			}
 
 			addToEndpoints(endpoints, path, DataEntry{
@@ -119,6 +125,7 @@ func readDirRecursively(path string, endpoints *[]Endpoint) error {
 				Data:          data,
 				DataType:      dt,
 				HasQueryParam: strings.HasPrefix(key, "?"),
+				IsJson:        isJson,
 			})
 		}
 	}
@@ -178,11 +185,18 @@ func main() {
 							if endpoint.hasSingleDataEntry() {
 								fmt.Printf("Sending data for %s\n", endpoint.Path())
 							} else {
-								fmt.Printf("Sending data for %s/%s\n", endpoint.Path(), strings.Join(keys, ", "))
+								fmt.Printf("Sending data for %s%s\n", endpoint.Path(), key)
 							}
-							err := json.NewEncoder(w).Encode(entry.Data)
-							if err != nil {
-								panic(err)
+							if entry.IsJson {
+								err := json.NewEncoder(w).Encode(entry.Data)
+								if err != nil {
+									fmt.Printf("Error sending data for %s: %s\n", endpoint.Path(), err)
+								}
+							} else {
+								_, err := w.Write(entry.Data.([]byte))
+								if err != nil {
+									fmt.Printf("Error sending data for %s: %s\n", endpoint.Path(), err)
+								}
 							}
 							return
 						}

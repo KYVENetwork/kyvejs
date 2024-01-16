@@ -13,6 +13,8 @@ import (
 
 // integrationsPath is the path to the integrations folder
 const integrationsPath = "../integrations"
+const testdataPath = "%s/testdata"
+const testdataApiPath = testdataPath + "/api"
 
 type poolConfigYml struct {
 	StartKey string                 `default:"1" yaml:"startKey"`
@@ -30,9 +32,10 @@ type PoolConfig struct {
 }
 
 type Integration struct {
-	Name         string
-	Path         string
-	TestDataPath string
+	Name            string
+	Path            string
+	TestDataPath    string
+	TestDataApiPath string
 }
 
 type TestConfig struct {
@@ -85,8 +88,8 @@ func getPoolConfig(integration Integration) (*PoolConfig, error) {
 	}, nil
 }
 
-func getTestdataPath(path string) (string, error) {
-	path, err := filepath.Abs(fmt.Sprintf("%s/testdata", path))
+func ensurePathExists(template string, basePath string) (string, error) {
+	path, err := filepath.Abs(fmt.Sprintf(template, basePath))
 	if err != nil {
 		return "", err
 	}
@@ -111,14 +114,19 @@ func getIntegrations() ([]Integration, error) {
 	for _, entry := range dirEntries {
 		if entry.IsDir() {
 			integrationPath := filepath.Join(path, entry.Name())
-			testDataPath, err := getTestdataPath(integrationPath)
+			testDataPath, err := ensurePathExists(testdataPath, integrationPath)
+			if err != nil {
+				return nil, err
+			}
+			testDataApiPath, err := ensurePathExists(testdataApiPath, integrationPath)
 			if err != nil {
 				return nil, err
 			}
 			integrationDirs = append(integrationDirs, Integration{
-				Path:         integrationPath,
-				Name:         entry.Name(),
-				TestDataPath: testDataPath,
+				Path:            integrationPath,
+				Name:            entry.Name(),
+				TestDataPath:    testDataPath,
+				TestDataApiPath: testDataApiPath,
 			})
 		}
 	}
