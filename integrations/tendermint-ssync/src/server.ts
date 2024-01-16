@@ -225,6 +225,15 @@ export class TendermintServer implements RuntimeServiceServer {
         return;
       }
 
+      // throw error if chunk is missing
+      if (!value.chunk) {
+        callback({
+          code: grpc.status.INVALID_ARGUMENT,
+          details: `Value in data item has no snapshot chunk`
+        });
+        return;
+      }
+
       if (chunkIndex > 0) {
         // error if one of those values is not null
         if (

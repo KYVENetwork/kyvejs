@@ -105,6 +105,8 @@ describe("vote abstain tests", () => {
 
     v["waitForNextBundleProposal"] = jest.fn();
 
+    v["archiveDebugBundle"] = jest.fn();
+
     v["continueRound"] = jest
       .fn()
       .mockReturnValueOnce(true)
@@ -272,10 +274,11 @@ describe("vote abstain tests", () => {
     // ASSERT NODEJS INTERFACES
     // ========================
 
+    // assert that debug bundle was saved
+    expect(v["archiveDebugBundle"]).toHaveBeenCalledTimes(0);
+
     // assert that only one round ran
     expect(v["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
-
-    // TODO: assert timeouts
   });
 
   test("vote abstain because local bundle could only be loaded partially", async () => {
@@ -438,10 +441,11 @@ describe("vote abstain tests", () => {
     // ASSERT NODEJS INTERFACES
     // ========================
 
+    // assert that debug bundle was saved
+    expect(v["archiveDebugBundle"]).toHaveBeenCalledTimes(0);
+
     // assert that only one round ran
     expect(v["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
-
-    // TODO: assert timeouts
   });
 
   test("vote abstain because local bundle could only be loaded partially multiple times", async () => {
@@ -605,10 +609,11 @@ describe("vote abstain tests", () => {
     // ASSERT NODEJS INTERFACES
     // ========================
 
+    // assert that debug bundle was saved
+    expect(v["archiveDebugBundle"]).toHaveBeenCalledTimes(0);
+
     // assert that only one round ran
     expect(v["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
-
-    // TODO: assert timeouts
   });
 
   test("vote abstain because bundle from storage provider could not be loaded", async () => {
@@ -777,10 +782,11 @@ describe("vote abstain tests", () => {
     // ASSERT NODEJS INTERFACES
     // ========================
 
+    // assert that debug bundle was saved
+    expect(v["archiveDebugBundle"]).toHaveBeenCalledTimes(0);
+
     // assert that only one round ran
     expect(v["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
-
-    // TODO: assert timeouts
   });
 
   test("vote abstain because bundle from storage provider could not be loaded multiple times", async () => {
@@ -956,10 +962,11 @@ describe("vote abstain tests", () => {
     // ASSERT NODEJS INTERFACES
     // ========================
 
+    // assert that debug bundle was saved
+    expect(v["archiveDebugBundle"]).toHaveBeenCalledTimes(0);
+
     // assert that only one round ran
     expect(v["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
-
-    // TODO: assert timeouts
   });
 
   test("vote abstain because local and storage provider bundle could not be loaded", async () => {
@@ -1130,10 +1137,11 @@ describe("vote abstain tests", () => {
     // ASSERT NODEJS INTERFACES
     // ========================
 
+    // assert that debug bundle was saved
+    expect(v["archiveDebugBundle"]).toHaveBeenCalledTimes(0);
+
     // assert that only one round ran
     expect(v["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
-
-    // TODO: assert timeouts
   });
 
   test("try to vote abstain after validator has already voted abstain", async () => {
@@ -1278,10 +1286,11 @@ describe("vote abstain tests", () => {
     // ASSERT NODEJS INTERFACES
     // ========================
 
+    // assert that debug bundle was saved
+    expect(v["archiveDebugBundle"]).toHaveBeenCalledTimes(0);
+
     // assert that only one round ran
     expect(v["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
-
-    // TODO: assert timeouts
   });
 
   test("try to vote abstain after validator has already voted valid", async () => {
@@ -1404,10 +1413,11 @@ describe("vote abstain tests", () => {
     // ASSERT NODEJS INTERFACES
     // ========================
 
+    // assert that debug bundle was saved
+    expect(v["archiveDebugBundle"]).toHaveBeenCalledTimes(0);
+
     // assert that only one round ran
     expect(v["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
-
-    // TODO: assert timeouts
   });
 
   test("try to vote abstain after validator has already voted invalid", async () => {
@@ -1531,10 +1541,11 @@ describe("vote abstain tests", () => {
     // ASSERT NODEJS INTERFACES
     // ========================
 
+    // assert that debug bundle was saved
+    expect(v["archiveDebugBundle"]).toHaveBeenCalledTimes(0);
+
     // assert that only one round ran
     expect(v["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
-
-    // TODO: assert timeouts
   });
 
   test("try to vote abstain where voteBundleProposal fails", async () => {
@@ -1701,10 +1712,11 @@ describe("vote abstain tests", () => {
     // ASSERT NODEJS INTERFACES
     // ========================
 
+    // assert that debug bundle was saved
+    expect(v["archiveDebugBundle"]).toHaveBeenCalledTimes(0);
+
     // assert that only one round ran
     expect(v["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
-
-    // TODO: assert timeouts
   });
 
   test("try to validate bundle but summarizeDataBundle fails", async () => {
@@ -1851,10 +1863,11 @@ describe("vote abstain tests", () => {
     // ASSERT NODEJS INTERFACES
     // ========================
 
+    // assert that debug bundle was saved
+    expect(v["archiveDebugBundle"]).toHaveBeenCalledTimes(1);
+
     // assert that only one round ran
     expect(v["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
-
-    // TODO: assert timeouts
   });
 
   test("try to validate bundle but validateDataItem fails", async () => {
@@ -1993,10 +2006,11 @@ describe("vote abstain tests", () => {
     // ASSERT NODEJS INTERFACES
     // ========================
 
+    // assert that debug bundle was saved
+    expect(v["archiveDebugBundle"]).toHaveBeenCalledTimes(1);
+
     // assert that only one round ran
     expect(v["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
-
-    // TODO: assert timeouts
   });
 
   test("vote abstain because decompression fails", async () => {
@@ -2131,9 +2145,10 @@ describe("vote abstain tests", () => {
     // ASSERT NODEJS INTERFACES
     // ========================
 
+    // assert that debug bundle was saved
+    expect(v["archiveDebugBundle"]).toHaveBeenCalledTimes(1);
+
     // assert that only one round ran
     expect(v["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
-
-    // TODO: assert timeouts
   });
 });
