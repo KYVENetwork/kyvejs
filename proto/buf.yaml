@@ -1,7 +1,7 @@
 version: v1
-name: buf.build/rapha/kyverdk
+name: buf.build/kyve/rdk
 deps:
-  - buf.build/rapha/kyve
+  - buf.build/kyve/chain
 breaking:
   use:
     - FILE
