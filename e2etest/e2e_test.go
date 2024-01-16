@@ -21,7 +21,7 @@ import (
 
 const testName = "Kyvejs e2e tests"
 
-func setup(t *testing.T, log *zap.Logger) ([]utils.TestConfig, string, *cosmos.CosmosChain, *interchaintest.Interchain, *utils.Executor) {
+func setup(t *testing.T, log *zap.Logger) ([]utils.TestConfig, string, *cosmos.CosmosChain, *interchaintest.Interchain, *cosmos.Broadcaster) {
 	ctx := context.Background()
 	g := NewWithT(t)
 
@@ -104,7 +104,7 @@ func setup(t *testing.T, log *zap.Logger) ([]utils.TestConfig, string, *cosmos.C
 		tcfgs = append(tcfgs, *cfg)
 	}
 
-	return tcfgs, network, kyveChain, interchain, executor
+	return tcfgs, network, kyveChain, interchain, broadcaster
 }
 
 func removeFolders(tmpIntegrations []utils.TmpIntegration) error {
@@ -150,7 +150,6 @@ func bootstrapTmpIntegrations(t *testing.T, log *zap.Logger, protocolBuilder *ut
 }
 
 func TestProtocolNode(t *testing.T) {
-	g := NewWithT(t)
 	log := zaptest.NewLogger(t)
 	protocolBuilder := utils.NewProtocolBuilder(testName, log)
 	t.Cleanup(func() {
@@ -163,7 +162,7 @@ func TestProtocolNode(t *testing.T) {
 	// Create integrations for all available templates in kystrap
 	bootstrapTmpIntegrations(t, log, protocolBuilder)
 
-	testConfigs, network, kyveChain, interchain, executor := setup(t, log)
+	testConfigs, network, kyveChain, interchain, broadcaster := setup(t, log)
 
 	t.Parallel()
 	t.Cleanup(func() {
@@ -178,7 +177,7 @@ func TestProtocolNode(t *testing.T) {
 		t.Run(fmt.Sprintf("Test protol runtime for %s", testConfig.Integration.Name), func(t *testing.T) {
 			// This will run the test in parallel
 			t.Parallel()
-
+			g := NewWithT(t)
 			protocolRunner := utils.NewProtocolRunner(testConfig, network, kyveChain.GetAPIAddress(), kyveChain.GetRPCAddress())
 
 			g.Expect(protocolRunner.RunProtocolNodes()).To(BeNil())
@@ -188,6 +187,7 @@ func TestProtocolNode(t *testing.T) {
 					log.Error(err.Error())
 				}
 			}()
+			executor := utils.NewExecutor(g, log, kyveChain, broadcaster)
 
 			// Create 3 protocol nodes
 			executor.CreateProtocolNode(testConfig.Alice.ProtocolNode)

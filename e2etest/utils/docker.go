@@ -160,7 +160,7 @@ func (pc *ProtocolBuilder) BuildDependencies() error {
 	defer cli.Close()
 
 	// Build all the images concurrently
-	configs := append([]DockerImage{protocolImage, testapiImage, kystrapImage})
+	configs := []DockerImage{protocolImage, testapiImage, kystrapImage}
 	errChs := make([]chan error, len(configs))
 	for i, img := range configs {
 		errChs[i] = make(chan error)
