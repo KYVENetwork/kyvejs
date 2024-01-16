@@ -12,9 +12,11 @@ import (
 )
 
 // integrationsPath is the path to the integrations folder
-const integrationsPath = "../integrations"
-const testdataPath = "%s/testdata"
-const testdataApiPath = testdataPath + "/api"
+const (
+	integrationsPath = "../integrations"
+	testdataPath     = "%s/testdata"
+	testdataApiPath  = testdataPath + "/api"
+)
 
 type poolConfigYml struct {
 	StartKey string                 `default:"1" yaml:"startKey"`
