@@ -11,10 +11,6 @@ import { valid, major, minor, patch, prerelease } from "semver";
  */
 export async function isValidVersion(this: Validator): Promise<boolean> {
   try {
-    this.logger.debug(
-      `Comparing remote runtime version with local runtime version`
-    );
-
     const remoteVersion = valid(this.pool.data!.protocol!.version);
 
     // exit if remote version is invalid
@@ -88,8 +84,6 @@ export async function isValidVersion(this: Validator): Promise<boolean> {
     }
 
     // patch version can be different, continue in this case
-    this.logger.info(`Validator running on valid runtime version = ${version}`);
-
     return true;
   } catch (err) {
     this.logger.fatal(`Error while validating runtime version. Exiting ...`);

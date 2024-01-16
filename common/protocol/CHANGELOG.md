@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.3](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/protocol@1.1.2...@kyvejs/protocol@1.1.3) (2024-01-05)
+
+### Bug Fixes
+
+- disable debug bundle because of memory issue ([#114](https://github.com/KYVENetwork/kyvejs/issues/114)) ([dae9858](https://github.com/KYVENetwork/kyvejs/commit/dae9858226d2da0fbf31070964888d2e2853f3b0))
+
+## [1.1.2](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/protocol@1.1.1...@kyvejs/protocol@1.1.2) (2024-01-03)
+
+### Bug Fixes
+
+- abort if different bundle round was returned from api ([#113](https://github.com/KYVENetwork/kyvejs/issues/113)) ([ccac962](https://github.com/KYVENetwork/kyvejs/commit/ccac96240ddd4550d15d0970f7e4ffb33feeb188))
+- archive debug bundle on invalid vote and added unit tests ([#112](https://github.com/KYVENetwork/kyvejs/issues/112)) ([800d4a1](https://github.com/KYVENetwork/kyvejs/commit/800d4a1e9b1897d8572c178769c87c8f4b0e1599))
+
+## [1.1.1](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/protocol@1.1.0...@kyvejs/protocol@1.1.1) (2023-12-15)
+
+### Bug Fixes
+
+- remove unecessary logs ([#109](https://github.com/KYVENetwork/kyvejs/issues/109)) ([6915fda](https://github.com/KYVENetwork/kyvejs/commit/6915fda81b5debce1ca0451857d2fbbd35acdcd5))
+- zip archives of binaries ([#106](https://github.com/KYVENetwork/kyvejs/issues/106)) ([b6d8290](https://github.com/KYVENetwork/kyvejs/commit/b6d829042a9f7304603a25b9716b948923fc07dd))
+
 # [1.1.0](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/protocol@1.0.14...@kyvejs/protocol@1.1.0) (2023-11-28)
 
 ### Features
