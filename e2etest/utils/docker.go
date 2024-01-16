@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"os/user"
 	"path/filepath"
 	"slices"
 	"time"
@@ -33,14 +34,18 @@ const (
 	cleanupLabel = "kyve-e2e-test"
 	// interchainCleanupLabel is the label used to identify containers and volumes that should be cleaned up from interchaintest
 	interchainCleanupLabel = "ibc-test"
-	// protocolPath is the path to the protocol folder
-	protocolPath = "../common/protocol"
-	// testapiPath is the path to the testapi folder
-	testapiPath = "testapi"
-
-	protocolImage          = "protocol"
-	testapiImage           = "testapi"
+	// integrationImagePrefix is the prefix used for the integration image name
 	integrationImagePrefix = "integration"
+	// kystrapTemplatesDir is the path to the templates folder
+	kystrapTemplatesDir = "../tools/kystrap/templates"
+	// kystrapMount is the mount path for the output folder in the kystrap container
+	kystrapMount = "/app/out"
+)
+
+var (
+	protocolImage = DockerImage{path: "../common/protocol", tag: "protocol"}
+	testapiImage  = DockerImage{path: "testapi", tag: "testapi"}
+	kystrapImage  = DockerImage{path: "../tools/kystrap", tag: "kystrap-e2etest"}
 )
 
 type DockerImage struct {
@@ -95,7 +100,7 @@ func (pc *ProtocolBuilder) printBuild(rd io.Reader) error {
 }
 
 func (pc *ProtocolBuilder) buildImage(dockerClient *client.Client, buildPath string, tag string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*60*5)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*5)
 	defer cancel()
 
 	path, err := filepath.Abs(buildPath)
@@ -140,7 +145,7 @@ func (pc *ProtocolBuilder) buildImageAsync(dockerClient *client.Client, image Do
 	}()
 }
 
-func (pc *ProtocolBuilder) Build(testConfigs []*TestConfig) error {
+func (pc *ProtocolBuilder) BuildDependencies() error {
 	// First, cleanup any old containers and volumes
 	err := pc.Cleanup()
 	if err != nil {
@@ -154,9 +159,31 @@ func (pc *ProtocolBuilder) Build(testConfigs []*TestConfig) error {
 	//goland:noinspection GoUnhandledErrorResult
 	defer cli.Close()
 
-	// Define protocol and testapi configs
-	protocolConfig := DockerImage{path: protocolPath, tag: protocolImage}
-	testapiConfig := DockerImage{path: testapiPath, tag: testapiImage}
+	// Build all the images concurrently
+	configs := append([]DockerImage{protocolImage, testapiImage, kystrapImage})
+	errChs := make([]chan error, len(configs))
+	for i, img := range configs {
+		errChs[i] = make(chan error)
+		pc.buildImageAsync(cli, img, errChs[i])
+	}
+
+	for _, errCh := range errChs {
+		err := <-errCh
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (pc *ProtocolBuilder) BuildIntegrations(testConfigs []*TestConfig) error {
+	cli, err := client.NewClientWithOpts()
+	if err != nil {
+		return fmt.Errorf("failed to create docker client: %v", err)
+	}
+	//goland:noinspection GoUnhandledErrorResult
+	defer cli.Close()
+
 	var integrationConfigs []DockerImage
 
 	// Find all subfolders in the integrations folder and build them
@@ -179,9 +206,8 @@ func (pc *ProtocolBuilder) Build(testConfigs []*TestConfig) error {
 	}
 
 	// Build all the images concurrently
-	configs := append([]DockerImage{protocolConfig, testapiConfig}, integrationConfigs...)
-	errChs := make([]chan error, len(configs))
-	for i, img := range configs {
+	errChs := make([]chan error, len(integrationConfigs))
+	for i, img := range integrationConfigs {
 		errChs[i] = make(chan error)
 		pc.buildImageAsync(cli, img, errChs[i])
 	}
@@ -196,7 +222,7 @@ func (pc *ProtocolBuilder) Build(testConfigs []*TestConfig) error {
 }
 
 func (pc *ProtocolBuilder) Cleanup() error {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*60*5)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*5)
 	defer cancel()
 
 	cli, err := client.NewClientWithOpts()
@@ -247,6 +273,80 @@ func (pc *ProtocolBuilder) Cleanup() error {
 	return nil
 }
 
+type KystrapRunner struct {
+	kystrapConfig ContainerConfig
+}
+
+func NewKystrapRunner() *KystrapRunner {
+	path, err := filepath.Abs(integrationsPath)
+	if err != nil {
+		panic(fmt.Errorf("failed to get absolute path for integrations folder: %v", err))
+	}
+	binds := []string{fmt.Sprintf("%s:%s", path, kystrapMount)}
+	return &KystrapRunner{
+		kystrapConfig: ContainerConfig{
+			image: kystrapImage.tag,
+			name:  kystrapImage.tag,
+			binds: binds,
+		},
+	}
+}
+
+func runDockerAndRemove(ctx context.Context, cli *client.Client, config ContainerConfig, timeout time.Duration) error {
+	id, err := runDocker(ctx, cli, config)
+	if err != nil {
+		return err
+	}
+
+	// Try to remove the container until it succeeds or the timeout is reached
+	for {
+		ctx, cancel := context.WithTimeout(ctx, timeout)
+
+		err = cli.ContainerRemove(ctx, id, types.ContainerRemoveOptions{})
+		if err != nil {
+			// check if err is a timeout error
+			if errors.Is(ctx.Err(), context.DeadlineExceeded) {
+				cancel()
+				return fmt.Errorf("failed to remove container: %v", err)
+			}
+		} else {
+			cancel()
+			return nil
+		}
+	}
+}
+
+// BootstrapTmpIntegrations creates an integrations for the provided TmpIntegrations
+// The integrations will be created in the integrations folder
+func (kr *KystrapRunner) BootstrapTmpIntegrations(tmpIntegrations []TmpIntegration) error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+	defer cancel()
+
+	cli, err := client.NewClientWithOpts()
+	if err != nil {
+		return fmt.Errorf("failed to create docker client: %v", err)
+	}
+	//goland:noinspection GoUnhandledErrorResult
+	defer cli.Close()
+
+	currentUser, err := user.Current()
+	if err != nil {
+		return err
+	}
+
+	for _, tmp := range tmpIntegrations {
+		config := kr.kystrapConfig
+		config.cmd = []string{"create", "-n", tmp.Name, "-l", tmp.Language, "-y"}
+		config.user = fmt.Sprintf("%s:%s", currentUser.Uid, currentUser.Gid)
+
+		err := runDockerAndRemove(ctx, cli, config, time.Second*10)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 type ProtocolRunner struct {
 	testapiConfig     ContainerConfig
 	integrationConfig ContainerConfig
@@ -262,11 +362,11 @@ func NewProtocolRunner(testConfig TestConfig, networkId string, restAddress stri
 	integrationImage := integrationTag(testConfig.Integration)
 	var protocolConfigs []ContainerConfig
 	for _, cfg := range testConfig.GetProtocolConfigs() {
-		name := fmt.Sprintf("%s-%s-%s", protocolImage, integrationImage, cfg.ProtocolNode.KeyName())
+		name := fmt.Sprintf("%s-%s-%s", protocolImage.tag, integrationImage, cfg.ProtocolNode.KeyName())
 		env := getProtocolEnv(cfg.Valaccount.Mnemonic(), rpcAddress, restAddress, integrationImage, testConfig.PoolId, true)
 		binds := []string{fmt.Sprintf("%s:%s", kyveStorageVolumeName(testConfig.Integration), kyveStorageMountProtocol)}
 		protocolConfigs = append(protocolConfigs, ContainerConfig{
-			image:     protocolImage,
+			image:     protocolImage.tag,
 			name:      name,
 			networkId: networkId,
 			env:       env,
@@ -275,8 +375,8 @@ func NewProtocolRunner(testConfig TestConfig, networkId string, restAddress stri
 	}
 	return &ProtocolRunner{
 		testapiConfig: ContainerConfig{
-			image:     testapiImage,
-			name:      fmt.Sprintf("%s-%s", testapiImage, integrationImage),
+			image:     testapiImage.tag,
+			name:      fmt.Sprintf("%s-%s", testapiImage.tag, integrationImage),
 			networkId: networkId,
 			binds:     []string{fmt.Sprintf("%s:%s:ro", testConfig.Integration.TestDataPath, kyveStorageMountApi)},
 		},
@@ -298,41 +398,45 @@ type ContainerConfig struct {
 	image     string
 	name      string
 	networkId string
+	user      string
 	env       []string
 	binds     []string
+	cmd       []string
 }
 
-func runDocker(
-	ctx context.Context,
-	cli *client.Client,
-	config ContainerConfig,
-) error {
+func runDocker(ctx context.Context, cli *client.Client, config ContainerConfig) (string, error) {
+	var endpointsConfig map[string]*network.EndpointSettings
+	if config.networkId != "" {
+		endpointsConfig = map[string]*network.EndpointSettings{
+			config.networkId: {},
+		}
+	}
 	r, err := cli.ContainerCreate(
 		ctx,
 		&container.Config{
 			Image: config.image,
 			Env:   config.env,
+			Cmd:   config.cmd,
+			User:  config.user,
 		},
 		&container.HostConfig{
 			Binds: config.binds,
 		},
 		&network.NetworkingConfig{
-			EndpointsConfig: map[string]*network.EndpointSettings{
-				config.networkId: {},
-			},
+			EndpointsConfig: endpointsConfig,
 		},
 		nil,
 		config.name,
 	)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	err = cli.ContainerStart(ctx, r.ID, types.ContainerStartOptions{})
 	if err != nil {
-		return err
+		return "", err
 	}
-	return nil
+	return r.ID, nil
 }
 
 func getProtocolEnv(
@@ -372,7 +476,7 @@ func kyveStorageVolumeName(integration Integration) string {
 }
 
 func (pc *ProtocolRunner) RunProtocolNodes() error {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*1030)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
 
 	cli, err := client.NewClientWithOpts()
@@ -383,20 +487,20 @@ func (pc *ProtocolRunner) RunProtocolNodes() error {
 	defer cli.Close()
 
 	// Run testapi
-	err = runDocker(ctx, cli, pc.testapiConfig)
+	_, err = runDocker(ctx, cli, pc.testapiConfig)
 	if err != nil {
 		return err
 	}
 
 	// Run integration
-	err = runDocker(ctx, cli, pc.integrationConfig)
+	_, err = runDocker(ctx, cli, pc.integrationConfig)
 	if err != nil {
 		return err
 	}
 
 	// Run protocol with multiple nodes
 	for _, protocol := range pc.protocolConfigs {
-		err = runDocker(ctx, cli, protocol)
+		_, err = runDocker(ctx, cli, protocol)
 		if err != nil {
 			return err
 		}

@@ -3,6 +3,7 @@ package e2etest
 import (
 	"context"
 	"fmt"
+	"os"
 	"testing"
 	"time"
 
@@ -20,11 +21,12 @@ import (
 
 const testName = "Kyvejs e2e tests"
 
-func setup(t *testing.T, log *zap.Logger) ([]utils.TestConfig, string, *cosmos.CosmosChain, *interchaintest.Interchain, *utils.ProtocolBuilder, *utils.Executor) {
+func setup(t *testing.T, log *zap.Logger) ([]utils.TestConfig, string, *cosmos.CosmosChain, *interchaintest.Interchain, *utils.Executor) {
 	ctx := context.Background()
 	g := NewWithT(t)
 
-	testConfigs := utils.GetTestConfigs()
+	testConfigs, err := utils.GetTestConfigs()
+	g.Expect(err).To(BeNil())
 	genesisWrapper := utils.NewGenesisWrapper(testConfigs)
 
 	numFullNodes := 0
@@ -45,7 +47,7 @@ func setup(t *testing.T, log *zap.Logger) ([]utils.TestConfig, string, *cosmos.C
 
 	// Build the docker images
 	protocolBuilder := utils.NewProtocolBuilder(testName, log)
-	g.Expect(protocolBuilder.Build(testConfigs)).To(BeNil())
+	g.Expect(protocolBuilder.BuildIntegrations(testConfigs)).To(BeNil())
 
 	// Start the chain
 	err = interchain.Build(ctx, nil, interchaintest.InterchainBuildOptions{
@@ -102,22 +104,70 @@ func setup(t *testing.T, log *zap.Logger) ([]utils.TestConfig, string, *cosmos.C
 		tcfgs = append(tcfgs, *cfg)
 	}
 
-	return tcfgs, network, kyveChain, interchain, protocolBuilder, executor
+	return tcfgs, network, kyveChain, interchain, executor
+}
+
+func removeFolders(tmpIntegrations []utils.TmpIntegration) error {
+	for _, tmp := range tmpIntegrations {
+		if _, err := os.Stat(tmp.Path); os.IsNotExist(err) {
+			continue
+		}
+		err := os.RemoveAll(tmp.Path)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func bootstrapTmpIntegrations(t *testing.T, log *zap.Logger, protocolBuilder *utils.ProtocolBuilder) {
+	g := NewWithT(t)
+	err := protocolBuilder.BuildDependencies()
+	g.Expect(err).To(BeNil())
+
+	tmpFolders, err := utils.GetTmpIntegrationDirectories()
+	g.Expect(err).To(BeNil())
+
+	// Cleanup any folders from previous runs
+	err = removeFolders(tmpFolders)
+	g.Expect(err).To(BeNil())
+
+	t.Cleanup(func() {
+		// Remove the tmp folders after the tests
+		err := removeFolders(tmpFolders)
+		if err != nil {
+			log.Error(err.Error())
+		}
+	})
+
+	kystrapRunner := utils.NewKystrapRunner()
+	err = kystrapRunner.BootstrapTmpIntegrations(tmpFolders)
+
+	g.Expect(err).To(BeNil())
+	for _, tmpFolder := range tmpFolders {
+		g.Expect(tmpFolder.Path).To(BeADirectory())
+	}
 }
 
 func TestProtocolNode(t *testing.T) {
 	g := NewWithT(t)
 	log := zaptest.NewLogger(t)
-	testConfigs, network, kyveChain, interchain, protocolBuilder, executor := setup(t, log)
+	protocolBuilder := utils.NewProtocolBuilder(testName, log)
+	t.Cleanup(func() {
+		err := protocolBuilder.Cleanup()
+		if err != nil {
+			log.Error(err.Error())
+		}
+	})
+
+	// Create integrations for all available templates in kystrap
+	bootstrapTmpIntegrations(t, log, protocolBuilder)
+
+	testConfigs, network, kyveChain, interchain, executor := setup(t, log)
 
 	t.Parallel()
 	t.Cleanup(func() {
 		err := interchain.Close()
-		if err != nil {
-			log.Error(err.Error())
-		}
-
-		err = protocolBuilder.Cleanup()
 		if err != nil {
 			log.Error(err.Error())
 		}
