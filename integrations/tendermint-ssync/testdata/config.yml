@@ -1,5 +1,5 @@
 ---
-startKey: 2187000/35
+startKey: 2187000/0
 config:
   api: http://testapi-integration-tendermint-ssync:8080
   interval: 3000
