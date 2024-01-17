@@ -108,7 +108,7 @@ func (pc *ProtocolBuilder) buildImage(dockerClient *client.Client, buildPath str
 		return err
 	}
 	if _, err := os.Stat(path); os.IsNotExist(err) {
-		return errors.New("protocol path does not exist")
+		return fmt.Errorf("path %s does not exist", path)
 	}
 
 	tar, err := archive.TarWithOptions(path, &archive.TarOptions{})

@@ -23,5 +23,5 @@ lint:
 
 test:
 	@echo "🎯 Running tests..."
-	@GOMAXPROCS=10 go test -v -timeout 30m ./...
+	@go test -v -parallel 10 -timeout 30m ./...
 	@echo "✅ Completed tests!"
