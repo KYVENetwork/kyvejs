@@ -38,11 +38,11 @@ export async function canVote(
               };
             }
 
-            // abort if a new bundle proposal was found
-            if (parseInt(this.pool.bundle_proposal!.updated_at) > updatedAt) {
+            // abort if a different bundle proposal was found
+            if (parseInt(this.pool.bundle_proposal!.updated_at) !== updatedAt) {
               return {
                 possible: false,
-                reason: "New bundle proposal was found",
+                reason: "Different bundle proposal was found",
               };
             }
 

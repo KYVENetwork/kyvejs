@@ -1,7 +1,7 @@
 {
   "name": "@kyve/kysor",
   "description": "The Cosmovisor for KYVE protocol nodes",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "homepage": "https://github.com/KYVENetwork/kysor#readme",
