@@ -1,8 +1,16 @@
 package config
 
-import "github.com/KYVENetwork/kyvejs/tools/kysor/cmd/types"
+import (
+	"fmt"
+	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/types"
+)
 
-var FlagNonInteractive = types.BoolFlag{Name: "yes", Short: "y", DefaultValue: false, Usage: "Non-interactive mode: Skips all prompts (default false)", Required: false}
+const configFilePath = ".kysor/config.toml"
+
+var (
+	FlagConfig         = types.StringFlag{Name: "config", Short: "c", DefaultValue: "", Usage: fmt.Sprintf("config file (default is $HOME/%s)", configFilePath), Required: false}
+	FlagNonInteractive = types.BoolFlag{Name: "yes", Short: "y", DefaultValue: false, Usage: "Non-interactive mode: Skips all prompts (default false)", Required: false}
+)
 
 var (
 	RootCmdConfig        = types.CmdConfig{Name: "kysor", Short: "Kysor helps you manage your KYVE data validators"}

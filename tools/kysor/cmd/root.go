@@ -76,7 +76,7 @@ func Execute() {
 func init() {
 	cobra.OnInitialize(initConfig)
 
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.kysor.toml)")
+	rootCmd.PersistentFlags().StringVarP(&cfgFile, config.FlagConfig.Name, config.FlagConfig.Short, config.FlagConfig.DefaultValue, config.FlagConfig.Usage)
 
 	rootCmd.PersistentFlags().BoolP(config.FlagNonInteractive.Name, config.FlagNonInteractive.Short, config.FlagNonInteractive.DefaultValue, config.FlagNonInteractive.Usage)
 	rootCmd.SetErrPrefix(promptui.IconBad)

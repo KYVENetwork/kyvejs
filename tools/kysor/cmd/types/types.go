@@ -19,10 +19,10 @@ type BoolFlag struct {
 }
 
 type KysorConfig struct {
-	ChainID              string `json:"chainId"`
-	RPC                  string `json:"rpc"`
-	REST                 string `json:"rest"`
-	AutoDownloadBinaries bool   `json:"autoDownloadBinaries"`
+	ChainID              string `json:"chainId" mapstructure:"chainId"`
+	RPC                  string `json:"rpc" mapstructure:"rpc"`
+	REST                 string `json:"rest" mapstructure:"rest"`
+	AutoDownloadBinaries bool   `json:"autoDownloadBinaries" mapstructure:"autoDownloadBinaries"`
 }
 
 type CmdConfig struct {
