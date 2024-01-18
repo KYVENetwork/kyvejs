@@ -26,11 +26,11 @@ var (
 )
 
 var (
-	RootCmdConfig    = types.CmdConfig{Name: "kysor", Short: "Kysor helps you manage your KYVE data validators"}
-	VersionCmdConfig = types.CmdConfig{Name: "version", Short: "Show the version of kysor"}
-	InitCmdConfig    = types.CmdConfig{Name: "init", Short: "Init kysor"}
-	StartCmdConfig   = types.CmdConfig{Name: "start", Short: "Start kysor"}
-	//StopCmdConfig       = types.CmdConfig{Name: "stop", Short: "Stop kysor"}
+	RootCmdConfig    = types.CmdConfig{Name: "kysor", Short: "KYSOR helps you manage your KYVE data validators"}
+	VersionCmdConfig = types.CmdConfig{Name: "version", Short: "Show the version of KYSOR"}
+	InitCmdConfig    = types.CmdConfig{Name: "init", Short: "Init KYSOR"}
+	StartCmdConfig   = types.CmdConfig{Name: "start", Short: "Start KYSOR"}
+	//StopCmdConfig       = types.CmdConfig{Name: "stop", Short: "Stop KYSOR"}
 	ValaccountsCmdConfig       = types.CmdConfig{Name: "valaccounts", Short: "Manage validator accounts"}
 	ValaccountsCreateCmdConfig = types.CmdConfig{Name: "create", Short: "Create a new valaccount"}
 )

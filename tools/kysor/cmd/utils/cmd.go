@@ -88,7 +88,7 @@ func GetStringFromPromptOrFlag(cmd *cobra.Command, flag types.StringFlag) (strin
 	}
 
 	prompt := promptui.Prompt{
-		Label: flag.Question,
+		Label: flag.Prompt,
 	}
 	return prompt.Run()
 }

@@ -7,7 +7,7 @@ type StringFlag struct {
 	Short        string
 	DefaultValue string
 	Usage        string
-	Question     string
+	Prompt       string
 	Required     bool
 }
 

@@ -14,7 +14,7 @@ var (
 		Short:        "",
 		DefaultValue: "",
 		Usage:        "Chain ID of the network",
-		Question:     "Chain ID of the network",
+		Prompt:       "Chain ID of the network",
 		Required:     true,
 	}
 	flagRPC = types.StringFlag{
@@ -22,7 +22,7 @@ var (
 		Short:        "",
 		DefaultValue: "",
 		Usage:        "Comma separated list of rpc endpoints. If the first fails the next endpoint will be used as fallback.",
-		Question:     "Comma separated list of rpc endpoints",
+		Prompt:       "Comma separated list of rpc endpoints",
 		Required:     true,
 	}
 	flagREST = types.StringFlag{
@@ -30,7 +30,7 @@ var (
 		Short:        "",
 		DefaultValue: "",
 		Usage:        "Comma separated list of rest endpoints. If the first fails the next endpoint will be used as fallback.",
-		Question:     "Comma separated list of rest endpoints",
+		Prompt:       "Comma separated list of rest endpoints",
 		Required:     true,
 	}
 	flagAutoDownload = types.BoolFlag{
