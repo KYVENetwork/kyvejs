@@ -9,6 +9,7 @@ type StringFlag struct {
 	Usage        string
 	Prompt       string
 	Required     bool
+	ValidateFn   func(input string) error
 }
 
 type BoolFlag struct {

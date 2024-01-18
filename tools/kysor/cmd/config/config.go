@@ -25,6 +25,7 @@ var (
 	FlagNonInteractive = types.BoolFlag{Name: "yes", Short: "y", DefaultValue: false, Usage: "Non-interactive mode: Skips all prompts (default false)", Required: false}
 )
 
+// TODO: move to respective cmd files
 var (
 	RootCmdConfig    = types.CmdConfig{Name: "kysor", Short: "KYSOR helps you manage your KYVE data validators"}
 	VersionCmdConfig = types.CmdConfig{Name: "version", Short: "Show the version of KYSOR"}

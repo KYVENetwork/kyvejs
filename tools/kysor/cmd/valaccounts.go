@@ -19,10 +19,15 @@ func valaccountsCmd() *cobra.Command {
 			// Check if the interactive flag is set
 			// -> if so ask the user what to do
 			if utils.IsInteractive(cmd) {
+				// TODO: print a better help message (explain interactive mode)
+				err := cmd.Help()
+				if err != nil {
+					return err
+				}
+
 				options := []types.CmdConfig{
 					config.ValaccountsCreateCmdConfig,
 				}
-				var err error
 				nextCmd, err = utils.PromptCmd(options)
 				if err != nil {
 					return err

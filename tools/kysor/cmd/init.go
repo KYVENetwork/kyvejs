@@ -16,6 +16,12 @@ var (
 		Usage:        "Chain ID of the network",
 		Prompt:       "Chain ID of the network",
 		Required:     true,
+		ValidateFn: func(input string) error {
+			if len(input) == 0 {
+				return fmt.Errorf("chain ID must not be empty")
+			}
+			return nil
+		},
 	}
 	flagRPC = types.StringFlag{
 		Name:         "rpc",
@@ -24,6 +30,12 @@ var (
 		Usage:        "Comma separated list of rpc endpoints. If the first fails the next endpoint will be used as fallback.",
 		Prompt:       "Comma separated list of rpc endpoints",
 		Required:     true,
+		ValidateFn: func(input string) error {
+			if len(input) == 0 {
+				return fmt.Errorf("rpc endpoints must not be empty")
+			}
+			return nil
+		},
 	}
 	flagREST = types.StringFlag{
 		Name:         "rest",
@@ -32,6 +44,12 @@ var (
 		Usage:        "Comma separated list of rest endpoints. If the first fails the next endpoint will be used as fallback.",
 		Prompt:       "Comma separated list of rest endpoints",
 		Required:     true,
+		ValidateFn: func(input string) error {
+			if len(input) == 0 {
+				return fmt.Errorf("rest endpoints must not be empty")
+			}
+			return nil
+		},
 	}
 	flagAutoDownload = types.BoolFlag{
 		Name:         "auto-download-binaries",
