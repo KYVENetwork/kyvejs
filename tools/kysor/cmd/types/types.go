@@ -7,6 +7,7 @@ type StringFlag struct {
 	Short        string
 	DefaultValue string
 	Usage        string
+	Question     string
 	Required     bool
 }
 
@@ -15,14 +16,8 @@ type BoolFlag struct {
 	Short        string
 	DefaultValue bool
 	Usage        string
+	Question     string
 	Required     bool
-}
-
-type KysorConfig struct {
-	ChainID              string `json:"chainId" mapstructure:"chainId"`
-	RPC                  string `json:"rpc" mapstructure:"rpc"`
-	REST                 string `json:"rest" mapstructure:"rest"`
-	AutoDownloadBinaries bool   `json:"autoDownloadBinaries" mapstructure:"autoDownloadBinaries"`
 }
 
 type CmdConfig struct {

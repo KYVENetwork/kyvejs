@@ -1,19 +1,12 @@
 package cmd
 
 import (
-	"fmt"
 	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/config"
-	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/types"
 	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/utils"
 	"github.com/manifoldco/promptui"
-	"os"
-	"path/filepath"
-
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
+	"os"
 )
-
-var cfgFile string
 
 func promptCmd() (string, error) {
 	items := []string{
@@ -74,41 +67,10 @@ func Execute() {
 }
 
 func init() {
-	cobra.OnInitialize(initConfig)
+	cobra.OnInitialize(config.InitConfig)
 
-	rootCmd.PersistentFlags().StringVarP(&cfgFile, config.FlagConfig.Name, config.FlagConfig.Short, config.FlagConfig.DefaultValue, config.FlagConfig.Usage)
+	rootCmd.PersistentFlags().StringVarP(&config.ConfigFilePath, config.FlagConfig.Name, config.FlagConfig.Short, config.FlagConfig.DefaultValue, config.FlagConfig.Usage)
 
 	rootCmd.PersistentFlags().BoolP(config.FlagNonInteractive.Name, config.FlagNonInteractive.Short, config.FlagNonInteractive.DefaultValue, config.FlagNonInteractive.Usage)
 	rootCmd.SetErrPrefix(promptui.IconBad)
-}
-
-// initConfig reads in config file and ENV variables if set
-func initConfig() {
-	if cfgFile != "" {
-		// Use config file from the flag
-		viper.SetConfigFile(cfgFile)
-	} else {
-		// Find home directory
-		home, err := os.UserHomeDir()
-		cobra.CheckErr(err)
-
-		path := filepath.Join(home, ".kysor")
-
-		// Search config in home directory with name ".kysor"
-		viper.AddConfigPath(path)
-		viper.SetConfigType("toml")
-		viper.SetConfigName("config")
-	}
-
-	viper.AutomaticEnv() // read in environment variables that match
-
-	// If a config file is found, read it in
-	if err := viper.ReadInConfig(); err == nil {
-		fmt.Println("Using config file:", viper.ConfigFileUsed())
-
-		// Unmarshal config
-		kysorConfig := types.KysorConfig{}
-		err = viper.Unmarshal(&kysorConfig)
-		cobra.CheckErr(err)
-	}
 }

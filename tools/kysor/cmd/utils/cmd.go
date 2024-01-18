@@ -3,6 +3,7 @@ package utils
 import (
 	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/config"
 	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/types"
+	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
@@ -47,4 +48,52 @@ func SetupInteractiveMode(cmd *cobra.Command, _ []string) {
 			}
 		})
 	}
+}
+
+// GetStringFromPromptOrFlag returns the string value from
+// 1. the given flag
+// 2. prompts the user for the value if the flag was not set
+func GetStringFromPromptOrFlag(cmd *cobra.Command, flag types.StringFlag) (string, error) {
+	value, err := cmd.Flags().GetString(flag.Name)
+	if err != nil {
+		return "", err
+	}
+
+	if value != "" {
+		return value, nil
+	}
+
+	prompt := promptui.Prompt{
+		Label: flag.Question,
+	}
+	return prompt.Run()
+}
+
+// GetBoolFromPromptOrFlag returns the bool value from
+// 1. the given flag
+// 2. prompts the user for the value if the flag was not set
+func GetBoolFromPromptOrFlag(cmd *cobra.Command, flag types.BoolFlag) (bool, error) {
+	value, err := cmd.Flags().GetBool(flag.Name)
+	if err != nil {
+		return false, err
+	}
+
+	// Only ask if we are in interactive mode and the flag was not set
+	if IsInteractive(cmd) && !cmd.Flags().Changed(flag.Name) {
+		cursorPos := 0
+		if !value {
+			cursorPos = 1
+		}
+		prompt := promptui.Select{
+			Label:     flag.Question,
+			Items:     []string{"Yes", "No"},
+			CursorPos: cursorPos,
+		}
+		_, result, err := prompt.Run()
+		if err != nil {
+			return false, err
+		}
+		return result == "Yes", nil
+	}
+	return value, nil
 }
