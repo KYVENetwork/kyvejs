@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/config"
 	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/types"
 	"github.com/manifoldco/promptui"
@@ -48,6 +49,29 @@ func SetupInteractiveMode(cmd *cobra.Command, _ []string) {
 			}
 		})
 	}
+}
+
+func PromptCmd(options []types.CmdConfig) (*types.CmdConfig, error) {
+	var items []string
+	for _, option := range options {
+		items = append(items, option.ActionString())
+	}
+
+	prompt := promptui.Select{
+		Label: "What do you want to do?",
+		Items: items,
+	}
+
+	_, result, err := prompt.Run()
+	if err != nil {
+		return nil, err
+	}
+	for _, option := range options {
+		if option.ActionString() == result {
+			return &option, nil
+		}
+	}
+	return nil, fmt.Errorf("invalid option: %s", result)
 }
 
 // GetStringFromPromptOrFlag returns the string value from

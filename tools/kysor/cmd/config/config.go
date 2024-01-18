@@ -26,11 +26,13 @@ var (
 )
 
 var (
-	RootCmdConfig        = types.CmdConfig{Name: "kysor", Short: "Kysor helps you manage your KYVE data validators"}
-	InitCmdConfig        = types.CmdConfig{Name: "init", Short: "Init kysor"}
-	StartCmdConfig       = types.CmdConfig{Name: "start", Short: "Start kysor"}
-	ValaccountsCmdConfig = types.CmdConfig{Name: "valaccounts", Short: "Manage validator accounts"}
-	VersionCmdConfig     = types.CmdConfig{Name: "version", Short: "Show the version of kysor"}
+	RootCmdConfig    = types.CmdConfig{Name: "kysor", Short: "Kysor helps you manage your KYVE data validators"}
+	VersionCmdConfig = types.CmdConfig{Name: "version", Short: "Show the version of kysor"}
+	InitCmdConfig    = types.CmdConfig{Name: "init", Short: "Init kysor"}
+	StartCmdConfig   = types.CmdConfig{Name: "start", Short: "Start kysor"}
+	//StopCmdConfig       = types.CmdConfig{Name: "stop", Short: "Stop kysor"}
+	ValaccountsCmdConfig       = types.CmdConfig{Name: "valaccounts", Short: "Manage validator accounts"}
+	ValaccountsCreateCmdConfig = types.CmdConfig{Name: "create", Short: "Create a new valaccount"}
 )
 
 type KysorConfig struct {
@@ -41,7 +43,7 @@ type KysorConfig struct {
 }
 
 func (c KysorConfig) Save(path string) error {
-	if DoesConfigExist() {
+	if DoesConfigExist(path) {
 		return fmt.Errorf("config file already exists at %s", getConfigFilePath())
 	}
 
@@ -71,9 +73,11 @@ func (c KysorConfig) Save(path string) error {
 	return nil
 }
 
-func DoesConfigExist() bool {
-	configFile := getConfigFilePath()
-	if _, err := os.Stat(configFile); os.IsNotExist(err) {
+func DoesConfigExist(configFilePath string) bool {
+	if configFilePath == "" {
+		configFilePath = getConfigFilePath()
+	}
+	if _, err := os.Stat(configFilePath); os.IsNotExist(err) {
 		return false
 	} else if err != nil {
 		cobra.CheckErr(err)

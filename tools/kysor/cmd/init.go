@@ -43,14 +43,23 @@ var (
 	}
 )
 
-func InitCmd() *cobra.Command {
+func initCmd(configFilePath string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:    config.InitCmdConfig.Name,
 		Short:  config.InitCmdConfig.Short,
 		PreRun: utils.SetupInteractiveMode,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			// Parent is only defined if the command runs in non interactive mode
+			if configFilePath == "" && cmd.Parent() != nil {
+				path, err := cmd.Parent().PersistentFlags().GetString(config.FlagConfig.Name)
+				if err != nil {
+					return err
+				}
+				configFilePath = path
+			}
+
 			// Check if the config file already exists
-			if config.DoesConfigExist() {
+			if config.DoesConfigExist(configFilePath) {
 				return fmt.Errorf("config file already exists: %s", config.FlagConfig.DefaultValue)
 			}
 
@@ -83,11 +92,6 @@ func InitCmd() *cobra.Command {
 				AutoDownloadBinaries: autoDownload,
 			}
 
-			configFilePath, err := cmd.Flags().GetString(config.FlagConfig.Name)
-			if err != nil {
-				return err
-			}
-
 			return kysorConfig.Save(configFilePath)
 		},
 	}
@@ -97,5 +101,5 @@ func InitCmd() *cobra.Command {
 }
 
 func init() {
-	rootCmd.AddCommand(InitCmd())
+	rootCmd.AddCommand(initCmd(""))
 }

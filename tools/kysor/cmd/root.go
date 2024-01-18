@@ -1,58 +1,53 @@
 package cmd
 
 import (
+	"fmt"
 	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/config"
+	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/types"
 	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/utils"
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 	"os"
 )
 
-func promptCmd() (string, error) {
-	items := []string{
-		config.InitCmdConfig.ActionString(),
-		config.StartCmdConfig.ActionString(),
-		config.ValaccountsCmdConfig.ActionString(),
-		config.VersionCmdConfig.ActionString(),
-	}
-
-	prompt := promptui.Select{
-		Label: "What do you want to do?",
-		Items: items,
-	}
-
-	_, result, err := prompt.Run()
-	return result, err
-}
-
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   config.RootCmdConfig.Name,
 	Short: config.RootCmdConfig.Short,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		option := ""
+		var nextCmd *types.CmdConfig
 
 		// Check if the interactive flag is set
 		// -> if so ask the user what to do
 		if utils.IsInteractive(cmd) {
+			options := []types.CmdConfig{
+				config.InitCmdConfig,
+				config.StartCmdConfig,
+				config.ValaccountsCmdConfig,
+				config.VersionCmdConfig,
+			}
 			var err error
-			option, err = promptCmd()
+			nextCmd, err = utils.PromptCmd(options)
 			if err != nil {
 				return err
 			}
 		}
 
-		switch option {
+		switch nextCmd.Name {
 		case config.InitCmdConfig.Name:
-			return InitCmd().Execute()
+			config, err := cmd.PersistentFlags().GetString(config.FlagConfig.Name)
+			if err != nil {
+				return err
+			}
+			return initCmd(config).Execute()
 		case config.StartCmdConfig.Name:
-			return startCmd.Execute()
+			return startCmd().Execute()
 		case config.ValaccountsCmdConfig.Name:
-			return valaccountsCmd.Execute()
+			return valaccountsCmd().Execute()
 		case config.VersionCmdConfig.Name:
-			return versionCmd.Execute()
+			return versionCmd().Execute()
 		default:
-			return nil
+			return fmt.Errorf("invalid option: %s", nextCmd.Name)
 		}
 	},
 }

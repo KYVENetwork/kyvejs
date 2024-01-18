@@ -7,14 +7,16 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var startCmd = &cobra.Command{
-	Use:   config.StartCmdConfig.Name,
-	Short: config.StartCmdConfig.Short,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("start called")
-	},
+func startCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   config.StartCmdConfig.Name,
+		Short: config.StartCmdConfig.Short,
+		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Println("start called")
+		},
+	}
 }
 
 func init() {
-	rootCmd.AddCommand(startCmd)
+	rootCmd.AddCommand(startCmd())
 }
