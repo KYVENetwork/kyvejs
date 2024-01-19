@@ -34,12 +34,13 @@ export default class Syntropy implements IRuntime {
   async getDataItem(_: Validator, key: string): Promise<DataItem> {
     const fromKey = parseInt(key);
     const toKey = fromKey + this.config.interval;
-    console.log(
-      `getDataItem:`,
-      `${this.config.api}/get_item/${fromKey}/${toKey}`
-    );
     const { data } = await axios.get(
       `${this.config.api}/get_item/${fromKey}/${toKey}`
+    );
+    console.log(
+      `getDataItem:`,
+      `${this.config.api}/get_item/${fromKey}/${toKey}`,
+      (data || []).length
     );
     return { key, value: data || [] };
   }
@@ -57,17 +58,38 @@ export default class Syntropy implements IRuntime {
     proposedDataItem: DataItem,
     validationDataItem: DataItem
   ): Promise<number> {
-    if (proposedDataItem.value.length !== validationDataItem.value.length) {
+    console.log(
+      'proposed',
+      proposedDataItem.value.length,
+      'validation',
+      validationDataItem.value.length
+    );
+    // vote abstain if proposed data item has more entries than local one
+    if (proposedDataItem.value.length > validationDataItem.value.length) {
+      console.log(
+        'proposedDataItem.value.length > validationDataItem.value.length',
+        proposedDataItem.value.length,
+        validationDataItem.value.length
+      );
       return VOTE.VOTE_TYPE_ABSTAIN;
     }
 
-    if (
-      JSON.stringify(proposedDataItem) === JSON.stringify(validationDataItem)
-    ) {
-      return VOTE.VOTE_TYPE_VALID;
+    const proposed = proposedDataItem.value.map((p: any) => JSON.stringify(p));
+    const validation = proposedDataItem.value.map((p: any) =>
+      JSON.stringify(p)
+    );
+
+    let valid = true;
+
+    for (let i = 0; i < proposed.length; i++) {
+      valid = validation.includes(proposed[i]);
+
+      if (!valid) {
+        break;
+      }
     }
 
-    return VOTE.VOTE_TYPE_INVALID;
+    return valid ? VOTE.VOTE_TYPE_VALID : VOTE.VOTE_TYPE_INVALID;
   }
 
   async summarizeDataBundle(_: Validator, __: DataItem[]): Promise<string> {
@@ -76,10 +98,11 @@ export default class Syntropy implements IRuntime {
 
   async nextKey(_: Validator, key: string): Promise<string> {
     const nextKey = parseInt(key) + this.config.interval;
+    const buffer = 5;
     let now = Math.floor(Date.now() / 1000);
 
     // we only return the next key if it is in the past
-    while (nextKey + this.config.interval > now) {
+    while (nextKey + this.config.interval + buffer > now) {
       console.log('sleep', nextKey, now);
       await sleep(1000);
       now = Math.floor(Date.now() / 1000);
