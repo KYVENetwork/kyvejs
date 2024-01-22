@@ -16,7 +16,6 @@ var (
 		Short:        "",
 		DefaultValue: "",
 		Usage:        "Chain ID of the network",
-		Prompt:       "Chain ID of the network",
 		Required:     true,
 		ValidateFn: func(input string) error {
 			if len(input) == 0 {
@@ -58,7 +57,6 @@ var (
 		Short:        "d",
 		DefaultValue: false,
 		Usage:        "Allow automatic download and execution of new upgrade binaries",
-		Question:     "Allow automatic download and execution of new upgrade binaries",
 		Required:     false,
 	}
 )

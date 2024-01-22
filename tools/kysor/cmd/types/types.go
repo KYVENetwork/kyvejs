@@ -17,8 +17,18 @@ type BoolFlag struct {
 	Short        string
 	DefaultValue bool
 	Usage        string
-	Question     string
+	Prompt       string
 	Required     bool
+}
+
+type IntFlag struct {
+	Name         string
+	Short        string
+	DefaultValue int64
+	Usage        string
+	Prompt       string
+	Required     bool
+	ValidateFn   func(input string) error
 }
 
 type CmdConfig struct {

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/types"
 	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/utils"
-
 	"github.com/spf13/cobra"
 )
 
@@ -50,27 +49,48 @@ func valaccountsCmd() *cobra.Command {
 
 var (
 	flagValaccCreateName = types.StringFlag{
-		Name:         "name",
-		Short:        "n",
-		DefaultValue: "",
-		Usage:        "Name of the valaccount (name only used locally for KYSOR)",
-		Prompt:       "Name of the valaccount (name only used locally for KYSOR)",
-		Required:     true,
+		Name:     "name",
+		Short:    "n",
+		Usage:    "Name of the valaccount (name only used locally for KYSOR)",
+		Required: true,
 	}
-	flagValaccCreatePool = types.StringFlag{
-		Name:         "pool",
-		Short:        "p",
-		DefaultValue: "",
-		Usage:        "The ID of the pool this valaccount should participate as a validator",
-		Prompt:       "The ID of the pool this valaccount should participate as a validator",
-		Required:     true,
+	flagValaccCreatePool = types.IntFlag{
+		Name:       "pool",
+		Short:      "p",
+		Usage:      "The ID of the pool this valaccount should participate as a validator",
+		Required:   true,
+		ValidateFn: utils.ValidateInt,
 	}
 	flagValaccCreateStorageProvKey = types.StringFlag{
-		Name:         "storage-priv",
-		Short:        "",
-		DefaultValue: "",
-		Usage:        "The private key of the storage provider",
-		Prompt:       "The private key of the storage provider",
+		Name:  "storage-priv",
+		Usage: "The private key of the storage provider",
+	}
+	flagValaccCreateRequestBackoff = types.IntFlag{
+		Name:         "request-backoff",
+		DefaultValue: 50,
+		Usage:        "The time in milliseconds between each getDataItem request where the node sleeps",
+		ValidateFn:   utils.ValidateIntOrEmpty,
+	}
+	flagValaccCreateCache = types.StringFlag{
+		Name:         "cache",
+		DefaultValue: "jsonfile",
+		Usage:        "The cache this node should use",
+	}
+	flagValaccCreateMetrics = types.BoolFlag{
+		Name:         "metrics",
+		DefaultValue: false,
+		Usage:        "Start a prometheus metrics server on http://localhost:8080/metrics",
+	}
+	flagValaccCreateMetricsPort = types.IntFlag{
+		Name:         "metrics-port",
+		DefaultValue: 8080,
+		ValidateFn:   utils.ValidatePort,
+		Usage:        "Specify the port of the metrics server. Only considered if '--metrics' is set",
+	}
+	flagValaccCreateRecover = types.BoolFlag{
+		Name:         "recover",
+		DefaultValue: false,
+		Usage:        "Recover a valaccount from a mnemonic",
 	}
 )
 
@@ -87,22 +107,49 @@ func valaccountsCreateCmd() *cobra.Command {
 			}
 
 			// TODO: Get pools from chain and make a selection
-			pool, err := utils.GetStringFromPromptOrFlag(cmd, flagValaccCreatePool)
+			pool, err := utils.GetIntFromPromptOrFlag(cmd, flagValaccCreatePool)
 			if err != nil {
-				return nil
+				return err
 			}
 
 			storageProvKey, err := utils.GetStringFromPromptOrFlag(cmd, flagValaccCreateStorageProvKey)
 			if err != nil {
-				return nil
+				return err
 			}
 
-			fmt.Println(name, pool, storageProvKey)
+			backoffTime, err := utils.GetIntFromPromptOrFlag(cmd, flagValaccCreateRequestBackoff)
+			if err != nil {
+				return err
+			}
+
+			cache, err := utils.GetStringFromPromptOrFlag(cmd, flagValaccCreateCache)
+			if err != nil {
+				return err
+			}
+
+			metrics, err := utils.GetBoolFromPromptOrFlag(cmd, flagValaccCreateMetrics)
+			if err != nil {
+				return err
+			}
+
+			metricsPort, err := utils.GetIntFromPromptOrFlag(cmd, flagValaccCreateMetricsPort)
+			if err != nil {
+				return err
+			}
+
+			isRecover, err := utils.GetBoolFromPromptOrFlag(cmd, flagValaccCreateRecover)
+			if err != nil {
+				return err
+			}
+
+			fmt.Println(name, pool, storageProvKey, backoffTime, cache, metrics, metricsPort, isRecover)
 
 			return nil
 		},
 	}
-	utils.AddStringFlags(cmd, []types.StringFlag{flagValaccCreateName, flagValaccCreatePool})
+	utils.AddStringFlags(cmd, []types.StringFlag{flagValaccCreateName, flagValaccCreateStorageProvKey, flagValaccCreateCache})
+	utils.AddIntFlags(cmd, []types.IntFlag{flagValaccCreatePool, flagValaccCreateRequestBackoff, flagValaccCreateMetricsPort})
+	utils.AddBoolFlags(cmd, []types.BoolFlag{flagValaccCreateMetrics, flagValaccCreateRecover})
 	return cmd
 }
 
