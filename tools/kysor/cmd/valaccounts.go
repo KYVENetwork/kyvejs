@@ -2,17 +2,21 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/config"
 	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/types"
 	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/utils"
 
 	"github.com/spf13/cobra"
 )
 
+var (
+	ValaccountsCmdConfig       = types.CmdConfig{Name: "valaccounts", Short: "Manage validator accounts"}
+	ValaccountsCreateCmdConfig = types.CmdConfig{Name: "create", Short: "Create a new valaccount"}
+)
+
 func valaccountsCmd() *cobra.Command {
 	return &cobra.Command{
-		Use:   config.ValaccountsCmdConfig.Name,
-		Short: config.ValaccountsCmdConfig.Short,
+		Use:   ValaccountsCmdConfig.Name,
+		Short: ValaccountsCmdConfig.Short,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var nextCmd *types.CmdConfig
 
@@ -26,7 +30,7 @@ func valaccountsCmd() *cobra.Command {
 				}
 
 				options := []types.CmdConfig{
-					config.ValaccountsCreateCmdConfig,
+					ValaccountsCreateCmdConfig,
 				}
 				nextCmd, err = utils.PromptCmd(options)
 				if err != nil {
@@ -35,7 +39,7 @@ func valaccountsCmd() *cobra.Command {
 			}
 
 			switch nextCmd.Name {
-			case config.ValaccountsCreateCmdConfig.Name:
+			case ValaccountsCreateCmdConfig.Name:
 				return valaccountsCreateCmd().Execute()
 			default:
 				return fmt.Errorf("invalid option: %s", nextCmd.Name)
@@ -72,8 +76,8 @@ var (
 
 func valaccountsCreateCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:    config.ValaccountsCreateCmdConfig.Name,
-		Short:  config.ValaccountsCreateCmdConfig.Short,
+		Use:    ValaccountsCreateCmdConfig.Name,
+		Short:  ValaccountsCreateCmdConfig.Short,
 		PreRun: utils.SetupInteractiveMode,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// Get the values from the flags or prompt the user for them

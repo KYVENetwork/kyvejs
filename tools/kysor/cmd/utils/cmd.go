@@ -2,7 +2,6 @@ package utils
 
 import (
 	"fmt"
-	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/config"
 	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/types"
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
@@ -34,7 +33,7 @@ func AddBoolFlags(cmd *cobra.Command, flags []types.BoolFlag) {
 }
 
 func IsInteractive(cmd *cobra.Command) bool {
-	return !cmd.Flags().Changed(config.FlagNonInteractive.Name)
+	return !cmd.Flags().Changed(types.FlagNonInteractive.Name)
 }
 
 // SetupInteractiveMode sets up the interactive mode for the given command.

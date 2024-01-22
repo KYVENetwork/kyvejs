@@ -10,10 +10,14 @@ import (
 	"os"
 )
 
+var (
+	RootCmdConfig = types.CmdConfig{Name: "kysor", Short: "KYSOR helps you manage your KYVE data validators"}
+)
+
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   config.RootCmdConfig.Name,
-	Short: config.RootCmdConfig.Short,
+	Use:   RootCmdConfig.Name,
+	Short: RootCmdConfig.Short,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		var nextCmd *types.CmdConfig
 
@@ -27,10 +31,10 @@ var rootCmd = &cobra.Command{
 			}
 
 			options := []types.CmdConfig{
-				config.InitCmdConfig,
-				config.StartCmdConfig,
-				config.ValaccountsCmdConfig,
-				config.VersionCmdConfig,
+				InitCmdConfig,
+				StartCmdConfig,
+				ValaccountsCmdConfig,
+				VersionCmdConfig,
 			}
 			nextCmd, err = utils.PromptCmd(options)
 			if err != nil {
@@ -39,17 +43,17 @@ var rootCmd = &cobra.Command{
 		}
 
 		switch nextCmd.Name {
-		case config.InitCmdConfig.Name:
-			config, err := cmd.PersistentFlags().GetString(config.FlagConfig.Name)
+		case InitCmdConfig.Name:
+			config, err := cmd.PersistentFlags().GetString(types.FlagConfig.Name)
 			if err != nil {
 				return err
 			}
 			return initCmd(config).Execute()
-		case config.StartCmdConfig.Name:
+		case StartCmdConfig.Name:
 			return startCmd().Execute()
-		case config.ValaccountsCmdConfig.Name:
+		case ValaccountsCmdConfig.Name:
 			return valaccountsCmd().Execute()
-		case config.VersionCmdConfig.Name:
+		case VersionCmdConfig.Name:
 			return versionCmd().Execute()
 		default:
 			return fmt.Errorf("invalid option: %s", nextCmd.Name)
@@ -69,8 +73,10 @@ func Execute() {
 func init() {
 	cobra.OnInitialize(config.InitConfig)
 
-	rootCmd.PersistentFlags().StringVarP(&config.ConfigFilePath, config.FlagConfig.Name, config.FlagConfig.Short, config.FlagConfig.DefaultValue, config.FlagConfig.Usage)
+	types.FlagConfig.DefaultValue = config.GetConfigFilePath()
 
-	rootCmd.PersistentFlags().BoolP(config.FlagNonInteractive.Name, config.FlagNonInteractive.Short, config.FlagNonInteractive.DefaultValue, config.FlagNonInteractive.Usage)
+	rootCmd.PersistentFlags().StringVarP(&config.ConfigFilePath, types.FlagConfig.Name, types.FlagConfig.Short, types.FlagConfig.DefaultValue, types.FlagConfig.Usage)
+
+	rootCmd.PersistentFlags().BoolP(types.FlagNonInteractive.Name, types.FlagNonInteractive.Short, types.FlagNonInteractive.DefaultValue, types.FlagNonInteractive.Usage)
 	rootCmd.SetErrPrefix(promptui.IconBad)
 }

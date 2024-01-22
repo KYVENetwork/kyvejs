@@ -8,6 +8,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var InitCmdConfig = types.CmdConfig{Name: "init", Short: "Init KYSOR"}
+
 var (
 	flagChainID = types.StringFlag{
 		Name:         "chain-id",
@@ -63,13 +65,13 @@ var (
 
 func initCmd(configFilePath string) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:    config.InitCmdConfig.Name,
-		Short:  config.InitCmdConfig.Short,
+		Use:    InitCmdConfig.Name,
+		Short:  InitCmdConfig.Short,
 		PreRun: utils.SetupInteractiveMode,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// Parent is only defined if the command runs in non interactive mode
 			if configFilePath == "" && cmd.Parent() != nil {
-				path, err := cmd.Parent().PersistentFlags().GetString(config.FlagConfig.Name)
+				path, err := cmd.Parent().PersistentFlags().GetString(types.FlagConfig.Name)
 				if err != nil {
 					return err
 				}
@@ -78,7 +80,7 @@ func initCmd(configFilePath string) *cobra.Command {
 
 			// Check if the config file already exists
 			if config.DoesConfigExist(configFilePath) {
-				return fmt.Errorf("config file already exists: %s", config.FlagConfig.DefaultValue)
+				return fmt.Errorf("config file already exists: %s", types.FlagConfig.DefaultValue)
 			}
 
 			// Get the values from the flags or prompt the user for them

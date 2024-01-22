@@ -2,16 +2,18 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/config"
+	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/types"
 	"github.com/spf13/cobra"
 	"runtime"
 	"runtime/debug"
 )
 
+var VersionCmdConfig = types.CmdConfig{Name: "version", Short: "Show the version of KYSOR"}
+
 func versionCmd() *cobra.Command {
 	return &cobra.Command{
-		Use:   config.VersionCmdConfig.Name,
-		Short: config.VersionCmdConfig.Short,
+		Use:   VersionCmdConfig.Name,
+		Short: VersionCmdConfig.Short,
 		Run: func(cmd *cobra.Command, args []string) {
 			bi, ok := debug.ReadBuildInfo()
 			if ok && bi.Main.Version != "" {

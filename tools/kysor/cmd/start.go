@@ -2,15 +2,17 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/config"
+	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/types"
 
 	"github.com/spf13/cobra"
 )
 
+var StartCmdConfig = types.CmdConfig{Name: "start", Short: "Start KYSOR"}
+
 func startCmd() *cobra.Command {
 	return &cobra.Command{
-		Use:   config.StartCmdConfig.Name,
-		Short: config.StartCmdConfig.Short,
+		Use:   StartCmdConfig.Name,
+		Short: StartCmdConfig.Short,
 		Run: func(cmd *cobra.Command, args []string) {
 			fmt.Println("start called")
 		},
