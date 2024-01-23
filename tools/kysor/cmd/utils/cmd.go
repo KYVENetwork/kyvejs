@@ -51,6 +51,24 @@ func AddIntFlags(cmd *cobra.Command, flags []types.IntFlag) {
 	}
 }
 
+// AddOptionFlags adds the given option flags to the given command.
+// If a flag is required it will be marked as required.
+func AddOptionFlags[T any](cmd *cobra.Command, flags []types.OptionFlag[T]) {
+	for _, f := range flags {
+		var options []string
+		for _, option := range f.Options {
+			options = append(options, option.String())
+		}
+		cmd.Flags().StringP(f.Name, f.Short, f.DefaultValue.String(), f.Usage)
+		if f.Required {
+			err := cmd.MarkFlagRequired(f.Name)
+			if err != nil {
+				panic(err)
+			}
+		}
+	}
+}
+
 // IsInteractive returns true if the non-interactive flag was not set.
 func IsInteractive(cmd *cobra.Command) bool {
 	return !cmd.Flags().Changed(types.FlagNonInteractive.Name)
@@ -204,4 +222,56 @@ func GetIntFromPromptOrFlag(cmd *cobra.Command, flag types.IntFlag) (int64, erro
 		}
 	}
 	return value, nil
+}
+
+// GetOptionFromPromptOrFlag returns the option value from
+// 1. the given flag
+// 2. prompts the user for the value if the flag was not set
+func GetOptionFromPromptOrFlag[T any](cmd *cobra.Command, flag types.OptionFlag[T]) (types.Option[T], error) {
+	value, err := cmd.Flags().GetString(flag.Name)
+	if err != nil {
+		return nil, err
+	}
+
+	if IsInteractive(cmd) && !cmd.Flags().Changed(flag.Name) {
+		// Only prompt if we are in interactive mode and the flag was not set
+		label := flag.Prompt
+		if label == "" {
+			label = flag.Usage
+		}
+
+		var items []string
+		for _, option := range flag.Options {
+			items = append(items, option.String())
+		}
+
+		prompt := promptui.Select{
+			Label: label,
+			Items: items,
+		}
+		_, result, err := prompt.Run()
+		if err != nil {
+			return nil, err
+		}
+		for _, option := range flag.Options {
+			if option.String() == result {
+				return option, nil
+			}
+		}
+		return nil, fmt.Errorf("invalid option: %s", result)
+	} else if cmd.Flags().Changed(flag.Name) {
+		// If the flag was set we need to validate it (if a validation function is set)
+		if flag.ValidateFn != nil {
+			err = flag.ValidateFn(value)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+	for _, option := range flag.Options {
+		if option.String() == value {
+			return option, nil
+		}
+	}
+	return nil, fmt.Errorf("invalid option: %s", value)
 }

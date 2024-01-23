@@ -104,13 +104,15 @@ func initCmd(configFilePath string) *cobra.Command {
 
 			// Create the config file
 			kysorConfig := config.KysorConfig{
+				Name:                 "config.toml",
+				Path:                 configFilePath,
 				ChainID:              chainID,
 				RPC:                  rpc,
 				REST:                 rest,
 				AutoDownloadBinaries: autoDownload,
 			}
 
-			return kysorConfig.Save(configFilePath)
+			return kysorConfig.Save()
 		},
 	}
 	utils.AddStringFlags(cmd, []types.StringFlag{flagChainID, flagRPC, flagREST})

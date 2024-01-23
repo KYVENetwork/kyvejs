@@ -11,28 +11,35 @@ import (
 	"path/filepath"
 )
 
-const configFilePath = ".kysor/config.toml"
-
-var k = koanf.New(".")
+const configDir = ".kysor"
+const configFilePath = configDir + "/config.toml"
 
 var ConfigFilePath string
 
-var Config KysorConfig
+var Config *KysorConfig
 
 type KysorConfig struct {
+	Name                 string
+	Path                 string
 	ChainID              string `koanf:"chainId"`
 	RPC                  string `koanf:"rpc"`
 	REST                 string `koanf:"rest"`
 	AutoDownloadBinaries bool   `koanf:"autoDownloadBinaries"`
 }
 
-func (c KysorConfig) Save(path string) error {
+func (c KysorConfig) Save() error {
+	return save(c, c.Path)
+}
+
+func save(s interface{}, path string) error {
 	if DoesConfigExist(path) {
-		return fmt.Errorf("config file already exists at %s", GetConfigFilePath())
+		return fmt.Errorf("config file already exists at %s", path)
 	}
 
+	var k = koanf.New(".")
+
 	// Load the config into koanf
-	err := k.Load(structs.Provider(c, "koanf"), nil)
+	err := k.Load(structs.Provider(s, "koanf"), nil)
 	if err != nil {
 		return err
 	}
@@ -58,9 +65,6 @@ func (c KysorConfig) Save(path string) error {
 }
 
 func DoesConfigExist(configFilePath string) bool {
-	if configFilePath == "" {
-		configFilePath = GetConfigFilePath()
-	}
 	if _, err := os.Stat(configFilePath); os.IsNotExist(err) {
 		return false
 	} else if err != nil {
@@ -69,17 +73,19 @@ func DoesConfigExist(configFilePath string) bool {
 	return true
 }
 
-func GetConfigFilePath() string {
+func GetDefaultConfigFilePath() string {
 	home, err := os.UserHomeDir()
 	cobra.CheckErr(err)
 	return filepath.Join(home, configFilePath)
 }
 
-func InitConfig() {
+func InitKysorConfig() {
 	// Check if the config file exists
 	if _, err := os.Stat(ConfigFilePath); os.IsNotExist(err) {
 		return
 	}
+
+	var k = koanf.New(".")
 
 	// Load the config file
 	if err := k.Load(file.Provider(ConfigFilePath), toml.Parser()); err != nil {
@@ -87,6 +93,12 @@ func InitConfig() {
 	}
 
 	// Unmarshal the config file into the config struct
-	err := k.Unmarshal("kysor", &Config)
+	var config KysorConfig
+	err := k.Unmarshal("kysor", &config)
 	cobra.CheckErr(err)
+
+	// Set the config name and path
+	config.Name = filepath.Base(ConfigFilePath)
+	config.Path = ConfigFilePath
+	Config = &config
 }

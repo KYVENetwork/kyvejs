@@ -5,6 +5,13 @@ import (
 	"strconv"
 )
 
+func ValidateNotEmpty(input string) error {
+	if input == "" {
+		return fmt.Errorf("input cannot be empty")
+	}
+	return nil
+}
+
 func ValidateInt(input string) error {
 	_, err := strconv.ParseInt(input, 10, 64)
 	if err != nil {

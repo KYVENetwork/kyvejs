@@ -19,8 +19,6 @@ var rootCmd = &cobra.Command{
 	Use:   RootCmdConfig.Name,
 	Short: RootCmdConfig.Short,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		var nextCmd *types.CmdConfig
-
 		// Check if the interactive flag is set
 		// -> if so ask the user what to do
 		if utils.IsInteractive(cmd) {
@@ -36,28 +34,29 @@ var rootCmd = &cobra.Command{
 				ValaccountsCmdConfig,
 				VersionCmdConfig,
 			}
-			nextCmd, err = utils.PromptCmd(options)
+			nextCmd, err := utils.PromptCmd(options)
 			if err != nil {
 				return err
 			}
-		}
 
-		switch nextCmd.Name {
-		case InitCmdConfig.Name:
-			config, err := cmd.PersistentFlags().GetString(types.FlagConfig.Name)
-			if err != nil {
-				return err
+			switch nextCmd.Name {
+			case InitCmdConfig.Name:
+				config, err := cmd.PersistentFlags().GetString(types.FlagConfig.Name)
+				if err != nil {
+					return err
+				}
+				return initCmd(config).Execute()
+			case StartCmdConfig.Name:
+				return startCmd().Execute()
+			case ValaccountsCmdConfig.Name:
+				return valaccountsCmd().Execute()
+			case VersionCmdConfig.Name:
+				return versionCmd().Execute()
+			default:
+				return fmt.Errorf("invalid option: %s", nextCmd.Name)
 			}
-			return initCmd(config).Execute()
-		case StartCmdConfig.Name:
-			return startCmd().Execute()
-		case ValaccountsCmdConfig.Name:
-			return valaccountsCmd().Execute()
-		case VersionCmdConfig.Name:
-			return versionCmd().Execute()
-		default:
-			return fmt.Errorf("invalid option: %s", nextCmd.Name)
 		}
+		return cmd.Help()
 	},
 }
 
@@ -71,9 +70,10 @@ func Execute() {
 }
 
 func init() {
-	cobra.OnInitialize(config.InitConfig)
+	cobra.OnInitialize(config.InitKysorConfig)
+	cobra.OnInitialize(config.InitValaccountConfigs)
 
-	types.FlagConfig.DefaultValue = config.GetConfigFilePath()
+	types.FlagConfig.DefaultValue = config.GetDefaultConfigFilePath()
 
 	rootCmd.PersistentFlags().StringVarP(&config.ConfigFilePath, types.FlagConfig.Name, types.FlagConfig.Short, types.FlagConfig.DefaultValue, types.FlagConfig.Usage)
 

@@ -31,6 +31,22 @@ type IntFlag struct {
 	ValidateFn   func(input string) error
 }
 
+type Option[T any] interface {
+	String() string
+	Value() T
+}
+
+type OptionFlag[T any] struct {
+	Name         string
+	Short        string
+	DefaultValue Option[T]
+	Options      []Option[T]
+	Usage        string
+	Prompt       string
+	Required     bool
+	ValidateFn   func(input string) error
+}
+
 type CmdConfig struct {
 	Name  string
 	Short string

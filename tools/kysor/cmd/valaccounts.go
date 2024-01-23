@@ -2,9 +2,14 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/config"
 	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/types"
 	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/utils"
+	"github.com/cosmos/go-bip39"
+	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
+	"os"
+	"path/filepath"
 )
 
 var (
@@ -17,8 +22,6 @@ func valaccountsCmd() *cobra.Command {
 		Use:   ValaccountsCmdConfig.Name,
 		Short: ValaccountsCmdConfig.Short,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			var nextCmd *types.CmdConfig
-
 			// Check if the interactive flag is set
 			// -> if so ask the user what to do
 			if utils.IsInteractive(cmd) {
@@ -31,21 +34,41 @@ func valaccountsCmd() *cobra.Command {
 				options := []types.CmdConfig{
 					ValaccountsCreateCmdConfig,
 				}
-				nextCmd, err = utils.PromptCmd(options)
+				nextCmd, err := utils.PromptCmd(options)
 				if err != nil {
 					return err
 				}
+				switch nextCmd.Name {
+				case ValaccountsCreateCmdConfig.Name:
+					return valaccountsCreateCmd().Execute()
+				default:
+					return fmt.Errorf("invalid option: %s", nextCmd.Name)
+				}
 			}
-
-			switch nextCmd.Name {
-			case ValaccountsCreateCmdConfig.Name:
-				return valaccountsCreateCmd().Execute()
-			default:
-				return fmt.Errorf("invalid option: %s", nextCmd.Name)
-			}
+			return cmd.Help()
 		},
 	}
 }
+
+type CacheOption[T string] struct {
+	types.Option[T]
+	value string
+}
+
+func newCacheOption(value string) CacheOption[string] {
+	return CacheOption[string]{value: value}
+}
+
+func (o CacheOption[T]) String() string {
+	return o.value
+}
+
+func (o CacheOption[T]) Value() T {
+	return (T)(o.value)
+}
+
+var jsonfile = newCacheOption("jsonfile")
+var memory = newCacheOption("memory")
 
 var (
 	flagValaccCreateName = types.StringFlag{
@@ -53,6 +76,21 @@ var (
 		Short:    "n",
 		Usage:    "Name of the valaccount (name only used locally for KYSOR)",
 		Required: true,
+		ValidateFn: func(s string) error {
+			if err := utils.ValidateNotEmpty(s); err != nil {
+				return err
+			}
+
+			// Check if a config file with this name already exists
+			configName := fmt.Sprintf("%s.toml", s)
+			for _, c := range config.ValaccountConfigs {
+				if c.Name == configName {
+					return fmt.Errorf("valaccount with this name already exists")
+				}
+			}
+
+			return nil
+		},
 	}
 	flagValaccCreatePool = types.IntFlag{
 		Name:       "pool",
@@ -62,8 +100,9 @@ var (
 		ValidateFn: utils.ValidateInt,
 	}
 	flagValaccCreateStorageProvKey = types.StringFlag{
-		Name:  "storage-priv",
-		Usage: "The private key of the storage provider",
+		Name:     "storage-priv",
+		Usage:    "The private key of the storage provider",
+		Required: true,
 	}
 	flagValaccCreateRequestBackoff = types.IntFlag{
 		Name:         "request-backoff",
@@ -71,9 +110,10 @@ var (
 		Usage:        "The time in milliseconds between each getDataItem request where the node sleeps",
 		ValidateFn:   utils.ValidateIntOrEmpty,
 	}
-	flagValaccCreateCache = types.StringFlag{
+	flagValaccCreateCache = types.OptionFlag[string]{
 		Name:         "cache",
-		DefaultValue: "jsonfile",
+		DefaultValue: jsonfile,
+		Options:      []types.Option[string]{jsonfile, memory},
 		Usage:        "The cache this node should use",
 	}
 	flagValaccCreateMetrics = types.BoolFlag{
@@ -93,6 +133,45 @@ var (
 		Usage:        "Recover a valaccount from a mnemonic",
 	}
 )
+
+func getMnemonic(cmd *cobra.Command) (string, error) {
+	isRecover, err := utils.GetBoolFromPromptOrFlag(cmd, flagValaccCreateRecover)
+	if err != nil {
+		return "", nil
+	}
+
+	if isRecover {
+		prompt := promptui.Prompt{
+			Label: "Enter your mnemonic",
+			Validate: func(s string) error {
+				if !bip39.IsMnemonicValid(s) {
+					return fmt.Errorf("invalid mnemonic")
+				}
+
+				for _, c := range config.ValaccountConfigs {
+					if c.Valaccount == s {
+						return fmt.Errorf("valaccount with this mnemonic already exists")
+					}
+				}
+
+				return nil
+			},
+		}
+		mnemonic, err := prompt.Run()
+		if err != nil {
+			return "", nil
+		}
+
+		return mnemonic, nil
+	} else {
+		entropySeed, err := bip39.NewEntropy(256)
+		if err != nil {
+			return "", nil
+		}
+
+		return bip39.NewMnemonic(entropySeed)
+	}
+}
 
 func valaccountsCreateCmd() *cobra.Command {
 	cmd := &cobra.Command{
@@ -122,7 +201,7 @@ func valaccountsCreateCmd() *cobra.Command {
 				return err
 			}
 
-			cache, err := utils.GetStringFromPromptOrFlag(cmd, flagValaccCreateCache)
+			cache, err := utils.GetOptionFromPromptOrFlag(cmd, flagValaccCreateCache)
 			if err != nil {
 				return err
 			}
@@ -132,24 +211,52 @@ func valaccountsCreateCmd() *cobra.Command {
 				return err
 			}
 
-			metricsPort, err := utils.GetIntFromPromptOrFlag(cmd, flagValaccCreateMetricsPort)
+			metricsPort, err := cmd.Flags().GetInt64(flagValaccCreateMetricsPort.Name)
+			if err != nil {
+				return err
+			}
+			if metrics {
+				// Only ask for the port if metrics are enabled
+				metricsPort, err = utils.GetIntFromPromptOrFlag(cmd, flagValaccCreateMetricsPort)
+				if err != nil {
+					return err
+				}
+			}
+
+			mnemonic, err := getMnemonic(cmd)
 			if err != nil {
 				return err
 			}
 
-			isRecover, err := utils.GetBoolFromPromptOrFlag(cmd, flagValaccCreateRecover)
+			home, err := os.UserHomeDir()
 			if err != nil {
 				return err
 			}
 
-			fmt.Println(name, pool, storageProvKey, backoffTime, cache, metrics, metricsPort, isRecover)
+			valaccountConfig := config.ValaccountConfig{
+				Name:           fmt.Sprintf("%s.toml", name),
+				Path:           filepath.Join(home, config.ValaccountsDir, fmt.Sprintf("%s.toml", name)),
+				Pool:           uint64(pool),
+				Valaccount:     mnemonic,
+				StoragePriv:    storageProvKey,
+				RequestBackoff: fmt.Sprintf("%d", backoffTime),
+				Cache:          cache.String(),
+				Metrics:        metrics,
+				MetricsPort:    fmt.Sprintf("%d", metricsPort),
+			}
 
+			err = valaccountConfig.Save()
+			if err != nil {
+				return err
+			}
+			fmt.Printf("Created valaccount '%s' in '%s'\n", name, valaccountConfig.Path)
 			return nil
 		},
 	}
-	utils.AddStringFlags(cmd, []types.StringFlag{flagValaccCreateName, flagValaccCreateStorageProvKey, flagValaccCreateCache})
+	utils.AddStringFlags(cmd, []types.StringFlag{flagValaccCreateName, flagValaccCreateStorageProvKey})
 	utils.AddIntFlags(cmd, []types.IntFlag{flagValaccCreatePool, flagValaccCreateRequestBackoff, flagValaccCreateMetricsPort})
 	utils.AddBoolFlags(cmd, []types.BoolFlag{flagValaccCreateMetrics, flagValaccCreateRecover})
+	utils.AddOptionFlags(cmd, []types.OptionFlag[string]{flagValaccCreateCache})
 	return cmd
 }
 
