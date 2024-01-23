@@ -16,7 +16,7 @@ const configFilePath = configDir + "/config.toml"
 
 var ConfigFilePath string
 
-var Config *KysorConfig
+var Config KysorConfig
 
 type KysorConfig struct {
 	Name                 string
@@ -100,5 +100,5 @@ func InitKysorConfig() {
 	// Set the config name and path
 	c.Name = filepath.Base(ConfigFilePath)
 	c.Path = ConfigFilePath
-	Config = &c
+	Config = c
 }

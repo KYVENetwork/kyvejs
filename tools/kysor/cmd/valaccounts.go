@@ -14,8 +14,10 @@ import (
 )
 
 var (
-	ValaccountsCmdConfig       = types.CmdConfig{Name: "valaccounts", Short: "Manage validator accounts"}
-	ValaccountsCreateCmdConfig = types.CmdConfig{Name: "create", Short: "Create a new valaccount"}
+	ValaccountsCmdConfig            = types.CmdConfig{Name: "valaccounts", Short: "Manage validator accounts"}
+	ValaccountsCreateCmdConfig      = types.CmdConfig{Name: "create", Short: "Create a new valaccount"}
+	ValaccountsShowAddressCmdConfig = types.CmdConfig{Name: "show-address", Short: "Show the address of a valaccount"}
+	ValaccountsShowBalanceCmdConfig = types.CmdConfig{Name: "show-balance", Short: "Show the balance of a valaccount"}
 )
 
 func valaccountsCmd() *cobra.Command {
@@ -34,6 +36,8 @@ func valaccountsCmd() *cobra.Command {
 
 				options := []types.CmdConfig{
 					ValaccountsCreateCmdConfig,
+					ValaccountsShowAddressCmdConfig,
+					ValaccountsShowBalanceCmdConfig,
 				}
 				nextCmd, err := utils.PromptCmd(options)
 				if err != nil {
@@ -42,6 +46,10 @@ func valaccountsCmd() *cobra.Command {
 				switch nextCmd.Name {
 				case ValaccountsCreateCmdConfig.Name:
 					return valaccountsCreateCmd().Execute()
+				case ValaccountsShowAddressCmdConfig.Name:
+					return valaccountsShowAddressCmd().Execute()
+				case ValaccountsShowBalanceCmdConfig.Name:
+					return valaccountsShowBalanceCmd().Execute()
 				default:
 					return fmt.Errorf("invalid option: %s", nextCmd.Name)
 				}
@@ -167,11 +175,11 @@ func valaccountsCreateCmd() *cobra.Command {
 			}
 
 			// Pool
-			executor, err := chain.NewExecutor(config.Config.RPC)
+			kyveClient, err := chain.NewKyveClient(config.Config.RPC)
 			if err != nil {
 				return err
 			}
-			response, err := executor.GetPools()
+			response, err := kyveClient.GetPools()
 			if err != nil {
 				return err
 			}
@@ -259,8 +267,83 @@ func valaccountsCreateCmd() *cobra.Command {
 	return cmd
 }
 
+var flagValaccShowAddressName = types.OptionFlag[config.ValaccountConfig]{
+	Name:     "name",
+	Short:    "n",
+	Usage:    "Name of the valaccount",
+	Required: true,
+}
+
+func valaccountsShowAddressCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:    "show-address",
+		Short:  "Show the address of a valaccount",
+		PreRun: utils.SetupInteractiveMode,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			// Get the values from the flags or prompt the user for them
+			flagValaccShowAddressName.Options = config.ValaccountConfigOptions
+			valConfig, err := utils.GetOptionFromPromptOrFlag(cmd, flagValaccShowAddressName)
+			if err != nil {
+				return err
+			}
+
+			// Get the address from the mnemonic
+			address, err := utils.GetAddressFromMnemonic(valConfig.Value().Valaccount)
+			if err != nil {
+				return err
+			}
+
+			fmt.Printf("Address: %s\n", address.String())
+			return nil
+		},
+	}
+	utils.AddOptionFlags(cmd, []types.OptionFlag[config.ValaccountConfig]{flagValaccShowAddressName})
+	return cmd
+}
+
+var flagValaccShowBalanceName = flagValaccShowAddressName
+
+func valaccountsShowBalanceCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:    "show-balance",
+		Short:  "Show the balance of a valaccount",
+		PreRun: utils.SetupInteractiveMode,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			// Get the values from the flags or prompt the user for them
+			flagValaccShowAddressName.Options = config.ValaccountConfigOptions
+			valConfig, err := utils.GetOptionFromPromptOrFlag(cmd, flagValaccShowAddressName)
+			if err != nil {
+				return err
+			}
+
+			// Get the address from the mnemonic
+			address, err := utils.GetAddressFromMnemonic(valConfig.Value().Valaccount)
+			if err != nil {
+				return err
+			}
+
+			kyveClient, err := chain.NewKyveClient(config.Config.RPC)
+			if err != nil {
+				return err
+			}
+
+			result, err := kyveClient.GetBalance(address.String())
+			if err != nil {
+				return err
+			}
+
+			fmt.Printf("Balance: %v%s\n", result.GetBalance().Amount, result.GetBalance().GetDenom())
+			return nil
+		},
+	}
+	utils.AddOptionFlags(cmd, []types.OptionFlag[config.ValaccountConfig]{flagValaccShowBalanceName})
+	return cmd
+}
+
 func init() {
 	cmd := valaccountsCmd()
 	cmd.AddCommand(valaccountsCreateCmd())
+	cmd.AddCommand(valaccountsShowAddressCmd())
+	cmd.AddCommand(valaccountsShowBalanceCmd())
 	rootCmd.AddCommand(cmd)
 }

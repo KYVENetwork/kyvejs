@@ -6,28 +6,28 @@ import (
 )
 
 var (
-	CacheOptionJsonFile = newCacheOption("jsonfile")
-	CacheOptionMemory   = newCacheOption("memory")
+	CacheOptionJsonFile = NewStringOption("jsonfile")
+	CacheOptionMemory   = NewStringOption("memory")
 )
 
-type CacheOption struct {
+type StringOption struct {
 	Option[string]
 	value string
 }
 
-func newCacheOption(value string) CacheOption {
-	return CacheOption{value: value}
+func NewStringOption(value string) StringOption {
+	return StringOption{value: value}
 }
 
-func (o CacheOption) Name() string {
+func (o StringOption) Name() string {
 	return o.value
 }
 
-func (o CacheOption) Value() string {
+func (o StringOption) Value() string {
 	return o.value
 }
 
-func (o CacheOption) StringValue() string {
+func (o StringOption) StringValue() string {
 	return o.value
 }
 

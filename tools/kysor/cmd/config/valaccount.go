@@ -1,17 +1,20 @@
 package config
 
 import (
+	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/types"
 	"github.com/knadh/koanf/parsers/toml"
 	"github.com/knadh/koanf/providers/file"
 	"github.com/knadh/koanf/v2"
 	"github.com/spf13/cobra"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 var ValaccountsDir = filepath.Join(configDir, "valaccounts")
 
-var ValaccountConfigs []*ValaccountConfig
+var ValaccountConfigs []ValaccountConfig
+var ValaccountConfigOptions []types.Option[ValaccountConfig]
 
 type ValaccountConfig struct {
 	Name           string
@@ -27,6 +30,27 @@ type ValaccountConfig struct {
 
 func (c ValaccountConfig) Save() error {
 	return save(c, c.Path)
+}
+
+type ValaccountConfigOption struct {
+	types.Option[ValaccountConfig]
+	config ValaccountConfig
+}
+
+func NewValaccountConfigOption(config ValaccountConfig) ValaccountConfigOption {
+	return ValaccountConfigOption{config: config}
+}
+
+func (o ValaccountConfigOption) Name() string {
+	return strings.TrimSuffix(o.config.Name, ".toml")
+}
+
+func (o ValaccountConfigOption) Value() ValaccountConfig {
+	return o.config
+}
+
+func (o ValaccountConfigOption) StringValue() string {
+	return o.config.Name
 }
 
 func InitValaccountConfigs() {
@@ -55,7 +79,8 @@ func InitValaccountConfigs() {
 				cobra.CheckErr(err)
 				valaccountConfig.Name = name
 				valaccountConfig.Path = path
-				ValaccountConfigs = append(ValaccountConfigs, &valaccountConfig)
+				ValaccountConfigs = append(ValaccountConfigs, valaccountConfig)
+				ValaccountConfigOptions = append(ValaccountConfigOptions, ValaccountConfigOption{config: valaccountConfig})
 			}
 		}
 	}
