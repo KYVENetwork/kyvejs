@@ -1,11 +1,11 @@
-import KyveSDK from '@kyvejs/sdk';
-import { v4 as uuidv4 } from 'uuid';
-import { BundleTag, IStorageProvider } from '../../types';
-import fs from 'fs';
-import path from 'path';
+import KyveSDK from "@kyvejs/sdk";
+import { v4 as uuidv4 } from "uuid";
+import { BundleTag, IStorageProvider } from "../../types";
+import fs from "fs";
+import path from "path";
 
 export class Local implements IStorageProvider {
-  public name = 'Local';
+  public name = "Local";
   public coinDecimals = 0;
 
   private readonly valaccount: string;
@@ -13,11 +13,11 @@ export class Local implements IStorageProvider {
 
   constructor(valaccount: string, storagePath: string) {
     if (!valaccount) {
-      throw new Error('Valaccount mnemonic is empty.');
+      throw new Error("Valaccount mnemonic is empty.");
     }
 
     if (!storagePath) {
-      throw new Error('Storage path is empty.');
+      throw new Error("Storage path is empty.");
     }
 
     this.valaccount = valaccount;
@@ -29,39 +29,39 @@ export class Local implements IStorageProvider {
   }
 
   async getBalance() {
-    return '';
+    return "";
   }
 
   async getPrice(_: number) {
-    return '0';
+    return "0";
   }
 
   async saveBundle(bundle: Buffer, _: BundleTag[]) {
-    const data = bundle.toString('base64');
+    const data = bundle.toString("base64");
     const storageId = uuidv4();
     const filePath = path.join(this.storagePath, storageId);
 
     // Create storage path if it doesn't exist
     if (!fs.existsSync(this.storagePath)) {
-      fs.mkdirSync(this.storagePath, {recursive: true});
+      fs.mkdirSync(this.storagePath, { recursive: true });
     }
 
     fs.writeFileSync(filePath, data);
 
     return {
       storageId: storageId,
-      storageData: bundle
+      storageData: bundle,
     };
   }
 
   async retrieveBundle(storageId: string, _: number) {
     const filePath = path.join(this.storagePath, storageId);
     const data = fs.readFileSync(filePath);
-    const storageData = Buffer.from(data.toString(), 'base64');
+    const storageData = Buffer.from(data.toString(), "base64");
 
     return {
       storageId,
-      storageData
+      storageData,
     };
   }
 }
