@@ -32,8 +32,9 @@ type IntFlag struct {
 }
 
 type Option[T any] interface {
-	String() string
+	Name() string
 	Value() T
+	StringValue() string
 }
 
 type OptionFlag[T any] struct {

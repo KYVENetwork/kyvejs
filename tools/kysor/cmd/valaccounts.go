@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/chain"
 	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/config"
 	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/types"
 	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/utils"
@@ -50,26 +51,6 @@ func valaccountsCmd() *cobra.Command {
 	}
 }
 
-type CacheOption[T string] struct {
-	types.Option[T]
-	value string
-}
-
-func newCacheOption(value string) CacheOption[string] {
-	return CacheOption[string]{value: value}
-}
-
-func (o CacheOption[T]) String() string {
-	return o.value
-}
-
-func (o CacheOption[T]) Value() T {
-	return (T)(o.value)
-}
-
-var jsonfile = newCacheOption("jsonfile")
-var memory = newCacheOption("memory")
-
 var (
 	flagValaccCreateName = types.StringFlag{
 		Name:     "name",
@@ -92,7 +73,7 @@ var (
 			return nil
 		},
 	}
-	flagValaccCreatePool = types.IntFlag{
+	flagValaccCreatePool = types.OptionFlag[uint64]{
 		Name:       "pool",
 		Short:      "p",
 		Usage:      "The ID of the pool this valaccount should participate as a validator",
@@ -112,8 +93,8 @@ var (
 	}
 	flagValaccCreateCache = types.OptionFlag[string]{
 		Name:         "cache",
-		DefaultValue: jsonfile,
-		Options:      []types.Option[string]{jsonfile, memory},
+		DefaultValue: types.CacheOptionJsonFile,
+		Options:      []types.Option[string]{types.CacheOptionJsonFile, types.CacheOptionMemory},
 		Usage:        "The cache this node should use",
 	}
 	flagValaccCreateMetrics = types.BoolFlag{
@@ -185,32 +166,48 @@ func valaccountsCreateCmd() *cobra.Command {
 				return err
 			}
 
-			// TODO: Get pools from chain and make a selection
-			pool, err := utils.GetIntFromPromptOrFlag(cmd, flagValaccCreatePool)
+			// Pool
+			executor, err := chain.NewExecutor(config.Config.RPC)
+			if err != nil {
+				return err
+			}
+			response, err := executor.GetPools()
+			if err != nil {
+				return err
+			}
+			for _, pool := range response.GetPools() {
+				flagValaccCreatePool.Options = append(flagValaccCreatePool.Options, types.NewPoolOption(pool))
+			}
+			pool, err := utils.GetOptionFromPromptOrFlag(cmd, flagValaccCreatePool)
 			if err != nil {
 				return err
 			}
 
+			// Storage provider key
 			storageProvKey, err := utils.GetStringFromPromptOrFlag(cmd, flagValaccCreateStorageProvKey)
 			if err != nil {
 				return err
 			}
 
+			// Request backoff
 			backoffTime, err := utils.GetIntFromPromptOrFlag(cmd, flagValaccCreateRequestBackoff)
 			if err != nil {
 				return err
 			}
 
+			// Cache
 			cache, err := utils.GetOptionFromPromptOrFlag(cmd, flagValaccCreateCache)
 			if err != nil {
 				return err
 			}
 
+			// Metrics
 			metrics, err := utils.GetBoolFromPromptOrFlag(cmd, flagValaccCreateMetrics)
 			if err != nil {
 				return err
 			}
 
+			// Metrics port
 			metricsPort, err := cmd.Flags().GetInt64(flagValaccCreateMetricsPort.Name)
 			if err != nil {
 				return err
@@ -223,6 +220,7 @@ func valaccountsCreateCmd() *cobra.Command {
 				}
 			}
 
+			// Mnemonic
 			mnemonic, err := getMnemonic(cmd)
 			if err != nil {
 				return err
@@ -236,11 +234,11 @@ func valaccountsCreateCmd() *cobra.Command {
 			valaccountConfig := config.ValaccountConfig{
 				Name:           fmt.Sprintf("%s.toml", name),
 				Path:           filepath.Join(home, config.ValaccountsDir, fmt.Sprintf("%s.toml", name)),
-				Pool:           uint64(pool),
+				Pool:           pool.Value(),
 				Valaccount:     mnemonic,
 				StoragePriv:    storageProvKey,
 				RequestBackoff: fmt.Sprintf("%d", backoffTime),
-				Cache:          cache.String(),
+				Cache:          cache.Value(),
 				Metrics:        metrics,
 				MetricsPort:    fmt.Sprintf("%d", metricsPort),
 			}
@@ -254,9 +252,10 @@ func valaccountsCreateCmd() *cobra.Command {
 		},
 	}
 	utils.AddStringFlags(cmd, []types.StringFlag{flagValaccCreateName, flagValaccCreateStorageProvKey})
-	utils.AddIntFlags(cmd, []types.IntFlag{flagValaccCreatePool, flagValaccCreateRequestBackoff, flagValaccCreateMetricsPort})
+	utils.AddIntFlags(cmd, []types.IntFlag{flagValaccCreateRequestBackoff, flagValaccCreateMetricsPort})
 	utils.AddBoolFlags(cmd, []types.BoolFlag{flagValaccCreateMetrics, flagValaccCreateRecover})
 	utils.AddOptionFlags(cmd, []types.OptionFlag[string]{flagValaccCreateCache})
+	utils.AddOptionFlags(cmd, []types.OptionFlag[uint64]{flagValaccCreatePool})
 	return cmd
 }
 

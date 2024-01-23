@@ -57,9 +57,13 @@ func AddOptionFlags[T any](cmd *cobra.Command, flags []types.OptionFlag[T]) {
 	for _, f := range flags {
 		var options []string
 		for _, option := range f.Options {
-			options = append(options, option.String())
+			options = append(options, option.Name())
 		}
-		cmd.Flags().StringP(f.Name, f.Short, f.DefaultValue.String(), f.Usage)
+		var defaultValue string
+		if f.DefaultValue != nil {
+			defaultValue = f.DefaultValue.Name()
+		}
+		cmd.Flags().StringP(f.Name, f.Short, defaultValue, f.Usage)
 		if f.Required {
 			err := cmd.MarkFlagRequired(f.Name)
 			if err != nil {
@@ -242,7 +246,7 @@ func GetOptionFromPromptOrFlag[T any](cmd *cobra.Command, flag types.OptionFlag[
 
 		var items []string
 		for _, option := range flag.Options {
-			items = append(items, option.String())
+			items = append(items, option.Name())
 		}
 
 		prompt := promptui.Select{
@@ -254,7 +258,7 @@ func GetOptionFromPromptOrFlag[T any](cmd *cobra.Command, flag types.OptionFlag[
 			return nil, err
 		}
 		for _, option := range flag.Options {
-			if option.String() == result {
+			if option.Name() == result {
 				return option, nil
 			}
 		}
@@ -269,7 +273,7 @@ func GetOptionFromPromptOrFlag[T any](cmd *cobra.Command, flag types.OptionFlag[
 		}
 	}
 	for _, option := range flag.Options {
-		if option.String() == value {
+		if option.StringValue() == value || option.Name() == value {
 			return option, nil
 		}
 	}

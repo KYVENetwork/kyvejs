@@ -93,12 +93,12 @@ func InitKysorConfig() {
 	}
 
 	// Unmarshal the config file into the config struct
-	var config KysorConfig
-	err := k.Unmarshal("kysor", &config)
+	var c KysorConfig
+	err := k.Unmarshal("", &c)
 	cobra.CheckErr(err)
 
 	// Set the config name and path
-	config.Name = filepath.Base(ConfigFilePath)
-	config.Path = ConfigFilePath
-	Config = &config
+	c.Name = filepath.Base(ConfigFilePath)
+	c.Path = ConfigFilePath
+	Config = &c
 }
