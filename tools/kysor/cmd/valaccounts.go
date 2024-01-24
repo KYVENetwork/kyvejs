@@ -176,24 +176,26 @@ func valaccountsCreateCmd() *cobra.Command {
 		Short:  ValaccountsCreateCmdConfig.Short,
 		PreRun: utils.SetupInteractiveMode,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			kyveClient, err := chain.NewKyveClient(config.Config.RPC)
+			if err != nil {
+				return err
+			}
+
 			// Get the values from the flags or prompt the user for them
 			name, err := utils.GetStringFromPromptOrFlag(cmd, flagValaccCreateName)
 			if err != nil {
 				return err
 			}
 
-			// Pool
-			kyveClient, err := chain.NewKyveClient(config.Config.RPC)
-			if err != nil {
-				return err
-			}
-			response, err := kyveClient.GetPools()
+			// Query pools
+			response, err := kyveClient.QueryPools()
 			if err != nil {
 				return err
 			}
 			for _, pool := range response.GetPools() {
 				flagValaccCreatePool.Options = append(flagValaccCreatePool.Options, types.NewPoolOption(pool))
 			}
+			// Pool
 			pool, err := utils.GetOptionFromPromptOrFlag(cmd, flagValaccCreatePool)
 			if err != nil {
 				return err
@@ -288,20 +290,20 @@ func valaccountsShowAddressCmd() *cobra.Command {
 		Short:  "Show the address of a valaccount",
 		PreRun: utils.SetupInteractiveMode,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			// Return if no valaccounts exist
+			// Return if no valaccount exists
 			flagValaccShowAddressName.Options = config.ValaccountConfigOptions
 			if len(flagValaccShowAddressName.Options) == 0 {
 				fmt.Println("No valaccount found. Create one with 'kysor valaccounts create'")
 				return nil
 			}
 
-			// Get the values from the flags or prompt the user for them
+			// Valaccount config
 			valConfig, err := utils.GetOptionFromPromptOrFlag(cmd, flagValaccShowAddressName)
 			if err != nil {
 				return err
 			}
 
-			// Get the address from the mnemonic
+			// Address from mnemonic
 			address, err := utils.GetAddressFromMnemonic(valConfig.Value().Valaccount)
 			if err != nil {
 				return err
@@ -323,31 +325,32 @@ func valaccountsShowBalanceCmd() *cobra.Command {
 		Short:  "Show the balance of a valaccount",
 		PreRun: utils.SetupInteractiveMode,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			// Return if no valaccounts exist
+			kyveClient, err := chain.NewKyveClient(config.Config.RPC)
+			if err != nil {
+				return err
+			}
+
+			// Return if no valaccount exists
 			flagValaccShowAddressName.Options = config.ValaccountConfigOptions
 			if len(flagValaccShowAddressName.Options) == 0 {
 				fmt.Println("No valaccount found. Create one with 'kysor valaccounts create'")
 				return nil
 			}
 
-			// Get the values from the flags or prompt the user for them
+			// Valaccount config
 			valConfig, err := utils.GetOptionFromPromptOrFlag(cmd, flagValaccShowAddressName)
 			if err != nil {
 				return err
 			}
 
-			// Get the address from the mnemonic
+			// Address from mnemonic
 			address, err := utils.GetAddressFromMnemonic(valConfig.Value().Valaccount)
 			if err != nil {
 				return err
 			}
 
-			kyveClient, err := chain.NewKyveClient(config.Config.RPC)
-			if err != nil {
-				return err
-			}
-
-			result, err := kyveClient.GetBalance(address.String())
+			// Query the balance
+			result, err := kyveClient.QueryBalance(address.String())
 			if err != nil {
 				return err
 			}
@@ -387,43 +390,43 @@ func valaccountsTransferCmd() *cobra.Command {
 		Example: "kysor valaccounts transfer --from <valaccount> --to <address> --amount <amount>",
 		PreRun:  utils.SetupInteractiveMode,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			// Return if no valaccounts exist
+			kyveClient, err := chain.NewKyveClient(config.Config.RPC)
+			if err != nil {
+				return err
+			}
+
+			// Return if no valaccount exists
 			flagValaccTransferFrom.Options = config.ValaccountConfigOptions
 			if len(flagValaccTransferFrom.Options) == 0 {
 				fmt.Println("No valaccount found. Create one with 'kysor valaccounts create'")
 				return nil
 			}
 
-			// Get the values from the flags or prompt the user for them
+			// Valaccount config
 			valConfig, err := utils.GetOptionFromPromptOrFlag(cmd, flagValaccTransferFrom)
 			if err != nil {
 				return err
 			}
 
-			// Get the address from the mnemonic
+			// Address from mnemonic
 			address, err := utils.GetAddressFromMnemonic(valConfig.Value().Valaccount)
 			if err != nil {
 				return err
 			}
 
-			// Get the address to transfer to
+			// Transfer to
 			to, err := utils.GetStringFromPromptOrFlag(cmd, flagValaccTransferTo)
 			if err != nil {
 				return err
 			}
 
-			// Get the amount to transfer
+			// Amount
 			amount, err := utils.GetStringFromPromptOrFlag(cmd, flagValaccTransferAmount)
 			if err != nil {
 				return err
 			}
 
-			kyveClient, err := chain.NewKyveClient(config.Config.RPC)
-			if err != nil {
-				return err
-			}
-
-			// Send the transaction
+			// Execute the send transaction
 			result, err := kyveClient.ExecuteSend(address.String(), to, amount)
 			if err != nil {
 				return err
@@ -446,14 +449,14 @@ func valaccountsDeleteCmd() *cobra.Command {
 		Short:  "Delete a valaccount",
 		PreRun: utils.SetupInteractiveMode,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			// Return if no valaccounts exist
+			// Return if no valaccount exists
 			flagValaccShowAddressName.Options = config.ValaccountConfigOptions
 			if len(flagValaccShowAddressName.Options) == 0 {
 				fmt.Println("No valaccount found. Create one with 'kysor valaccounts create'")
 				return nil
 			}
 
-			// Get the values from the flags or prompt the user for them
+			// Valaccount config
 			valConfig, err := utils.GetOptionFromPromptOrFlag(cmd, flagValaccShowAddressName)
 			if err != nil {
 				return err

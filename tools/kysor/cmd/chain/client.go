@@ -68,7 +68,7 @@ func NewKyveClient(rpcAddress string) (*KyveClient, error) {
 	}, nil
 }
 
-func (e *KyveClient) GetPools() (*querytypes.QueryPoolsResponse, error) {
+func (e *KyveClient) QueryPools() (*querytypes.QueryPoolsResponse, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), defaultQueryTimeout)
 	defer cancel()
 
@@ -77,7 +77,7 @@ func (e *KyveClient) GetPools() (*querytypes.QueryPoolsResponse, error) {
 	return e.q.Query.PoolClient.Pools(ctx, params)
 }
 
-func (e *KyveClient) GetBalance(address string) (*banktypes.QueryBalanceResponse, error) {
+func (e *KyveClient) QueryBalance(address string) (*banktypes.QueryBalanceResponse, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), defaultQueryTimeout)
 	defer cancel()
 

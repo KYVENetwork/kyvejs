@@ -3,6 +3,7 @@ package utils
 import (
 	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"os"
 	"strconv"
 )
 
@@ -56,4 +57,18 @@ func ValidateKyveAddress(input string) error {
 		return fmt.Errorf("invalid kyve address. Must be a bech32 encoded address (ex: kyve1kumjqpufgh8myla26jtc9r2e674zeppu8fears)")
 	}
 	return nil
+}
+
+func ValidatePathExists(input string) error {
+	if _, err := os.Stat(input); os.IsNotExist(err) {
+		return fmt.Errorf("path does not exist")
+	}
+	return nil
+}
+
+func ValidatePathExistsOrEmpty(input string) error {
+	if input == "" {
+		return nil
+	}
+	return ValidatePathExists(input)
 }
