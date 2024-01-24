@@ -18,6 +18,8 @@ var (
 	ValaccountsCreateCmdConfig      = types.CmdConfig{Name: "create", Short: "Create a new valaccount"}
 	ValaccountsShowAddressCmdConfig = types.CmdConfig{Name: "show-address", Short: "Show the address of a valaccount"}
 	ValaccountsShowBalanceCmdConfig = types.CmdConfig{Name: "show-balance", Short: "Show the balance of a valaccount"}
+	VallaccountsTransferCmdConfig   = types.CmdConfig{Name: "transfer", Short: "Transfer tokens from a valaccount to another address"}
+	ValaccountsDeleteCmdConfig      = types.CmdConfig{Name: "delete", Short: "Delete a valaccount"}
 )
 
 func valaccountsCmd() *cobra.Command {
@@ -38,6 +40,8 @@ func valaccountsCmd() *cobra.Command {
 					ValaccountsCreateCmdConfig,
 					ValaccountsShowAddressCmdConfig,
 					ValaccountsShowBalanceCmdConfig,
+					VallaccountsTransferCmdConfig,
+					ValaccountsDeleteCmdConfig,
 				}
 				nextCmd, err := utils.PromptCmd(options)
 				if err != nil {
@@ -50,6 +54,10 @@ func valaccountsCmd() *cobra.Command {
 					return valaccountsShowAddressCmd().Execute()
 				case ValaccountsShowBalanceCmdConfig.Name:
 					return valaccountsShowBalanceCmd().Execute()
+				case VallaccountsTransferCmdConfig.Name:
+					return valaccountsTransferCmd().Execute()
+				case ValaccountsDeleteCmdConfig.Name:
+					return valaccountsDeleteCmd().Execute()
 				default:
 					return fmt.Errorf("invalid option: %s", nextCmd.Name)
 				}
@@ -280,8 +288,14 @@ func valaccountsShowAddressCmd() *cobra.Command {
 		Short:  "Show the address of a valaccount",
 		PreRun: utils.SetupInteractiveMode,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			// Get the values from the flags or prompt the user for them
+			// Return if no valaccounts exist
 			flagValaccShowAddressName.Options = config.ValaccountConfigOptions
+			if len(flagValaccShowAddressName.Options) == 0 {
+				fmt.Println("No valaccount found. Create one with 'kysor valaccounts create'")
+				return nil
+			}
+
+			// Get the values from the flags or prompt the user for them
 			valConfig, err := utils.GetOptionFromPromptOrFlag(cmd, flagValaccShowAddressName)
 			if err != nil {
 				return err
@@ -293,7 +307,7 @@ func valaccountsShowAddressCmd() *cobra.Command {
 				return err
 			}
 
-			fmt.Printf("Address: %s\n", address.String())
+			fmt.Println(address.String())
 			return nil
 		},
 	}
@@ -309,8 +323,14 @@ func valaccountsShowBalanceCmd() *cobra.Command {
 		Short:  "Show the balance of a valaccount",
 		PreRun: utils.SetupInteractiveMode,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			// Get the values from the flags or prompt the user for them
+			// Return if no valaccounts exist
 			flagValaccShowAddressName.Options = config.ValaccountConfigOptions
+			if len(flagValaccShowAddressName.Options) == 0 {
+				fmt.Println("No valaccount found. Create one with 'kysor valaccounts create'")
+				return nil
+			}
+
+			// Get the values from the flags or prompt the user for them
 			valConfig, err := utils.GetOptionFromPromptOrFlag(cmd, flagValaccShowAddressName)
 			if err != nil {
 				return err
@@ -332,11 +352,123 @@ func valaccountsShowBalanceCmd() *cobra.Command {
 				return err
 			}
 
-			fmt.Printf("Balance: %v%s\n", result.GetBalance().Amount, result.GetBalance().GetDenom())
+			fmt.Printf("%v %s\n", result.GetBalance().Amount, result.GetBalance().GetDenom())
 			return nil
 		},
 	}
 	utils.AddOptionFlags(cmd, []types.OptionFlag[config.ValaccountConfig]{flagValaccShowBalanceName})
+	return cmd
+}
+
+var (
+	flagValaccTransferFrom = types.OptionFlag[config.ValaccountConfig]{
+		Name:     "from",
+		Usage:    "Name of the valaccount to transfer from",
+		Required: true,
+	}
+	flagValaccTransferTo = types.StringFlag{
+		Name:       "to",
+		Usage:      "Address to transfer to",
+		Required:   true,
+		ValidateFn: utils.ValidateKyveAddress,
+	}
+	flagValaccTransferAmount = types.StringFlag{
+		Name:       "amount",
+		Usage:      "Amount to transfer",
+		Required:   true,
+		ValidateFn: utils.ValidateIntGreaterZero,
+	}
+)
+
+func valaccountsTransferCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "transfer",
+		Short:   "Transfer tokens from a valaccount to another address",
+		Example: "kysor valaccounts transfer --from <valaccount> --to <address> --amount <amount>",
+		PreRun:  utils.SetupInteractiveMode,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			// Return if no valaccounts exist
+			flagValaccTransferFrom.Options = config.ValaccountConfigOptions
+			if len(flagValaccTransferFrom.Options) == 0 {
+				fmt.Println("No valaccount found. Create one with 'kysor valaccounts create'")
+				return nil
+			}
+
+			// Get the values from the flags or prompt the user for them
+			valConfig, err := utils.GetOptionFromPromptOrFlag(cmd, flagValaccTransferFrom)
+			if err != nil {
+				return err
+			}
+
+			// Get the address from the mnemonic
+			address, err := utils.GetAddressFromMnemonic(valConfig.Value().Valaccount)
+			if err != nil {
+				return err
+			}
+
+			// Get the address to transfer to
+			to, err := utils.GetStringFromPromptOrFlag(cmd, flagValaccTransferTo)
+			if err != nil {
+				return err
+			}
+
+			// Get the amount to transfer
+			amount, err := utils.GetStringFromPromptOrFlag(cmd, flagValaccTransferAmount)
+			if err != nil {
+				return err
+			}
+
+			kyveClient, err := chain.NewKyveClient(config.Config.RPC)
+			if err != nil {
+				return err
+			}
+
+			// Send the transaction
+			result, err := kyveClient.ExecuteSend(address.String(), to, amount)
+			if err != nil {
+				return err
+			}
+
+			fmt.Printf("Transaction sent: %s\n", result.String())
+			return nil
+		},
+	}
+	utils.AddOptionFlags(cmd, []types.OptionFlag[config.ValaccountConfig]{flagValaccTransferFrom})
+	utils.AddStringFlags(cmd, []types.StringFlag{flagValaccTransferTo, flagValaccTransferAmount})
+	return cmd
+}
+
+var flagValaccDeleteName = flagValaccShowAddressName
+
+func valaccountsDeleteCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:    "delete",
+		Short:  "Delete a valaccount",
+		PreRun: utils.SetupInteractiveMode,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			// Return if no valaccounts exist
+			flagValaccShowAddressName.Options = config.ValaccountConfigOptions
+			if len(flagValaccShowAddressName.Options) == 0 {
+				fmt.Println("No valaccount found. Create one with 'kysor valaccounts create'")
+				return nil
+			}
+
+			// Get the values from the flags or prompt the user for them
+			valConfig, err := utils.GetOptionFromPromptOrFlag(cmd, flagValaccShowAddressName)
+			if err != nil {
+				return err
+			}
+
+			// Delete the config file
+			err = os.Remove(valConfig.Value().Path)
+			if err != nil {
+				return err
+			}
+			fmt.Printf("Deleted valaccount '%s' in '%s'\n", valConfig.Value().Name, valConfig.Value().Path)
+			return nil
+		},
+	}
+	utils.AddOptionFlags(cmd, []types.OptionFlag[config.ValaccountConfig]{flagValaccDeleteName})
 	return cmd
 }
 
@@ -345,5 +477,7 @@ func init() {
 	cmd.AddCommand(valaccountsCreateCmd())
 	cmd.AddCommand(valaccountsShowAddressCmd())
 	cmd.AddCommand(valaccountsShowBalanceCmd())
+	cmd.AddCommand(valaccountsTransferCmd())
+	cmd.AddCommand(valaccountsDeleteCmd())
 	rootCmd.AddCommand(cmd)
 }

@@ -2,6 +2,7 @@ package chain
 
 import (
 	"context"
+	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"time"
 
@@ -35,8 +36,7 @@ type Querier struct {
 	BankClient banktypes.QueryClient
 }
 
-func NewQuerier(client sdkclient.TendermintRPC) Querier {
-	clientContext := sdkclient.Context{Client: client}
+func NewQuerier(clientContext sdkclient.Context) Querier {
 	return Querier{
 		Query:      NewKyveQuerier(clientContext),
 		BankClient: banktypes.NewQueryClient(clientContext),
@@ -44,7 +44,8 @@ func NewQuerier(client sdkclient.TendermintRPC) Querier {
 }
 
 type KyveClient struct {
-	q Querier
+	q          Querier
+	bankClient banktypes.MsgClient
 }
 
 func NewKyveClient(rpcAddress string) (*KyveClient, error) {
@@ -59,8 +60,11 @@ func NewKyveClient(rpcAddress string) (*KyveClient, error) {
 		return nil, err
 	}
 
+	clientContext := sdkclient.Context{Client: rpcClient}
+
 	return &KyveClient{
-		q: NewQuerier(rpcClient),
+		q:          NewQuerier(clientContext),
+		bankClient: banktypes.NewMsgClient(clientContext),
 	}, nil
 }
 
@@ -80,6 +84,26 @@ func (e *KyveClient) GetBalance(address string) (*banktypes.QueryBalanceResponse
 	params := &banktypes.QueryBalanceRequest{Address: address, Denom: denom}
 
 	return e.q.BankClient.Balance(ctx, params)
+}
+
+func (e *KyveClient) ExecuteSend(from string, to string, amount string) (*banktypes.MsgSendResponse, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), defaultQueryTimeout)
+	defer cancel()
+
+	intAmount, ok := sdk.NewIntFromString(amount)
+	if !ok {
+		return nil, fmt.Errorf("invalid amount: %s", amount)
+	}
+
+	params := &banktypes.MsgSend{
+		FromAddress: from,
+		ToAddress:   to,
+		Amount:      sdk.NewCoins(sdk.NewCoin(denom, intAmount)),
+	}
+
+	// TODO: implement this proper (sign tx, broadcast tx, wait for tx)
+
+	return e.bankClient.Send(ctx, params)
 }
 
 func init() {

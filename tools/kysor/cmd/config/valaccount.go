@@ -37,10 +37,6 @@ type ValaccountConfigOption struct {
 	config ValaccountConfig
 }
 
-func NewValaccountConfigOption(config ValaccountConfig) ValaccountConfigOption {
-	return ValaccountConfigOption{config: config}
-}
-
 func (o ValaccountConfigOption) Name() string {
 	return strings.TrimSuffix(o.config.Name, ".toml")
 }
@@ -54,6 +50,10 @@ func (o ValaccountConfigOption) StringValue() string {
 }
 
 func InitValaccountConfigs() {
+	if ValaccountConfigs != nil {
+		return
+	}
+
 	home, err := os.UserHomeDir()
 	cobra.CheckErr(err)
 

@@ -237,6 +237,10 @@ func GetOptionFromPromptOrFlag[T any](cmd *cobra.Command, flag types.OptionFlag[
 		return nil, err
 	}
 
+	if len(flag.Options) == 0 {
+		return nil, fmt.Errorf("no options available")
+	}
+
 	if IsInteractive(cmd) && !cmd.Flags().Changed(flag.Name) {
 		// Only prompt if we are in interactive mode and the flag was not set
 		label := flag.Prompt

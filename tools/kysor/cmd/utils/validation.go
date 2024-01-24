@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"strconv"
 )
 
@@ -27,6 +28,17 @@ func ValidateIntOrEmpty(input string) error {
 	return ValidateInt(input)
 }
 
+func ValidateIntGreaterZero(input string) error {
+	if err := ValidateInt(input); err != nil {
+		return err
+	}
+	value, _ := strconv.ParseInt(input, 10, 64)
+	if value <= 0 {
+		return fmt.Errorf("input must be greater than zero")
+	}
+	return nil
+}
+
 func ValidatePort(input string) error {
 	if err := ValidateInt(input); err != nil {
 		return err
@@ -34,6 +46,14 @@ func ValidatePort(input string) error {
 	port, _ := strconv.ParseInt(input, 10, 64)
 	if port < 0 || port > 65535 {
 		return fmt.Errorf("port must be between 0 and 65535")
+	}
+	return nil
+}
+
+func ValidateKyveAddress(input string) error {
+	_, err := sdk.AccAddressFromBech32(input)
+	if err != nil {
+		return fmt.Errorf("invalid kyve address. Must be a bech32 encoded address (ex: kyve1kumjqpufgh8myla26jtc9r2e674zeppu8fears)")
 	}
 	return nil
 }
