@@ -2,12 +2,29 @@ package utils
 
 import (
 	"fmt"
+	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/config"
 	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/types"
+	"github.com/chzyer/readline"
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"strconv"
 )
+
+type noBellStdout struct{}
+
+func (n *noBellStdout) Write(p []byte) (int, error) {
+	if len(p) == 1 && p[0] == readline.CharBell {
+		return 0, nil
+	}
+	return readline.Stdout.Write(p)
+}
+
+func (n *noBellStdout) Close() error {
+	return readline.Stdout.Close()
+}
+
+var NoBellStdout = &noBellStdout{}
 
 // AddStringFlags adds the given string flags to the given command.
 // If a flag is required it will be marked as required.
@@ -80,7 +97,7 @@ func IsInteractive(cmd *cobra.Command) bool {
 
 // SetupInteractiveMode sets up the interactive mode for the given command.
 // This means that all flags are not required anymore.
-func SetupInteractiveMode(cmd *cobra.Command, _ []string) {
+func SetupInteractiveMode(cmd *cobra.Command, _ []string) error {
 	if IsInteractive(cmd) {
 		cmd.Flags().VisitAll(func(f *pflag.Flag) {
 			for val, annotation := range f.Annotations {
@@ -89,6 +106,33 @@ func SetupInteractiveMode(cmd *cobra.Command, _ []string) {
 				}
 			}
 		})
+	}
+	return nil
+}
+
+func CheckIfInitialized(_ *cobra.Command, _ []string) error {
+	if !config.IsInitialzed() {
+		return fmt.Errorf("kysor is not initialized. Run 'kysor init' to initialize kysor")
+	}
+	return nil
+}
+
+func CheckIfHasValaccounts(_ *cobra.Command, _ []string) error {
+	if len(config.ValaccountConfigOptions) == 0 {
+		return fmt.Errorf("no valaccount found. Create one with 'kysor valaccounts create'")
+	}
+	return nil
+}
+
+func CombineFuncs(funcs ...cobra.PositionalArgs) cobra.PositionalArgs {
+	return func(cmd *cobra.Command, args []string) error {
+		for _, f := range funcs {
+			err := f(cmd, args)
+			if err != nil {
+				return err
+			}
+		}
+		return nil
 	}
 }
 
@@ -100,8 +144,9 @@ func PromptCmd(options []types.CmdConfig) (*types.CmdConfig, error) {
 	}
 
 	prompt := promptui.Select{
-		Label: "What do you want to do?",
-		Items: items,
+		Label:  "What do you want to do?",
+		Items:  items,
+		Stdout: NoBellStdout,
 	}
 
 	_, result, err := prompt.Run()
@@ -136,6 +181,7 @@ func GetStringFromPromptOrFlag(cmd *cobra.Command, flag types.StringFlag) (strin
 			Label:    label,
 			Validate: flag.ValidateFn,
 			Default:  flag.DefaultValue,
+			Stdout:   NoBellStdout,
 		}
 		return prompt.Run()
 	} else if cmd.Flags().Changed(flag.Name) {
@@ -175,6 +221,7 @@ func GetBoolFromPromptOrFlag(cmd *cobra.Command, flag types.BoolFlag) (bool, err
 			Label:     label,
 			Items:     []string{"Yes", "No"},
 			CursorPos: cursorPos,
+			Stdout:    NoBellStdout,
 		}
 		_, result, err := prompt.Run()
 		if err != nil {
@@ -205,6 +252,7 @@ func GetIntFromPromptOrFlag(cmd *cobra.Command, flag types.IntFlag) (int64, erro
 			Label:    label,
 			Validate: flag.ValidateFn,
 			Default:  strconv.FormatInt(flag.DefaultValue, 10),
+			Stdout:   NoBellStdout,
 		}
 		result, err := prompt.Run()
 		if err != nil {
@@ -254,8 +302,9 @@ func GetOptionFromPromptOrFlag[T any](cmd *cobra.Command, flag types.OptionFlag[
 		}
 
 		prompt := promptui.Select{
-			Label: label,
-			Items: items,
+			Label:  label,
+			Items:  items,
+			Stdout: NoBellStdout,
 		}
 		_, result, err := prompt.Run()
 		if err != nil {

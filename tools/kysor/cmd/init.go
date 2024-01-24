@@ -63,9 +63,9 @@ var (
 
 func initCmd(configFilePath string) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:    InitCmdConfig.Name,
-		Short:  InitCmdConfig.Short,
-		PreRun: utils.SetupInteractiveMode,
+		Use:     InitCmdConfig.Name,
+		Short:   InitCmdConfig.Short,
+		PreRunE: utils.SetupInteractiveMode,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// Parent is only defined if the command runs in non interactive mode
 			if configFilePath == "" && cmd.Parent() != nil {

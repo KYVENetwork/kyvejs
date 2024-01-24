@@ -24,8 +24,9 @@ var (
 
 func valaccountsCmd() *cobra.Command {
 	return &cobra.Command{
-		Use:   ValaccountsCmdConfig.Name,
-		Short: ValaccountsCmdConfig.Short,
+		Use:     ValaccountsCmdConfig.Name,
+		Short:   ValaccountsCmdConfig.Short,
+		PreRunE: utils.CheckIfInitialized,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// Check if the interactive flag is set
 			// -> if so ask the user what to do
@@ -172,9 +173,9 @@ func getMnemonic(cmd *cobra.Command) (string, error) {
 
 func valaccountsCreateCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:    ValaccountsCreateCmdConfig.Name,
-		Short:  ValaccountsCreateCmdConfig.Short,
-		PreRun: utils.SetupInteractiveMode,
+		Use:     ValaccountsCreateCmdConfig.Name,
+		Short:   ValaccountsCreateCmdConfig.Short,
+		PreRunE: utils.CombineFuncs(utils.SetupInteractiveMode, utils.CheckIfInitialized),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			kyveClient, err := chain.NewKyveClient(config.Config.RPC)
 			if err != nil {
@@ -286,9 +287,9 @@ var flagValaccShowAddressName = types.OptionFlag[config.ValaccountConfig]{
 
 func valaccountsShowAddressCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:    "show-address",
-		Short:  "Show the address of a valaccount",
-		PreRun: utils.SetupInteractiveMode,
+		Use:     "show-address",
+		Short:   "Show the address of a valaccount",
+		PreRunE: utils.CombineFuncs(utils.SetupInteractiveMode, utils.CheckIfInitialized),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// Return if no valaccount exists
 			flagValaccShowAddressName.Options = config.ValaccountConfigOptions
@@ -321,9 +322,9 @@ var flagValaccShowBalanceName = flagValaccShowAddressName
 
 func valaccountsShowBalanceCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:    "show-balance",
-		Short:  "Show the balance of a valaccount",
-		PreRun: utils.SetupInteractiveMode,
+		Use:     "show-balance",
+		Short:   "Show the balance of a valaccount",
+		PreRunE: utils.CombineFuncs(utils.SetupInteractiveMode, utils.CheckIfInitialized),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			kyveClient, err := chain.NewKyveClient(config.Config.RPC)
 			if err != nil {
@@ -388,7 +389,7 @@ func valaccountsTransferCmd() *cobra.Command {
 		Use:     "transfer",
 		Short:   "Transfer tokens from a valaccount to another address",
 		Example: "kysor valaccounts transfer --from <valaccount> --to <address> --amount <amount>",
-		PreRun:  utils.SetupInteractiveMode,
+		PreRunE: utils.CombineFuncs(utils.SetupInteractiveMode, utils.CheckIfInitialized),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			kyveClient, err := chain.NewKyveClient(config.Config.RPC)
 			if err != nil {
@@ -445,9 +446,9 @@ var flagValaccDeleteName = flagValaccShowAddressName
 
 func valaccountsDeleteCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:    "delete",
-		Short:  "Delete a valaccount",
-		PreRun: utils.SetupInteractiveMode,
+		Use:     "delete",
+		Short:   "Delete a valaccount",
+		PreRunE: utils.CombineFuncs(utils.SetupInteractiveMode, utils.CheckIfInitialized),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// Return if no valaccount exists
 			flagValaccShowAddressName.Options = config.ValaccountConfigOptions

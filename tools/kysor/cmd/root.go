@@ -75,7 +75,7 @@ func init() {
 
 	types.FlagConfig.DefaultValue = config.GetDefaultConfigFilePath()
 
-	rootCmd.PersistentFlags().StringVarP(&config.ConfigFilePath, types.FlagConfig.Name, types.FlagConfig.Short, types.FlagConfig.DefaultValue, types.FlagConfig.Usage)
+	rootCmd.PersistentFlags().StringP(types.FlagConfig.Name, types.FlagConfig.Short, types.FlagConfig.DefaultValue, types.FlagConfig.Usage)
 
 	rootCmd.PersistentFlags().BoolP(types.FlagNonInteractive.Name, types.FlagNonInteractive.Short, types.FlagNonInteractive.DefaultValue, types.FlagNonInteractive.Usage)
 	rootCmd.SetErrPrefix(promptui.IconBad)

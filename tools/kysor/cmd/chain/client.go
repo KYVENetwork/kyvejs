@@ -49,6 +49,10 @@ type KyveClient struct {
 }
 
 func NewKyveClient(rpcAddress string) (*KyveClient, error) {
+	if rpcAddress == "" {
+		return nil, fmt.Errorf("rpc address must not be empty")
+	}
+
 	httpClient, err := libclient.DefaultHTTPClient(rpcAddress)
 	if err != nil {
 		return nil, err
@@ -75,6 +79,15 @@ func (e *KyveClient) QueryPools() (*querytypes.QueryPoolsResponse, error) {
 	params := &querytypes.QueryPoolsRequest{Pagination: &sdkquery.PageRequest{Limit: 1000}}
 
 	return e.q.Query.PoolClient.Pools(ctx, params)
+}
+
+func (e *KyveClient) QueryPool(poolId uint64) (*querytypes.QueryPoolResponse, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), defaultQueryTimeout)
+	defer cancel()
+
+	params := &querytypes.QueryPoolRequest{Id: poolId}
+
+	return e.q.Query.PoolClient.Pool(ctx, params)
 }
 
 func (e *KyveClient) QueryBalance(address string) (*banktypes.QueryBalanceResponse, error) {

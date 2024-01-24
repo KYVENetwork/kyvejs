@@ -1,12 +1,24 @@
 package cmd
 
 import (
+	"context"
+	"errors"
 	"fmt"
+	pooltypes "github.com/KYVENetwork/chain/x/pool/types"
+	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/chain"
 	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/config"
+	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/docker"
 	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/types"
 	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/utils"
+	"github.com/docker/docker/client"
+	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/plumbing"
+	"github.com/hashicorp/go-version"
 	"github.com/spf13/cobra"
+	"os"
+	"path/filepath"
 	"runtime"
+	"strings"
 )
 
 var StartCmdConfig = types.CmdConfig{Name: "start", Short: "Start KYSOR"}
@@ -33,12 +45,210 @@ var (
 	}
 )
 
+type Runtime struct {
+	RuntimeVersion  string
+	ProtocolVersion string
+	RepoDir         string
+}
+
+func getHigherVersion(old *kyveRef, ref *plumbing.Reference, path string, contraint version.Constraints) *kyveRef {
+	var oldVersion *version.Version
+	if old != nil {
+		oldVersion = old.ver
+	}
+	split := strings.Split(ref.Name().Short(), path)
+	if len(split) == 2 {
+		newVersion, err := version.NewVersion(split[1])
+		if err != nil {
+			// Ignore invalid versions
+			return old
+		}
+		if newVersion.Prerelease() != "" {
+			// Ignore prerelease versions
+			return old
+		}
+		if oldVersion != nil && newVersion.LessThan(oldVersion) {
+			// Ignore lower versions
+			return old
+		}
+		if contraint != nil && !contraint.Check(newVersion) {
+			// Ignore versions which don't match the constraint
+			return old
+		}
+		return &kyveRef{
+			ver: newVersion,
+			ref: ref,
+		}
+	}
+	return old
+}
+
+type kyveRef struct {
+	ver  *version.Version
+	ref  *plumbing.Reference
+	path string
+}
+
+func getRuntimeVersions(repo *git.Repository, pool *pooltypes.Pool, repoDir string) (*kyveRef, *kyveRef, error) {
+	tagrefs, err := repo.Tags()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	expectedRuntime := pool.Runtime
+	split := strings.Split(expectedRuntime, "@kyvejs/")
+	if len(split) != 2 {
+		return nil, nil, fmt.Errorf("invalid runtime name: %s", expectedRuntime)
+	}
+	expectedIntegrationDir := split[1]
+
+	pVersion, err := version.NewVersion(pool.Protocol.Version)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	// Protocol must be at least the same major and minor version as defined in the pool
+	protocolVersContraint, err := version.NewConstraint(fmt.Sprintf(">=%s, < %d.%d.0", pVersion.String(), pVersion.Segments()[0], pVersion.Segments()[1]+1))
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var latestRuntimeVersion *kyveRef
+	var latestProtocolVersion *kyveRef
+	err = tagrefs.ForEach(func(ref *plumbing.Reference) error {
+		if ref.Name().IsTag() && strings.HasPrefix(ref.Name().Short(), "@kyvejs/protocol@") {
+			latestProtocolVersion = getHigherVersion(latestProtocolVersion, ref, "@kyvejs/protocol@", protocolVersContraint)
+		} else if ref.Name().IsTag() && strings.HasPrefix(ref.Name().Short(), expectedRuntime) {
+			latestRuntimeVersion = getHigherVersion(latestRuntimeVersion, ref, fmt.Sprintf("%s@", expectedRuntime), nil)
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	if latestProtocolVersion == nil {
+		return nil, nil, fmt.Errorf("no protocol found for %s", expectedRuntime)
+	}
+	if latestRuntimeVersion == nil {
+		return nil, nil, fmt.Errorf("no runtime found for %s", expectedRuntime)
+	}
+
+	latestProtocolVersion.path = filepath.Join(repoDir, "common", "protocol")
+	latestRuntimeVersion.path = filepath.Join(repoDir, "integrations", expectedIntegrationDir)
+
+	return latestProtocolVersion, latestRuntimeVersion, nil
+}
+
+func cloneRepo(kyveClient *chain.KyveClient, valConfig config.ValaccountConfig, pool *pooltypes.Pool) error {
+	repoUrl := "https://github.com/KYVENetwork/kyvejs.git"
+	repoDir := filepath.Join(config.GetConfigDir(), "kyvejs")
+
+	var repo *git.Repository
+	if _, err := os.Stat(repoDir); os.IsNotExist(err) {
+		// Clone the given repository to the given directory
+		fmt.Printf("Cloning %s\n", repoUrl)
+		repo, err = git.PlainClone(repoDir, false, &git.CloneOptions{
+			URL:      repoUrl,
+			Progress: os.Stdout,
+			Mirror:   true,
+			//NoCheckout: true,
+		})
+		if err != nil {
+			return err
+		}
+	} else {
+		// Otherwise open the existing repository
+		repo, err = git.PlainOpen(repoDir)
+		if err != nil {
+			return err
+		}
+
+		w, err := repo.Worktree()
+		if err != nil {
+			return err
+		}
+
+		// Pull the latest changes
+		fmt.Println("Pulling latest changes")
+		err = w.Pull(&git.PullOptions{RemoteName: "origin", Force: true})
+		if err != nil && !errors.Is(err, git.NoErrAlreadyUpToDate) {
+			return err
+		}
+	}
+
+	protocol, integration, err := getRuntimeVersions(repo, pool, repoDir)
+	if err != nil {
+		return err
+	}
+
+	// Todo: remove this for final release
+	protocol.ref = plumbing.NewHashReference(plumbing.NewBranchReferenceName("rapha/dockerization-e2etest"), plumbing.NewHash("34e7d141505997910666e7327ea8d9ae4971723a"))
+	integration.ref = plumbing.NewHashReference(plumbing.NewBranchReferenceName("rapha/dockerization-e2etest"), plumbing.NewHash("34e7d141505997910666e7327ea8d9ae4971723a"))
+
+	cli, err := client.NewClientWithOpts()
+	if err != nil {
+		return fmt.Errorf("failed to create docker client: %v", err)
+	}
+	//goland:noinspection GoUnhandledErrorResult
+	defer cli.Close()
+
+	images := map[kyveRef]docker.Image{
+		*protocol: {
+			Path:   protocol.path,
+			Tags:   []string{protocol.ver.String()},
+			Labels: nil,
+		},
+		*integration: {
+			Path:   integration.path,
+			Tags:   []string{integration.ver.String()},
+			Labels: nil,
+		},
+	}
+
+	w, err := repo.Worktree()
+	if err != nil {
+		return err
+	}
+
+	for kRef, img := range images {
+		// TODO: check if image with this tag already exists
+		fmt.Printf("📦  Checking out %s\n", kRef.ref.Name().Short())
+
+		err = w.Pull(&git.PullOptions{ReferenceName: kRef.ref.Name(), Force: true})
+		if err != nil && !errors.Is(err, git.NoErrAlreadyUpToDate) {
+			return err
+		}
+
+		err := w.Checkout(&git.CheckoutOptions{
+			Branch: kRef.ref.Name(),
+			Force:  true,
+		})
+		if err != nil {
+			return err
+		}
+
+		fmt.Printf("🏗️ Building %s\n", kRef.ref.Name().Short())
+		err = docker.BuildImage(context.Background(), cli, img)
+		if err != nil {
+			return err
+		}
+	}
+
+	return err
+}
+
 func startCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:    StartCmdConfig.Name,
-		Short:  StartCmdConfig.Short,
-		PreRun: utils.SetupInteractiveMode,
+		Use:     StartCmdConfig.Name,
+		Short:   StartCmdConfig.Short,
+		PreRunE: utils.CombineFuncs(utils.SetupInteractiveMode, utils.CheckIfInitialized),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			kyveClient, err := chain.NewKyveClient(config.Config.RPC)
+			if err != nil {
+				return err
+			}
+
 			// Return if no valaccount exists
 			flagStartValaccount.Options = config.ValaccountConfigOptions
 			if len(flagStartValaccount.Options) == 0 {
@@ -70,6 +280,16 @@ func startCmd() *cobra.Command {
 			fmt.Println("Valaccount:", valConfig.Name())
 			fmt.Println("Env file:", envFile)
 			fmt.Println("Debug:", debug)
+
+			response, err := kyveClient.QueryPool(valConfig.Value().Pool)
+			if err != nil {
+				return fmt.Errorf("failed to query pool: %v", err)
+			}
+
+			err = cloneRepo(kyveClient, valConfig.Value(), response.GetPool().Data)
+			if err != nil {
+				return fmt.Errorf("failed to clone repository: %v", err)
+			}
 
 			return nil
 		},

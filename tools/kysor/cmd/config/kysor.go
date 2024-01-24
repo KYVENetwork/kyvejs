@@ -12,9 +12,7 @@ import (
 )
 
 const configDir = ".kysor"
-const configFilePath = configDir + "/config.toml"
-
-var ConfigFilePath string
+const configFileName = "config.toml"
 
 var Config KysorConfig
 
@@ -73,22 +71,32 @@ func DoesConfigExist(configFilePath string) bool {
 	return true
 }
 
-func GetDefaultConfigFilePath() string {
+func GetConfigDir() string {
 	home, err := os.UserHomeDir()
 	cobra.CheckErr(err)
-	return filepath.Join(home, configFilePath)
+	return filepath.Join(home, configDir)
+}
+
+func GetDefaultConfigFilePath() string {
+	return filepath.Join(GetConfigDir(), configFileName)
+}
+
+func IsInitialzed() bool {
+	return DoesConfigExist(GetDefaultConfigFilePath())
 }
 
 func InitKysorConfig() {
+	path := GetDefaultConfigFilePath()
+
 	// Check if the config file exists
-	if _, err := os.Stat(ConfigFilePath); os.IsNotExist(err) {
+	if _, err := os.Stat(path); os.IsNotExist(err) {
 		return
 	}
 
 	var k = koanf.New(".")
 
 	// Load the config file
-	if err := k.Load(file.Provider(ConfigFilePath), toml.Parser()); err != nil {
+	if err := k.Load(file.Provider(path), toml.Parser()); err != nil {
 		cobra.CheckErr(fmt.Errorf("error loading config: %v", err))
 	}
 
@@ -98,7 +106,7 @@ func InitKysorConfig() {
 	cobra.CheckErr(err)
 
 	// Set the config name and path
-	c.Name = filepath.Base(ConfigFilePath)
-	c.Path = ConfigFilePath
+	c.Name = filepath.Base(path)
+	c.Path = path
 	Config = c
 }
