@@ -44,7 +44,7 @@ export async function runNode(this: Validator): Promise<void> {
       continue;
     }
 
-    // temp save proposal creation time to detect if a new proposal is
+    // temp save proposal creation time to detect if a different proposal is
     // available in the meantime
     const updatedAt = parseInt(this.pool.bundle_proposal!.updated_at);
 

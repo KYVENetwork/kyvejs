@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.3.0](https://github.com/KYVENetwork/kyvejs/compare/@kyve/kysor@1.2.1...@kyve/kysor@1.3.0) (2024-01-25)
+
+### Features
+
+- added home flag for kysor home directory ([#117](https://github.com/KYVENetwork/kyvejs/issues/117)) ([1c3b893](https://github.com/KYVENetwork/kyvejs/commit/1c3b89343bcbebf5d3d91e7d4eab96dc85c7d8cd))
+
+## [1.2.1](https://github.com/KYVENetwork/kyvejs/compare/@kyve/kysor@1.2.0...@kyve/kysor@1.2.1) (2023-12-15)
+
+### Bug Fixes
+
+- extract zip files with correct permissions ([#107](https://github.com/KYVENetwork/kyvejs/issues/107)) ([09ff476](https://github.com/KYVENetwork/kyvejs/commit/09ff47675aad7272d18aaffdf660d6a261f03a73))
+
 # [1.2.0](https://github.com/KYVENetwork/kyvejs/compare/@kyve/kysor@1.0.5...@kyve/kysor@1.2.0) (2023-11-28)
 
 ### Features

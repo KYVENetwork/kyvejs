@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.3](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint@1.1.2...@kyvejs/tendermint@1.1.3) (2024-01-05)
+
+**Note:** Version bump only for package @kyvejs/tendermint
+
+## [1.1.2](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint@1.1.1...@kyvejs/tendermint@1.1.2) (2024-01-03)
+
+**Note:** Version bump only for package @kyvejs/tendermint
+
+## [1.1.1](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint@1.1.0...@kyvejs/tendermint@1.1.1) (2023-12-15)
+
+### Bug Fixes
+
+- zip archives of binaries ([#106](https://github.com/KYVENetwork/kyvejs/issues/106)) ([b6d8290](https://github.com/KYVENetwork/kyvejs/commit/b6d829042a9f7304603a25b9716b948923fc07dd))
+
 # [1.1.0](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint@1.0.11...@kyvejs/tendermint@1.1.0) (2023-11-28)
 
 ### Features

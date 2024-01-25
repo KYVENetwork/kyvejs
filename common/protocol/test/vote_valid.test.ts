@@ -92,6 +92,8 @@ describe("vote valid tests", () => {
 
     v["waitForNextBundleProposal"] = jest.fn();
 
+    v["archiveDebugBundle"] = jest.fn();
+
     v["continueRound"] = jest
       .fn()
       .mockReturnValueOnce(true)
@@ -248,10 +250,11 @@ describe("vote valid tests", () => {
     // ASSERT NODEJS INTERFACES
     // ========================
 
+    // assert that debug bundle was saved
+    expect(v["archiveDebugBundle"]).toHaveBeenCalledTimes(0);
+
     // assert that only one round ran
     expect(v["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
-
-    // TODO: assert timeouts
   });
 
   test("vote valid but local bundle could not be loaded in the first try", async () => {
@@ -412,10 +415,11 @@ describe("vote valid tests", () => {
     // ASSERT NODEJS INTERFACES
     // ========================
 
+    // assert that debug bundle was saved
+    expect(v["archiveDebugBundle"]).toHaveBeenCalledTimes(0);
+
     // assert that only one round ran
     expect(v["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
-
-    // TODO: assert timeouts
   });
 
   test("vote valid but bundle from storage provider could not be loaded in the first try", async () => {
@@ -588,10 +592,11 @@ describe("vote valid tests", () => {
     // ASSERT NODEJS INTERFACES
     // ========================
 
+    // assert that debug bundle was saved
+    expect(v["archiveDebugBundle"]).toHaveBeenCalledTimes(0);
+
     // assert that only one round ran
     expect(v["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
-
-    // TODO: assert timeouts
   });
 
   test("try to vote valid after validator has voted abstain bebore", async () => {
@@ -738,10 +743,11 @@ describe("vote valid tests", () => {
     // ASSERT NODEJS INTERFACES
     // ========================
 
+    // assert that debug bundle was saved
+    expect(v["archiveDebugBundle"]).toHaveBeenCalledTimes(0);
+
     // assert that only one round ran
     expect(v["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
-
-    // TODO: assert timeouts
   });
 
   test("try to vote valid after validator has voted invalid before", async () => {
@@ -863,10 +869,11 @@ describe("vote valid tests", () => {
     // ASSERT NODEJS INTERFACES
     // ========================
 
+    // assert that debug bundle was saved
+    expect(v["archiveDebugBundle"]).toHaveBeenCalledTimes(0);
+
     // assert that only one round ran
     expect(v["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
-
-    // TODO: assert timeouts
   });
 
   test("try to vote valid after validator has voted valid before", async () => {
@@ -986,10 +993,11 @@ describe("vote valid tests", () => {
     // ASSERT NODEJS INTERFACES
     // ========================
 
+    // assert that debug bundle was saved
+    expect(v["archiveDebugBundle"]).toHaveBeenCalledTimes(0);
+
     // assert that only one round ran
     expect(v["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
-
-    // TODO: assert timeouts
   });
 
   test("try to vote valid where voteBundleProposal fails", async () => {
@@ -1193,9 +1201,10 @@ describe("vote valid tests", () => {
     // ASSERT NODEJS INTERFACES
     // ========================
 
+    // assert that debug bundle was saved
+    expect(v["archiveDebugBundle"]).toHaveBeenCalledTimes(0);
+
     // assert that only one round ran
     expect(v["waitForNextBundleProposal"]).toHaveBeenCalledTimes(1);
-
-    // TODO: assert timeouts
   });
 });

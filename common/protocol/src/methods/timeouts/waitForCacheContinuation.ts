@@ -15,7 +15,7 @@ export async function waitForCacheContinuation(
   this: Validator,
   updatedAt: number
 ): Promise<void> {
-  // continue if a new proposal is available
+  // continue if a different proposal is available
   while (updatedAt === parseInt(this.pool.bundle_proposal!.updated_at)) {
     await sleep(1000);
   }
