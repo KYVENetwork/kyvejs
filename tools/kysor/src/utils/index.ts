@@ -4,17 +4,15 @@ import fs from "fs";
 import path from "path";
 import { ILogObject, Logger } from "tslog";
 
-import { HOME } from "./constants";
-
-export const setupLogger = () => {
+export const setupLogger = (home: string) => {
   // create log folder
-  fs.mkdirSync(path.join(HOME, `logs`), { recursive: true });
+  fs.mkdirSync(path.join(home, `logs`), { recursive: true });
 
   const logFile = `${new Date().toISOString()}.log`;
 
   const logToTransport = (log: ILogObject) => {
     fs.appendFileSync(
-      path.join(HOME, `logs`, logFile),
+      path.join(home, `logs`, logFile),
       JSON.stringify(log) + "\n"
     );
   };

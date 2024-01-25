@@ -4,7 +4,7 @@ import { Command } from "commander";
 import fs from "fs";
 import path from "path";
 
-import { HOME } from "../utils/constants";
+import { USER_HOME, KYSOR_DIR } from "../utils/constants";
 
 const init = new Command("init").description("Init KYSOR");
 
@@ -17,6 +17,10 @@ init
   .requiredOption(
     "--rest <string>",
     "Comma separated list of rest endpoints. If the first fails the next endpoint will be used as fallback. "
+  )
+  .option(
+    "--home <string>",
+    "The location of the .kysor home directory where binaries and configs are stored."
   )
   .option(
     "--coin-denom <string>",
@@ -36,16 +40,18 @@ init
   )
   .action(async (options) => {
     try {
-      if (fs.existsSync(path.join(HOME, `config.toml`))) {
+      const home = path.join(options.home || USER_HOME, KYSOR_DIR);
+
+      if (fs.existsSync(path.join(home, `config.toml`))) {
         console.log(
           `KYSOR was already initialized. You can directly edit the config file under ${path.join(
-            HOME,
+            home,
             `config.toml`
           )}`
         );
       } else {
         // create KYSOR home directory
-        fs.mkdirSync(HOME, {
+        fs.mkdirSync(home, {
           recursive: true,
         });
 
@@ -93,12 +99,12 @@ init
         };
 
         fs.writeFileSync(
-          path.join(HOME, `config.toml`),
+          path.join(home, `config.toml`),
           TOML.stringify(config as any)
         );
 
         console.log(
-          `Successfully initialized KYSOR in the following home directory: ${HOME}`
+          `Successfully initialized KYSOR in the following home directory: ${home}`
         );
       }
     } catch (err) {
