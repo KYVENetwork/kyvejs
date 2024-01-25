@@ -2,7 +2,8 @@ import { DataItem, IRuntime, Validator, VOTE } from '@kyvejs/protocol';
 import { name, version } from '../package.json';
 import { providers } from 'ethers';
 import { BlockWithTransactions, TransactionReceipt } from '@ethersproject/abstract-provider';
-import {shuffle} from "../utils/utils";
+import {shuffle, removeLeadingZero, chunkArray} from "../utils/utils";
+import fs from "fs";
 
 // EVM config
 interface IConfig {
@@ -26,7 +27,7 @@ export default class EVM implements IRuntime {
     }
 
     if (RPCs.length) {
-      config.sources = config.sources.concat(RPCs)
+      config.sources = ["https://polygon-rpc.com","https://polygon.drpc.org","https://rpc.ankr.com/polygon/eb2a0f47804a2f34f4af73be124e7df49ca9ed3e0675b850409aa3affc562a63"]
     }
 
     if (!config.sources.length) {
@@ -44,9 +45,10 @@ export default class EVM implements IRuntime {
     this.config = config;
   }
 
-  async getDataItem(_: Validator, key: string): Promise<DataItem> {
+  async  getDataItem(_: Validator, key: string): Promise<any> {
     const blockWithTxs: BlockWithTransactions[] = [];
     const receipts: TransactionReceipt[] = [];
+    const traceCalls: any[] = [];
 
     const receiptRequestData = {
       method: 'eth_getBlockReceipts',
@@ -55,38 +57,63 @@ export default class EVM implements IRuntime {
       jsonrpc: '2.0',
     };
 
-    const sources = shuffle(this.config.sources);
-    for (let i = 0; i < this.config.sourceThreshold; i++) {
+    const sources = shuffle(["https://polygon-rpc.com", "https://polygon.drpc.org", "https://rpc.ankr.com/polygon"]);
+    for (let i = 0; i < 1; i++) {
       const provider = new providers.StaticJsonRpcProvider({
         url: sources[i],
       });
 
       const currentHeight = await provider.getBlockNumber();
 
+      console.log("current height", currentHeight)
+
       const block = await provider.getBlockWithTransactions(+key);
 
       // only validate if current height is already 'finalized'
-      if (block.number >= currentHeight - this.config.finality) {
+      if (block.number >= currentHeight - 256) {
         throw new Error(
-            `Finality not reached yet; waiting for next block`
+          `Finality not reached yet; waiting for next block`
         )
       }
       // delete confirmations from transactions to keep data deterministic
       block.transactions.forEach(
-          (tx: Partial<providers.TransactionResponse>) => {
-            delete tx.confirmations
-          }
+        (tx: Partial<providers.TransactionResponse>) => {
+          delete tx.confirmations
+        }
       );
       blockWithTxs.push(block);
 
       // retrieve all transaction receipts for the key
       const receipt = await provider.send(receiptRequestData.method, receiptRequestData.params);
       receipts.push(receipt);
+
+      const chunkedTransactions = chunkArray(blockWithTxs[0].transactions, 4);
+
+      const chunkedTraceCalls: any[] = [];
+      // Process each chunk
+      for (const chunk of chunkedTransactions) {
+        const traceParams = chunk.map((tx: any) => [
+          {
+            from: tx.from,
+            to: tx.to,
+            value: removeLeadingZero(tx.value.toHexString()),
+          },
+          ['trace'],
+        ]);
+
+        // Send trace call request for each chunk
+        const traceCall = await provider.send('trace_callMany', [traceParams, 'latest']);
+
+        traceCall.forEach((t: any) => {
+          chunkedTraceCalls.push(t);
+        })
+      }
+      traceCalls.push(chunkedTraceCalls)
     }
 
     // check if results from the different sources match
     if (
-        !blockWithTxs.every((b) => JSON.stringify(b) === JSON.stringify(blockWithTxs[0]))
+      !blockWithTxs.every((b) => JSON.stringify(b) === JSON.stringify(blockWithTxs[0]))
     ) {
       throw new Error(`Sources returned different blockWithTxs`);
     }
@@ -95,12 +122,18 @@ export default class EVM implements IRuntime {
     ) {
       throw new Error(`Sources returned different receipts`);
     }
+    if (
+      !traceCalls.every((t) => JSON.stringify(t) === JSON.stringify(traceCalls[0]))
+    ) {
+      throw new Error(`Sources returned different traceCalls`);
+    }
 
     return {
       key,
       value: {
         block: blockWithTxs[0],
         receipts: receipts[0],
+        traceCalls: traceCalls[0]
       },
     };
   }
