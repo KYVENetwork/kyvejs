@@ -9,7 +9,6 @@ import {
   DirectSecp256k1HdWallet,
   DirectSecp256k1Wallet,
   OfflineDirectSigner,
-  OfflineSigner,
 } from "@cosmjs/proto-signing";
 import { RequestAccountResponse } from "@cosmostation/extension-client/types/message";
 import { verifyADR36Amino } from "@keplr-wallet/cosmos";
