@@ -1,4 +1,5 @@
 import {
+  OfflineAminoSigner,
   pubkeyToAddress,
   Secp256k1HdWallet,
   Secp256k1Wallet,
@@ -7,6 +8,7 @@ import { fromBase64, fromHex } from "@cosmjs/encoding";
 import {
   DirectSecp256k1HdWallet,
   DirectSecp256k1Wallet,
+  OfflineDirectSigner,
 } from "@cosmjs/proto-signing";
 import { RequestAccountResponse } from "@cosmostation/extension-client/types/message";
 import { verifyADR36Amino } from "@keplr-wallet/cosmos";
@@ -118,6 +120,26 @@ export class KyveSDK {
     );
     const aminoSigner = await Secp256k1Wallet.fromKey(formattedKey, PREFIX);
     return getSigningKyveClient(this.config, signedClient, aminoSigner);
+  }
+
+  /**
+   * create a client from offline signers
+   * @param offlineSigner - offline signer
+   * @param offlineAminoSigner - offline amino signer
+   * @param walletName - optinal wallet name
+   * @return Promise<KyveClient>
+   */
+  async fromOfflineSigner(
+    offlineSigner: OfflineDirectSigner | OfflineAminoSigner,
+    offlineAminoSigner: OfflineAminoSigner,
+    walletName?: string
+  ): Promise<KyveClient> {
+    return getSigningKyveClient(
+      this.config,
+      offlineSigner,
+      offlineAminoSigner,
+      walletName
+    );
   }
 
   /**
