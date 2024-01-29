@@ -87,6 +87,7 @@ type kyveRef struct {
 	ver  *version.Version
 	ref  *plumbing.Reference
 	path string
+	name string
 }
 
 func getRuntimeVersions(repo *git.Repository, pool *pooltypes.Pool, repoDir string) (*kyveRef, *kyveRef, error) {
@@ -136,18 +137,20 @@ func getRuntimeVersions(repo *git.Repository, pool *pooltypes.Pool, repoDir stri
 
 	latestProtocolVersion.path = filepath.Join(repoDir, "common", "protocol")
 	latestRuntimeVersion.path = filepath.Join(repoDir, "integrations", expectedIntegrationDir)
+	latestProtocolVersion.name = "protocol"
+	latestRuntimeVersion.name = fmt.Sprintf("integration-%s", expectedIntegrationDir)
 
 	return latestProtocolVersion, latestRuntimeVersion, nil
 }
 
-func cloneRepo(kyveClient *chain.KyveClient, valConfig config.ValaccountConfig, pool *pooltypes.Pool) error {
+func cloneRepo(pool *pooltypes.Pool) (*docker.Image, *docker.Image, error) {
 	repoUrl := "https://github.com/KYVENetwork/kyvejs.git"
 	repoDir := filepath.Join(config.GetConfigDir(), "kyvejs")
 
 	var repo *git.Repository
 	if _, err := os.Stat(repoDir); os.IsNotExist(err) {
 		// Clone the given repository to the given directory
-		fmt.Printf("Cloning %s\n", repoUrl)
+		fmt.Printf("📥  Cloning %s\n", repoUrl)
 		repo, err = git.PlainClone(repoDir, false, &git.CloneOptions{
 			URL:      repoUrl,
 			Progress: os.Stdout,
@@ -155,31 +158,31 @@ func cloneRepo(kyveClient *chain.KyveClient, valConfig config.ValaccountConfig, 
 			//NoCheckout: true,
 		})
 		if err != nil {
-			return err
+			return nil, nil, err
 		}
 	} else {
 		// Otherwise open the existing repository
 		repo, err = git.PlainOpen(repoDir)
 		if err != nil {
-			return err
+			return nil, nil, err
 		}
 
 		w, err := repo.Worktree()
 		if err != nil {
-			return err
+			return nil, nil, err
 		}
 
 		// Pull the latest changes
-		fmt.Println("Pulling latest changes")
+		fmt.Println("⬇️  Pulling latest changes")
 		err = w.Pull(&git.PullOptions{RemoteName: "origin", Force: true})
-		if err != nil && !errors.Is(err, git.NoErrAlreadyUpToDate) {
-			return err
+		if err != nil && !errors.Is(err, git.NoErrAlreadyUpToDate) && !errors.Is(err, git.ErrNonFastForwardUpdate) {
+			return nil, nil, err
 		}
 	}
 
 	protocol, integration, err := getRuntimeVersions(repo, pool, repoDir)
 	if err != nil {
-		return err
+		return nil, nil, err
 	}
 
 	// Todo: remove this for final release
@@ -188,54 +191,52 @@ func cloneRepo(kyveClient *chain.KyveClient, valConfig config.ValaccountConfig, 
 
 	cli, err := client.NewClientWithOpts()
 	if err != nil {
-		return fmt.Errorf("failed to create docker client: %v", err)
+		return nil, nil, fmt.Errorf("failed to create docker client: %v", err)
 	}
 	//goland:noinspection GoUnhandledErrorResult
 	defer cli.Close()
 
 	images := map[kyveRef]docker.Image{
 		*protocol: {
-			Path:   protocol.path,
-			Tags:   []string{protocol.ver.String()},
-			Labels: nil,
+			Path: protocol.path,
+			Tags: []string{fmt.Sprintf("%s:%s", protocol.name, protocol.ver.String())},
 		},
 		*integration: {
-			Path:   integration.path,
-			Tags:   []string{integration.ver.String()},
-			Labels: nil,
+			Path: integration.path,
+			Tags: []string{fmt.Sprintf("%s:%s", integration.name, integration.ver.String())},
 		},
 	}
 
 	w, err := repo.Worktree()
 	if err != nil {
-		return err
+		return nil, nil, err
 	}
 
 	for kRef, img := range images {
-		// TODO: check if image with this tag already exists
-		fmt.Printf("📦  Checking out %s\n", kRef.ref.Name().Short())
+		fmt.Printf("📦  Checkout %s\n", kRef.ref.Name().Short())
 
 		err = w.Pull(&git.PullOptions{ReferenceName: kRef.ref.Name(), Force: true})
 		if err != nil && !errors.Is(err, git.NoErrAlreadyUpToDate) {
-			return err
+			return nil, nil, err
 		}
 
 		err := w.Checkout(&git.CheckoutOptions{
-			Branch: kRef.ref.Name(),
-			Force:  true,
+			Hash:  kRef.ref.Hash(),
+			Force: true,
 		})
 		if err != nil {
-			return err
+			return nil, nil, err
 		}
 
-		fmt.Printf("🏗️ Building %s\n", kRef.ref.Name().Short())
+		fmt.Printf("🏗️ Building %s ...\n", img.Tags[0])
 		err = docker.BuildImage(context.Background(), cli, img)
 		if err != nil {
-			return err
+			return nil, nil, err
 		}
 	}
-
-	return err
+	p := images[*protocol]
+	i := images[*integration]
+	return &p, &i, nil
 }
 
 func startCmd() *cobra.Command {
@@ -286,7 +287,7 @@ func startCmd() *cobra.Command {
 				return fmt.Errorf("failed to query pool: %v", err)
 			}
 
-			err = cloneRepo(kyveClient, valConfig.Value(), response.GetPool().Data)
+			_, _, err = cloneRepo(response.GetPool().Data)
 			if err != nil {
 				return fmt.Errorf("failed to clone repository: %v", err)
 			}
