@@ -22,3 +22,25 @@ export function removeLeadingZero(inputStr: string): string {
         return inputStr;
     }
 }
+
+export function removeOutputProperties(obj: any, removeKeys: string[]) {
+    if (!obj || typeof obj !== 'object') {
+        return obj;
+    }
+
+    if (Array.isArray(obj)) {
+        for (let i = 0; i < obj.length; i++) {
+            obj[i] = removeOutputProperties(obj[i], removeKeys);
+        }
+    } else {
+        for (const key in obj) {
+            if (removeKeys.some(removeKey => key.includes(removeKey))) {
+                delete obj[key];
+            } else if (typeof obj[key] === 'object' && obj[key] !== null) {
+                obj[key] = removeOutputProperties(obj[key], removeKeys);
+            }
+        }
+    }
+
+    return obj;
+}

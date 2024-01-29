@@ -2,8 +2,7 @@ import { DataItem, IRuntime, Validator, VOTE } from '@kyvejs/protocol';
 import { name, version } from '../package.json';
 import { providers } from 'ethers';
 import { BlockWithTransactions, TransactionReceipt } from '@ethersproject/abstract-provider';
-import {shuffle, removeLeadingZero, chunkArray} from "../utils/utils";
-import fs from "fs";
+import { shuffle, removeLeadingZero, chunkArray, removeOutputProperties } from "../utils/utils";
 
 // EVM config
 interface IConfig {
@@ -159,6 +158,15 @@ export default class EVM implements IRuntime {
         JSON.stringify(proposedDataItem) === JSON.stringify(validationDataItem)
     ) {
       return VOTE.VOTE_TYPE_VALID;
+    }
+    // Remove non-deterministic data
+    const modifiedValidationDataItem = removeOutputProperties(validationDataItem.value.traceCalls, ["output", "accessList", "address", "value"]);
+    const modifiedProposedDataItem = removeOutputProperties(proposedDataItem.value.traceCalls, ["output", "accessList", "address", "value"])
+
+  if (
+      JSON.stringify(modifiedProposedDataItem) === JSON.stringify(modifiedValidationDataItem)
+    ) {
+      return VOTE.VOTE_TYPE_ABSTAIN;
     }
     return VOTE.VOTE_TYPE_INVALID;
   }
