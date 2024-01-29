@@ -59,6 +59,7 @@ var (
 		Usage:        "Allow automatic download and execution of new upgrade binaries",
 		Required:     false,
 	}
+	// TODO: add home flag
 )
 
 func initCmd(configFilePath string) *cobra.Command {
