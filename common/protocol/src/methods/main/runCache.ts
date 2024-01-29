@@ -1,6 +1,7 @@
-import { DataItem, Validator } from "../..";
+import { Validator } from "../..";
 import { callWithBackoffStrategy, sleep, standardizeError } from "../../utils";
 import clone from "clone";
+import { DataItem } from "../../proto/kyverdk/runtime/v1/runtime";
 
 /**
  * runCache is the other main execution thread for collecting data items
@@ -136,7 +137,7 @@ export async function runCache(this: Validator): Promise<void> {
         const nextKey = key
           ? await callWithBackoffStrategy(
               async () => {
-                return await this.runtime.nextKey(this, key);
+                return await this.runtime.nextKey(key);
               },
               {
                 limitTimeoutMs: 5 * 60 * 1000,
@@ -158,22 +159,18 @@ export async function runCache(this: Validator): Promise<void> {
           const dataItem: DataItem = await callWithBackoffStrategy(
             async () => {
               // get the data item from the runtime by key
-              this.logger.debug(`this.runtime.getDataItem($THIS,${nextKey})`);
-              const data = await this.runtime.getDataItem(this, nextKey);
+              this.logger.debug(`this.runtime.getDataItem(${nextKey})`);
+              const data = await this.runtime.getDataItem(nextKey);
 
               this.m.runtime_get_data_item_successful.inc();
 
               // prevalidate data item and reject if it fails
               try {
-                this.logger.debug(
-                  `this.runtime.prevalidateDataItem($THIS,$ITEM)`
-                );
-                const valid = await this.runtime.prevalidateDataItem(
-                  this,
-                  data
-                );
+                this.logger.debug(`this.runtime.prevalidateDataItem($ITEM)`);
+                const response = await this.runtime.prevalidateDataItem(data);
 
-                if (!valid) {
+                if (!response.valid) {
+                  this.logger.error(standardizeError(response.error));
                   this.logger.error(
                     `Prevalidation of data item with key ${nextKey} failed, only voting abstain from now on. Please check if you have configured your data source correctly.`
                   );
@@ -189,7 +186,7 @@ export async function runCache(this: Validator): Promise<void> {
 
               // transform data item
               this.logger.debug(`this.runtime.transformDataItem($ITEM)`);
-              return await this.runtime.transformDataItem(this, data);
+              return await this.runtime.transformDataItem(data);
             },
             {
               limitTimeoutMs: 5 * 60 * 1000,

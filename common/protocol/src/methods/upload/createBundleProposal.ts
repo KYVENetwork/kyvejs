@@ -1,12 +1,13 @@
 import BigNumber from "bignumber.js";
 import { Validator } from "../..";
-import { BundleTag, DataItem } from "../../types";
+import { BundleTag } from "../../types";
 import {
   bundleToBytes,
   MAX_BUNDLE_BYTE_SIZE,
   sha256,
   standardizeError,
 } from "../../utils";
+import { DataItem } from "../../proto/kyverdk/runtime/v1/runtime";
 
 /**
  * createBundleProposal assembles a bundle proposal by loading
@@ -95,7 +96,7 @@ export async function createBundleProposal(this: Validator): Promise<void> {
     // saved on chain
     this.logger.debug(`this.runtime.summarizeDataBundle($BUNDLE_PROPOSAL)`);
     const bundleSummary = await this.runtime
-      .summarizeDataBundle(this, bundleProposal)
+      .summarizeDataBundle(bundleProposal)
       .catch((err) => {
         this.logger.error(
           `Unexpected error summarizing bundle. Skipping Uploader Role ...`
@@ -141,6 +142,9 @@ export async function createBundleProposal(this: Validator): Promise<void> {
       `Successfully compressed bundle with Compression:${compression.name}`
     );
 
+    const name = await this.runtime.getName();
+    const version = await this.runtime.getVersion();
+
     // create tags for bundle to make it easier to find KYVE data
     // on the storage provider itself
     const tags: BundleTag[] = [
@@ -161,8 +165,8 @@ export async function createBundleProposal(this: Validator): Promise<void> {
         value: this.protocolVersion,
       },
       {
-        name: this.runtime.name,
-        value: this.runtime.version,
+        name: name,
+        value: version,
       },
       {
         name: "Pool",

@@ -132,6 +132,7 @@ dist
 .yarn/install-state.gz
 .pnp.*
 .DS_Store/
+
 ### Node Patch ###
 # Serverless Webpack directories
 .webpack/
@@ -144,3 +145,6 @@ dist
 /common/types/client/
 /common/types/lcd/
 # End of https://www.toptal.com/developers/gitignore/api/node
+
+# Ignore docker compose file
+docker-compose.yml

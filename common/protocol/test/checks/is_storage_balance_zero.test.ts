@@ -1,8 +1,8 @@
 import { Logger } from "tslog";
-import { IStorageProvider, Validator } from "../../src/index";
-import { setupMetrics, isStorageBalanceZero } from "../../src/methods";
+import { IStorageProvider, Validator } from "../../src";
+import { isStorageBalanceZero, setupMetrics } from "../../src/methods";
 import { register } from "prom-client";
-import { TestRuntime } from "../mocks/runtime.mock";
+import { newTestValidator } from "../mocks/runtime.mock";
 import { genesis_pool } from "../mocks/constants";
 import { TestNormalStorageProvider } from "../mocks/storageProvider.mock";
 
@@ -23,7 +23,7 @@ describe("isStorageBalanceZero", () => {
   let storageProvider: IStorageProvider;
 
   beforeEach(() => {
-    v = new Validator(new TestRuntime());
+    v = newTestValidator();
 
     // mock logger
     v.logger = new Logger();

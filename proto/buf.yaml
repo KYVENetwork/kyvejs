@@ -1,0 +1,15 @@
+version: v1
+name: buf.build/kyve/rdk
+deps:
+  - buf.build/kyve/chain
+breaking:
+  use:
+    - FILE
+lint:
+  use:
+    - DEFAULT
+    - COMMENTS
+  except:
+    - SERVICE_SUFFIX
+    - RPC_REQUEST_STANDARD_NAME
+    - RPC_RESPONSE_STANDARD_NAME

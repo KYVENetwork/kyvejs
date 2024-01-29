@@ -1,5 +1,5 @@
 import { randomBytes } from "crypto";
-import { ICompression } from "../../src/index";
+import { ICompression } from "../../src";
 import { NoCompression } from "../../src/reactors/compression/NoCompression";
 
 /*

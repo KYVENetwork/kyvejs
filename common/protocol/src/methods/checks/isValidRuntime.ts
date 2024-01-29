@@ -6,16 +6,18 @@ import { Validator, standardizeError } from "../..";
  *
  * @method isValidRuntime
  * @param {Validator} this
- * @return {boolean}
+ * @return {Promise<boolean>}
  */
-export function isValidRuntime(this: Validator): boolean {
+export async function isValidRuntime(this: Validator): Promise<boolean> {
   try {
-    if (this.pool.data!.runtime !== this.runtime.name) {
+    const name = await this.runtime.getName();
+
+    if (this.pool.data!.runtime !== name) {
       this.logger.fatal(
         `Specified pool does not match the integration runtime! Exiting ...`
       );
       this.logger.fatal(
-        `Found = ${this.runtime.name} required = ${this.pool.data!.runtime}`
+        `Found = ${name} required = ${this.pool.data!.runtime}`
       );
 
       return false;

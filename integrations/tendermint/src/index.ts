@@ -1,6 +1,11 @@
-import { Validator } from '@kyvejs/protocol';
-import Tendermint from './runtime';
+import { TendermintServer } from './server';
+import { ProtocolConfig, Validator } from '@kyvejs/protocol';
 
-const runtime = new Tendermint();
+const runtimeService = new TendermintServer();
 
-new Validator(runtime).bootstrap();
+const config: Partial<ProtocolConfig> = {
+  useGrpc: false,
+  services: runtimeService
+};
+
+new Validator(config).bootstrap();

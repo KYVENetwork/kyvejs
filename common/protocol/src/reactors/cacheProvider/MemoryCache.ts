@@ -1,4 +1,5 @@
-import { DataItem, ICacheProvider } from "../../types";
+import { ICacheProvider } from "../../types";
+import { DataItem } from "../../proto/kyverdk/runtime/v1/runtime";
 
 export class MemoryCache implements ICacheProvider {
   public name = "MemoryCache";

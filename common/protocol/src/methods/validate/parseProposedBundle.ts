@@ -1,6 +1,6 @@
 import { Validator } from "../..";
-import { DataItem } from "../../types";
 import { bytesToBundle } from "../../utils";
+import { DataItem } from "../../proto/kyverdk/runtime/v1/runtime";
 
 /**
  * parseProposedBundle takes the raw data from the storage
