@@ -51,7 +51,9 @@ type Runtime struct {
 	RepoDir         string
 }
 
-func getHigherVersion(old *kyveRef, ref *plumbing.Reference, path string, contraint version.Constraints) *kyveRef {
+// getHigherVersion returns the higher version of the two given versions or nil if the old version is higher
+// If constraints are given, the new version must match them
+func getHigherVersion(old *kyveRef, ref *plumbing.Reference, path string, constraints version.Constraints) *kyveRef {
 	var oldVersion *version.Version
 	if old != nil {
 		oldVersion = old.ver
@@ -71,8 +73,8 @@ func getHigherVersion(old *kyveRef, ref *plumbing.Reference, path string, contra
 			// Ignore lower versions
 			return old
 		}
-		if contraint != nil && !contraint.Check(newVersion) {
-			// Ignore versions which don't match the constraint
+		if constraints != nil && !constraints.Check(newVersion) {
+			// Ignore versions which don't match the constraints
 			return old
 		}
 		return &kyveRef{
@@ -90,6 +92,9 @@ type kyveRef struct {
 	name string
 }
 
+// getRuntimeVersions returns the required protocol and integration versions for the given pool
+// protocol version: Latest patch version that is defined on-chain (ex: v1.1.0 -> v1.1.3)
+// integration version: Latest version (no constraints) -> TODO: save constraints on-chain and use them
 func getRuntimeVersions(repo *git.Repository, pool *pooltypes.Pool, repoDir string) (*kyveRef, *kyveRef, error) {
 	tagrefs, err := repo.Tags()
 	if err != nil {
@@ -143,8 +148,10 @@ func getRuntimeVersions(repo *git.Repository, pool *pooltypes.Pool, repoDir stri
 	return latestProtocolVersion, latestRuntimeVersion, nil
 }
 
-func cloneRepo(pool *pooltypes.Pool) (*docker.Image, *docker.Image, error) {
-	repoUrl := "https://github.com/KYVENetwork/kyvejs.git"
+// buildImagesFromGithub clones the kyvejs repository and builds the protocol and integration images
+func buildImagesFromGithub(cli *client.Client, pool *pooltypes.Pool, cleanupLabel string) (*docker.Image, *docker.Image, error) {
+	repoName := "github.com/KYVENetwork/kyvejs"
+	repoUrl := fmt.Sprintf("https://%s.git", repoName)
 	repoDir := filepath.Join(config.GetConfigDir(), "kyvejs")
 
 	var repo *git.Repository
@@ -155,7 +162,6 @@ func cloneRepo(pool *pooltypes.Pool) (*docker.Image, *docker.Image, error) {
 			URL:      repoUrl,
 			Progress: os.Stdout,
 			Mirror:   true,
-			//NoCheckout: true,
 		})
 		if err != nil {
 			return nil, nil, err
@@ -189,21 +195,16 @@ func cloneRepo(pool *pooltypes.Pool) (*docker.Image, *docker.Image, error) {
 	protocol.ref = plumbing.NewHashReference(plumbing.NewBranchReferenceName("rapha/dockerization-e2etest"), plumbing.NewHash("34e7d141505997910666e7327ea8d9ae4971723a"))
 	integration.ref = plumbing.NewHashReference(plumbing.NewBranchReferenceName("rapha/dockerization-e2etest"), plumbing.NewHash("34e7d141505997910666e7327ea8d9ae4971723a"))
 
-	cli, err := client.NewClientWithOpts()
-	if err != nil {
-		return nil, nil, fmt.Errorf("failed to create docker client: %v", err)
-	}
-	//goland:noinspection GoUnhandledErrorResult
-	defer cli.Close()
-
 	images := map[kyveRef]docker.Image{
 		*protocol: {
-			Path: protocol.path,
-			Tags: []string{fmt.Sprintf("%s:%s", protocol.name, protocol.ver.String())},
+			Path:   protocol.path,
+			Tags:   []string{fmt.Sprintf("%s/%s:%s", strings.ToLower(repoName), protocol.name, protocol.ver.String())},
+			Labels: map[string]string{cleanupLabel: ""},
 		},
 		*integration: {
-			Path: integration.path,
-			Tags: []string{fmt.Sprintf("%s:%s", integration.name, integration.ver.String())},
+			Path:   integration.path,
+			Tags:   []string{fmt.Sprintf("%s/%s:%s", strings.ToLower(repoName), integration.name, integration.ver.String())},
+			Labels: map[string]string{cleanupLabel: ""},
 		},
 	}
 
@@ -239,6 +240,61 @@ func cloneRepo(pool *pooltypes.Pool) (*docker.Image, *docker.Image, error) {
 	return &p, &i, nil
 }
 
+// removeContainers removes all containers and networks with the given label
+func removeContainers(cli *client.Client, label string) error {
+	err := docker.RemoveContainers(context.Background(), cli, label)
+	if err != nil {
+		return err
+	}
+	return docker.RemoveNetworks(context.Background(), cli, label)
+}
+
+// startContainers starts the protocol and integration containers
+func startContainers(cli *client.Client, valConfig config.ValaccountConfig, pool *pooltypes.Pool, debug bool, protocol *docker.Image, integration *docker.Image, cleanupLabel string) error {
+	env, err := docker.CreateProtocolEnv(docker.ProtocolEnv{
+		Valaccount:  valConfig.Valaccount,
+		RpcAddress:  config.Config.RPC,
+		RestAddress: config.Config.REST,
+		Host:        integration.TagsLastPartWithoutVersion()[0],
+		PoolId:      pool.Id,
+		Debug:       debug,
+		ChainId:     "kaon-1",
+	})
+	if err != nil {
+		return err
+	}
+
+	pConfig := docker.ContainerConfig{
+		Image: protocol.Tags[0],
+		Name:  protocol.TagsLastPartWithoutVersion()[0],
+		Network: docker.NetworkConfig{
+			Name:   cleanupLabel,
+			Labels: map[string]string{cleanupLabel: ""},
+		},
+		Env: env,
+	}
+
+	iConfig := docker.ContainerConfig{
+		Image: integration.Tags[0],
+		Name:  integration.TagsLastPartWithoutVersion()[0],
+		Network: docker.NetworkConfig{
+			Name:   cleanupLabel,
+			Labels: map[string]string{cleanupLabel: ""},
+		},
+	}
+
+	_, err = docker.StartContainer(context.Background(), cli, pConfig)
+	if err != nil {
+		return err
+	}
+
+	_, err = docker.StartContainer(context.Background(), cli, iConfig)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func startCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     StartCmdConfig.Name,
@@ -258,16 +314,18 @@ func startCmd() *cobra.Command {
 			}
 
 			// Valaccount config
-			valConfig, err := utils.GetOptionFromPromptOrFlag(cmd, flagStartValaccount)
+			valaccOption, err := utils.GetOptionFromPromptOrFlag(cmd, flagStartValaccount)
 			if err != nil {
 				return err
 			}
+			valConfig := valaccOption.Value()
 
 			// Env file
-			envFile, err := utils.GetStringFromPromptOrFlag(cmd, flagStartEnvFile)
-			if err != nil {
-				return err
-			}
+			//// TODO: use this
+			//envFile, err := utils.GetStringFromPromptOrFlag(cmd, flagStartEnvFile)
+			//if err != nil {
+			//	return err
+			//}
 
 			// Debug
 			debug, err := utils.GetBoolFromPromptOrFlag(cmd, flagStartDebug)
@@ -278,21 +336,32 @@ func startCmd() *cobra.Command {
 			fmt.Println("Starting KYSOR...")
 			fmt.Printf("Running on platform and architecture: %s - %s\n", runtime.GOOS, runtime.GOARCH)
 
-			fmt.Println("Valaccount:", valConfig.Name())
-			fmt.Println("Env file:", envFile)
-			fmt.Println("Debug:", debug)
-
-			response, err := kyveClient.QueryPool(valConfig.Value().Pool)
+			response, err := kyveClient.QueryPool(valConfig.Pool)
 			if err != nil {
 				return fmt.Errorf("failed to query pool: %v", err)
 			}
+			pool := response.GetPool().Data
 
-			_, _, err = cloneRepo(response.GetPool().Data)
+			cli, err := client.NewClientWithOpts()
+			if err != nil {
+				return fmt.Errorf("failed to create docker client: %v", err)
+			}
+			//goland:noinspection GoUnhandledErrorResult
+			defer cli.Close()
+
+			cleanupLabel := fmt.Sprintf("kysor-pool-%d", pool.Id)
+
+			protocol, integration, err := buildImagesFromGithub(cli, pool, cleanupLabel)
 			if err != nil {
 				return fmt.Errorf("failed to clone repository: %v", err)
 			}
 
-			return nil
+			err = removeContainers(cli, cleanupLabel)
+			if err != nil {
+				return err
+			}
+
+			return startContainers(cli, valConfig, pool, debug, protocol, integration, cleanupLabel)
 		},
 	}
 	utils.AddOptionFlags(cmd, []types.OptionFlag[config.ValaccountConfig]{flagStartValaccount})

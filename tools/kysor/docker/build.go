@@ -12,12 +12,29 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 type Image struct {
 	Path   string
 	Tags   []string
 	Labels map[string]string
+}
+
+func (i Image) TagsWithoutVersion() []string {
+	var result []string
+	for _, tag := range i.Tags {
+		result = append(result, tag[:strings.LastIndex(tag, ":")])
+	}
+	return result
+}
+
+func (i Image) TagsLastPartWithoutVersion() []string {
+	var result []string
+	for _, tag := range i.TagsWithoutVersion() {
+		result = append(result, tag[strings.LastIndex(tag, "/")+1:])
+	}
+	return result
 }
 
 type errorLine struct {
