@@ -155,8 +155,14 @@ func getRuntimeVersions(repo *git.Repository, pool *pooltypes.Pool, repoDir stri
 	return latestProtocolVersion, latestRuntimeVersion, nil
 }
 
-// buildImagesFromGithub clones the kyvejs repository and builds the protocol and integration images
-func buildImagesFromGithub(cli *client.Client, pool *pooltypes.Pool, label string) (*docker.Image, *docker.Image, error) {
+type kyveJsRepo struct {
+	name string
+	dir  string
+	repo *git.Repository
+}
+
+// pullRepo clones or pulls the kyvejs repository
+func pullRepo() (*kyveJsRepo, error) {
 	repoName := "github.com/KYVENetwork/kyvejs"
 	repoUrl := fmt.Sprintf("https://%s.git", repoName)
 	repoDir := filepath.Join(config.GetConfigDir(), "kyvejs")
@@ -168,32 +174,45 @@ func buildImagesFromGithub(cli *client.Client, pool *pooltypes.Pool, label strin
 		repo, err = git.PlainClone(repoDir, false, &git.CloneOptions{
 			URL:      repoUrl,
 			Progress: os.Stdout,
-			Mirror:   true,
 		})
 		if err != nil {
-			return nil, nil, err
+			return nil, err
 		}
 	} else {
 		// Otherwise open the existing repository
 		repo, err = git.PlainOpen(repoDir)
 		if err != nil {
-			return nil, nil, err
+			return nil, err
 		}
 
 		w, err := repo.Worktree()
 		if err != nil {
-			return nil, nil, err
+			return nil, err
 		}
 
 		// Pull the latest changes
 		fmt.Println("⬇️  Pulling latest changes")
 		err = w.Pull(&git.PullOptions{RemoteName: "origin", Force: true})
 		if err != nil && !errors.Is(err, git.NoErrAlreadyUpToDate) && !errors.Is(err, git.ErrNonFastForwardUpdate) {
-			return nil, nil, err
+			return nil, err
 		}
 	}
 
-	protocol, integration, err := getRuntimeVersions(repo, pool, repoDir)
+	return &kyveJsRepo{
+		repo: repo,
+		name: repoName,
+		dir:  repoDir,
+	}, nil
+}
+
+// buildImages builds the protocol and integration images
+func buildImages(kr *kyveJsRepo, cli *client.Client, pool *pooltypes.Pool, label string) (*docker.Image, *docker.Image, error) {
+	w, err := kr.repo.Worktree()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	protocol, integration, err := getRuntimeVersions(kr.repo, pool, kr.dir)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -205,29 +224,18 @@ func buildImagesFromGithub(cli *client.Client, pool *pooltypes.Pool, label strin
 	images := map[kyveRef]docker.Image{
 		*protocol: {
 			Path:   protocol.path,
-			Tags:   []string{fmt.Sprintf("%s/%s:%s", strings.ToLower(repoName), protocol.name, protocol.ver.String())},
+			Tags:   []string{fmt.Sprintf("%s/%s:%s", strings.ToLower(kr.name), protocol.name, protocol.ver.String())},
 			Labels: map[string]string{globalCleanupLabel: "", label: ""},
 		},
 		*integration: {
 			Path:   integration.path,
-			Tags:   []string{fmt.Sprintf("%s/%s:%s", strings.ToLower(repoName), integration.name, integration.ver.String())},
+			Tags:   []string{fmt.Sprintf("%s/%s:%s", strings.ToLower(kr.name), integration.name, integration.ver.String())},
 			Labels: map[string]string{globalCleanupLabel: "", label: ""},
 		},
 	}
 
-	w, err := repo.Worktree()
-	if err != nil {
-		return nil, nil, err
-	}
-
 	for kRef, img := range images {
 		fmt.Printf("📦  Checkout %s\n", kRef.ref.Name().Short())
-
-		err = w.Pull(&git.PullOptions{ReferenceName: kRef.ref.Name(), Force: true})
-		if err != nil && !errors.Is(err, git.NoErrAlreadyUpToDate) {
-			return nil, nil, err
-		}
-
 		err := w.Checkout(&git.CheckoutOptions{
 			Hash:  kRef.ref.Hash(),
 			Force: true,
@@ -371,9 +379,14 @@ func startCmd() *cobra.Command {
 
 			label := fmt.Sprintf("kysor-pool-%d", pool.Id)
 
-			protocol, integration, err := buildImagesFromGithub(cli, pool, label)
+			repo, err := pullRepo()
 			if err != nil {
-				return fmt.Errorf("failed to clone repository: %v", err)
+				return err
+			}
+
+			protocol, integration, err := buildImages(repo, cli, pool, label)
+			if err != nil {
+				return fmt.Errorf("failed to build images: %v", err)
 			}
 
 			err = tearDownContainers(cli, label)
