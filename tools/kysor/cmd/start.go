@@ -14,14 +14,21 @@ import (
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/hashicorp/go-version"
+	"github.com/knadh/koanf/parsers/dotenv"
+	"github.com/knadh/koanf/providers/file"
+	"github.com/knadh/koanf/v2"
+	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
+	"time"
 )
 
 var StartCmdConfig = types.CmdConfig{Name: "start", Short: "Start KYSOR"}
+
+var globalCleanupLabel = "kysor-all"
 
 var (
 	flagStartValaccount = types.OptionFlag[config.ValaccountConfig]{
@@ -149,7 +156,7 @@ func getRuntimeVersions(repo *git.Repository, pool *pooltypes.Pool, repoDir stri
 }
 
 // buildImagesFromGithub clones the kyvejs repository and builds the protocol and integration images
-func buildImagesFromGithub(cli *client.Client, pool *pooltypes.Pool, cleanupLabel string) (*docker.Image, *docker.Image, error) {
+func buildImagesFromGithub(cli *client.Client, pool *pooltypes.Pool, label string) (*docker.Image, *docker.Image, error) {
 	repoName := "github.com/KYVENetwork/kyvejs"
 	repoUrl := fmt.Sprintf("https://%s.git", repoName)
 	repoDir := filepath.Join(config.GetConfigDir(), "kyvejs")
@@ -199,12 +206,12 @@ func buildImagesFromGithub(cli *client.Client, pool *pooltypes.Pool, cleanupLabe
 		*protocol: {
 			Path:   protocol.path,
 			Tags:   []string{fmt.Sprintf("%s/%s:%s", strings.ToLower(repoName), protocol.name, protocol.ver.String())},
-			Labels: map[string]string{cleanupLabel: ""},
+			Labels: map[string]string{globalCleanupLabel: "", label: ""},
 		},
 		*integration: {
 			Path:   integration.path,
 			Tags:   []string{fmt.Sprintf("%s/%s:%s", strings.ToLower(repoName), integration.name, integration.ver.String())},
-			Labels: map[string]string{cleanupLabel: ""},
+			Labels: map[string]string{globalCleanupLabel: "", label: ""},
 		},
 	}
 
@@ -240,22 +247,19 @@ func buildImagesFromGithub(cli *client.Client, pool *pooltypes.Pool, cleanupLabe
 	return &p, &i, nil
 }
 
-// removeContainers removes all containers and networks with the given label
-func removeContainers(cli *client.Client, label string) error {
-	err := docker.RemoveContainers(context.Background(), cli, label)
-	if err != nil {
-		return err
-	}
-	return docker.RemoveNetworks(context.Background(), cli, label)
-}
-
 // startContainers starts the protocol and integration containers
-func startContainers(cli *client.Client, valConfig config.ValaccountConfig, pool *pooltypes.Pool, debug bool, protocol *docker.Image, integration *docker.Image, cleanupLabel string) error {
+func startContainers(cli *client.Client, valConfig config.ValaccountConfig, pool *pooltypes.Pool, debug bool, protocol *docker.Image, integration *docker.Image, label string, integrationEnv []string) error {
+	protocolName := fmt.Sprintf("kysor-%s", protocol.TagsLastPartWithoutVersion()[0])
+	integrationName := fmt.Sprintf("kysor-%s", integration.TagsLastPartWithoutVersion()[0])
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
+	defer cancel()
+
 	env, err := docker.CreateProtocolEnv(docker.ProtocolEnv{
 		Valaccount:  valConfig.Valaccount,
 		RpcAddress:  config.Config.RPC,
 		RestAddress: config.Config.REST,
-		Host:        integration.TagsLastPartWithoutVersion()[0],
+		Host:        integrationName,
 		PoolId:      pool.Id,
 		Debug:       debug,
 		ChainId:     "kaon-1",
@@ -264,31 +268,34 @@ func startContainers(cli *client.Client, valConfig config.ValaccountConfig, pool
 		return err
 	}
 
-	pConfig := docker.ContainerConfig{
-		Image: protocol.Tags[0],
-		Name:  protocol.TagsLastPartWithoutVersion()[0],
-		Network: docker.NetworkConfig{
-			Name:   cleanupLabel,
-			Labels: map[string]string{cleanupLabel: ""},
-		},
-		Env: env,
-	}
-
-	iConfig := docker.ContainerConfig{
-		Image: integration.Tags[0],
-		Name:  integration.TagsLastPartWithoutVersion()[0],
-		Network: docker.NetworkConfig{
-			Name:   cleanupLabel,
-			Labels: map[string]string{cleanupLabel: ""},
-		},
-	}
-
-	_, err = docker.StartContainer(context.Background(), cli, pConfig)
+	err = docker.CreateNetwork(ctx, cli, docker.NetworkConfig{
+		Name:   label,
+		Labels: map[string]string{globalCleanupLabel: "", label: ""},
+	})
 	if err != nil {
 		return err
 	}
 
-	_, err = docker.StartContainer(context.Background(), cli, iConfig)
+	pConfig := docker.ContainerConfig{
+		Image:   protocol.Tags[0],
+		Name:    protocolName,
+		Network: label,
+		Env:     env,
+	}
+
+	iConfig := docker.ContainerConfig{
+		Image:   integration.Tags[0],
+		Name:    integrationName,
+		Network: label,
+		Env:     integrationEnv,
+	}
+
+	_, err = docker.StartContainer(ctx, cli, pConfig)
+	if err != nil {
+		return err
+	}
+
+	_, err = docker.StartContainer(ctx, cli, iConfig)
 	if err != nil {
 		return err
 	}
@@ -321,20 +328,30 @@ func startCmd() *cobra.Command {
 			valConfig := valaccOption.Value()
 
 			// Env file
-			//// TODO: use this
-			//envFile, err := utils.GetStringFromPromptOrFlag(cmd, flagStartEnvFile)
-			//if err != nil {
-			//	return err
-			//}
+			var integrationEnv []string
+			envFile, err := utils.GetStringFromPromptOrFlag(cmd, flagStartEnvFile)
+			if err != nil {
+				return err
+			}
+			if envFile != "" {
+				path, err := homedir.Expand(envFile)
+				if err != nil {
+					return err
+				}
+				var k = koanf.New(".")
+				if err := k.Load(file.Provider(path), dotenv.Parser()); err != nil {
+					return fmt.Errorf("failed to load env file: %v", err)
+				}
+				for key, value := range k.All() {
+					integrationEnv = append(integrationEnv, fmt.Sprintf("%s=%v", key, value))
+				}
+			}
 
 			// Debug
 			debug, err := utils.GetBoolFromPromptOrFlag(cmd, flagStartDebug)
 			if err != nil {
 				return err
 			}
-
-			fmt.Println("Starting KYSOR...")
-			fmt.Printf("Running on platform and architecture: %s - %s\n", runtime.GOOS, runtime.GOARCH)
 
 			response, err := kyveClient.QueryPool(valConfig.Pool)
 			if err != nil {
@@ -349,19 +366,27 @@ func startCmd() *cobra.Command {
 			//goland:noinspection GoUnhandledErrorResult
 			defer cli.Close()
 
-			cleanupLabel := fmt.Sprintf("kysor-pool-%d", pool.Id)
+			fmt.Println("Starting KYSOR...")
+			fmt.Printf("Running on platform and architecture: %s - %s\n\n", runtime.GOOS, runtime.GOARCH)
 
-			protocol, integration, err := buildImagesFromGithub(cli, pool, cleanupLabel)
+			label := fmt.Sprintf("kysor-pool-%d", pool.Id)
+
+			protocol, integration, err := buildImagesFromGithub(cli, pool, label)
 			if err != nil {
 				return fmt.Errorf("failed to clone repository: %v", err)
 			}
 
-			err = removeContainers(cli, cleanupLabel)
+			err = tearDownContainers(cli, label)
 			if err != nil {
 				return err
 			}
 
-			return startContainers(cli, valConfig, pool, debug, protocol, integration, cleanupLabel)
+			err = startContainers(cli, valConfig, pool, debug, protocol, integration, label, integrationEnv)
+			if err != nil {
+				return err
+			}
+			fmt.Println("✅   KYSOR started successfully")
+			return nil
 		},
 	}
 	utils.AddOptionFlags(cmd, []types.OptionFlag[config.ValaccountConfig]{flagStartValaccount})

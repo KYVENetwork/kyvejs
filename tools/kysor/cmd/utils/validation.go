@@ -3,6 +3,7 @@ package utils
 import (
 	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/mitchellh/go-homedir"
 	"os"
 	"strconv"
 )
@@ -60,7 +61,11 @@ func ValidateKyveAddress(input string) error {
 }
 
 func ValidatePathExists(input string) error {
-	if _, err := os.Stat(input); os.IsNotExist(err) {
+	path, err := homedir.Expand(input)
+	if err != nil {
+		return err
+	}
+	if _, err := os.Stat(path); os.IsNotExist(err) {
 		return fmt.Errorf("path does not exist")
 	}
 	return nil
