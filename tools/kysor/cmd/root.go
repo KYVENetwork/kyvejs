@@ -31,6 +31,7 @@ var rootCmd = &cobra.Command{
 			options := []types.CmdConfig{
 				InitCmdConfig,
 				StartCmdConfig,
+				StopCmdConfig,
 				ValaccountsCmdConfig,
 				VersionCmdConfig,
 			}
@@ -48,6 +49,8 @@ var rootCmd = &cobra.Command{
 				return initCmd(config).Execute()
 			case StartCmdConfig.Name:
 				return startCmd().Execute()
+			case StopCmdConfig.Name:
+				return stopCmd().Execute()
 			case ValaccountsCmdConfig.Name:
 				return valaccountsCmd().Execute()
 			case VersionCmdConfig.Name:
