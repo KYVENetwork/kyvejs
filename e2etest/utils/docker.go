@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"os/user"
 	"path/filepath"
-	"slices"
 	"time"
 
 	"github.com/KYVENetwork/kyvejs/tools/kysor/docker"
@@ -275,11 +274,14 @@ type ProtocolRunner struct {
 	networkId         string
 	restAddress       string
 	rpcAddress        string
+	label             string
 }
 
 func NewProtocolRunner(testConfig TestConfig, networkId string, restAddress string, rpcAddress string) *ProtocolRunner {
 	integrationImageName := integrationImage(testConfig.Integration)
 	integrationName := fmt.Sprintf("%s-%s-%s", cleanupLabel, integrationImagePrefix, testConfig.Integration.Name)
+	label := fmt.Sprintf("%s-%s", cleanupLabel, testConfig.Integration.Name)
+
 	var protocolConfigs []docker.ContainerConfig
 	for _, cfg := range testConfig.GetProtocolConfigs() {
 		name := fmt.Sprintf("%s-%s-%s-%s", cleanupLabel, protocolImage.Tags[0], integrationImageName, cfg.ProtocolNode.KeyName())
@@ -301,6 +303,7 @@ func NewProtocolRunner(testConfig TestConfig, networkId string, restAddress stri
 			Network: networkId,
 			Env:     env,
 			Binds:   binds,
+			Labels:  map[string]string{cleanupLabel: "", label: ""},
 		})
 	}
 	return &ProtocolRunner{
@@ -309,11 +312,13 @@ func NewProtocolRunner(testConfig TestConfig, networkId string, restAddress stri
 			Name:    fmt.Sprintf("%s-%s-%s", cleanupLabel, testapiImage.Tags[0], integrationImageName),
 			Network: networkId,
 			Binds:   []string{fmt.Sprintf("%s:%s:ro", testConfig.Integration.TestDataApiPath, kyveStorageMountApi)},
+			Labels:  map[string]string{cleanupLabel: "", label: ""},
 		},
 		integrationConfig: docker.ContainerConfig{
 			Image:   integrationImageName,
 			Name:    fmt.Sprintf("%s-%s", cleanupLabel, integrationImageName),
 			Network: networkId,
+			Labels:  map[string]string{cleanupLabel: "", label: ""},
 		},
 		protocolConfigs: protocolConfigs,
 		testConfig:      testConfig,
@@ -321,6 +326,7 @@ func NewProtocolRunner(testConfig TestConfig, networkId string, restAddress stri
 		networkId:       networkId,
 		restAddress:     restAddress,
 		rpcAddress:      rpcAddress,
+		label:           label,
 	}
 }
 
@@ -332,7 +338,7 @@ func kyveStorageVolumeName(integration Integration) string {
 	return fmt.Sprintf("%s-%s", kyveStorageName, integrationImage(integration))
 }
 
-func (pc *ProtocolRunner) RunProtocolNodes() error {
+func (pc *ProtocolRunner) RunProtocolContainers() error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
 
@@ -365,7 +371,7 @@ func (pc *ProtocolRunner) RunProtocolNodes() error {
 	return nil
 }
 
-func (pc *ProtocolRunner) StopProtocolNodes() error {
+func (pc *ProtocolRunner) StopProtocolContainers() error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*60)
 	defer cancel()
 
@@ -376,33 +382,12 @@ func (pc *ProtocolRunner) StopProtocolNodes() error {
 	//goland:noinspection GoUnhandledErrorResult
 	defer cli.Close()
 
-	// Get all containers with the cleanup label
-	containers, err := cli.ContainerList(ctx, types.ContainerListOptions{
-		All: true,
-		Filters: filters.NewArgs(
-			filters.Arg("label", fmt.Sprintf("%s=", cleanupLabel)),
-		),
-	})
+	// Stop containers
+	_, err = docker.StopContainers(ctx, cli, pc.label)
 	if err != nil {
 		return err
 	}
 
-	// Collect all containers that should be removed
-	toBeRemoved := []string{"/" + pc.testapiConfig.Name, "/" + pc.integrationConfig.Name}
-	for _, protocol := range pc.protocolConfigs {
-		toBeRemoved = append(toBeRemoved, "/"+protocol.Name)
-	}
-
-	// Remove the containers
-	for _, cont := range containers {
-		if slices.Contains(toBeRemoved, cont.Names[0]) {
-			err = cli.ContainerRemove(ctx, cont.ID, types.ContainerRemoveOptions{
-				Force: true,
-			})
-			if err != nil {
-				return err
-			}
-		}
-	}
-	return nil
+	// Remove containers
+	return docker.RemoveContainers(ctx, cli, pc.label)
 }

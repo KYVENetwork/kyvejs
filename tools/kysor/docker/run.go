@@ -23,7 +23,7 @@ type ContainerConfig struct {
 	Env     []string
 	Binds   []string
 	Cmd     []string
-	Labels  []string
+	Labels  map[string]string
 }
 
 func CreateNetwork(ctx context.Context, cli *client.Client, network NetworkConfig) error {
@@ -53,13 +53,6 @@ func StartContainer(ctx context.Context, cli *client.Client, config ContainerCon
 			config.Network: {},
 		}
 	}
-	var labels map[string]string
-	if config.Labels != nil {
-		labels = make(map[string]string)
-		for _, label := range config.Labels {
-			labels[label] = ""
-		}
-	}
 
 	r, err := cli.ContainerCreate(
 		ctx,
@@ -68,7 +61,7 @@ func StartContainer(ctx context.Context, cli *client.Client, config ContainerCon
 			Env:    config.Env,
 			Cmd:    config.Cmd,
 			User:   config.User,
-			Labels: labels,
+			Labels: config.Labels,
 		},
 		&container.HostConfig{
 			Binds: config.Binds,

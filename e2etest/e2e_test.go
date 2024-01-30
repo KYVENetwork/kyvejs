@@ -180,9 +180,9 @@ func TestProtocolNode(t *testing.T) {
 			g := NewWithT(t)
 			protocolRunner := utils.NewProtocolRunner(testConfig, network, kyveChain.GetAPIAddress(), kyveChain.GetRPCAddress())
 
-			g.Expect(protocolRunner.RunProtocolNodes()).To(BeNil())
+			g.Expect(protocolRunner.RunProtocolContainers()).To(BeNil())
 			defer func() {
-				err := protocolRunner.StopProtocolNodes()
+				err := protocolRunner.StopProtocolContainers()
 				if err != nil {
 					log.Error(err.Error())
 				}
