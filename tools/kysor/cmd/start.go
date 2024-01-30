@@ -17,6 +17,7 @@ import (
 	"github.com/knadh/koanf/parsers/dotenv"
 	"github.com/knadh/koanf/providers/file"
 	"github.com/knadh/koanf/v2"
+	goTerminal "github.com/leandroveronezi/go-terminal"
 	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"os"
@@ -304,11 +305,19 @@ func startContainers(cli *client.Client, valConfig config.ValaccountConfig, pool
 	if err != nil {
 		return err
 	}
+	fmt.Print("🚀  Started container ")
+	goTerminal.SetSGR(goTerminal.Reset, goTerminal.Italic)
+	fmt.Println(protocolName)
+	goTerminal.SetSGR(goTerminal.Reset)
 
 	_, err = docker.StartContainer(ctx, cli, iConfig)
 	if err != nil {
 		return err
 	}
+	fmt.Print("🚀  Started container ")
+	goTerminal.SetSGR(goTerminal.Reset, goTerminal.Italic)
+	fmt.Println(integrationName)
+	goTerminal.SetSGR(goTerminal.Reset)
 	return nil
 }
 
@@ -384,8 +393,8 @@ func startCmd() *cobra.Command {
 			//goland:noinspection GoUnhandledErrorResult
 			defer cli.Close()
 
-			fmt.Println("Starting KYSOR...")
-			fmt.Printf("Running on platform and architecture: %s - %s\n\n", runtime.GOOS, runtime.GOARCH)
+			fmt.Println("    Starting KYSOR...")
+			fmt.Printf("    Running on platform and architecture: %s - %s\n\n", runtime.GOOS, runtime.GOARCH)
 
 			// Clone or pull the kyvejs repository
 			repo, err := pullRepo()
@@ -411,7 +420,12 @@ func startCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			fmt.Println("✅   KYSOR started successfully")
+			fmt.Println()
+			fmt.Println("🔍  Use following commands to view the logs:")
+			goTerminal.SetSGR(goTerminal.Reset, goTerminal.Italic)
+			fmt.Printf("    docker logs -f kysor-%s\n", protocol.TagsLastPartWithoutVersion()[0])
+			fmt.Printf("    docker logs -f kysor-%s\n", integration.TagsLastPartWithoutVersion()[0])
+			goTerminal.SetSGR(goTerminal.Reset)
 			return nil
 		},
 	}

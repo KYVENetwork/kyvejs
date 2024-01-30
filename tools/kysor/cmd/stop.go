@@ -6,7 +6,9 @@ import (
 	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/types"
 	"github.com/KYVENetwork/kyvejs/tools/kysor/docker"
 	"github.com/docker/docker/client"
+	goTerminal "github.com/leandroveronezi/go-terminal"
 	"github.com/spf13/cobra"
+	"strings"
 	"time"
 )
 
@@ -17,9 +19,15 @@ func tearDownContainers(cli *client.Client, label string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
 	defer cancel()
 
-	err := docker.StopContainers(ctx, cli, label)
+	containers, err := docker.StopContainers(ctx, cli, label)
 	if err != nil {
 		return err
+	}
+	for _, container := range containers {
+		fmt.Print("🔌  Stopped container ")
+		goTerminal.SetSGR(goTerminal.Reset, goTerminal.Italic)
+		fmt.Println(strings.TrimPrefix(container.Names[0], "/"))
+		goTerminal.SetSGR(goTerminal.Reset)
 	}
 
 	err = docker.RemoveContainers(ctx, cli, label)

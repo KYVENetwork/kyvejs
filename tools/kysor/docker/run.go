@@ -90,21 +90,21 @@ func StartContainer(ctx context.Context, cli *client.Client, config ContainerCon
 	return r.ID, nil
 }
 
-func StopContainers(ctx context.Context, cli *client.Client, label string) error {
+func StopContainers(ctx context.Context, cli *client.Client, label string) ([]types.Container, error) {
 	containers, err := cli.ContainerList(ctx, types.ContainerListOptions{
 		Filters: filters.NewArgs(filters.Arg("label", fmt.Sprintf("%s=", label))),
 	})
 	if err != nil {
-		return fmt.Errorf("failed to list containers: %v", err)
+		return nil, fmt.Errorf("failed to list containers: %v", err)
 	}
 
 	for _, c := range containers {
 		err = cli.ContainerStop(ctx, c.ID, container.StopOptions{})
 		if err != nil {
-			return fmt.Errorf("failed to stop container %s (%s): %v", c.Names[0], c.ID, err)
+			return nil, fmt.Errorf("failed to stop container %s (%s): %v", c.Names[0], c.ID, err)
 		}
 	}
-	return nil
+	return containers, nil
 }
 
 func RemoveContainers(ctx context.Context, cli *client.Client, label string) error {
