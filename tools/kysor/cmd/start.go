@@ -155,14 +155,14 @@ func getRuntimeVersions(repo *git.Repository, pool *pooltypes.Pool, repoDir stri
 	return latestProtocolVersion, latestRuntimeVersion, nil
 }
 
-type kyveJsRepo struct {
+type kyveRepo struct {
 	name string
 	dir  string
 	repo *git.Repository
 }
 
 // pullRepo clones or pulls the kyvejs repository
-func pullRepo() (*kyveJsRepo, error) {
+func pullRepo() (*kyveRepo, error) {
 	repoName := "github.com/KYVENetwork/kyvejs"
 	repoUrl := fmt.Sprintf("https://%s.git", repoName)
 	repoDir := filepath.Join(config.GetConfigDir(), "kyvejs")
@@ -198,15 +198,29 @@ func pullRepo() (*kyveJsRepo, error) {
 		}
 	}
 
-	return &kyveJsRepo{
+	return &kyveRepo{
 		repo: repo,
 		name: repoName,
 		dir:  repoDir,
 	}, nil
 }
 
+func buildImage(worktree *git.Worktree, ref *plumbing.Reference, cli *client.Client, image docker.Image) error {
+	fmt.Printf("📦  Checkout %s\n", ref.Name().Short())
+	err := worktree.Checkout(&git.CheckoutOptions{
+		Hash:  ref.Hash(),
+		Force: true,
+	})
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("🏗️ Building %s ...\n", image.Tags[0])
+	return docker.BuildImage(context.Background(), cli, image)
+}
+
 // buildImages builds the protocol and integration images
-func buildImages(kr *kyveJsRepo, cli *client.Client, pool *pooltypes.Pool, label string) (*docker.Image, *docker.Image, error) {
+func buildImages(kr *kyveRepo, cli *client.Client, pool *pooltypes.Pool, label string) (*docker.Image, *docker.Image, error) {
 	w, err := kr.repo.Worktree()
 	if err != nil {
 		return nil, nil, err
@@ -221,38 +235,26 @@ func buildImages(kr *kyveJsRepo, cli *client.Client, pool *pooltypes.Pool, label
 	protocol.ref = plumbing.NewHashReference(plumbing.NewBranchReferenceName("rapha/dockerization-e2etest"), plumbing.NewHash("34e7d141505997910666e7327ea8d9ae4971723a"))
 	integration.ref = plumbing.NewHashReference(plumbing.NewBranchReferenceName("rapha/dockerization-e2etest"), plumbing.NewHash("34e7d141505997910666e7327ea8d9ae4971723a"))
 
-	images := map[kyveRef]docker.Image{
-		*protocol: {
-			Path:   protocol.path,
-			Tags:   []string{fmt.Sprintf("%s/%s:%s", strings.ToLower(kr.name), protocol.name, protocol.ver.String())},
-			Labels: map[string]string{globalCleanupLabel: "", label: ""},
-		},
-		*integration: {
-			Path:   integration.path,
-			Tags:   []string{fmt.Sprintf("%s/%s:%s", strings.ToLower(kr.name), integration.name, integration.ver.String())},
-			Labels: map[string]string{globalCleanupLabel: "", label: ""},
-		},
+	protocolImage := docker.Image{
+		Path:   protocol.path,
+		Tags:   []string{fmt.Sprintf("%s/%s:%s", strings.ToLower(kr.name), protocol.name, protocol.ver.String())},
+		Labels: map[string]string{globalCleanupLabel: "", label: ""},
+	}
+	integrationImage := docker.Image{
+		Path:   integration.path,
+		Tags:   []string{fmt.Sprintf("%s/%s:%s", strings.ToLower(kr.name), integration.name, integration.ver.String())},
+		Labels: map[string]string{globalCleanupLabel: "", label: ""},
 	}
 
-	for kRef, img := range images {
-		fmt.Printf("📦  Checkout %s\n", kRef.ref.Name().Short())
-		err := w.Checkout(&git.CheckoutOptions{
-			Hash:  kRef.ref.Hash(),
-			Force: true,
-		})
-		if err != nil {
-			return nil, nil, err
-		}
-
-		fmt.Printf("🏗️ Building %s ...\n", img.Tags[0])
-		err = docker.BuildImage(context.Background(), cli, img)
-		if err != nil {
-			return nil, nil, err
-		}
+	err = buildImage(w, protocol.ref, cli, protocolImage)
+	if err != nil {
+		return nil, nil, err
 	}
-	p := images[*protocol]
-	i := images[*integration]
-	return &p, &i, nil
+	err = buildImage(w, integration.ref, cli, integrationImage)
+	if err != nil {
+		return nil, nil, err
+	}
+	return &protocolImage, &integrationImage, nil
 }
 
 // startContainers starts the protocol and integration containers
@@ -310,6 +312,28 @@ func startContainers(cli *client.Client, valConfig config.ValaccountConfig, pool
 	return nil
 }
 
+func getIntegrationEnv(cmd *cobra.Command) ([]string, error) {
+	var integrationEnv []string
+	envFile, err := utils.GetStringFromPromptOrFlag(cmd, flagStartEnvFile)
+	if err != nil {
+		return nil, err
+	}
+	if envFile != "" {
+		path, err := homedir.Expand(envFile)
+		if err != nil {
+			return nil, err
+		}
+		var k = koanf.New(".")
+		if err := k.Load(file.Provider(path), dotenv.Parser()); err != nil {
+			return nil, fmt.Errorf("failed to load env file: %v", err)
+		}
+		for key, value := range k.All() {
+			integrationEnv = append(integrationEnv, fmt.Sprintf("%s=%v", key, value))
+		}
+	}
+	return integrationEnv, nil
+}
+
 func startCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     StartCmdConfig.Name,
@@ -335,24 +359,10 @@ func startCmd() *cobra.Command {
 			}
 			valConfig := valaccOption.Value()
 
-			// Env file
-			var integrationEnv []string
-			envFile, err := utils.GetStringFromPromptOrFlag(cmd, flagStartEnvFile)
+			// Env vars
+			integrationEnv, err := getIntegrationEnv(cmd)
 			if err != nil {
 				return err
-			}
-			if envFile != "" {
-				path, err := homedir.Expand(envFile)
-				if err != nil {
-					return err
-				}
-				var k = koanf.New(".")
-				if err := k.Load(file.Provider(path), dotenv.Parser()); err != nil {
-					return fmt.Errorf("failed to load env file: %v", err)
-				}
-				for key, value := range k.All() {
-					integrationEnv = append(integrationEnv, fmt.Sprintf("%s=%v", key, value))
-				}
 			}
 
 			// Debug
@@ -377,23 +387,26 @@ func startCmd() *cobra.Command {
 			fmt.Println("Starting KYSOR...")
 			fmt.Printf("Running on platform and architecture: %s - %s\n\n", runtime.GOOS, runtime.GOARCH)
 
-			label := fmt.Sprintf("kysor-pool-%d", pool.Id)
-
+			// Clone or pull the kyvejs repository
 			repo, err := pullRepo()
 			if err != nil {
 				return err
 			}
 
+			// Build images
+			label := fmt.Sprintf("kysor-pool-%d", pool.Id)
 			protocol, integration, err := buildImages(repo, cli, pool, label)
 			if err != nil {
 				return fmt.Errorf("failed to build images: %v", err)
 			}
 
+			// Stop and remove existing containers
 			err = tearDownContainers(cli, label)
 			if err != nil {
 				return err
 			}
 
+			// Start containers
 			err = startContainers(cli, valConfig, pool, debug, protocol, integration, label, integrationEnv)
 			if err != nil {
 				return err
