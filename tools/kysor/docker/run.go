@@ -18,14 +18,15 @@ type NetworkConfig struct {
 type ContainerConfig struct {
 	Image   string
 	Name    string
-	Network NetworkConfig
+	Network string
 	User    string
 	Env     []string
 	Binds   []string
 	Cmd     []string
+	Labels  []string
 }
 
-func createNetwork(ctx context.Context, cli *client.Client, network NetworkConfig) error {
+func CreateNetwork(ctx context.Context, cli *client.Client, network NetworkConfig) error {
 	networks, err := cli.NetworkList(ctx, types.NetworkListOptions{})
 	if err != nil {
 		return err
@@ -47,23 +48,27 @@ func createNetwork(ctx context.Context, cli *client.Client, network NetworkConfi
 
 func StartContainer(ctx context.Context, cli *client.Client, config ContainerConfig) (string, error) {
 	var endpointsConfig map[string]*network.EndpointSettings
-	if config.Network.Name != "" {
-		err := createNetwork(ctx, cli, config.Network)
-		if err != nil {
-			return "", err
-		}
+	if config.Network != "" {
 		endpointsConfig = map[string]*network.EndpointSettings{
-			config.Network.Name: {},
+			config.Network: {},
+		}
+	}
+	var labels map[string]string
+	if config.Labels != nil {
+		labels = make(map[string]string)
+		for _, label := range config.Labels {
+			labels[label] = ""
 		}
 	}
 
 	r, err := cli.ContainerCreate(
 		ctx,
 		&container.Config{
-			Image: config.Image,
-			Env:   config.Env,
-			Cmd:   config.Cmd,
-			User:  config.User,
+			Image:  config.Image,
+			Env:    config.Env,
+			Cmd:    config.Cmd,
+			User:   config.User,
+			Labels: labels,
 		},
 		&container.HostConfig{
 			Binds: config.Binds,
@@ -83,6 +88,23 @@ func StartContainer(ctx context.Context, cli *client.Client, config ContainerCon
 		return "", err
 	}
 	return r.ID, nil
+}
+
+func StopContainers(ctx context.Context, cli *client.Client, label string) error {
+	containers, err := cli.ContainerList(ctx, types.ContainerListOptions{
+		Filters: filters.NewArgs(filters.Arg("label", fmt.Sprintf("%s=", label))),
+	})
+	if err != nil {
+		return fmt.Errorf("failed to list containers: %v", err)
+	}
+
+	for _, c := range containers {
+		err = cli.ContainerStop(ctx, c.ID, container.StopOptions{})
+		if err != nil {
+			return fmt.Errorf("failed to stop container %s (%s): %v", c.Names[0], c.ID, err)
+		}
+	}
+	return nil
 }
 
 func RemoveContainers(ctx context.Context, cli *client.Client, label string) error {

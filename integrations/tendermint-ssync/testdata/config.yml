@@ -1,5 +1,5 @@
 ---
 startKey: 2187000/0
 config:
-  api: http://testapi-integration-tendermint-ssync:8080
+  api: http://kyve-e2e-test-testapi-integration-tendermint-ssync:8080
   interval: 3000

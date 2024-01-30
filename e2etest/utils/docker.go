@@ -11,9 +11,7 @@ import (
 
 	"github.com/KYVENetwork/kyvejs/tools/kysor/docker"
 	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
-	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/api/types/volume"
 	"github.com/docker/docker/client"
 	"go.uber.org/zap"
@@ -121,7 +119,7 @@ func (pc *ProtocolBuilder) BuildIntegrations(testConfigs []*TestConfig) error {
 		}
 		integrationConfigs = append(integrationConfigs, docker.Image{
 			Path:   cfg.Integration.Path,
-			Tags:   []string{integrationTag(cfg.Integration)},
+			Tags:   []string{integrationImage(cfg.Integration)},
 			Labels: map[string]string{cleanupLabel: ""},
 		})
 	}
@@ -195,7 +193,7 @@ func (pc *ProtocolBuilder) Cleanup() error {
 }
 
 type KystrapRunner struct {
-	kystrapConfig ContainerConfig
+	kystrapConfig docker.ContainerConfig
 }
 
 func NewKystrapRunner() *KystrapRunner {
@@ -205,16 +203,16 @@ func NewKystrapRunner() *KystrapRunner {
 	}
 	binds := []string{fmt.Sprintf("%s:%s", path, kystrapMount)}
 	return &KystrapRunner{
-		kystrapConfig: ContainerConfig{
-			image: kystrapImage.Tags[0],
-			name:  kystrapImage.Tags[0],
-			binds: binds,
+		kystrapConfig: docker.ContainerConfig{
+			Image: kystrapImage.Tags[0],
+			Name:  kystrapImage.Tags[0],
+			Binds: binds,
 		},
 	}
 }
 
-func runDockerAndRemove(ctx context.Context, cli *client.Client, config ContainerConfig, timeout time.Duration) error {
-	id, err := runDocker(ctx, cli, config)
+func runDockerAndRemove(ctx context.Context, cli *client.Client, config docker.ContainerConfig, timeout time.Duration) error {
+	id, err := docker.StartContainer(ctx, cli, config)
 	if err != nil {
 		return err
 	}
@@ -257,8 +255,8 @@ func (kr *KystrapRunner) BootstrapTmpIntegrations(tmpIntegrations []TmpIntegrati
 
 	for _, tmp := range tmpIntegrations {
 		config := kr.kystrapConfig
-		config.cmd = []string{"create", "-n", tmp.Name, "-l", tmp.Language, "-y"}
-		config.user = fmt.Sprintf("%s:%s", currentUser.Uid, currentUser.Gid)
+		config.Cmd = []string{"create", "-n", tmp.Name, "-l", tmp.Language, "-y"}
+		config.User = fmt.Sprintf("%s:%s", currentUser.Uid, currentUser.Gid)
 
 		err := runDockerAndRemove(ctx, cli, config, time.Second*10)
 		if err != nil {
@@ -269,9 +267,9 @@ func (kr *KystrapRunner) BootstrapTmpIntegrations(tmpIntegrations []TmpIntegrati
 }
 
 type ProtocolRunner struct {
-	testapiConfig     ContainerConfig
-	integrationConfig ContainerConfig
-	protocolConfigs   []ContainerConfig
+	testapiConfig     docker.ContainerConfig
+	integrationConfig docker.ContainerConfig
+	protocolConfigs   []docker.ContainerConfig
 	testConfig        TestConfig
 	sharedVolume      string
 	networkId         string
@@ -280,31 +278,42 @@ type ProtocolRunner struct {
 }
 
 func NewProtocolRunner(testConfig TestConfig, networkId string, restAddress string, rpcAddress string) *ProtocolRunner {
-	integrationImage := integrationTag(testConfig.Integration)
-	var protocolConfigs []ContainerConfig
+	integrationImageName := integrationImage(testConfig.Integration)
+	integrationName := fmt.Sprintf("%s-%s-%s", cleanupLabel, integrationImagePrefix, testConfig.Integration.Name)
+	var protocolConfigs []docker.ContainerConfig
 	for _, cfg := range testConfig.GetProtocolConfigs() {
-		name := fmt.Sprintf("%s-%s-%s", protocolImage.Tags[0], integrationImage, cfg.ProtocolNode.KeyName())
-		env := getProtocolEnv(cfg.Valaccount.Mnemonic(), rpcAddress, restAddress, integrationImage, testConfig.PoolId, true)
+		name := fmt.Sprintf("%s-%s-%s-%s", cleanupLabel, protocolImage.Tags[0], integrationImageName, cfg.ProtocolNode.KeyName())
+		env, err := docker.CreateProtocolEnv(docker.ProtocolEnv{
+			Valaccount:  cfg.Valaccount.Mnemonic(),
+			RpcAddress:  rpcAddress,
+			RestAddress: restAddress,
+			Host:        integrationName,
+			PoolId:      testConfig.PoolId,
+			Debug:       true,
+		})
+		if err != nil {
+			panic(fmt.Errorf("programming error! This should never happen! Error: %s", err))
+		}
 		binds := []string{fmt.Sprintf("%s:%s", kyveStorageVolumeName(testConfig.Integration), kyveStorageMountProtocol)}
-		protocolConfigs = append(protocolConfigs, ContainerConfig{
-			image:     protocolImage.Tags[0],
-			name:      name,
-			networkId: networkId,
-			env:       env,
-			binds:     binds,
+		protocolConfigs = append(protocolConfigs, docker.ContainerConfig{
+			Image:   protocolImage.Tags[0],
+			Name:    name,
+			Network: networkId,
+			Env:     env,
+			Binds:   binds,
 		})
 	}
 	return &ProtocolRunner{
-		testapiConfig: ContainerConfig{
-			image:     testapiImage.Tags[0],
-			name:      fmt.Sprintf("%s-%s", testapiImage.Tags[0], integrationImage),
-			networkId: networkId,
-			binds:     []string{fmt.Sprintf("%s:%s:ro", testConfig.Integration.TestDataApiPath, kyveStorageMountApi)},
+		testapiConfig: docker.ContainerConfig{
+			Image:   testapiImage.Tags[0],
+			Name:    fmt.Sprintf("%s-%s-%s", cleanupLabel, testapiImage.Tags[0], integrationImageName),
+			Network: networkId,
+			Binds:   []string{fmt.Sprintf("%s:%s:ro", testConfig.Integration.TestDataApiPath, kyveStorageMountApi)},
 		},
-		integrationConfig: ContainerConfig{
-			image:     integrationImage,
-			name:      integrationImage,
-			networkId: networkId,
+		integrationConfig: docker.ContainerConfig{
+			Image:   integrationImageName,
+			Name:    fmt.Sprintf("%s-%s", cleanupLabel, integrationImageName),
+			Network: networkId,
 		},
 		protocolConfigs: protocolConfigs,
 		testConfig:      testConfig,
@@ -315,85 +324,12 @@ func NewProtocolRunner(testConfig TestConfig, networkId string, restAddress stri
 	}
 }
 
-type ContainerConfig struct {
-	image     string
-	name      string
-	networkId string
-	user      string
-	env       []string
-	binds     []string
-	cmd       []string
-}
-
-func runDocker(ctx context.Context, cli *client.Client, config ContainerConfig) (string, error) {
-	var endpointsConfig map[string]*network.EndpointSettings
-	if config.networkId != "" {
-		endpointsConfig = map[string]*network.EndpointSettings{
-			config.networkId: {},
-		}
-	}
-	r, err := cli.ContainerCreate(
-		ctx,
-		&container.Config{
-			Image: config.image,
-			Env:   config.env,
-			Cmd:   config.cmd,
-			User:  config.user,
-		},
-		&container.HostConfig{
-			Binds: config.binds,
-		},
-		&network.NetworkingConfig{
-			EndpointsConfig: endpointsConfig,
-		},
-		nil,
-		config.name,
-	)
-	if err != nil {
-		return "", err
-	}
-
-	err = cli.ContainerStart(ctx, r.ID, types.ContainerStartOptions{})
-	if err != nil {
-		return "", err
-	}
-	return r.ID, nil
-}
-
-func getProtocolEnv(
-	valaccount string,
-	rpcAddress string,
-	restAddress string,
-	host string,
-	poolId uint64,
-	debug bool,
-) []string {
-	debugFlag := "DEBUG="
-	if debug {
-		debugFlag = "DEBUG=--debug" // set to --debug to enable debug logging
-	}
-	return []string{
-		fmt.Sprintf("VALACCOUNT=%s", valaccount),
-		fmt.Sprintf("RPC=%s", rpcAddress),
-		fmt.Sprintf("REST=%s", restAddress),
-		fmt.Sprintf("HOST=%s", host),
-		fmt.Sprintf("POOL=%d", poolId),
-		debugFlag,
-		"STORAGE_PRIV=",
-		"REQUEST_BACKOFF=1",
-		"CACHE=jsonfile",
-		"METRICS=false",
-		"METRICS_PORT=8080",
-		"CHAIN_ID=kyve-1",
-	}
-}
-
-func integrationTag(integration Integration) string {
+func integrationImage(integration Integration) string {
 	return fmt.Sprintf("%s-%s", integrationImagePrefix, integration.Name)
 }
 
 func kyveStorageVolumeName(integration Integration) string {
-	return fmt.Sprintf("%s-%s", kyveStorageName, integrationTag(integration))
+	return fmt.Sprintf("%s-%s", kyveStorageName, integrationImage(integration))
 }
 
 func (pc *ProtocolRunner) RunProtocolNodes() error {
@@ -408,20 +344,20 @@ func (pc *ProtocolRunner) RunProtocolNodes() error {
 	defer cli.Close()
 
 	// Run testapi
-	_, err = runDocker(ctx, cli, pc.testapiConfig)
+	_, err = docker.StartContainer(ctx, cli, pc.testapiConfig)
 	if err != nil {
 		return err
 	}
 
 	// Run integration
-	_, err = runDocker(ctx, cli, pc.integrationConfig)
+	_, err = docker.StartContainer(ctx, cli, pc.integrationConfig)
 	if err != nil {
 		return err
 	}
 
 	// Run protocol with multiple nodes
 	for _, protocol := range pc.protocolConfigs {
-		_, err = runDocker(ctx, cli, protocol)
+		_, err = docker.StartContainer(ctx, cli, protocol)
 		if err != nil {
 			return err
 		}
@@ -452,9 +388,9 @@ func (pc *ProtocolRunner) StopProtocolNodes() error {
 	}
 
 	// Collect all containers that should be removed
-	toBeRemoved := []string{"/" + pc.testapiConfig.name, "/" + pc.integrationConfig.name}
+	toBeRemoved := []string{"/" + pc.testapiConfig.Name, "/" + pc.integrationConfig.Name}
 	for _, protocol := range pc.protocolConfigs {
-		toBeRemoved = append(toBeRemoved, "/"+protocol.name)
+		toBeRemoved = append(toBeRemoved, "/"+protocol.Name)
 	}
 
 	// Remove the containers

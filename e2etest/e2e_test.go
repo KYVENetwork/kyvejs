@@ -80,7 +80,7 @@ func setup(t *testing.T, log *zap.Logger) ([]utils.TestConfig, string, *cosmos.C
 
 	// Wait for all pools to be created (gov proposals)
 	expectedPoolCnt := len(testConfigs)
-	err = testutil.WaitForCondition(utils.GovVotingPeriod, 1*time.Second, func() (bool, error) {
+	err = testutil.WaitForCondition(utils.GovVotingPeriod+10*time.Second, time.Second, func() (bool, error) {
 		pools := executor.GetPools().Pools
 		configuredConfigs := map[string]interface{}{}
 		if len(pools) == expectedPoolCnt {

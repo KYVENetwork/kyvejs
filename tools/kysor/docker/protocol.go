@@ -31,9 +31,6 @@ func CreateProtocolEnv(env ProtocolEnv) ([]string, error) {
 	if env.Host == "" {
 		return nil, fmt.Errorf("Host is required")
 	}
-	if env.PoolId == 0 {
-		return nil, fmt.Errorf("PoolId is required")
-	}
 
 	debugFlag := "DEBUG="
 	if env.Debug {
