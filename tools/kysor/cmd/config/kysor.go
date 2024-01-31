@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/types"
 	"github.com/knadh/koanf/parsers/toml"
 	"github.com/knadh/koanf/providers/file"
 	"github.com/knadh/koanf/providers/structs"
@@ -13,6 +14,8 @@ import (
 
 const configDir = ".kysor"
 const configFileName = "config.toml"
+
+var FlagConfig = types.StringFlag{Name: "config", Short: "c", DefaultValue: "", Usage: "Config file", Required: false}
 
 var Config KysorConfig
 

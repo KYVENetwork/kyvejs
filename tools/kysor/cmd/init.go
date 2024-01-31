@@ -70,7 +70,7 @@ func initCmd(configFilePath string) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// Parent is only defined if the command runs in non interactive mode
 			if configFilePath == "" && cmd.Parent() != nil {
-				path, err := cmd.Parent().PersistentFlags().GetString(types.FlagConfig.Name)
+				path, err := cmd.Parent().PersistentFlags().GetString(config.FlagConfig.Name)
 				if err != nil {
 					return err
 				}
@@ -79,7 +79,7 @@ func initCmd(configFilePath string) *cobra.Command {
 
 			// Check if the config file already exists
 			if config.DoesConfigExist(configFilePath) {
-				return fmt.Errorf("config file already exists: %s", types.FlagConfig.DefaultValue)
+				return fmt.Errorf("config file already exists: %s", config.FlagConfig.DefaultValue)
 			}
 
 			// Get the values from the flags or prompt the user for them

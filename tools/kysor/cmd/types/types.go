@@ -1,7 +1,5 @@
 package types
 
-import "fmt"
-
 type StringFlag struct {
 	Name         string
 	Short        string
@@ -53,6 +51,6 @@ type CmdConfig struct {
 	Short string
 }
 
-func (c CmdConfig) ActionString() string {
-	return fmt.Sprintf("%s (%s)", c.Short, c.Name)
+func (c CmdConfig) PromptString() string {
+	return c.Short
 }

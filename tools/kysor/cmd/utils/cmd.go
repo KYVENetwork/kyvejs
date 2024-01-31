@@ -140,7 +140,7 @@ func CombineFuncs(funcs ...cobra.PositionalArgs) cobra.PositionalArgs {
 func PromptCmd(options []types.CmdConfig) (*types.CmdConfig, error) {
 	var items []string
 	for _, option := range options {
-		items = append(items, option.ActionString())
+		items = append(items, option.PromptString())
 	}
 
 	prompt := promptui.Select{
@@ -154,7 +154,7 @@ func PromptCmd(options []types.CmdConfig) (*types.CmdConfig, error) {
 		return nil, err
 	}
 	for _, option := range options {
-		if option.ActionString() == result {
+		if option.PromptString() == result {
 			return &option, nil
 		}
 	}
