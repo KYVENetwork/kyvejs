@@ -276,6 +276,41 @@ func GetIntFromPromptOrFlag(cmd *cobra.Command, flag types.IntFlag) (int64, erro
 	return value, nil
 }
 
+// GetOptionFromPrompt returns the option value from a select prompt
+func GetOptionFromPrompt[T any](flag types.OptionFlag[T]) (types.Option[T], error) {
+	label := flag.Prompt
+	if label == "" {
+		label = flag.Usage
+	}
+
+	cursorPos := 0
+	var items []string
+	for i, option := range flag.Options {
+		items = append(items, option.Name())
+		if option == flag.DefaultValue {
+			cursorPos = i
+		}
+	}
+
+	prompt := promptui.Select{
+		Label:     label,
+		Items:     items,
+		Stdout:    NoBellStdout,
+		Size:      len(flag.Options),
+		CursorPos: cursorPos,
+	}
+	_, result, err := prompt.Run()
+	if err != nil {
+		return nil, err
+	}
+	for _, option := range flag.Options {
+		if option.Name() == result {
+			return option, nil
+		}
+	}
+	return nil, fmt.Errorf("invalid option: %s", result)
+}
+
 // GetOptionFromPromptOrFlag returns the option value from
 // 1. the given flag
 // 2. prompts the user for the value if the flag was not set
@@ -291,31 +326,7 @@ func GetOptionFromPromptOrFlag[T any](cmd *cobra.Command, flag types.OptionFlag[
 
 	if IsInteractive(cmd) && !cmd.Flags().Changed(flag.Name) {
 		// Only prompt if we are in interactive mode and the flag was not set
-		label := flag.Prompt
-		if label == "" {
-			label = flag.Usage
-		}
-
-		var items []string
-		for _, option := range flag.Options {
-			items = append(items, option.Name())
-		}
-
-		prompt := promptui.Select{
-			Label:  label,
-			Items:  items,
-			Stdout: NoBellStdout,
-		}
-		_, result, err := prompt.Run()
-		if err != nil {
-			return nil, err
-		}
-		for _, option := range flag.Options {
-			if option.Name() == result {
-				return option, nil
-			}
-		}
-		return nil, fmt.Errorf("invalid option: %s", result)
+		return GetOptionFromPrompt(flag)
 	} else if cmd.Flags().Changed(flag.Name) {
 		// If the flag was set we need to validate it (if a validation function is set)
 		if flag.ValidateFn != nil {

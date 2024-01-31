@@ -1,6 +1,7 @@
 package types
 
 import (
+	ktypes "github.com/KYVENetwork/kyvejs/tools/kysor/cmd/types"
 	"os"
 
 	"golang.org/x/text/cases"
@@ -11,14 +12,14 @@ var toTitle = cases.Title(lang.English)
 
 type Language string
 
-var Languages []Language
+var Languages []ktypes.Option[Language]
 
 const requestOtherLanguage Language = "Other"
 
 func LanguagesStringSlice() []string {
 	var languages []string
 	for _, language := range Languages {
-		languages = append(languages, language.String())
+		languages = append(languages, language.StringValue())
 	}
 	return languages
 }
@@ -27,11 +28,15 @@ func NewLanguage(val string) Language {
 	return Language(toTitle.String(val))
 }
 
-func (l Language) Type() string {
-	return "Language"
+func (l Language) Name() string {
+	return string(l)
 }
 
-func (l Language) String() string {
+func (l Language) Value() Language {
+	return l
+}
+
+func (l Language) StringValue() string {
 	return string(l)
 }
 

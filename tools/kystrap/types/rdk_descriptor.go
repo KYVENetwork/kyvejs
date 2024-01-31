@@ -2,6 +2,7 @@ package types
 
 import (
 	"fmt"
+	ktypes "github.com/KYVENetwork/kyvejs/tools/kysor/cmd/types"
 
 	"github.com/fullstorydev/grpcurl"
 	"github.com/jhump/protoreflect/desc"
@@ -27,6 +28,35 @@ func (r *RdkDescriptor) MethodList() []protoreflect.MethodDescriptor {
 		methods = append(methods, r.Methods.Get(i))
 	}
 	return methods
+}
+
+type MethodOption struct {
+	ktypes.Option[protoreflect.MethodDescriptor]
+	method protoreflect.MethodDescriptor
+}
+
+func (r *RdkDescriptor) MethodOptions() []ktypes.Option[protoreflect.MethodDescriptor] {
+	var methods []ktypes.Option[protoreflect.MethodDescriptor]
+	for i := 0; i < r.Methods.Len(); i++ {
+		methods = append(methods, NewMethodOption(r.Methods.Get(i)))
+	}
+	return methods
+}
+
+func NewMethodOption(method protoreflect.MethodDescriptor) MethodOption {
+	return MethodOption{method: method}
+}
+
+func (o MethodOption) Name() string {
+	return string(o.method.Name())
+}
+
+func (o MethodOption) Value() protoreflect.MethodDescriptor {
+	return o.method
+}
+
+func (o MethodOption) StringValue() string {
+	return o.Name()
 }
 
 func (r *RdkDescriptor) MethodNames() []string {

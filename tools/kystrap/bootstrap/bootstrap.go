@@ -83,7 +83,7 @@ func CreateIntegration(outputDir string, language types.Language, name string) e
 	}
 
 	// Assemble paths
-	templateDir := filepath.Join(types.TemplatesDir, strings.ToLower(language.String()))
+	templateDir := filepath.Join(types.TemplatesDir, strings.ToLower(language.StringValue()))
 	outputPath := filepath.Join(outputDir, name)
 
 	// Check if the output directory already exists

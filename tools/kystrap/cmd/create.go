@@ -6,64 +6,60 @@ import (
 	"regexp"
 	"strings"
 
+	ktypes "github.com/KYVENetwork/kyvejs/tools/kysor/cmd/types"
+	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/utils"
 	"github.com/KYVENetwork/kyvejs/tools/kystrap/bootstrap"
 	"github.com/KYVENetwork/kyvejs/tools/kystrap/types"
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 )
 
+var CreateCmdConfig = ktypes.CmdConfig{Name: "create", Short: "Create integration"}
+
 var regexpAlphaNumericAndDash = regexp.MustCompile(`^[a-zA-Z0-9-]+$`)
 
-func promptLanguage(defaultVal types.Language, skipPrompt bool) (types.Language, error) {
-	items := types.Languages
-	position := 0
-	if defaultVal != "" {
-		for i, item := range items {
-			if item == defaultVal {
-				position = i
-				break
+var (
+	flagLanguage = ktypes.OptionFlag[types.Language]{
+		Name:     "language",
+		Short:    "l",
+		Usage:    fmt.Sprintf("Language for your integration (%s)", strings.Join(types.LanguagesStringSlice(), ", ")),
+		Prompt:   "Select the Language for your integration",
+		Required: true,
+		ValidateFn: func(input string) error {
+			if utils.ValidateNotEmpty(input) != nil {
+				return fmt.Errorf("language must not be empty")
 			}
-		}
+			for _, language := range types.Languages {
+				if language.StringValue() == input {
+					return nil
+				}
+			}
+			return fmt.Errorf("invalid language. Please choose one from '%s'", strings.Join(types.LanguagesStringSlice(), ", "))
+		},
 	}
-	prompt := promptui.Select{
-		Label:     "Select the Language for your integration",
-		Items:     items,
-		CursorPos: position,
+	flagName = ktypes.StringFlag{
+		Name:     "name",
+		Short:    "n",
+		Usage:    "Name for your integration",
+		Prompt:   "Set a name for your integration",
+		Required: true,
+		ValidateFn: func(input string) error {
+			if len(input) < 3 {
+				return errors.New("name must be at least 3 characters long")
+			}
+			if !regexpAlphaNumericAndDash.MatchString(input) {
+				return errors.New("name must only contain alphanumeric characters and dashes")
+			}
+			return nil
+		},
 	}
-
-	if skipPrompt {
-		if defaultVal == "" {
-			return "", errors.New("no language specified")
-		}
-		return defaultVal, nil
+	flagOutput = ktypes.StringFlag{
+		Name:         "output",
+		Short:        "o",
+		Usage:        "Output directory for your integration",
+		DefaultValue: "out",
 	}
-	_, result, err := prompt.Run()
-	return types.NewLanguage(result), err
-}
-
-func promptName(defaultVal string, skipPrompt bool) (string, error) {
-	validate := func(input string) error {
-		if len(input) < 3 {
-			return errors.New("name must be at least 3 characters long")
-		}
-		if !regexpAlphaNumericAndDash.MatchString(input) {
-			return errors.New("name must only contain alphanumeric characters and dashes")
-		}
-		return nil
-	}
-	prompt := promptui.Prompt{
-		Label:    "Set a name for your integration",
-		Validate: validate,
-		Default:  defaultVal,
-	}
-
-	if skipPrompt {
-		return strings.ToLower(defaultVal), validate(defaultVal)
-	}
-
-	result, err := prompt.Run()
-	return strings.ToLower(result), err
-}
+)
 
 func promptLinkToGithub() error {
 	const githubUrl = "https://github.com/KYVENetwork/kyvejs/issues/new"
@@ -77,37 +73,34 @@ func promptLinkToGithub() error {
 }
 
 func CmdCreateIntegration() *cobra.Command {
-	const flagLanguage = "language"
-	const flagName = "name"
-	const flagOutputDir = "output"
-
 	cmd := &cobra.Command{
-		Use:   "create",
-		Short: "Create a new runtime integration",
+		Use:     CreateCmdConfig.Name,
+		Short:   CreateCmdConfig.Short,
+		PreRunE: utils.SetupInteractiveMode,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			outputDir, err := cmd.Flags().GetString(flagOutputDir)
+			// Output directory
+			outputDir, err := cmd.Flags().GetString(flagOutput.Name)
 			if err != nil {
 				return err
 			}
 
-			var defaultLanguage types.Language
-			defaultLanguageStr, _ := cmd.Flags().GetString(flagLanguage)
-			if defaultLanguageStr != "" {
-				defaultLanguage = types.NewLanguage(defaultLanguageStr)
-			}
-			language, err := promptLanguage(defaultLanguage, cmd.Flags().Changed(flagYes))
+			// Language
+			languageOption, err := utils.GetOptionFromPromptOrFlag(cmd, flagLanguage)
 			if err != nil {
 				return err
 			}
+			language := languageOption.Value()
 			if language.IsRequestOtherLanguage() {
 				return promptLinkToGithub()
 			}
 
-			defaultName, _ := cmd.Flags().GetString(flagName)
-			name, err := promptName(defaultName, cmd.Flags().Changed(flagYes))
+			// Name
+			name, err := utils.GetStringFromPromptOrFlag(cmd, flagName)
 			if err != nil {
 				return err
 			}
+
+			// Create integration
 			err = bootstrap.CreateIntegration(outputDir, language, name)
 			if err != nil {
 				return err
@@ -116,10 +109,9 @@ func CmdCreateIntegration() *cobra.Command {
 			return nil
 		},
 	}
-	cmd.Flags().StringP(flagLanguage, "l", "",
-		fmt.Sprintf("language for your integration (%s)", strings.Join(types.LanguagesStringSlice(), ", ")))
-	cmd.Flags().StringP(flagName, "n", "", "name for your integration")
-	cmd.Flags().StringP(flagOutputDir, "o", "out", "output directory for your integration")
+	flagLanguage.Options = types.Languages
+	utils.AddOptionFlags(cmd, []ktypes.OptionFlag[types.Language]{flagLanguage})
+	utils.AddStringFlags(cmd, []ktypes.StringFlag{flagName, flagOutput})
 	return cmd
 }
 

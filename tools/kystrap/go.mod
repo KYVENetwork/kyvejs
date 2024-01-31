@@ -288,6 +288,10 @@ require (
 )
 
 replace (
+	// use cosmos compatible ChainSafe/go-schnorrkel
+	github.com/ChainSafe/go-schnorrkel => github.com/ChainSafe/go-schnorrkel v0.0.0-20200405005733-88cbf1b4c40d
+	github.com/ChainSafe/go-schnorrkel/1 => github.com/ChainSafe/go-schnorrkel v1.0.0
+
 	// use this rosetta version to avoid conflicts
 	github.com/coinbase/rosetta-sdk-go => github.com/coinbase/rosetta-sdk-go v0.8.3
 

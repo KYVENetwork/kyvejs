@@ -1,6 +1,9 @@
 package cmd
 
 import (
+	"fmt"
+	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/types"
+	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/utils"
 	"os"
 
 	"github.com/manifoldco/promptui"
@@ -8,56 +11,33 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type option string
-
-const (
-	create option = "bootstrap integration"
-	test   option = "test integration"
-)
-
-const flagYes = "yes"
-
-func skipPrompts(cmd *cobra.Command) bool {
-	return cmd.Flags().Changed(flagYes)
-}
-
-func promptOption() (option, error) {
-	items := []option{create, test}
-
-	prompt := promptui.Select{
-		Label: "What do you want to do?",
-		Items: items,
-	}
-
-	_, result, err := prompt.Run()
-	return option(result), err
-}
-
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "kystrap",
 	Short: "kystrap is a CLI tool to bootstrap KYVE integrations",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		option := create
-
-		// Check if the yes flag is set
-		// -> if not ask the user what to do
-		if !skipPrompts(cmd) {
-			var err error
-			option, err = promptOption()
+		// Check if the interactive flag is set
+		// -> if so ask the user what to do
+		if utils.IsInteractive(cmd) {
+			options := []types.CmdConfig{
+				CreateCmdConfig,
+				TestCmdConfig,
+			}
+			nextCmd, err := utils.PromptCmd(options)
 			if err != nil {
 				return err
 			}
-		}
 
-		switch option {
-		case create:
-			return CmdCreateIntegration().Execute()
-		case test:
-			return CmdTestIntegration().Execute()
-		default:
-			return nil
+			switch nextCmd.Name {
+			case CreateCmdConfig.Name:
+				return CmdCreateIntegration().Execute()
+			case TestCmdConfig.Name:
+				return CmdTestIntegration().Execute()
+			default:
+				return fmt.Errorf("invalid option: %s", nextCmd.Name)
+			}
 		}
+		return cmd.Help()
 	},
 }
 
@@ -72,14 +52,6 @@ func Execute() {
 }
 
 func init() {
-	// Here you will define your flags and configuration settings.
-	// Cobra supports persistent flags, which, if defined here,
-	// will be global for your application.
-
-	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.kystrap.yaml)")
-
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
-	rootCmd.PersistentFlags().BoolP(flagYes, "y", false, "Skip all prompts and use provided or default values")
+	rootCmd.PersistentFlags().BoolP(types.FlagNonInteractive.Name, types.FlagNonInteractive.Short, types.FlagNonInteractive.DefaultValue, types.FlagNonInteractive.Usage)
 	rootCmd.SetErrPrefix(promptui.IconBad)
 }
