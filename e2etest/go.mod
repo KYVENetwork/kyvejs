@@ -5,7 +5,7 @@ go 1.21.4
 require (
 	cosmossdk.io/math v1.2.0
 	github.com/KYVENetwork/chain v1.4.0
-	github.com/KYVENetwork/kyvejs/tools/kysor v0.0.0-20240131121323-7b7a4b04d44a
+	github.com/KYVENetwork/kyvejs/tools/kysor v0.0.0-20240131143922-9676df824f24
 	github.com/cosmos/cosmos-sdk v0.47.6
 	github.com/cosmos/go-bip39 v1.0.0
 	github.com/creasty/defaults v1.7.0
@@ -388,4 +388,7 @@ replace (
 	// use cosmos flavored gogo/protobuf
 	// https://github.com/cosmos/cosmos-sdk/issues/8469
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
+
+	// use this otherwise we get an error because the signature of `SortFunc` changed
+	golang.org/x/exp => golang.org/x/exp v0.0.0-20230711153332-06a737ee72cb
 )

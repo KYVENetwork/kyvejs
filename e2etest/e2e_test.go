@@ -145,7 +145,7 @@ func bootstrapTmpIntegrations(t *testing.T, log *zap.Logger, protocolBuilder *ut
 
 	g.Expect(err).To(BeNil())
 	for _, tmpFolder := range tmpFolders {
-		g.Expect(tmpFolder.Path).To(BeADirectory())
+		g.Expect(tmpFolder.Path).To(BeADirectory(), "There is a problem with creating new integrations with kystrap")
 	}
 }
 

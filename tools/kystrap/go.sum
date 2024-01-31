@@ -93,8 +93,8 @@ github.com/KYVENetwork/chain v1.4.0 h1:i/1qgeyYL6LEwKkClXHgx0qjVxWfJtb1NVKqwOyhB
 github.com/KYVENetwork/chain v1.4.0/go.mod h1:7O6Avj5hdMyReTS5ykkYn9Vh4Ky8m2G4rwHPl9PyD+M=
 github.com/KYVENetwork/cosmos-sdk v0.47.6-kyve-rc0 h1:OoVLykPiZx3ecHY5lZH5TJmBBNADZYnvsNhH/nH8etA=
 github.com/KYVENetwork/cosmos-sdk v0.47.6-kyve-rc0/go.mod h1:xTc1chW8HyUWCfrgGbjS5jNu9RzlPVrBNfbL9RmZUio=
-github.com/KYVENetwork/kyvejs/tools/kysor v0.0.0-20240131121323-7b7a4b04d44a h1:npAVYuJYD/NO5drh2Nsl/4PEW+y3aBAUQmpnpe0m018=
-github.com/KYVENetwork/kyvejs/tools/kysor v0.0.0-20240131121323-7b7a4b04d44a/go.mod h1:vLa/Y0mc63zM8y0w2AzKBZ4PK8Q3OxvV1/0GbvNFwlI=
+github.com/KYVENetwork/kyvejs/tools/kysor v0.0.0-20240131143922-9676df824f24 h1:Gujmnh1YL/LC0gSr9raCTb+rzt5WhmNdbA1bV/VK4YM=
+github.com/KYVENetwork/kyvejs/tools/kysor v0.0.0-20240131143922-9676df824f24/go.mod h1:vLa/Y0mc63zM8y0w2AzKBZ4PK8Q3OxvV1/0GbvNFwlI=
 github.com/Masterminds/semver v1.5.0 h1:H65muMkzWKEuNDnfl9d70GUjFniHKHRbFPGBuZ3QEww=
 github.com/Masterminds/semver v1.5.0/go.mod h1:MB6lktGJrhw8PrUyiEoblNEGEQ+RzHPF078ddwwvV3Y=
 github.com/OneOfOne/xxhash v1.2.2 h1:KMrpdQIwFcEqXDklaen+P1axHaj9BSKzvpUUfnHldSE=

@@ -3,7 +3,7 @@ module github.com/KYVENetwork/kyvejs/tools/kystrap
 go 1.21.4
 
 require (
-	github.com/KYVENetwork/kyvejs/tools/kysor v0.0.0-20240131121323-7b7a4b04d44a
+	github.com/KYVENetwork/kyvejs/tools/kysor v0.0.0-20240131143922-9676df824f24
 	github.com/fullstorydev/grpcurl v1.8.9
 	github.com/golangci/golangci-lint v1.55.2
 	github.com/jhump/protoreflect v1.15.3
