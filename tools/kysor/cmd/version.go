@@ -8,7 +8,7 @@ import (
 	"runtime/debug"
 )
 
-var VersionCmdConfig = types.CmdConfig{Name: "version", Short: "Show the version of KYSOR"}
+var VersionCmdConfig = types.CmdConfig{Name: "version", Short: "Show KYSOR version"}
 
 func versionCmd() *cobra.Command {
 	return &cobra.Command{

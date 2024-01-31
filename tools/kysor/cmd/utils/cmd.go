@@ -147,6 +147,7 @@ func PromptCmd(options []types.CmdConfig) (*types.CmdConfig, error) {
 		Label:  "What do you want to do?",
 		Items:  items,
 		Stdout: NoBellStdout,
+		Size:   len(options),
 	}
 
 	_, result, err := prompt.Run()

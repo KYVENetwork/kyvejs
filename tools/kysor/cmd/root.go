@@ -12,6 +12,7 @@ import (
 
 var (
 	RootCmdConfig = types.CmdConfig{Name: "kysor", Short: "KYSOR helps you manage your KYVE data validators"}
+	HelpCmdConfig = types.CmdConfig{Name: "help", Short: "Show help"}
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -30,10 +31,11 @@ var rootCmd = &cobra.Command{
 
 			options := []types.CmdConfig{
 				InitCmdConfig,
+				ValaccountsCmdConfig,
 				StartCmdConfig,
 				StopCmdConfig,
-				ValaccountsCmdConfig,
 				VersionCmdConfig,
+				HelpCmdConfig,
 			}
 			nextCmd, err := utils.PromptCmd(options)
 			if err != nil {
@@ -42,7 +44,7 @@ var rootCmd = &cobra.Command{
 
 			switch nextCmd.Name {
 			case InitCmdConfig.Name:
-				config, err := cmd.PersistentFlags().GetString(types.FlagConfig.Name)
+				config, err := cmd.PersistentFlags().GetString(config.FlagConfig.Name)
 				if err != nil {
 					return err
 				}
@@ -55,6 +57,8 @@ var rootCmd = &cobra.Command{
 				return valaccountsCmd().Execute()
 			case VersionCmdConfig.Name:
 				return versionCmd().Execute()
+			case HelpCmdConfig.Name:
+				return cmd.Help()
 			default:
 				return fmt.Errorf("invalid option: %s", nextCmd.Name)
 			}
@@ -76,9 +80,9 @@ func init() {
 	cobra.OnInitialize(config.InitKysorConfig)
 	cobra.OnInitialize(config.InitValaccountConfigs)
 
-	types.FlagConfig.DefaultValue = config.GetDefaultConfigFilePath()
+	config.FlagConfig.DefaultValue = config.GetDefaultConfigFilePath()
 
-	rootCmd.PersistentFlags().StringP(types.FlagConfig.Name, types.FlagConfig.Short, types.FlagConfig.DefaultValue, types.FlagConfig.Usage)
+	rootCmd.PersistentFlags().StringP(config.FlagConfig.Name, config.FlagConfig.Short, config.FlagConfig.DefaultValue, config.FlagConfig.Usage)
 
 	rootCmd.PersistentFlags().BoolP(types.FlagNonInteractive.Name, types.FlagNonInteractive.Short, types.FlagNonInteractive.DefaultValue, types.FlagNonInteractive.Usage)
 	rootCmd.SetErrPrefix(promptui.IconBad)

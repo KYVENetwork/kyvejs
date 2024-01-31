@@ -68,7 +68,7 @@ func initCmd(configFilePath string) *cobra.Command {
 		Short:   InitCmdConfig.Short,
 		PreRunE: utils.SetupInteractiveMode,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			// Parent is only defined if the command runs in non interactive mode
+			// Parent is only defined if the command runs in non-interactive mode
 			if configFilePath == "" && cmd.Parent() != nil {
 				path, err := cmd.Parent().PersistentFlags().GetString(config.FlagConfig.Name)
 				if err != nil {

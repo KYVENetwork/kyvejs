@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-var StopCmdConfig = types.CmdConfig{Name: "stop", Short: "Stop KYSOR"}
+var StopCmdConfig = types.CmdConfig{Name: "stop", Short: "Stop data validator"}
 
 // tearDownContainers stops and removes all containers and networks with the given label
 func tearDownContainers(cli *client.Client, label string) error {

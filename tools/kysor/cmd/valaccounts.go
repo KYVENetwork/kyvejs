@@ -16,8 +16,8 @@ import (
 var (
 	ValaccountsCmdConfig            = types.CmdConfig{Name: "valaccounts", Short: "Manage validator accounts"}
 	ValaccountsCreateCmdConfig      = types.CmdConfig{Name: "create", Short: "Create a new valaccount"}
-	ValaccountsShowAddressCmdConfig = types.CmdConfig{Name: "show-address", Short: "Show the address of a valaccount"}
-	ValaccountsShowBalanceCmdConfig = types.CmdConfig{Name: "show-balance", Short: "Show the balance of a valaccount"}
+	ValaccountsShowAddressCmdConfig = types.CmdConfig{Name: "show-address", Short: "Show address of a valaccount"}
+	ValaccountsShowBalanceCmdConfig = types.CmdConfig{Name: "show-balance", Short: "Show balance of a valaccount"}
 	VallaccountsTransferCmdConfig   = types.CmdConfig{Name: "transfer", Short: "Transfer tokens from a valaccount to another address"}
 	ValaccountsDeleteCmdConfig      = types.CmdConfig{Name: "delete", Short: "Delete a valaccount"}
 )

@@ -27,7 +27,7 @@ import (
 	"time"
 )
 
-var StartCmdConfig = types.CmdConfig{Name: "start", Short: "Start KYSOR"}
+var StartCmdConfig = types.CmdConfig{Name: "start", Short: "Start data validator"}
 
 var globalCleanupLabel = "kysor-all"
 
