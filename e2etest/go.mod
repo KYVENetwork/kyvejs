@@ -5,7 +5,7 @@ go 1.21.4
 require (
 	cosmossdk.io/math v1.2.0
 	github.com/KYVENetwork/chain v1.4.0
-	github.com/KYVENetwork/kyvejs/tools/kysor v0.0.0
+	github.com/KYVENetwork/kyvejs/tools/kysor v0.0.0-20240131121323-7b7a4b04d44a
 	github.com/cosmos/cosmos-sdk v0.47.6
 	github.com/cosmos/go-bip39 v1.0.0
 	github.com/creasty/defaults v1.7.0
@@ -378,9 +378,6 @@ replace (
 	// use cosmos compatible ChainSafe/go-schnorrkel
 	github.com/ChainSafe/go-schnorrkel => github.com/ChainSafe/go-schnorrkel v0.0.0-20200405005733-88cbf1b4c40d
 	github.com/ChainSafe/go-schnorrkel/1 => github.com/ChainSafe/go-schnorrkel v1.0.0
-
-	// use local kysor
-	github.com/KYVENetwork/kyvejs/tools/kysor => ../tools/kysor
 
 	// use this rosetta version to avoid conflicts
 	github.com/coinbase/rosetta-sdk-go => github.com/coinbase/rosetta-sdk-go v0.8.3
