@@ -69,7 +69,7 @@ func (pc *ProtocolBuilder) BuildDependencies() error {
 		return err
 	}
 
-	cli, err := client.NewClientWithOpts()
+	cli, err := client.NewClientWithOpts(client.WithAPIVersionNegotiation())
 	if err != nil {
 		return fmt.Errorf("failed to create docker client: %v", err)
 	}
@@ -94,7 +94,7 @@ func (pc *ProtocolBuilder) BuildDependencies() error {
 }
 
 func (pc *ProtocolBuilder) BuildIntegrations(testConfigs []*TestConfig) error {
-	cli, err := client.NewClientWithOpts()
+	cli, err := client.NewClientWithOpts(client.WithAPIVersionNegotiation())
 	if err != nil {
 		return fmt.Errorf("failed to create docker client: %v", err)
 	}
@@ -143,7 +143,7 @@ func (pc *ProtocolBuilder) Cleanup() error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*5)
 	defer cancel()
 
-	cli, err := client.NewClientWithOpts()
+	cli, err := client.NewClientWithOpts(client.WithAPIVersionNegotiation())
 	if err != nil {
 		return fmt.Errorf("failed to create docker client: %v", err)
 	}
@@ -240,7 +240,7 @@ func (kr *KystrapRunner) BootstrapTmpIntegrations(tmpIntegrations []TmpIntegrati
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
 
-	cli, err := client.NewClientWithOpts()
+	cli, err := client.NewClientWithOpts(client.WithAPIVersionNegotiation())
 	if err != nil {
 		return fmt.Errorf("failed to create docker client: %v", err)
 	}
@@ -342,7 +342,7 @@ func (pc *ProtocolRunner) RunProtocolContainers() error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
 
-	cli, err := client.NewClientWithOpts()
+	cli, err := client.NewClientWithOpts(client.WithAPIVersionNegotiation())
 	if err != nil {
 		return fmt.Errorf("failed to create docker client: %v", err)
 	}
@@ -375,7 +375,7 @@ func (pc *ProtocolRunner) StopProtocolContainers() error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*60)
 	defer cancel()
 
-	cli, err := client.NewClientWithOpts()
+	cli, err := client.NewClientWithOpts(client.WithAPIVersionNegotiation())
 	if err != nil {
 		return fmt.Errorf("failed to create docker client: %v", err)
 	}

@@ -40,7 +40,7 @@ func stopCmd() *cobra.Command {
 		Use:   StopCmdConfig.Name,
 		Short: StopCmdConfig.Short,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cli, err := client.NewClientWithOpts()
+			cli, err := client.NewClientWithOpts(client.WithAPIVersionNegotiation())
 			if err != nil {
 				return fmt.Errorf("failed to create docker client: %v", err)
 			}

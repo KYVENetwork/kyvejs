@@ -385,7 +385,7 @@ func startCmd() *cobra.Command {
 			}
 			pool := response.GetPool().Data
 
-			cli, err := client.NewClientWithOpts()
+			cli, err := client.NewClientWithOpts(client.WithAPIVersionNegotiation())
 			if err != nil {
 				return fmt.Errorf("failed to create docker client: %v", err)
 			}
