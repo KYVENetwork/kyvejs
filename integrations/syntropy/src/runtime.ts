@@ -65,31 +65,21 @@ export default class Syntropy implements IRuntime {
       validationDataItem.value.length
     );
     // vote abstain if proposed data item has more entries than local one
-    if (proposedDataItem.value.length > validationDataItem.value.length) {
+    if (proposedDataItem.value.length != validationDataItem.value.length) {
       console.log(
-        'proposedDataItem.value.length > validationDataItem.value.length',
+        'proposedDataItem.value.length != validationDataItem.value.length',
         proposedDataItem.value.length,
         validationDataItem.value.length
       );
       return VOTE.VOTE_TYPE_ABSTAIN;
     }
 
-    const proposed = proposedDataItem.value.map((p: any) => JSON.stringify(p));
-    const validation = proposedDataItem.value.map((p: any) =>
-      JSON.stringify(p)
-    );
-
-    let valid = true;
-
-    for (let i = 0; i < proposed.length; i++) {
-      valid = validation.includes(proposed[i]);
-
-      if (!valid) {
-        break;
-      }
+    if (
+      JSON.stringify(proposedDataItem) === JSON.stringify(validationDataItem)
+    ) {
+      return VOTE.VOTE_TYPE_VALID;
     }
-
-    return valid ? VOTE.VOTE_TYPE_VALID : VOTE.VOTE_TYPE_INVALID;
+    return VOTE.VOTE_TYPE_INVALID
   }
 
   async summarizeDataBundle(_: Validator, __: DataItem[]): Promise<string> {
