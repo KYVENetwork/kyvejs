@@ -192,7 +192,7 @@ func pullRepo() (*kyveRepo, error) {
 		}
 
 		// Pull the latest changes
-		fmt.Println("⬇️  Pulling latest changes")
+		fmt.Println("⬇️   Pulling latest changes")
 		err = w.Pull(&git.PullOptions{RemoteName: "origin", Force: true})
 		if err != nil && !errors.Is(err, git.NoErrAlreadyUpToDate) && !errors.Is(err, git.ErrNonFastForwardUpdate) {
 			return nil, err
@@ -216,7 +216,7 @@ func buildImage(worktree *git.Worktree, ref *plumbing.Reference, cli *client.Cli
 		return err
 	}
 
-	fmt.Printf("🏗️ Building %s ...\n", image.Tags[0])
+	fmt.Printf("🏗️   Building %s ...\n", image.Tags[0])
 	return docker.BuildImage(context.Background(), cli, image)
 }
 
@@ -259,9 +259,10 @@ func buildImages(kr *kyveRepo, cli *client.Client, pool *pooltypes.Pool, label s
 }
 
 // startContainers starts the protocol and integration containers
-func startContainers(cli *client.Client, valConfig config.ValaccountConfig, pool *pooltypes.Pool, debug bool, protocol *docker.Image, integration *docker.Image, label string, integrationEnv []string) error {
-	protocolName := fmt.Sprintf("kysor-%s", protocol.TagsLastPartWithoutVersion()[0])
-	integrationName := fmt.Sprintf("kysor-%s", integration.TagsLastPartWithoutVersion()[0])
+func startContainers(cli *client.Client, valConfig config.ValaccountConfig, pool *pooltypes.Pool, debug bool, protocol *docker.Image, integration *docker.Image, label string, integrationEnv []string) (string, string, error) {
+	prefix := fmt.Sprintf("kysor-pool-%d", pool.Id)
+	protocolName := fmt.Sprintf("%s-%s", prefix, protocol.TagsLastPartWithoutVersion()[0])
+	integrationName := fmt.Sprintf("%s-%s", prefix, integration.TagsLastPartWithoutVersion()[0])
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
 	defer cancel()
@@ -273,10 +274,10 @@ func startContainers(cli *client.Client, valConfig config.ValaccountConfig, pool
 		Host:        integrationName,
 		PoolId:      pool.Id,
 		Debug:       debug,
-		ChainId:     "kaon-1",
+		ChainId:     config.Config.ChainID,
 	})
 	if err != nil {
-		return err
+		return "", "", err
 	}
 
 	err = docker.CreateNetwork(ctx, cli, docker.NetworkConfig{
@@ -284,7 +285,7 @@ func startContainers(cli *client.Client, valConfig config.ValaccountConfig, pool
 		Labels: map[string]string{globalCleanupLabel: "", label: ""},
 	})
 	if err != nil {
-		return err
+		return "", "", err
 	}
 
 	pConfig := docker.ContainerConfig{
@@ -292,6 +293,7 @@ func startContainers(cli *client.Client, valConfig config.ValaccountConfig, pool
 		Name:    protocolName,
 		Network: label,
 		Env:     env,
+		Labels:  map[string]string{globalCleanupLabel: "", label: ""},
 	}
 
 	iConfig := docker.ContainerConfig{
@@ -299,26 +301,23 @@ func startContainers(cli *client.Client, valConfig config.ValaccountConfig, pool
 		Name:    integrationName,
 		Network: label,
 		Env:     integrationEnv,
+		Labels:  map[string]string{globalCleanupLabel: "", label: ""},
 	}
 
 	_, err = docker.StartContainer(ctx, cli, pConfig)
 	if err != nil {
-		return err
+		return "", "", err
 	}
 	fmt.Print("🚀  Started container ")
-	goTerminal.SetSGR(goTerminal.Reset, goTerminal.Italic)
-	fmt.Println(protocolName)
-	goTerminal.SetSGR(goTerminal.Reset)
+	utils.PrintlnItalic(protocolName)
 
 	_, err = docker.StartContainer(ctx, cli, iConfig)
 	if err != nil {
-		return err
+		return "", "", err
 	}
 	fmt.Print("🚀  Started container ")
-	goTerminal.SetSGR(goTerminal.Reset, goTerminal.Italic)
-	fmt.Println(integrationName)
-	goTerminal.SetSGR(goTerminal.Reset)
-	return nil
+	utils.PrintlnItalic(integrationName)
+	return protocolName, integrationName, nil
 }
 
 func getIntegrationEnv(cmd *cobra.Command) ([]string, error) {
@@ -416,15 +415,16 @@ func startCmd() *cobra.Command {
 			}
 
 			// Start containers
-			err = startContainers(cli, valConfig, pool, debug, protocol, integration, label, integrationEnv)
+			protocolContainer, integrationContainer, err := startContainers(cli, valConfig, pool, debug, protocol, integration, label, integrationEnv)
 			if err != nil {
 				return err
 			}
 			fmt.Println()
 			fmt.Println("🔍  Use following commands to view the logs:")
-			goTerminal.SetSGR(goTerminal.Reset, goTerminal.Italic)
-			fmt.Printf("    docker logs -f kysor-%s\n", protocol.TagsLastPartWithoutVersion()[0])
-			fmt.Printf("    docker logs -f kysor-%s\n", integration.TagsLastPartWithoutVersion()[0])
+			fmt.Print("    ")
+			utils.PrintlnItalic(fmt.Sprintf("docker logs -f %s", integrationContainer))
+			fmt.Print("    ")
+			utils.PrintlnItalic(fmt.Sprintf("docker logs -f %s", protocolContainer))
 			goTerminal.SetSGR(goTerminal.Reset)
 			return nil
 		},
