@@ -1,7 +1,7 @@
 import { DataItem, IRuntime, sleep, Validator, VOTE } from '@kyvejs/protocol';
 import { name, version } from '../package.json';
 import axios from 'axios';
-import { isTimestampMoreThan10MinutesAgo } from "../utils/utils";
+import { isTimestampLessThan10MinutesAgo } from "../utils/utils";
 
 // Syntropy config
 interface IConfig {
@@ -38,7 +38,8 @@ export default class Syntropy implements IRuntime {
     const { data } = await axios.get(
       `${this.config.api}/get_item/${fromKey}/${toKey}`
     );
-    if (!isTimestampMoreThan10MinutesAgo(Number(key))) {
+    if (isTimestampLessThan10MinutesAgo(Number(key))) {
+      console.log("Waiting until key is more than 10 minutes in the past", key)
       throw new Error(
         `Waiting until key is more than 10 minutes in the past.`
       )
