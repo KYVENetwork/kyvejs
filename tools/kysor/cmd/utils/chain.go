@@ -1,15 +1,19 @@
 package utils
 
 import (
+	"github.com/KYVENetwork/chain/app"
+	"github.com/cosmos/cosmos-sdk/crypto/hd"
+	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/go-bip39"
 )
 
-func GetAddressFromMnemonic(mnemonic string) (sdk.AccAddress, error) {
-	bytes, err := bip39.MnemonicToByteArray(mnemonic)
-	if err != nil {
-		return sdk.AccAddress{}, err
-	}
+func GetAccAddressFromMnemonic(mnemonic string) (sdk.AccAddress, error) {
+	encodingConfig := app.NewEncodingConfig()
 
-	return sdk.AccAddressFromBech32(sdk.AccAddress(bytes).String())
+	keystore := keyring.NewInMemory(encodingConfig.Marshaler)
+	k, err := keystore.NewAccount("", mnemonic, keyring.DefaultBIP39Passphrase, sdk.FullFundraiserPath, hd.Secp256k1)
+	if err != nil {
+		return nil, err
+	}
+	return k.GetAddress()
 }

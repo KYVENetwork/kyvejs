@@ -6,6 +6,7 @@ import (
 	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/config"
 	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/types"
 	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/utils"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/go-bip39"
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
@@ -177,7 +178,7 @@ func valaccountsCreateCmd() *cobra.Command {
 		Short:   ValaccountsCreateCmdConfig.Short,
 		PreRunE: utils.CombineFuncs(utils.SetupInteractiveMode, utils.CheckIfInitialized),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			kyveClient, err := chain.NewKyveClient(config.Config.RPC)
+			kyveClient, err := chain.NewKyveClient(config.Config, nil)
 			if err != nil {
 				return err
 			}
@@ -305,7 +306,7 @@ func valaccountsShowAddressCmd() *cobra.Command {
 			}
 
 			// Address from mnemonic
-			address, err := utils.GetAddressFromMnemonic(valConfig.Value().Valaccount)
+			address, err := utils.GetAccAddressFromMnemonic(valConfig.Value().Valaccount)
 			if err != nil {
 				return err
 			}
@@ -326,7 +327,7 @@ func valaccountsShowBalanceCmd() *cobra.Command {
 		Short:   "Show the balance of a valaccount",
 		PreRunE: utils.CombineFuncs(utils.SetupInteractiveMode, utils.CheckIfInitialized),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			kyveClient, err := chain.NewKyveClient(config.Config.RPC)
+			kyveClient, err := chain.NewKyveClient(config.Config, nil)
 			if err != nil {
 				return err
 			}
@@ -345,7 +346,7 @@ func valaccountsShowBalanceCmd() *cobra.Command {
 			}
 
 			// Address from mnemonic
-			address, err := utils.GetAddressFromMnemonic(valConfig.Value().Valaccount)
+			address, err := utils.GetAccAddressFromMnemonic(valConfig.Value().Valaccount)
 			if err != nil {
 				return err
 			}
@@ -391,7 +392,7 @@ func valaccountsTransferCmd() *cobra.Command {
 		Example: "kysor valaccounts transfer --from <valaccount> --to <address> --amount <amount>",
 		PreRunE: utils.CombineFuncs(utils.SetupInteractiveMode, utils.CheckIfInitialized),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			kyveClient, err := chain.NewKyveClient(config.Config.RPC)
+			kyveClient, err := chain.NewKyveClient(config.Config, config.ValaccountConfigs)
 			if err != nil {
 				return err
 			}
@@ -404,19 +405,24 @@ func valaccountsTransferCmd() *cobra.Command {
 			}
 
 			// Valaccount config
-			valConfig, err := utils.GetOptionFromPromptOrFlag(cmd, flagValaccTransferFrom)
+			valConfigOption, err := utils.GetOptionFromPromptOrFlag(cmd, flagValaccTransferFrom)
 			if err != nil {
 				return err
 			}
+			valConfig := valConfigOption.Value()
 
 			// Address from mnemonic
-			address, err := utils.GetAddressFromMnemonic(valConfig.Value().Valaccount)
+			address, err := utils.GetAccAddressFromMnemonic(valConfig.Valaccount)
 			if err != nil {
 				return err
 			}
 
 			// Transfer to
-			to, err := utils.GetStringFromPromptOrFlag(cmd, flagValaccTransferTo)
+			toStr, err := utils.GetStringFromPromptOrFlag(cmd, flagValaccTransferTo)
+			if err != nil {
+				return err
+			}
+			to, err := sdk.AccAddressFromBech32(toStr)
 			if err != nil {
 				return err
 			}
@@ -428,12 +434,13 @@ func valaccountsTransferCmd() *cobra.Command {
 			}
 
 			// Execute the send transaction
-			result, err := kyveClient.ExecuteSend(address.String(), to, amount)
+			txResult, err := kyveClient.ExecuteSend(address, to, amount)
 			if err != nil {
 				return err
 			}
 
-			fmt.Printf("Transaction sent: %s\n", result.String())
+			fmt.Printf("💰 Sent %s %s from %s (%s) to %s. Transaction hash: %s\n",
+				amount, config.Config.Denom, valConfig.PrettyName(), address.String(), to.String(), txResult.TxHash)
 			return nil
 		},
 	}

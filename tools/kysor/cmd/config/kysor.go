@@ -10,6 +10,7 @@ import (
 	"github.com/spf13/cobra"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 const configDir = ".kysor"
@@ -26,6 +27,7 @@ type KysorConfig struct {
 	RPC                  string `koanf:"rpc"`
 	REST                 string `koanf:"rest"`
 	AutoDownloadBinaries bool   `koanf:"autoDownloadBinaries"`
+	Denom                string
 }
 
 func (c KysorConfig) Save() error {
@@ -112,4 +114,10 @@ func InitKysorConfig() {
 	c.Name = filepath.Base(path)
 	c.Path = path
 	Config = c
+
+	// Set the denom based on the chain ID (kaon and korrelia use tkyve)
+	Config.Denom = "ukyve"
+	if strings.HasPrefix(c.ChainID, "kaon") || strings.HasPrefix(c.ChainID, "korellia") {
+		Config.Denom = "tkyve"
+	}
 }

@@ -32,6 +32,10 @@ func (c ValaccountConfig) Save() error {
 	return save(c, c.Path)
 }
 
+func (c ValaccountConfig) PrettyName() string {
+	return strings.TrimSuffix(c.Name, ".toml")
+}
+
 type ValaccountConfigOption struct {
 	types.Option[ValaccountConfig]
 	config ValaccountConfig

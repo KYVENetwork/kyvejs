@@ -1,26 +1,29 @@
 package chain
 
 import (
-	"context"
 	"fmt"
+	"github.com/KYVENetwork/chain/app"
+	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/config"
+	"github.com/cosmos/cosmos-sdk/crypto/hd"
+	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"time"
 
 	querytypes "github.com/KYVENetwork/chain/x/query/types"
 	rpchttp "github.com/cometbft/cometbft/rpc/client/http"
 	libclient "github.com/cometbft/cometbft/rpc/jsonrpc/client"
 	sdkclient "github.com/cosmos/cosmos-sdk/client"
-	sdkquery "github.com/cosmos/cosmos-sdk/types/query"
+	txtypes "github.com/cosmos/cosmos-sdk/types/tx"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 )
 
 const (
 	defaultQueryTimeout = 10 * time.Second
 	defaultTxTimeout    = 20 * time.Second
-
-	denom = "ukyve"
 )
 
+// KyveQuerier is a wrapper around all kyve specific x/query query clients
 type KyveQuerier struct {
 	PoolClient querytypes.QueryPoolClient
 }
@@ -31,92 +34,77 @@ func NewKyveQuerier(clientContext sdkclient.Context) *KyveQuerier {
 	}
 }
 
+// Querier performs all queries
 type Querier struct {
 	Query      *KyveQuerier
 	BankClient banktypes.QueryClient
+	AuthClient authtypes.QueryClient
 }
 
 func NewQuerier(clientContext sdkclient.Context) Querier {
 	return Querier{
 		Query:      NewKyveQuerier(clientContext),
 		BankClient: banktypes.NewQueryClient(clientContext),
+		AuthClient: authtypes.NewQueryClient(clientContext),
+	}
+}
+
+// Executor executes all transactions
+type Executor struct {
+	txClient       txtypes.ServiceClient
+	txBuilder      sdkclient.TxBuilder
+	encodingConfig app.EncodingConfig
+	keystore       keyring.Keyring
+}
+
+func NewExecutor(clientContext sdkclient.Context, encodingConfig app.EncodingConfig, configs []config.ValaccountConfig) Executor {
+	keystore := keyring.NewInMemory(encodingConfig.Marshaler)
+	for _, valaccConfig := range configs {
+		_, err := keystore.NewAccount(valaccConfig.Name, valaccConfig.Valaccount, keyring.DefaultBIP39Passphrase, sdk.FullFundraiserPath, hd.Secp256k1)
+		if err != nil {
+			fmt.Printf("⚠️ Warning: could not add key of valaccount %s: %v", valaccConfig.Name, err)
+		}
+	}
+	return Executor{
+		txClient:       txtypes.NewServiceClient(clientContext),
+		txBuilder:      encodingConfig.TxConfig.NewTxBuilder(),
+		encodingConfig: encodingConfig,
+		keystore:       keystore,
 	}
 }
 
 type KyveClient struct {
-	q          Querier
-	bankClient banktypes.MsgClient
+	q      Querier
+	e      Executor
+	config config.KysorConfig
 }
 
-func NewKyveClient(rpcAddress string) (*KyveClient, error) {
-	if rpcAddress == "" {
+func NewKyveClient(cfg config.KysorConfig, valaccConfigs []config.ValaccountConfig) (*KyveClient, error) {
+	if cfg.RPC == "" {
 		return nil, fmt.Errorf("rpc address must not be empty")
 	}
 
-	httpClient, err := libclient.DefaultHTTPClient(rpcAddress)
+	httpClient, err := libclient.DefaultHTTPClient(cfg.RPC)
 	if err != nil {
 		return nil, err
 	}
 
 	httpClient.Timeout = 10 * time.Second
-	rpcClient, err := rpchttp.NewWithClient(rpcAddress, "/websocket", httpClient)
+	rpcClient, err := rpchttp.NewWithClient(cfg.RPC, "/websocket", httpClient)
 	if err != nil {
 		return nil, err
 	}
 
-	clientContext := sdkclient.Context{Client: rpcClient}
+	encodingConfig := app.MakeEncodingConfig()
+	txConfig := encodingConfig.TxConfig
+	cdc := encodingConfig.Marshaler
+	clientContext := sdkclient.Context{Client: rpcClient, Codec: cdc, TxConfig: txConfig}
 
 	return &KyveClient{
-		q:          NewQuerier(clientContext),
-		bankClient: banktypes.NewMsgClient(clientContext),
+		q:      NewQuerier(clientContext),
+		e:      NewExecutor(clientContext, encodingConfig, valaccConfigs),
+		config: cfg,
 	}, nil
-}
-
-func (e *KyveClient) QueryPools() (*querytypes.QueryPoolsResponse, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), defaultQueryTimeout)
-	defer cancel()
-
-	params := &querytypes.QueryPoolsRequest{Pagination: &sdkquery.PageRequest{Limit: 1000}}
-
-	return e.q.Query.PoolClient.Pools(ctx, params)
-}
-
-func (e *KyveClient) QueryPool(poolId uint64) (*querytypes.QueryPoolResponse, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), defaultQueryTimeout)
-	defer cancel()
-
-	params := &querytypes.QueryPoolRequest{Id: poolId}
-
-	return e.q.Query.PoolClient.Pool(ctx, params)
-}
-
-func (e *KyveClient) QueryBalance(address string) (*banktypes.QueryBalanceResponse, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), defaultQueryTimeout)
-	defer cancel()
-
-	params := &banktypes.QueryBalanceRequest{Address: address, Denom: denom}
-
-	return e.q.BankClient.Balance(ctx, params)
-}
-
-func (e *KyveClient) ExecuteSend(from string, to string, amount string) (*banktypes.MsgSendResponse, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), defaultQueryTimeout)
-	defer cancel()
-
-	intAmount, ok := sdk.NewIntFromString(amount)
-	if !ok {
-		return nil, fmt.Errorf("invalid amount: %s", amount)
-	}
-
-	params := &banktypes.MsgSend{
-		FromAddress: from,
-		ToAddress:   to,
-		Amount:      sdk.NewCoins(sdk.NewCoin(denom, intAmount)),
-	}
-
-	// TODO: implement this proper (sign tx, broadcast tx, wait for tx)
-
-	return e.bankClient.Send(ctx, params)
 }
 
 func init() {
@@ -127,9 +115,9 @@ func init() {
 	consNodeAddressPrefix := accountAddressPrefix + "valcons"
 	consNodePubKeyPrefix := accountAddressPrefix + "valconspub"
 
-	config := sdk.GetConfig()
-	config.SetBech32PrefixForAccount(accountAddressPrefix, accountPubKeyPrefix)
-	config.SetBech32PrefixForValidator(validatorAddressPrefix, validatorPubKeyPrefix)
-	config.SetBech32PrefixForConsensusNode(consNodeAddressPrefix, consNodePubKeyPrefix)
-	config.Seal()
+	cfg := sdk.GetConfig()
+	cfg.SetBech32PrefixForAccount(accountAddressPrefix, accountPubKeyPrefix)
+	cfg.SetBech32PrefixForValidator(validatorAddressPrefix, validatorPubKeyPrefix)
+	cfg.SetBech32PrefixForConsensusNode(consNodeAddressPrefix, consNodePubKeyPrefix)
+	cfg.Seal()
 }

@@ -349,7 +349,7 @@ func startCmd() *cobra.Command {
 		Short:   StartCmdConfig.Short,
 		PreRunE: utils.CombineFuncs(utils.SetupInteractiveMode, utils.CheckIfInitialized),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			kyveClient, err := chain.NewKyveClient(config.Config.RPC)
+			kyveClient, err := chain.NewKyveClient(config.Config, config.ValaccountConfigs)
 			if err != nil {
 				return err
 			}
