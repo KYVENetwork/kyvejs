@@ -9,8 +9,6 @@ import (
 	"path/filepath"
 )
 
-var InitCmdConfig = types.CmdConfig{Name: "init", Short: "Init KYSOR"}
-
 var (
 	flagChainID = types.StringFlag{
 		Name:         "chain-id",
@@ -64,9 +62,9 @@ var (
 
 func initCmd(homeDir string) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     InitCmdConfig.Name,
-		Short:   InitCmdConfig.Short,
-		PreRunE: utils.CombineFuncs(utils.SetupInteractiveMode),
+		Use:     "init",
+		Short:   "Initialize KYSOR",
+		PreRunE: utils.SetupInteractiveMode,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// Parent is only defined if the command runs in non-interactive mode
 			if homeDir == "" && cmd.Parent() != nil {

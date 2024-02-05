@@ -14,58 +14,50 @@ import (
 	"path/filepath"
 )
 
-var (
-	ValaccountsCmdConfig            = types.CmdConfig{Name: "valaccounts", Short: "Manage validator accounts"}
-	ValaccountsCreateCmdConfig      = types.CmdConfig{Name: "create", Short: "Create a new valaccount"}
-	ValaccountsShowAddressCmdConfig = types.CmdConfig{Name: "show-address", Short: "Show address of a valaccount"}
-	ValaccountsShowBalanceCmdConfig = types.CmdConfig{Name: "show-balance", Short: "Show balance of a valaccount"}
-	VallaccountsTransferCmdConfig   = types.CmdConfig{Name: "transfer", Short: "Transfer tokens from a valaccount to another address"}
-	ValaccountsDeleteCmdConfig      = types.CmdConfig{Name: "delete", Short: "Delete a valaccount"}
-)
-
 func valaccountsCmd() *cobra.Command {
 	return &cobra.Command{
-		Use:     ValaccountsCmdConfig.Name,
-		Short:   ValaccountsCmdConfig.Short,
-		PreRunE: config.LoadConfigs,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			// Check if the interactive flag is set
-			// -> if so ask the user what to do
-			if utils.IsInteractive(cmd) {
-				// TODO: print a better help message (explain interactive mode)
-				err := cmd.Help()
-				if err != nil {
-					return err
+		Use:   "valaccounts",
+		Short: "Manage validator accounts",
+		RunE:  utils.RunPromptCommandE,
+	}
+}
+
+func getMnemonic(cmd *cobra.Command) (string, error) {
+	isRecover, err := utils.GetBoolFromPromptOrFlag(cmd, flagValaccCreateRecover)
+	if err != nil {
+		return "", nil
+	}
+
+	if isRecover {
+		prompt := promptui.Prompt{
+			Label: "Enter your mnemonic",
+			Validate: func(s string) error {
+				if !bip39.IsMnemonicValid(s) {
+					return fmt.Errorf("invalid mnemonic")
 				}
 
-				options := []types.CmdConfig{
-					ValaccountsCreateCmdConfig,
-					ValaccountsShowAddressCmdConfig,
-					ValaccountsShowBalanceCmdConfig,
-					VallaccountsTransferCmdConfig,
-					ValaccountsDeleteCmdConfig,
+				for _, c := range config.ValaccountConfigs {
+					if c.Valaccount == s {
+						return fmt.Errorf("valaccount with this mnemonic already exists")
+					}
 				}
-				nextCmd, err := utils.PromptCmd(options)
-				if err != nil {
-					return err
-				}
-				switch nextCmd.Name {
-				case ValaccountsCreateCmdConfig.Name:
-					return valaccountsCreateCmd().Execute()
-				case ValaccountsShowAddressCmdConfig.Name:
-					return valaccountsShowAddressCmd().Execute()
-				case ValaccountsShowBalanceCmdConfig.Name:
-					return valaccountsShowBalanceCmd().Execute()
-				case VallaccountsTransferCmdConfig.Name:
-					return valaccountsTransferCmd().Execute()
-				case ValaccountsDeleteCmdConfig.Name:
-					return valaccountsDeleteCmd().Execute()
-				default:
-					return fmt.Errorf("invalid option: %s", nextCmd.Name)
-				}
-			}
-			return cmd.Help()
-		},
+
+				return nil
+			},
+		}
+		mnemonic, err := prompt.Run()
+		if err != nil {
+			return "", nil
+		}
+
+		return mnemonic, nil
+	} else {
+		entropySeed, err := bip39.NewEntropy(256)
+		if err != nil {
+			return "", nil
+		}
+
+		return bip39.NewMnemonic(entropySeed)
 	}
 }
 
@@ -133,49 +125,10 @@ var (
 	}
 )
 
-func getMnemonic(cmd *cobra.Command) (string, error) {
-	isRecover, err := utils.GetBoolFromPromptOrFlag(cmd, flagValaccCreateRecover)
-	if err != nil {
-		return "", nil
-	}
-
-	if isRecover {
-		prompt := promptui.Prompt{
-			Label: "Enter your mnemonic",
-			Validate: func(s string) error {
-				if !bip39.IsMnemonicValid(s) {
-					return fmt.Errorf("invalid mnemonic")
-				}
-
-				for _, c := range config.ValaccountConfigs {
-					if c.Valaccount == s {
-						return fmt.Errorf("valaccount with this mnemonic already exists")
-					}
-				}
-
-				return nil
-			},
-		}
-		mnemonic, err := prompt.Run()
-		if err != nil {
-			return "", nil
-		}
-
-		return mnemonic, nil
-	} else {
-		entropySeed, err := bip39.NewEntropy(256)
-		if err != nil {
-			return "", nil
-		}
-
-		return bip39.NewMnemonic(entropySeed)
-	}
-}
-
 func valaccountsCreateCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     ValaccountsCreateCmdConfig.Name,
-		Short:   ValaccountsCreateCmdConfig.Short,
+		Use:     "create",
+		Short:   "Create a new valaccount",
 		PreRunE: utils.CombineFuncs(config.LoadConfigs, utils.SetupInteractiveMode),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			kyveClient, err := chain.NewKyveClient(config.GetConfigX(), nil)

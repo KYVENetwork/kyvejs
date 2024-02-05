@@ -8,6 +8,7 @@ import (
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+	"slices"
 	"strconv"
 )
 
@@ -142,11 +143,20 @@ func CombineFuncs(funcs ...cobra.PositionalArgs) cobra.PositionalArgs {
 	}
 }
 
+func getPromptString(cmd *cobra.Command) string {
+	return fmt.Sprintf("%s - %s", cmd.Name(), cmd.Short)
+}
+
 // PromptCmd prompts the user to select one of the given options.
-func PromptCmd(options []types.CmdConfig) (*types.CmdConfig, error) {
+func PromptCmd(options []*cobra.Command) (*cobra.Command, error) {
 	var items []string
+
+	// Commands that will not be shown in the list
+	blacklist := []string{"completion", "help"}
 	for _, option := range options {
-		items = append(items, option.PromptString())
+		if !slices.Contains(blacklist, option.Name()) {
+			items = append(items, getPromptString(option))
+		}
 	}
 
 	prompt := promptui.Select{
@@ -161,8 +171,8 @@ func PromptCmd(options []types.CmdConfig) (*types.CmdConfig, error) {
 		return nil, err
 	}
 	for _, option := range options {
-		if option.PromptString() == result {
-			return &option, nil
+		if getPromptString(option) == result {
+			return option, nil
 		}
 	}
 	return nil, fmt.Errorf("invalid option: %s", result)
@@ -349,4 +359,61 @@ func GetOptionFromPromptOrFlag[T any](cmd *cobra.Command, flag types.OptionFlag[
 		}
 	}
 	return nil, fmt.Errorf("invalid option: %s", value)
+}
+
+var hasInteractiveInfoBeenShown = false
+
+// ShowInteractiveInfo prints a message to the user that the command is running in interactive mode.
+func ShowInteractiveInfo() {
+	if !hasInteractiveInfoBeenShown {
+		fmt.Println("KYSOR is running in interactive mode.")
+		fmt.Println("Add '-y' to your command to disable interactive mode.")
+		fmt.Println()
+		hasInteractiveInfoBeenShown = true
+	}
+}
+
+func RunPromptCommandE(cmd *cobra.Command, args []string) error {
+	// Check if the interactive flag is set
+	// -> if so ask the user what to do
+	if IsInteractive(cmd) {
+		ShowInteractiveInfo()
+
+		// Prompt for the next command
+		nextCmd, err := PromptCmd(cmd.Commands())
+		if err != nil {
+			return err
+		}
+
+		// Run persistent pre run functions
+		if nextCmd.PersistentPreRunE != nil {
+			err = nextCmd.PersistentPreRunE(nextCmd, args)
+			if err != nil {
+				return err
+			}
+		} else if nextCmd.PersistentPreRun != nil {
+			nextCmd.PersistentPreRun(nextCmd, args)
+		}
+
+		// Run pre run functions
+		if nextCmd.PreRunE != nil {
+			err = nextCmd.PreRunE(nextCmd, args)
+			if err != nil {
+				return err
+			}
+		} else if nextCmd.PreRun != nil {
+			nextCmd.PreRun(nextCmd, args)
+		}
+
+		// Run the next command
+		if nextCmd.RunE != nil {
+			return nextCmd.RunE(nextCmd, args)
+		} else if nextCmd.Run != nil {
+			nextCmd.Run(nextCmd, args)
+			return nil
+		}
+		return fmt.Errorf("no run function defined for command: %s", nextCmd.Name())
+	}
+	// Otherwise show the help
+	return cmd.Help()
 }

@@ -55,7 +55,7 @@ func ValidatePort(input string) error {
 func ValidateKyveAddress(input string) error {
 	_, err := sdk.AccAddressFromBech32(input)
 	if err != nil {
-		return fmt.Errorf("invalid kyve address. Must be a bech32 encoded address (ex: kyve1kumjqpufgh8myla26jtc9r2e674zeppu8fears)")
+		return fmt.Errorf("invalid kyve address. Must be a bech32 encoded address (ex: kyve1kumjqpufgh8myla26jtc9r2e674zeppu8feard)")
 	}
 	return nil
 }

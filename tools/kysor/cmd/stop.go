@@ -3,7 +3,6 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/types"
 	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/utils"
 	"github.com/KYVENetwork/kyvejs/tools/kysor/docker"
 	"github.com/docker/docker/client"
@@ -11,8 +10,6 @@ import (
 	"strings"
 	"time"
 )
-
-var StopCmdConfig = types.CmdConfig{Name: "stop", Short: "Stop data validator"}
 
 // tearDownContainers stops and removes all containers and networks with the given label
 func tearDownContainers(cli *client.Client, label string) error {
@@ -37,8 +34,9 @@ func tearDownContainers(cli *client.Client, label string) error {
 
 func stopCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   StopCmdConfig.Name,
-		Short: StopCmdConfig.Short,
+		Use:     "stop",
+		Short:   "Stop the KYVE data validator",
+		PreRunE: utils.SetupInteractiveMode,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cli, err := client.NewClientWithOpts(client.WithAPIVersionNegotiation())
 			if err != nil {

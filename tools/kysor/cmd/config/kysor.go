@@ -77,6 +77,11 @@ func save(s interface{}, path string) error {
 }
 
 func GetHomeDir(cmd *cobra.Command) (string, error) {
+	// Go up the command tree until the root command is reached
+	if cmd.Parent() != nil {
+		return GetHomeDir(cmd.Parent())
+	}
+	// Get the home directory from the flags
 	homeDir, err := cmd.Flags().GetString(FlagHome.Name)
 	if err != nil {
 		return "", err

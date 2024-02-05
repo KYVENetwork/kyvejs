@@ -26,36 +26,7 @@ import (
 	"time"
 )
 
-var StartCmdConfig = types.CmdConfig{Name: "start", Short: "Start data validator"}
-
 var globalCleanupLabel = "kysor-all"
-
-var (
-	flagStartValaccount = types.OptionFlag[config.ValaccountConfig]{
-		Name:     "valaccount",
-		Short:    "v",
-		Usage:    "Name of the valaccount to run",
-		Required: true,
-	}
-	flagStartEnvFile = types.StringFlag{
-		Name:       "env-file",
-		Short:      "e",
-		Usage:      "Specify the path to an .env file which should be used when starting a binary",
-		Required:   false,
-		ValidateFn: utils.ValidatePathExistsOrEmpty,
-	}
-	flagStartDebug = types.BoolFlag{
-		Name:         "debug",
-		Short:        "",
-		Usage:        "Run the validator node in debug mode",
-		DefaultValue: false,
-	}
-	flagStartVerbose = types.BoolFlag{
-		Name:         "verbose",
-		Usage:        "Show detailed build output",
-		DefaultValue: false,
-	}
-)
 
 type Runtime struct {
 	RuntimeVersion  string
@@ -357,10 +328,37 @@ func getIntegrationEnv(cmd *cobra.Command) ([]string, error) {
 	return integrationEnv, nil
 }
 
+var (
+	flagStartValaccount = types.OptionFlag[config.ValaccountConfig]{
+		Name:     "valaccount",
+		Short:    "v",
+		Usage:    "Name of the valaccount to run",
+		Required: true,
+	}
+	flagStartEnvFile = types.StringFlag{
+		Name:       "env-file",
+		Short:      "e",
+		Usage:      "Specify the path to an .env file which should be used when starting a binary",
+		Required:   false,
+		ValidateFn: utils.ValidatePathExistsOrEmpty,
+	}
+	flagStartDebug = types.BoolFlag{
+		Name:         "debug",
+		Short:        "",
+		Usage:        "Run the validator node in debug mode",
+		DefaultValue: false,
+	}
+	flagStartVerbose = types.BoolFlag{
+		Name:         "verbose",
+		Usage:        "Show detailed build output",
+		DefaultValue: false,
+	}
+)
+
 func startCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     StartCmdConfig.Name,
-		Short:   StartCmdConfig.Short,
+		Use:     "start",
+		Short:   "Start data validator",
 		PreRunE: utils.CombineFuncs(config.LoadConfigs, utils.SetupInteractiveMode),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			kyveClient, err := chain.NewKyveClient(config.GetConfigX(), config.ValaccountConfigs)

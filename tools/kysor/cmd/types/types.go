@@ -45,12 +45,3 @@ type OptionFlag[T any] struct {
 	Required     bool
 	ValidateFn   func(input string) error
 }
-
-type CmdConfig struct {
-	Name  string
-	Short string
-}
-
-func (c CmdConfig) PromptString() string {
-	return c.Short
-}
