@@ -53,13 +53,8 @@ func NewProtocolBuilder(testName string, log *zap.Logger) *ProtocolBuilder {
 	}
 }
 
-type ErrorLine struct {
-	Error       string      `json:"error"`
-	ErrorDetail ErrorDetail `json:"errorDetail"`
-}
-
-type ErrorDetail struct {
-	Message string `json:"message"`
+func (pc *ProtocolBuilder) printToDebugLog(text string) {
+	pc.log.Debug(text)
 }
 
 func (pc *ProtocolBuilder) BuildDependencies() error {
@@ -81,7 +76,7 @@ func (pc *ProtocolBuilder) BuildDependencies() error {
 	errChs := make([]chan error, len(configs))
 	for i, img := range configs {
 		errChs[i] = make(chan error)
-		docker.BuildImageAsync(context.Background(), cli, img, errChs[i])
+		docker.BuildImageAsync(context.Background(), cli, img, errChs[i], docker.OutputOptions{PrintFn: pc.printToDebugLog})
 	}
 
 	for _, errCh := range errChs {
@@ -127,7 +122,7 @@ func (pc *ProtocolBuilder) BuildIntegrations(testConfigs []*TestConfig) error {
 	errChs := make([]chan error, len(integrationConfigs))
 	for i, img := range integrationConfigs {
 		errChs[i] = make(chan error)
-		docker.BuildImageAsync(context.Background(), cli, img, errChs[i])
+		docker.BuildImageAsync(context.Background(), cli, img, errChs[i], docker.OutputOptions{PrintFn: pc.log.Debug})
 	}
 
 	for _, errCh := range errChs {
