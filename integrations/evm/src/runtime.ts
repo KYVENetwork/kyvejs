@@ -1,8 +1,8 @@
 import { DataItem, IRuntime, Validator, VOTE } from '@kyvejs/protocol';
 import { name, version } from '../package.json';
-import { BigNumber, providers, utils } from "ethers";
+import { providers, utils } from "ethers";
 import { BlockWithTransactions, TransactionReceipt } from '@ethersproject/abstract-provider';
-import { ethers } from "ethers/lib.esm";
+import { chunkArray, removeLeadingZero, removeOutputProperties } from "../utils/utils";
 
 // EVM config
 interface IConfig {
@@ -36,7 +36,7 @@ export default class EVM implements IRuntime {
   async  getDataItem(_: Validator, key: string): Promise<any> {
     const blockWithTxs: BlockWithTransactions[] = [];
     const receipts: TransactionReceipt[] = [];
-    // const traceCalls: any[] = [];
+    const traceCalls: any[] = [];
 
     const provider = new providers.StaticJsonRpcProvider({
       url: this.config.rpc,
@@ -73,52 +73,35 @@ export default class EVM implements IRuntime {
     const receipt = await provider.send(receiptRequestData.method, receiptRequestData.params);
     receipts.push(receipt);
 
-    // const chunkedTransactions = chunkArray(blockWithTxs[0].transactions, 4);
-    //
-    // const chunkedTraceCalls: any[] = [];
-    // // Process each chunk
-    // for (const chunk of chunkedTransactions) {
-    //   const traceParams = chunk.map((tx: any) => [
-    //     {
-    //       from: tx.from,
-    //       to: tx.to,
-    //       value: removeLeadingZero(tx.value.toHexString()),
-    //     },
-    //     ['trace'],
-    //   ]);
-    //
-    //   // Send trace call request for each chunk
-    //   const traceCall = await provider.send('trace_callMany', [traceParams, 'latest']);
-    //
-    //   traceCall.forEach((t: any) => {
-    //     chunkedTraceCalls.push(t);
-    //   })
-    // }
-    // traceCalls.push(chunkedTraceCalls)
+    const chunkedTransactions = chunkArray(blockWithTxs[0].transactions, 4);
 
-    // check if results from the different sources match
-    if (
-      !blockWithTxs.every((b) => JSON.stringify(b) === JSON.stringify(blockWithTxs[0]))
-    ) {
-      throw new Error(`Sources returned different blockWithTxs`);
+    const chunkedTraceCalls: any[] = [];
+    // Process each chunk
+    for (const chunk of chunkedTransactions) {
+      const traceParams = chunk.map((tx: any) => [
+        {
+          from: tx.from,
+          to: tx.to,
+          value: removeLeadingZero(tx.value.toHexString()),
+        },
+        ['trace'],
+      ]);
+
+      // Send trace call request for each chunk
+      const traceCall = await provider.send('trace_callMany', [traceParams, 'latest']);
+
+      traceCall.forEach((t: any) => {
+        chunkedTraceCalls.push(t);
+      })
     }
-    if (
-      !receipts.every((r) => JSON.stringify(r) === JSON.stringify(receipts[0]))
-    ) {
-      throw new Error(`Sources returned different receipts`);
-    }
-    // if (
-    //   !traceCalls.every((t) => JSON.stringify(t) === JSON.stringify(traceCalls[0]))
-    // ) {
-    //   throw new Error(`Sources returned different traceCalls`);
-    // }
+    traceCalls.push(chunkedTraceCalls)
 
     return {
       key,
       value: {
         block: blockWithTxs[0],
         receipts: receipts[0],
-        // traceCalls: traceCalls[0]
+        traceCalls: traceCalls[0]
       },
     };
   }
@@ -147,14 +130,14 @@ export default class EVM implements IRuntime {
     }
 
   // Remove non-deterministic data
-  //   const modifiedValidationDataItem = removeOutputProperties(validationDataItem.value.traceCalls, ["output", "accessList", "address", "value"]);
-  //   const modifiedProposedDataItem = removeOutputProperties(proposedDataItem.value.traceCalls, ["output", "accessList", "address", "value"])
-  //
-  // if (
-  //     JSON.stringify(modifiedProposedDataItem) === JSON.stringify(modifiedValidationDataItem)
-  //   ) {
-  //     return VOTE.VOTE_TYPE_ABSTAIN;
-  //   }
+    const modifiedValidationDataItem = removeOutputProperties(validationDataItem.value.traceCalls, ["output", "accessList", "address", "value"]);
+    const modifiedProposedDataItem = removeOutputProperties(proposedDataItem.value.traceCalls, ["output", "accessList", "address", "value"])
+
+  if (
+      JSON.stringify(modifiedProposedDataItem) === JSON.stringify(modifiedValidationDataItem)
+    ) {
+      return VOTE.VOTE_TYPE_ABSTAIN;
+    }
 
     return VOTE.VOTE_TYPE_INVALID;
   }
