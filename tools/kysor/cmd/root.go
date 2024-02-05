@@ -77,7 +77,7 @@ func Execute() {
 }
 
 func init() {
-	rootCmd.PersistentFlags().StringP(config.FlagHome.Name, config.FlagHome.Short, config.FlagHome.DefaultValue, config.FlagHome.Usage)
-	rootCmd.PersistentFlags().BoolP(types.FlagNonInteractive.Name, types.FlagNonInteractive.Short, types.FlagNonInteractive.DefaultValue, types.FlagNonInteractive.Usage)
+	utils.AddPersistentStringFlags(rootCmd, []types.StringFlag{config.FlagHome})
+	utils.AddPersistentBoolFlags(rootCmd, []types.BoolFlag{types.FlagNonInteractive})
 	rootCmd.SetErrPrefix(promptui.IconBad)
 }

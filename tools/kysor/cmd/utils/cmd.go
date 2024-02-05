@@ -111,6 +111,18 @@ func SetupInteractiveMode(cmd *cobra.Command, _ []string) error {
 	return nil
 }
 
+func AddPersistentStringFlags(cmd *cobra.Command, flags []types.StringFlag) {
+	for _, f := range flags {
+		cmd.PersistentFlags().StringP(f.Name, f.Short, f.DefaultValue, f.Usage)
+	}
+}
+
+func AddPersistentBoolFlags(cmd *cobra.Command, flags []types.BoolFlag) {
+	for _, f := range flags {
+		cmd.PersistentFlags().BoolP(f.Name, f.Short, f.DefaultValue, f.Usage)
+	}
+}
+
 func CheckIfHasValaccounts(_ *cobra.Command, _ []string) error {
 	if len(config.ValaccountConfigOptions) == 0 {
 		return fmt.Errorf("no valaccount found. Create one with 'kysor valaccounts create'")
