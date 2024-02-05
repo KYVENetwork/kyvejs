@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/types"
 	"github.com/knadh/koanf/parsers/toml"
 	"github.com/knadh/koanf/providers/file"
@@ -10,8 +11,6 @@ import (
 	"path/filepath"
 	"strings"
 )
-
-var ValaccountsDir = filepath.Join(configDir, "valaccounts")
 
 var ValaccountConfigs []ValaccountConfig
 var ValaccountConfigOptions []types.Option[ValaccountConfig]
@@ -53,21 +52,27 @@ func (o ValaccountConfigOption) StringValue() string {
 	return o.config.Name
 }
 
-func InitValaccountConfigs() {
-	if ValaccountConfigs != nil {
-		return
+func GetValaccountsConfigDir(cmd *cobra.Command) (string, error) {
+	homeDir, err := GetHomeDir(cmd)
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(homeDir, "valaccounts"), nil
+}
+
+func loadValaccountConfigs(cmd *cobra.Command, args []string) error {
+	valaccountsDir, err := GetValaccountsConfigDir(cmd)
+	if err != nil {
+		return err
 	}
 
-	home, err := os.UserHomeDir()
-	cobra.CheckErr(err)
-
 	// Get all the valaccount config files
-	entries, err := os.ReadDir(filepath.Join(home, ValaccountsDir))
+	entries, err := os.ReadDir(valaccountsDir)
 	if err != nil && os.IsNotExist(err) {
 		// return if the dir doesn't exist
-		return
-	} else {
-		cobra.CheckErr(err)
+		return nil
+	} else if err != nil {
+		return fmt.Errorf("error reading valaccount config directory: %s", err)
 	}
 
 	for _, entry := range entries {
@@ -76,11 +81,15 @@ func InitValaccountConfigs() {
 				var k = koanf.New(".")
 				var valaccountConfig ValaccountConfig
 				name := entry.Name()
-				path := filepath.Join(home, ValaccountsDir, entry.Name())
+				path := filepath.Join(valaccountsDir, entry.Name())
 				err = k.Load(file.Provider(path), toml.Parser())
-				cobra.CheckErr(err)
+				if err != nil {
+					return fmt.Errorf("error loading valaccount config file: %s", err)
+				}
 				err = k.Unmarshal("", &valaccountConfig)
-				cobra.CheckErr(err)
+				if err != nil {
+					return fmt.Errorf("error unmarshalling valaccount config file: %s", err)
+				}
 				valaccountConfig.Name = name
 				valaccountConfig.Path = path
 				ValaccountConfigs = append(ValaccountConfigs, valaccountConfig)
@@ -88,4 +97,5 @@ func InitValaccountConfigs() {
 			}
 		}
 	}
+	return nil
 }

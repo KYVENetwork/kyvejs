@@ -36,7 +36,7 @@ func (c *KyveClient) createSignedTxn(sender sdktypes.Address, msgs ...sdktypes.M
 	if err := txBuilder.SetMsgs(msgs...); err != nil {
 		return nil, err
 	}
-	feeAmt := sdktypes.Coin{Denom: c.config.Denom, Amount: sdktypes.NewInt(2000)}
+	feeAmt := sdktypes.Coin{Denom: c.config.GetDenom(), Amount: sdktypes.NewInt(2000)}
 	feeAmount := sdktypes.NewCoins(feeAmt)
 	txBuilder.SetFeeAmount(feeAmount)
 	txBuilder.SetGasLimit(100000)
@@ -124,7 +124,7 @@ func (c *KyveClient) ExecuteSend(from sdktypes.AccAddress, to sdktypes.AccAddres
 		return nil, fmt.Errorf("invalid amount: %s", amount)
 	}
 
-	msg := banktypes.NewMsgSend(from, to, sdk.NewCoins(sdk.NewCoin(c.config.Denom, intAmount)))
+	msg := banktypes.NewMsgSend(from, to, sdk.NewCoins(sdk.NewCoin(c.config.GetDenom(), intAmount)))
 
 	txn, err := c.createSignedTxn(from, msg)
 	if err != nil {

@@ -97,6 +97,7 @@ func IsInteractive(cmd *cobra.Command) bool {
 
 // SetupInteractiveMode sets up the interactive mode for the given command.
 // This means that all flags are not required anymore.
+// Load the config file before running this function.
 func SetupInteractiveMode(cmd *cobra.Command, _ []string) error {
 	if IsInteractive(cmd) {
 		cmd.Flags().VisitAll(func(f *pflag.Flag) {
@@ -106,13 +107,6 @@ func SetupInteractiveMode(cmd *cobra.Command, _ []string) error {
 				}
 			}
 		})
-	}
-	return nil
-}
-
-func CheckIfInitialized(_ *cobra.Command, _ []string) error {
-	if !config.IsInitialzed() {
-		return fmt.Errorf("kysor is not initialized. Run 'kysor init' to initialize kysor")
 	}
 	return nil
 }

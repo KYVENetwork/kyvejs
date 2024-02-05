@@ -30,7 +30,7 @@ func (c *KyveClient) QueryBalance(address string) (*banktypes.QueryBalanceRespon
 	ctx, cancel := context.WithTimeout(context.Background(), defaultQueryTimeout)
 	defer cancel()
 
-	params := &banktypes.QueryBalanceRequest{Address: address, Denom: c.config.Denom}
+	params := &banktypes.QueryBalanceRequest{Address: address, Denom: c.config.GetDenom()}
 
 	return c.q.BankClient.Balance(ctx, params)
 }

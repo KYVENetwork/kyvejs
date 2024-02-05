@@ -6,6 +6,7 @@ import (
 	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/types"
 	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/utils"
 	"github.com/spf13/cobra"
+	"path/filepath"
 )
 
 var InitCmdConfig = types.CmdConfig{Name: "init", Short: "Init KYSOR"}
@@ -59,27 +60,27 @@ var (
 		Usage:        "Allow automatic download and execution of new upgrade binaries",
 		Required:     false,
 	}
-	// TODO: add home flag
 )
 
-func initCmd(configFilePath string) *cobra.Command {
+func initCmd(homeDir string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     InitCmdConfig.Name,
 		Short:   InitCmdConfig.Short,
-		PreRunE: utils.SetupInteractiveMode,
+		PreRunE: utils.CombineFuncs(utils.SetupInteractiveMode),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// Parent is only defined if the command runs in non-interactive mode
-			if configFilePath == "" && cmd.Parent() != nil {
-				path, err := cmd.Parent().PersistentFlags().GetString(config.FlagConfig.Name)
+			if homeDir == "" && cmd.Parent() != nil {
+				path, err := cmd.Parent().PersistentFlags().GetString(config.FlagHome.Name)
 				if err != nil {
 					return err
 				}
-				configFilePath = path
+				homeDir = path
 			}
+			configFilePath, err := filepath.Abs(filepath.Join(homeDir, "config.toml"))
 
 			// Check if the config file already exists
 			if config.DoesConfigExist(configFilePath) {
-				return fmt.Errorf("config file already exists: %s", config.FlagConfig.DefaultValue)
+				return fmt.Errorf("config file already exists: %s", configFilePath)
 			}
 
 			// Get the values from the flags or prompt the user for them
@@ -105,15 +106,13 @@ func initCmd(configFilePath string) *cobra.Command {
 
 			// Create the config file
 			kysorConfig := config.KysorConfig{
-				Name:                 "config.toml",
-				Path:                 configFilePath,
 				ChainID:              chainID,
 				RPC:                  rpc,
 				REST:                 rest,
 				AutoDownloadBinaries: autoDownload,
 			}
 
-			return kysorConfig.Save()
+			return kysorConfig.Save(configFilePath)
 		},
 	}
 	utils.AddStringFlags(cmd, []types.StringFlag{flagChainID, flagRPC, flagREST})

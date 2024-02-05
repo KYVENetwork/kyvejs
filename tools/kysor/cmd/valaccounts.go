@@ -27,7 +27,7 @@ func valaccountsCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:     ValaccountsCmdConfig.Name,
 		Short:   ValaccountsCmdConfig.Short,
-		PreRunE: utils.CheckIfInitialized,
+		PreRunE: config.LoadConfigs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// Check if the interactive flag is set
 			// -> if so ask the user what to do
@@ -176,9 +176,9 @@ func valaccountsCreateCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     ValaccountsCreateCmdConfig.Name,
 		Short:   ValaccountsCreateCmdConfig.Short,
-		PreRunE: utils.CombineFuncs(utils.SetupInteractiveMode, utils.CheckIfInitialized),
+		PreRunE: utils.CombineFuncs(config.LoadConfigs, utils.SetupInteractiveMode),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			kyveClient, err := chain.NewKyveClient(config.Config, nil)
+			kyveClient, err := chain.NewKyveClient(config.GetConfigX(), nil)
 			if err != nil {
 				return err
 			}
@@ -246,14 +246,14 @@ func valaccountsCreateCmd() *cobra.Command {
 				return err
 			}
 
-			home, err := os.UserHomeDir()
+			valaccountsDir, err := config.GetValaccountsConfigDir(cmd)
 			if err != nil {
 				return err
 			}
 
 			valaccountConfig := config.ValaccountConfig{
 				Name:           fmt.Sprintf("%s.toml", name),
-				Path:           filepath.Join(home, config.ValaccountsDir, fmt.Sprintf("%s.toml", name)),
+				Path:           filepath.Join(valaccountsDir, fmt.Sprintf("%s.toml", name)),
 				Pool:           pool.Value(),
 				Valaccount:     mnemonic,
 				StoragePriv:    storageProvKey,
@@ -290,7 +290,7 @@ func valaccountsShowAddressCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "show-address",
 		Short:   "Show the address of a valaccount",
-		PreRunE: utils.CombineFuncs(utils.SetupInteractiveMode, utils.CheckIfInitialized),
+		PreRunE: utils.CombineFuncs(config.LoadConfigs, utils.SetupInteractiveMode),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// Return if no valaccount exists
 			flagValaccShowAddressName.Options = config.ValaccountConfigOptions
@@ -325,9 +325,9 @@ func valaccountsShowBalanceCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "show-balance",
 		Short:   "Show the balance of a valaccount",
-		PreRunE: utils.CombineFuncs(utils.SetupInteractiveMode, utils.CheckIfInitialized),
+		PreRunE: utils.CombineFuncs(config.LoadConfigs, utils.SetupInteractiveMode),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			kyveClient, err := chain.NewKyveClient(config.Config, nil)
+			kyveClient, err := chain.NewKyveClient(config.GetConfigX(), nil)
 			if err != nil {
 				return err
 			}
@@ -390,9 +390,9 @@ func valaccountsTransferCmd() *cobra.Command {
 		Use:     "transfer",
 		Short:   "Transfer tokens from a valaccount to another address",
 		Example: "kysor valaccounts transfer --from <valaccount> --to <address> --amount <amount>",
-		PreRunE: utils.CombineFuncs(utils.SetupInteractiveMode, utils.CheckIfInitialized),
+		PreRunE: utils.CombineFuncs(config.LoadConfigs, utils.SetupInteractiveMode),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			kyveClient, err := chain.NewKyveClient(config.Config, config.ValaccountConfigs)
+			kyveClient, err := chain.NewKyveClient(config.GetConfigX(), config.ValaccountConfigs)
 			if err != nil {
 				return err
 			}
@@ -440,7 +440,7 @@ func valaccountsTransferCmd() *cobra.Command {
 			}
 
 			fmt.Printf("💰 Sent %s %s from %s (%s) to %s. Transaction hash: %s\n",
-				amount, config.Config.Denom, valConfig.PrettyName(), address.String(), to.String(), txResult.TxHash)
+				amount, config.GetConfigX().GetDenom(), valConfig.PrettyName(), address.String(), to.String(), txResult.TxHash)
 			return nil
 		},
 	}
@@ -455,7 +455,7 @@ func valaccountsDeleteCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "delete",
 		Short:   "Delete a valaccount",
-		PreRunE: utils.CombineFuncs(utils.SetupInteractiveMode, utils.CheckIfInitialized),
+		PreRunE: utils.CombineFuncs(config.LoadConfigs, utils.SetupInteractiveMode),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// Return if no valaccount exists
 			flagValaccShowAddressName.Options = config.ValaccountConfigOptions

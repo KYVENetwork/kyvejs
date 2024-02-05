@@ -17,7 +17,6 @@ import (
 	"github.com/knadh/koanf/parsers/dotenv"
 	"github.com/knadh/koanf/providers/file"
 	"github.com/knadh/koanf/v2"
-	goTerminal "github.com/leandroveronezi/go-terminal"
 	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"os"
@@ -168,10 +167,9 @@ type kyveRepo struct {
 }
 
 // pullRepo clones or pulls the kyvejs repository
-func pullRepo() (*kyveRepo, error) {
+func pullRepo(repoDir string) (*kyveRepo, error) {
 	repoName := "github.com/KYVENetwork/kyvejs"
 	repoUrl := fmt.Sprintf("https://%s.git", repoName)
-	repoDir := filepath.Join(config.GetConfigDir(), "kyvejs")
 
 	var repo *git.Repository
 	if _, err := os.Stat(repoDir); os.IsNotExist(err) {
@@ -286,12 +284,12 @@ func startContainers(cli *client.Client, valConfig config.ValaccountConfig, pool
 
 	env, err := docker.CreateProtocolEnv(docker.ProtocolEnv{
 		Valaccount:  valConfig.Valaccount,
-		RpcAddress:  config.Config.RPC,
-		RestAddress: config.Config.REST,
+		RpcAddress:  config.GetConfigX().RPC,
+		RestAddress: config.GetConfigX().REST,
 		Host:        integrationName,
 		PoolId:      pool.Id,
 		Debug:       debug,
-		ChainId:     config.Config.ChainID,
+		ChainId:     config.GetConfigX().ChainID,
 	})
 	if err != nil {
 		return "", "", err
@@ -363,9 +361,9 @@ func startCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     StartCmdConfig.Name,
 		Short:   StartCmdConfig.Short,
-		PreRunE: utils.CombineFuncs(utils.SetupInteractiveMode, utils.CheckIfInitialized),
+		PreRunE: utils.CombineFuncs(config.LoadConfigs, utils.SetupInteractiveMode),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			kyveClient, err := chain.NewKyveClient(config.Config, config.ValaccountConfigs)
+			kyveClient, err := chain.NewKyveClient(config.GetConfigX(), config.ValaccountConfigs)
 			if err != nil {
 				return err
 			}
@@ -418,8 +416,13 @@ func startCmd() *cobra.Command {
 			fmt.Println("    Starting KYSOR...")
 			fmt.Printf("    Running on platform and architecture: %s - %s\n\n", runtime.GOOS, runtime.GOARCH)
 
+			homeDir, err := config.GetHomeDir(cmd)
+			if err != nil {
+				return err
+			}
+
 			// Clone or pull the kyvejs repository
-			repo, err := pullRepo()
+			repo, err := pullRepo(filepath.Join(homeDir, "kyvejs"))
 			if err != nil {
 				return err
 			}
@@ -442,13 +445,13 @@ func startCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
+
 			fmt.Println()
 			fmt.Println("🔍  Use following commands to view the logs:")
 			fmt.Print("    ")
 			utils.PrintlnItalic(fmt.Sprintf("docker logs -f %s", integrationContainer))
 			fmt.Print("    ")
 			utils.PrintlnItalic(fmt.Sprintf("docker logs -f %s", protocolContainer))
-			goTerminal.SetSGR(goTerminal.Reset)
 			return nil
 		},
 	}

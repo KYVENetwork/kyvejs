@@ -44,11 +44,11 @@ var rootCmd = &cobra.Command{
 
 			switch nextCmd.Name {
 			case InitCmdConfig.Name:
-				config, err := cmd.PersistentFlags().GetString(config.FlagConfig.Name)
+				homeDir, err := cmd.PersistentFlags().GetString(config.FlagHome.Name)
 				if err != nil {
 					return err
 				}
-				return initCmd(config).Execute()
+				return initCmd(homeDir).Execute()
 			case StartCmdConfig.Name:
 				return startCmd().Execute()
 			case StopCmdConfig.Name:
@@ -77,13 +77,7 @@ func Execute() {
 }
 
 func init() {
-	cobra.OnInitialize(config.InitKysorConfig)
-	cobra.OnInitialize(config.InitValaccountConfigs)
-
-	config.FlagConfig.DefaultValue = config.GetDefaultConfigFilePath()
-
-	rootCmd.PersistentFlags().StringP(config.FlagConfig.Name, config.FlagConfig.Short, config.FlagConfig.DefaultValue, config.FlagConfig.Usage)
-
+	rootCmd.PersistentFlags().StringP(config.FlagHome.Name, config.FlagHome.Short, config.FlagHome.DefaultValue, config.FlagHome.Usage)
 	rootCmd.PersistentFlags().BoolP(types.FlagNonInteractive.Name, types.FlagNonInteractive.Short, types.FlagNonInteractive.DefaultValue, types.FlagNonInteractive.Usage)
 	rootCmd.SetErrPrefix(promptui.IconBad)
 }

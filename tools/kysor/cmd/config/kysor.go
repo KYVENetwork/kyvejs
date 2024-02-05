@@ -13,25 +13,34 @@ import (
 	"strings"
 )
 
-const configDir = ".kysor"
 const configFileName = "config.toml"
 
-var FlagConfig = types.StringFlag{Name: "config", Short: "c", DefaultValue: "", Usage: "Config file", Required: false}
+var (
+	FlagHome = types.StringFlag{
+		Name:         "home",
+		DefaultValue: "~/.kysor", // Overwritten in init() to set the path as absolute
+		Usage:        "The loaction of the .kysor home directory where binaries and configs are stored.",
+	}
+)
 
-var Config KysorConfig
+var config *KysorConfig
 
 type KysorConfig struct {
-	Name                 string
-	Path                 string
 	ChainID              string `koanf:"chainId"`
 	RPC                  string `koanf:"rpc"`
 	REST                 string `koanf:"rest"`
 	AutoDownloadBinaries bool   `koanf:"autoDownloadBinaries"`
-	Denom                string
 }
 
-func (c KysorConfig) Save() error {
-	return save(c, c.Path)
+func (c KysorConfig) GetDenom() string {
+	if strings.HasPrefix(c.ChainID, "kaon") || strings.HasPrefix(c.ChainID, "korellia") {
+		return "tkyve"
+	}
+	return "ukyve"
+}
+
+func (c KysorConfig) Save(path string) error {
+	return save(c, path)
 }
 
 func save(s interface{}, path string) error {
@@ -67,6 +76,22 @@ func save(s interface{}, path string) error {
 	return nil
 }
 
+func GetHomeDir(cmd *cobra.Command) (string, error) {
+	homeDir, err := cmd.Flags().GetString(FlagHome.Name)
+	if err != nil {
+		return "", err
+	}
+	return filepath.Abs(homeDir)
+}
+
+func getConfigFilePath(cmd *cobra.Command) (string, error) {
+	homeDir, err := GetHomeDir(cmd)
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(homeDir, configFileName), nil
+}
+
 func DoesConfigExist(configFilePath string) bool {
 	if _, err := os.Stat(configFilePath); os.IsNotExist(err) {
 		return false
@@ -76,48 +101,52 @@ func DoesConfigExist(configFilePath string) bool {
 	return true
 }
 
-func GetConfigDir() string {
-	home, err := os.UserHomeDir()
-	cobra.CheckErr(err)
-	return filepath.Join(home, configDir)
+// GetConfigX returns the current config, assuming it has been loaded
+// It panics if the config has not been loaded
+func GetConfigX() KysorConfig {
+	if config == nil {
+		cobra.CheckErr(fmt.Errorf("config has not been initialized"))
+	}
+	return *config
 }
 
-func GetDefaultConfigFilePath() string {
-	return filepath.Join(GetConfigDir(), configFileName)
+func LoadConfigs(cmd *cobra.Command, _ []string) error {
+	err := loadKysorConfig(cmd, nil)
+	if err != nil {
+		return err
+	}
+	return loadValaccountConfigs(cmd, nil)
 }
 
-func IsInitialzed() bool {
-	return DoesConfigExist(GetDefaultConfigFilePath())
-}
-
-func InitKysorConfig() {
-	path := GetDefaultConfigFilePath()
+func loadKysorConfig(cmd *cobra.Command, _ []string) error {
+	configFilePath, err := getConfigFilePath(cmd)
+	if err != nil {
+		return err
+	}
 
 	// Check if the config file exists
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		return
+	if _, err := os.Stat(configFilePath); os.IsNotExist(err) {
+		return err
 	}
 
 	var k = koanf.New(".")
 
 	// Load the config file
-	if err := k.Load(file.Provider(path), toml.Parser()); err != nil {
-		cobra.CheckErr(fmt.Errorf("error loading config: %v", err))
+	if err := k.Load(file.Provider(configFilePath), toml.Parser()); err != nil {
+		return fmt.Errorf("error loading config file: %s", err)
 	}
 
 	// Unmarshal the config file into the config struct
-	var c KysorConfig
-	err := k.Unmarshal("", &c)
-	cobra.CheckErr(err)
-
-	// Set the config name and path
-	c.Name = filepath.Base(path)
-	c.Path = path
-	Config = c
-
-	// Set the denom based on the chain ID (kaon and korrelia use tkyve)
-	Config.Denom = "ukyve"
-	if strings.HasPrefix(c.ChainID, "kaon") || strings.HasPrefix(c.ChainID, "korellia") {
-		Config.Denom = "tkyve"
+	err = k.Unmarshal("", &config)
+	if err != nil {
+		return fmt.Errorf("error unmarshalling config file: %s", err)
 	}
+
+	return nil
+}
+
+func init() {
+	homeDir, err := os.UserHomeDir()
+	cobra.CheckErr(err)
+	FlagHome.DefaultValue = filepath.Join(homeDir, ".kysor")
 }
