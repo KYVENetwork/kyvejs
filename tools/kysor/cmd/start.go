@@ -51,6 +51,11 @@ var (
 		Usage:        "Run the validator node in debug mode",
 		DefaultValue: false,
 	}
+	flagStartVerbose = types.BoolFlag{
+		Name:         "verbose",
+		Usage:        "Show detailed build output",
+		DefaultValue: false,
+	}
 )
 
 type Runtime struct {
@@ -206,7 +211,7 @@ func pullRepo() (*kyveRepo, error) {
 	}, nil
 }
 
-func buildImage(worktree *git.Worktree, ref *plumbing.Reference, cli *client.Client, image docker.Image) error {
+func buildImage(worktree *git.Worktree, ref *plumbing.Reference, cli *client.Client, image docker.Image, verbose bool) error {
 	fmt.Printf("📦  Checkout %s\n", ref.Name().Short())
 	err := worktree.Checkout(&git.CheckoutOptions{
 		Hash:  ref.Hash(),
@@ -216,12 +221,21 @@ func buildImage(worktree *git.Worktree, ref *plumbing.Reference, cli *client.Cli
 		return err
 	}
 
+	showOnlyProgress := true
+	var printFn func(string)
+	if verbose {
+		showOnlyProgress = false
+		printFn = func(text string) {
+			fmt.Print(text)
+		}
+	}
+
 	fmt.Printf("🏗️   Building %s ...\n", image.Tags[0])
-	return docker.BuildImage(context.Background(), cli, image)
+	return docker.BuildImage(context.Background(), cli, image, docker.OutputOptions{ShowOnlyProgress: showOnlyProgress, PrintFn: printFn})
 }
 
 // buildImages builds the protocol and integration images
-func buildImages(kr *kyveRepo, cli *client.Client, pool *pooltypes.Pool, label string) (*docker.Image, *docker.Image, error) {
+func buildImages(kr *kyveRepo, cli *client.Client, pool *pooltypes.Pool, label string, verbose bool) (*docker.Image, *docker.Image, error) {
 	w, err := kr.repo.Worktree()
 	if err != nil {
 		return nil, nil, err
@@ -247,14 +261,17 @@ func buildImages(kr *kyveRepo, cli *client.Client, pool *pooltypes.Pool, label s
 		Labels: map[string]string{globalCleanupLabel: "", label: ""},
 	}
 
-	err = buildImage(w, protocol.ref, cli, protocolImage)
+	err = buildImage(w, protocol.ref, cli, protocolImage, verbose)
 	if err != nil {
 		return nil, nil, err
 	}
-	err = buildImage(w, integration.ref, cli, integrationImage)
+	fmt.Println("🛠️  Built image: " + protocolImage.Tags[0])
+
+	err = buildImage(w, integration.ref, cli, integrationImage, verbose)
 	if err != nil {
 		return nil, nil, err
 	}
+	fmt.Println("🛠️  Built image: " + integrationImage.Tags[0])
 	return &protocolImage, &integrationImage, nil
 }
 
@@ -379,6 +396,12 @@ func startCmd() *cobra.Command {
 				return err
 			}
 
+			// Verbose
+			verbose, err := utils.GetBoolFromPromptOrFlag(cmd, flagStartVerbose)
+			if err != nil {
+				return err
+			}
+
 			response, err := kyveClient.QueryPool(valConfig.Pool)
 			if err != nil {
 				return fmt.Errorf("failed to query pool: %v", err)
@@ -403,7 +426,7 @@ func startCmd() *cobra.Command {
 
 			// Build images
 			label := fmt.Sprintf("kysor-pool-%d", pool.Id)
-			protocol, integration, err := buildImages(repo, cli, pool, label)
+			protocol, integration, err := buildImages(repo, cli, pool, label, verbose)
 			if err != nil {
 				return fmt.Errorf("failed to build images: %v", err)
 			}
@@ -431,7 +454,7 @@ func startCmd() *cobra.Command {
 	}
 	utils.AddOptionFlags(cmd, []types.OptionFlag[config.ValaccountConfig]{flagStartValaccount})
 	utils.AddStringFlags(cmd, []types.StringFlag{flagStartEnvFile})
-	utils.AddBoolFlags(cmd, []types.BoolFlag{flagStartDebug})
+	utils.AddBoolFlags(cmd, []types.BoolFlag{flagStartDebug, flagStartVerbose})
 	return cmd
 }
 

@@ -52,7 +52,7 @@ func stopCmd() *cobra.Command {
 				return err
 			}
 
-			fmt.Println("✅   KYSOR stopped successfully")
+			fmt.Println("✅  KYSOR stopped successfully")
 			return nil
 		},
 	}

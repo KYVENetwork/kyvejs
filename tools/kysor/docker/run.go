@@ -76,7 +76,7 @@ func StartContainer(ctx context.Context, cli *client.Client, config ContainerCon
 		return "", err
 	}
 
-	err = cli.ContainerStart(ctx, r.ID, types.ContainerStartOptions{})
+	err = cli.ContainerStart(ctx, r.ID, container.StartOptions{})
 	if err != nil {
 		return "", err
 	}
@@ -84,7 +84,7 @@ func StartContainer(ctx context.Context, cli *client.Client, config ContainerCon
 }
 
 func StopContainers(ctx context.Context, cli *client.Client, label string) ([]types.Container, error) {
-	containers, err := cli.ContainerList(ctx, types.ContainerListOptions{
+	containers, err := cli.ContainerList(ctx, container.ListOptions{
 		Filters: filters.NewArgs(filters.Arg("label", fmt.Sprintf("%s=", label))),
 	})
 	if err != nil {
@@ -102,7 +102,7 @@ func StopContainers(ctx context.Context, cli *client.Client, label string) ([]ty
 
 func RemoveContainers(ctx context.Context, cli *client.Client, label string) error {
 	// Get all containers with "label"
-	containers, err := cli.ContainerList(ctx, types.ContainerListOptions{
+	containers, err := cli.ContainerList(ctx, container.ListOptions{
 		All: true,
 		Filters: filters.NewArgs(
 			filters.Arg("label", fmt.Sprintf("%s=", label)),
@@ -114,7 +114,7 @@ func RemoveContainers(ctx context.Context, cli *client.Client, label string) err
 
 	// Remove the containers
 	for _, cont := range containers {
-		err = cli.ContainerRemove(ctx, cont.ID, types.ContainerRemoveOptions{
+		err = cli.ContainerRemove(ctx, cont.ID, container.RemoveOptions{
 			Force: true,
 		})
 		if err != nil {
