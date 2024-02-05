@@ -265,13 +265,13 @@ func buildImages(kr *kyveRepo, cli *client.Client, pool *pooltypes.Pool, label s
 	if err != nil {
 		return nil, nil, err
 	}
-	fmt.Println("🛠️  Built image: " + protocolImage.Tags[0])
+	fmt.Println("🏗️   Finished bulding image: " + protocolImage.Tags[0])
 
 	err = buildImage(w, integration.ref, cli, integrationImage, verbose)
 	if err != nil {
 		return nil, nil, err
 	}
-	fmt.Println("🛠️  Built image: " + integrationImage.Tags[0])
+	fmt.Println("🏗️   Finished bulding image " + integrationImage.Tags[0])
 	return &protocolImage, &integrationImage, nil
 }
 

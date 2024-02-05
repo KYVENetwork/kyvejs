@@ -16,6 +16,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type Image struct {
@@ -100,7 +101,18 @@ func printProgress(bar *progressbar.ProgressBar, line *buildLine) *progressbar.P
 	if hasProgress {
 		//fmt.Printf("hasProgress: %v, step: %d, total: %d\n", hasProgress, step, total)
 		if bar == nil {
-			bar = progressbar.Default(int64(total))
+			bar = progressbar.NewOptions(
+				total,
+				progressbar.OptionSetWriter(os.Stderr),
+				progressbar.OptionSetWidth(10),
+				progressbar.OptionThrottle(65*time.Millisecond),
+				progressbar.OptionShowCount(),
+				progressbar.OptionClearOnFinish(),
+				progressbar.OptionSpinnerType(14),
+				progressbar.OptionFullWidth(),
+				progressbar.OptionSetRenderBlankState(true),
+			)
+
 		}
 		//fmt.Printf("Setting bar to %d\n", step)
 		err := bar.Set(step)
