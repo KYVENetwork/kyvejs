@@ -122,7 +122,7 @@ func (pc *ProtocolBuilder) BuildIntegrations(testConfigs []*TestConfig) error {
 	errChs := make([]chan error, len(integrationConfigs))
 	for i, img := range integrationConfigs {
 		errChs[i] = make(chan error)
-		docker.BuildImageAsync(context.Background(), cli, img, errChs[i], docker.OutputOptions{PrintFn: pc.log.Debug})
+		docker.BuildImageAsync(context.Background(), cli, img, errChs[i], docker.OutputOptions{PrintFn: pc.printToDebugLog})
 	}
 
 	for _, errCh := range errChs {
