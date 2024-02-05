@@ -2,6 +2,7 @@ package types
 
 import (
 	"fmt"
+
 	querytypes "github.com/KYVENetwork/chain/x/query/types"
 )
 

@@ -2,6 +2,9 @@ package cmd
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
+
 	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/chain"
 	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/config"
 	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/types"
@@ -10,8 +13,6 @@ import (
 	"github.com/cosmos/go-bip39"
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
-	"os"
-	"path/filepath"
 )
 
 func valaccountsCmd() *cobra.Command {

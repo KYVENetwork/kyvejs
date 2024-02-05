@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+
 	goTerminal "github.com/leandroveronezi/go-terminal"
 )
 

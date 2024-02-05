@@ -3,6 +3,7 @@ package chain
 import (
 	"context"
 	"fmt"
+
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	"github.com/cosmos/cosmos-sdk/crypto"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
@@ -22,6 +23,9 @@ func (c *KyveClient) getPrivateKeyByAddress(address sdktypes.Address) (cryptotyp
 	}
 
 	exportedPrivateKey, err := c.e.keystore.ExportPrivKeyArmor(keyInfo.Name, keyring.DefaultBIP39Passphrase)
+	if err != nil {
+		return nil, err
+	}
 	privateKey, _, err := crypto.UnarmorDecryptPrivKey(exportedPrivateKey, keyring.DefaultBIP39Passphrase)
 	if err != nil {
 		return nil, err
@@ -93,8 +97,7 @@ func (c *KyveClient) createSignedTxn(sender sdktypes.Address, msgs ...sdktypes.M
 	if err := txBuilder.SetSignatures(signingList...); err != nil {
 		return nil, err
 	}
-	txBytes, err := txConfig.TxEncoder()(txBuilder.GetTx())
-	return txBytes, nil
+	return txConfig.TxEncoder()(txBuilder.GetTx())
 }
 
 func (c *KyveClient) broadcastSignedTxn(ctx context.Context, txBytes []byte) (*sdktypes.TxResponse, error) {

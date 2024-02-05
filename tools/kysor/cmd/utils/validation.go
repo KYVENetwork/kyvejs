@@ -2,10 +2,11 @@ package utils
 
 import (
 	"fmt"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/mitchellh/go-homedir"
 	"os"
 	"strconv"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/mitchellh/go-homedir"
 )
 
 func ValidateNotEmpty(input string) error {

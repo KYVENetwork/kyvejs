@@ -2,6 +2,7 @@ package chain
 
 import (
 	"context"
+
 	querytypes "github.com/KYVENetwork/chain/x/query/types"
 	sdkquery "github.com/cosmos/cosmos-sdk/types/query"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"

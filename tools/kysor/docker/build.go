@@ -6,10 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/client"
-	"github.com/docker/docker/pkg/archive"
-	"github.com/schollz/progressbar/v3"
 	"io"
 	"os"
 	"path/filepath"
@@ -17,6 +13,11 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/client"
+	"github.com/docker/docker/pkg/archive"
+	"github.com/schollz/progressbar/v3"
 )
 
 type Image struct {
@@ -99,7 +100,7 @@ type OutputOptions struct {
 func printProgress(bar *progressbar.ProgressBar, line *buildLine) *progressbar.ProgressBar {
 	hasProgress, step, total := line.Progress()
 	if hasProgress {
-		//fmt.Printf("hasProgress: %v, step: %d, total: %d\n", hasProgress, step, total)
+		// fmt.Printf("hasProgress: %v, step: %d, total: %d\n", hasProgress, step, total)
 		if bar == nil {
 			bar = progressbar.NewOptions(
 				total,
@@ -112,9 +113,8 @@ func printProgress(bar *progressbar.ProgressBar, line *buildLine) *progressbar.P
 				progressbar.OptionFullWidth(),
 				progressbar.OptionSetRenderBlankState(true),
 			)
-
 		}
-		//fmt.Printf("Setting bar to %d\n", step)
+		// fmt.Printf("Setting bar to %d\n", step)
 		err := bar.Set(step)
 		if err != nil {
 			fmt.Println(err)

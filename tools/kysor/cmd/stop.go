@@ -3,12 +3,13 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"strings"
+	"time"
+
 	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/utils"
 	"github.com/KYVENetwork/kyvejs/tools/kysor/docker"
 	"github.com/docker/docker/client"
 	"github.com/spf13/cobra"
-	"strings"
-	"time"
 )
 
 // tearDownContainers stops and removes all containers and networks with the given label

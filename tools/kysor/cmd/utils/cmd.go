@@ -2,14 +2,14 @@ package utils
 
 import (
 	"fmt"
-	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/config"
+	"slices"
+	"strconv"
+
 	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/types"
 	"github.com/chzyer/readline"
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
-	"slices"
-	"strconv"
 )
 
 type noBellStdout struct{}
@@ -73,10 +73,6 @@ func AddIntFlags(cmd *cobra.Command, flags []types.IntFlag) {
 // If a flag is required it will be marked as required.
 func AddOptionFlags[T any](cmd *cobra.Command, flags []types.OptionFlag[T]) {
 	for _, f := range flags {
-		var options []string
-		for _, option := range f.Options {
-			options = append(options, option.Name())
-		}
 		var defaultValue string
 		if f.DefaultValue != nil {
 			defaultValue = f.DefaultValue.Name()
@@ -122,13 +118,6 @@ func AddPersistentBoolFlags(cmd *cobra.Command, flags []types.BoolFlag) {
 	for _, f := range flags {
 		cmd.PersistentFlags().BoolP(f.Name, f.Short, f.DefaultValue, f.Usage)
 	}
-}
-
-func CheckIfHasValaccounts(_ *cobra.Command, _ []string) error {
-	if len(config.ValaccountConfigOptions) == 0 {
-		return fmt.Errorf("no valaccount found. Create one with 'kysor valaccounts create'")
-	}
-	return nil
 }
 
 func CombineFuncs(funcs ...cobra.PositionalArgs) cobra.PositionalArgs {

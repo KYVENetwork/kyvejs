@@ -2,13 +2,14 @@ package chain
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/KYVENetwork/chain/app"
 	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/config"
 	"github.com/cosmos/cosmos-sdk/crypto/hd"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	"time"
 
 	querytypes "github.com/KYVENetwork/chain/x/query/types"
 	rpchttp "github.com/cometbft/cometbft/rpc/client/http"

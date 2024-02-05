@@ -6,7 +6,6 @@ import (
 	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/types"
 	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/utils"
 	"github.com/spf13/cobra"
-	"path/filepath"
 )
 
 var (
@@ -60,25 +59,20 @@ var (
 	}
 )
 
-func initCmd(homeDir string) *cobra.Command {
+func initCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "init",
 		Short:   "Initialize KYSOR",
 		PreRunE: utils.SetupInteractiveMode,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			// Parent is only defined if the command runs in non-interactive mode
-			if homeDir == "" && cmd.Parent() != nil {
-				path, err := cmd.Parent().PersistentFlags().GetString(config.FlagHome.Name)
-				if err != nil {
-					return err
-				}
-				homeDir = path
+			path, err := config.GetConfigFilePath(cmd)
+			if err != nil {
+				return fmt.Errorf("error getting config file path: %s", err)
 			}
-			configFilePath, err := filepath.Abs(filepath.Join(homeDir, "config.toml"))
 
 			// Check if the config file already exists
-			if config.DoesConfigExist(configFilePath) {
-				return fmt.Errorf("config file already exists: %s", configFilePath)
+			if config.DoesConfigExist(path) {
+				return fmt.Errorf("config file already exists: %s", path)
 			}
 
 			// Get the values from the flags or prompt the user for them
@@ -110,7 +104,7 @@ func initCmd(homeDir string) *cobra.Command {
 				AutoDownloadBinaries: autoDownload,
 			}
 
-			return kysorConfig.Save(configFilePath)
+			return kysorConfig.Save(path)
 		},
 	}
 	utils.AddStringFlags(cmd, []types.StringFlag{flagChainID, flagRPC, flagREST})
@@ -119,5 +113,5 @@ func initCmd(homeDir string) *cobra.Command {
 }
 
 func init() {
-	rootCmd.AddCommand(initCmd(""))
+	rootCmd.AddCommand(initCmd())
 }

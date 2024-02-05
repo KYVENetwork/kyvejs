@@ -2,18 +2,21 @@ package config
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
+
 	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/types"
 	"github.com/knadh/koanf/parsers/toml"
 	"github.com/knadh/koanf/providers/file"
 	"github.com/knadh/koanf/v2"
 	"github.com/spf13/cobra"
-	"os"
-	"path/filepath"
-	"strings"
 )
 
-var ValaccountConfigs []ValaccountConfig
-var ValaccountConfigOptions []types.Option[ValaccountConfig]
+var (
+	ValaccountConfigs       []ValaccountConfig
+	ValaccountConfigOptions []types.Option[ValaccountConfig]
+)
 
 type ValaccountConfig struct {
 	Pool           uint64 `koanf:"pool"`
@@ -82,7 +85,7 @@ func loadValaccountConfigs(cmd *cobra.Command, _ []string) error {
 	for _, entry := range entries {
 		if !entry.IsDir() {
 			if filepath.Ext(entry.Name()) == ".toml" {
-				var k = koanf.New(".")
+				k := koanf.New(".")
 				var valaccountConfig ValaccountConfig
 				name := entry.Name()
 				path := filepath.Join(valaccountsDir, entry.Name())

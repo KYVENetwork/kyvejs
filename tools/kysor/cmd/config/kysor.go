@@ -2,26 +2,25 @@ package config
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
+
 	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/types"
 	"github.com/knadh/koanf/parsers/toml"
 	"github.com/knadh/koanf/providers/file"
 	"github.com/knadh/koanf/providers/structs"
 	"github.com/knadh/koanf/v2"
 	"github.com/spf13/cobra"
-	"os"
-	"path/filepath"
-	"strings"
 )
 
 const configFileName = "config.toml"
 
-var (
-	FlagHome = types.StringFlag{
-		Name:         "home",
-		DefaultValue: "~/.kysor", // Overwritten in init() to set the path as absolute
-		Usage:        "The loaction of the .kysor home directory where binaries and configs are stored.",
-	}
-)
+var FlagHome = types.StringFlag{
+	Name:         "home",
+	DefaultValue: "~/.kysor", // Overwritten in init() to set the path as absolute
+	Usage:        "The loaction of the .kysor home directory where binaries and configs are stored.",
+}
 
 var config *KysorConfig
 
@@ -48,7 +47,7 @@ func save(s interface{}, path string) error {
 		return fmt.Errorf("config file already exists at %s", path)
 	}
 
-	var k = koanf.New(".")
+	k := koanf.New(".")
 
 	// Load the config into koanf
 	err := k.Load(structs.Provider(s, "koanf"), nil)
@@ -68,7 +67,7 @@ func save(s interface{}, path string) error {
 	}
 
 	// Save the config file
-	err = os.WriteFile(path, b, 0644)
+	err = os.WriteFile(path, b, 0o644)
 	if err != nil {
 		return err
 	}
@@ -89,7 +88,7 @@ func GetHomeDir(cmd *cobra.Command) (string, error) {
 	return filepath.Abs(homeDir)
 }
 
-func getConfigFilePath(cmd *cobra.Command) (string, error) {
+func GetConfigFilePath(cmd *cobra.Command) (string, error) {
 	homeDir, err := GetHomeDir(cmd)
 	if err != nil {
 		return "", err
@@ -124,7 +123,7 @@ func LoadConfigs(cmd *cobra.Command, _ []string) error {
 }
 
 func loadKysorConfig(cmd *cobra.Command, _ []string) error {
-	configFilePath, err := getConfigFilePath(cmd)
+	configFilePath, err := GetConfigFilePath(cmd)
 	if err != nil {
 		return err
 	}
@@ -134,7 +133,7 @@ func loadKysorConfig(cmd *cobra.Command, _ []string) error {
 		return err
 	}
 
-	var k = koanf.New(".")
+	k := koanf.New(".")
 
 	// Load the config file
 	if err := k.Load(file.Provider(configFilePath), toml.Parser()); err != nil {

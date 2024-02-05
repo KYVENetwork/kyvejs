@@ -4,6 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
+	"runtime"
+	"strings"
+	"time"
+
 	pooltypes "github.com/KYVENetwork/chain/x/pool/types"
 	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/chain"
 	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/config"
@@ -19,11 +25,6 @@ import (
 	"github.com/knadh/koanf/v2"
 	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
-	"os"
-	"path/filepath"
-	"runtime"
-	"strings"
-	"time"
 )
 
 var globalCleanupLabel = "kysor-all"
@@ -317,7 +318,7 @@ func getIntegrationEnv(cmd *cobra.Command) ([]string, error) {
 		if err != nil {
 			return nil, err
 		}
-		var k = koanf.New(".")
+		k := koanf.New(".")
 		if err := k.Load(file.Provider(path), dotenv.Parser()); err != nil {
 			return nil, fmt.Errorf("failed to load env file: %v", err)
 		}
