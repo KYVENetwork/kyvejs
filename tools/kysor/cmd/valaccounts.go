@@ -83,7 +83,7 @@ var (
 			// Check if a config file with this name already exists
 			configName := fmt.Sprintf("%s.toml", s)
 			for _, c := range config.ValaccountConfigs {
-				if c.Name == configName {
+				if c.Name() == configName {
 					return fmt.Errorf("valaccount with this name already exists")
 				}
 			}
@@ -250,10 +250,8 @@ func valaccountsCreateCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-
+			configPath := filepath.Join(valaccountsDir, fmt.Sprintf("%s.toml", name))
 			valaccountConfig := config.ValaccountConfig{
-				Name:           fmt.Sprintf("%s.toml", name),
-				Path:           filepath.Join(valaccountsDir, fmt.Sprintf("%s.toml", name)),
 				Pool:           pool.Value(),
 				Valaccount:     mnemonic,
 				StoragePriv:    storageProvKey,
@@ -263,11 +261,11 @@ func valaccountsCreateCmd() *cobra.Command {
 				MetricsPort:    fmt.Sprintf("%d", metricsPort),
 			}
 
-			err = valaccountConfig.Save()
+			err = valaccountConfig.Save(configPath)
 			if err != nil {
 				return err
 			}
-			fmt.Printf("Created valaccount '%s' in '%s'\n", name, valaccountConfig.Path)
+			fmt.Printf("Created valaccount '%s' in '%s'\n", name, configPath)
 			return nil
 		},
 	}
@@ -440,7 +438,7 @@ func valaccountsTransferCmd() *cobra.Command {
 			}
 
 			fmt.Printf("💰 Sent %s %s from %s (%s) to %s. Transaction hash: %s\n",
-				amount, config.GetConfigX().GetDenom(), valConfig.PrettyName(), address.String(), to.String(), txResult.TxHash)
+				amount, config.GetConfigX().GetDenom(), valConfig.Name(), address.String(), to.String(), txResult.TxHash)
 			return nil
 		},
 	}
@@ -471,11 +469,11 @@ func valaccountsDeleteCmd() *cobra.Command {
 			}
 
 			// Delete the config file
-			err = os.Remove(valConfig.Value().Path)
+			err = os.Remove(valConfig.Value().Path())
 			if err != nil {
 				return err
 			}
-			fmt.Printf("Deleted valaccount '%s' in '%s'\n", valConfig.Value().Name, valConfig.Value().Path)
+			fmt.Printf("Deleted valaccount '%s' in '%s'\n", valConfig.Value().Name(), valConfig.Value().Path())
 			return nil
 		},
 	}

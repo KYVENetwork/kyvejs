@@ -16,8 +16,6 @@ var ValaccountConfigs []ValaccountConfig
 var ValaccountConfigOptions []types.Option[ValaccountConfig]
 
 type ValaccountConfig struct {
-	Name           string
-	Path           string
 	Pool           uint64 `koanf:"pool"`
 	Valaccount     string `koanf:"valaccount"`
 	StoragePriv    string `koanf:"storagePriv"`
@@ -25,14 +23,20 @@ type ValaccountConfig struct {
 	Cache          string `koanf:"cache"`
 	Metrics        bool   `koanf:"metrics"`
 	MetricsPort    string `koanf:"metricsPort"`
+	name           string
+	path           string
 }
 
-func (c ValaccountConfig) Save() error {
-	return save(c, c.Path)
+func (c ValaccountConfig) Save(path string) error {
+	return save(c, path)
 }
 
-func (c ValaccountConfig) PrettyName() string {
-	return strings.TrimSuffix(c.Name, ".toml")
+func (c ValaccountConfig) Name() string {
+	return c.name
+}
+
+func (c ValaccountConfig) Path() string {
+	return c.path
 }
 
 type ValaccountConfigOption struct {
@@ -41,7 +45,7 @@ type ValaccountConfigOption struct {
 }
 
 func (o ValaccountConfigOption) Name() string {
-	return strings.TrimSuffix(o.config.Name, ".toml")
+	return o.config.name
 }
 
 func (o ValaccountConfigOption) Value() ValaccountConfig {
@@ -49,7 +53,7 @@ func (o ValaccountConfigOption) Value() ValaccountConfig {
 }
 
 func (o ValaccountConfigOption) StringValue() string {
-	return o.config.Name
+	return o.config.name + ".toml"
 }
 
 func GetValaccountsConfigDir(cmd *cobra.Command) (string, error) {
@@ -60,7 +64,7 @@ func GetValaccountsConfigDir(cmd *cobra.Command) (string, error) {
 	return filepath.Join(homeDir, "valaccounts"), nil
 }
 
-func loadValaccountConfigs(cmd *cobra.Command, args []string) error {
+func loadValaccountConfigs(cmd *cobra.Command, _ []string) error {
 	valaccountsDir, err := GetValaccountsConfigDir(cmd)
 	if err != nil {
 		return err
@@ -90,8 +94,9 @@ func loadValaccountConfigs(cmd *cobra.Command, args []string) error {
 				if err != nil {
 					return fmt.Errorf("error unmarshalling valaccount config file: %s", err)
 				}
-				valaccountConfig.Name = name
-				valaccountConfig.Path = path
+				// Set the name without the extension
+				valaccountConfig.name = strings.TrimSuffix(name, filepath.Ext(name))
+				valaccountConfig.path = path
 				ValaccountConfigs = append(ValaccountConfigs, valaccountConfig)
 				ValaccountConfigOptions = append(ValaccountConfigOptions, ValaccountConfigOption{config: valaccountConfig})
 			}

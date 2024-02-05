@@ -60,9 +60,9 @@ type Executor struct {
 func NewExecutor(clientContext sdkclient.Context, encodingConfig app.EncodingConfig, configs []config.ValaccountConfig) Executor {
 	keystore := keyring.NewInMemory(encodingConfig.Marshaler)
 	for _, valaccConfig := range configs {
-		_, err := keystore.NewAccount(valaccConfig.Name, valaccConfig.Valaccount, keyring.DefaultBIP39Passphrase, sdk.FullFundraiserPath, hd.Secp256k1)
+		_, err := keystore.NewAccount(valaccConfig.Name(), valaccConfig.Valaccount, keyring.DefaultBIP39Passphrase, sdk.FullFundraiserPath, hd.Secp256k1)
 		if err != nil {
-			fmt.Printf("⚠️ Warning: could not add key of valaccount %s: %v", valaccConfig.Name, err)
+			fmt.Printf("⚠️ Warning: could not add key of valaccount %s: %v", valaccConfig.Name(), err)
 		}
 	}
 	return Executor{
