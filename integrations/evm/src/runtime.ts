@@ -44,7 +44,7 @@ export default class EVM implements IRuntime {
 
     const currentHeight = await provider.getBlockNumber();
 
-    const hexKey = utils.hexValue(key);
+    const hexKey = utils.hexValue(+key);
 
     const block = await provider.getBlockWithTransactions(hexKey);
 
