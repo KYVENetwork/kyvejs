@@ -1,7 +1,8 @@
 import { DataItem, IRuntime, Validator, VOTE } from '@kyvejs/protocol';
 import { name, version } from '../package.json';
-import { providers } from 'ethers';
+import { BigNumber, providers, utils } from "ethers";
 import { BlockWithTransactions, TransactionReceipt } from '@ethersproject/abstract-provider';
+import { ethers } from "ethers/lib.esm";
 
 // EVM config
 interface IConfig {
@@ -43,7 +44,9 @@ export default class EVM implements IRuntime {
 
     const currentHeight = await provider.getBlockNumber();
 
-    const block = await provider.getBlockWithTransactions(+key);
+    const hexKey = utils.hexValue(key);
+
+    const block = await provider.getBlockWithTransactions(hexKey);
 
     // only validate if current height is already 'finalized'
     if (block.number >= currentHeight - 256) {
@@ -61,7 +64,7 @@ export default class EVM implements IRuntime {
 
     const receiptRequestData = {
       method: 'eth_getBlockReceipts',
-      params: [Number(key)],
+      params: [hexKey],
       id: 1,
       jsonrpc: '2.0',
     };
