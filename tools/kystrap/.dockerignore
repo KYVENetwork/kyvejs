@@ -2,5 +2,5 @@
 **/out
 
 # Ignore source files not needed to build released binaries
-start.sh
+kystrap.sh
 README.md
