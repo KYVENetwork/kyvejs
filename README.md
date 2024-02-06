@@ -86,27 +86,6 @@ yarn build:binaries
 
 The binaries can then be found in the `/out` folder
 
-## Dockerized Execution (alpha)
-
-**This is still in alpha and not recommended for production use!**
-
-The easiest way to run a KYVE integration is by using the provided Docker images via docker compose. 
-
-**Prerequisites**
-- Copy the `docker-compose.yml.template` as `docker-compose.yml` and fill in the required environment variables.
-- Instead of environment variables, you can also provide a `.env` file in the root directory of the repository. Just copy the `.env.template` file as `.env` and fill in the required environment variables.
-
-```bash
-cp docker-compose.yml.template docker-compose.yml
-cp .env.template .env
-```
-
-**Execution**
-```bash
-docker compose up # add -d to run in background; add --build to rebuild images
-```
-
-
 ## How to contribute
 
 Checkout new branch to implement new features/fixes there

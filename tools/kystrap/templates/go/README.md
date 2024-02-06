@@ -11,6 +11,10 @@ This is the {{ .name | ToTitle }} runtime server.
 
 Setup
 ```bash
+cd ../../
+go work use integrations/{{ .name | ToLower }}
+cd integrations/{{ .name | ToLower }}
+
 go mod tidy
 ```
 
