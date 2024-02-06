@@ -4,10 +4,10 @@ This is the {{ .name | ToTitle }} runtime server.
 
 ## Development
 
-### Requirements
-- Docker
-- Go
-- Make (optional)
+**Prerequisites:**
+- [Docker](https://docs.docker.com/engine/install/)
+- [Go](https://golang.org/doc/install)
+- [make](https://www.gnu.org/software/make/) (optional)
 
 Setup
 ```bash
@@ -25,6 +25,21 @@ go run main.go
 
 You must implement the methods defined in `proto/kyverdk/runtime/v1/runtime_grpc.pb.go`.<br>
 The implementation is in `server/server.go` and contains already a running example.
+
+**Runtime Workflow:**
+
+*Protocol* (client) and *integration* (server) run inside 2 docker containers and communicate via gRPC.
+1. *protocol* calls *GetRuntimeName* and *GetRuntimeVersion* to get the runtime name and version.
+2. *protocol* calls *ValidateSetConfig* to validate the configuration. Implementation specific config options can be set here.
+3. *protocol* calls *GetDataItem* to get the data item.
+4. *protocol* calls *PrevalidateDataItem* to make some simple checks on the data item. If the checks fail, the data item is rejected.
+5. *protocol* calls *TransformDataItem* to remove unnecessary data from the data item.
+6. *protocol* calls *ValidateDataItem* to validate the data item. If the data item is invalid, it is rejected.
+7. *protocol* calls *SummarizeDataBundle* to summarize the data bundle (ex: block height of a blockchain item).
+8. *protocol* calls *NextKey* to get the next key for the data item.
+
+**Note**<br>
+The behaviour of the integration has to be **deterministic**. 
 
 ### Test the runtime
 

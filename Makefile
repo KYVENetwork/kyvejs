@@ -21,3 +21,20 @@ lint:
 	@for module in $(MODULES); do \
 		make -C $$module lint; \
 	done
+
+###############################################################################
+###    		                       Protobuf    		                        ###
+###############################################################################
+
+proto-gen:
+	sh ./proto/proto-gen.sh
+
+###############################################################################
+###    		                       Kystrap    		                        ###
+###############################################################################
+
+bootstrap-integration:
+	sh ./tools/kystrap/kystrap.sh create
+
+test-integration:
+	sh ./tools/kystrap/kystrap.sh test

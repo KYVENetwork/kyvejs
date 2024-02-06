@@ -5,9 +5,9 @@ This is the {{ .name | ToTitle }} runtime server.
 ## Development
 
 ### Requirements
-- Docker
-- Python 3
-- Make (optional)
+- [Docker](https://docs.docker.com/engine/install/)
+- [Python](https://www.python.org/downloads/)
+- [make](https://www.gnu.org/software/make/) (optional)
 
 Setup
 ```bash
