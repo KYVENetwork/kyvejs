@@ -2,6 +2,7 @@ package types
 
 import (
 	"fmt"
+
 	commoncmd "github.com/KYVENetwork/kyvejs/common/goutils/cmd"
 	"github.com/fullstorydev/grpcurl"
 	"github.com/jhump/protoreflect/desc"

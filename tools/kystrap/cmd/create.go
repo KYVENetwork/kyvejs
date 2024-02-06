@@ -3,9 +3,10 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	commoncmd "github.com/KYVENetwork/kyvejs/common/goutils/cmd"
 	"regexp"
 	"strings"
+
+	commoncmd "github.com/KYVENetwork/kyvejs/common/goutils/cmd"
 
 	"github.com/KYVENetwork/kyvejs/tools/kystrap/bootstrap"
 	"github.com/KYVENetwork/kyvejs/tools/kystrap/types"

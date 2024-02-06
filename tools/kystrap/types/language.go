@@ -1,11 +1,12 @@
 package types
 
 import (
+	"os"
+	"strings"
+
 	commoncmd "github.com/KYVENetwork/kyvejs/common/goutils/cmd"
 	"golang.org/x/text/cases"
 	lang "golang.org/x/text/language"
-	"os"
-	"strings"
 )
 
 var toTitle = cases.Title(lang.English)

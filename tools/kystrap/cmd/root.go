@@ -2,8 +2,9 @@ package cmd
 
 import (
 	"fmt"
-	commoncmd "github.com/KYVENetwork/kyvejs/common/goutils/cmd"
 	"os"
+
+	commoncmd "github.com/KYVENetwork/kyvejs/common/goutils/cmd"
 
 	"github.com/manifoldco/promptui"
 

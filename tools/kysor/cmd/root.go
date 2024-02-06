@@ -1,8 +1,9 @@
 package cmd
 
 import (
-	commoncmd "github.com/KYVENetwork/kyvejs/common/goutils/cmd"
 	"os"
+
+	commoncmd "github.com/KYVENetwork/kyvejs/common/goutils/cmd"
 
 	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/config"
 	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/utils"

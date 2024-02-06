@@ -2,10 +2,11 @@ package config
 
 import (
 	"fmt"
-	commoncmd "github.com/KYVENetwork/kyvejs/common/goutils/cmd"
 	"os"
 	"path/filepath"
 	"strings"
+
+	commoncmd "github.com/KYVENetwork/kyvejs/common/goutils/cmd"
 
 	"github.com/knadh/koanf/parsers/toml"
 	"github.com/knadh/koanf/providers/file"

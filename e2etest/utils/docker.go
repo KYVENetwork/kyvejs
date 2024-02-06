@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/docker/docker/api/types/container"
+
 	"github.com/KYVENetwork/kyvejs/common/goutils/docker"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
@@ -149,7 +151,7 @@ func (pc *ProtocolBuilder) Cleanup() error {
 
 	var containers []types.Container
 	for _, label := range labelFilters {
-		c, err := cli.ContainerList(ctx, types.ContainerListOptions{
+		c, err := cli.ContainerList(ctx, container.ListOptions{
 			All:     true,
 			Filters: filters.NewArgs(filters.Arg("label", label)),
 		})
@@ -159,7 +161,7 @@ func (pc *ProtocolBuilder) Cleanup() error {
 		containers = append(containers, c...)
 	}
 	for _, cont := range containers {
-		err = cli.ContainerRemove(ctx, cont.ID, types.ContainerRemoveOptions{
+		err = cli.ContainerRemove(ctx, cont.ID, container.RemoveOptions{
 			Force: true,
 		})
 		if err != nil {
@@ -215,7 +217,7 @@ func runDockerAndRemove(ctx context.Context, cli *client.Client, config docker.C
 	for {
 		ctx, cancel := context.WithTimeout(ctx, timeout)
 
-		err = cli.ContainerRemove(ctx, id, types.ContainerRemoveOptions{})
+		err = cli.ContainerRemove(ctx, id, container.RemoveOptions{})
 		if err != nil {
 			// check if err is a timeout error
 			if errors.Is(ctx.Err(), context.DeadlineExceeded) {

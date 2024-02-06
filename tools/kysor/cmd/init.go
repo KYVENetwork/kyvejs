@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+
 	commoncmd "github.com/KYVENetwork/kyvejs/common/goutils/cmd"
 	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/config"
 	"github.com/spf13/cobra"

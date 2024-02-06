@@ -3,13 +3,14 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"regexp"
+
 	commoncmd "github.com/KYVENetwork/kyvejs/common/goutils/cmd"
 	"github.com/KYVENetwork/kyvejs/tools/kystrap/grpcall"
 	"github.com/KYVENetwork/kyvejs/tools/kystrap/types"
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 	"google.golang.org/protobuf/reflect/protoreflect"
-	"regexp"
 )
 
 var addressRegex = regexp.MustCompile(`^([a-zA-Z0-9-]+\.)*[a-zA-Z0-9-]+:([0-9]+)+$`)

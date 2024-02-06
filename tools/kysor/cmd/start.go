@@ -4,12 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	commoncmd "github.com/KYVENetwork/kyvejs/common/goutils/cmd"
 	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
 	"time"
+
+	commoncmd "github.com/KYVENetwork/kyvejs/common/goutils/cmd"
 
 	pooltypes "github.com/KYVENetwork/chain/x/pool/types"
 	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/chain"

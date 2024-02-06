@@ -3,9 +3,10 @@ package cmd
 import (
 	"context"
 	"fmt"
-	commoncmd "github.com/KYVENetwork/kyvejs/common/goutils/cmd"
 	"strings"
 	"time"
+
+	commoncmd "github.com/KYVENetwork/kyvejs/common/goutils/cmd"
 
 	"github.com/KYVENetwork/kyvejs/common/goutils/docker"
 	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/utils"

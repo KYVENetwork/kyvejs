@@ -2,9 +2,10 @@ package cmd
 
 import (
 	"fmt"
-	commoncmd "github.com/KYVENetwork/kyvejs/common/goutils/cmd"
 	"os"
 	"path/filepath"
+
+	commoncmd "github.com/KYVENetwork/kyvejs/common/goutils/cmd"
 
 	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/chain"
 	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/config"
