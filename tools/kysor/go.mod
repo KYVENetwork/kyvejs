@@ -4,7 +4,7 @@ go 1.21.6
 
 require (
 	github.com/KYVENetwork/chain v1.4.0
-	github.com/KYVENetwork/kyvejs/common/goutils v0.0.0
+	github.com/KYVENetwork/kyvejs/common/goutils v0.0.0-20240206141745-42c2c6ce21d2
 	github.com/cometbft/cometbft v0.37.2
 	github.com/cosmos/cosmos-sdk v0.47.6
 	github.com/cosmos/go-bip39 v1.0.0
@@ -363,12 +363,12 @@ require (
 )
 
 replace (
+	// Uncomment this for local development
+	//github.com/KYVENetwork/kyvejs/common/goutils => ../../common/goutils
 
 	// use cosmos compatible ChainSafe/go-schnorrkel
 	github.com/ChainSafe/go-schnorrkel => github.com/ChainSafe/go-schnorrkel v0.0.0-20200405005733-88cbf1b4c40d
 	github.com/ChainSafe/go-schnorrkel/1 => github.com/ChainSafe/go-schnorrkel v1.0.0
-	// TODO: remove for final release
-	github.com/KYVENetwork/kyvejs/common/goutils => ../../common/goutils
 
 	// use this rosetta version to avoid conflicts
 	github.com/coinbase/rosetta-sdk-go => github.com/coinbase/rosetta-sdk-go v0.8.3
