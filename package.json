@@ -33,7 +33,7 @@
     "build:changed": "lerna run --since origin/master --include-dependents build",
     "test": "lerna run test",
     "test:unit": "lerna run test:unit",
-    "test:integration": "sh tools/kystrap/start.sh test",
+    "test:integration": "sh tools/kystrap/kystrap.sh test",
     "fmt": "prettier --write .",
     "clean": "lerna run clean",
     "lint": "lerna run lint",

@@ -43,10 +43,12 @@ KYVE, the Web3 data lake solution, is a protocol that enables data providers to 
 - [@kyvejs/types](common/types/README.md) - holds all types for the KYVE application in typescript
 - [@kyvejs/sdk](common/sdk/README.md) - development kit for communicating with the KYVE blockchain
 - [@kyvejs/protocol](common/protocol/README.md) - core functionality for running validators on the KYVE network
+- @kyvejs/goutils - go utility functions for this repository
 
 **Tools:**
 
 - [@kyvejs/kysor](tools/kysor/README.md) - The Cosmovisor of KYVE
+- [@kyvejs/kystrap](tools/kystrap/README.md) - A bootstrap tool for creating new KYVE integrations
 
 **Integrations:**
 
@@ -54,62 +56,22 @@ KYVE, the Web3 data lake solution, is a protocol that enables data providers to 
 - [@kyvejs/tendermint-ssync](integrations/tendermint-ssync/README.md) - The official KYVE Tendermint state-sync integration
 - [@kyvejs/tendermint-bsync](integrations/tendermint-bsync/README.md) - The official KYVE Tendermint block sync integration
 
-## Build Integration Binaries
-
-Clone and checkout repository:
-
-```bash
-git clone git@github.com:KYVENetwork/kyvejs.git
-cd kyvejs
-```
-
-Checkout desired version:
-
-```
-git checkout tags/@kyvejs/<integration>@x.x.x -b @kyvejs/<integration>@x.x.x
-```
-
-Example: `git checkout tags/@kyvejs/tendermint-bsync@1.0.0 -b @kyvejs/tendermint-bsync@1.0.0`
-
-Install dependencies and setup project:
-
-```
-yarn setup
-```
-
-Checkout integration and build binaries:
-
-```
-cd integrations/<integration>
-yarn build:binaries
-```
-
-The binaries can then be found in the `/out` folder
-
-## How to contribute
-
-Checkout new branch to implement new features/fixes there
-
-```bash
-git checkout -b [feat/fix]/[my-branch-name]
-```
-
-Install dependencies and setup project:
-
-```bash
-yarn setup
-```
-
-Apply your changes and create a Pull Request to `main`. Once the team has
-reviewed and approved your PR it can be merged and used.
-
-**NOTE**: The usage of [Conventional Commits](https://conventionalcommits.org) is required when creating PRs and committing to this repository
-
-### How to write a KYVE integration
+## How to write a KYVE integration
 
 **Prerequisites:**
 - Docker
 - yarn (optional)
+
+**Step 1:** Clone the repository and checkout a new branch
+```bash
+git clone git@github.com:KYVENetwork/kyvejs.git
+
+# Checkout a new branch
+# git checkout -b [feat/fix]/integration/[my-branch-name] 
+git checkout -b feat/integration/fancypants
+```
+
+**NOTE**: The usage of [Conventional Commits](https://conventionalcommits.org) is required when creating PRs and committing to this repository
 
 #### Bootstrap a new integration
 
@@ -121,7 +83,7 @@ yarn bootstrap:integration
 ```
 ```bash
 # or without yarn
-sh ./tools/kystrap/start.sh
+sh ./tools/kystrap/kystrap.sh
 ```
 
 Follow the instructions to create a new integration.
