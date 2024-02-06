@@ -1,63 +1,78 @@
 package cmd
 
 import (
-	"github.com/manifoldco/promptui"
+	"fmt"
 	"os"
+
+	commoncmd "github.com/KYVENetwork/kyvejs/common/goutils/cmd"
+
+	"github.com/manifoldco/promptui"
 
 	"github.com/spf13/cobra"
 )
 
-type option string
+var hasInteractiveInfoBeenShown = false
 
-const (
-	create option = "bootstrap integration"
-	test   option = "test integration"
-)
-
-const flagYes = "yes"
-
-func skipPrompts(cmd *cobra.Command) bool {
-	return cmd.Flags().Changed(flagYes)
+// ShowInteractiveInfo prints a message to the user that the command is running in interactive mode.
+func ShowInteractiveInfo() {
+	if !hasInteractiveInfoBeenShown {
+		fmt.Println("Kystrap is running in interactive mode.")
+		fmt.Println("Add '-y' to your command to disable interactive mode.")
+		fmt.Println()
+		hasInteractiveInfoBeenShown = true
+	}
 }
 
-func promptOption() (option, error) {
-	var items = []option{create, test}
+func RunPromptCommandE(cmd *cobra.Command, args []string) error {
+	// Check if the interactive flag is set
+	// -> if so ask the user what to do
+	if commoncmd.IsInteractive(cmd) {
+		ShowInteractiveInfo()
 
-	prompt := promptui.Select{
-		Label: "What do you want to do?",
-		Items: items,
+		// Prompt for the next command
+		nextCmd, err := commoncmd.PromptCmd(cmd.Commands())
+		if err != nil {
+			return err
+		}
+
+		// Run persistent pre run functions
+		if nextCmd.PersistentPreRunE != nil {
+			err = nextCmd.PersistentPreRunE(nextCmd, args)
+			if err != nil {
+				return err
+			}
+		} else if nextCmd.PersistentPreRun != nil {
+			nextCmd.PersistentPreRun(nextCmd, args)
+		}
+
+		// Run pre run functions
+		if nextCmd.PreRunE != nil {
+			err = nextCmd.PreRunE(nextCmd, args)
+			if err != nil {
+				return err
+			}
+		} else if nextCmd.PreRun != nil {
+			nextCmd.PreRun(nextCmd, args)
+		}
+
+		// Run the next command
+		if nextCmd.RunE != nil {
+			return nextCmd.RunE(nextCmd, args)
+		} else if nextCmd.Run != nil {
+			nextCmd.Run(nextCmd, args)
+			return nil
+		}
+		return fmt.Errorf("no run function defined for command: %s", nextCmd.Name())
 	}
-
-	_, result, err := prompt.Run()
-	return option(result), err
+	// Otherwise show the help
+	return cmd.Help()
 }
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "kystrap",
 	Short: "kystrap is a CLI tool to bootstrap KYVE integrations",
-	RunE: func(cmd *cobra.Command, args []string) error {
-		option := create
-
-		// Check if the yes flag is set
-		// -> if not ask the user what to do
-		if !skipPrompts(cmd) {
-			var err error
-			option, err = promptOption()
-			if err != nil {
-				return err
-			}
-		}
-
-		switch option {
-		case create:
-			return CmdCreateIntegration().Execute()
-		case test:
-			return CmdTestIntegration().Execute()
-		default:
-			return nil
-		}
-	},
+	RunE:  RunPromptCommandE,
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -71,14 +86,6 @@ func Execute() {
 }
 
 func init() {
-	// Here you will define your flags and configuration settings.
-	// Cobra supports persistent flags, which, if defined here,
-	// will be global for your application.
-
-	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.kystrap.yaml)")
-
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
-	rootCmd.PersistentFlags().BoolP(flagYes, "y", false, "Skip all prompts and use provided or default values")
+	commoncmd.AddPersistentBoolFlags(rootCmd, []commoncmd.BoolFlag{commoncmd.FlagNonInteractive})
 	rootCmd.SetErrPrefix(promptui.IconBad)
 }

@@ -44,4 +44,4 @@ CMD /bin/bash -c "set -a; source .env &>0; set +a; \
     --chain-id \$CHAIN_ID \
     --rpc \$RPC \
     --rest \$REST \
-    --debug \$DEBUG"
+    \$DEBUG"

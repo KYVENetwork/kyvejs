@@ -5,9 +5,10 @@ This is the {{ .name | ToTitle }} runtime server.
 ## Development
 
 ### Requirements
-- Docker
-- Typescript + yarn
-- Make (optional)
+- [Docker](https://docs.docker.com/engine/install/)
+- [yarn](https://yarnpkg.com/getting-started/install)
+- [Node.js](https://nodejs.org/en/download/)
+- [make](https://www.gnu.org/software/make/) (optional)
 
 Setup
 ```bash

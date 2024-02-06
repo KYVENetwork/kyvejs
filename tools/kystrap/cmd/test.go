@@ -3,99 +3,61 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"regexp"
+
+	commoncmd "github.com/KYVENetwork/kyvejs/common/goutils/cmd"
 	"github.com/KYVENetwork/kyvejs/tools/kystrap/grpcall"
 	"github.com/KYVENetwork/kyvejs/tools/kystrap/types"
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 	"google.golang.org/protobuf/reflect/protoreflect"
-	"regexp"
-	"strings"
 )
-
-type executionInfo struct {
-	method   protoreflect.MethodDescriptor
-	position int
-	success  bool
-	address  string
-}
-
-func newExecutionInfo() executionInfo {
-	return executionInfo{
-		method:   nil,
-		position: 0,
-		success:  false,
-		address:  "host.docker.internal:50051",
-	}
-}
-
-func findDescriptorMethod(name string) protoreflect.MethodDescriptor {
-	if name == "" {
-		return nil
-	}
-	lower := strings.ToLower(name)
-	for _, method := range types.Rdk.MethodList() {
-		if strings.ToLower(string(method.Name())) == lower || strings.ToLower(string(method.FullName())) == lower {
-			return method
-		}
-	}
-	return nil
-}
-
-// setMethodPosition sets the position of the method in the list of methods
-func setMethodPosition(execution *executionInfo) {
-	if execution.method != nil {
-		for i := 0; i < types.Rdk.Methods.Len(); i++ {
-			if types.Rdk.Methods.Get(i).FullName() == execution.method.FullName() {
-				execution.position = i
-			}
-		}
-	}
-}
 
 var addressRegex = regexp.MustCompile(`^([a-zA-Z0-9-]+\.)*[a-zA-Z0-9-]+:([0-9]+)+$`)
 
-func promptAddress(execution *executionInfo) error {
-	validate := func(input string) error {
-		if !addressRegex.MatchString(input) {
-			return errors.New("invalid address... must be in the format address:port")
-		}
-		return nil
+var (
+	flagAddress = commoncmd.StringFlag{
+		Name:         "address",
+		Short:        "a",
+		Usage:        "address and port of the runtime server (ex: localhost:50051)",
+		Prompt:       "Enter address and port of the runtime server",
+		DefaultValue: "host.docker.internal:50051",
+		ValidateFn: func(input string) error {
+			if !addressRegex.MatchString(input) {
+				return errors.New("invalid address... must be in the format address:port")
+			}
+			return nil
+		},
 	}
-	prompt := promptui.Prompt{
-		Label:    "Enter the address and port of the runtime server",
-		Default:  execution.address,
-		Validate: validate,
+	flagMethod = commoncmd.OptionFlag[protoreflect.MethodDescriptor]{
+		Name:   "method",
+		Short:  "m",
+		Usage:  "gRPC method that you want to test",
+		Prompt: "Which method do you want to test?",
 	}
-	result, err := prompt.Run()
-	if err != nil {
-		return err
+	flagData = commoncmd.StringFlag{
+		Name:  "data",
+		Short: "d",
+		Usage: "data that you want to send with the gRPC method call",
 	}
-	execution.address = result
-	return nil
-}
+	flagSimple = commoncmd.BoolFlag{
+		Name:         "simple",
+		Short:        "s",
+		Usage:        "simple output (only prints the response)",
+		DefaultValue: false,
+	}
+)
 
-func promptMethod(execution *executionInfo) error {
-	prompt := promptui.Select{
-		Label:     "Which method do you want to test?",
-		Items:     types.Rdk.MethodNames(),
-		CursorPos: execution.position,
-		Size:      types.Rdk.Methods.Len(),
+func promptInput(cmd *cobra.Command, field protoreflect.FieldDescriptor, fieldLabel string) (string, error) {
+	if !commoncmd.IsInteractive(cmd) {
+		return "", nil
 	}
-	position, result, err := prompt.Run()
-	if err != nil {
-		return err
-	}
-	execution.method = findDescriptorMethod(result)
-	execution.position = position
-	return nil
-}
 
-func promptInput(field protoreflect.FieldDescriptor, fieldLabel string) (string, error) {
 	if field.Message() != nil {
 		var data string
 		for i := 0; i < field.Message().Fields().Len(); i++ {
 			subField := field.Message().Fields().Get(i)
-			input, err := promptInput(subField, fmt.Sprintf("%s -> %s", fieldLabel, subField.Name()))
+			input, err := promptInput(cmd, subField, fmt.Sprintf("%s -> %s", fieldLabel, subField.Name()))
 			if err != nil {
 				return "", err
 			}
@@ -119,6 +81,43 @@ func promptInput(field protoreflect.FieldDescriptor, fieldLabel string) (string,
 		return "", err
 	}
 	return fmt.Sprintf(`"%s": "%s"`, field.Name(), result), err
+}
+
+func runMethodPrompts(cmd *cobra.Command, method protoreflect.MethodDescriptor, address string, data string) (protoreflect.MethodDescriptor, bool, error) {
+	if method == nil {
+		methodOption, err := commoncmd.GetOptionFromPrompt(flagMethod)
+		if err != nil {
+			return method, false, err
+		}
+		method = methodOption.Value()
+		flagMethod.DefaultValue = types.NewMethodOption(method)
+	}
+
+	if data == "" {
+		fields := method.Input().Fields()
+		for i := 0; i < fields.Len(); i++ {
+			field := fields.Get(i)
+			input, err := promptInput(cmd, field, string(field.Name()))
+			if err != nil {
+				return method, false, err
+			}
+
+			// separate fields with comma
+			if data != "" {
+				data += ", "
+			}
+			data += input
+		}
+		data = fmt.Sprintf(`{%s}`, data)
+	}
+
+	caller := grpcall.NewGrpcCaller(address, isSimpleOutput(cmd), cmd)
+	success, err := caller.PerformMethodCall(method, data)
+	return method, success, err
+}
+
+func isSimpleOutput(cmd *cobra.Command) bool {
+	return cmd.Flags().Changed(flagSimple.Name)
 }
 
 type action string
@@ -146,109 +145,60 @@ func promptAction(wasSuccess bool) (action, error) {
 	return action(result), nil
 }
 
-func runMethodPrompts(
-	cmd *cobra.Command,
-	execution *executionInfo,
-	data string,
-) error {
-	if execution.method == nil {
-		if skipPrompts(cmd) {
-			return errors.New("no gRPC method specified")
-		}
-
-		err := promptMethod(execution)
-		if err != nil {
-			return err
-		}
-	}
-
-	if data == "" {
-		fields := execution.method.Input().Fields()
-		for i := 0; i < fields.Len(); i++ {
-			field := fields.Get(i)
-			input, err := promptInput(field, string(field.Name()))
-			if err != nil {
-				return err
-			}
-
-			// separate fields with comma
-			if data != "" {
-				data += ", "
-			}
-			data += input
-		}
-		data = fmt.Sprintf(`{%s}`, data)
-	}
-
-	caller := grpcall.NewGrpcCaller(execution.address, isSimpleOutput(cmd), cmd)
-	success, err := caller.PerformMethodCall(execution.method, data)
-	execution.success = success
-	return err
-}
-
-const flagSimple = "simple"
-
-func isSimpleOutput(cmd *cobra.Command) bool {
-	return cmd.Flags().Changed(flagSimple)
-}
-
 func CmdTestIntegration() *cobra.Command {
-	const flagMethod = "method"
-	const flagData = "data"
-	const flagAddress = "address"
-
 	cmd := &cobra.Command{
-		Use:   "test",
-		Short: "Test a runtime integration",
+		Use:     "test",
+		Short:   "Test integration",
+		PreRunE: commoncmd.SetupInteractiveMode,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			execution := newExecutionInfo()
-			method, _ := cmd.Flags().GetString(flagMethod)
-			data, _ := cmd.Flags().GetString(flagData)
-			address, _ := cmd.Flags().GetString(flagAddress)
-
-			if method != "" {
-				execution.method = findDescriptorMethod(method)
-				if execution.method == nil {
-					return errors.New(fmt.Sprintf("invalid gRPC method %s", method))
-				}
-				setMethodPosition(&execution)
-			}
-
-			if address != "" {
-				execution.address = address
-			} else if !skipPrompts(cmd) {
-				err := promptAddress(&execution)
-				if err != nil {
-					return err
-				}
-			}
-
-			err := runMethodPrompts(cmd, &execution, data)
+			// Data (don't prompt if the flag was not set)
+			data, err := cmd.Flags().GetString(flagData.Name)
 			if err != nil {
 				return err
 			}
 
-			// if yes flag is set, don't prompt for further actions
-			if skipPrompts(cmd) {
+			// Address
+			address, err := commoncmd.GetStringFromPromptOrFlag(cmd, flagAddress)
+			if err != nil {
+				return err
+			}
+
+			// Method
+			methodOption, err := commoncmd.GetOptionFromPromptOrFlag(cmd, flagMethod)
+			if err != nil {
+				return err
+			}
+			method := methodOption.Value()
+
+			// Set as new default value to remember the cursor position in further prompts
+			flagMethod.DefaultValue = types.NewMethodOption(method)
+
+			method, success, err := runMethodPrompts(cmd, method, address, data)
+			if err != nil {
+				return err
+			}
+
+			// don't prompt for further actions if we are not in interactive mode
+			if !commoncmd.IsInteractive(cmd) {
 				return nil
 			}
 
 			// prompt for action until the user exits or an error occurs
 			for {
 				cmd.Println()
-				actionResult, err := promptAction(execution.success)
+				actionResult, err := promptAction(success)
 				if err != nil {
 					return err
 				}
 				switch actionResult {
 				case actionRetry:
-					err = runMethodPrompts(cmd, &execution, "")
+					method, success, err = runMethodPrompts(cmd, method, address, "")
 					if err != nil {
 						return err
 					}
 				case actionTestAnother:
-					execution.method = nil
-					err = runMethodPrompts(cmd, &execution, "")
+					method = nil
+					method, success, err = runMethodPrompts(cmd, method, address, "")
 					if err != nil {
 						return err
 					}
@@ -258,10 +208,10 @@ func CmdTestIntegration() *cobra.Command {
 			}
 		},
 	}
-	cmd.Flags().StringP(flagMethod, "m", "", "gRPC method that you want to test")
-	cmd.Flags().StringP(flagData, "d", "", "data that you want to send with the gRPC method call")
-	cmd.Flags().StringP(flagAddress, "a", "", "address and port of the runtime server (ex: localhost:50051)")
-	cmd.Flags().BoolP(flagSimple, "s", false, "simple output (only prints the response)")
+	flagMethod.Options = types.Rdk.MethodOptions()
+	commoncmd.AddOptionFlags(cmd, []commoncmd.OptionFlag[protoreflect.MethodDescriptor]{flagMethod})
+	commoncmd.AddStringFlags(cmd, []commoncmd.StringFlag{flagData, flagAddress})
+	commoncmd.AddBoolFlags(cmd, []commoncmd.BoolFlag{flagSimple})
 	return cmd
 }
 

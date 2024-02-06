@@ -1,0 +1,4 @@
+---
+config:
+  network: dydx-mainnet-1
+  rpc: http://kyve-e2e-test-testapi-integration-{{ .name | ToLower }}:8080

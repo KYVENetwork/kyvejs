@@ -5,6 +5,9 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"strings"
+	"time"
+
 	"github.com/KYVENetwork/kyvejs/tools/kystrap/types"
 	"github.com/fullstorydev/grpcurl"
 	"github.com/manifoldco/promptui"
@@ -12,8 +15,6 @@ import (
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/reflect/protoreflect"
-	"strings"
-	"time"
 )
 
 type GrpcCaller struct {

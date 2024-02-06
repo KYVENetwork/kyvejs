@@ -185,7 +185,7 @@ func (t *{{ .name | ToPascal }}Server) ValidateDataItem(ctx context.Context, req
 	}
 
 	// Check if the proposedDataItem and validationDataItem are equal
-	if !reflect.DeepEqual(proposed, validation) {
+	if reflect.DeepEqual(proposed, validation) {
 		return &pb.ValidateDataItemResponse{Vote: bundlestypes.VOTE_TYPE_VALID}, nil
 	}
 

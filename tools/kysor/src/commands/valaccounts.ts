@@ -7,7 +7,7 @@ import path from "path";
 import prompts from "prompts";
 
 import { IValaccountConfig } from "../types/interfaces";
-import { FILE_ACCESS, HOME } from "../utils/constants";
+import { FILE_ACCESS, USER_HOME, KYSOR_DIR } from "../utils/constants";
 
 const valaccounts = new Command("valaccounts").description(
   "Create and delete valaccounts"
@@ -27,6 +27,10 @@ valaccounts
   .requiredOption(
     "--storage-priv <string>",
     "The private key of the storage provider"
+  )
+  .option(
+    "--home <string>",
+    "The location of the .kysor home directory where binaries and configs are stored."
   )
   .option(
     "--request-backoff <number>",
@@ -50,7 +54,9 @@ valaccounts
   .option("--recover", "Create a valaccount by importing an existing mnemonic")
   .action(async (options) => {
     try {
-      if (!fs.existsSync(path.join(HOME, `config.toml`))) {
+      const home = path.join(options.home || USER_HOME, KYSOR_DIR);
+
+      if (!fs.existsSync(path.join(home, `config.toml`))) {
         console.log(
           `KYSOR is not initialized yet. You can initialize it by running: ./kysor init --network <desired_network> --auto-download-binaries`
         );
@@ -58,7 +64,7 @@ valaccounts
       }
 
       // create home directory for valaccount configs
-      fs.mkdirSync(path.join(HOME, "valaccounts"), { recursive: true });
+      fs.mkdirSync(path.join(home, "valaccounts"), { recursive: true });
 
       // get mnemonic for valaccount
       let valaccount;
@@ -92,7 +98,7 @@ valaccounts
       }
       // check if name already exists
       if (
-        fs.existsSync(path.join(HOME, "valaccounts", `${options.name}.toml`))
+        fs.existsSync(path.join(home, "valaccounts", `${options.name}.toml`))
       ) {
         console.log(
           `ERROR: Already created a valaccount with name = ${options.name}`
@@ -100,12 +106,12 @@ valaccounts
         return;
       }
       // check if same valaccount was already created
-      const configs = fs.readdirSync(path.join(HOME, "valaccounts"));
+      const configs = fs.readdirSync(path.join(home, "valaccounts"));
       const valaccounts = [];
 
       for (const config of configs) {
         const valaccount: IValaccountConfig = TOML.parse(
-          fs.readFileSync(path.join(HOME, "valaccounts", config), "utf-8")
+          fs.readFileSync(path.join(home, "valaccounts", config), "utf-8")
         ) as any;
         valaccounts.push(valaccount.valaccount);
       }
@@ -130,7 +136,7 @@ valaccounts
       };
 
       fs.writeFileSync(
-        path.join(HOME, "valaccounts", `${options.name}.toml`),
+        path.join(home, "valaccounts", `${options.name}.toml`),
         TOML.stringify(config as any),
         {
           mode: FILE_ACCESS,
@@ -149,10 +155,16 @@ valaccounts
     "--name <string>",
     "Name of the valaccount (name only used locally for KYSOR)"
   )
+  .option(
+    "--home <string>",
+    "The location of the .kysor home directory where binaries and configs are stored."
+  )
   .action(async (options) => {
     try {
+      const home = path.join(options.home || USER_HOME, KYSOR_DIR);
+
       if (
-        !fs.existsSync(path.join(HOME, "valaccounts", `${options.name}.toml`))
+        !fs.existsSync(path.join(home, "valaccounts", `${options.name}.toml`))
       ) {
         console.log(`Valaccount with name ${options.name} does not exist`);
         return;
@@ -160,7 +172,7 @@ valaccounts
 
       const valaccount = TOML.parse(
         fs.readFileSync(
-          path.join(HOME, "valaccounts", `${options.name}.toml`),
+          path.join(home, "valaccounts", `${options.name}.toml`),
           "utf-8"
         )
       ) as any;
@@ -181,22 +193,28 @@ valaccounts
     "--name <string>",
     "Name of the valaccount (name only used locally for KYSOR)"
   )
+  .option(
+    "--home <string>",
+    "The location of the .kysor home directory where binaries and configs are stored."
+  )
   .action(async (options) => {
     try {
+      const home = path.join(options.home || USER_HOME, KYSOR_DIR);
+
       if (
-        !fs.existsSync(path.join(HOME, "valaccounts", `${options.name}.toml`))
+        !fs.existsSync(path.join(home, "valaccounts", `${options.name}.toml`))
       ) {
         console.log(`Valaccount with name ${options.name} does not exist`);
         return;
       }
 
       const config = TOML.parse(
-        fs.readFileSync(path.join(HOME, "config.toml"), "utf-8")
+        fs.readFileSync(path.join(home, "config.toml"), "utf-8")
       ) as any;
 
       const valaccount = TOML.parse(
         fs.readFileSync(
-          path.join(HOME, "valaccounts", `${options.name}.toml`),
+          path.join(home, "valaccounts", `${options.name}.toml`),
           "utf-8"
         )
       ) as any;
@@ -227,22 +245,28 @@ valaccounts
     "Amount to send to recipient (base unit)"
   )
   .requiredOption("--recipient <string>", "Wallet address of the recipient")
+  .option(
+    "--home <string>",
+    "The location of the .kysor home directory where binaries and configs are stored."
+  )
   .action(async (options) => {
     try {
+      const home = path.join(options.home || USER_HOME, KYSOR_DIR);
+
       if (
-        !fs.existsSync(path.join(HOME, "valaccounts", `${options.from}.toml`))
+        !fs.existsSync(path.join(home, "valaccounts", `${options.from}.toml`))
       ) {
         console.log(`Valaccount with name ${options.from} does not exist`);
         return;
       }
 
       const config = TOML.parse(
-        fs.readFileSync(path.join(HOME, "config.toml"), "utf-8")
+        fs.readFileSync(path.join(home, "config.toml"), "utf-8")
       ) as any;
 
       const valaccount = TOML.parse(
         fs.readFileSync(
-          path.join(HOME, "valaccounts", `${options.from}.toml`),
+          path.join(home, "valaccounts", `${options.from}.toml`),
           "utf-8"
         )
       ) as any;
@@ -308,16 +332,22 @@ valaccounts
     "--name <string>",
     "Name of the valaccount (name only used locally for KYSOR)"
   )
+  .option(
+    "--home <string>",
+    "The location of the .kysor home directory where binaries and configs are stored."
+  )
   .action(async (options) => {
     try {
+      const home = path.join(options.home || USER_HOME, KYSOR_DIR);
+
       if (
-        !fs.existsSync(path.join(HOME, "valaccounts", `${options.name}.toml`))
+        !fs.existsSync(path.join(home, "valaccounts", `${options.name}.toml`))
       ) {
         console.log(`Valaccount with name ${options.name} does not exist`);
         return;
       }
 
-      fs.unlinkSync(path.join(HOME, "valaccounts", `${options.name}.toml`));
+      fs.unlinkSync(path.join(home, "valaccounts", `${options.name}.toml`));
       console.log(`Successfully deleted valaccount ${options.name}`);
     } catch (err) {
       console.log(`ERROR: Could not delete valaccount: ${err}`);

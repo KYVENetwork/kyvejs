@@ -1,24 +1,26 @@
 package types
 
 import (
-	"errors"
+	"os"
+	"strings"
+
+	commoncmd "github.com/KYVENetwork/kyvejs/common/goutils/cmd"
 	"golang.org/x/text/cases"
 	lang "golang.org/x/text/language"
-	"os"
 )
 
 var toTitle = cases.Title(lang.English)
 
 type Language string
 
-var Languages []Language
+var Languages []commoncmd.Option[Language]
 
 const requestOtherLanguage Language = "Other"
 
 func LanguagesStringSlice() []string {
 	var languages []string
 	for _, language := range Languages {
-		languages = append(languages, language.String())
+		languages = append(languages, language.StringValue())
 	}
 	return languages
 }
@@ -27,23 +29,16 @@ func NewLanguage(val string) Language {
 	return Language(toTitle.String(val))
 }
 
-func (l Language) Type() string {
-	return "Language"
-}
-
-func (l Language) String() string {
+func (l Language) Name() string {
 	return string(l)
 }
 
-func (l Language) Set(val string) error {
-	var newLang = NewLanguage(val)
-	for _, language := range Languages {
-		if language == newLang {
-			l = language
-			return nil
-		}
-	}
-	return errors.New("invalid language")
+func (l Language) Value() Language {
+	return l
+}
+
+func (l Language) StringValue() string {
+	return strings.ToLower(string(l))
 }
 
 func (l Language) IsRequestOtherLanguage() bool {
