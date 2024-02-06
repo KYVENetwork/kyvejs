@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/KYVENetwork/kyvejs/tools/kysor/docker"
+	"github.com/KYVENetwork/kyvejs/common/goutils/docker"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/volume"

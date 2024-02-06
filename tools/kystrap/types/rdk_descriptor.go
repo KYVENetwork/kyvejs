@@ -2,8 +2,7 @@ package types
 
 import (
 	"fmt"
-	ktypes "github.com/KYVENetwork/kyvejs/tools/kysor/cmd/types"
-
+	commoncmd "github.com/KYVENetwork/kyvejs/common/goutils/cmd"
 	"github.com/fullstorydev/grpcurl"
 	"github.com/jhump/protoreflect/desc"
 	"google.golang.org/protobuf/reflect/protoreflect"
@@ -31,12 +30,12 @@ func (r *RdkDescriptor) MethodList() []protoreflect.MethodDescriptor {
 }
 
 type MethodOption struct {
-	ktypes.Option[protoreflect.MethodDescriptor]
+	commoncmd.Option[protoreflect.MethodDescriptor]
 	method protoreflect.MethodDescriptor
 }
 
-func (r *RdkDescriptor) MethodOptions() []ktypes.Option[protoreflect.MethodDescriptor] {
-	var methods []ktypes.Option[protoreflect.MethodDescriptor]
+func (r *RdkDescriptor) MethodOptions() []commoncmd.Option[protoreflect.MethodDescriptor] {
+	var methods []commoncmd.Option[protoreflect.MethodDescriptor]
 	for i := 0; i < r.Methods.Len(); i++ {
 		methods = append(methods, NewMethodOption(r.Methods.Get(i)))
 	}

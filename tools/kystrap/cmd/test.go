@@ -3,8 +3,7 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	ktypes "github.com/KYVENetwork/kyvejs/tools/kysor/cmd/types"
-	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/utils"
+	commoncmd "github.com/KYVENetwork/kyvejs/common/goutils/cmd"
 	"github.com/KYVENetwork/kyvejs/tools/kystrap/grpcall"
 	"github.com/KYVENetwork/kyvejs/tools/kystrap/types"
 	"github.com/manifoldco/promptui"
@@ -13,12 +12,10 @@ import (
 	"regexp"
 )
 
-var TestCmdConfig = ktypes.CmdConfig{Name: "test", Short: "Test integration"}
-
 var addressRegex = regexp.MustCompile(`^([a-zA-Z0-9-]+\.)*[a-zA-Z0-9-]+:([0-9]+)+$`)
 
 var (
-	flagAddress = ktypes.StringFlag{
+	flagAddress = commoncmd.StringFlag{
 		Name:         "address",
 		Short:        "a",
 		Usage:        "address and port of the runtime server (ex: localhost:50051)",
@@ -31,18 +28,18 @@ var (
 			return nil
 		},
 	}
-	flagMethod = ktypes.OptionFlag[protoreflect.MethodDescriptor]{
+	flagMethod = commoncmd.OptionFlag[protoreflect.MethodDescriptor]{
 		Name:   "method",
 		Short:  "m",
 		Usage:  "gRPC method that you want to test",
 		Prompt: "Which method do you want to test?",
 	}
-	flagData = ktypes.StringFlag{
+	flagData = commoncmd.StringFlag{
 		Name:  "data",
 		Short: "d",
 		Usage: "data that you want to send with the gRPC method call",
 	}
-	flagSimple = ktypes.BoolFlag{
+	flagSimple = commoncmd.BoolFlag{
 		Name:         "simple",
 		Short:        "s",
 		Usage:        "simple output (only prints the response)",
@@ -51,7 +48,7 @@ var (
 )
 
 func promptInput(cmd *cobra.Command, field protoreflect.FieldDescriptor, fieldLabel string) (string, error) {
-	if !utils.IsInteractive(cmd) {
+	if !commoncmd.IsInteractive(cmd) {
 		return "", nil
 	}
 
@@ -87,7 +84,7 @@ func promptInput(cmd *cobra.Command, field protoreflect.FieldDescriptor, fieldLa
 
 func runMethodPrompts(cmd *cobra.Command, method protoreflect.MethodDescriptor, address string, data string) (protoreflect.MethodDescriptor, bool, error) {
 	if method == nil {
-		methodOption, err := utils.GetOptionFromPrompt(flagMethod)
+		methodOption, err := commoncmd.GetOptionFromPrompt(flagMethod)
 		if err != nil {
 			return method, false, err
 		}
@@ -149,9 +146,9 @@ func promptAction(wasSuccess bool) (action, error) {
 
 func CmdTestIntegration() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     TestCmdConfig.Name,
-		Short:   TestCmdConfig.Short,
-		PreRunE: utils.SetupInteractiveMode,
+		Use:     "test",
+		Short:   "Test integration",
+		PreRunE: commoncmd.SetupInteractiveMode,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// Data (don't prompt if the flag was not set)
 			data, err := cmd.Flags().GetString(flagData.Name)
@@ -160,13 +157,13 @@ func CmdTestIntegration() *cobra.Command {
 			}
 
 			// Address
-			address, err := utils.GetStringFromPromptOrFlag(cmd, flagAddress)
+			address, err := commoncmd.GetStringFromPromptOrFlag(cmd, flagAddress)
 			if err != nil {
 				return err
 			}
 
 			// Method
-			methodOption, err := utils.GetOptionFromPromptOrFlag(cmd, flagMethod)
+			methodOption, err := commoncmd.GetOptionFromPromptOrFlag(cmd, flagMethod)
 			if err != nil {
 				return err
 			}
@@ -181,7 +178,7 @@ func CmdTestIntegration() *cobra.Command {
 			}
 
 			// don't prompt for further actions if we are not in interactive mode
-			if !utils.IsInteractive(cmd) {
+			if !commoncmd.IsInteractive(cmd) {
 				return nil
 			}
 
@@ -211,9 +208,9 @@ func CmdTestIntegration() *cobra.Command {
 		},
 	}
 	flagMethod.Options = types.Rdk.MethodOptions()
-	utils.AddOptionFlags(cmd, []ktypes.OptionFlag[protoreflect.MethodDescriptor]{flagMethod})
-	utils.AddStringFlags(cmd, []ktypes.StringFlag{flagData, flagAddress})
-	utils.AddBoolFlags(cmd, []ktypes.BoolFlag{flagSimple})
+	commoncmd.AddOptionFlags(cmd, []commoncmd.OptionFlag[protoreflect.MethodDescriptor]{flagMethod})
+	commoncmd.AddStringFlags(cmd, []commoncmd.StringFlag{flagData, flagAddress})
+	commoncmd.AddBoolFlags(cmd, []commoncmd.BoolFlag{flagSimple})
 	return cmd
 }
 

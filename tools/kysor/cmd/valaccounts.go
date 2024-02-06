@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	commoncmd "github.com/KYVENetwork/kyvejs/common/goutils/cmd"
 	"os"
 	"path/filepath"
 
@@ -24,7 +25,7 @@ func valaccountsCmd() *cobra.Command {
 }
 
 func getMnemonic(cmd *cobra.Command) (string, error) {
-	isRecover, err := utils.GetBoolFromPromptOrFlag(cmd, flagValaccCreateRecover)
+	isRecover, err := commoncmd.GetBoolFromPromptOrFlag(cmd, flagValaccCreateRecover)
 	if err != nil {
 		return "", nil
 	}
@@ -63,13 +64,13 @@ func getMnemonic(cmd *cobra.Command) (string, error) {
 }
 
 var (
-	flagValaccCreateName = types.StringFlag{
+	flagValaccCreateName = commoncmd.StringFlag{
 		Name:     "name",
 		Short:    "n",
 		Usage:    "Name of the valaccount (name only used locally for KYSOR)",
 		Required: true,
 		ValidateFn: func(s string) error {
-			if err := utils.ValidateNotEmpty(s); err != nil {
+			if err := commoncmd.ValidateNotEmpty(s); err != nil {
 				return err
 			}
 
@@ -84,42 +85,42 @@ var (
 			return nil
 		},
 	}
-	flagValaccCreatePool = types.OptionFlag[uint64]{
+	flagValaccCreatePool = commoncmd.OptionFlag[uint64]{
 		Name:       "pool",
 		Short:      "p",
 		Usage:      "The ID of the pool this valaccount should participate as a validator",
 		Required:   true,
-		ValidateFn: utils.ValidateInt,
+		ValidateFn: commoncmd.ValidateInt,
 	}
-	flagValaccCreateStorageProvKey = types.StringFlag{
+	flagValaccCreateStorageProvKey = commoncmd.StringFlag{
 		Name:     "storage-priv",
 		Usage:    "The private key of the storage provider",
 		Required: true,
 	}
-	flagValaccCreateRequestBackoff = types.IntFlag{
+	flagValaccCreateRequestBackoff = commoncmd.IntFlag{
 		Name:         "request-backoff",
 		DefaultValue: 50,
 		Usage:        "The time in milliseconds between each getDataItem request where the node sleeps",
-		ValidateFn:   utils.ValidateIntOrEmpty,
+		ValidateFn:   commoncmd.ValidateIntOrEmpty,
 	}
-	flagValaccCreateCache = types.OptionFlag[string]{
+	flagValaccCreateCache = commoncmd.OptionFlag[string]{
 		Name:         "cache",
 		DefaultValue: types.CacheOptionJsonFile,
-		Options:      []types.Option[string]{types.CacheOptionJsonFile, types.CacheOptionMemory},
+		Options:      []commoncmd.Option[string]{types.CacheOptionJsonFile, types.CacheOptionMemory},
 		Usage:        "The cache this node should use",
 	}
-	flagValaccCreateMetrics = types.BoolFlag{
+	flagValaccCreateMetrics = commoncmd.BoolFlag{
 		Name:         "metrics",
 		DefaultValue: false,
 		Usage:        "Start a prometheus metrics server on http://localhost:8080/metrics",
 	}
-	flagValaccCreateMetricsPort = types.IntFlag{
+	flagValaccCreateMetricsPort = commoncmd.IntFlag{
 		Name:         "metrics-port",
 		DefaultValue: 8080,
-		ValidateFn:   utils.ValidatePort,
+		ValidateFn:   commoncmd.ValidatePort,
 		Usage:        "Specify the port of the metrics server. Only considered if '--metrics' is set",
 	}
-	flagValaccCreateRecover = types.BoolFlag{
+	flagValaccCreateRecover = commoncmd.BoolFlag{
 		Name:         "recover",
 		DefaultValue: false,
 		Usage:        "Recover a valaccount from a mnemonic",
@@ -130,7 +131,7 @@ func valaccountsCreateCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "create",
 		Short:   "Create a new valaccount",
-		PreRunE: utils.CombineFuncs(config.LoadConfigs, utils.SetupInteractiveMode),
+		PreRunE: commoncmd.CombineFuncs(config.LoadConfigs, commoncmd.SetupInteractiveMode),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			kyveClient, err := chain.NewKyveClient(config.GetConfigX(), nil)
 			if err != nil {
@@ -138,7 +139,7 @@ func valaccountsCreateCmd() *cobra.Command {
 			}
 
 			// Get the values from the flags or prompt the user for them
-			name, err := utils.GetStringFromPromptOrFlag(cmd, flagValaccCreateName)
+			name, err := commoncmd.GetStringFromPromptOrFlag(cmd, flagValaccCreateName)
 			if err != nil {
 				return err
 			}
@@ -152,31 +153,31 @@ func valaccountsCreateCmd() *cobra.Command {
 				flagValaccCreatePool.Options = append(flagValaccCreatePool.Options, types.NewPoolOption(pool))
 			}
 			// Pool
-			pool, err := utils.GetOptionFromPromptOrFlag(cmd, flagValaccCreatePool)
+			pool, err := commoncmd.GetOptionFromPromptOrFlag(cmd, flagValaccCreatePool)
 			if err != nil {
 				return err
 			}
 
 			// Storage provider key
-			storageProvKey, err := utils.GetStringFromPromptOrFlag(cmd, flagValaccCreateStorageProvKey)
+			storageProvKey, err := commoncmd.GetStringFromPromptOrFlag(cmd, flagValaccCreateStorageProvKey)
 			if err != nil {
 				return err
 			}
 
 			// Request backoff
-			backoffTime, err := utils.GetIntFromPromptOrFlag(cmd, flagValaccCreateRequestBackoff)
+			backoffTime, err := commoncmd.GetIntFromPromptOrFlag(cmd, flagValaccCreateRequestBackoff)
 			if err != nil {
 				return err
 			}
 
 			// Cache
-			cache, err := utils.GetOptionFromPromptOrFlag(cmd, flagValaccCreateCache)
+			cache, err := commoncmd.GetOptionFromPromptOrFlag(cmd, flagValaccCreateCache)
 			if err != nil {
 				return err
 			}
 
 			// Metrics
-			metrics, err := utils.GetBoolFromPromptOrFlag(cmd, flagValaccCreateMetrics)
+			metrics, err := commoncmd.GetBoolFromPromptOrFlag(cmd, flagValaccCreateMetrics)
 			if err != nil {
 				return err
 			}
@@ -188,7 +189,7 @@ func valaccountsCreateCmd() *cobra.Command {
 			}
 			if metrics {
 				// Only ask for the port if metrics are enabled
-				metricsPort, err = utils.GetIntFromPromptOrFlag(cmd, flagValaccCreateMetricsPort)
+				metricsPort, err = commoncmd.GetIntFromPromptOrFlag(cmd, flagValaccCreateMetricsPort)
 				if err != nil {
 					return err
 				}
@@ -223,15 +224,15 @@ func valaccountsCreateCmd() *cobra.Command {
 			return nil
 		},
 	}
-	utils.AddStringFlags(cmd, []types.StringFlag{flagValaccCreateName, flagValaccCreateStorageProvKey})
-	utils.AddIntFlags(cmd, []types.IntFlag{flagValaccCreateRequestBackoff, flagValaccCreateMetricsPort})
-	utils.AddBoolFlags(cmd, []types.BoolFlag{flagValaccCreateMetrics, flagValaccCreateRecover})
-	utils.AddOptionFlags(cmd, []types.OptionFlag[string]{flagValaccCreateCache})
-	utils.AddOptionFlags(cmd, []types.OptionFlag[uint64]{flagValaccCreatePool})
+	commoncmd.AddStringFlags(cmd, []commoncmd.StringFlag{flagValaccCreateName, flagValaccCreateStorageProvKey})
+	commoncmd.AddIntFlags(cmd, []commoncmd.IntFlag{flagValaccCreateRequestBackoff, flagValaccCreateMetricsPort})
+	commoncmd.AddBoolFlags(cmd, []commoncmd.BoolFlag{flagValaccCreateMetrics, flagValaccCreateRecover})
+	commoncmd.AddOptionFlags(cmd, []commoncmd.OptionFlag[string]{flagValaccCreateCache})
+	commoncmd.AddOptionFlags(cmd, []commoncmd.OptionFlag[uint64]{flagValaccCreatePool})
 	return cmd
 }
 
-var flagValaccShowAddressName = types.OptionFlag[config.ValaccountConfig]{
+var flagValaccShowAddressName = commoncmd.OptionFlag[config.ValaccountConfig]{
 	Name:     "name",
 	Short:    "n",
 	Usage:    "Name of the valaccount",
@@ -242,7 +243,7 @@ func valaccountsShowAddressCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "show-address",
 		Short:   "Show the address of a valaccount",
-		PreRunE: utils.CombineFuncs(config.LoadConfigs, utils.SetupInteractiveMode),
+		PreRunE: commoncmd.CombineFuncs(config.LoadConfigs, commoncmd.SetupInteractiveMode),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// Return if no valaccount exists
 			flagValaccShowAddressName.Options = config.ValaccountConfigOptions
@@ -252,7 +253,7 @@ func valaccountsShowAddressCmd() *cobra.Command {
 			}
 
 			// Valaccount config
-			valConfig, err := utils.GetOptionFromPromptOrFlag(cmd, flagValaccShowAddressName)
+			valConfig, err := commoncmd.GetOptionFromPromptOrFlag(cmd, flagValaccShowAddressName)
 			if err != nil {
 				return err
 			}
@@ -267,7 +268,7 @@ func valaccountsShowAddressCmd() *cobra.Command {
 			return nil
 		},
 	}
-	utils.AddOptionFlags(cmd, []types.OptionFlag[config.ValaccountConfig]{flagValaccShowAddressName})
+	commoncmd.AddOptionFlags(cmd, []commoncmd.OptionFlag[config.ValaccountConfig]{flagValaccShowAddressName})
 	return cmd
 }
 
@@ -277,7 +278,7 @@ func valaccountsShowBalanceCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "show-balance",
 		Short:   "Show the balance of a valaccount",
-		PreRunE: utils.CombineFuncs(config.LoadConfigs, utils.SetupInteractiveMode),
+		PreRunE: commoncmd.CombineFuncs(config.LoadConfigs, commoncmd.SetupInteractiveMode),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			kyveClient, err := chain.NewKyveClient(config.GetConfigX(), nil)
 			if err != nil {
@@ -292,7 +293,7 @@ func valaccountsShowBalanceCmd() *cobra.Command {
 			}
 
 			// Valaccount config
-			valConfig, err := utils.GetOptionFromPromptOrFlag(cmd, flagValaccShowAddressName)
+			valConfig, err := commoncmd.GetOptionFromPromptOrFlag(cmd, flagValaccShowAddressName)
 			if err != nil {
 				return err
 			}
@@ -313,27 +314,27 @@ func valaccountsShowBalanceCmd() *cobra.Command {
 			return nil
 		},
 	}
-	utils.AddOptionFlags(cmd, []types.OptionFlag[config.ValaccountConfig]{flagValaccShowBalanceName})
+	commoncmd.AddOptionFlags(cmd, []commoncmd.OptionFlag[config.ValaccountConfig]{flagValaccShowBalanceName})
 	return cmd
 }
 
 var (
-	flagValaccTransferFrom = types.OptionFlag[config.ValaccountConfig]{
+	flagValaccTransferFrom = commoncmd.OptionFlag[config.ValaccountConfig]{
 		Name:     "from",
 		Usage:    "Name of the valaccount to transfer from",
 		Required: true,
 	}
-	flagValaccTransferTo = types.StringFlag{
+	flagValaccTransferTo = commoncmd.StringFlag{
 		Name:       "to",
 		Usage:      "Address to transfer to",
 		Required:   true,
-		ValidateFn: utils.ValidateKyveAddress,
+		ValidateFn: commoncmd.ValidateKyveAddress,
 	}
-	flagValaccTransferAmount = types.StringFlag{
+	flagValaccTransferAmount = commoncmd.StringFlag{
 		Name:       "amount",
 		Usage:      "Amount to transfer",
 		Required:   true,
-		ValidateFn: utils.ValidateIntGreaterZero,
+		ValidateFn: commoncmd.ValidateIntGreaterZero,
 	}
 )
 
@@ -342,7 +343,7 @@ func valaccountsTransferCmd() *cobra.Command {
 		Use:     "transfer",
 		Short:   "Transfer tokens from a valaccount to another address",
 		Example: "kysor valaccounts transfer --from <valaccount> --to <address> --amount <amount>",
-		PreRunE: utils.CombineFuncs(config.LoadConfigs, utils.SetupInteractiveMode),
+		PreRunE: commoncmd.CombineFuncs(config.LoadConfigs, commoncmd.SetupInteractiveMode),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			kyveClient, err := chain.NewKyveClient(config.GetConfigX(), config.ValaccountConfigs)
 			if err != nil {
@@ -357,7 +358,7 @@ func valaccountsTransferCmd() *cobra.Command {
 			}
 
 			// Valaccount config
-			valConfigOption, err := utils.GetOptionFromPromptOrFlag(cmd, flagValaccTransferFrom)
+			valConfigOption, err := commoncmd.GetOptionFromPromptOrFlag(cmd, flagValaccTransferFrom)
 			if err != nil {
 				return err
 			}
@@ -370,7 +371,7 @@ func valaccountsTransferCmd() *cobra.Command {
 			}
 
 			// Transfer to
-			toStr, err := utils.GetStringFromPromptOrFlag(cmd, flagValaccTransferTo)
+			toStr, err := commoncmd.GetStringFromPromptOrFlag(cmd, flagValaccTransferTo)
 			if err != nil {
 				return err
 			}
@@ -380,7 +381,7 @@ func valaccountsTransferCmd() *cobra.Command {
 			}
 
 			// Amount
-			amount, err := utils.GetStringFromPromptOrFlag(cmd, flagValaccTransferAmount)
+			amount, err := commoncmd.GetStringFromPromptOrFlag(cmd, flagValaccTransferAmount)
 			if err != nil {
 				return err
 			}
@@ -396,8 +397,8 @@ func valaccountsTransferCmd() *cobra.Command {
 			return nil
 		},
 	}
-	utils.AddOptionFlags(cmd, []types.OptionFlag[config.ValaccountConfig]{flagValaccTransferFrom})
-	utils.AddStringFlags(cmd, []types.StringFlag{flagValaccTransferTo, flagValaccTransferAmount})
+	commoncmd.AddOptionFlags(cmd, []commoncmd.OptionFlag[config.ValaccountConfig]{flagValaccTransferFrom})
+	commoncmd.AddStringFlags(cmd, []commoncmd.StringFlag{flagValaccTransferTo, flagValaccTransferAmount})
 	return cmd
 }
 
@@ -407,7 +408,7 @@ func valaccountsDeleteCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "delete",
 		Short:   "Delete a valaccount",
-		PreRunE: utils.CombineFuncs(config.LoadConfigs, utils.SetupInteractiveMode),
+		PreRunE: commoncmd.CombineFuncs(config.LoadConfigs, commoncmd.SetupInteractiveMode),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// Return if no valaccount exists
 			flagValaccShowAddressName.Options = config.ValaccountConfigOptions
@@ -417,7 +418,7 @@ func valaccountsDeleteCmd() *cobra.Command {
 			}
 
 			// Valaccount config
-			valConfig, err := utils.GetOptionFromPromptOrFlag(cmd, flagValaccShowAddressName)
+			valConfig, err := commoncmd.GetOptionFromPromptOrFlag(cmd, flagValaccShowAddressName)
 			if err != nil {
 				return err
 			}
@@ -431,7 +432,7 @@ func valaccountsDeleteCmd() *cobra.Command {
 			return nil
 		},
 	}
-	utils.AddOptionFlags(cmd, []types.OptionFlag[config.ValaccountConfig]{flagValaccDeleteName})
+	commoncmd.AddOptionFlags(cmd, []commoncmd.OptionFlag[config.ValaccountConfig]{flagValaccDeleteName})
 	return cmd
 }
 

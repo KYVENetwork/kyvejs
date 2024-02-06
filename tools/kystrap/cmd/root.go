@@ -2,8 +2,7 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/types"
-	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/utils"
+	commoncmd "github.com/KYVENetwork/kyvejs/common/goutils/cmd"
 	"os"
 
 	"github.com/manifoldco/promptui"
@@ -11,34 +10,68 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var hasInteractiveInfoBeenShown = false
+
+// ShowInteractiveInfo prints a message to the user that the command is running in interactive mode.
+func ShowInteractiveInfo() {
+	if !hasInteractiveInfoBeenShown {
+		fmt.Println("Kystrap is running in interactive mode.")
+		fmt.Println("Add '-y' to your command to disable interactive mode.")
+		fmt.Println()
+		hasInteractiveInfoBeenShown = true
+	}
+}
+
+func RunPromptCommandE(cmd *cobra.Command, args []string) error {
+	// Check if the interactive flag is set
+	// -> if so ask the user what to do
+	if commoncmd.IsInteractive(cmd) {
+		ShowInteractiveInfo()
+
+		// Prompt for the next command
+		nextCmd, err := commoncmd.PromptCmd(cmd.Commands())
+		if err != nil {
+			return err
+		}
+
+		// Run persistent pre run functions
+		if nextCmd.PersistentPreRunE != nil {
+			err = nextCmd.PersistentPreRunE(nextCmd, args)
+			if err != nil {
+				return err
+			}
+		} else if nextCmd.PersistentPreRun != nil {
+			nextCmd.PersistentPreRun(nextCmd, args)
+		}
+
+		// Run pre run functions
+		if nextCmd.PreRunE != nil {
+			err = nextCmd.PreRunE(nextCmd, args)
+			if err != nil {
+				return err
+			}
+		} else if nextCmd.PreRun != nil {
+			nextCmd.PreRun(nextCmd, args)
+		}
+
+		// Run the next command
+		if nextCmd.RunE != nil {
+			return nextCmd.RunE(nextCmd, args)
+		} else if nextCmd.Run != nil {
+			nextCmd.Run(nextCmd, args)
+			return nil
+		}
+		return fmt.Errorf("no run function defined for command: %s", nextCmd.Name())
+	}
+	// Otherwise show the help
+	return cmd.Help()
+}
+
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "kystrap",
 	Short: "kystrap is a CLI tool to bootstrap KYVE integrations",
-	RunE: func(cmd *cobra.Command, args []string) error {
-		// Check if the interactive flag is set
-		// -> if so ask the user what to do
-		if utils.IsInteractive(cmd) {
-			options := []types.CmdConfig{
-				CreateCmdConfig,
-				TestCmdConfig,
-			}
-			nextCmd, err := utils.PromptCmd(options)
-			if err != nil {
-				return err
-			}
-
-			switch nextCmd.Name {
-			case CreateCmdConfig.Name:
-				return CmdCreateIntegration().Execute()
-			case TestCmdConfig.Name:
-				return CmdTestIntegration().Execute()
-			default:
-				return fmt.Errorf("invalid option: %s", nextCmd.Name)
-			}
-		}
-		return cmd.Help()
-	},
+	RunE:  RunPromptCommandE,
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -52,6 +85,6 @@ func Execute() {
 }
 
 func init() {
-	rootCmd.PersistentFlags().BoolP(types.FlagNonInteractive.Name, types.FlagNonInteractive.Short, types.FlagNonInteractive.DefaultValue, types.FlagNonInteractive.Usage)
+	commoncmd.AddPersistentBoolFlags(rootCmd, []commoncmd.BoolFlag{commoncmd.FlagNonInteractive})
 	rootCmd.SetErrPrefix(promptui.IconBad)
 }

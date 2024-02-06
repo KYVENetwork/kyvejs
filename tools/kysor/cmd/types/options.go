@@ -2,6 +2,7 @@ package types
 
 import (
 	"fmt"
+	commoncmd "github.com/KYVENetwork/kyvejs/common/goutils/cmd"
 
 	querytypes "github.com/KYVENetwork/chain/x/query/types"
 )
@@ -12,7 +13,7 @@ var (
 )
 
 type StringOption struct {
-	Option[string]
+	commoncmd.Option[string]
 	value string
 }
 
@@ -33,7 +34,7 @@ func (o StringOption) StringValue() string {
 }
 
 type PoolOption struct {
-	Option[uint64]
+	commoncmd.Option[uint64]
 	value querytypes.PoolResponse
 }
 

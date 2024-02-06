@@ -3,11 +3,12 @@ package cmd
 import (
 	"context"
 	"fmt"
+	commoncmd "github.com/KYVENetwork/kyvejs/common/goutils/cmd"
 	"strings"
 	"time"
 
+	"github.com/KYVENetwork/kyvejs/common/goutils/docker"
 	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/utils"
-	"github.com/KYVENetwork/kyvejs/tools/kysor/docker"
 	"github.com/docker/docker/client"
 	"github.com/spf13/cobra"
 )
@@ -37,7 +38,7 @@ func stopCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "stop",
 		Short:   "Stop the KYVE data validator",
-		PreRunE: utils.SetupInteractiveMode,
+		PreRunE: commoncmd.SetupInteractiveMode,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cli, err := client.NewClientWithOpts(client.WithAPIVersionNegotiation())
 			if err != nil {

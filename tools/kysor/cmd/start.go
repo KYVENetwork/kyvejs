@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	commoncmd "github.com/KYVENetwork/kyvejs/common/goutils/cmd"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -13,9 +14,9 @@ import (
 	pooltypes "github.com/KYVENetwork/chain/x/pool/types"
 	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/chain"
 	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/config"
-	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/types"
 	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/utils"
-	"github.com/KYVENetwork/kyvejs/tools/kysor/docker"
+
+	"github.com/KYVENetwork/kyvejs/common/goutils/docker"
 	"github.com/docker/docker/client"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
@@ -309,7 +310,7 @@ func startContainers(cli *client.Client, valConfig config.ValaccountConfig, pool
 
 func getIntegrationEnv(cmd *cobra.Command) ([]string, error) {
 	var integrationEnv []string
-	envFile, err := utils.GetStringFromPromptOrFlag(cmd, flagStartEnvFile)
+	envFile, err := commoncmd.GetStringFromPromptOrFlag(cmd, flagStartEnvFile)
 	if err != nil {
 		return nil, err
 	}
@@ -330,26 +331,26 @@ func getIntegrationEnv(cmd *cobra.Command) ([]string, error) {
 }
 
 var (
-	flagStartValaccount = types.OptionFlag[config.ValaccountConfig]{
+	flagStartValaccount = commoncmd.OptionFlag[config.ValaccountConfig]{
 		Name:     "valaccount",
 		Short:    "v",
 		Usage:    "Name of the valaccount to run",
 		Required: true,
 	}
-	flagStartEnvFile = types.StringFlag{
+	flagStartEnvFile = commoncmd.StringFlag{
 		Name:       "env-file",
 		Short:      "e",
 		Usage:      "Specify the path to an .env file which should be used when starting a binary",
 		Required:   false,
-		ValidateFn: utils.ValidatePathExistsOrEmpty,
+		ValidateFn: commoncmd.ValidatePathExistsOrEmpty,
 	}
-	flagStartDebug = types.BoolFlag{
+	flagStartDebug = commoncmd.BoolFlag{
 		Name:         "debug",
 		Short:        "",
 		Usage:        "Run the validator node in debug mode",
 		DefaultValue: false,
 	}
-	flagStartVerbose = types.BoolFlag{
+	flagStartVerbose = commoncmd.BoolFlag{
 		Name:         "verbose",
 		Usage:        "Show detailed build output",
 		DefaultValue: false,
@@ -360,7 +361,7 @@ func startCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "start",
 		Short:   "Start data validator",
-		PreRunE: utils.CombineFuncs(config.LoadConfigs, utils.SetupInteractiveMode),
+		PreRunE: commoncmd.CombineFuncs(config.LoadConfigs, commoncmd.SetupInteractiveMode),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			kyveClient, err := chain.NewKyveClient(config.GetConfigX(), config.ValaccountConfigs)
 			if err != nil {
@@ -375,7 +376,7 @@ func startCmd() *cobra.Command {
 			}
 
 			// Valaccount config
-			valaccOption, err := utils.GetOptionFromPromptOrFlag(cmd, flagStartValaccount)
+			valaccOption, err := commoncmd.GetOptionFromPromptOrFlag(cmd, flagStartValaccount)
 			if err != nil {
 				return err
 			}
@@ -388,13 +389,13 @@ func startCmd() *cobra.Command {
 			}
 
 			// Debug
-			debug, err := utils.GetBoolFromPromptOrFlag(cmd, flagStartDebug)
+			debug, err := commoncmd.GetBoolFromPromptOrFlag(cmd, flagStartDebug)
 			if err != nil {
 				return err
 			}
 
 			// Verbose
-			verbose, err := utils.GetBoolFromPromptOrFlag(cmd, flagStartVerbose)
+			verbose, err := commoncmd.GetBoolFromPromptOrFlag(cmd, flagStartVerbose)
 			if err != nil {
 				return err
 			}
@@ -454,9 +455,9 @@ func startCmd() *cobra.Command {
 			return nil
 		},
 	}
-	utils.AddOptionFlags(cmd, []types.OptionFlag[config.ValaccountConfig]{flagStartValaccount})
-	utils.AddStringFlags(cmd, []types.StringFlag{flagStartEnvFile})
-	utils.AddBoolFlags(cmd, []types.BoolFlag{flagStartDebug, flagStartVerbose})
+	commoncmd.AddOptionFlags(cmd, []commoncmd.OptionFlag[config.ValaccountConfig]{flagStartValaccount})
+	commoncmd.AddStringFlags(cmd, []commoncmd.StringFlag{flagStartEnvFile})
+	commoncmd.AddBoolFlags(cmd, []commoncmd.BoolFlag{flagStartDebug, flagStartVerbose})
 	return cmd
 }
 

@@ -3,30 +3,27 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	commoncmd "github.com/KYVENetwork/kyvejs/common/goutils/cmd"
 	"regexp"
 	"strings"
 
-	ktypes "github.com/KYVENetwork/kyvejs/tools/kysor/cmd/types"
-	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/utils"
 	"github.com/KYVENetwork/kyvejs/tools/kystrap/bootstrap"
 	"github.com/KYVENetwork/kyvejs/tools/kystrap/types"
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 )
 
-var CreateCmdConfig = ktypes.CmdConfig{Name: "create", Short: "Create integration"}
-
 var regexpAlphaNumericAndDash = regexp.MustCompile(`^[a-zA-Z0-9-]+$`)
 
 var (
-	flagLanguage = ktypes.OptionFlag[types.Language]{
+	flagLanguage = commoncmd.OptionFlag[types.Language]{
 		Name:     "language",
 		Short:    "l",
 		Usage:    fmt.Sprintf("Language for your integration (%s)", strings.Join(types.LanguagesStringSlice(), ", ")),
 		Prompt:   "Select the Language for your integration",
 		Required: true,
 		ValidateFn: func(input string) error {
-			if utils.ValidateNotEmpty(input) != nil {
+			if commoncmd.ValidateNotEmpty(input) != nil {
 				return fmt.Errorf("language must not be empty")
 			}
 			for _, language := range types.Languages {
@@ -37,7 +34,7 @@ var (
 			return fmt.Errorf("invalid language. Please choose one from '%s'", strings.Join(types.LanguagesStringSlice(), ", "))
 		},
 	}
-	flagName = ktypes.StringFlag{
+	flagName = commoncmd.StringFlag{
 		Name:     "name",
 		Short:    "n",
 		Usage:    "Name for your integration",
@@ -53,7 +50,7 @@ var (
 			return nil
 		},
 	}
-	flagOutput = ktypes.StringFlag{
+	flagOutput = commoncmd.StringFlag{
 		Name:         "output",
 		Short:        "o",
 		Usage:        "Output directory for your integration",
@@ -74,9 +71,9 @@ func promptLinkToGithub() error {
 
 func CmdCreateIntegration() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     CreateCmdConfig.Name,
-		Short:   CreateCmdConfig.Short,
-		PreRunE: utils.SetupInteractiveMode,
+		Use:     "create",
+		Short:   "Create integration",
+		PreRunE: commoncmd.SetupInteractiveMode,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// Output directory
 			outputDir, err := cmd.Flags().GetString(flagOutput.Name)
@@ -85,7 +82,7 @@ func CmdCreateIntegration() *cobra.Command {
 			}
 
 			// Language
-			languageOption, err := utils.GetOptionFromPromptOrFlag(cmd, flagLanguage)
+			languageOption, err := commoncmd.GetOptionFromPromptOrFlag(cmd, flagLanguage)
 			if err != nil {
 				return err
 			}
@@ -95,7 +92,7 @@ func CmdCreateIntegration() *cobra.Command {
 			}
 
 			// Name
-			name, err := utils.GetStringFromPromptOrFlag(cmd, flagName)
+			name, err := commoncmd.GetStringFromPromptOrFlag(cmd, flagName)
 			if err != nil {
 				return err
 			}
@@ -110,8 +107,8 @@ func CmdCreateIntegration() *cobra.Command {
 		},
 	}
 	flagLanguage.Options = types.Languages
-	utils.AddOptionFlags(cmd, []ktypes.OptionFlag[types.Language]{flagLanguage})
-	utils.AddStringFlags(cmd, []ktypes.StringFlag{flagName, flagOutput})
+	commoncmd.AddOptionFlags(cmd, []commoncmd.OptionFlag[types.Language]{flagLanguage})
+	commoncmd.AddStringFlags(cmd, []commoncmd.StringFlag{flagName, flagOutput})
 	return cmd
 }
 

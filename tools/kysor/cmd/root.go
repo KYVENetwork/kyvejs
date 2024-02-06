@@ -1,10 +1,10 @@
 package cmd
 
 import (
+	commoncmd "github.com/KYVENetwork/kyvejs/common/goutils/cmd"
 	"os"
 
 	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/config"
-	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/types"
 	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/utils"
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
@@ -27,7 +27,7 @@ func Execute() {
 }
 
 func init() {
-	utils.AddPersistentStringFlags(rootCmd, []types.StringFlag{config.FlagHome})
-	utils.AddPersistentBoolFlags(rootCmd, []types.BoolFlag{types.FlagNonInteractive})
+	commoncmd.AddPersistentStringFlags(rootCmd, []commoncmd.StringFlag{config.FlagHome})
+	commoncmd.AddPersistentBoolFlags(rootCmd, []commoncmd.BoolFlag{commoncmd.FlagNonInteractive})
 	rootCmd.SetErrPrefix(promptui.IconBad)
 }

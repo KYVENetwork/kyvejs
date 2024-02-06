@@ -2,14 +2,13 @@ package cmd
 
 import (
 	"fmt"
+	commoncmd "github.com/KYVENetwork/kyvejs/common/goutils/cmd"
 	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/config"
-	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/types"
-	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/utils"
 	"github.com/spf13/cobra"
 )
 
 var (
-	flagChainID = types.StringFlag{
+	flagChainID = commoncmd.StringFlag{
 		Name:         "chain-id",
 		Short:        "",
 		DefaultValue: "",
@@ -22,7 +21,7 @@ var (
 			return nil
 		},
 	}
-	flagRPC = types.StringFlag{
+	flagRPC = commoncmd.StringFlag{
 		Name:         "rpc",
 		Short:        "",
 		DefaultValue: "",
@@ -36,7 +35,7 @@ var (
 			return nil
 		},
 	}
-	flagREST = types.StringFlag{
+	flagREST = commoncmd.StringFlag{
 		Name:         "rest",
 		Short:        "",
 		DefaultValue: "",
@@ -50,7 +49,7 @@ var (
 			return nil
 		},
 	}
-	flagAutoDownload = types.BoolFlag{
+	flagAutoDownload = commoncmd.BoolFlag{
 		Name:         "auto-download-binaries",
 		Short:        "d",
 		DefaultValue: false,
@@ -63,7 +62,7 @@ func initCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "init",
 		Short:   "Initialize KYSOR",
-		PreRunE: utils.SetupInteractiveMode,
+		PreRunE: commoncmd.SetupInteractiveMode,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			path, err := config.GetConfigFilePath(cmd)
 			if err != nil {
@@ -76,22 +75,22 @@ func initCmd() *cobra.Command {
 			}
 
 			// Get the values from the flags or prompt the user for them
-			chainID, err := utils.GetStringFromPromptOrFlag(cmd, flagChainID)
+			chainID, err := commoncmd.GetStringFromPromptOrFlag(cmd, flagChainID)
 			if err != nil {
 				return err
 			}
 
-			rpc, err := utils.GetStringFromPromptOrFlag(cmd, flagRPC)
+			rpc, err := commoncmd.GetStringFromPromptOrFlag(cmd, flagRPC)
 			if err != nil {
 				return err
 			}
 
-			rest, err := utils.GetStringFromPromptOrFlag(cmd, flagREST)
+			rest, err := commoncmd.GetStringFromPromptOrFlag(cmd, flagREST)
 			if err != nil {
 				return err
 			}
 
-			autoDownload, err := utils.GetBoolFromPromptOrFlag(cmd, flagAutoDownload)
+			autoDownload, err := commoncmd.GetBoolFromPromptOrFlag(cmd, flagAutoDownload)
 			if err != nil {
 				return err
 			}
@@ -107,8 +106,8 @@ func initCmd() *cobra.Command {
 			return kysorConfig.Save(path)
 		},
 	}
-	utils.AddStringFlags(cmd, []types.StringFlag{flagChainID, flagRPC, flagREST})
-	utils.AddBoolFlags(cmd, []types.BoolFlag{flagAutoDownload})
+	commoncmd.AddStringFlags(cmd, []commoncmd.StringFlag{flagChainID, flagRPC, flagREST})
+	commoncmd.AddBoolFlags(cmd, []commoncmd.BoolFlag{flagAutoDownload})
 	return cmd
 }
 

@@ -3,7 +3,6 @@ module github.com/KYVENetwork/kyvejs/tools/kystrap
 go 1.21.4
 
 require (
-	github.com/KYVENetwork/kyvejs/tools/kysor v0.0.0-20240131143922-9676df824f24
 	github.com/fullstorydev/grpcurl v1.8.9
 	github.com/golangci/golangci-lint v1.55.2
 	github.com/jhump/protoreflect v1.15.3
@@ -14,6 +13,7 @@ require (
 	google.golang.org/grpc v1.59.0
 	google.golang.org/protobuf v1.31.0
 	mvdan.cc/gofumpt v0.5.0
+	github.com/KYVENetwork/kyvejs/common/goutils v0.0.0
 )
 
 require (
@@ -287,21 +287,5 @@ require (
 	sigs.k8s.io/yaml v1.3.0 // indirect
 )
 
-replace (
-	// use cosmos compatible ChainSafe/go-schnorrkel
-	github.com/ChainSafe/go-schnorrkel => github.com/ChainSafe/go-schnorrkel v0.0.0-20200405005733-88cbf1b4c40d
-	github.com/ChainSafe/go-schnorrkel/1 => github.com/ChainSafe/go-schnorrkel v1.0.0
-
-	// use this rosetta version to avoid conflicts
-	github.com/coinbase/rosetta-sdk-go => github.com/coinbase/rosetta-sdk-go v0.8.3
-
-	// use kyve flavored cosmos/cosmos-sdk
-	github.com/cosmos/cosmos-sdk => github.com/KYVENetwork/cosmos-sdk v0.47.6-kyve-rc0
-
-	// use cosmos flavored gogo/protobuf
-	// https://github.com/cosmos/cosmos-sdk/issues/8469
-	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
-
-	// use this otherwise we get an error because the signature of `SortFunc` changed
-	golang.org/x/exp => golang.org/x/exp v0.0.0-20230711153332-06a737ee72cb
-)
+// TODO: remove for final release
+replace github.com/KYVENetwork/kyvejs/common/goutils => ../../common/goutils

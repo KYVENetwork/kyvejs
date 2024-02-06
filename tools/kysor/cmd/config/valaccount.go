@@ -2,11 +2,11 @@ package config
 
 import (
 	"fmt"
+	commoncmd "github.com/KYVENetwork/kyvejs/common/goutils/cmd"
 	"os"
 	"path/filepath"
 	"strings"
 
-	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/types"
 	"github.com/knadh/koanf/parsers/toml"
 	"github.com/knadh/koanf/providers/file"
 	"github.com/knadh/koanf/v2"
@@ -15,7 +15,7 @@ import (
 
 var (
 	ValaccountConfigs       []ValaccountConfig
-	ValaccountConfigOptions []types.Option[ValaccountConfig]
+	ValaccountConfigOptions []commoncmd.Option[ValaccountConfig]
 )
 
 type ValaccountConfig struct {
@@ -43,7 +43,7 @@ func (c ValaccountConfig) Path() string {
 }
 
 type ValaccountConfigOption struct {
-	types.Option[ValaccountConfig]
+	commoncmd.Option[ValaccountConfig]
 	config ValaccountConfig
 }
 

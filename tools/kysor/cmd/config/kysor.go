@@ -2,11 +2,11 @@ package config
 
 import (
 	"fmt"
+	commoncmd "github.com/KYVENetwork/kyvejs/common/goutils/cmd"
 	"os"
 	"path/filepath"
 	"strings"
 
-	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/types"
 	"github.com/knadh/koanf/parsers/toml"
 	"github.com/knadh/koanf/providers/file"
 	"github.com/knadh/koanf/providers/structs"
@@ -16,7 +16,7 @@ import (
 
 const configFileName = "config.toml"
 
-var FlagHome = types.StringFlag{
+var FlagHome = commoncmd.StringFlag{
 	Name:         "home",
 	DefaultValue: "~/.kysor", // Overwritten in init() to set the path as absolute
 	Usage:        "The loaction of the .kysor home directory where binaries and configs are stored.",

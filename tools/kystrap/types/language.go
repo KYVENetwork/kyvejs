@@ -1,18 +1,18 @@
 package types
 
 import (
-	ktypes "github.com/KYVENetwork/kyvejs/tools/kysor/cmd/types"
-	"os"
-
+	commoncmd "github.com/KYVENetwork/kyvejs/common/goutils/cmd"
 	"golang.org/x/text/cases"
 	lang "golang.org/x/text/language"
+	"os"
+	"strings"
 )
 
 var toTitle = cases.Title(lang.English)
 
 type Language string
 
-var Languages []ktypes.Option[Language]
+var Languages []commoncmd.Option[Language]
 
 const requestOtherLanguage Language = "Other"
 
@@ -37,7 +37,7 @@ func (l Language) Value() Language {
 }
 
 func (l Language) StringValue() string {
-	return string(l)
+	return strings.ToLower(string(l))
 }
 
 func (l Language) IsRequestOtherLanguage() bool {
