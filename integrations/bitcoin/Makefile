@@ -47,7 +47,7 @@ ifneq ($(GO_VERSION),1.21)
 endif
 
 ###############################################################################
-# Building the binary
+###  						 Building the binary							###
 ###############################################################################
 
 build: ensure_version
@@ -56,7 +56,24 @@ build: ensure_version
 	@echo "✅ Completed binary build!"
 
 ###############################################################################
-# Building the image
+###                          Formatting & Linting                           ###
+###############################################################################
+
+gofumpt_cmd=mvdan.cc/gofumpt
+golangci_lint_cmd=github.com/golangci/golangci-lint/cmd/golangci-lint
+
+format:
+	@echo "📝 Running formatter..."
+	@go run $(golangci_lint_cmd) run --timeout=10m
+	@echo "✅ Completed formatting!"
+
+lint:
+	@echo "📝 Running linter..."
+	@go run $(golangci_lint_cmd) run --timeout=10m
+	@echo "✅ Completed linting!"
+
+###############################################################################
+### 						 Building the image								###
 ###############################################################################
 
 docker-image:

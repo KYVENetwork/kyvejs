@@ -3,6 +3,7 @@ go 1.21.6
 use (
 	./common/goutils
 	./e2etest
+	./integrations/bitcoin
 	./tools/kysor
 	./tools/kystrap
 )

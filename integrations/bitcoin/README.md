@@ -4,13 +4,17 @@ This is the Bitcoin runtime server.
 
 ## Development
 
-### Requirements
-- Docker
-- Go
-- Make (optional)
+**Prerequisites:**
+- [Docker](https://docs.docker.com/engine/install/)
+- [Go](https://golang.org/doc/install)
+- [make](https://www.gnu.org/software/make/) (optional)
 
 Setup
 ```bash
+cd ../../
+go work use integrations/bitcoin
+cd integrations/bitcoin
+
 go mod tidy
 ```
 
@@ -21,6 +25,21 @@ go run main.go
 
 You must implement the methods defined in `proto/kyverdk/runtime/v1/runtime_grpc.pb.go`.<br>
 The implementation is in `server/server.go` and contains already a running example.
+
+**Runtime Workflow:**
+
+*Protocol* (client) and *integration* (server) run inside 2 docker containers and communicate via gRPC.
+1. *protocol* calls *GetRuntimeName* and *GetRuntimeVersion* to get the runtime name and version.
+2. *protocol* calls *ValidateSetConfig* to validate the configuration. Implementation specific config options can be set here.
+3. *protocol* calls *GetDataItem* to get the data item.
+4. *protocol* calls *PrevalidateDataItem* to make some simple checks on the data item. If the checks fail, the data item is rejected.
+5. *protocol* calls *TransformDataItem* to remove unnecessary data from the data item.
+6. *protocol* calls *ValidateDataItem* to validate the data item. If the data item is invalid, it is rejected.
+7. *protocol* calls *SummarizeDataBundle* to summarize the data bundle (ex: block height of a blockchain item).
+8. *protocol* calls *NextKey* to get the next key for the data item.
+
+**Note**<br>
+The behaviour of the integration has to be **deterministic**. 
 
 ### Test the runtime
 
@@ -64,23 +83,23 @@ go run main.go
 Open another terminal and run
 ```bash
 # You must be in the root directory of the project
-sh tools/kystrap/start.sh test -a host.docker.internal:50051
+sh tools/kystrap/kystrap.sh test -a host.docker.internal:50051
 ```
 
 **Examples for testing**
 
 ```bash
 # test command structure
-sh tools/kystrap/start.sh test -a <host>:<port> -m <method> -d <data> <flags>
+sh tools/kystrap/kystrap.sh test -a <host>:<port> -m <method> -d <data> <flags>
 
 # call GetRuntimeName running on localhost:50051 in non-interactive mode (see -y)
-sh tools/kystrap/start.sh test -a host.docker.internal:50051 -m GetRuntimeName -y
+sh tools/kystrap/kystrap.sh test -a host.docker.internal:50051 -m GetRuntimeName -y
 
 # call ValidateSetConfig running in a docker container with data
-sh tools/kystrap/start.sh test -a host.docker.internal:50051 -m ValidateSetConfig -d '{"raw_config":"{\"network\":\"my-network\",\"rpc\":\"https://my-fancy-rpc.com\"}"}'
+sh tools/kystrap/kystrap.sh test -a host.docker.internal:50051 -m ValidateSetConfig -d '{"raw_config":"{\"network\":\"my-network\",\"rpc\":\"https://my-fancy-rpc.com\"}"}'
 
 # call GetRuntimeName in non-interactive and simple mode and pipe the output to jq
-sh tools/kystrap/start.sh test -a host.docker.internal:50051 -y -s -m GetRuntimeName 2>&1 | jq '.name'
+sh tools/kystrap/kystrap.sh test -a host.docker.internal:50051 -y -s -m GetRuntimeName 2>&1 | jq '.name'
 ```
 ⚠️ **Note:** The `-d` flag expects a JSON string **without spaces**.
 </details>
