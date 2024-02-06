@@ -7,7 +7,7 @@ golangci_lint_cmd=github.com/golangci/golangci-lint/cmd/golangci-lint
 
 format:
 	@echo "📝 Running formatter..."
-	@find . -name "*.go" -not -path "./templates/*" | xargs go run $(gofumpt_cmd) -l -w -e
+	@go run $(gofumpt_cmd) -l -w -e .
 	@echo "✅ Completed formatting!"
 
 lint:
