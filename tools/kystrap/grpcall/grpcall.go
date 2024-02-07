@@ -3,8 +3,6 @@ package grpcall
 import (
 	"bytes"
 	"context"
-	"encoding/json"
-	"errors"
 	"strings"
 	"time"
 
@@ -120,12 +118,6 @@ func (gc *GrpcCaller) dial() (*grpc.ClientConn, error) {
 // An error is only returned if the call could not be performed (e.g. connection issues)
 // Invalid JSON is not considered an error
 func (gc *GrpcCaller) PerformMethodCall(method protoreflect.MethodDescriptor, data string) (bool, error) {
-	if !json.Valid([]byte(data)) {
-		gc.printMethodDescription(method)
-		gc.printError(errors.New("invalid JSON"))
-		return false, nil
-	}
-
 	cc, err := gc.dial()
 	if err != nil {
 		return false, err
@@ -142,6 +134,7 @@ func (gc *GrpcCaller) PerformMethodCall(method protoreflect.MethodDescriptor, da
 	options := grpcurl.FormatOptions{
 		EmitJSONDefaultFields: true,
 		AllowUnknownFields:    true,
+		IncludeTextSeparator:  true,
 	}
 
 	rf, formatter, err := grpcurl.RequestParserAndFormatter(grpcurl.FormatJSON, types.Rdk.DescriptorSource, in, options)

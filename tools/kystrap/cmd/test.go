@@ -48,7 +48,7 @@ var (
 	}
 )
 
-func promptInput(cmd *cobra.Command, field protoreflect.FieldDescriptor, fieldLabel string) (string, error) {
+func promptInput(cmd *cobra.Command, field protoreflect.FieldDescriptor, fieldLabel string, history *map[string]string) (string, error) {
 	if !commoncmd.IsInteractive(cmd) {
 		return "", nil
 	}
@@ -57,7 +57,7 @@ func promptInput(cmd *cobra.Command, field protoreflect.FieldDescriptor, fieldLa
 		var data string
 		for i := 0; i < field.Message().Fields().Len(); i++ {
 			subField := field.Message().Fields().Get(i)
-			input, err := promptInput(cmd, subField, fmt.Sprintf("%s -> %s", fieldLabel, subField.Name()))
+			input, err := promptInput(cmd, subField, fmt.Sprintf("%s -> %s", fieldLabel, subField.Name()), history)
 			if err != nil {
 				return "", err
 			}
@@ -73,17 +73,23 @@ func promptInput(cmd *cobra.Command, field protoreflect.FieldDescriptor, fieldLa
 		}
 		return fmt.Sprintf(`"%s": "%s"`, field.Name(), data), nil
 	}
+	historyValue := ""
+	if history != nil {
+		historyValue = (*history)[fieldLabel]
+	}
 	prompt := promptui.Prompt{
-		Label: fieldLabel,
+		Label:   fieldLabel,
+		Default: historyValue,
 	}
 	result, err := prompt.Run()
 	if err != nil {
 		return "", err
 	}
+	(*history)[fieldLabel] = result
 	return fmt.Sprintf(`"%s": "%s"`, field.Name(), result), err
 }
 
-func runMethodPrompts(cmd *cobra.Command, method protoreflect.MethodDescriptor, address string, data string) (protoreflect.MethodDescriptor, bool, error) {
+func runMethodPrompts(cmd *cobra.Command, method protoreflect.MethodDescriptor, address string, data string, history *map[string]string) (protoreflect.MethodDescriptor, bool, error) {
 	if method == nil {
 		methodOption, err := commoncmd.GetOptionFromPrompt(flagMethod)
 		if err != nil {
@@ -97,7 +103,7 @@ func runMethodPrompts(cmd *cobra.Command, method protoreflect.MethodDescriptor, 
 		fields := method.Input().Fields()
 		for i := 0; i < fields.Len(); i++ {
 			field := fields.Get(i)
-			input, err := promptInput(cmd, field, string(field.Name()))
+			input, err := promptInput(cmd, field, string(field.Name()), history)
 			if err != nil {
 				return method, false, err
 			}
@@ -173,7 +179,8 @@ func CmdTestIntegration() *cobra.Command {
 			// Set as new default value to remember the cursor position in further prompts
 			flagMethod.DefaultValue = types.NewMethodOption(method)
 
-			method, success, err := runMethodPrompts(cmd, method, address, data)
+			history := make(map[string]string)
+			method, success, err := runMethodPrompts(cmd, method, address, data, &history)
 			if err != nil {
 				return err
 			}
@@ -192,13 +199,13 @@ func CmdTestIntegration() *cobra.Command {
 				}
 				switch actionResult {
 				case actionRetry:
-					method, success, err = runMethodPrompts(cmd, method, address, "")
+					method, success, err = runMethodPrompts(cmd, method, address, "", &history)
 					if err != nil {
 						return err
 					}
 				case actionTestAnother:
 					method = nil
-					method, success, err = runMethodPrompts(cmd, method, address, "")
+					method, success, err = runMethodPrompts(cmd, method, address, "", &history)
 					if err != nil {
 						return err
 					}
