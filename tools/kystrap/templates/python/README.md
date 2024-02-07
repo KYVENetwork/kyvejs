@@ -55,7 +55,6 @@ docker exec -it $(docker ps -qf "name={{ .name |ToLower }}-kystrap") ./kystrap t
 # call GetRuntimeName in non-interactive and simple mode and pipe the output to jq
 docker exec -it $(docker ps -qf "name={{ .name |ToLower }}-kystrap") ./kystrap test -a runtime:50051 -y -s -m GetRuntimeName 2>&1 | jq '.name'
 ```
-⚠️ **Note:** The `-d` flag expects a JSON string **without spaces**.
 </details>
 
 <details>
@@ -87,5 +86,4 @@ sh tools/kystrap/kystrap.sh test -a host.docker.internal:50051 -m ValidateSetCon
 # call GetRuntimeName in non-interactive and simple mode and pipe the output to jq
 sh tools/kystrap/kystrap.sh test -a host.docker.internal:50051 -y -s -m GetRuntimeName 2>&1 | jq '.name'
 ```
-⚠️ **Note:** The `-d` flag expects a JSON string **without spaces**.
 </details>

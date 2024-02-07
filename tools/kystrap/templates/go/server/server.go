@@ -208,7 +208,7 @@ func (t *{{ .name | ToPascal }}Server) SummarizeDataBundle(ctx context.Context, 
 	// Example:
 	// grpcBundle := req.GetBundle()
 	// latestBundle := grpcBundle[len(grpcBundle)-1]
-	// var value GogoTransformedItemValue
+	// var value {{ .name | ToPascal }}TransformedItemValue
 	// err := json.Unmarshal([]byte(latestBundle.GetValue()), &value)
 	// if err == nil {
 	//	 if value.Block.(map[string]interface{})["height"] != nil {
