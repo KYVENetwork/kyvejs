@@ -2,8 +2,8 @@
 
 KEY=11044702  # Change this to the key you want to test
 RPC="https://my-fancy-pants-rpc"  # Change this to the RPC you want to test
-CONFIG='{"network":"lavanet","rpc":"'$RPC'"}' # Set your config here
-HOST="localhost"
+CONFIG='{"network":"fancy-network","rpc":"'$RPC'"}' # Set your config here
+HOST="host:docker:internal"
 PORT="50051"
 
 # Go up until the root of the project (max 3 levels)
