@@ -65,7 +65,7 @@ func (gc *GrpcCaller) printRequest(data string) {
 		return
 	}
 
-	gc.printer.Printf("➡️ Request\n%s\n\n", data)
+	gc.printer.Printf("➡️  Request\n%s\n\n", data)
 }
 
 func (gc *GrpcCaller) printResponse(h *grpcurl.DefaultEventHandler, data string) {
@@ -77,10 +77,10 @@ func (gc *GrpcCaller) printResponse(h *grpcurl.DefaultEventHandler, data string)
 		}
 	} else {
 		if h.Status.Err() != nil {
-			gc.printer.PrintErrln("⬅️ Response")
+			gc.printer.PrintErrln("⬅️  Response")
 			gc.printer.PrintErrf("%s %d %s - %s\n", promptui.IconBad, h.Status.Code(), h.Status.Code(), h.Status.Message())
 		} else {
-			gc.printer.Printf("⬅️ Response\n%s", data)
+			gc.printer.Printf("⬅️  Response\n%s", data)
 			gc.printer.Printf("%s %d %s %s\n", promptui.IconGood, h.Status.Code(), h.Status.Code(), h.Status.Message())
 		}
 	}
