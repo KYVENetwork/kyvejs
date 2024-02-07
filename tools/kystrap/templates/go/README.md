@@ -8,6 +8,7 @@ This is the {{ .name | ToTitle }} runtime server.
 - [Docker](https://docs.docker.com/engine/install/)
 - [Go](https://golang.org/doc/install)
 - [make](https://www.gnu.org/software/make/) (optional)
+- [jw](https://jqlang.github.io/jq/download/)(optional)
 
 Setup
 ```bash
@@ -42,36 +43,6 @@ The implementation is in `server/server.go` and contains already a running examp
 The behaviour of the integration has to be **deterministic**. 
 
 ### Test the runtime
-
-<details>
-<summary>Using Docker</summary>
-
-Start the runtime container and the kystrap container
-```bash
-docker compose up --build
-```
-Open another terminal and run
-```bash
-docker exec -it $(docker ps -qf "name={{ .name |ToLower }}-kystrap") ./kystrap test -a runtime:50051
-```
-
-**Examples for testing**
-```bash
-# test command structure
-docker exec -it $(docker ps -qf "name={{ .name |ToLower }}-kystrap") ./kystrap test -a <host>:<port> -m <method> -d <data> <flags>
-
-# call GetRuntimeName running on localhost:50051 in non-interactive mode (see -y)
-docker exec -it $(docker ps -qf "name={{ .name |ToLower }}-kystrap") ./kystrap test -a runtime:50051 -m GetRuntimeName -y
-
-# call ValidateSetConfig running in a docker container with data
-docker exec -it $(docker ps -qf "name={{ .name |ToLower }}-kystrap") ./kystrap test -a runtime:50051 -m ValidateSetConfig -d '{"raw_config":"{\"network\":\"my-network\",\"rpc\":\"https://my-fancy-rpc.com\"}"}'
-
-# call GetRuntimeName in non-interactive and simple mode and pipe the output to jq
-docker exec -it $(docker ps -qf "name={{ .name |ToLower }}-kystrap") ./kystrap test -a runtime:50051 -y -s -m GetRuntimeName 2>&1 | jq '.name'
-```
-⚠️ **Note:** The `-d` flag expects a JSON string **without spaces**.
-</details>
-
 <details>
 <summary>Using a shell</summary>
 
@@ -81,6 +52,12 @@ go run main.go
 ```
 
 Open another terminal and run
+```bash
+# This will test the whole workflow
+test/test.sh
+```
+
+To test individual methods, you can use the kystrap tool. Or you customize the test/test.sh script to your needs.
 ```bash
 # You must be in the root directory of the project
 sh tools/kystrap/kystrap.sh test -a host.docker.internal:50051
@@ -92,14 +69,14 @@ sh tools/kystrap/kystrap.sh test -a host.docker.internal:50051
 # test command structure
 sh tools/kystrap/kystrap.sh test -a <host>:<port> -m <method> -d <data> <flags>
 
-# call GetRuntimeName running on localhost:50051 in non-interactive mode (see -y)
-sh tools/kystrap/kystrap.sh test -a host.docker.internal:50051 -m GetRuntimeName -y
+# call GetRuntimeName in non-interactive mode (see -y)
+sh tools/kystrap/kystrap.sh test -a localhost:50051 -m GetRuntimeName -y
 
-# call ValidateSetConfig running in a docker container with data
-sh tools/kystrap/kystrap.sh test -a host.docker.internal:50051 -m ValidateSetConfig -d '{"raw_config":"{\"network\":\"my-network\",\"rpc\":\"https://my-fancy-rpc.com\"}"}'
+# call ValidateSetConfig with data
+sh tools/kystrap/kystrap.sh test -a localhost:50051 -m ValidateSetConfig -d '{"raw_config":"{\"network\":\"my-network\",\"rpc\":\"https://my-fancy-rpc.com\"}"}'
 
-# call GetRuntimeName in non-interactive and simple mode and pipe the output to jq
-sh tools/kystrap/kystrap.sh test -a host.docker.internal:50051 -y -s -m GetRuntimeName 2>&1 | jq '.name'
+# call GetRuntimeName in non-interactive and simple mode, pipe the output to jq
+sh tools/kystrap/kystrap.sh test -a localhost:50051 -y -s -m GetRuntimeName 2>&1 | jq '.name'
 ```
 ⚠️ **Note:** The `-d` flag expects a JSON string **without spaces**.
 </details>

@@ -3,8 +3,6 @@ package grpcall
 import (
 	"bytes"
 	"context"
-	"encoding/json"
-	"errors"
 	"strings"
 	"time"
 
@@ -67,7 +65,7 @@ func (gc *GrpcCaller) printRequest(data string) {
 		return
 	}
 
-	gc.printer.Printf("➡️ Request\n%s\n\n", data)
+	gc.printer.Printf("➡️  Request\n%s\n\n", data)
 }
 
 func (gc *GrpcCaller) printResponse(h *grpcurl.DefaultEventHandler, data string) {
@@ -79,10 +77,10 @@ func (gc *GrpcCaller) printResponse(h *grpcurl.DefaultEventHandler, data string)
 		}
 	} else {
 		if h.Status.Err() != nil {
-			gc.printer.PrintErrln("⬅️ Response")
+			gc.printer.PrintErrln("⬅️  Response")
 			gc.printer.PrintErrf("%s %d %s - %s\n", promptui.IconBad, h.Status.Code(), h.Status.Code(), h.Status.Message())
 		} else {
-			gc.printer.Printf("⬅️ Response\n%s", data)
+			gc.printer.Printf("⬅️  Response\n%s", data)
 			gc.printer.Printf("%s %d %s %s\n", promptui.IconGood, h.Status.Code(), h.Status.Code(), h.Status.Message())
 		}
 	}
@@ -120,12 +118,6 @@ func (gc *GrpcCaller) dial() (*grpc.ClientConn, error) {
 // An error is only returned if the call could not be performed (e.g. connection issues)
 // Invalid JSON is not considered an error
 func (gc *GrpcCaller) PerformMethodCall(method protoreflect.MethodDescriptor, data string) (bool, error) {
-	if !json.Valid([]byte(data)) {
-		gc.printMethodDescription(method)
-		gc.printError(errors.New("invalid JSON"))
-		return false, nil
-	}
-
 	cc, err := gc.dial()
 	if err != nil {
 		return false, err
@@ -142,6 +134,7 @@ func (gc *GrpcCaller) PerformMethodCall(method protoreflect.MethodDescriptor, da
 	options := grpcurl.FormatOptions{
 		EmitJSONDefaultFields: true,
 		AllowUnknownFields:    true,
+		IncludeTextSeparator:  true,
 	}
 
 	rf, formatter, err := grpcurl.RequestParserAndFormatter(grpcurl.FormatJSON, types.Rdk.DescriptorSource, in, options)
