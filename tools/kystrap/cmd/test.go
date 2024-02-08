@@ -3,6 +3,7 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"os"
 	"regexp"
 
 	commoncmd "github.com/KYVENetwork/kyvejs/common/goutils/cmd"
@@ -39,6 +40,11 @@ var (
 		Name:  "data",
 		Short: "d",
 		Usage: "data that you want to send with the gRPC method call",
+	}
+	flagDataFile = commoncmd.StringFlag{
+		Name:  "data-file",
+		Short: "f",
+		Usage: "file containing the data that you want to send with the gRPC method call",
 	}
 	flagSimple = commoncmd.BoolFlag{
 		Name:         "simple",
@@ -117,6 +123,7 @@ func runMethodPrompts(cmd *cobra.Command, method protoreflect.MethodDescriptor, 
 		data = fmt.Sprintf(`{%s}`, data)
 	}
 
+	cmd.SetOut(os.Stdout)
 	caller := grpcall.NewGrpcCaller(address, isSimpleOutput(cmd), cmd)
 	success, err := caller.PerformMethodCall(method, data)
 	return method, success, err
@@ -161,6 +168,23 @@ func CmdTestIntegration() *cobra.Command {
 			data, err := cmd.Flags().GetString(flagData.Name)
 			if err != nil {
 				return err
+			}
+
+			// If data is not set, check if the data-file flag is set
+			if data == "" {
+				dataFile, err := cmd.Flags().GetString(flagDataFile.Name)
+				if err != nil {
+					return err
+				}
+				if dataFile != "" {
+					// read data from file
+					var dataBytes []byte
+					dataBytes, err = os.ReadFile(dataFile)
+					if err != nil {
+						return err
+					}
+					data = string(dataBytes)
+				}
 			}
 
 			// Address
@@ -217,8 +241,9 @@ func CmdTestIntegration() *cobra.Command {
 	}
 	flagMethod.Options = types.Rdk.MethodOptions()
 	commoncmd.AddOptionFlags(cmd, []commoncmd.OptionFlag[protoreflect.MethodDescriptor]{flagMethod})
-	commoncmd.AddStringFlags(cmd, []commoncmd.StringFlag{flagData, flagAddress})
+	commoncmd.AddStringFlags(cmd, []commoncmd.StringFlag{flagData, flagDataFile, flagAddress})
 	commoncmd.AddBoolFlags(cmd, []commoncmd.BoolFlag{flagSimple})
+	cmd.MarkFlagsMutuallyExclusive(flagData.Name, flagDataFile.Name)
 	return cmd
 }
 
