@@ -47,15 +47,6 @@ ifneq ($(GO_VERSION),{{ .lang.go.version.minor }})
 endif
 
 ###############################################################################
-###  						 Building the binary							###
-###############################################################################
-
-build: ensure_version
-	@echo "🏗️ Building binary..."
-	go build -o build/$(BINARY_NAME) .
-	@echo "✅ Completed binary build!"
-
-###############################################################################
 ###                          Formatting & Linting                           ###
 ###############################################################################
 
@@ -71,6 +62,15 @@ lint:
 	@echo "📝 Running linter..."
 	@go run $(golangci_lint_cmd) run --timeout=10m
 	@echo "✅ Completed linting!"
+
+###############################################################################
+###  						 Building the binary							###
+###############################################################################
+
+build: ensure_version
+	@echo "🏗️ Building binary..."
+	go build -o build/$(BINARY_NAME) .
+	@echo "✅ Completed binary build!"
 
 ###############################################################################
 ### 						 Building the image								###
