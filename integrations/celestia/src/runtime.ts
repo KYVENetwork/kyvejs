@@ -50,7 +50,10 @@ export default class Celestia implements IRuntime {
       }
     });
 
-    return { key, value: data.result };
+    if (data.result) {
+      return { key, value: data.result };
+    }
+    return { key, value: [] };
   }
 
   async prevalidateDataItem(_: Validator, dataItem: DataItem): Promise<boolean> {
