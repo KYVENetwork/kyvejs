@@ -32,10 +32,8 @@ export default class Celestia implements IRuntime {
   }
 
   async getDataItem(_: Validator, key: string): Promise<DataItem> {
-    let blobs;
-
     // fetch GetAll from namespace
-    axios.post('http://127.0.0.1:26658', {
+    const { data } = await axios.post(this.config.rpc, {
       id: 1,
       jsonrpc: '2.0',
       method: 'blob.GetAll',
@@ -50,18 +48,12 @@ export default class Celestia implements IRuntime {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${process.env.CELESTIA_NODE_AUTH_TOKEN}`
       }
-    })
-      .then(response => {
-        blobs = response.data;
-      })
-      .catch(error => {
-        console.error(error);
-      });
+    });
 
-    return { key, value: blobs };
+    return { key, value: data.result };
   }
 
-  async prevalidateDataItem(_: Validator, item: DataItem): Promise<boolean> {
+  async prevalidateDataItem(_: Validator, dataItem: DataItem): Promise<boolean> {
     return true;
   }
 
