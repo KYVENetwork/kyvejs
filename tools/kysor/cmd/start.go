@@ -502,6 +502,9 @@ func start(cmd *cobra.Command, kyveClient *chain.KyveClient, cli *client.Client,
 	return label, nil
 }
 
+// isNewVersionAvailable checks if a new version is available and sends a signal to the newVersionChan if it is
+// It also updates the local repository and pulls the latest changes
+// This function is blocking
 func isNewVersionAvailable(kyveClient *chain.KyveClient, poolId uint64, repoDir string, newVersionChan chan interface{}, exitChan chan interface{}) {
 	var currentVersion string
 	ticker := time.NewTicker(1 * time.Minute)
@@ -614,36 +617,41 @@ func startCmd() *cobra.Command {
 				)
 				isStopping := false
 
-				// Enter endless loop
+				// Cleanup containers on exit
+				defer func() {
+					// Send exit signal
+					exitChan <- nil
+
+					// Cleanup containers
+					if err := tearDownContainers(cli, label); err != nil {
+						fmt.Printf("failed to stop containers: %v\n", err)
+					}
+				}()
+
+				// Enter loop
 				for {
-					// Listen to signals, stop containers on signal
-					go func() {
-						<-sigc
+					select {
+					case <-sigc:
+						// Stop signal received, stop containers
 						isStopping = true
 						fmt.Println("\n🛑  Stopping KYSOR...")
-						if err := tearDownContainers(cli, label); err != nil {
-							fmt.Printf("failed to stop containers: %v\n", err)
-						}
-						exitChan <- nil
-						os.Exit(0)
-					}()
-
-					select {
-					case err := <-errChan:
-						if err != nil {
-							_ = tearDownContainers(cli, label)
-							exitChan <- nil
-							return err
-						}
-					case <-logEndChan:
+						return nil
+					case containerName := <-logEndChan:
+						// Log ended, throw error if container is not supposed to stop
 						if !isStopping {
-							errChan <- fmt.Errorf("container %s stopped", <-logEndChan)
+							return fmt.Errorf("container %s stopped unexpected", containerName)
 						}
 					case <-newVersionChan:
+						// New version available, restart containers
 						isStopping = true
 						fmt.Println("🔄  New version available, restarting KYSOR...")
 						label, err = start(cmd, kyveClient, cli, valConfig, integrationEnv, debug, verbose, detached, errChan, logEndChan, exitChan, newVersionChan)
 						isStopping = false
+						if err != nil {
+							return err
+						}
+					case err := <-errChan:
+						// Error received, throw error
 						if err != nil {
 							return err
 						}
