@@ -358,12 +358,14 @@ var (
 )
 
 // printLogs prints the logs of the given container (stdout and stderr)
+// Errors are sent to the errChan and the name of the container is sent to the endChan when the logs end
 // This function is blocking
-func printLogs(cli *client.Client, cont *StartResult, color color) error {
+func printLogs(cli *client.Client, cont *StartResult, color color, errChan chan error, endChan chan string) {
 	logs, err := cli.ContainerLogs(context.Background(), cont.ID,
 		container.LogsOptions{ShowStdout: true, ShowStderr: true, Follow: true, Details: false})
 	if err != nil {
-		return err
+		errChan <- err
+		return
 	}
 
 	reader := bufio.NewReader(logs)
@@ -374,7 +376,8 @@ func printLogs(cli *client.Client, cont *StartResult, color color) error {
 			if err == io.EOF {
 				break
 			}
-			return err
+			errChan <- err
+			return
 		}
 
 		// Read one line
@@ -383,16 +386,18 @@ func printLogs(cli *client.Client, cont *StartResult, color color) error {
 			if err == io.EOF {
 				break
 			}
-			return err
+			errChan <- err
+			return
 		}
 
 		// Print the line
 		goTerminal.ColorRGBForeground(color[0], color[1], color[2])
 		fmt.Printf("%s: ", cont.Name)
 		goTerminal.Color256Foreground(15)
-		fmt.Println(line)
+		fmt.Print(line)
 	}
-	return nil
+	endChan <- cont.Name
+	return
 }
 
 var (
@@ -426,6 +431,99 @@ var (
 		DefaultValue: false,
 	}
 )
+
+func start(cmd *cobra.Command, kyveClient *chain.KyveClient, cli *client.Client, valConfig config.ValaccountConfig, integrationEnv []string, debug bool, verbose bool, detached bool, errChan chan error, logEndChan chan string, exitChan chan interface{}, newVersionChan chan interface{}) (string, error) {
+	response, err := kyveClient.QueryPool(valConfig.Pool)
+	if err != nil {
+		return "", fmt.Errorf("failed to query pool: %v", err)
+	}
+	pool := response.GetPool().Data
+
+	if detached {
+		fmt.Println("    Starting KYSOR (detached)...")
+		fmt.Println("    Auto update during runtime is disabled in detached mode!")
+	} else {
+		fmt.Println("    Starting KYSOR...")
+	}
+	fmt.Printf("    Running on platform and architecture: %s - %s\n\n", runtime.GOOS, runtime.GOARCH)
+
+	homeDir, err := config.GetHomeDir(cmd)
+	if err != nil {
+		return "", err
+	}
+
+	// Clone or pull the kyvejs repository
+	repo, err := pullRepo(filepath.Join(homeDir, "kyvejs"))
+	if err != nil {
+		return "", err
+	}
+
+	// Build images
+	label := fmt.Sprintf("kysor-%s-pool-%d", config.GetConfigX().GetChainPrettyName(), pool.Id)
+	protocol, integration, err := buildImages(repo, cli, pool, label, verbose)
+	if err != nil {
+		return "", fmt.Errorf("failed to build images: %v", err)
+	}
+
+	// Stop and remove existing containers
+	err = tearDownContainers(cli, label)
+	if err != nil {
+		return "", err
+	}
+
+	// Start containers
+	protocolContainer, integrationContainer, err := startContainers(cli, valConfig, pool, debug, protocol, integration, label, integrationEnv)
+	if err != nil {
+		return "", err
+	}
+
+	fmt.Println()
+	if detached {
+		fmt.Println("🔍  Use following commands to view the logs:")
+		fmt.Print("    ")
+		utils.PrintlnItalic(fmt.Sprintf("docker logs -f %s", integrationContainer.Name))
+		fmt.Print("    ")
+		utils.PrintlnItalic(fmt.Sprintf("docker logs -f %s", protocolContainer.Name))
+	} else {
+		// Print protocol logs
+		go printLogs(cli, protocolContainer, green, errChan, logEndChan)
+
+		// Print integration logs
+		go printLogs(cli, integrationContainer, blue, errChan, logEndChan)
+
+		// Check for new version
+		go isNewVersionAvailable(kyveClient, valConfig.Pool, newVersionChan, exitChan)
+	}
+	return label, nil
+}
+
+func isNewVersionAvailable(kyveClient *chain.KyveClient, poolId uint64, newVersionChan chan interface{}, exitChan chan interface{}) {
+	var currentVersion string
+	ticker := time.NewTicker(1 * time.Minute)
+	defer ticker.Stop()
+
+	for {
+		response, err := kyveClient.QueryPool(poolId)
+		if err != nil {
+			fmt.Printf("failed to query pool: %v\n", err)
+		}
+		newVersion := response.GetPool().Data.GetProtocol().GetVersion()
+		if currentVersion == "" {
+			currentVersion = newVersion
+		}
+		if newVersion != currentVersion {
+			newVersionChan <- nil
+			return
+		}
+
+		select {
+		case <-exitChan:
+			return
+		case <-ticker.C:
+			// Continue the loop
+		}
+	}
+}
 
 func startCmd() *cobra.Command {
 	cmd := &cobra.Command{
@@ -476,12 +574,6 @@ func startCmd() *cobra.Command {
 				return err
 			}
 
-			response, err := kyveClient.QueryPool(valConfig.Pool)
-			if err != nil {
-				return fmt.Errorf("failed to query pool: %v", err)
-			}
-			pool := response.GetPool().Data
-
 			cli, err := client.NewClientWithOpts(client.WithAPIVersionNegotiation())
 			if err != nil {
 				return fmt.Errorf("failed to create docker client: %v", err)
@@ -489,53 +581,20 @@ func startCmd() *cobra.Command {
 			//goland:noinspection GoUnhandledErrorResult
 			defer cli.Close()
 
-			if detached {
-				fmt.Println("    Starting KYSOR (detached)...")
-				fmt.Println("    Auto update during runtime is disabled in detached mode!")
-			} else {
-				fmt.Println("    Starting KYSOR...")
-			}
-			fmt.Printf("    Running on platform and architecture: %s - %s\n\n", runtime.GOOS, runtime.GOARCH)
+			errChan := make(chan error)
+			logEndChan := make(chan string)
+			exitChan := make(chan interface{})
+			newVersionChan := make(chan interface{})
 
-			homeDir, err := config.GetHomeDir(cmd)
+			// Detached 	-> start containers and forget about them
+			// Not detached -> listen to signals and stop containers on signal
+			//              -> listen to new version and restart containers on new version
+			//   			-> listen to log end and throw error if log ends unexpectedly (which means the container died)
+			label, err := start(cmd, kyveClient, cli, valConfig, integrationEnv, debug, verbose, detached, errChan, logEndChan, exitChan, newVersionChan)
 			if err != nil {
 				return err
 			}
-
-			// Clone or pull the kyvejs repository
-			repo, err := pullRepo(filepath.Join(homeDir, "kyvejs"))
-			if err != nil {
-				return err
-			}
-
-			// Build images
-			label := fmt.Sprintf("kysor-%s-pool-%d", config.GetConfigX().GetChainPrettyName(), pool.Id)
-			protocol, integration, err := buildImages(repo, cli, pool, label, verbose)
-			if err != nil {
-				return fmt.Errorf("failed to build images: %v", err)
-			}
-
-			// Stop and remove existing containers
-			err = tearDownContainers(cli, label)
-			if err != nil {
-				return err
-			}
-
-			// Start containers
-			protocolContainer, integrationContainer, err := startContainers(cli, valConfig, pool, debug, protocol, integration, label, integrationEnv)
-			if err != nil {
-				return err
-			}
-
-			fmt.Println()
-
-			if detached {
-				fmt.Println("🔍  Use following commands to view the logs:")
-				fmt.Print("    ")
-				utils.PrintlnItalic(fmt.Sprintf("docker logs -f %s", integrationContainer.Name))
-				fmt.Print("    ")
-				utils.PrintlnItalic(fmt.Sprintf("docker logs -f %s", protocolContainer.Name))
-			} else {
+			if !detached {
 				sigc := make(chan os.Signal, 1)
 				signal.Notify(sigc,
 					syscall.SIGHUP,
@@ -543,51 +602,44 @@ func startCmd() *cobra.Command {
 					syscall.SIGTERM,
 					syscall.SIGQUIT,
 				)
+				isStopping := false
 
-				errChan := make(chan error)
 				// Enter endless loop
 				for {
-					isStopping := false
-
-					// Listen to signals and stop the containers
+					// Listen to signals, stop containers on signal
 					go func() {
 						<-sigc
 						isStopping = true
 						fmt.Println("\n🛑  Stopping KYSOR...")
-						errChan <- tearDownContainers(cli, label)
+						if err := tearDownContainers(cli, label); err != nil {
+							fmt.Printf("failed to stop containers: %v\n", err)
+						}
+						exitChan <- nil
 						os.Exit(0)
 					}()
 
-					// Print protocol logs
-					go func() {
-						if err := printLogs(cli, protocolContainer, green); err != nil {
-							errChan <- err
-							return
+					select {
+					case err := <-errChan:
+						if err != nil {
+							_ = tearDownContainers(cli, label)
+							exitChan <- nil
+							return err
 						}
+					case <-logEndChan:
 						if !isStopping {
-							errChan <- fmt.Errorf("protocol container stopped")
+							errChan <- fmt.Errorf("container %s stopped", <-logEndChan)
 						}
-					}()
-
-					// Print integration logs
-					go func() {
-						if err := printLogs(cli, integrationContainer, blue); err != nil {
-							errChan <- err
-							return
+					case <-newVersionChan:
+						isStopping = true
+						fmt.Println("🔄  New version available, restarting KYSOR...")
+						label, err = start(cmd, kyveClient, cli, valConfig, integrationEnv, debug, verbose, detached, errChan, logEndChan, exitChan, newVersionChan)
+						isStopping = false
+						if err != nil {
+							return err
 						}
-						if !isStopping {
-							errChan <- fmt.Errorf("integration container stopped")
-						}
-					}()
-
-					err := <-errChan
-					if err != nil {
-						_ = tearDownContainers(cli, label)
-						return err
 					}
 				}
 			}
-
 			return nil
 		},
 	}
