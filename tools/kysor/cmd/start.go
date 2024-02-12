@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/docker/docker/api/types/container"
 	goTerminal "github.com/leandroveronezi/go-terminal"
+	"io"
 	"os"
 	"os/signal"
 	"path/filepath"
@@ -356,18 +357,40 @@ var (
 	blue  color = []int{28, 15, 209}
 )
 
+// printLogs prints the logs of the given container (stdout and stderr)
+// This function is blocking
 func printLogs(cli *client.Client, cont *StartResult, color color) error {
 	logs, err := cli.ContainerLogs(context.Background(), cont.ID,
 		container.LogsOptions{ShowStdout: true, ShowStderr: true, Follow: true, Details: false})
 	if err != nil {
 		return err
 	}
-	scanner := bufio.NewScanner(logs)
-	for scanner.Scan() {
+
+	reader := bufio.NewReader(logs)
+	for {
+		// Discard the 8-byte header
+		_, err := reader.Discard(8)
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			return err
+		}
+
+		// Read one line
+		line, err := reader.ReadString('\n')
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			return err
+		}
+
+		// Print the line
 		goTerminal.ColorRGBForeground(color[0], color[1], color[2])
 		fmt.Printf("%s: ", cont.Name)
 		goTerminal.Color256Foreground(15)
-		fmt.Println(scanner.Text())
+		fmt.Println(line)
 	}
 	return nil
 }
