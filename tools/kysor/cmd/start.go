@@ -147,14 +147,16 @@ type kyveRepo struct {
 }
 
 // pullRepo clones or pulls the kyvejs repository
-func pullRepo(repoDir string) (*kyveRepo, error) {
+func pullRepo(repoDir string, silent bool) (*kyveRepo, error) {
 	repoName := "github.com/KYVENetwork/kyvejs"
 	repoUrl := fmt.Sprintf("https://%s.git", repoName)
 
 	var repo *git.Repository
 	if _, err := os.Stat(repoDir); os.IsNotExist(err) {
 		// Clone the given repository to the given directory
-		fmt.Printf("📥  Cloning %s\n", repoUrl)
+		if !silent {
+			fmt.Printf("📥  Cloning %s\n", repoUrl)
+		}
 		repo, err = git.PlainClone(repoDir, false, &git.CloneOptions{
 			URL:      repoUrl,
 			Progress: os.Stdout,
@@ -175,7 +177,9 @@ func pullRepo(repoDir string) (*kyveRepo, error) {
 		}
 
 		// Pull the latest changes
-		fmt.Println("⬇️   Pulling latest changes")
+		if !silent {
+			fmt.Println("⬇️   Pulling latest changes")
+		}
 		err = w.Pull(&git.PullOptions{RemoteName: "origin", Force: true})
 		if err != nil && !errors.Is(err, git.NoErrAlreadyUpToDate) && !errors.Is(err, git.ErrNonFastForwardUpdate) {
 			return nil, err
@@ -453,7 +457,8 @@ func start(cmd *cobra.Command, kyveClient *chain.KyveClient, cli *client.Client,
 	}
 
 	// Clone or pull the kyvejs repository
-	repo, err := pullRepo(filepath.Join(homeDir, "kyvejs"))
+	repoDir := filepath.Join(homeDir, "kyvejs")
+	repo, err := pullRepo(repoDir, false)
 	if err != nil {
 		return "", err
 	}
@@ -492,17 +497,22 @@ func start(cmd *cobra.Command, kyveClient *chain.KyveClient, cli *client.Client,
 		go printLogs(cli, integrationContainer, blue, errChan, logEndChan)
 
 		// Check for new version
-		go isNewVersionAvailable(kyveClient, valConfig.Pool, newVersionChan, exitChan)
+		go isNewVersionAvailable(kyveClient, valConfig.Pool, repoDir, newVersionChan, exitChan)
 	}
 	return label, nil
 }
 
-func isNewVersionAvailable(kyveClient *chain.KyveClient, poolId uint64, newVersionChan chan interface{}, exitChan chan interface{}) {
+func isNewVersionAvailable(kyveClient *chain.KyveClient, poolId uint64, repoDir string, newVersionChan chan interface{}, exitChan chan interface{}) {
 	var currentVersion string
 	ticker := time.NewTicker(1 * time.Minute)
 	defer ticker.Stop()
 
 	for {
+		_, err := pullRepo(repoDir, true)
+		if err != nil {
+			return
+		}
+
 		response, err := kyveClient.QueryPool(poolId)
 		if err != nil {
 			fmt.Printf("failed to query pool: %v\n", err)
@@ -581,10 +591,10 @@ func startCmd() *cobra.Command {
 			//goland:noinspection GoUnhandledErrorResult
 			defer cli.Close()
 
-			errChan := make(chan error)
-			logEndChan := make(chan string)
-			exitChan := make(chan interface{})
-			newVersionChan := make(chan interface{})
+			errChan := make(chan error)              // async error channel
+			logEndChan := make(chan string)          // docker logs ended
+			exitChan := make(chan interface{})       // program exit's
+			newVersionChan := make(chan interface{}) // new version is available
 
 			// Detached 	-> start containers and forget about them
 			// Not detached -> listen to signals and stop containers on signal
