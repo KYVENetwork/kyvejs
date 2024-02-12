@@ -5,16 +5,18 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/docker/docker/api/types/container"
-	goTerminal "github.com/leandroveronezi/go-terminal"
 	"io"
 	"os"
 	"os/signal"
 	"path/filepath"
 	"runtime"
 	"strings"
+	"sync"
 	"syscall"
 	"time"
+
+	"github.com/docker/docker/api/types/container"
+	goTerminal "github.com/leandroveronezi/go-terminal"
 
 	commoncmd "github.com/KYVENetwork/kyvejs/common/goutils/cmd"
 
@@ -425,7 +427,6 @@ func printLogs(cli *client.Client, cont *StartResult, color color, errChan chan 
 		fmt.Print(line)
 	}
 	endChan <- cont.Name
-	return
 }
 
 func validateVersion(s string) error {
@@ -681,7 +682,7 @@ func startCmd() *cobra.Command {
 
 			errChan := make(chan error)              // async error channel
 			logEndChan := make(chan string)          // docker logs ended
-			exitChan := make(chan interface{})       // program exit's
+			exitChan := make(chan interface{}, 1)    // program exit's
 			newVersionChan := make(chan interface{}) // new version is available
 
 			// Detached 	-> start containers and forget about them
@@ -733,7 +734,6 @@ func startCmd() *cobra.Command {
 					select {
 					case <-sigc:
 						// Stop signal received, stop containers
-						isStopping = true
 						fmt.Println("\n🛑  Stopping KYSOR...")
 						return nil
 					case containerName := <-logEndChan:
