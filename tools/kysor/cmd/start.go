@@ -87,7 +87,7 @@ type kyveRef struct {
 // getRuntimeVersions returns the required protocol and integration versions for the given pool
 // protocol version: Latest patch version that is defined on-chain (ex: v1.1.0 -> v1.1.3)
 // integration version: Latest version (no constraints) -> TODO: save constraints on-chain and use them
-func getRuntimeVersions(repo *git.Repository, pool *pooltypes.Pool, repoDir string) (*kyveRef, *kyveRef, error) {
+func getRuntimeVersions(repo *git.Repository, pool *pooltypes.Pool, repoDir string, wantedProtocolVers *version.Version, wantedIntegrationVers *version.Version) (*kyveRef, *kyveRef, error) {
 	tagrefs, err := repo.Tags()
 	if err != nil {
 		return nil, nil, err
@@ -115,9 +115,27 @@ func getRuntimeVersions(repo *git.Repository, pool *pooltypes.Pool, repoDir stri
 	var latestProtocolVersion *kyveRef
 	err = tagrefs.ForEach(func(ref *plumbing.Reference) error {
 		if ref.Name().IsTag() && strings.HasPrefix(ref.Name().Short(), "@kyvejs/protocol@") {
-			latestProtocolVersion = getHigherVersion(latestProtocolVersion, ref, "@kyvejs/protocol@", protocolVersContraint)
+			if wantedProtocolVers != nil {
+				if ref.Name().Short() == fmt.Sprintf("@kyvejs/protocol@%s", wantedProtocolVers.String()) {
+					latestProtocolVersion = &kyveRef{
+						ver: wantedProtocolVers,
+						ref: ref,
+					}
+				}
+			} else {
+				latestProtocolVersion = getHigherVersion(latestProtocolVersion, ref, "@kyvejs/protocol@", protocolVersContraint)
+			}
 		} else if ref.Name().IsTag() && strings.HasPrefix(ref.Name().Short(), expectedRuntime) {
-			latestRuntimeVersion = getHigherVersion(latestRuntimeVersion, ref, fmt.Sprintf("%s@", expectedRuntime), nil)
+			if wantedIntegrationVers != nil {
+				if ref.Name().Short() == fmt.Sprintf("%s@%s", expectedRuntime, wantedIntegrationVers.String()) {
+					latestRuntimeVersion = &kyveRef{
+						ver: wantedIntegrationVers,
+						ref: ref,
+					}
+				}
+			} else {
+				latestRuntimeVersion = getHigherVersion(latestRuntimeVersion, ref, fmt.Sprintf("%s@", expectedRuntime), nil)
+			}
 		}
 		return nil
 	})
@@ -126,9 +144,15 @@ func getRuntimeVersions(repo *git.Repository, pool *pooltypes.Pool, repoDir stri
 	}
 
 	if latestProtocolVersion == nil {
-		return nil, nil, fmt.Errorf("no protocol found for %s", expectedRuntime)
+		if wantedProtocolVers != nil {
+			return nil, nil, fmt.Errorf("no protocol found for kyvejs/protocol@%s", wantedProtocolVers)
+		}
+		return nil, nil, fmt.Errorf("no protocol found for kyvejs/protocol@")
 	}
 	if latestRuntimeVersion == nil {
+		if wantedIntegrationVers != nil {
+			return nil, nil, fmt.Errorf("no runtime found for %s@%s", expectedRuntime, wantedIntegrationVers)
+		}
 		return nil, nil, fmt.Errorf("no runtime found for %s", expectedRuntime)
 	}
 
@@ -217,13 +241,13 @@ func buildImage(worktree *git.Worktree, ref *plumbing.Reference, cli *client.Cli
 }
 
 // buildImages builds the protocol and integration images
-func buildImages(kr *kyveRepo, cli *client.Client, pool *pooltypes.Pool, label string, verbose bool) (*docker.Image, *docker.Image, error) {
+func buildImages(kr *kyveRepo, cli *client.Client, pool *pooltypes.Pool, label string, protocolVersion *version.Version, integrationVersion *version.Version, verbose bool) (*docker.Image, *docker.Image, error) {
 	w, err := kr.repo.Worktree()
 	if err != nil {
 		return nil, nil, err
 	}
 
-	protocol, integration, err := getRuntimeVersions(kr.repo, pool, kr.dir)
+	protocol, integration, err := getRuntimeVersions(kr.repo, pool, kr.dir, protocolVersion, integrationVersion)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -404,6 +428,14 @@ func printLogs(cli *client.Client, cont *StartResult, color color, errChan chan 
 	return
 }
 
+func validateVersion(s string) error {
+	if s == "" {
+		return nil
+	}
+	_, err := version.NewVersion(s)
+	return err
+}
+
 var (
 	flagStartValaccount = commoncmd.OptionFlag[config.ValaccountConfig]{
 		Name:     "valaccount",
@@ -417,6 +449,18 @@ var (
 		Usage:      "Specify the path to an .env file which should be used when starting a binary",
 		Required:   false,
 		ValidateFn: commoncmd.ValidatePathExistsOrEmpty,
+	}
+	flagStartProtocolVersion = commoncmd.StringFlag{
+		Name:       "protocol-version",
+		Usage:      "Specify the version of the protocol to run",
+		Required:   false,
+		ValidateFn: validateVersion,
+	}
+	flagStartIntegrationVersion = commoncmd.StringFlag{
+		Name:       "integration-version",
+		Usage:      "Specify the version of the integration to run",
+		Required:   false,
+		ValidateFn: validateVersion,
 	}
 	flagStartDebug = commoncmd.BoolFlag{
 		Name:         "debug",
@@ -436,7 +480,8 @@ var (
 	}
 )
 
-func start(cmd *cobra.Command, kyveClient *chain.KyveClient, cli *client.Client, valConfig config.ValaccountConfig, integrationEnv []string, debug bool, verbose bool, detached bool, errChan chan error, logEndChan chan string, exitChan chan interface{}, newVersionChan chan interface{}) (string, error) {
+// start (or restart) the protocol and integration containers
+func start(cmd *cobra.Command, kyveClient *chain.KyveClient, cli *client.Client, valConfig config.ValaccountConfig, integrationEnv []string, protocolVersion *version.Version, integrationVersion *version.Version, debug bool, verbose bool, detached bool, errChan chan error, logEndChan chan string, exitChan chan interface{}, newVersionChan chan interface{}) (string, error) {
 	response, err := kyveClient.QueryPool(valConfig.Pool)
 	if err != nil {
 		return "", fmt.Errorf("failed to query pool: %v", err)
@@ -465,7 +510,7 @@ func start(cmd *cobra.Command, kyveClient *chain.KyveClient, cli *client.Client,
 
 	// Build images
 	label := fmt.Sprintf("kysor-%s-pool-%d", config.GetConfigX().GetChainPrettyName(), pool.Id)
-	protocol, integration, err := buildImages(repo, cli, pool, label, verbose)
+	protocol, integration, err := buildImages(repo, cli, pool, label, protocolVersion, integrationVersion, verbose)
 	if err != nil {
 		return "", fmt.Errorf("failed to build images: %v", err)
 	}
@@ -482,8 +527,8 @@ func start(cmd *cobra.Command, kyveClient *chain.KyveClient, cli *client.Client,
 		return "", err
 	}
 
-	fmt.Println()
 	if detached {
+		fmt.Println()
 		fmt.Println("🔍  Use following commands to view the logs:")
 		fmt.Print("    ")
 		utils.PrintlnItalic(fmt.Sprintf("docker logs -f %s", integrationContainer.Name))
@@ -496,8 +541,14 @@ func start(cmd *cobra.Command, kyveClient *chain.KyveClient, cli *client.Client,
 		// Print integration logs
 		go printLogs(cli, integrationContainer, blue, errChan, logEndChan)
 
-		// Check for new version
-		go isNewVersionAvailable(kyveClient, valConfig.Pool, repoDir, newVersionChan, exitChan)
+		// Check for new versions only if 'AutoDownloadBinaries' is enabled and versions are not pinned
+		if config.GetConfigX().AutoDownloadBinaries && protocolVersion == nil && integrationVersion == nil {
+			fmt.Println("🔄  Auto update is enabled")
+			go isNewVersionAvailable(kyveClient, valConfig.Pool, repo, newVersionChan, exitChan)
+		} else {
+			fmt.Println("🔄  Auto update is disabled")
+		}
+		fmt.Println()
 	}
 	return label, nil
 }
@@ -505,26 +556,34 @@ func start(cmd *cobra.Command, kyveClient *chain.KyveClient, cli *client.Client,
 // isNewVersionAvailable checks if a new version is available and sends a signal to the newVersionChan if it is
 // It also updates the local repository and pulls the latest changes
 // This function is blocking
-func isNewVersionAvailable(kyveClient *chain.KyveClient, poolId uint64, repoDir string, newVersionChan chan interface{}, exitChan chan interface{}) {
-	var currentVersion string
+func isNewVersionAvailable(kyveClient *chain.KyveClient, poolId uint64, kr *kyveRepo, newVersionChan chan interface{}, exitChan chan interface{}) {
+	var currentProtocol, currentIntegration *version.Version
 	ticker := time.NewTicker(1 * time.Minute)
 	defer ticker.Stop()
 
 	for {
-		_, err := pullRepo(repoDir, true)
+		_, err := pullRepo(kr.dir, true)
 		if err != nil {
-			return
+			fmt.Println("failed to update repository: ", err)
 		}
 
 		response, err := kyveClient.QueryPool(poolId)
 		if err != nil {
 			fmt.Printf("failed to query pool: %v\n", err)
 		}
-		newVersion := response.GetPool().Data.GetProtocol().GetVersion()
-		if currentVersion == "" {
-			currentVersion = newVersion
+
+		protocolRef, integrationRef, err := getRuntimeVersions(kr.repo, response.GetPool().Data, kr.dir, nil, nil)
+		if err != nil {
+			fmt.Println("failed to get runtime versions: ", err)
 		}
-		if newVersion != currentVersion {
+		if currentProtocol == nil {
+			currentProtocol = protocolRef.ver
+		}
+		if currentIntegration == nil {
+			currentIntegration = integrationRef.ver
+		}
+
+		if protocolRef.ver != currentProtocol || integrationRef.ver != currentIntegration {
 			newVersionChan <- nil
 			return
 		}
@@ -569,6 +628,32 @@ func startCmd() *cobra.Command {
 				return err
 			}
 
+			// Protocol version
+			var protocolVersion *version.Version
+			protocolVersionStr, err := commoncmd.GetStringFromPromptOrFlag(cmd, flagStartProtocolVersion)
+			if err != nil {
+				return err
+			}
+			if protocolVersionStr != "" {
+				protocolVersion, err = version.NewVersion(protocolVersionStr)
+				if err != nil {
+					return err
+				}
+			}
+
+			// Integration version
+			var integrationVersion *version.Version
+			integrationVersionStr, err := commoncmd.GetStringFromPromptOrFlag(cmd, flagStartIntegrationVersion)
+			if err != nil {
+				return err
+			}
+			if integrationVersionStr != "" {
+				integrationVersion, err = version.NewVersion(integrationVersionStr)
+				if err != nil {
+					return err
+				}
+			}
+
 			// Debug
 			debug, err := commoncmd.GetBoolFromPromptOrFlag(cmd, flagStartDebug)
 			if err != nil {
@@ -603,7 +688,22 @@ func startCmd() *cobra.Command {
 			// Not detached -> listen to signals and stop containers on signal
 			//              -> listen to new version and restart containers on new version
 			//   			-> listen to log end and throw error if log ends unexpectedly (which means the container died)
-			label, err := start(cmd, kyveClient, cli, valConfig, integrationEnv, debug, verbose, detached, errChan, logEndChan, exitChan, newVersionChan)
+			label, err := start(
+				cmd,
+				kyveClient,
+				cli,
+				valConfig,
+				integrationEnv,
+				protocolVersion,
+				integrationVersion,
+				debug,
+				verbose,
+				detached,
+				errChan,
+				logEndChan,
+				exitChan,
+				newVersionChan,
+			)
 			if err != nil {
 				return err
 			}
@@ -645,7 +745,7 @@ func startCmd() *cobra.Command {
 						// New version available, restart containers
 						isStopping = true
 						fmt.Println("🔄  New version available, restarting KYSOR...")
-						label, err = start(cmd, kyveClient, cli, valConfig, integrationEnv, debug, verbose, detached, errChan, logEndChan, exitChan, newVersionChan)
+						label, err = start(cmd, kyveClient, cli, valConfig, integrationEnv, protocolVersion, integrationVersion, debug, verbose, detached, errChan, logEndChan, exitChan, newVersionChan)
 						isStopping = false
 						if err != nil {
 							return err
@@ -662,7 +762,7 @@ func startCmd() *cobra.Command {
 		},
 	}
 	commoncmd.AddOptionFlags(cmd, []commoncmd.OptionFlag[config.ValaccountConfig]{flagStartValaccount})
-	commoncmd.AddStringFlags(cmd, []commoncmd.StringFlag{flagStartEnvFile})
+	commoncmd.AddStringFlags(cmd, []commoncmd.StringFlag{flagStartEnvFile, flagStartProtocolVersion, flagStartIntegrationVersion})
 	commoncmd.AddBoolFlags(cmd, []commoncmd.BoolFlag{flagStartDebug, flagStartVerbose, flagStartDetached})
 	return cmd
 }
