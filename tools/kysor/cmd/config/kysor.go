@@ -39,6 +39,19 @@ func (c KysorConfig) GetDenom() string {
 	return "ukyve"
 }
 
+func (c KysorConfig) GetChainPrettyName() string {
+	if strings.HasPrefix(c.ChainID, "kyve") {
+		return "kyve"
+	}
+	if strings.HasPrefix(c.ChainID, "kaon") {
+		return "kaon"
+	}
+	if strings.HasPrefix(c.ChainID, "korellia") {
+		return "korellia"
+	}
+	return c.ChainID
+}
+
 func (c KysorConfig) Save(path string) error {
 	return save(c, path)
 }

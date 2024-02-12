@@ -1,13 +1,18 @@
 package cmd
 
 import (
+	"bufio"
 	"context"
 	"errors"
 	"fmt"
+	"github.com/docker/docker/api/types/container"
+	goTerminal "github.com/leandroveronezi/go-terminal"
 	"os"
+	"os/signal"
 	"path/filepath"
 	"runtime"
 	"strings"
+	"syscall"
 	"time"
 
 	commoncmd "github.com/KYVENetwork/kyvejs/common/goutils/cmd"
@@ -247,11 +252,15 @@ func buildImages(kr *kyveRepo, cli *client.Client, pool *pooltypes.Pool, label s
 	return &protocolImage, &integrationImage, nil
 }
 
+type StartResult struct {
+	Name string
+	ID   string
+}
+
 // startContainers starts the protocol and integration containers
-func startContainers(cli *client.Client, valConfig config.ValaccountConfig, pool *pooltypes.Pool, debug bool, protocol *docker.Image, integration *docker.Image, label string, integrationEnv []string) (string, string, error) {
-	prefix := fmt.Sprintf("kysor-pool-%d", pool.Id)
-	protocolName := fmt.Sprintf("%s-%s", prefix, protocol.TagsLastPartWithoutVersion()[0])
-	integrationName := fmt.Sprintf("%s-%s", prefix, integration.TagsLastPartWithoutVersion()[0])
+func startContainers(cli *client.Client, valConfig config.ValaccountConfig, pool *pooltypes.Pool, debug bool, protocol *docker.Image, integration *docker.Image, label string, integrationEnv []string) (*StartResult, *StartResult, error) {
+	protocolName := fmt.Sprintf("%s-%s", label, protocol.TagsLastPartWithoutVersion()[0])
+	integrationName := fmt.Sprintf("%s-%s", label, integration.TagsLastPartWithoutVersion()[0])
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
 	defer cancel()
@@ -266,7 +275,7 @@ func startContainers(cli *client.Client, valConfig config.ValaccountConfig, pool
 		ChainId:     config.GetConfigX().ChainID,
 	})
 	if err != nil {
-		return "", "", err
+		return nil, nil, err
 	}
 
 	err = docker.CreateNetwork(ctx, cli, docker.NetworkConfig{
@@ -274,7 +283,7 @@ func startContainers(cli *client.Client, valConfig config.ValaccountConfig, pool
 		Labels: map[string]string{globalCleanupLabel: "", label: ""},
 	})
 	if err != nil {
-		return "", "", err
+		return nil, nil, err
 	}
 
 	pConfig := docker.ContainerConfig{
@@ -293,20 +302,29 @@ func startContainers(cli *client.Client, valConfig config.ValaccountConfig, pool
 		Labels:  map[string]string{globalCleanupLabel: "", label: ""},
 	}
 
-	_, err = docker.StartContainer(ctx, cli, pConfig)
+	protocolId, err := docker.StartContainer(ctx, cli, pConfig)
 	if err != nil {
-		return "", "", err
+		return nil, nil, err
 	}
 	fmt.Print("🚀  Started container ")
 	utils.PrintlnItalic(protocolName)
+	protocolResult := &StartResult{
+		Name: protocolName,
+		ID:   protocolId,
+	}
 
-	_, err = docker.StartContainer(ctx, cli, iConfig)
+	integrationId, err := docker.StartContainer(ctx, cli, iConfig)
 	if err != nil {
-		return "", "", err
+		return nil, nil, err
 	}
 	fmt.Print("🚀  Started container ")
 	utils.PrintlnItalic(integrationName)
-	return protocolName, integrationName, nil
+	integrationResult := &StartResult{
+		Name: integrationName,
+		ID:   integrationId,
+	}
+
+	return protocolResult, integrationResult, nil
 }
 
 func getIntegrationEnv(cmd *cobra.Command) ([]string, error) {
@@ -329,6 +347,29 @@ func getIntegrationEnv(cmd *cobra.Command) ([]string, error) {
 		}
 	}
 	return integrationEnv, nil
+}
+
+type color []int
+
+var (
+	green color = []int{0, 158, 84}
+	blue  color = []int{28, 15, 209}
+)
+
+func printLogs(cli *client.Client, cont *StartResult, color color) error {
+	logs, err := cli.ContainerLogs(context.Background(), cont.ID,
+		container.LogsOptions{ShowStdout: true, ShowStderr: true, Follow: true, Details: false})
+	if err != nil {
+		return err
+	}
+	scanner := bufio.NewScanner(logs)
+	for scanner.Scan() {
+		goTerminal.ColorRGBForeground(color[0], color[1], color[2])
+		fmt.Printf("%s: ", cont.Name)
+		goTerminal.Color256Foreground(15)
+		fmt.Println(scanner.Text())
+	}
+	return nil
 }
 
 var (
@@ -354,6 +395,11 @@ var (
 	flagStartVerbose = commoncmd.BoolFlag{
 		Name:         "verbose",
 		Usage:        "Show detailed build output",
+		DefaultValue: false,
+	}
+	flagStartDetached = commoncmd.BoolFlag{
+		Name:         "detached",
+		Usage:        "Run the validator node in detached mode (no auto update)",
 		DefaultValue: false,
 	}
 )
@@ -401,6 +447,12 @@ func startCmd() *cobra.Command {
 				return err
 			}
 
+			// Detached
+			detached, err := commoncmd.GetBoolFromPromptOrFlag(cmd, flagStartDetached)
+			if err != nil {
+				return err
+			}
+
 			response, err := kyveClient.QueryPool(valConfig.Pool)
 			if err != nil {
 				return fmt.Errorf("failed to query pool: %v", err)
@@ -414,7 +466,12 @@ func startCmd() *cobra.Command {
 			//goland:noinspection GoUnhandledErrorResult
 			defer cli.Close()
 
-			fmt.Println("    Starting KYSOR...")
+			if detached {
+				fmt.Println("    Starting KYSOR (detached)...")
+				fmt.Println("    Auto update during runtime is disabled in detached mode!")
+			} else {
+				fmt.Println("    Starting KYSOR...")
+			}
 			fmt.Printf("    Running on platform and architecture: %s - %s\n\n", runtime.GOOS, runtime.GOARCH)
 
 			homeDir, err := config.GetHomeDir(cmd)
@@ -429,7 +486,7 @@ func startCmd() *cobra.Command {
 			}
 
 			// Build images
-			label := fmt.Sprintf("kysor-pool-%d", pool.Id)
+			label := fmt.Sprintf("kysor-%s-pool-%d", config.GetConfigX().GetChainPrettyName(), pool.Id)
 			protocol, integration, err := buildImages(repo, cli, pool, label, verbose)
 			if err != nil {
 				return fmt.Errorf("failed to build images: %v", err)
@@ -448,17 +505,72 @@ func startCmd() *cobra.Command {
 			}
 
 			fmt.Println()
-			fmt.Println("🔍  Use following commands to view the logs:")
-			fmt.Print("    ")
-			utils.PrintlnItalic(fmt.Sprintf("docker logs -f %s", integrationContainer))
-			fmt.Print("    ")
-			utils.PrintlnItalic(fmt.Sprintf("docker logs -f %s", protocolContainer))
+
+			if detached {
+				fmt.Println("🔍  Use following commands to view the logs:")
+				fmt.Print("    ")
+				utils.PrintlnItalic(fmt.Sprintf("docker logs -f %s", integrationContainer.Name))
+				fmt.Print("    ")
+				utils.PrintlnItalic(fmt.Sprintf("docker logs -f %s", protocolContainer.Name))
+			} else {
+				sigc := make(chan os.Signal, 1)
+				signal.Notify(sigc,
+					syscall.SIGHUP,
+					syscall.SIGINT,
+					syscall.SIGTERM,
+					syscall.SIGQUIT,
+				)
+
+				errChan := make(chan error)
+				// Enter endless loop
+				for {
+					isStopping := false
+
+					// Listen to signals and stop the containers
+					go func() {
+						<-sigc
+						isStopping = true
+						fmt.Println("\n🛑  Stopping KYSOR...")
+						errChan <- tearDownContainers(cli, label)
+						os.Exit(0)
+					}()
+
+					// Print protocol logs
+					go func() {
+						if err := printLogs(cli, protocolContainer, green); err != nil {
+							errChan <- err
+							return
+						}
+						if !isStopping {
+							errChan <- fmt.Errorf("protocol container stopped")
+						}
+					}()
+
+					// Print integration logs
+					go func() {
+						if err := printLogs(cli, integrationContainer, blue); err != nil {
+							errChan <- err
+							return
+						}
+						if !isStopping {
+							errChan <- fmt.Errorf("integration container stopped")
+						}
+					}()
+
+					err := <-errChan
+					if err != nil {
+						_ = tearDownContainers(cli, label)
+						return err
+					}
+				}
+			}
+
 			return nil
 		},
 	}
 	commoncmd.AddOptionFlags(cmd, []commoncmd.OptionFlag[config.ValaccountConfig]{flagStartValaccount})
 	commoncmd.AddStringFlags(cmd, []commoncmd.StringFlag{flagStartEnvFile})
-	commoncmd.AddBoolFlags(cmd, []commoncmd.BoolFlag{flagStartDebug, flagStartVerbose})
+	commoncmd.AddBoolFlags(cmd, []commoncmd.BoolFlag{flagStartDebug, flagStartVerbose, flagStartDetached})
 	return cmd
 }
 
