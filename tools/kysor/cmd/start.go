@@ -533,9 +533,8 @@ func checkNewVersion(kyveClient *chain.KyveClient, poolId uint64, kr *kyveRepo, 
 			currentIntegration = integrationRef.ver
 		}
 
-		if protocolRef.ver != currentProtocol || integrationRef.ver != currentIntegration {
-			// TODO: fix this
-			//newVersionChan <- nil
+		if protocolRef.ver.String() != currentProtocol.String() || integrationRef.ver.String() != currentIntegration.String() {
+			newVersionChan <- nil
 		}
 
 		select {
