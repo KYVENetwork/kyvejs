@@ -237,8 +237,8 @@ github.com/KYVENetwork/chain v1.4.0 h1:i/1qgeyYL6LEwKkClXHgx0qjVxWfJtb1NVKqwOyhB
 github.com/KYVENetwork/chain v1.4.0/go.mod h1:7O6Avj5hdMyReTS5ykkYn9Vh4Ky8m2G4rwHPl9PyD+M=
 github.com/KYVENetwork/cosmos-sdk v0.47.6-kyve-rc0 h1:OoVLykPiZx3ecHY5lZH5TJmBBNADZYnvsNhH/nH8etA=
 github.com/KYVENetwork/cosmos-sdk v0.47.6-kyve-rc0/go.mod h1:xTc1chW8HyUWCfrgGbjS5jNu9RzlPVrBNfbL9RmZUio=
-github.com/KYVENetwork/kyvejs/common/goutils v0.0.0-20240206141745-42c2c6ce21d2 h1:N5k7hAwiQosiEQOHoi0wLWlEHfSBYylasMGLii2+XWM=
-github.com/KYVENetwork/kyvejs/common/goutils v0.0.0-20240206141745-42c2c6ce21d2/go.mod h1:muMw9EbNmi8NUdzX8Ss0+uQxxWUpfiXY3ns54fcNkqA=
+github.com/KYVENetwork/kyvejs/common/goutils v0.0.0-20240213141031-e45de46bab5f h1:gyEdho6XMdMS2eOwHR01yk7mElcgySIL8eP9Mgf+X7M=
+github.com/KYVENetwork/kyvejs/common/goutils v0.0.0-20240213141031-e45de46bab5f/go.mod h1:muMw9EbNmi8NUdzX8Ss0+uQxxWUpfiXY3ns54fcNkqA=
 github.com/Knetic/govaluate v3.0.1-0.20171022003610-9aa49832a739+incompatible/go.mod h1:r7JcOSlj0wfOMncg0iLm8Leh48TZaKVeNIfJntJ2wa0=
 github.com/Masterminds/semver v1.5.0 h1:H65muMkzWKEuNDnfl9d70GUjFniHKHRbFPGBuZ3QEww=
 github.com/Masterminds/semver v1.5.0/go.mod h1:MB6lktGJrhw8PrUyiEoblNEGEQ+RzHPF078ddwwvV3Y=
