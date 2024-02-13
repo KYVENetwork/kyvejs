@@ -326,11 +326,12 @@ func startContainers(cli *client.Client, valConfig config.ValaccountConfig, pool
 	}
 
 	iConfig := docker.ContainerConfig{
-		Image:   integration.Tags[0],
-		Name:    integrationName,
-		Network: label,
-		Env:     integrationEnv,
-		Labels:  map[string]string{globalCleanupLabel: "", label: ""},
+		Image:      integration.Tags[0],
+		Name:       integrationName,
+		Network:    label,
+		Env:        integrationEnv,
+		Labels:     map[string]string{globalCleanupLabel: "", label: ""},
+		ExtraHosts: []string{"host.docker.internal:host-gateway"},
 	}
 
 	protocolId, err := docker.StartContainer(ctx, cli, pConfig)
