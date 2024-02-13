@@ -5,6 +5,7 @@ import (
 	"github.com/mitchellh/go-homedir"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	commoncmd "github.com/KYVENetwork/kyvejs/common/goutils/cmd"
@@ -164,6 +165,22 @@ func loadKysorConfig(cmd *cobra.Command, _ []string) error {
 	err = k.Unmarshal("", &config)
 	if err != nil {
 		return fmt.Errorf("error unmarshalling config file: %s", err)
+	}
+
+	// Add port to the RPC and REST URLs if they are missing
+	if !regexp.MustCompile(`:\d+$`).MatchString(config.RPC) {
+		if strings.HasPrefix(config.RPC, "https://") {
+			config.RPC += ":443"
+		} else if strings.HasPrefix(config.RPC, "http://") {
+			config.RPC += ":80"
+		}
+	}
+	if !regexp.MustCompile(`:\d+$`).MatchString(config.REST) {
+		if strings.HasPrefix(config.REST, "https://") {
+			config.REST += ":443"
+		} else if strings.HasPrefix(config.REST, "http://") {
+			config.REST += ":80"
+		}
 	}
 
 	return nil
