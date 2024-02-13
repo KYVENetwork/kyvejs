@@ -255,8 +255,8 @@ func buildImages(kr *kyveRepo, cli *client.Client, pool *pooltypes.Pool, label s
 	}
 
 	// Todo: remove this for final release
-	protocol.ref = plumbing.NewHashReference(plumbing.NewBranchReferenceName("rapha/dockerization-e2etest"), plumbing.NewHash("045b0cde2e229cf5367ae826ebe774359ccd06c7"))
-	integration.ref = plumbing.NewHashReference(plumbing.NewBranchReferenceName("rapha/dockerization-e2etest"), plumbing.NewHash("045b0cde2e229cf5367ae826ebe774359ccd06c7"))
+	protocol.ref = plumbing.NewHashReference(plumbing.NewBranchReferenceName("rapha/dockerization-e2etest"), plumbing.NewHash("34e7d141505997910666e7327ea8d9ae4971723a"))
+	integration.ref = plumbing.NewHashReference(plumbing.NewBranchReferenceName("rapha/dockerization-e2etest"), plumbing.NewHash("34e7d141505997910666e7327ea8d9ae4971723a"))
 
 	protocolImage := docker.Image{
 		Path:   protocol.path,
@@ -534,8 +534,8 @@ func checkNewVersion(kyveClient *chain.KyveClient, poolId uint64, kr *kyveRepo, 
 		}
 
 		if protocolRef.ver != currentProtocol || integrationRef.ver != currentIntegration {
-			newVersionChan <- nil
-			return
+			// TODO: fix this
+			//newVersionChan <- nil
 		}
 
 		select {
