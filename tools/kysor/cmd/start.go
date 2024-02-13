@@ -255,8 +255,8 @@ func buildImages(kr *kyveRepo, cli *client.Client, pool *pooltypes.Pool, label s
 	}
 
 	// Todo: remove this for final release
-	protocol.ref = plumbing.NewHashReference(plumbing.NewBranchReferenceName("rapha/dockerization-e2etest"), plumbing.NewHash("34e7d141505997910666e7327ea8d9ae4971723a"))
-	integration.ref = plumbing.NewHashReference(plumbing.NewBranchReferenceName("rapha/dockerization-e2etest"), plumbing.NewHash("34e7d141505997910666e7327ea8d9ae4971723a"))
+	protocol.ref = plumbing.NewHashReference(plumbing.NewBranchReferenceName("rapha/dockerization-e2etest"), plumbing.NewHash("045b0cde2e229cf5367ae826ebe774359ccd06c7"))
+	integration.ref = plumbing.NewHashReference(plumbing.NewBranchReferenceName("rapha/dockerization-e2etest"), plumbing.NewHash("045b0cde2e229cf5367ae826ebe774359ccd06c7"))
 
 	protocolImage := docker.Image{
 		Path:   protocol.path,
@@ -494,7 +494,7 @@ func start(cmd *cobra.Command, kyveClient *chain.KyveClient, cli *client.Client,
 		// Check for new versions only if 'AutoDownloadBinaries' is enabled and versions are not pinned
 		if config.GetConfigX().AutoDownloadBinaries && protocolVersion == nil && integrationVersion == nil {
 			fmt.Println("🔄  Auto update is enabled")
-			go isNewVersionAvailable(kyveClient, valConfig.Pool, repo, newVersionChan, exitChan)
+			go checkNewVersion(kyveClient, valConfig.Pool, repo, newVersionChan, exitChan)
 		} else {
 			fmt.Println("🔄  Auto update is disabled")
 		}
@@ -503,10 +503,10 @@ func start(cmd *cobra.Command, kyveClient *chain.KyveClient, cli *client.Client,
 	return label, nil
 }
 
-// isNewVersionAvailable checks if a new version is available and sends a signal to the newVersionChan if it is
+// checkNewVersion checks if a new version is available and sends a signal to the newVersionChan if it is
 // It also updates the local repository and pulls the latest changes
 // This function is blocking
-func isNewVersionAvailable(kyveClient *chain.KyveClient, poolId uint64, kr *kyveRepo, newVersionChan chan interface{}, exitChan chan interface{}) {
+func checkNewVersion(kyveClient *chain.KyveClient, poolId uint64, kr *kyveRepo, newVersionChan chan interface{}, exitChan chan interface{}) {
 	var currentProtocol, currentIntegration *version.Version
 	ticker := time.NewTicker(1 * time.Minute)
 	defer ticker.Stop()
