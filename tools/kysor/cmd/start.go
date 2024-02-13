@@ -15,6 +15,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/docker/docker/api/types/filters"
+
 	"github.com/docker/docker/api/types/container"
 	goTerminal "github.com/leandroveronezi/go-terminal"
 
@@ -390,7 +392,7 @@ var (
 // printLogs prints the logs of the given container (stdout and stderr)
 // Errors are sent to the errChan and the name of the container is sent to the endChan when the logs end
 // This function is blocking
-func printLogs(cli *client.Client, cont *StartResult, color color, errChan chan error, endChan chan string) {
+func printLogs(cli *client.Client, cont *StartResult, color color, errChan chan error, endChan chan *StartResult) {
 	logs, err := cli.ContainerLogs(context.Background(), cont.ID,
 		container.LogsOptions{ShowStdout: true, ShowStderr: true, Follow: true, Details: false})
 	if err != nil {
@@ -426,7 +428,7 @@ func printLogs(cli *client.Client, cont *StartResult, color color, errChan chan 
 		goTerminal.Color256Foreground(15)
 		fmt.Print(line)
 	}
-	endChan <- cont.Name
+	endChan <- cont
 }
 
 func validateVersion(s string) error {
@@ -482,7 +484,7 @@ var (
 )
 
 // start (or restart) the protocol and integration containers
-func start(cmd *cobra.Command, kyveClient *chain.KyveClient, cli *client.Client, valConfig config.ValaccountConfig, integrationEnv []string, protocolVersion *version.Version, integrationVersion *version.Version, debug bool, verbose bool, detached bool, errChan chan error, logEndChan chan string, exitChan chan interface{}, newVersionChan chan interface{}) (string, error) {
+func start(cmd *cobra.Command, kyveClient *chain.KyveClient, cli *client.Client, valConfig config.ValaccountConfig, integrationEnv []string, protocolVersion *version.Version, integrationVersion *version.Version, debug bool, verbose bool, detached bool, errChan chan error, logEndChan chan *StartResult, exitChan chan interface{}, newVersionChan chan interface{}) (string, error) {
 	response, err := kyveClient.QueryPool(valConfig.Pool)
 	if err != nil {
 		return "", fmt.Errorf("failed to query pool: %v", err)
@@ -598,6 +600,41 @@ func isNewVersionAvailable(kyveClient *chain.KyveClient, poolId uint64, kr *kyve
 	}
 }
 
+type containerSync struct {
+	sync.Mutex
+	stoppingContainers map[string]interface{}
+}
+
+func newContainerSync() *containerSync {
+	return &containerSync{
+		stoppingContainers: make(map[string]interface{}),
+	}
+}
+
+// markAsBeingStopped marks the containers with the given label as being stopped
+func (c *containerSync) markAsBeingStopped(cli *client.Client, label string) error {
+	c.Lock()
+	defer c.Unlock()
+
+	containers, err := cli.ContainerList(context.Background(), container.ListOptions{
+		Filters: filters.NewArgs(filters.Arg("label", fmt.Sprintf("%s=", label))),
+	})
+	if err != nil {
+		return fmt.Errorf("failed to list containers: %v", err)
+	}
+	for _, cont := range containers {
+		c.stoppingContainers[cont.ID] = nil
+	}
+	return nil
+}
+
+func (c *containerSync) isStopping(cont *StartResult) bool {
+	c.Lock()
+	defer c.Unlock()
+	_, ok := c.stoppingContainers[cont.ID]
+	return ok
+}
+
 func startCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "start",
@@ -681,7 +718,7 @@ func startCmd() *cobra.Command {
 			defer cli.Close()
 
 			errChan := make(chan error)              // async error channel
-			logEndChan := make(chan string)          // docker logs ended
+			logEndChan := make(chan *StartResult)    // docker logs ended
 			exitChan := make(chan interface{}, 1)    // program exit's
 			newVersionChan := make(chan interface{}) // new version is available
 
@@ -709,6 +746,8 @@ func startCmd() *cobra.Command {
 				return err
 			}
 			if !detached {
+				contSync := newContainerSync()
+
 				sigc := make(chan os.Signal, 1)
 				signal.Notify(sigc,
 					syscall.SIGHUP,
@@ -716,7 +755,6 @@ func startCmd() *cobra.Command {
 					syscall.SIGTERM,
 					syscall.SIGQUIT,
 				)
-				isStopping := false
 
 				// Cleanup containers on exit
 				defer func() {
@@ -736,17 +774,19 @@ func startCmd() *cobra.Command {
 						// Stop signal received, stop containers
 						fmt.Println("\n🛑  Stopping KYSOR...")
 						return nil
-					case containerName := <-logEndChan:
+					case cont := <-logEndChan:
 						// Log ended, throw error if container is not supposed to stop
-						if !isStopping {
-							return fmt.Errorf("container %s stopped unexpected", containerName)
+						if !contSync.isStopping(cont) {
+							return fmt.Errorf("container %s stopped unexpected", cont.Name)
 						}
 					case <-newVersionChan:
 						// New version available, restart containers
-						isStopping = true
+						err := contSync.markAsBeingStopped(cli, label)
+						if err != nil {
+							fmt.Println("failed to set stopping: ", err)
+						}
 						fmt.Println("🔄  New version available, restarting KYSOR...")
 						label, err = start(cmd, kyveClient, cli, valConfig, integrationEnv, protocolVersion, integrationVersion, debug, verbose, detached, errChan, logEndChan, exitChan, newVersionChan)
-						isStopping = false
 						if err != nil {
 							return err
 						}
