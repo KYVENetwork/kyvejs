@@ -18,7 +18,6 @@ require (
 	github.com/knadh/koanf/providers/file v0.1.0
 	github.com/knadh/koanf/providers/structs v0.1.0
 	github.com/knadh/koanf/v2 v2.0.1
-	github.com/leandroveronezi/go-terminal v1.3.7
 	github.com/manifoldco/promptui v0.9.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/savioxavier/termlink v1.3.0

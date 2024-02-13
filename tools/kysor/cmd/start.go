@@ -5,6 +5,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/fatih/color"
 	"io"
 	"os"
 	"os/signal"
@@ -16,7 +17,6 @@ import (
 	"time"
 
 	"github.com/docker/docker/api/types/container"
-	goTerminal "github.com/leandroveronezi/go-terminal"
 
 	commoncmd "github.com/KYVENetwork/kyvejs/common/goutils/cmd"
 
@@ -381,17 +381,10 @@ func getIntegrationEnv(cmd *cobra.Command) ([]string, error) {
 	return integrationEnv, nil
 }
 
-type color []int
-
-var (
-	green color = []int{0, 158, 84}
-	blue  color = []int{28, 15, 209}
-)
-
 // printLogs prints the logs of the given container (stdout and stderr)
 // Errors are sent to the errChan and the name of the container is sent to the endChan when the logs end
 // This function is blocking
-func printLogs(cli *client.Client, cont *StartResult, color color, errChan chan error, endChan chan *StartResult) {
+func printLogs(cli *client.Client, cont *StartResult, colorAttr color.Attribute, errChan chan error, endChan chan *StartResult) {
 	logs, err := cli.ContainerLogs(context.Background(), cont.ID,
 		container.LogsOptions{ShowStdout: true, ShowStderr: true, Follow: true, Details: false})
 	if err != nil {
@@ -422,9 +415,9 @@ func printLogs(cli *client.Client, cont *StartResult, color color, errChan chan 
 		}
 
 		// Print the line
-		goTerminal.ColorRGBForeground(color[0], color[1], color[2])
+		color.Set(colorAttr)
 		fmt.Printf("%s: ", cont.Name)
-		goTerminal.Color256Foreground(15)
+		color.Unset()
 		fmt.Print(line)
 	}
 	endChan <- cont
@@ -486,10 +479,10 @@ func start(cmd *cobra.Command, kyveClient *chain.KyveClient, cli *client.Client,
 		utils.PrintlnItalic(fmt.Sprintf("docker logs -f %s", protocolContainer.Name))
 	} else {
 		// Print protocol logs
-		go printLogs(cli, protocolContainer, green, errChan, logEndChan)
+		go printLogs(cli, protocolContainer, color.FgGreen, errChan, logEndChan)
 
 		// Print integration logs
-		go printLogs(cli, integrationContainer, blue, errChan, logEndChan)
+		go printLogs(cli, integrationContainer, color.FgBlue, errChan, logEndChan)
 
 		// Check for new versions only if 'AutoDownloadBinaries' is enabled and versions are not pinned
 		if config.GetConfigX().AutoDownloadBinaries && protocolVersion == nil && integrationVersion == nil {

@@ -2,12 +2,11 @@ package utils
 
 import (
 	"fmt"
-
-	goTerminal "github.com/leandroveronezi/go-terminal"
+	"github.com/fatih/color"
 )
 
 func PrintlnItalic(text string) {
-	goTerminal.SetSGR(goTerminal.Reset, goTerminal.Italic)
+	color.Set(color.Italic)
 	fmt.Println(text)
-	goTerminal.SetSGR(goTerminal.Reset)
+	color.Unset()
 }
