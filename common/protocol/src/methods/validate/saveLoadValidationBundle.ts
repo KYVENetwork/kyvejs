@@ -85,13 +85,21 @@ export async function saveLoadValidationBundle(
       return standardizeJSON(bundle);
     },
     { limitTimeoutMs: 5 * 60 * 1000, increaseByMs: 10 * 1000 },
-    async (_: any, ctx) => {
-      this.logger.info(
+    async (err: any, ctx) => {
+      // this.logger.info(
+      //   `Loading validation bundle from CacheProvider:${
+      //     this.cacheProvider.name
+      //   } was unsuccessful. Retrying in ${(ctx.nextTimeoutInMs / 1000).toFixed(
+      //     2
+      //   )}s ...`
+      // );
+
+      this.logger.error(
         `Loading validation bundle from CacheProvider:${
           this.cacheProvider.name
         } was unsuccessful. Retrying in ${(ctx.nextTimeoutInMs / 1000).toFixed(
           2
-        )}s ...`
+        )}s ...: ${err}`
       );
 
       // vote abstain if validation bundle could not be loaded from cache.
