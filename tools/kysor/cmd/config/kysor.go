@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"github.com/mitchellh/go-homedir"
 	"os"
 	"path/filepath"
 	"strings"
@@ -99,6 +100,11 @@ func GetHomeDir(cmd *cobra.Command) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	// Expand the home directory
+	homeDir, err = homedir.Expand(homeDir)
+	if err != nil {
+		return "", err
+	}
 	return filepath.Abs(homeDir)
 }
 
@@ -144,7 +150,7 @@ func loadKysorConfig(cmd *cobra.Command, _ []string) error {
 
 	// Check if the config file exists
 	if _, err := os.Stat(configFilePath); os.IsNotExist(err) {
-		return err
+		return fmt.Errorf("config file does not exist at %s. Run `kysor init` to create a new config", configFilePath)
 	}
 
 	k := koanf.New(".")

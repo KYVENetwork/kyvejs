@@ -219,7 +219,7 @@ func valaccountsCreateCmd() *cobra.Command {
 
 			err = valaccountConfig.Save(configPath)
 			if err != nil {
-				return err
+				return fmt.Errorf("failed to save valaccount config: %v", err)
 			}
 			fmt.Printf("Created valaccount '%s' in '%s'\n", name, configPath)
 			return nil

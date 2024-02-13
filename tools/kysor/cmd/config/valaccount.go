@@ -20,7 +20,9 @@ var (
 )
 
 type ValaccountConfig struct {
-	commoncmd.Option[ValaccountConfig]
+	option commoncmd.Option[ValaccountConfig]
+	name   string
+	path   string
 
 	Pool           uint64 `koanf:"pool"`
 	Valaccount     string `koanf:"valaccount"`
@@ -29,8 +31,6 @@ type ValaccountConfig struct {
 	Cache          string `koanf:"cache"`
 	Metrics        bool   `koanf:"metrics"`
 	MetricsPort    string `koanf:"metricsPort"`
-	name           string
-	path           string
 }
 
 func (c ValaccountConfig) Save(path string) error {
