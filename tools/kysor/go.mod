@@ -9,6 +9,7 @@ require (
 	github.com/cosmos/cosmos-sdk v0.47.6
 	github.com/cosmos/go-bip39 v1.0.0
 	github.com/docker/docker v25.0.2+incompatible
+	github.com/fatih/color v1.16.0
 	github.com/go-git/go-git/v5 v5.11.0
 	github.com/golangci/golangci-lint v1.52.2
 	github.com/hashicorp/go-version v1.6.0
@@ -20,6 +21,7 @@ require (
 	github.com/leandroveronezi/go-terminal v1.3.7
 	github.com/manifoldco/promptui v0.9.0
 	github.com/mitchellh/go-homedir v1.1.0
+	github.com/savioxavier/termlink v1.3.0
 	github.com/spf13/cobra v1.8.0
 	golang.org/x/exp v0.0.0-20230711153332-06a737ee72cb
 	mvdan.cc/gofumpt v0.5.0
@@ -116,7 +118,6 @@ require (
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/esimonov/ifshort v1.0.4 // indirect
 	github.com/ettle/strcase v0.1.1 // indirect
-	github.com/fatih/color v1.15.0 // indirect
 	github.com/fatih/structs v1.1.0 // indirect
 	github.com/fatih/structtag v1.2.0 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect

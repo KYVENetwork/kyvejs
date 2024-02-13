@@ -2,6 +2,9 @@ package utils
 
 import (
 	"fmt"
+	"github.com/docker/docker/client"
+	"github.com/fatih/color"
+	"github.com/savioxavier/termlink"
 
 	commoncmd "github.com/KYVENetwork/kyvejs/common/goutils/cmd"
 	"github.com/spf13/cobra"
@@ -62,4 +65,18 @@ func RunPromptCommandE(cmd *cobra.Command, args []string) error {
 	}
 	// Otherwise show the help
 	return cmd.Help()
+}
+
+func CheckDockerInstalled(_ *cobra.Command, _ []string) error {
+	cli, err := client.NewClientWithOpts(client.WithAPIVersionNegotiation())
+	if err != nil {
+		cyan := color.New(color.FgHiMagenta).SprintFunc()
+		hyperlink := cyan(termlink.Link("Install Docker", "https://docs.docker.com/engine/install", true))
+		return fmt.Errorf("failed to connect to the docker daemon: %w\n"+
+			"- Did you install docker? (%s)\n"+
+			"- Is the docker deamon running?", err, hyperlink)
+	}
+	//goland:noinspection GoUnhandledErrorResult
+	defer cli.Close()
+	return nil
 }

@@ -635,7 +635,7 @@ func startCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "start",
 		Short:   "Start data validator",
-		PreRunE: commoncmd.CombineFuncs(config.LoadConfigs, commoncmd.SetupInteractiveMode),
+		PreRunE: commoncmd.CombineFuncs(utils.CheckDockerInstalled, config.LoadConfigs, commoncmd.SetupInteractiveMode),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			kyveClient, err := chain.NewKyveClient(config.GetConfigX(), config.ValaccountConfigs)
 			if err != nil {
