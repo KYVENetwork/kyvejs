@@ -22,7 +22,7 @@ const configFileName = "config.toml"
 var FlagHome = commoncmd.StringFlag{
 	Name:         "home",
 	DefaultValue: "~/.kysor", // Overwritten in init() to set the path as absolute
-	Usage:        "The loaction of the .kysor home directory where binaries and configs are stored.",
+	Usage:        "The location of the .kysor home directory where binaries and configs are stored.",
 }
 
 var config *KysorConfig

@@ -8,19 +8,44 @@ import (
 	"github.com/spf13/cobra"
 )
 
+type chainId struct {
+	value string
+	label string
+}
+
+func newChainId(value, label string) chainId {
+	return chainId{
+		value: value,
+		label: label,
+	}
+}
+
+func (c chainId) Name() string {
+	return fmt.Sprintf("%s (%s)", c.label, c.value)
+}
+
+func (c chainId) Value() chainId {
+	return c
+}
+
+func (c chainId) StringValue() string {
+	return c.value
+}
+
+var chainIds = []chainId{
+	newChainId("kyve-1", "mainnet"),
+	newChainId("kaon-1", "testnet"),
+	newChainId("korellia-2", "dev-testnet"),
+}
+
 var (
-	flagChainID = commoncmd.StringFlag{
+	flagChainID = commoncmd.OptionFlag[chainId]{
 		Name:         "chain-id",
 		Short:        "",
-		DefaultValue: "",
+		DefaultValue: chainIds[0],
 		Usage:        "Chain ID of the network",
 		Required:     true,
-		ValidateFn: func(input string) error {
-			if len(input) == 0 {
-				return fmt.Errorf("chain ID must not be empty")
-			}
-			return nil
-		},
+		Options:      []commoncmd.Option[chainId]{chainIds[0], chainIds[1], chainIds[2]},
 	}
 	flagRPC = commoncmd.StringFlag{
 		Name:         "rpc",
@@ -29,12 +54,7 @@ var (
 		Usage:        "Comma separated list of rpc endpoints. If the first fails the next endpoint will be used as fallback.",
 		Prompt:       "Comma separated list of rpc endpoints",
 		Required:     true,
-		ValidateFn: func(input string) error {
-			if len(input) == 0 {
-				return fmt.Errorf("rpc endpoints must not be empty")
-			}
-			return nil
-		},
+		ValidateFn:   commoncmd.ValidateNotEmpty,
 	}
 	flagREST = commoncmd.StringFlag{
 		Name:         "rest",
@@ -43,17 +63,12 @@ var (
 		Usage:        "Comma separated list of rest endpoints. If the first fails the next endpoint will be used as fallback.",
 		Prompt:       "Comma separated list of rest endpoints",
 		Required:     true,
-		ValidateFn: func(input string) error {
-			if len(input) == 0 {
-				return fmt.Errorf("rest endpoints must not be empty")
-			}
-			return nil
-		},
+		ValidateFn:   commoncmd.ValidateNotEmpty,
 	}
 	flagAutoDownload = commoncmd.BoolFlag{
 		Name:         "auto-download-binaries",
 		Short:        "d",
-		DefaultValue: false,
+		DefaultValue: true,
 		Usage:        "Allow automatic download and execution of new upgrade binaries",
 		Required:     false,
 	}
@@ -72,11 +87,11 @@ func initCmd() *cobra.Command {
 
 			// Check if the config file already exists
 			if config.DoesConfigExist(path) {
-				return fmt.Errorf("config file already exists: %s", path)
+				return fmt.Errorf("KYSOR was already initialized. You can edit the config file directyl under %s", path)
 			}
 
 			// Get the values from the flags or prompt the user for them
-			chainID, err := commoncmd.GetStringFromPromptOrFlag(cmd, flagChainID)
+			chainID, err := commoncmd.GetOptionFromPromptOrFlag(cmd, flagChainID)
 			if err != nil {
 				return err
 			}
@@ -98,7 +113,7 @@ func initCmd() *cobra.Command {
 
 			// Create the config file
 			kysorConfig := config.KysorConfig{
-				ChainID:              chainID,
+				ChainID:              chainID.Value().value,
 				RPC:                  rpc,
 				REST:                 rest,
 				AutoDownloadBinaries: autoDownload,
@@ -107,7 +122,8 @@ func initCmd() *cobra.Command {
 			return kysorConfig.Save(path)
 		},
 	}
-	commoncmd.AddStringFlags(cmd, []commoncmd.StringFlag{flagChainID, flagRPC, flagREST})
+	commoncmd.AddOptionFlags(cmd, []commoncmd.OptionFlag[chainId]{flagChainID})
+	commoncmd.AddStringFlags(cmd, []commoncmd.StringFlag{flagRPC, flagREST})
 	commoncmd.AddBoolFlags(cmd, []commoncmd.BoolFlag{flagAutoDownload})
 	return cmd
 }
