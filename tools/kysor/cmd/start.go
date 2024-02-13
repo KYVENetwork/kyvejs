@@ -15,8 +15,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/docker/docker/api/types/filters"
-
 	"github.com/docker/docker/api/types/container"
 	goTerminal "github.com/leandroveronezi/go-terminal"
 
@@ -431,58 +429,6 @@ func printLogs(cli *client.Client, cont *StartResult, color color, errChan chan 
 	endChan <- cont
 }
 
-func validateVersion(s string) error {
-	if s == "" {
-		return nil
-	}
-	_, err := version.NewVersion(s)
-	return err
-}
-
-var (
-	flagStartValaccount = commoncmd.OptionFlag[config.ValaccountConfig]{
-		Name:     "valaccount",
-		Short:    "v",
-		Usage:    "Name of the valaccount to run",
-		Required: true,
-	}
-	flagStartEnvFile = commoncmd.StringFlag{
-		Name:       "env-file",
-		Short:      "e",
-		Usage:      "Specify the path to an .env file which should be used when starting a binary",
-		Required:   false,
-		ValidateFn: commoncmd.ValidatePathExistsOrEmpty,
-	}
-	flagStartProtocolVersion = commoncmd.StringFlag{
-		Name:       "protocol-version",
-		Usage:      "Specify the version of the protocol to run",
-		Required:   false,
-		ValidateFn: validateVersion,
-	}
-	flagStartIntegrationVersion = commoncmd.StringFlag{
-		Name:       "integration-version",
-		Usage:      "Specify the version of the integration to run",
-		Required:   false,
-		ValidateFn: validateVersion,
-	}
-	flagStartDebug = commoncmd.BoolFlag{
-		Name:         "debug",
-		Short:        "",
-		Usage:        "Run the validator node in debug mode",
-		DefaultValue: false,
-	}
-	flagStartVerbose = commoncmd.BoolFlag{
-		Name:         "verbose",
-		Usage:        "Show detailed build output",
-		DefaultValue: false,
-	}
-	flagStartDetached = commoncmd.BoolFlag{
-		Name:         "detached",
-		Usage:        "Run the validator node in detached mode (no auto update)",
-		DefaultValue: false,
-	}
-)
-
 // start (or restart) the protocol and integration containers
 func start(cmd *cobra.Command, kyveClient *chain.KyveClient, cli *client.Client, valConfig config.ValaccountConfig, integrationEnv []string, protocolVersion *version.Version, integrationVersion *version.Version, debug bool, verbose bool, detached bool, errChan chan error, logEndChan chan *StartResult, exitChan chan interface{}, newVersionChan chan interface{}) (string, error) {
 	response, err := kyveClient.QueryPool(valConfig.Pool)
@@ -512,7 +458,7 @@ func start(cmd *cobra.Command, kyveClient *chain.KyveClient, cli *client.Client,
 	}
 
 	// Build images
-	label := fmt.Sprintf("kysor-%s-pool-%d", config.GetConfigX().GetChainPrettyName(), pool.Id)
+	label := valConfig.GetContainerLabel()
 	protocol, integration, err := buildImages(repo, cli, pool, label, protocolVersion, integrationVersion, verbose)
 	if err != nil {
 		return "", fmt.Errorf("failed to build images: %v", err)
@@ -616,9 +562,7 @@ func (c *containerSync) markAsBeingStopped(cli *client.Client, label string) err
 	c.Lock()
 	defer c.Unlock()
 
-	containers, err := cli.ContainerList(context.Background(), container.ListOptions{
-		Filters: filters.NewArgs(filters.Arg("label", fmt.Sprintf("%s=", label))),
-	})
+	containers, err := docker.ListContainers(context.Background(), cli, label)
 	if err != nil {
 		return fmt.Errorf("failed to list containers: %v", err)
 	}
@@ -634,6 +578,58 @@ func (c *containerSync) isStopping(cont *StartResult) bool {
 	_, ok := c.stoppingContainers[cont.ID]
 	return ok
 }
+
+func validateVersion(s string) error {
+	if s == "" {
+		return nil
+	}
+	_, err := version.NewVersion(s)
+	return err
+}
+
+var (
+	flagStartValaccount = commoncmd.OptionFlag[config.ValaccountConfig]{
+		Name:     "valaccount",
+		Short:    "v",
+		Usage:    "Name of the valaccount to run",
+		Required: true,
+	}
+	flagStartEnvFile = commoncmd.StringFlag{
+		Name:       "env-file",
+		Short:      "e",
+		Usage:      "Specify the path to an .env file which should be used when starting a binary",
+		Required:   false,
+		ValidateFn: commoncmd.ValidatePathExistsOrEmpty,
+	}
+	flagStartProtocolVersion = commoncmd.StringFlag{
+		Name:       "protocol-version",
+		Usage:      "Specify the version of the protocol to run",
+		Required:   false,
+		ValidateFn: validateVersion,
+	}
+	flagStartIntegrationVersion = commoncmd.StringFlag{
+		Name:       "integration-version",
+		Usage:      "Specify the version of the integration to run",
+		Required:   false,
+		ValidateFn: validateVersion,
+	}
+	flagStartDebug = commoncmd.BoolFlag{
+		Name:         "debug",
+		Short:        "",
+		Usage:        "Run the validator node in debug mode",
+		DefaultValue: false,
+	}
+	flagStartVerbose = commoncmd.BoolFlag{
+		Name:         "verbose",
+		Usage:        "Show detailed build output",
+		DefaultValue: false,
+	}
+	flagStartDetached = commoncmd.BoolFlag{
+		Name:         "detached",
+		Usage:        "Run the validator node in detached mode (no auto update)",
+		DefaultValue: false,
+	}
+)
 
 func startCmd() *cobra.Command {
 	cmd := &cobra.Command{

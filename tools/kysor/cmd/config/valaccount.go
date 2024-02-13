@@ -20,6 +20,8 @@ var (
 )
 
 type ValaccountConfig struct {
+	commoncmd.Option[ValaccountConfig]
+
 	Pool           uint64 `koanf:"pool"`
 	Valaccount     string `koanf:"valaccount"`
 	StoragePriv    string `koanf:"storagePriv"`
@@ -39,25 +41,20 @@ func (c ValaccountConfig) Name() string {
 	return c.name
 }
 
+func (c ValaccountConfig) Value() ValaccountConfig {
+	return c
+}
+
+func (c ValaccountConfig) StringValue() string {
+	return c.name + ".toml"
+}
+
 func (c ValaccountConfig) Path() string {
 	return c.path
 }
 
-type ValaccountConfigOption struct {
-	commoncmd.Option[ValaccountConfig]
-	config ValaccountConfig
-}
-
-func (o ValaccountConfigOption) Name() string {
-	return o.config.name
-}
-
-func (o ValaccountConfigOption) Value() ValaccountConfig {
-	return o.config
-}
-
-func (o ValaccountConfigOption) StringValue() string {
-	return o.config.name + ".toml"
+func (c ValaccountConfig) GetContainerLabel() string {
+	return fmt.Sprintf("kysor-%s-pool-%d", GetConfigX().GetChainPrettyName(), c.Pool)
 }
 
 func GetValaccountsConfigDir(cmd *cobra.Command) (string, error) {
@@ -102,7 +99,7 @@ func loadValaccountConfigs(cmd *cobra.Command, _ []string) error {
 				valaccountConfig.name = strings.TrimSuffix(name, filepath.Ext(name))
 				valaccountConfig.path = path
 				ValaccountConfigs = append(ValaccountConfigs, valaccountConfig)
-				ValaccountConfigOptions = append(ValaccountConfigOptions, ValaccountConfigOption{config: valaccountConfig})
+				ValaccountConfigOptions = append(ValaccountConfigOptions, valaccountConfig)
 			}
 		}
 	}

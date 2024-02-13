@@ -145,3 +145,13 @@ func RemoveNetworks(ctx context.Context, cli *client.Client, label string) error
 	}
 	return nil
 }
+
+func ListContainers(ctx context.Context, cli *client.Client, label string) ([]types.Container, error) {
+	containers, err := cli.ContainerList(ctx, container.ListOptions{
+		Filters: filters.NewArgs(filters.Arg("label", fmt.Sprintf("%s=", label))),
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to list containers: %v", err)
+	}
+	return containers, nil
+}
