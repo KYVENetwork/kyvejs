@@ -297,11 +297,16 @@ func GetOptionFromPrompt[T any](flag OptionFlag[T]) (Option[T], error) {
 		}
 	}
 
+	size := len(items)
+	if flag.MaxSelectionSize > 0 {
+		size = int(flag.MaxSelectionSize)
+	}
+
 	prompt := promptui.Select{
 		Label:     label,
 		Items:     items,
 		Stdout:    NoBellStdout,
-		Size:      len(flag.Options),
+		Size:      size,
 		CursorPos: cursorPos,
 	}
 	_, result, err := prompt.Run()

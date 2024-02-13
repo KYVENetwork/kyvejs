@@ -87,11 +87,12 @@ var (
 		},
 	}
 	flagValaccCreatePool = commoncmd.OptionFlag[uint64]{
-		Name:       "pool",
-		Short:      "p",
-		Usage:      "The ID of the pool this valaccount should participate as a validator",
-		Required:   true,
-		ValidateFn: commoncmd.ValidateInt,
+		Name:             "pool",
+		Short:            "p",
+		Usage:            "The ID of the pool this valaccount should participate as a validator",
+		Required:         true,
+		ValidateFn:       commoncmd.ValidateInt,
+		MaxSelectionSize: 10,
 	}
 	flagValaccCreateStorageProvKey = commoncmd.StringFlag{
 		Name:     "storage-priv",
