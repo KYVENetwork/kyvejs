@@ -17,14 +17,15 @@ type NetworkConfig struct {
 }
 
 type ContainerConfig struct {
-	Image   string
-	Name    string
-	Network string
-	User    string
-	Env     []string
-	Binds   []string
-	Cmd     []string
-	Labels  map[string]string
+	Image      string
+	Name       string
+	Network    string
+	User       string
+	Env        []string
+	Binds      []string
+	Cmd        []string
+	Labels     map[string]string
+	ExtraHosts []string
 }
 
 func CreateNetwork(ctx context.Context, cli *client.Client, network NetworkConfig) error {
@@ -65,7 +66,8 @@ func StartContainer(ctx context.Context, cli *client.Client, config ContainerCon
 			Labels: config.Labels,
 		},
 		&container.HostConfig{
-			Binds: config.Binds,
+			Binds:      config.Binds,
+			ExtraHosts: config.ExtraHosts,
 		},
 		&network.NetworkingConfig{
 			EndpointsConfig: endpointsConfig,
