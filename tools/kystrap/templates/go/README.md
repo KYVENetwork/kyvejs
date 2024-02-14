@@ -11,20 +11,21 @@ This is the {{ .name | ToTitle }} runtime server.
 - [jq](https://jqlang.github.io/jq/download/)
 
 Setup
-```bash
+```shell
 go mod tidy
 ```
 
 Start the runtime
-```bash
+```shell
 go run main.go
 ```
 
-You must implement the methods defined in `proto/kyverdk/runtime/v1/runtime_grpc.pb.go`.<br>
-The implementation is in `server/server.go` and contains already a running example.
-
-⚠️ **Note**
-The behaviour of the integration has to be **deterministic**.
+📌 **Task**
+- You must implement the methods defined in `proto/kyverdk/runtime/v1/runtime_grpc.pb.go`.<br>
+  The implementation is in `server/server.go` and contains already a running example.
+  <br>
+  ⚠️ **Note:**
+   The behaviour of the integration has to be **deterministic**.
 
 <details>
 <summary>Runtime Workflow</summary>
@@ -40,35 +41,38 @@ The behaviour of the integration has to be **deterministic**.
 8. *protocol* calls *NextKey* to get the next key for the data item.
 </details>
 
-### Test the runtime
+## Test the runtime
 Start the runtime
-```bash
+```shell
 go run main.go
 ```
 Change the environment variables in `scripts/test.sh` to match your environment.
 
 Open another terminal and run
-```bash
+```shell
 make test
 ```
 This will run the whole workflow like the protocol would do.<br>
-Make sure that your integration passes all tests. The tests are defined in `scripts/test.sh`. 
 
-You might want to run your integration in debug mode if you encounter any issues. 
-It's out of scope of this README to explain how to do that (please refer to your IDE).
+📌 **Task**
+- Make sure that your integration passes all tests. The tests are defined in `scripts/test.sh`. 
+<br><br>
+  **Note:**
+    You might want to run your integration in debug mode if you encounter any issues. 
+    It's out of scope of this README to explain how to do that (please refer to your IDE).
 
 <details>
 <summary>Advanced manual testing</summary>
 
 To test individual methods, you can use the kystrap tool. Or you customize the `scripts/test.sh` to your needs. 
-```bash
+```shell
 # You must be in the root directory of the project
 sh tools/kystrap/kystrap.sh test -a host.docker.internal:50051
 ```
 
 **Examples for testing**
 
-```bash
+```shell
 # test-command structure
 sh tools/kystrap/kystrap.sh test -a <host>:<port> -m <method> -d <data> <flags>
 
@@ -88,40 +92,45 @@ sh tools/kystrap/kystrap.sh test -a host.docker.internal:50051 -y -s -m GetRunti
 The e2e tests are already defined in the `e2etest` directory in the root of the project.
 The only thing that you have to do is to provide test-data and a valid config for the e2e tests.
 
-The e2e test creates a REST server to simulate the specific endpoint for this integration.
-This server is reachable with `http://kyve-e2e-test-testapi-integration-{{ .name | ToLower }}:8080`
+<details>
+<summary>Testdata</summary>
 
-#### Testdata
-The testdata is located in `testdata/api`. You can add your testdata here.
-It already contains a simple example.
-The structure is as follows:
-```text
+The `testdata` directory is used to store mock data for testing purposes.
+This data is used to simulate responses from the API endpoints of your application during testing.  
+
+The structure of the `testdata` directory is as follows:
+```shell
 testdata/api/<path>/<sub-path>/<sub-sub-path>/.../<file>
 ```
+Each file in this directory corresponds to a specific API endpoint and the response it should return during testing.
+The file path mimics the API endpoint's path.
 
-**Example**<br>
-I have a `block` endpoint and want to test it.
-This is the structure of the testdata:
-```text
-testdata/api/block/1.json
-testdata/api/block/2.json
-testdata/api/block/3.json
-```
-http://localhost:8080/get_block/1 will return the content of `testdata/api/get_block/1.json`
+**List's**<br>
+If you have an API endpoint `/block/1`, you would create a file at `testdata/api/block/1.json` containing the response
+you want this endpoint to return during testing. You need at least 2 files in `testdata/api/block/` (otherwiese it's a `Single object`).
 
-If my query has a parameter, I can add it to the path like this:
-```text
-testdata/api/block/?height=1.json
-testdata/api/block/?height=2.json
-testdata/api/block/?height=3.json
-```
-http://localhost:8080/block/?height=1 will return the content of `testdata/api/block/?height=1.json`
+**List's with query parameters**<br>
+If your API endpoint includes query parameters, you can include these in the file path as well.
+For example, for the endpoint `/block?height=1.json`, you would create a file at `testdata/api/block/?height=1.json`.
 
-If my REST endpoint returns a single object, I can add it to the path like this:
-```text
-testdata/api/block/any-name-that-I-want.json
-```
-http://localhost:8080/block will return the content of `testdata/api/block/1.json`
+**Single objects**<br>
+If your API endpoint returns a single object, you can represent this with a single file.
+For example, for the endpoint `/block`, you could create a file at `testdata/api/block/any-name-that-I-want.json`.
+The name of the file doesn't matter in this case.
 
-#### Config
+**Note:** Instead of '.json' you can also leave the file extension empty (this will treat the data as a blob).
+
+</details>
+
+<details>
+<summary>Config</summary>
 Change the config in `testdata/config.yaml` to match your environment.
+The REST server with your testdata is reachable under `http://kyve-e2e-test-testapi-integration-{{ .name | ToLower }}:8080`
+</details>
+
+📌 **Tasks**
+- Add test-data for **10 bundles** to the `testdata/api` directory
+- Update the config for the e2e tests in `testdata/config.yaml`
+- Run the e2e tests with `make test-e2e`
+
+
