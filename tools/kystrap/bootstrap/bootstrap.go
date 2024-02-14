@@ -41,9 +41,9 @@ func readConfig(name string) error {
 	return nil
 }
 
-func createFile(path string, outputPath string, data map[string]any, fileInfo os.DirEntry) error {
+func createFile(path string, outputPath string, data map[string]any, dirEntry os.DirEntry) error {
 	// Check if the file is a directory
-	if fileInfo.IsDir() {
+	if dirEntry.IsDir() {
 		// Create the directory in the output path
 		return os.MkdirAll(outputPath, os.ModePerm)
 	}
@@ -57,21 +57,32 @@ func createFile(path string, outputPath string, data map[string]any, fileInfo os
 	// Parse the template
 	tmpl, err := template.New("").Funcs(funcMap).Parse(string(content))
 	if err != nil {
-		return fmt.Errorf("failed to parse template for file %s with error:\n%s", fileInfo.Name(), err.Error())
+		return fmt.Errorf("failed to parse template for file %s with error:\n%s", dirEntry.Name(), err.Error())
 	}
 
 	// Create the output file
 	outputFile, err := os.Create(outputPath)
 	if err != nil {
-		return fmt.Errorf("failed to create file %s with error:\n%s", fileInfo.Name(), err.Error())
+		return fmt.Errorf("failed to create file %s with error:\n%s", dirEntry.Name(), err.Error())
 	}
 	//goland:noinspection GoUnhandledErrorResult
 	defer outputFile.Close()
 
+	fileInfo, err := dirEntry.Info()
+	if err != nil {
+		return fmt.Errorf("failed to get file info for file %s with error:\n%s", dirEntry.Name(), err.Error())
+	}
+
+	// Set the file permissions
+	err = os.Chmod(outputPath, fileInfo.Mode())
+	if err != nil {
+		return fmt.Errorf("failed to set file permissions for file %s with error:\n%s", dirEntry.Name(), err.Error())
+	}
+
 	// Execute the template
 	err = tmpl.Execute(outputFile, data)
 	if err != nil {
-		return fmt.Errorf("failed to create template for file %s with error:\n%s", fileInfo.Name(), err.Error())
+		return fmt.Errorf("failed to create template for file %s with error:\n%s", dirEntry.Name(), err.Error())
 	}
 	return nil
 }
