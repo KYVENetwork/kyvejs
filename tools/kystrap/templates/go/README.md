@@ -129,8 +129,10 @@ The REST server with your testdata is reachable under `http://kyve-e2e-test-test
 </details>
 
 📌 **Tasks**
-- Add test-data for **10 bundles** to the `testdata/api` directory
+- Add test-data for **10 bundles** to the `testdata/api` directory (replace the existing example files)
 - Update the config for the e2e tests in `testdata/config.yaml`
 - Run the e2e tests with `make test-e2e`
 
+**Note:** You can use `scripts/fetch-testdata.sh` to fetch testdata from a real API. 
+Just change it to fit your needs and run it with `./scripts/fetch-testdata.sh`.
 
