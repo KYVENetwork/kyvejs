@@ -36,12 +36,13 @@ type Option[T any] interface {
 }
 
 type OptionFlag[T any] struct {
-	Name         string
-	Short        string
-	DefaultValue Option[T]
-	Options      []Option[T]
-	Usage        string
-	Prompt       string
-	Required     bool
-	ValidateFn   func(input string) error
+	Name             string
+	Short            string
+	DefaultValue     Option[T]
+	Options          []Option[T]
+	Usage            string
+	Prompt           string
+	Required         bool
+	ValidateFn       func(input string) error
+	MaxSelectionSize uint
 }

@@ -20,6 +20,10 @@ var (
 )
 
 type ValaccountConfig struct {
+	option commoncmd.Option[ValaccountConfig]
+	name   string
+	path   string
+
 	Pool           uint64 `koanf:"pool"`
 	Valaccount     string `koanf:"valaccount"`
 	StoragePriv    string `koanf:"storagePriv"`
@@ -27,8 +31,6 @@ type ValaccountConfig struct {
 	Cache          string `koanf:"cache"`
 	Metrics        bool   `koanf:"metrics"`
 	MetricsPort    string `koanf:"metricsPort"`
-	name           string
-	path           string
 }
 
 func (c ValaccountConfig) Save(path string) error {
@@ -39,25 +41,20 @@ func (c ValaccountConfig) Name() string {
 	return c.name
 }
 
+func (c ValaccountConfig) Value() ValaccountConfig {
+	return c
+}
+
+func (c ValaccountConfig) StringValue() string {
+	return c.name + ".toml"
+}
+
 func (c ValaccountConfig) Path() string {
 	return c.path
 }
 
-type ValaccountConfigOption struct {
-	commoncmd.Option[ValaccountConfig]
-	config ValaccountConfig
-}
-
-func (o ValaccountConfigOption) Name() string {
-	return o.config.name
-}
-
-func (o ValaccountConfigOption) Value() ValaccountConfig {
-	return o.config
-}
-
-func (o ValaccountConfigOption) StringValue() string {
-	return o.config.name + ".toml"
+func (c ValaccountConfig) GetContainerLabel() string {
+	return fmt.Sprintf("kysor-%s-%s", GetConfigX().GetChainPrettyName(), c.name)
 }
 
 func GetValaccountsConfigDir(cmd *cobra.Command) (string, error) {
@@ -102,7 +99,7 @@ func loadValaccountConfigs(cmd *cobra.Command, _ []string) error {
 				valaccountConfig.name = strings.TrimSuffix(name, filepath.Ext(name))
 				valaccountConfig.path = path
 				ValaccountConfigs = append(ValaccountConfigs, valaccountConfig)
-				ValaccountConfigOptions = append(ValaccountConfigOptions, ValaccountConfigOption{config: valaccountConfig})
+				ValaccountConfigOptions = append(ValaccountConfigOptions, valaccountConfig)
 			}
 		}
 	}

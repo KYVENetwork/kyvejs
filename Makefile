@@ -38,3 +38,20 @@ bootstrap-integration:
 
 test-integration:
 	sh ./tools/kystrap/kystrap.sh test
+
+###############################################################################
+### 						 	   Testing									###
+###############################################################################
+
+# Runs the e2e tests in a local environment
+test-e2e:
+	@echo "🧪 Running end-to-end tests..."
+	@cd e2etest && go test -test.v -test.parallel 10 -test.timeout 30m ./...
+	@echo "✅ Completed end-to-end tests!"
+
+# Runs the e2e tests in a dind container (docker in docker)
+# This is useful for running tests in a CI environment
+test-e2e-dind:
+	@echo "🧪 Running end-to-end tests (dind)..."
+	@./e2etest/run-e2e-tests.sh
+	@echo "✅ Completed end-to-end tests (dind)!"

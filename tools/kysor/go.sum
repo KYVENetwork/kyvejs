@@ -237,8 +237,10 @@ github.com/KYVENetwork/chain v1.4.0 h1:i/1qgeyYL6LEwKkClXHgx0qjVxWfJtb1NVKqwOyhB
 github.com/KYVENetwork/chain v1.4.0/go.mod h1:7O6Avj5hdMyReTS5ykkYn9Vh4Ky8m2G4rwHPl9PyD+M=
 github.com/KYVENetwork/cosmos-sdk v0.47.6-kyve-rc0 h1:OoVLykPiZx3ecHY5lZH5TJmBBNADZYnvsNhH/nH8etA=
 github.com/KYVENetwork/cosmos-sdk v0.47.6-kyve-rc0/go.mod h1:xTc1chW8HyUWCfrgGbjS5jNu9RzlPVrBNfbL9RmZUio=
-github.com/KYVENetwork/kyvejs/common/goutils v0.0.0-20240206141745-42c2c6ce21d2 h1:N5k7hAwiQosiEQOHoi0wLWlEHfSBYylasMGLii2+XWM=
-github.com/KYVENetwork/kyvejs/common/goutils v0.0.0-20240206141745-42c2c6ce21d2/go.mod h1:muMw9EbNmi8NUdzX8Ss0+uQxxWUpfiXY3ns54fcNkqA=
+github.com/KYVENetwork/kyvejs/common/goutils v0.0.0-20240213143535-34bac29e1aa8 h1:8kxQ12t/4MQYDI0l4NGzCmBd6tJzfCFuVjUIcI/sJnA=
+github.com/KYVENetwork/kyvejs/common/goutils v0.0.0-20240213143535-34bac29e1aa8/go.mod h1:muMw9EbNmi8NUdzX8Ss0+uQxxWUpfiXY3ns54fcNkqA=
+github.com/KYVENetwork/kyvejs/common/goutils v0.0.0-20240214201356-1ae8171fcbf7 h1:xvz/Wd/BBJz1kVPu7XD718ttIXPLVEX4hHnB4zFZoNM=
+github.com/KYVENetwork/kyvejs/common/goutils v0.0.0-20240214201356-1ae8171fcbf7/go.mod h1:muMw9EbNmi8NUdzX8Ss0+uQxxWUpfiXY3ns54fcNkqA=
 github.com/Knetic/govaluate v3.0.1-0.20171022003610-9aa49832a739+incompatible/go.mod h1:r7JcOSlj0wfOMncg0iLm8Leh48TZaKVeNIfJntJ2wa0=
 github.com/Masterminds/semver v1.5.0 h1:H65muMkzWKEuNDnfl9d70GUjFniHKHRbFPGBuZ3QEww=
 github.com/Masterminds/semver v1.5.0/go.mod h1:MB6lktGJrhw8PrUyiEoblNEGEQ+RzHPF078ddwwvV3Y=
@@ -495,8 +497,8 @@ github.com/ethereum/go-ethereum v1.10.22/go.mod h1:EYFyF19u3ezGLD4RqOkLq+ZCXzYbL
 github.com/ettle/strcase v0.1.1 h1:htFueZyVeE1XNnMEfbqp5r67qAN/4r6ya1ysq8Q+Zcw=
 github.com/ettle/strcase v0.1.1/go.mod h1:hzDLsPC7/lwKyBOywSHEP89nt2pDgdy+No1NBA9o9VY=
 github.com/fatih/color v1.7.0/go.mod h1:Zm6kSWBoL9eyXnKyktHP6abPY2pDugNf5KwzbycvMj4=
-github.com/fatih/color v1.15.0 h1:kOqh6YHBtK8aywxGerMG2Eq3H6Qgoqeo13Bk2Mv/nBs=
-github.com/fatih/color v1.15.0/go.mod h1:0h5ZqXfHYED7Bhv2ZJamyIOUej9KtShiJESRwBDUSsw=
+github.com/fatih/color v1.16.0 h1:zmkK9Ngbjj+K0yRhTVONQh1p/HknKYSlNT+vZCzyokM=
+github.com/fatih/color v1.16.0/go.mod h1:fL2Sau1YI5c0pdGEVCbKQbLXB6edEj1ZgiY4NijnWvE=
 github.com/fatih/structs v1.1.0 h1:Q7juDM0QtcnhCpeyLGQKyg4TOIghuNXrkL32pHAUMxo=
 github.com/fatih/structs v1.1.0/go.mod h1:9NiDSp5zOcgEDl+j00MP/WkGVPOlPRLejGD8Ga6PJ7M=
 github.com/fatih/structtag v1.2.0 h1:/OdNE99OxoI/PqaW/SuSK9uxxT3f/tcSZgon/ssNSx4=
@@ -947,8 +949,6 @@ github.com/ldez/gomoddirectives v0.2.3 h1:y7MBaisZVDYmKvt9/l1mjNCiSA1BVn34U0ObUc
 github.com/ldez/gomoddirectives v0.2.3/go.mod h1:cpgBogWITnCfRq2qGoDkKMEVSaarhdBr6g8G04uz6d0=
 github.com/ldez/tagliatelle v0.4.0 h1:sylp7d9kh6AdXN2DpVGHBRb5guTVAgOxqNGhbqc4b1c=
 github.com/ldez/tagliatelle v0.4.0/go.mod h1:mNtTfrHy2haaBAw+VT7IBV6VXBThS7TCreYWbBcJ87I=
-github.com/leandroveronezi/go-terminal v1.3.7 h1:viDwHhXAv2bDstZ3nv3nUm0ACmWJprjH9jyX+jE1ih8=
-github.com/leandroveronezi/go-terminal v1.3.7/go.mod h1:km3Zrn3cy50UCmigmRI6lHDHpiLgOVdGghPfrvaDJMM=
 github.com/leodido/go-urn v1.2.0/go.mod h1:+8+nEpDfqqsY+g338gtMEUOtuK+4dEMhiQEgxpxOKII=
 github.com/leodido/go-urn v1.2.1 h1:BqpAaACuzVSgi/VLzGZIobT2z4v53pjosyNd9Yv6n/w=
 github.com/leodido/go-urn v1.2.1/go.mod h1:zt4jvISO2HfUBqxjfIshjdMTYS56ZS/qv49ictyFfxY=
@@ -1234,6 +1234,8 @@ github.com/sashamelentyev/interfacebloat v1.1.0 h1:xdRdJp0irL086OyW1H/RTZTr1h/tM
 github.com/sashamelentyev/interfacebloat v1.1.0/go.mod h1:+Y9yU5YdTkrNvoX0xHc84dxiN1iBi9+G8zZIhPVoNjQ=
 github.com/sashamelentyev/usestdlibvars v1.23.0 h1:01h+/2Kd+NblNItNeux0veSL5cBF1jbEOPrEhDzGYq0=
 github.com/sashamelentyev/usestdlibvars v1.23.0/go.mod h1:YPwr/Y1LATzHI93CqoPUN/2BzGQ/6N/cl/KwgR0B/aU=
+github.com/savioxavier/termlink v1.3.0 h1:3Gl4FzQjUyiHzmoEDfmWEhgIwDiJY4poOQHP+k8ReA4=
+github.com/savioxavier/termlink v1.3.0/go.mod h1:5T5ePUlWbxCHIwyF8/Ez1qufOoGM89RCg9NvG+3G3gc=
 github.com/schollz/progressbar/v3 v3.14.1 h1:VD+MJPCr4s3wdhTc7OEJ/Z3dAeBzJ7yKH/P4lC5yRTI=
 github.com/schollz/progressbar/v3 v3.14.1/go.mod h1:Zc9xXneTzWXF81TGoqL71u0sBPjULtEHYtj/WVgVy8E=
 github.com/sean-/seed v0.0.0-20170313163322-e2103e2c3529/go.mod h1:DxrIzT+xaE7yg65j358z/aeFdxmN0P9QXhEzd20vsDc=

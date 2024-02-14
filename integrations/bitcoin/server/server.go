@@ -196,20 +196,23 @@ func (t *BitcoinServer) ValidateDataItem(ctx context.Context, req *pb.ValidateDa
 //
 // Deterministic behavior is required
 func (t *BitcoinServer) SummarizeDataBundle(ctx context.Context, req *pb.SummarizeDataBundleRequest) (*pb.SummarizeDataBundleResponse, error) {
-	var summary = ""
+	grpcBundle := req.GetBundle()
+	if len(grpcBundle) == 0 {
+		return nil, status.Error(codes.Internal, "Bundle is empty")
+	}
 
+	latestBundle := grpcBundle[len(grpcBundle)-1]
+	var value BitcoinTransformedItemValue
+	err := json.Unmarshal([]byte(latestBundle.GetValue()), &value)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "Error unmarshalling data item: %v", err)
+	}
+	summary := latestBundle.Key
 	// TODO: summarize the data bundle
 	// Example:
-	// grpcBundle := req.GetBundle()
-	// latestBundle := grpcBundle[len(grpcBundle)-1]
-	// var value GogoTransformedItemValue
-	// err := json.Unmarshal([]byte(latestBundle.GetValue()), &value)
-	// if err == nil {
-	//	 if value.Block.(map[string]interface{})["height"] != nil {
-	//		 summary = value.Block.(map[string]interface{})["height"].(string)
-	//	 }
-	// }
-
+	//if value.Block.(map[string]interface{})["height"] != nil {
+	// summary = value.Block.(map[string]interface{})["height"].(string)
+	//}
 	return &pb.SummarizeDataBundleResponse{Summary: summary}, nil
 }
 

@@ -76,6 +76,8 @@ github.com/GaijinEntertainment/go-exhaustruct/v3 v3.1.0 h1:3ZBs7LAezy8gh0uECsA6C
 github.com/GaijinEntertainment/go-exhaustruct/v3 v3.1.0/go.mod h1:rZLTje5A9kFBe0pzhpe2TdhRniBF++PRHQuRpR8esVc=
 github.com/KYVENetwork/kyvejs/common/goutils v0.0.0-20240206141745-42c2c6ce21d2 h1:N5k7hAwiQosiEQOHoi0wLWlEHfSBYylasMGLii2+XWM=
 github.com/KYVENetwork/kyvejs/common/goutils v0.0.0-20240206141745-42c2c6ce21d2/go.mod h1:muMw9EbNmi8NUdzX8Ss0+uQxxWUpfiXY3ns54fcNkqA=
+github.com/KYVENetwork/kyvejs/common/goutils v0.0.0-20240214201356-1ae8171fcbf7 h1:xvz/Wd/BBJz1kVPu7XD718ttIXPLVEX4hHnB4zFZoNM=
+github.com/KYVENetwork/kyvejs/common/goutils v0.0.0-20240214201356-1ae8171fcbf7/go.mod h1:muMw9EbNmi8NUdzX8Ss0+uQxxWUpfiXY3ns54fcNkqA=
 github.com/Masterminds/semver v1.5.0 h1:H65muMkzWKEuNDnfl9d70GUjFniHKHRbFPGBuZ3QEww=
 github.com/Masterminds/semver v1.5.0/go.mod h1:MB6lktGJrhw8PrUyiEoblNEGEQ+RzHPF078ddwwvV3Y=
 github.com/OneOfOne/xxhash v1.2.2 h1:KMrpdQIwFcEqXDklaen+P1axHaj9BSKzvpUUfnHldSE=

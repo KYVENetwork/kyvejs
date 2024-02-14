@@ -37,6 +37,8 @@ DOCKER_IMAGE_NAME={{ .name }}
 BINARY_NAME ?= kyve-$(GOOS)-$(ARCH)
 CGO_ENABLED=0
 
+.PHONY: ensure_version build format lint test test-e2e docker-image docker-run
+
 ###############################################################################
 ###                                 Checks                                  ###
 ###############################################################################
@@ -45,15 +47,6 @@ ensure_version:
 ifneq ($(GO_VERSION),{{ .lang.go.version.minor }})
 	$(error ❌  Please run Go v{{ .lang.go.version.minor }}.x..)
 endif
-
-###############################################################################
-###  						 Building the binary							###
-###############################################################################
-
-build: ensure_version
-	@echo "🏗️ Building binary..."
-	go build -o build/$(BINARY_NAME) .
-	@echo "✅ Completed binary build!"
 
 ###############################################################################
 ###                          Formatting & Linting                           ###
@@ -71,6 +64,29 @@ lint:
 	@echo "📝 Running linter..."
 	@go run $(golangci_lint_cmd) run --timeout=10m
 	@echo "✅ Completed linting!"
+
+###############################################################################
+### 						 	   Testing									###
+###############################################################################
+
+test:
+	@echo "🧪 Running tests..."
+	@./scripts/test.sh
+	@echo "✅ Completed tests!"
+
+test-e2e:
+	@echo "🧪 Running end-to-end tests..."
+	@../../e2etest/run-e2e-tests.sh "-test.run '/{{ .name }}\$$'"
+	@echo "✅ Completed end-to-end tests!"
+
+###############################################################################
+###  						 Building the binary							###
+###############################################################################
+
+build: ensure_version
+	@echo "🏗️ Building binary..."
+	go build -o build/$(BINARY_NAME) .
+	@echo "✅ Completed binary build!"
 
 ###############################################################################
 ### 						 Building the image								###

@@ -2,6 +2,7 @@
 **/dist
 **/out
 **/logs
+**/build
 .git
 npm-debug.log
 .coverage

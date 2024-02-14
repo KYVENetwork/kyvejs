@@ -4,7 +4,10 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
+
+	"github.com/mitchellh/go-homedir"
 
 	commoncmd "github.com/KYVENetwork/kyvejs/common/goutils/cmd"
 
@@ -20,7 +23,7 @@ const configFileName = "config.toml"
 var FlagHome = commoncmd.StringFlag{
 	Name:         "home",
 	DefaultValue: "~/.kysor", // Overwritten in init() to set the path as absolute
-	Usage:        "The loaction of the .kysor home directory where binaries and configs are stored.",
+	Usage:        "The location of the .kysor home directory where binaries and configs are stored.",
 }
 
 var config *KysorConfig
@@ -37,6 +40,19 @@ func (c KysorConfig) GetDenom() string {
 		return "tkyve"
 	}
 	return "ukyve"
+}
+
+func (c KysorConfig) GetChainPrettyName() string {
+	if strings.HasPrefix(c.ChainID, "kyve") {
+		return "kyve"
+	}
+	if strings.HasPrefix(c.ChainID, "kaon") {
+		return "kaon"
+	}
+	if strings.HasPrefix(c.ChainID, "korellia") {
+		return "korellia"
+	}
+	return c.ChainID
 }
 
 func (c KysorConfig) Save(path string) error {
@@ -86,6 +102,11 @@ func GetHomeDir(cmd *cobra.Command) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	// Expand the home directory
+	homeDir, err = homedir.Expand(homeDir)
+	if err != nil {
+		return "", err
+	}
 	return filepath.Abs(homeDir)
 }
 
@@ -131,7 +152,7 @@ func loadKysorConfig(cmd *cobra.Command, _ []string) error {
 
 	// Check if the config file exists
 	if _, err := os.Stat(configFilePath); os.IsNotExist(err) {
-		return err
+		return fmt.Errorf("config file does not exist at %s. Run `kysor init` to create a new config", configFilePath)
 	}
 
 	k := koanf.New(".")
@@ -145,6 +166,22 @@ func loadKysorConfig(cmd *cobra.Command, _ []string) error {
 	err = k.Unmarshal("", &config)
 	if err != nil {
 		return fmt.Errorf("error unmarshalling config file: %s", err)
+	}
+
+	// Add port to the RPC and REST URLs if they are missing
+	if !regexp.MustCompile(`:\d+$`).MatchString(config.RPC) {
+		if strings.HasPrefix(config.RPC, "https://") {
+			config.RPC += ":443"
+		} else if strings.HasPrefix(config.RPC, "http://") {
+			config.RPC += ":80"
+		}
+	}
+	if !regexp.MustCompile(`:\d+$`).MatchString(config.REST) {
+		if strings.HasPrefix(config.REST, "https://") {
+			config.REST += ":443"
+		} else if strings.HasPrefix(config.REST, "http://") {
+			config.REST += ":80"
+		}
 	}
 
 	return nil

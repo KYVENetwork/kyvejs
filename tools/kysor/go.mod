@@ -4,11 +4,12 @@ go 1.21.6
 
 require (
 	github.com/KYVENetwork/chain v1.4.0
-	github.com/KYVENetwork/kyvejs/common/goutils v0.0.0-20240206141745-42c2c6ce21d2
+	github.com/KYVENetwork/kyvejs/common/goutils v0.0.0-20240214201356-1ae8171fcbf7
 	github.com/cometbft/cometbft v0.37.2
 	github.com/cosmos/cosmos-sdk v0.47.6
 	github.com/cosmos/go-bip39 v1.0.0
 	github.com/docker/docker v25.0.2+incompatible
+	github.com/fatih/color v1.16.0
 	github.com/go-git/go-git/v5 v5.11.0
 	github.com/golangci/golangci-lint v1.52.2
 	github.com/hashicorp/go-version v1.6.0
@@ -17,10 +18,11 @@ require (
 	github.com/knadh/koanf/providers/file v0.1.0
 	github.com/knadh/koanf/providers/structs v0.1.0
 	github.com/knadh/koanf/v2 v2.0.1
-	github.com/leandroveronezi/go-terminal v1.3.7
 	github.com/manifoldco/promptui v0.9.0
 	github.com/mitchellh/go-homedir v1.1.0
+	github.com/savioxavier/termlink v1.3.0
 	github.com/spf13/cobra v1.8.0
+	golang.org/x/exp v0.0.0-20230711153332-06a737ee72cb
 	mvdan.cc/gofumpt v0.5.0
 )
 
@@ -115,7 +117,6 @@ require (
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/esimonov/ifshort v1.0.4 // indirect
 	github.com/ettle/strcase v0.1.1 // indirect
-	github.com/fatih/color v1.15.0 // indirect
 	github.com/fatih/structs v1.1.0 // indirect
 	github.com/fatih/structtag v1.2.0 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
@@ -331,7 +332,6 @@ require (
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.26.0 // indirect
 	golang.org/x/crypto v0.16.0 // indirect
-	golang.org/x/exp v0.0.0-20230711153332-06a737ee72cb // indirect
 	golang.org/x/exp/typeparams v0.0.0-20230224173230-c95f2b4c22f2 // indirect
 	golang.org/x/mod v0.13.0 // indirect
 	golang.org/x/net v0.19.0 // indirect
@@ -363,9 +363,6 @@ require (
 )
 
 replace (
-	// Uncomment this for local development
-	//github.com/KYVENetwork/kyvejs/common/goutils => ../../common/goutils
-
 	// use cosmos compatible ChainSafe/go-schnorrkel
 	github.com/ChainSafe/go-schnorrkel => github.com/ChainSafe/go-schnorrkel v0.0.0-20200405005733-88cbf1b4c40d
 	github.com/ChainSafe/go-schnorrkel/1 => github.com/ChainSafe/go-schnorrkel v1.0.0
