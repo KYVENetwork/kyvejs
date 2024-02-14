@@ -1,10 +1,18 @@
 #!/bin/sh
 
-# Variables
-KEY=11291474  # Change this to the key you want to test
-CONFIG='{"network":"fancy-network","rpc":"https://my-fancy-pants-rpc"}' # Set your config here
-EXPECTED_SUMMARY="\"$KEY\"" # Change this to the expected summary
-EXPECTED_NEXT_KEY="\"$(("$KEY" + 1))\""  # Change this to the next key you want to test
+#########################################
+#               Variables               #
+#########################################
+# Key, config, and expected values (CHANGE THESE TO MATCH YOUR INTEGRATION!!!)
+KEY=11291474
+API="https://g.w.lavanet.xyz:443/gateway/axelar/rpc-http/1d87fa61650d165d2c044c14b8db25f0"
+CONFIG='{"network":"axelar-dojo-1","rpc":"'$API'"}'
+EXPECTED_SUMMARY="\"$KEY\""
+EXPECTED_NEXT_KEY="\"$(expr $KEY + 1)\""
+
+#########################################
+
+# Host and port
 HOST="host.docker.internal"
 PORT="50051"
 
@@ -12,6 +20,8 @@ PORT="50051"
 KYSTRAP_DIR=./tools/kystrap
 TMP_DIR=/tmp/kystrap
 OUTPUT_DIR=$TMP_DIR/output
+
+#########################################
 
 # Go up until the root of the project (max 3 levels)
 for _ in 1 2 3; do
