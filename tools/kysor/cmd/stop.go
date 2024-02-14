@@ -3,10 +3,11 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/config"
-	"golang.org/x/exp/maps"
 	"strings"
 	"time"
+
+	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/config"
+	"golang.org/x/exp/maps"
 
 	commoncmd "github.com/KYVENetwork/kyvejs/common/goutils/cmd"
 
@@ -86,14 +87,12 @@ func setStopOptions(cli *client.Client) error {
 	return nil
 }
 
-var (
-	flagStopValaccount = commoncmd.OptionFlag[StopOption]{
-		Name:     "valaccount",
-		Short:    "v",
-		Usage:    "Name of the valaccount to stop",
-		Required: true,
-	}
-)
+var flagStopValaccount = commoncmd.OptionFlag[StopOption]{
+	Name:     "valaccount",
+	Short:    "v",
+	Usage:    "Name of the valaccount to stop",
+	Required: true,
+}
 
 func stopCmd() *cobra.Command {
 	cmd := &cobra.Command{

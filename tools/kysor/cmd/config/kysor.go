@@ -2,11 +2,12 @@ package config
 
 import (
 	"fmt"
-	"github.com/mitchellh/go-homedir"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
+
+	"github.com/mitchellh/go-homedir"
 
 	commoncmd "github.com/KYVENetwork/kyvejs/common/goutils/cmd"
 

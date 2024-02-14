@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+
 	"github.com/docker/docker/client"
 	"github.com/fatih/color"
 	"github.com/savioxavier/termlink"

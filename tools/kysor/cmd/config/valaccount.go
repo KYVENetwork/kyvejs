@@ -54,7 +54,7 @@ func (c ValaccountConfig) Path() string {
 }
 
 func (c ValaccountConfig) GetContainerLabel() string {
-	return fmt.Sprintf("kysor-%s-pool-%d", GetConfigX().GetChainPrettyName(), c.Pool)
+	return fmt.Sprintf("kysor-%s-%s", GetConfigX().GetChainPrettyName(), c.name)
 }
 
 func GetValaccountsConfigDir(cmd *cobra.Command) (string, error) {

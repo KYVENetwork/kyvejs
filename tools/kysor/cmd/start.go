@@ -5,7 +5,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/fatih/color"
 	"io"
 	"os"
 	"os/signal"
@@ -15,6 +14,8 @@ import (
 	"sync"
 	"syscall"
 	"time"
+
+	"github.com/fatih/color"
 
 	"github.com/docker/docker/api/types/container"
 
@@ -424,7 +425,21 @@ func printLogs(cli *client.Client, cont *StartResult, colorAttr color.Attribute,
 }
 
 // start (or restart) the protocol and integration containers
-func start(cmd *cobra.Command, kyveClient *chain.KyveClient, cli *client.Client, valConfig config.ValaccountConfig, integrationEnv []string, protocolVersion *version.Version, integrationVersion *version.Version, debug bool, verbose bool, detached bool, errChan chan error, logEndChan chan *StartResult, exitChan chan interface{}, newVersionChan chan interface{}) (string, error) {
+func start(
+	cmd *cobra.Command,
+	kyveClient *chain.KyveClient,
+	cli *client.Client,
+	valConfig config.ValaccountConfig,
+	integrationEnv []string,
+	protocolVersion *version.Version,
+	integrationVersion *version.Version,
+	debug bool,
+	detached bool,
+	errChan chan error,
+	logEndChan chan *StartResult,
+	exitChan chan interface{},
+	newVersionChan chan interface{},
+) (string, error) {
 	response, err := kyveClient.QueryPool(valConfig.Pool)
 	if err != nil {
 		return "", fmt.Errorf("failed to query pool: %v", err)
@@ -453,7 +468,7 @@ func start(cmd *cobra.Command, kyveClient *chain.KyveClient, cli *client.Client,
 
 	// Build images
 	label := valConfig.GetContainerLabel()
-	protocol, integration, err := buildImages(repo, cli, pool, label, protocolVersion, integrationVersion, verbose)
+	protocol, integration, err := buildImages(repo, cli, pool, label, protocolVersion, integrationVersion, debug)
 	if err != nil {
 		return "", fmt.Errorf("failed to build images: %v", err)
 	}
@@ -484,12 +499,12 @@ func start(cmd *cobra.Command, kyveClient *chain.KyveClient, cli *client.Client,
 		// Print integration logs
 		go printLogs(cli, integrationContainer, color.FgBlue, errChan, logEndChan)
 
-		// Check for new versions only if 'AutoDownloadBinaries' is enabled and versions are not pinned
-		if config.GetConfigX().AutoDownloadBinaries && protocolVersion == nil && integrationVersion == nil {
-			fmt.Println("🔄  Auto update is enabled")
+		// Check for new versions only if versions are not pinned
+		if protocolVersion == nil && integrationVersion == nil {
+			fmt.Println("🔄  Auto update of docker container's is enabled")
 			go checkNewVersion(kyveClient, valConfig.Pool, repo, newVersionChan, exitChan)
 		} else {
-			fmt.Println("🔄  Auto update is disabled")
+			fmt.Println("🔄  Auto update of docker container's is disabled")
 		}
 		fmt.Println()
 	}
@@ -598,12 +613,14 @@ var (
 	flagStartProtocolVersion = commoncmd.StringFlag{
 		Name:       "protocol-version",
 		Usage:      "Specify the version of the protocol to run",
+		Prompt:     "Specify the version of the protocol to run (leave empty for latest)",
 		Required:   false,
 		ValidateFn: validateVersion,
 	}
 	flagStartIntegrationVersion = commoncmd.StringFlag{
 		Name:       "integration-version",
 		Usage:      "Specify the version of the integration to run",
+		Prompt:     "Specify the version of the integration to run (leave empty for latest)",
 		Required:   false,
 		ValidateFn: validateVersion,
 	}
@@ -613,13 +630,9 @@ var (
 		Usage:        "Run the validator node in debug mode",
 		DefaultValue: false,
 	}
-	flagStartVerbose = commoncmd.BoolFlag{
-		Name:         "verbose",
-		Usage:        "Show detailed build output",
-		DefaultValue: false,
-	}
 	flagStartDetached = commoncmd.BoolFlag{
 		Name:         "detached",
+		Short:        "d",
 		Usage:        "Run the validator node in detached mode (no auto update)",
 		DefaultValue: false,
 	}
@@ -688,12 +701,6 @@ func startCmd() *cobra.Command {
 				return err
 			}
 
-			// Verbose
-			verbose, err := commoncmd.GetBoolFromPromptOrFlag(cmd, flagStartVerbose)
-			if err != nil {
-				return err
-			}
-
 			// Detached
 			detached, err := commoncmd.GetBoolFromPromptOrFlag(cmd, flagStartDetached)
 			if err != nil {
@@ -725,7 +732,6 @@ func startCmd() *cobra.Command {
 				protocolVersion,
 				integrationVersion,
 				debug,
-				verbose,
 				detached,
 				errChan,
 				logEndChan,
@@ -773,10 +779,10 @@ func startCmd() *cobra.Command {
 						// New version available, restart containers
 						err := contSync.markAsBeingStopped(cli, label)
 						if err != nil {
-							fmt.Println("failed to set stopping: ", err)
+							fmt.Println("failed mark as being stopped: ", err)
 						}
 						fmt.Println("🔄  New version available, restarting KYSOR...")
-						label, err = start(cmd, kyveClient, cli, valConfig, integrationEnv, protocolVersion, integrationVersion, debug, verbose, detached, errChan, logEndChan, exitChan, newVersionChan)
+						label, err = start(cmd, kyveClient, cli, valConfig, integrationEnv, protocolVersion, integrationVersion, debug, detached, errChan, logEndChan, exitChan, newVersionChan)
 						if err != nil {
 							return err
 						}
@@ -793,7 +799,7 @@ func startCmd() *cobra.Command {
 	}
 	commoncmd.AddOptionFlags(cmd, []commoncmd.OptionFlag[config.ValaccountConfig]{flagStartValaccount})
 	commoncmd.AddStringFlags(cmd, []commoncmd.StringFlag{flagStartEnvFile, flagStartProtocolVersion, flagStartIntegrationVersion})
-	commoncmd.AddBoolFlags(cmd, []commoncmd.BoolFlag{flagStartDebug, flagStartVerbose, flagStartDetached})
+	commoncmd.AddBoolFlags(cmd, []commoncmd.BoolFlag{flagStartDebug, flagStartDetached})
 	return cmd
 }
 

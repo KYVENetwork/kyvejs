@@ -49,7 +49,7 @@ BINARY_NAME ?= kyve-$(NODE_ARCH)
 ###############################################################################
 
 build:
-	@echo "🏗️ Building binary..."
+	@echo "🏗️  Building binary..."
 	yarn build && yarn run pkg --target latest-linux-$(NODE_ARCH) -o $(BINARY_NAME) package.json
 	@echo "✅ Completed binary build!"
 
@@ -58,7 +58,7 @@ build:
 ###############################################################################
 
 docker-image:
-	@echo "🏗️ Building docker image..."
+	@echo "🏗️  Building docker image..."
 	DOCKER_BUILDKIT=1 docker build --platform linux/$(ARCH) -t $(DOCKER_IMAGE_NAME):$(VERSION) .
 	@echo "✅ Completed docker image build!"
 
