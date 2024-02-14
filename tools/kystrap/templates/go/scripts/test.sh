@@ -56,7 +56,7 @@ run_test() {
       -v $TMP_DIR/data.json:/app/data.json          `# Mount the data.json file` \
       -v $TMP_DIR/entrypoint.sh:/app/entrypoint.sh  `# Mount the entrypoint.sh file` \
       -v $OUTPUT_DIR:/app/output                    `# Mount the output.json file` \
-      --entrypoint ./entrypoint.sh                  `# Set the entrypoint to kystrap` \
+      --entrypoint ./entrypoint.sh                  `# Set the entrypoint to entrypoint.sh` \
       kystrap
 }
 
