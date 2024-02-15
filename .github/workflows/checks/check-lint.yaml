@@ -1,0 +1,31 @@
+name: lint checks
+
+on:
+  - pull_request
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    env:
+      npm_config_user: "root"
+    steps:
+      # Checkout the repository
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+      # Setup Golang
+      - name: 🐿 Setup Golang
+        uses: actions/setup-go@v4
+        with:
+          go-version-file: 'e2etest/go.mod'
+      # Install nodejs
+      - name: "nodejs install"
+        uses: actions/setup-node@v3
+      # Install yarn
+      - name: install yarn
+        run: npm install --global yarn
+      # Run yarn setup
+      - name: "setup"
+        run: yarn setup
+      # Lint all modules and packages
+      - name: Lint all
+        run: make lint

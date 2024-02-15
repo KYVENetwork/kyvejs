@@ -1,0 +1,15 @@
+name: Build check
+on:
+  - pull_request
+
+jobs:
+  lint:
+    uses: ./.github/workflows/check-lint.yml
+
+  build-docker-images:
+    uses: ./.github/workflows/check-docker-build.yml
+
+  build-binaries:
+    uses: ./.github/workflows/check-build-binaries.yml
+
+
