@@ -4,7 +4,7 @@ on:
   workflow_call:
 
 jobs:
-  tests:
+  e2e-tests:
     runs-on: ubuntu-latest
     steps:
       # Checkout the repository
