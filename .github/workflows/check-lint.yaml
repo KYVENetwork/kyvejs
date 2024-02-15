@@ -1,7 +1,7 @@
-name: lint checks
+name: Lint check
 
 on:
-  - pull_request
+  workflow_call:
 
 jobs:
   lint:

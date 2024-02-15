@@ -1,7 +1,7 @@
-name: Build docker images
+name: Build docker images check
 
 on:
-  - pull_request
+  workflow_call:
 
 jobs:
   build-docker-images:
