@@ -531,16 +531,19 @@ func checkNewVersion(kyveClient *chain.KyveClient, poolId uint64, kr *kyveRepo, 
 		_, err := pullRepo(kr.dir, true)
 		if err != nil {
 			fmt.Println("failed to update repository: ", err)
+			continue
 		}
 
 		response, err := kyveClient.QueryPool(poolId)
 		if err != nil {
 			fmt.Printf("failed to query pool: %v\n", err)
+			continue
 		}
 
 		protocolRef, integrationRef, err := getRuntimeVersions(kr.repo, response.GetPool().Data, kr.dir, nil, nil)
 		if err != nil {
 			fmt.Println("failed to get runtime versions: ", err)
+			continue
 		}
 		if currentProtocol == nil {
 			currentProtocol = protocolRef.ver
