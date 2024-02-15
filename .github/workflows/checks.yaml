@@ -4,12 +4,12 @@ on:
 
 jobs:
   lint:
-    uses: ./.github/workflows/check-lint.yml
+    uses: ./.github/workflows/checks/check-lint.yml
 
   build-docker-images:
-    uses: ./.github/workflows/check-docker-build.yml
+    uses: ./.github/workflows/checks/check-docker-build.yml
 
   build-binaries:
-    uses: ./.github/workflows/check-build-binaries.yml
+    uses: ./.github/workflows/checks/check-build-binaries.yml
 
 
