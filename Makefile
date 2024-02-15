@@ -1,6 +1,6 @@
 
-# Get all modules by looking for subfolders with a Makefile
-MODULES := $(shell find . -mindepth 2 -maxdepth 4 -name Makefile -exec dirname {} \;)
+# Get all modules by looking for subfolders with a Makefile (excluding node_modules)
+MODULES := $(shell find . -mindepth 2 -maxdepth 4 -name Makefile -exec dirname {} \; | grep -v "node_modules")
 RESULT_FILE := /tmp/kyvejs-result
 GO_VERSION := $(shell go version | cut -c 14- | cut -d' ' -f1 | cut -d'.' -f1,2)
 
@@ -40,7 +40,7 @@ format: ensure_all
 	@$(MAKE) -C $* format
 
 # loop through all modules and run the lint command (in parallel)
-lint: ensure_go_version
+lint: ensure_all
 	@rm -f $(RESULT_FILE)
 	@set -e; for module in $(MODULES); do \
 	  if make -C $$module -n lint > /dev/null 2>&1; then \
