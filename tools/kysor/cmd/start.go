@@ -11,7 +11,6 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
-	"sync"
 	"syscall"
 	"time"
 
@@ -385,7 +384,7 @@ func getIntegrationEnv(cmd *cobra.Command) ([]string, error) {
 // printLogs prints the logs of the given container (stdout and stderr)
 // Errors are sent to the errChan and the name of the container is sent to the endChan when the logs end
 // This function is blocking
-func printLogs(cli *client.Client, cont *StartResult, colorAttr color.Attribute, errChan chan error, endChan chan *StartResult) {
+func printLogs(cli *client.Client, cont *StartResult, colorAttr color.Attribute, errChan chan error, exitChan chan interface{}) {
 	logs, err := cli.ContainerLogs(context.Background(), cont.ID,
 		container.LogsOptions{ShowStdout: true, ShowStderr: true, Follow: true, Details: false})
 	if err != nil {
@@ -393,6 +392,7 @@ func printLogs(cli *client.Client, cont *StartResult, colorAttr color.Attribute,
 		return
 	}
 
+	isRegularExit := false
 	reader := bufio.NewReader(logs)
 	for {
 		// Discard the 8-byte header
@@ -420,8 +420,17 @@ func printLogs(cli *client.Client, cont *StartResult, colorAttr color.Attribute,
 		fmt.Printf("%s: ", cont.Name)
 		color.Unset()
 		fmt.Print(line)
+
+		select {
+		case <-exitChan:
+			isRegularExit = true
+		}
 	}
-	endChan <- cont
+
+	// If we did not receive a signal to exit, the container stopped unexpectedly
+	if !isRegularExit {
+		errChan <- fmt.Errorf("container %s stopped unexpectedly", cont.Name)
+	}
 }
 
 // start (or restart) the protocol and integration containers
@@ -436,7 +445,6 @@ func start(
 	debug bool,
 	detached bool,
 	errChan chan error,
-	logEndChan chan *StartResult,
 	exitChan chan interface{},
 	newVersionChan chan interface{},
 ) (string, error) {
@@ -494,10 +502,10 @@ func start(
 		utils.PrintlnItalic(fmt.Sprintf("docker logs -f %s", protocolContainer.Name))
 	} else {
 		// Print protocol logs
-		go printLogs(cli, protocolContainer, color.FgGreen, errChan, logEndChan)
+		go printLogs(cli, protocolContainer, color.FgGreen, errChan, exitChan)
 
 		// Print integration logs
-		go printLogs(cli, integrationContainer, color.FgBlue, errChan, logEndChan)
+		go printLogs(cli, integrationContainer, color.FgBlue, errChan, exitChan)
 
 		// Check for new versions only if versions are not pinned
 		if protocolVersion == nil && integrationVersion == nil {
@@ -552,39 +560,6 @@ func checkNewVersion(kyveClient *chain.KyveClient, poolId uint64, kr *kyveRepo, 
 			// Continue the loop
 		}
 	}
-}
-
-type containerSync struct {
-	sync.Mutex
-	stoppingContainers map[string]interface{}
-}
-
-func newContainerSync() *containerSync {
-	return &containerSync{
-		stoppingContainers: make(map[string]interface{}),
-	}
-}
-
-// markAsBeingStopped marks the containers with the given label as being stopped
-func (c *containerSync) markAsBeingStopped(cli *client.Client, label string) error {
-	c.Lock()
-	defer c.Unlock()
-
-	containers, err := docker.ListContainers(context.Background(), cli, label)
-	if err != nil {
-		return fmt.Errorf("failed to list containers: %v", err)
-	}
-	for _, cont := range containers {
-		c.stoppingContainers[cont.ID] = nil
-	}
-	return nil
-}
-
-func (c *containerSync) isStopping(cont *StartResult) bool {
-	c.Lock()
-	defer c.Unlock()
-	_, ok := c.stoppingContainers[cont.ID]
-	return ok
 }
 
 func validateVersion(s string) error {
@@ -715,7 +690,6 @@ func startCmd() *cobra.Command {
 			defer cli.Close()
 
 			errChan := make(chan error)              // async error channel
-			logEndChan := make(chan *StartResult)    // docker logs ended
 			exitChan := make(chan interface{}, 1)    // program exit's
 			newVersionChan := make(chan interface{}) // new version is available
 
@@ -734,7 +708,6 @@ func startCmd() *cobra.Command {
 				debug,
 				detached,
 				errChan,
-				logEndChan,
 				exitChan,
 				newVersionChan,
 			)
@@ -742,8 +715,6 @@ func startCmd() *cobra.Command {
 				return err
 			}
 			if !detached {
-				contSync := newContainerSync()
-
 				sigc := make(chan os.Signal, 1)
 				signal.Notify(sigc,
 					syscall.SIGHUP,
@@ -770,19 +741,10 @@ func startCmd() *cobra.Command {
 						// Stop signal received, stop containers
 						fmt.Println("\n🛑  Stopping KYSOR...")
 						return nil
-					case cont := <-logEndChan:
-						// Log ended, throw error if container is not supposed to stop
-						if !contSync.isStopping(cont) {
-							return fmt.Errorf("container %s stopped unexpected", cont.Name)
-						}
 					case <-newVersionChan:
 						// New version available, restart containers
-						err := contSync.markAsBeingStopped(cli, label)
-						if err != nil {
-							fmt.Println("failed mark as being stopped: ", err)
-						}
 						fmt.Println("🔄  New version available, restarting KYSOR...")
-						label, err = start(cmd, kyveClient, cli, valConfig, integrationEnv, protocolVersion, integrationVersion, debug, detached, errChan, logEndChan, exitChan, newVersionChan)
+						label, err = start(cmd, kyveClient, cli, valConfig, integrationEnv, protocolVersion, integrationVersion, debug, detached, errChan, exitChan, newVersionChan)
 						if err != nil {
 							return err
 						}
