@@ -424,6 +424,8 @@ func printLogs(cli *client.Client, cont *StartResult, colorAttr color.Attribute,
 		select {
 		case <-exitChan:
 			isRegularExit = true
+		default:
+			continue
 		}
 	}
 
