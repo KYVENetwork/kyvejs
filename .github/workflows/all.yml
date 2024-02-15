@@ -1,0 +1,11 @@
+name: Test all
+
+on:
+  - pull_request
+
+jobs:
+  checks:
+    uses: ./.github/workflows/checks.yml
+
+  tests:
+    uses: ./.github/workflows/tests.yml

@@ -1,7 +1,7 @@
-name: Check all
+name: Test all
 
 on:
-  - pull_request
+  workflow_call:
 
 jobs:
   unit-tests:
