@@ -247,9 +247,6 @@ require (
 )
 
 replace (
-	// Uncomment this for local development
-	//github.com/KYVENetwork/kyvejs/common/goutils => ../../common/goutils
-
 	// use cosmos flavored gogo/protobuf
 	// https://github.com/cosmos/cosmos-sdk/issues/8469
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
