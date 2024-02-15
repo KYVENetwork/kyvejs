@@ -84,16 +84,16 @@ test-e2e:
 ###############################################################################
 
 build: ensure_version
-	@echo "🏗️ Building binary..."
+	@echo "🏗️  Building binary..."
 	go build -o build/$(BINARY_NAME) .
 	@echo "✅ Completed binary build!"
 
 ###############################################################################
-### 						 Building the image								###
+### 							 	Docker 							 		###
 ###############################################################################
 
 docker-image:
-	@echo "🏗️ Building docker image..."
+	@echo "🏗️  Building docker image..."
 	DOCKER_BUILDKIT=1 docker build --platform linux/$(ARCH) -t $(DOCKER_IMAGE_NAME):$(VERSION) .
 	@echo "✅ Completed docker image build!"
 

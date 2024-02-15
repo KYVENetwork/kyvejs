@@ -201,14 +201,14 @@ func (t *{{ .name | ToPascal }}Server) ValidateDataItem(ctx context.Context, req
 // String should not be longer than 100 characters, else gas costs might be too expensive.
 //
 // Deterministic behavior is required
-func (t *BitcoinServer) SummarizeDataBundle(ctx context.Context, req *pb.SummarizeDataBundleRequest) (*pb.SummarizeDataBundleResponse, error) {
+func (t *{{ .name | ToPascal }}Server) SummarizeDataBundle(ctx context.Context, req *pb.SummarizeDataBundleRequest) (*pb.SummarizeDataBundleResponse, error) {
 	grpcBundle := req.GetBundle()
 	if len(grpcBundle) == 0 {
 		return nil, status.Error(codes.Internal, "Bundle is empty")
 	}
 
 	latestBundle := grpcBundle[len(grpcBundle)-1]
-	var value BitcoinTransformedItemValue
+	var value {{ .name | ToPascal }}TransformedItemValue
 	err := json.Unmarshal([]byte(latestBundle.GetValue()), &value)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Error unmarshalling data item: %v", err)
