@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	commoncmd "github.com/KYVENetwork/kyvejs/common/goutils/cmd"
 
@@ -320,6 +321,18 @@ func valaccountsShowBalanceCmd() *cobra.Command {
 	return cmd
 }
 
+func confirmTransfer(from, to, amount string) (bool, error) {
+	prompt := promptui.Prompt{
+		Label:     fmt.Sprintf("Are you sure you want to transfer %s %s from %s to %s? (yes/no)", amount, config.GetConfigX().GetDenom(), from, to),
+		IsConfirm: true,
+	}
+	result, err := prompt.Run()
+	if err != nil {
+		return false, err
+	}
+	return strings.ToLower(result) == "yes" || strings.ToLower(result) == "y", nil
+}
+
 var (
 	flagValaccTransferFrom = commoncmd.OptionFlag[config.ValaccountConfig]{
 		Name:     "from",
@@ -388,13 +401,23 @@ func valaccountsTransferCmd() *cobra.Command {
 				return err
 			}
 
+			// Confirm the transfer
+			confirm, err := confirmTransfer(address.String(), to.String(), amount)
+			if err != nil {
+				return err
+			}
+			if !confirm {
+				fmt.Println("Transfer canceled")
+				return nil
+			}
+
 			// Execute the send transaction
 			txResult, err := kyveClient.ExecuteSend(address, to, amount)
 			if err != nil {
 				return err
 			}
 
-			fmt.Printf("💰 Sent %s %s from %s (%s) to %s. Transaction hash: %s\n",
+			fmt.Printf("💰 Sent %s %s from %s (%s) to %s.\nTransaction hash: %s\n",
 				amount, config.GetConfigX().GetDenom(), valConfig.Name(), address.String(), to.String(), txResult.TxHash)
 			return nil
 		},
