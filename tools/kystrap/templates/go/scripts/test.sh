@@ -4,9 +4,9 @@
 #               Variables               #
 #########################################
 # Key, config, and expected values (CHANGE THESE TO MATCH YOUR INTEGRATION!!!)
-KEY=11291474
-API="https://g.w.lavanet.xyz:443/gateway/axelar/rpc-http/1d87fa61650d165d2c044c14b8db25f0"
-CONFIG='{"network":"axelar-dojo-1","rpc":"'$API'"}'
+KEY=4943400
+API="https://rpc.kyve.network"
+CONFIG='{"network":"kyve-1","rpc":"'$API'"}'
 EXPECTED_SUMMARY="\"$KEY\""
 EXPECTED_NEXT_KEY="\"$(expr $KEY + 1)\""
 
