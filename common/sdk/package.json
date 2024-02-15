@@ -17,7 +17,7 @@
   },
   "scripts": {
     "build": "rimraf dist && tsc",
-    "format": "prettier --write .",
+    "format": "prettier --write . --ignore-path ./.prettierignore",
     "doc": "typedoc",
     "lint": "eslint . --ignore-path ../../.eslintignore --ext ts --ext tsx --ext js --ext jsx",
     "lint:fix": "eslint --fix . --ignore-path ../../.eslintignore --ext ts --ext tsx --ext js --ext jsx"
