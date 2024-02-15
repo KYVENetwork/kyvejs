@@ -62,7 +62,7 @@ format:
 
 lint:
 	@echo "📝 Running linter..."
-	@go run $(golangci_lint_cmd) run --timeout=10m
+	@go run $(golangci_lint_cmd) run --timeout=10m --allow-parallel-runners
 	@echo "✅ Completed linting!"
 
 ###############################################################################

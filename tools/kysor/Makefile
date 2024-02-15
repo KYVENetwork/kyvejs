@@ -60,7 +60,7 @@ format:
 
 lint:
 	@echo "📝 Running linter..."
-	@go run $(golangci_lint_cmd) run --timeout=10m  --skip-dirs templates
+	@go run $(golangci_lint_cmd) run --timeout=10m  --skip-dirs templates --allow-parallel-runners
 	@echo "✅ Completed linting!"
 
 ###############################################################################
@@ -78,7 +78,7 @@ install: ensure_version
 	@echo "✅ Completed binary install!"
 
 ###############################################################################
-### 						 Building the image								###
+### 							 	Docker 							 		###
 ###############################################################################
 
 docker-image:

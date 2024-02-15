@@ -6,7 +6,7 @@ require (
 	github.com/chzyer/readline v1.5.1
 	github.com/cosmos/cosmos-sdk v0.47.6
 	github.com/docker/docker v25.0.2+incompatible
-	github.com/golangci/golangci-lint v1.55.2
+	github.com/golangci/golangci-lint v1.55.1
 	github.com/manifoldco/promptui v0.9.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/schollz/progressbar/v3 v3.14.1

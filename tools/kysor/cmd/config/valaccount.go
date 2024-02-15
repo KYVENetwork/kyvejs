@@ -20,9 +20,9 @@ var (
 )
 
 type ValaccountConfig struct {
-	option commoncmd.Option[ValaccountConfig]
-	name   string
-	path   string
+	_    commoncmd.Option[ValaccountConfig]
+	name string
+	path string
 
 	Pool           uint64 `koanf:"pool"`
 	Valaccount     string `koanf:"valaccount"`
