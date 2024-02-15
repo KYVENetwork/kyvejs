@@ -1,0 +1,8 @@
+# Ignore everything:
+/*
+
+# Ecxept for src
+!/src
+
+# Also ignore src/proto
+/src/proto
