@@ -25,13 +25,13 @@ type Config struct {
 type {{ .name | ToPascal }}ItemValue struct {
 	// TODO: Define data properties here
 	// Example:
-	// Block string `json:"block"`
+	// Block interface{} `json:"block"`
 }
 
 type {{ .name | ToPascal }}TransformedItemValue struct {
 	// TODO: Define data properties here
 	// Example:
-	// Block string `json:"block"`
+	// Block interface{} `json:"block"`
 }
 
 // GetRuntimeName returns the name of the runtime. Example "@kyvejs/tendermint"
