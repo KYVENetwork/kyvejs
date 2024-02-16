@@ -4,7 +4,7 @@ import axios from 'axios';
 
 // Celestia config
 interface IConfig {
-  namespace: string;
+  namespaces: string[];
   rpc: string;
 }
 
@@ -16,8 +16,8 @@ export default class Celestia implements IRuntime {
   async validateSetConfig(rawConfig: string): Promise<void> {
     const config: IConfig = JSON.parse(rawConfig);
 
-    if (!config.namespace) {
-      throw new Error(`Config does not have property "namespace" defined`);
+    if (config.namespaces.length < 1) {
+      throw new Error(`Config does not have any "namespaces" defined`);
     }
 
     if (!config.rpc) {
@@ -39,9 +39,7 @@ export default class Celestia implements IRuntime {
       method: 'blob.GetAll',
       params: [
         +key,
-        [
-          this.config.namespace
-        ]
+        this.config.namespaces
       ]
     }, {
       headers: {
