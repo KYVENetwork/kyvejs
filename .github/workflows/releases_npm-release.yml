@@ -1,9 +1,7 @@
 name: Create package release
 on:
-  push:
-    branches: [ main ]
-    tags:
-      - '*'
+  workflow_call:
+
 jobs:
   prepare:
     name: 'Check packages for release'
