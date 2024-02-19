@@ -4,7 +4,7 @@ on:
   workflow_call:
 
 jobs:
-  lint:
+  release:
     runs-on: ubuntu-latest
     steps:
       # Checkout the repository
@@ -22,7 +22,7 @@ jobs:
       # Upload release
       - name: Upload release
         uses: softprops/action-gh-release@v1
-#        if: startsWith(github.ref, 'refs/tags/')
+        if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
             tools/kysor/releases/kysor-linux-amd64

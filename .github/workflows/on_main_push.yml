@@ -1,4 +1,4 @@
-name: Test all
+name: On main push
 
 on:
   push:
