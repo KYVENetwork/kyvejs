@@ -2,7 +2,7 @@ name: On main push
 
 on:
   push:
-    branches: [ main-test ]
+    branches: [ main ]
     tags:
       - '*'
 
