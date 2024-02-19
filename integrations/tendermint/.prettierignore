@@ -1,9 +1,8 @@
 # Ignore everything:
 /*
 
-# Except for src and test
+# Ecxept for src
 !/src
-!/test
 
 # Also ignore src/proto
 /src/proto

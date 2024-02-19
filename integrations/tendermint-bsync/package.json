@@ -8,7 +8,7 @@
     "build:docker": "docker build -t kyve/tendermint-bsync .",
     "build:docker:binaries": "yarn build && rimraf out && pkg --target latest-linux-x64 package.json",
     "start": "node ./dist/src/index.js",
-    "format": "prettier --write ."
+    "format": "prettier --write . --ignore-path ./.prettierignore"
   },
   "bin": "./dist/src/index.js",
   "pkg": {

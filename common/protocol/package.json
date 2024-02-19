@@ -28,7 +28,7 @@
     "build:binaries": "yarn build && rimraf out && pkg package.json",
     "build:docker": "docker build -t kyvejs/protocol .",
     "test": "jest",
-    "format": "prettier --write .",
+    "format": "prettier --write . --ignore-path ./.prettierignore",
     "doc": "typedoc"
   },
   "dependencies": {

@@ -1,1 +1,9 @@
-dist
+# Ignore everything:
+/*
+
+# Except for src and test
+!/src
+!/test
+
+# Also ignore src/proto
+/src/proto

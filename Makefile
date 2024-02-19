@@ -1,7 +1,24 @@
 
-# Get all modules by looking for subfolders with a Makefile and a go.mod file
-MODULES := $(shell find . -mindepth 2 -maxdepth 4 -name Makefile -exec dirname {} \; | xargs -I {} sh -c 'test -f {}/go.mod && echo {}')
+# Get all modules by looking for subfolders with a Makefile (excluding node_modules)
+MODULES := $(shell find . -mindepth 2 -maxdepth 4 -name Makefile -exec dirname {} \; | grep -v "node_modules")
 RESULT_FILE := /tmp/kyvejs-result
+GO_VERSION := $(shell go version | cut -c 14- | cut -d' ' -f1 | cut -d'.' -f1,2)
+
+###############################################################################
+###                                 Checks                                  ###
+###############################################################################
+
+ensure_all: ensure_go_version ensure_yarn
+
+# Check if specified go version is installed
+ensure_go_version:
+ifneq ($(GO_VERSION),1.21)
+	$(error ❌  Please run Go v1.21.x..)
+endif
+
+# Check if yarn is installed
+ensure_yarn:
+	@yarn --version > /dev/null 2>&1 || (echo "❌ Yarn not found.\n- Is yarn installed?\n- Did you forget to execute \`nvm use\`?" && exit 1)
 
 ###############################################################################
 ###                          Formatting & Linting                           ###
@@ -11,7 +28,7 @@ gofumpt_cmd=mvdan.cc/gofumpt
 golangci_lint_cmd=github.com/golangci/golangci-lint/cmd/golangci-lint
 
 # loop through all modules and run the format command (in parallel)
-format:
+format: ensure_all
 	@rm -f $(RESULT_FILE)
 	@set -e; for module in $(MODULES); do \
 	  if make -C $$module -n format > /dev/null 2>&1; then \
@@ -23,7 +40,7 @@ format:
 	@$(MAKE) -C $* format
 
 # loop through all modules and run the lint command (in parallel)
-lint:
+lint: ensure_all
 	@rm -f $(RESULT_FILE)
 	@set -e; for module in $(MODULES); do \
 	  if make -C $$module -n lint > /dev/null 2>&1; then \
@@ -58,7 +75,7 @@ test-integration:
 ###############################################################################
 
 # Runs the e2e tests in a local environment
-test-e2e:
+test-e2e: ensure_go_version
 	@echo "🧪 Running end-to-end tests..."
 	@cd e2etest && go test -test.v -test.parallel 10 -test.timeout 30m ./...
 	@echo "✅ Completed end-to-end tests!"

@@ -6,7 +6,7 @@ default: docker-image
 # The target architecture is select by setting the ARCH variable.
 # When ARCH is undefined it is set to the detected host architecture.
 # When ARCH differs from the host architecture a crossbuild will be performed.
-ARCHES = amd64 armv7 arm64
+ARCHES = amd64 arm64
 
 GOOS ?= $(shell uname | tr '[:upper:]' '[:lower:]')
 
@@ -22,19 +22,29 @@ endif
 ifeq ($(BUILDARCH),x86_64)
 	BUILDARCH=amd64
 endif
-ifeq ($(BUILDARCH),armv7l)
-	BUILDARCH=armv7
-endif
 
 # unless otherwise set, I am building for my own architecture, i.e. not cross-compiling
 ARCH ?= $(BUILDARCH)
 
 ###############################################################################
+
 GO_VERSION := $(shell go version | cut -c 14- | cut -d' ' -f1 | cut -d'.' -f1,2)
-DOCKERFILE ?= Dockerfile
+
+commit=$(shell git rev-parse HEAD)
+
+ldflags := $(LDFLAGS)
+ldflags += -X github.com/KYVENetwork/kyvejs/tools/kysor/cmd.Version=$(VERSION) \
+		  -X github.com/KYVENetwork/kyvejs/tools/kysor/cmd.Commit=$(commit)
+ldflags := $(strip $(ldflags))
+
+BUILD_FLAGS := -ldflags '$(ldflags)'
+
+###############################################################################
+
+PLATFORMS=linux darwin
 VERSION ?= latest
-DOCKER_IMAGE_NAME=kysor
-BINARY_NAME ?= kysor-$(GOOS)-$(ARCH)
+DOCKER_IMAGE_NAME ?= kysor
+BINARY_NAME ?= kysor
 CGO_ENABLED=0
 
 ###############################################################################
@@ -64,7 +74,7 @@ lint:
 	@echo "✅ Completed linting!"
 
 ###############################################################################
-###  						 Building the binary							###
+###  						    Binary building  						    ###
 ###############################################################################
 
 build: ensure_version
@@ -77,6 +87,17 @@ install: ensure_version
 	go install .
 	@echo "✅ Completed binary install!"
 
+release: ensure_version
+	@rm -rf release
+	@mkdir -p release
+
+	@for platform in $(PLATFORMS); do \
+		for arch in $(ARCHES); do \
+			echo "🏗️  Building for $$platform-$$arch..."; \
+			GOOS=$$platform GOARCH=$$arch go build -o release/$(BINARY_NAME)-$$platform-$$arch $(BUILD_FLAGS) .; \
+		done; \
+	done
+
 ###############################################################################
 ### 							 	Docker 							 		###
 ###############################################################################
@@ -87,5 +108,4 @@ docker-image:
 	@echo "✅ Completed docker image build!"
 
 docker-run:
-	docker run -it --rm -p 50051:50051 $(DOCKER_IMAGE_NAME):$(VERSION)
-
+	docker run -it --rm $(DOCKER_IMAGE_NAME):$(VERSION)
