@@ -1,0 +1,36 @@
+name: Release Kysor
+
+on:
+  workflow_call:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout the repository
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+      # Setup Golang
+      - name: 🐿 Setup Golang
+        uses: actions/setup-go@v4
+        with:
+          go-version-file: 'e2etest/go.mod'
+      # Build Kysor
+      - name: Build Kysor
+        run: make release
+        working-directory: tools/kysor
+      # Upload release
+      - name: Upload release
+        uses: softprops/action-gh-release@v1
+#        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: |
+            tools/kysor/releases/kysor-linux-amd64
+            tools/kysor/releases/kysor-linux-arm64
+            tools/kysor/releases/kysor-darwin-amd64
+            tools/kysor/releases/kysor-darwin-arm64
+          token: ${{ secrets.GITHUB_TOKEN }}
+          release_name: ${{ github.event.inputs.release_name }}
+          body: ${{ github.event.inputs.release_body }}
+          draft: false
+          prerelease: false

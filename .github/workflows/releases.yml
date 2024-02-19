@@ -1,0 +1,11 @@
+name: Test all
+
+on:
+  workflow_call:
+
+jobs:
+  npm-release:
+    uses: ./.github/workflows/releases_npm-release.yml
+
+  go-release:
+    uses: ./.github/workflows/releases_kysor-release.yml

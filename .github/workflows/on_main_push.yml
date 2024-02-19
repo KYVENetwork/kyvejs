@@ -1,0 +1,11 @@
+name: Test all
+
+on:
+  push:
+    branches: [ main-test ]
+    tags:
+      - '*'
+
+jobs:
+  releases:
+    uses: ./.github/workflows/releases.yml
