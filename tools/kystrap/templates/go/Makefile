@@ -34,7 +34,7 @@ GO_VERSION := $(shell go version | cut -c 14- | cut -d' ' -f1 | cut -d'.' -f1,2)
 DOCKERFILE ?= Dockerfile
 VERSION ?= latest
 DOCKER_IMAGE_NAME={{ .name }}
-BINARY_NAME ?= kyve-$(GOOS)-$(ARCH)
+BINARY_NAME ?= {{ .name | ToLower }}-$(GOOS)-$(ARCH)
 CGO_ENABLED=0
 
 .PHONY: ensure_version build format lint test test-e2e docker-image docker-run
