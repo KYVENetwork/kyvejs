@@ -1,0 +1,7 @@
+**/out
+build/
+.git
+.env
+*.md
+LICENSE
+Dockerfile

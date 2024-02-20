@@ -1,0 +1,15 @@
+version: '3.9'
+
+services:
+  runtime:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+  kystrap:
+    build:
+      context: ../../tools/kystrap
+      dockerfile: Dockerfile
+    entrypoint: [ "sh", "-c", "trap 'exit' INT TERM; while true; do sleep 0.2; done" ]  # New entrypoint so that the container does not exit
+    depends_on:
+      - runtime

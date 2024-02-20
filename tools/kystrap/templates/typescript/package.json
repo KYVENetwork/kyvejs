@@ -1,0 +1,33 @@
+{
+  "name": "@kyvejs/{{ .name }}",
+  "version": "{{ .version }}",
+  "license": "Apache-2.0",
+  "scripts": {
+    "build": "rimraf dist && tsc",
+    "start": "ts-node ./src/index.ts",
+    "format": "prettier --write ."
+  },
+  "bin": "./dist/src/index.js",
+  "pkg": {
+    "scripts": "./dist/src/index.js",
+    "outputPath": "out",
+    "noBytecode": true,
+    "publicPackages": [
+      "*"
+    ]
+  },
+  "prettier": {
+    "singleQuote": true
+  },
+  "dependencies": {
+    "@grpc/grpc-js": "^1.9.2",
+    "axios": "^0.27.2",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "pkg": "^5.8.0",
+    "prettier": "^2.7.1",
+    "rimraf": "^3.0.2",
+    "typescript": "^4.7.4"
+  }
+}

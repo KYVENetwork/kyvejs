@@ -4,6 +4,8 @@ package kyverdk.runtime.v1;
 
 import "kyve/bundles/v1beta1/tx.proto";
 
+option go_package = "github.com/KYVENetwork/kyvejs/kyverdk/runtime/v1";
+
 /*
  * Interface of Runtime.
  *

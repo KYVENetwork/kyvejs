@@ -1,0 +1,10 @@
+---
+name: "<set-by-cmd-tool>"
+version: "1.0.0"
+lang:
+  go:
+    version:
+      minor: "1.21"
+      patch: "1.21.4"
+  python:
+  typescript:
