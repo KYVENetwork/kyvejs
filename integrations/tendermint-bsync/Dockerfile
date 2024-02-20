@@ -9,18 +9,11 @@ WORKDIR /usr/src/app
 # Copy necessary files for installing dependencies
 COPY package.json tsconfig.json ./
 
-# Remove line with @kyvejs/protocol from package.json
-# because we don't need it when running in docker
-RUN sed -i '/@kyvejs\/protocol/d' package.json
-
 # Install dependencies
 RUN yarn install
 
 # Copy source files
 COPY ./src ./src
-
-# Overwrite index.ts with index-docker.ts
-COPY ./src/index-docker.ts ./src/index.ts
 
 # Build the docker core
 RUN yarn run build:docker:binaries
