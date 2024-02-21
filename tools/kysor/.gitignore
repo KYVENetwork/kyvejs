@@ -214,3 +214,6 @@ cmake-build-*/
 
 # IntelliJ
 out/
+
+# Release directory
+release/

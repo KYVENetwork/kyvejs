@@ -88,15 +88,22 @@ install: ensure_version
 	@echo "✅ Completed binary install!"
 
 release: ensure_version
+	@echo "🏗️  Building release binaries..."
 	@rm -rf release
-	@mkdir -p release
+	@mkdir release
+	@touch release/checksums.txt
 
 	@for platform in $(PLATFORMS); do \
 		for arch in $(ARCHES); do \
-			echo "🏗️  Building for $$platform-$$arch..."; \
+			echo "🖥️ Building for $$platform-$$arch..."; \
 			GOOS=$$platform GOARCH=$$arch go build -o release/$(BINARY_NAME)-$$platform-$$arch $(BUILD_FLAGS) .; \
+			cd release; \
+			sha256sum $(BINARY_NAME)-$$platform-$$arch >> checksums.txt; \
+   			zip -q $(BINARY_NAME)-$$platform-$$arch.zip $(BINARY_NAME)-$$platform-$$arch; \
+			cd ..; \
 		done; \
 	done
+	@echo "✅ Completed release build!"
 
 ###############################################################################
 ### 							 	Docker 							 		###
