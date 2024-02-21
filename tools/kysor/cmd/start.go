@@ -208,7 +208,7 @@ func pullRepo(repoDir string, silent bool) (*kyveRepo, error) {
 		}
 		err = w.Pull(&git.PullOptions{RemoteName: "origin", Force: true})
 		if err != nil && !errors.Is(err, git.NoErrAlreadyUpToDate) && !errors.Is(err, git.ErrNonFastForwardUpdate) {
-			return nil, err
+			return nil, fmt.Errorf("failed to pull latest changes: %v", err)
 		}
 	}
 
