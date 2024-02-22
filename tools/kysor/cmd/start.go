@@ -118,7 +118,7 @@ func getRuntimeVersions(repo *git.Repository, pool *pooltypes.Pool, repoDir stri
 	err = tagrefs.ForEach(func(ref *plumbing.Reference) error {
 		if ref.Name().IsTag() && strings.HasPrefix(ref.Name().Short(), "@kyvejs/protocol@") {
 			if wantedProtocolVers != nil {
-				if ref.Name().Short() == fmt.Sprintf("@kyvejs/protocol@%s", wantedProtocolVers.String()) {
+				if ref.Name().Short() == fmt.Sprintf("@kyvejs/protocol@%s", wantedProtocolVers.String()) && ref.Target().IsTag() {
 					latestProtocolVersion = &kyveRef{
 						ver: wantedProtocolVers,
 						ref: ref,
@@ -129,7 +129,7 @@ func getRuntimeVersions(repo *git.Repository, pool *pooltypes.Pool, repoDir stri
 			}
 		} else if ref.Name().IsTag() && strings.HasPrefix(ref.Name().Short(), expectedRuntime) {
 			if wantedIntegrationVers != nil {
-				if ref.Name().Short() == fmt.Sprintf("%s@%s", expectedRuntime, wantedIntegrationVers.String()) {
+				if ref.Name().Short() == fmt.Sprintf("%s@%s", expectedRuntime, wantedIntegrationVers.String()) && ref.Target().IsTag() {
 					latestRuntimeVersion = &kyveRef{
 						ver: wantedIntegrationVers,
 						ref: ref,
@@ -172,6 +172,28 @@ type kyveRepo struct {
 	repo *git.Repository
 }
 
+// getMainBranch returns the main branch of the given repository
+func getMainBranch(repo *git.Repository) (*plumbing.Reference, error) {
+	var main *plumbing.Reference
+	refs, _ := repo.References()
+	err := refs.ForEach(func(ref *plumbing.Reference) error {
+		if ref.Type() == plumbing.HashReference {
+			if ref.Name().Short() == "main" {
+				main = ref
+			}
+		}
+
+		return nil
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to get main branch: %v", err)
+	}
+	if main == nil {
+		return nil, fmt.Errorf("no main branch found")
+	}
+	return main, nil
+}
+
 // pullRepo clones or pulls the kyvejs repository
 func pullRepo(repoDir string, silent bool) (*kyveRepo, error) {
 	repoName := "github.com/KYVENetwork/kyvejs"
@@ -197,16 +219,29 @@ func pullRepo(repoDir string, silent bool) (*kyveRepo, error) {
 			return nil, err
 		}
 
+		// Get the main branch
+		main, err := getMainBranch(repo)
+		if err != nil {
+			return nil, err
+		}
+
 		w, err := repo.Worktree()
 		if err != nil {
 			return nil, err
+		}
+
+		// Reset the worktree to the latest commit, discarding any local changes
+		// If we don't do this, the pull will fail if there are local changes
+		err = w.Reset(&git.ResetOptions{Commit: main.Hash(), Mode: git.HardReset})
+		if err != nil {
+			return nil, fmt.Errorf("failed to reset worktree: %v", err)
 		}
 
 		// Pull the latest changes
 		if !silent {
 			fmt.Println("⬇️   Pulling latest changes")
 		}
-		err = w.Pull(&git.PullOptions{RemoteName: "origin", Force: true})
+		err = w.Pull(&git.PullOptions{ReferenceName: main.Name(), Force: true})
 		if err != nil && !errors.Is(err, git.NoErrAlreadyUpToDate) && !errors.Is(err, git.ErrNonFastForwardUpdate) {
 			return nil, fmt.Errorf("failed to pull latest changes: %v", err)
 		}
@@ -222,8 +257,8 @@ func pullRepo(repoDir string, silent bool) (*kyveRepo, error) {
 func buildImage(worktree *git.Worktree, ref *plumbing.Reference, cli *client.Client, image docker.Image, verbose bool) error {
 	fmt.Printf("📦  Checkout %s\n", ref.Name().Short())
 	err := worktree.Checkout(&git.CheckoutOptions{
-		Hash:  ref.Hash(),
-		Force: true,
+		Branch: ref.Name(),
+		Force:  true,
 	})
 	if err != nil {
 		return err
