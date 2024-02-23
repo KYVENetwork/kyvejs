@@ -1,13 +1,17 @@
-import { DataItem, IRuntime, Validator, VOTE } from '@kyvejs/protocol';
-import { name, version } from '../package.json';
-import { BigNumber, providers, utils } from "ethers";
-import { BlockWithTransactions, TransactionReceipt } from '@ethersproject/abstract-provider';
-import { ethers } from "ethers/lib.esm";
+import { DataItem, IRuntime, Validator, VOTE } from "@kyvejs/protocol";
+import { name, version } from "../package.json";
+import { providers, utils } from "ethers";
+import { TransactionReceipt } from "@ethersproject/abstract-provider";
 
 // EVM config
 interface IConfig {
   rpc: string;
   finality: number;
+  includedData: {
+    blockWithTransactions: boolean,
+    blockReceipts: boolean,
+    transactionReceipts: boolean,
+  }
 }
 
 export default class EVM implements IRuntime {
@@ -30,13 +34,19 @@ export default class EVM implements IRuntime {
       throw new Error(`Config does not have finality defined`);
     }
 
+    if (!config.includedData.blockWithTransactions && !config.includedData.blockReceipts && !config.includedData.transactionReceipts) {
+      throw new Error(`Config require included data`);
+    }
+
+    if (!config.includedData.blockReceipts && !config.includedData.transactionReceipts) {
+      throw new Error(`Config can not include block receipts and transaction receipts at the same time`);
+    }
+
     this.config = config;
   }
 
   async  getDataItem(_: Validator, key: string): Promise<any> {
-    const blockWithTxs: BlockWithTransactions[] = [];
-    const receipts: TransactionReceipt[] = [];
-    // const traceCalls: any[] = [];
+    let receipts: TransactionReceipt[] = [];
 
     const provider = new providers.StaticJsonRpcProvider({
       url: this.config.rpc,
@@ -60,66 +70,47 @@ export default class EVM implements IRuntime {
         delete tx.confirmations
       }
     );
-    blockWithTxs.push(block);
 
-    const receiptRequestData = {
-      method: 'eth_getBlockReceipts',
-      params: [hexKey],
-      id: 1,
-      jsonrpc: '2.0',
-    };
+    if (this.config.includedData.blockReceipts) {
+      const receiptRequestData = {
+        method: 'eth_getBlockReceipts',
+        params: [hexKey],
+        id: 1,
+        jsonrpc: '2.0',
+      };
 
-    // retrieve all transaction receipts for the key
-    const receipt = await provider.send(receiptRequestData.method, receiptRequestData.params);
-    receipts.push(receipt);
+      // retrieve all transaction receipts for the key
+      receipts = await provider.send(receiptRequestData.method, receiptRequestData.params)
+    } else if (this.config.includedData.transactionReceipts) {
+      for (const tx of block.transactions) {
+        // retrieve transaction receipt
+        const receiptRequestData = {
+          method: 'eth_getTransactionReceipt',
+          params: [tx.hash],
+          id: 1,
+          jsonrpc: '2.0',
+        };
 
-    // const chunkedTransactions = chunkArray(blockWithTxs[0].transactions, 4);
-    //
-    // const chunkedTraceCalls: any[] = [];
-    // // Process each chunk
-    // for (const chunk of chunkedTransactions) {
-    //   const traceParams = chunk.map((tx: any) => [
-    //     {
-    //       from: tx.from,
-    //       to: tx.to,
-    //       value: removeLeadingZero(tx.value.toHexString()),
-    //     },
-    //     ['trace'],
-    //   ]);
-    //
-    //   // Send trace call request for each chunk
-    //   const traceCall = await provider.send('trace_callMany', [traceParams, 'latest']);
-    //
-    //   traceCall.forEach((t: any) => {
-    //     chunkedTraceCalls.push(t);
-    //   })
-    // }
-    // traceCalls.push(chunkedTraceCalls)
-
-    // check if results from the different sources match
-    if (
-      !blockWithTxs.every((b) => JSON.stringify(b) === JSON.stringify(blockWithTxs[0]))
-    ) {
-      throw new Error(`Sources returned different blockWithTxs`);
+        const txReceipt = await provider.send(receiptRequestData.method, receiptRequestData.params);
+        receipts.push(txReceipt)
+      }
     }
-    if (
-      !receipts.every((r) => JSON.stringify(r) === JSON.stringify(receipts[0]))
-    ) {
-      throw new Error(`Sources returned different receipts`);
+
+    let value: any = {}
+
+    if (this.config.includedData.blockWithTransactions) {
+      value.block = block
     }
-    // if (
-    //   !traceCalls.every((t) => JSON.stringify(t) === JSON.stringify(traceCalls[0]))
-    // ) {
-    //   throw new Error(`Sources returned different traceCalls`);
-    // }
+
+    if (this.config.includedData.transactionReceipts) {
+      value.receipts = receipts
+    } else if (this.config.includedData.blockReceipts) {
+      value.receipts = receipts
+    }
 
     return {
       key,
-      value: {
-        block: blockWithTxs[0],
-        receipts: receipts[0],
-        // traceCalls: traceCalls[0]
-      },
+      value: value,
     };
   }
 
