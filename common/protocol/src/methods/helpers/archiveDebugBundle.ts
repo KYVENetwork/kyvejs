@@ -3,7 +3,6 @@ import path from "path";
 import { DataItem, standardizeError, Validator } from "../..";
 import JSZip from "jszip";
 import { VoteType } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
-import Diff from "diff";
 
 /**
  * archiveDebugBundle is used for storing a bundle for debug
@@ -55,13 +54,13 @@ export function archiveDebugBundle(
     zip.file("validation_bundle.json", validation_bundle_str);
 
     // save the diff of the proposed and local bundle
-    const diff_str = Diff.createTwoFilesPatch(
-      "proposed_bundle.json",
-      "validation_bundle.json",
-      proposed_bundle_str,
-      validation_bundle_str
-    );
-    zip.file("diff.txt", diff_str);
+    // const diff_str = Diff.createTwoFilesPatch(
+    //   "proposed_bundle.json",
+    //   "validation_bundle.json",
+    //   proposed_bundle_str,
+    //   validation_bundle_str
+    // );
+    // zip.file("diff.txt", diff_str);
 
     // save the logfile of the current session
     const debug_str = readFileSync(path.join(this.home, "logs", this.logFile));
