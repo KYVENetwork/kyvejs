@@ -9,16 +9,15 @@ import (
 	"strconv"
 
 	bundlestypes "github.com/KYVENetwork/chain/x/bundles/types"
-	pb "github.com/KYVENetwork/kyvejs/integrations/tendermint-go/proto/kyverdk/runtime/v1"
-	"github.com/KYVENetwork/kyvejs/integrations/tendermint-go/utils"
+	pb "github.com/KYVENetwork/kyvejs/integrations/tendermint-bsync-go/proto/kyverdk/runtime/v1"
+	"github.com/KYVENetwork/kyvejs/integrations/tendermint-bsync-go/utils"
 	tmJson "github.com/cometbft/cometbft/libs/json"
-	coreTypes "github.com/cometbft/cometbft/rpc/core/types"
 	"github.com/cometbft/cometbft/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
-type TendermintGoServer struct {
+type TendermintBsyncGoServer struct {
 	pb.RuntimeServiceServer
 }
 
@@ -27,30 +26,24 @@ type Config struct {
 	Rpc     string `json:"rpc"`
 }
 
-type Block struct {
-	BlockId types.BlockID `json:"block_id"`
-	Block   types.Block   `json:"block"`
-}
+type Block types.Block
 
-type BlockResults = coreTypes.ResultBlockResults
 
-type TendermintGoItemValue struct {
+type TendermintBsyncGoItemValue struct {
 	Block        Block                  `json:"block"`
-	BlockResults BlockResults `json:"block_results"`
 }
 
-type TendermintGoTransformedItemValue struct {
+type TendermintBsyncGoTransformedItemValue struct {
 	Block        Block       `json:"block"`
-	BlockResults BlockResults `json:"block_results"`
 }
 
 // GetRuntimeName returns the name of the runtime. Example "@kyvejs/tendermint"
-func (t *TendermintGoServer) GetRuntimeName(ctx context.Context, req *pb.GetRuntimeNameRequest) (*pb.GetRuntimeNameResponse, error) {
-	return &pb.GetRuntimeNameResponse{Name: "@kyvejs/tendermint"}, nil
+func (t *TendermintBsyncGoServer) GetRuntimeName(ctx context.Context, req *pb.GetRuntimeNameRequest) (*pb.GetRuntimeNameResponse, error) {
+	return &pb.GetRuntimeNameResponse{Name: "@kyvejs/tendermint-bsync"}, nil
 }
 
 // GetRuntimeVersion returns the version of the runtime. Example "1.2.0"
-func (t *TendermintGoServer) GetRuntimeVersion(ctx context.Context, req *pb.GetRuntimeVersionRequest) (*pb.GetRuntimeVersionResponse, error) {
+func (t *TendermintBsyncGoServer) GetRuntimeVersion(ctx context.Context, req *pb.GetRuntimeVersionRequest) (*pb.GetRuntimeVersionResponse, error) {
 	return &pb.GetRuntimeVersionResponse{Version: "1.1.4"}, nil
 }
 
@@ -60,7 +53,7 @@ func (t *TendermintGoServer) GetRuntimeVersion(ctx context.Context, req *pb.GetR
 // the specific runtime config is not parsable or invalid.
 //
 // Deterministic behavior is required
-func (t *TendermintGoServer) ValidateSetConfig(ctx context.Context, req *pb.ValidateSetConfigRequest) (*pb.ValidateSetConfigResponse, error) {
+func (t *TendermintBsyncGoServer) ValidateSetConfig(ctx context.Context, req *pb.ValidateSetConfigRequest) (*pb.ValidateSetConfigResponse, error) {
 	rawConfig := req.GetRawConfig()
 	var config Config
 	err := json.Unmarshal([]byte(rawConfig), &config)
@@ -76,7 +69,7 @@ func (t *TendermintGoServer) ValidateSetConfig(ctx context.Context, req *pb.Vali
 		return nil, status.Error(codes.Internal, "config does not have property 'rpc' defined")
 	}
 
-	if value, exists := os.LookupEnv("KYVEJS_TENDERMINT-GO_RPC"); exists {
+	if value, exists := os.LookupEnv("KYVEJS_TENDERMINT-BSYNC-GO_RPC"); exists {
 		config.Rpc = value
 	}
 
@@ -90,7 +83,7 @@ func (t *TendermintGoServer) ValidateSetConfig(ctx context.Context, req *pb.Vali
 // GetDataItem gets the data item from a specific key and returns both key and the value.
 //
 // Deterministic behavior is required
-func (t *TendermintGoServer) GetDataItem(ctx context.Context, req *pb.GetDataItemRequest) (*pb.GetDataItemResponse, error) {
+func (t *TendermintBsyncGoServer) GetDataItem(ctx context.Context, req *pb.GetDataItemRequest) (*pb.GetDataItemResponse, error) {
 	var config Config
 	err := json.Unmarshal([]byte(req.GetConfig().GetSerializedConfig()), &config)
 	if err != nil {
@@ -104,25 +97,15 @@ func (t *TendermintGoServer) GetDataItem(ctx context.Context, req *pb.GetDataIte
 		return nil, status.Errorf(codes.Internal, "Error getting JSON from URL %s: %v", blockHeightUrl, err)
 	}
 
-	var block Block
+	var block struct {
+		Block        Block                  `json:"block"`
+	}
 	if err := tmJson.Unmarshal(blockResponse, &block); err != nil {
 		return nil, status.Errorf(codes.Internal, "Error unmarshalling block: %s", err)
 	}
 
-	blockResultsHeightUrl := fmt.Sprintf("%s/block_results?height=%s", config.Rpc, key)
-	blockResultsResponse, err := utils.GetResultFromUrl(blockResultsHeightUrl)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "Error getting JSON from URL %s: %v", blockResultsHeightUrl, err)
-	}
-
-	var blockResults BlockResults
-	if err := tmJson.Unmarshal(blockResultsResponse, &blockResults); err != nil {
-		return nil, status.Errorf(codes.Internal, "Error unmarshalling block results: %s", err)
-	}
-
-	value := TendermintGoItemValue{
-		Block:        block,
-		BlockResults: blockResults,
+	value := TendermintBsyncGoItemValue{
+		Block:        block.Block,
 	}
 
 	parsedJson, err := tmJson.Marshal(value)
@@ -140,33 +123,25 @@ func (t *TendermintGoServer) GetDataItem(ctx context.Context, req *pb.GetDataIte
 // of proposals or bundle validation.
 //
 // Deterministic behavior is required
-func (t *TendermintGoServer) PrevalidateDataItem(ctx context.Context, req *pb.PrevalidateDataItemRequest) (*pb.PrevalidateDataItemResponse, error) {
+func (t *TendermintBsyncGoServer) PrevalidateDataItem(ctx context.Context, req *pb.PrevalidateDataItemRequest) (*pb.PrevalidateDataItemResponse, error) {
 	var config Config
 	err := json.Unmarshal([]byte(req.GetConfig().GetSerializedConfig()), &config)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Error unmarshalling serializedConfig JSON string: %v", err)
 	}
 
-	var itemValue TendermintGoItemValue
+	var itemValue TendermintBsyncGoItemValue
 	err = tmJson.Unmarshal([]byte(req.GetDataItem().GetValue()), &itemValue)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Error unmarshalling data item: %v", err)
 	}
 
-	if err := itemValue.Block.BlockId.ValidateBasic(); err != nil {
-		return &pb.PrevalidateDataItemResponse{Valid: false}, status.Errorf(codes.Internal, "Error validating block id: %s", err)
-	}
-
-	if err := itemValue.Block.Block.ValidateBasic(); err != nil {
+	if err := itemValue.Block.ValidateBasic(); err != nil {
 		return &pb.PrevalidateDataItemResponse{Valid: false}, status.Errorf(codes.Internal, "Error validating block: %s", err)
 	}
 
-	if itemValue.Block.Block.Header.ChainID != config.Network {
-		return &pb.PrevalidateDataItemResponse{Valid: false}, status.Errorf(codes.Internal, "Wrong chain id detected, expected %s got %s", config.Network, itemValue.Block.Block.Header.ChainID)
-	}
-
-	if itemValue.Block.Block.Header.Height != itemValue.BlockResults.Height {
-		return &pb.PrevalidateDataItemResponse{Valid: false}, status.Errorf(codes.Internal, "Block height differs from block results height, block = %d, block results = %d", itemValue.Block.Block.Header.Height, itemValue.BlockResults.Height)
+	if itemValue.Block.Header.ChainID != config.Network {
+		return &pb.PrevalidateDataItemResponse{Valid: false}, status.Errorf(codes.Internal, "Wrong chain id detected, expected %s got %s", config.Network, itemValue.Block.Header.ChainID)
 	}
 
 	return &pb.PrevalidateDataItemResponse{Valid: true}, nil
@@ -176,19 +151,19 @@ func (t *TendermintGoServer) PrevalidateDataItem(ctx context.Context, req *pb.Pr
 // to remove unecessary data or format the data in a better way.
 //
 // Deterministic behavior is required
-func (t *TendermintGoServer) TransformDataItem(ctx context.Context, req *pb.TransformDataItemRequest) (*pb.TransformDataItemResponse, error) {
+func (t *TendermintBsyncGoServer) TransformDataItem(ctx context.Context, req *pb.TransformDataItemRequest) (*pb.TransformDataItemResponse, error) {
 	return &pb.TransformDataItemResponse{TransformedDataItem: req.GetDataItem()}, nil
 }
 
 // ValidateDataItem validates a single data item of a bundle proposal
 //
 // Deterministic behavior is required
-func (t *TendermintGoServer) ValidateDataItem(ctx context.Context, req *pb.ValidateDataItemRequest) (*pb.ValidateDataItemResponse, error) {
+func (t *TendermintBsyncGoServer) ValidateDataItem(ctx context.Context, req *pb.ValidateDataItemRequest) (*pb.ValidateDataItemResponse, error) {
 	requestProposedDataItem := req.GetProposedDataItem()
 	requestValidationDataItem := req.GetValidationDataItem()
 
-	var proposed TendermintGoTransformedItemValue
-	var validation TendermintGoTransformedItemValue
+	var proposed TendermintBsyncGoTransformedItemValue
+	var validation TendermintBsyncGoTransformedItemValue
 	
 	if err := tmJson.Unmarshal([]byte(requestProposedDataItem.GetValue()), &proposed); err != nil {
 		return nil, status.Errorf(codes.Internal, "Error unmarshalling proposedDataItem: %v", err)
@@ -215,7 +190,7 @@ func (t *TendermintGoServer) ValidateDataItem(ctx context.Context, req *pb.Valid
 // String should not be longer than 100 characters, else gas costs might be too expensive.
 //
 // Deterministic behavior is required
-func (t *TendermintGoServer) SummarizeDataBundle(ctx context.Context, req *pb.SummarizeDataBundleRequest) (*pb.SummarizeDataBundleResponse, error) {
+func (t *TendermintBsyncGoServer) SummarizeDataBundle(ctx context.Context, req *pb.SummarizeDataBundleRequest) (*pb.SummarizeDataBundleResponse, error) {
 	bundle := req.GetBundle()
 	if len(bundle) == 0 {
 		return nil, status.Error(codes.Internal, "Bundle is empty")
@@ -223,7 +198,7 @@ func (t *TendermintGoServer) SummarizeDataBundle(ctx context.Context, req *pb.Su
 
 	latestBundle := bundle[len(bundle)-1]
 
-	var value TendermintGoTransformedItemValue
+	var value TendermintBsyncGoTransformedItemValue
 	if err := tmJson.Unmarshal([]byte(latestBundle.GetValue()), &value); err != nil {
 		return nil, status.Errorf(codes.Internal, "Error unmarshalling data item: %v", err)
 	}
@@ -234,7 +209,7 @@ func (t *TendermintGoServer) SummarizeDataBundle(ctx context.Context, req *pb.Su
 // NextKey gets the next key from the current key so that the data archived has an order.
 //
 // Deterministic behavior is required
-func (t *TendermintGoServer) NextKey(ctx context.Context, req *pb.NextKeyRequest) (*pb.NextKeyResponse, error) {
+func (t *TendermintBsyncGoServer) NextKey(ctx context.Context, req *pb.NextKeyRequest) (*pb.NextKeyResponse, error) {
 	key := req.GetKey()
 	parsedKey, err := strconv.Atoi(key)
 	if err != nil {
