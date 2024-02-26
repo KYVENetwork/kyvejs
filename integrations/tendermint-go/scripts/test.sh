@@ -4,9 +4,9 @@
 #               Variables               #
 #########################################
 # Key, config, and expected values (CHANGE THESE TO MATCH YOUR INTEGRATION!!!)
-KEY=4
+KEY=23912
 API="https://rpc.kaon.kyve.network"
-CONFIG='{"network":"celestia","rpc":"'$API'"}'
+CONFIG='{"network":"kaon-1","rpc":"'$API'"}'
 EXPECTED_SUMMARY="\"$KEY\""
 EXPECTED_NEXT_KEY="\"$(expr $KEY + 1)\""
 

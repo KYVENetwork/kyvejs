@@ -4,16 +4,18 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	bundlestypes "github.com/KYVENetwork/chain/x/bundles/types"
-	pb "github.com/KYVENetwork/kyvejs/integrations/tendermint-go/proto/kyverdk/runtime/v1"
-	"github.com/KYVENetwork/kyvejs/integrations/tendermint-go/utils"
-	tmJson "github.com/tendermint/tendermint/libs/json"
-	"github.com/tendermint/tendermint/types"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 	"os"
 	"reflect"
 	"strconv"
+
+	bundlestypes "github.com/KYVENetwork/chain/x/bundles/types"
+	pb "github.com/KYVENetwork/kyvejs/integrations/tendermint-go/proto/kyverdk/runtime/v1"
+	"github.com/KYVENetwork/kyvejs/integrations/tendermint-go/utils"
+	tmJson "github.com/cometbft/cometbft/libs/json"
+	coreTypes "github.com/cometbft/cometbft/rpc/core/types"
+	"github.com/cometbft/cometbft/types"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type TendermintGoServer struct {
@@ -25,17 +27,21 @@ type Config struct {
 	Rpc     string `json:"rpc"`
 }
 
+type Block struct {
+	BlockId types.BlockID `json:"block_id"`
+	Block   types.Block   `json:"block"`
+}
+
+type BlockResults = coreTypes.ResultBlockResults
+
 type TendermintGoItemValue struct {
-	Block struct {
-		BlockId types.BlockID `json:"block_id"`
-		Block   types.Block   `json:"block"`
-	} `json:"block"`
-	//BlockResults coreTypes.ResultBlockResults `json:"block_results"`
+	Block        Block                  `json:"block"`
+	BlockResults BlockResults `json:"block_results"`
 }
 
 type TendermintGoTransformedItemValue struct {
-	Block        types.Block       `json:"block"`
-	BlockResults types.ABCIResults `json:"block_results"`
+	Block        Block       `json:"block"`
+	BlockResults BlockResults `json:"block_results"`
 }
 
 // GetRuntimeName returns the name of the runtime. Example "@kyvejs/tendermint"
@@ -93,23 +99,33 @@ func (t *TendermintGoServer) GetDataItem(ctx context.Context, req *pb.GetDataIte
 	key := req.GetKey()
 
 	blockHeightUrl := fmt.Sprintf("%s/block?height=%s", config.Rpc, key)
-	blockResponse, err := utils.GetJsonFromUrl(blockHeightUrl)
+	blockResponse, err := utils.GetResultFromUrl(blockHeightUrl)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Error getting JSON from URL %s: %v", blockHeightUrl, err)
 	}
 
+	var block Block
+	if err := tmJson.Unmarshal(blockResponse, &block); err != nil {
+		return nil, status.Errorf(codes.Internal, "Error unmarshalling block: %s", err)
+	}
+
 	blockResultsHeightUrl := fmt.Sprintf("%s/block_results?height=%s", config.Rpc, key)
-	blockResultsResponse, err := utils.GetJsonFromUrl(blockResultsHeightUrl)
+	blockResultsResponse, err := utils.GetResultFromUrl(blockResultsHeightUrl)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Error getting JSON from URL %s: %v", blockResultsHeightUrl, err)
 	}
 
-	value := map[string]interface{}{
-		"block":         blockResponse["result"],
-		"block_results": blockResultsResponse["result"],
+	var blockResults BlockResults
+	if err := tmJson.Unmarshal(blockResultsResponse, &blockResults); err != nil {
+		return nil, status.Errorf(codes.Internal, "Error unmarshalling block results: %s", err)
 	}
 
-	parsedJson, err := json.Marshal(value)
+	value := TendermintGoItemValue{
+		Block:        block,
+		BlockResults: blockResults,
+	}
+
+	parsedJson, err := tmJson.Marshal(value)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Error marshalling value data: %v", err)
 	}
@@ -131,26 +147,26 @@ func (t *TendermintGoServer) PrevalidateDataItem(ctx context.Context, req *pb.Pr
 		return nil, status.Errorf(codes.Internal, "Error unmarshalling serializedConfig JSON string: %v", err)
 	}
 
-	fmt.Println("getvalue", req.GetDataItem().GetValue())
-
 	var itemValue TendermintGoItemValue
 	err = tmJson.Unmarshal([]byte(req.GetDataItem().GetValue()), &itemValue)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Error unmarshalling data item: %v", err)
 	}
 
-	fmt.Println("getvalue", req.GetDataItem().GetValue())
-
 	if err := itemValue.Block.BlockId.ValidateBasic(); err != nil {
-		return &pb.PrevalidateDataItemResponse{Valid: false}, status.Errorf(codes.Internal, "Error validating block id: %w", err)
+		return &pb.PrevalidateDataItemResponse{Valid: false}, status.Errorf(codes.Internal, "Error validating block id: %s", err)
 	}
 
 	if err := itemValue.Block.Block.ValidateBasic(); err != nil {
-		return &pb.PrevalidateDataItemResponse{Valid: false}, status.Errorf(codes.Internal, "Error validating block: %w", err)
+		return &pb.PrevalidateDataItemResponse{Valid: false}, status.Errorf(codes.Internal, "Error validating block: %s", err)
 	}
 
 	if itemValue.Block.Block.Header.ChainID != config.Network {
 		return &pb.PrevalidateDataItemResponse{Valid: false}, status.Errorf(codes.Internal, "Wrong chain id detected, expected %s got %s", config.Network, itemValue.Block.Block.Header.ChainID)
+	}
+
+	if itemValue.Block.Block.Header.Height != itemValue.BlockResults.Height {
+		return &pb.PrevalidateDataItemResponse{Valid: false}, status.Errorf(codes.Internal, "Block height differs from block results height, block = %d, block results = %d", itemValue.Block.Block.Header.Height, itemValue.BlockResults.Height)
 	}
 
 	return &pb.PrevalidateDataItemResponse{Valid: true}, nil
@@ -173,12 +189,12 @@ func (t *TendermintGoServer) ValidateDataItem(ctx context.Context, req *pb.Valid
 
 	var proposed TendermintGoTransformedItemValue
 	var validation TendermintGoTransformedItemValue
-	err := json.Unmarshal([]byte(requestProposedDataItem.GetValue()), &proposed)
-	if err != nil {
+	
+	if err := tmJson.Unmarshal([]byte(requestProposedDataItem.GetValue()), &proposed); err != nil {
 		return nil, status.Errorf(codes.Internal, "Error unmarshalling proposedDataItem: %v", err)
 	}
-	err = json.Unmarshal([]byte(requestValidationDataItem.GetValue()), &validation)
-	if err != nil {
+	
+	if err := tmJson.Unmarshal([]byte(requestValidationDataItem.GetValue()), &validation); err != nil {
 		return nil, status.Errorf(codes.Internal, "Error unmarshalling validationDataItem: %v", err)
 	}
 
@@ -200,24 +216,19 @@ func (t *TendermintGoServer) ValidateDataItem(ctx context.Context, req *pb.Valid
 //
 // Deterministic behavior is required
 func (t *TendermintGoServer) SummarizeDataBundle(ctx context.Context, req *pb.SummarizeDataBundleRequest) (*pb.SummarizeDataBundleResponse, error) {
-	grpcBundle := req.GetBundle()
-	if len(grpcBundle) == 0 {
+	bundle := req.GetBundle()
+	if len(bundle) == 0 {
 		return nil, status.Error(codes.Internal, "Bundle is empty")
 	}
 
-	latestBundle := grpcBundle[len(grpcBundle)-1]
+	latestBundle := bundle[len(bundle)-1]
+
 	var value TendermintGoTransformedItemValue
-	err := json.Unmarshal([]byte(latestBundle.GetValue()), &value)
-	if err != nil {
+	if err := tmJson.Unmarshal([]byte(latestBundle.GetValue()), &value); err != nil {
 		return nil, status.Errorf(codes.Internal, "Error unmarshalling data item: %v", err)
 	}
-	summary := latestBundle.Key
-	// TODO: summarize the data bundle
-	// Example:
-	//if value.Block.(map[string]interface{})["height"] != nil {
-	// summary = value.Block.(map[string]interface{})["height"].(string)
-	//}
-	return &pb.SummarizeDataBundleResponse{Summary: summary}, nil
+
+	return &pb.SummarizeDataBundleResponse{Summary: latestBundle.Key}, nil
 }
 
 // NextKey gets the next key from the current key so that the data archived has an order.
@@ -230,7 +241,6 @@ func (t *TendermintGoServer) NextKey(ctx context.Context, req *pb.NextKeyRequest
 		return nil, status.Errorf(codes.Internal, "Error converting key %s to int: %v", key, err)
 	}
 
-	// TODO: calculate the next key
 	nextKey := parsedKey + 1
 
 	return &pb.NextKeyResponse{NextKey: strconv.Itoa(nextKey)}, nil
