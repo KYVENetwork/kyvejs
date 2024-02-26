@@ -2,8 +2,8 @@ import { existsSync, mkdirSync, createWriteStream, readFileSync } from "fs";
 import path from "path";
 import { DataItem, standardizeError, Validator } from "../..";
 import JSZip from "jszip";
-import * as Diff from "diff";
 import { VoteType } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
+import Diff from "diff";
 
 /**
  * archiveDebugBundle is used for storing a bundle for debug

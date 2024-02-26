@@ -31,8 +31,8 @@ export async function saveLoadValidationBundle(
         .plus(this.pool.data!.upload_interval)
         .multipliedBy(1000);
 
-      // check if new proposal is available in the meantime
-      if (parseInt(this.pool.bundle_proposal!.updated_at) > updatedAt) {
+      // check if different proposal is available in the meantime
+      if (parseInt(this.pool.bundle_proposal!.updated_at) !== updatedAt) {
         return null;
       }
 
