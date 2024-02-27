@@ -3,12 +3,22 @@ package server
 import (
 	"context"
 	"encoding/json"
+	"fmt"
+	"os"
+	"reflect"
+	"slices"
+	"strconv"
+	"strings"
+
 	bundlestypes "github.com/KYVENetwork/chain/x/bundles/types"
 	pb "github.com/KYVENetwork/kyvejs/integrations/tendermint-ssync-go/proto/kyverdk/runtime/v1"
+	"github.com/KYVENetwork/kyvejs/integrations/tendermint-ssync-go/utils"
+	abciTypes "github.com/cometbft/cometbft/abci/types"
+	tmJson "github.com/cometbft/cometbft/libs/json"
+	stateTypes "github.com/cometbft/cometbft/state"
+	"github.com/cometbft/cometbft/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"reflect"
-	"strconv"
 )
 
 type TendermintSsyncGoServer struct {
@@ -16,32 +26,50 @@ type TendermintSsyncGoServer struct {
 }
 
 type Config struct {
-	// TODO: Add config properties here
-	// Example:
-	// Network string `json:"network"`
-	// Rpc string `json:"rpc"`
+	Api string `json:"api"`
+	Interval     int64 `json:"interval"`
 }
 
 type TendermintSsyncGoItemValue struct {
-	// TODO: Define data properties here
-	// Example:
-	// Block interface{} `json:"block"`
+	Snapshot        abciTypes.Snapshot                  `json:"snapshot"`
+	Block						types.Block 												`json:"block"`
+	SeenCommit 			types.Commit 												`json:"seenCommit"`
+	State 					stateTypes.State 										`json:"state"`
+	Chunk 					[]byte															`json:"chunk"`
 }
 
 type TendermintSsyncGoTransformedItemValue struct {
-	// TODO: Define data properties here
-	// Example:
-	// Block interface{} `json:"block"`
+	Snapshot        abciTypes.Snapshot                  `json:"snapshot"`
+	Block						types.Block 												`json:"block"`
+	SeenCommit 			types.Commit 												`json:"seenCommit"`
+	State 					stateTypes.State 										`json:"state"`
+	Chunk 					[]byte															`json:"chunk"`
+}
+
+func ParseKey(key string) (height uint64, chunkIndex uint64, err error) {
+	parsed := strings.Split(key, "/")
+
+	height, err = strconv.ParseUint(parsed[0], 10, 64)
+	if err != nil {
+		return
+	}
+
+	chunkIndex, err = strconv.ParseUint(parsed[1], 10, 64)
+	if err != nil {
+		return
+	}
+
+	return
 }
 
 // GetRuntimeName returns the name of the runtime. Example "@kyvejs/tendermint"
 func (t *TendermintSsyncGoServer) GetRuntimeName(ctx context.Context, req *pb.GetRuntimeNameRequest) (*pb.GetRuntimeNameResponse, error) {
-	return &pb.GetRuntimeNameResponse{Name: "@kyvejs/tendermint-ssync-go"}, nil
+	return &pb.GetRuntimeNameResponse{Name: "@kyvejs/tendermint-ssync"}, nil
 }
 
 // GetRuntimeVersion returns the version of the runtime. Example "1.2.0"
 func (t *TendermintSsyncGoServer) GetRuntimeVersion(ctx context.Context, req *pb.GetRuntimeVersionRequest) (*pb.GetRuntimeVersionResponse, error) {
-	return &pb.GetRuntimeVersionResponse{Version: "1.0.0"}, nil
+	return &pb.GetRuntimeVersionResponse{Version: "1.1.4"}, nil
 }
 
 // ValidateSetConfig parses the raw runtime config found on pool, validates it and finally sets
@@ -58,17 +86,17 @@ func (t *TendermintSsyncGoServer) ValidateSetConfig(ctx context.Context, req *pb
 		return nil, status.Errorf(codes.Internal, "Error unmarshalling rawConfig JSON string: %v", err)
 	}
 
-	// TODO: validate config here
-	// Example:
-	// if config.Network == "" {
-	//	 return nil, status.Error(codes.Internal, "config does not have property 'network' defined")
-	// }
+	if config.Api == "" {
+		return nil, status.Error(codes.Internal, "config does not have property 'api' defined")
+	}
 
-	// TODO: make changes to config if necessary
-	// Example:
-	// if value, exists := os.LookupEnv("KYVEJS_TENDERMINT-SSYNC-GO_API"); exists {
-	//	 config["rpc"] = value
-	// }
+	if config.Interval == 0 {
+		return nil, status.Error(codes.Internal, "config does not have property 'interval' defined")
+	}
+
+	if value, exists := os.LookupEnv("KYVEJS_TENDERMINT-SSYNC-GO_API"); exists {
+		config.Api = value
+	}
 
 	serializedConfig, err := json.Marshal(config)
 	if err != nil {
@@ -88,20 +116,99 @@ func (t *TendermintSsyncGoServer) GetDataItem(ctx context.Context, req *pb.GetDa
 	}
 	key := req.GetKey()
 
-	// TODO: get the data item with the given key
-	// Example:
-	// blockHeightUrl := fmt.Sprintf("%s/block?height=%s", config.Rpc, key)
-	// blockResponse, err := utils.GetJsonFromUrl(blockHeightUrl)
-	// if err != nil {
-	//   return nil, status.Errorf(codes.Internal, "Error getting JSON from URL %s: %v", blockHeightUrl, err)
-	// }
-	// value := map[string]interface{}{
-	//	 "block":         blockResponse["result"],
-	// }
+	height, chunkIndex, err := ParseKey(key)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "Error parsing key: %s", key)
+	}
 
-	var value = map[string]TendermintSsyncGoItemValue{}
+	listSnapshotsUrl := fmt.Sprintf("%s/list_snapshots", config.Api)
+	listSnapshotsResponse, err := utils.GetFromUrl(listSnapshotsUrl)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "Error getting snapshots from URL %s: %v", listSnapshotsUrl, err)
+	}
 
-	parsedJson, err := json.Marshal(value)
+	var listSnapshots []abciTypes.Snapshot
+	if err := tmJson.Unmarshal(listSnapshotsResponse, &listSnapshots); err != nil {
+		return nil, status.Errorf(codes.Internal, "Error unmarshalling snapshots: %s", err)
+	}
+
+	idx := slices.IndexFunc(listSnapshots, func (s abciTypes.Snapshot) bool {
+		return s.Height == height
+	})
+
+	if idx < 0 {
+		return nil, status.Errorf(codes.Internal, "Error snapshot with height %d not found", height)
+	}
+
+	snapshot := listSnapshots[idx]
+	loadSnapshotChunkUrl := fmt.Sprintf("%s/load_snapshot_chunk/%d/%d/%d", config.Api, snapshot.Height, snapshot.Format, chunkIndex)
+	loadSnapshotChunkResponse, err := utils.GetFromUrl(loadSnapshotChunkUrl)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "Error loading snapshot chunk from URL %s: %v", loadSnapshotChunkUrl, err)
+	}
+
+	var chunk []byte
+	if err := tmJson.Unmarshal(loadSnapshotChunkResponse, &chunk); err != nil {
+		return nil, status.Errorf(codes.Internal, "Error unmarshalling chunk: %s", err)
+	}
+
+	var value TendermintSsyncGoItemValue
+
+	if chunkIndex == 0 {
+		// if we are not at the first chunk we skip all the metadata to prevent
+  	// storing information repeatedly
+		value = TendermintSsyncGoItemValue{
+			Snapshot: abciTypes.Snapshot{},
+			Block: types.Block{},
+			SeenCommit: types.Commit{},
+			State: stateTypes.State{},
+			Chunk: chunk,
+		}
+	} else {
+		getBlockUrl := fmt.Sprintf("%s/get_block/%d", config.Api, height)
+		getBlockResponse, err := utils.GetFromUrl(getBlockUrl)
+		if err != nil {
+			return nil, status.Errorf(codes.Internal, "Error getting block from URL %s: %v", getBlockUrl, err)
+		}
+
+		var block types.Block
+		if err := tmJson.Unmarshal(getBlockResponse, &block); err != nil {
+			return nil, status.Errorf(codes.Internal, "Error unmarshalling block: %s", err)
+		}
+
+		getSeenCommitUrl := fmt.Sprintf("%s/get_seen_commit/%d", config.Api, height)
+		getSeenCommitResponse, err := utils.GetFromUrl(getSeenCommitUrl)
+		if err != nil {
+			return nil, status.Errorf(codes.Internal, "Error getting seen commit from URL %s: %v", getSeenCommitUrl, err)
+		}
+
+		var seenCommit types.Commit
+		if err := tmJson.Unmarshal(getSeenCommitResponse, &seenCommit); err != nil {
+			return nil, status.Errorf(codes.Internal, "Error unmarshalling seen commit: %s", err)
+		}
+
+		getStateUrl := fmt.Sprintf("%s/get_state/%d", config.Api, height)
+		getStateResponse, err := utils.GetFromUrl(getStateUrl)
+		if err != nil {
+			return nil, status.Errorf(codes.Internal, "Error getting state from URL %s: %v", getStateUrl, err)
+		}
+
+		var state stateTypes.State
+		if err := tmJson.Unmarshal(getStateResponse, &state); err != nil {
+			return nil, status.Errorf(codes.Internal, "Error unmarshalling state: %s", err)
+		}
+
+
+		value = TendermintSsyncGoItemValue{
+			Snapshot: snapshot,
+			Block: block,
+			SeenCommit: seenCommit,
+			State: state,
+			Chunk: chunk,
+		}
+	}
+
+	parsedJson, err := tmJson.Marshal(value)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Error marshalling value data: %v", err)
 	}
@@ -117,23 +224,96 @@ func (t *TendermintSsyncGoServer) GetDataItem(ctx context.Context, req *pb.GetDa
 //
 // Deterministic behavior is required
 func (t *TendermintSsyncGoServer) PrevalidateDataItem(ctx context.Context, req *pb.PrevalidateDataItemRequest) (*pb.PrevalidateDataItemResponse, error) {
-	var config map[string]string
+	var config Config
 	err := json.Unmarshal([]byte(req.GetConfig().GetSerializedConfig()), &config)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Error unmarshalling serializedConfig JSON string: %v", err)
 	}
 
+	key := req.GetDataItem().GetKey()
+
+	height, chunkIndex, err := ParseKey(key)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "Error parsing key: %s", key)
+	}
+
 	var itemValue TendermintSsyncGoItemValue
-	err = json.Unmarshal([]byte(req.GetDataItem().GetValue()), &itemValue)
+	err = tmJson.Unmarshal([]byte(req.GetDataItem().GetValue()), &itemValue)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Error unmarshalling data item: %v", err)
 	}
 
-	// TODO: check if data item is valid
-	// Example:
-	// if itemValue.Block == "" {
-	// 	 return &pb.PrevalidateDataItemResponse{Valid: false}, nil
-	// }
+	if len(itemValue.Chunk) == 0 {
+		return &pb.PrevalidateDataItemResponse{Valid: false}, status.Errorf(codes.Internal, "Error chunk is empty")
+	}
+
+	if chunkIndex > 0 {
+		// throw error if one of those values is not empty
+		if !reflect.DeepEqual(itemValue.Snapshot, abciTypes.Snapshot{}) {
+			return &pb.PrevalidateDataItemResponse{Valid: false}, status.Errorf(codes.Internal, "Error snapshot is not empty although chunk index is %d", chunkIndex)
+		}
+
+		if !reflect.DeepEqual(itemValue.Block, types.Block{}) {
+			return &pb.PrevalidateDataItemResponse{Valid: false}, status.Errorf(codes.Internal, "Error block is not empty although chunk index is %d", chunkIndex)
+		}
+
+		if !reflect.DeepEqual(itemValue.SeenCommit, types.Commit{}) {
+			return &pb.PrevalidateDataItemResponse{Valid: false}, status.Errorf(codes.Internal, "Error seen commit is not empty although chunk index is %d", chunkIndex)
+		}
+
+		if !reflect.DeepEqual(itemValue.State, stateTypes.State{}) {
+			return &pb.PrevalidateDataItemResponse{Valid: false}, status.Errorf(codes.Internal, "Error state is not empty although chunk index is %d", chunkIndex)
+		}
+
+		return &pb.PrevalidateDataItemResponse{Valid: true}, nil
+	}
+
+	// throw error if one of those values is empty
+	if reflect.DeepEqual(itemValue.Snapshot, abciTypes.Snapshot{}) {
+		return &pb.PrevalidateDataItemResponse{Valid: false}, status.Errorf(codes.Internal, "Error snapshot is empty although chunk index is zero")
+	}
+
+	if reflect.DeepEqual(itemValue.Block, types.Block{}) {
+		return &pb.PrevalidateDataItemResponse{Valid: false}, status.Errorf(codes.Internal, "Error block is empty although chunk index is zero")
+	}
+
+	if reflect.DeepEqual(itemValue.SeenCommit, types.Commit{}) {
+		return &pb.PrevalidateDataItemResponse{Valid: false}, status.Errorf(codes.Internal, "Error seen commit is empty although chunk index is zero")
+	}
+
+	if reflect.DeepEqual(itemValue.State, stateTypes.State{}) {
+		return &pb.PrevalidateDataItemResponse{Valid: false}, status.Errorf(codes.Internal, "Error state is empty although chunk index is zero")
+	}
+
+	// throw error if snapshot height mismatches
+	if itemValue.Snapshot.Height != height {
+		return &pb.PrevalidateDataItemResponse{Valid: false}, status.Errorf(codes.Internal, "Error snapshot height differs, snapshot = %d, key = %d", itemValue.Snapshot.Height, height)
+	}
+
+	// throw error if block height mismatches
+	if itemValue.Block.Header.Height != int64(height) {
+		return &pb.PrevalidateDataItemResponse{Valid: false}, status.Errorf(codes.Internal, "Error block height differs, block = %d, key = %d", itemValue.Block.Header.Height, height)
+	}
+
+	// throw error if seen commit height mismatches
+	if itemValue.SeenCommit.Height != int64(height) {
+		return &pb.PrevalidateDataItemResponse{Valid: false}, status.Errorf(codes.Internal, "Error seen commit height differs, block = %d, key = %d", itemValue.SeenCommit.Height, height)
+	}
+
+	// throw error if state height mismatches
+	if itemValue.State.LastBlockHeight != int64(height) {
+		return &pb.PrevalidateDataItemResponse{Valid: false}, status.Errorf(codes.Internal, "Error state height differs, state = %d, key = %d", itemValue.State.LastBlockHeight, height)
+	}
+
+	// validate block
+	if err := itemValue.Block.ValidateBasic(); err != nil {
+		return &pb.PrevalidateDataItemResponse{Valid: false}, status.Errorf(codes.Internal, "Error validating block: %s", err)
+	}
+
+	// validate commit
+	if err := itemValue.SeenCommit.ValidateBasic(); err != nil {
+		return &pb.PrevalidateDataItemResponse{Valid: false}, status.Errorf(codes.Internal, "Error validating seen commit: %s", err)
+	}
 
 	return &pb.PrevalidateDataItemResponse{Valid: true}, nil
 }
@@ -143,27 +323,7 @@ func (t *TendermintSsyncGoServer) PrevalidateDataItem(ctx context.Context, req *
 //
 // Deterministic behavior is required
 func (t *TendermintSsyncGoServer) TransformDataItem(ctx context.Context, req *pb.TransformDataItemRequest) (*pb.TransformDataItemResponse, error) {
-	var itemValue TendermintSsyncGoItemValue
-	err := json.Unmarshal([]byte(req.GetDataItem().GetValue()), &itemValue)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "Error unmarshalling data item: %v", err)
-	}
-
-	// TODO: transform the data item so that it can be saved
-	var transformedItemValue = itemValue
-
-	// Construct the data_item to return
-	transformedDataItemJSON, err := json.Marshal(transformedItemValue)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "Error marshalling JSON: %v", err)
-	}
-
-	transformedDataItem := &pb.DataItem{
-		Key:   req.DataItem.Key,
-		Value: string(transformedDataItemJSON),
-	}
-
-	return &pb.TransformDataItemResponse{TransformedDataItem: transformedDataItem}, nil
+	return &pb.TransformDataItemResponse{TransformedDataItem: req.GetDataItem()}, nil
 }
 
 // ValidateDataItem validates a single data item of a bundle proposal
@@ -175,12 +335,12 @@ func (t *TendermintSsyncGoServer) ValidateDataItem(ctx context.Context, req *pb.
 
 	var proposed TendermintSsyncGoTransformedItemValue
 	var validation TendermintSsyncGoTransformedItemValue
-	err := json.Unmarshal([]byte(requestProposedDataItem.GetValue()), &proposed)
-	if err != nil {
+	
+	if err := tmJson.Unmarshal([]byte(requestProposedDataItem.GetValue()), &proposed); err != nil {
 		return nil, status.Errorf(codes.Internal, "Error unmarshalling proposedDataItem: %v", err)
 	}
-	err = json.Unmarshal([]byte(requestValidationDataItem.GetValue()), &validation)
-	if err != nil {
+	
+	if err := tmJson.Unmarshal([]byte(requestValidationDataItem.GetValue()), &validation); err != nil {
 		return nil, status.Errorf(codes.Internal, "Error unmarshalling validationDataItem: %v", err)
 	}
 
@@ -202,38 +362,60 @@ func (t *TendermintSsyncGoServer) ValidateDataItem(ctx context.Context, req *pb.
 //
 // Deterministic behavior is required
 func (t *TendermintSsyncGoServer) SummarizeDataBundle(ctx context.Context, req *pb.SummarizeDataBundleRequest) (*pb.SummarizeDataBundleResponse, error) {
-	grpcBundle := req.GetBundle()
-	if len(grpcBundle) == 0 {
+	bundle := req.GetBundle()
+	if len(bundle) == 0 {
 		return nil, status.Error(codes.Internal, "Bundle is empty")
 	}
 
-	latestBundle := grpcBundle[len(grpcBundle)-1]
-	var value TendermintSsyncGoTransformedItemValue
-	err := json.Unmarshal([]byte(latestBundle.GetValue()), &value)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "Error unmarshalling data item: %v", err)
-	}
-	summary := latestBundle.Key
-	// TODO: summarize the data bundle
-	// Example:
-	//if value.Block.(map[string]interface{})["height"] != nil {
-	// summary = value.Block.(map[string]interface{})["height"].(string)
-	//}
-	return &pb.SummarizeDataBundleResponse{Summary: summary}, nil
+	latestBundle := bundle[len(bundle)-1]
+
+	return &pb.SummarizeDataBundleResponse{Summary: latestBundle.Key}, nil
 }
 
 // NextKey gets the next key from the current key so that the data archived has an order.
 //
 // Deterministic behavior is required
 func (t *TendermintSsyncGoServer) NextKey(ctx context.Context, req *pb.NextKeyRequest) (*pb.NextKeyResponse, error) {
-	key := req.GetKey()
-	parsedKey, err := strconv.Atoi(key)
+	var config Config
+	err := json.Unmarshal([]byte(req.GetConfig().GetSerializedConfig()), &config)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "Error converting key %s to int: %v", key, err)
+		return nil, status.Errorf(codes.Internal, "Error unmarshalling serializedConfig JSON string: %v", err)
 	}
 
-	// TODO: calculate the next key
-	nextKey := parsedKey + 1
+	key := req.GetKey()
 
-	return &pb.NextKeyResponse{NextKey: strconv.Itoa(nextKey)}, nil
+	height, chunkIndex, err := ParseKey(key)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "Error parsing key: %s", key)
+	}
+
+	listSnapshotsUrl := fmt.Sprintf("%s/list_snapshots", config.Api)
+	listSnapshotsResponse, err := utils.GetFromUrl(listSnapshotsUrl)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "Error getting snapshots from URL %s: %v", listSnapshotsUrl, err)
+	}
+
+	var listSnapshots []abciTypes.Snapshot
+	if err := tmJson.Unmarshal(listSnapshotsResponse, &listSnapshots); err != nil {
+		return nil, status.Errorf(codes.Internal, "Error unmarshalling snapshots: %s", err)
+	}
+
+	idx := slices.IndexFunc(listSnapshots, func (s abciTypes.Snapshot) bool {
+		return s.Height == height
+	})
+
+	if idx < 0 {
+		return nil, status.Errorf(codes.Internal, "Error snapshot with height %d not found", height)
+	}
+
+	snapshot := listSnapshots[idx]
+
+	// move on to next snapshot and start at first chunk
+  // if we have already reached all chunks in current snapshot
+	if snapshot.Chunks - 1 == uint32(chunkIndex) {
+		return &pb.NextKeyResponse{NextKey: fmt.Sprintf("%d/0", snapshot.Height + uint64(config.Interval))}, nil
+	}
+
+	// stay on current snapshot and continue with next snapshot chunk
+	return &pb.NextKeyResponse{NextKey: fmt.Sprintf("%d/%d", snapshot.Height, chunkIndex + 1)}, nil
 }
