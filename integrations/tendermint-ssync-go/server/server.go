@@ -141,6 +141,9 @@ func (t *TendermintSsyncGoServer) GetDataItem(ctx context.Context, req *pb.GetDa
 	}
 
 	snapshot := listSnapshots[idx]
+
+	fmt.Println("found snapshot", snapshot.Height, snapshot.Hash)
+
 	loadSnapshotChunkUrl := fmt.Sprintf("%s/load_snapshot_chunk/%d/%d/%d", config.Api, snapshot.Height, snapshot.Format, chunkIndex)
 	loadSnapshotChunkResponse, err := utils.GetFromUrl(loadSnapshotChunkUrl)
 	if err != nil {
@@ -151,6 +154,8 @@ func (t *TendermintSsyncGoServer) GetDataItem(ctx context.Context, req *pb.GetDa
 	if err := tmJson.Unmarshal(loadSnapshotChunkResponse, &chunk); err != nil {
 		return nil, status.Errorf(codes.Internal, "Error unmarshalling chunk: %s", err)
 	}
+
+	fmt.Println("found snapshot chunk", len(chunk))
 
 	var value TendermintSsyncGoItemValue
 
@@ -212,6 +217,8 @@ func (t *TendermintSsyncGoServer) GetDataItem(ctx context.Context, req *pb.GetDa
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Error marshalling value data: %v", err)
 	}
+
+	fmt.Println("parsed json")
 
 	return &pb.GetDataItemResponse{DataItem: &pb.DataItem{Key: key, Value: string(parsedJson)}}, nil
 }

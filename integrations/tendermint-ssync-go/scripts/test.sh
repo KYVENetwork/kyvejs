@@ -4,9 +4,9 @@
 #               Variables               #
 #########################################
 # Key, config, and expected values (CHANGE THESE TO MATCH YOUR INTEGRATION!!!)
-KEY=4943400
-API="https://rpc.kyve.network"
-CONFIG='{"network":"kyve-1","rpc":"'$API'"}'
+KEY="600000/0"
+API="http://ovh-protocol-1.tail625ca.ts.net:26015"
+CONFIG='{"interval":5000,"api":"'$API'"}'
 EXPECTED_SUMMARY="\"$KEY\""
 EXPECTED_NEXT_KEY="\"$(expr $KEY + 1)\""
 
