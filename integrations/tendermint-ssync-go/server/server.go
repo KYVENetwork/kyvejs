@@ -26,16 +26,17 @@ type TendermintSsyncGoServer struct {
 }
 
 type Config struct {
+	Network string `json:"network"`
 	Api string `json:"api"`
 	Interval     int64 `json:"interval"`
 }
 
 type TendermintSsyncGoItemValue struct {
-	Snapshot        abciTypes.Snapshot                  `json:"snapshot"`
-	Block						types.Block 												`json:"block"`
-	SeenCommit 			types.Commit 												`json:"seenCommit"`
-	State 					stateTypes.State 										`json:"state"`
-	Chunk 					[]byte															`json:"chunk"`
+	Snapshot        *abciTypes.Snapshot                  `json:"snapshot"`
+	Block						*types.Block 												`json:"block"`
+	SeenCommit 			*types.Commit 												`json:"seenCommit"`
+	State 					*stateTypes.State 										`json:"state"`
+	Chunk 					*[]byte															`json:"chunk"`
 }
 
 type TendermintSsyncGoTransformedItemValue struct {
@@ -142,8 +143,6 @@ func (t *TendermintSsyncGoServer) GetDataItem(ctx context.Context, req *pb.GetDa
 
 	snapshot := listSnapshots[idx]
 
-	fmt.Println("found snapshot", snapshot.Height, snapshot.Hash)
-
 	loadSnapshotChunkUrl := fmt.Sprintf("%s/load_snapshot_chunk/%d/%d/%d", config.Api, snapshot.Height, snapshot.Format, chunkIndex)
 	loadSnapshotChunkResponse, err := utils.GetFromUrl(loadSnapshotChunkUrl)
 	if err != nil {
@@ -155,19 +154,17 @@ func (t *TendermintSsyncGoServer) GetDataItem(ctx context.Context, req *pb.GetDa
 		return nil, status.Errorf(codes.Internal, "Error unmarshalling chunk: %s", err)
 	}
 
-	fmt.Println("found snapshot chunk", len(chunk))
-
 	var value TendermintSsyncGoItemValue
 
 	if chunkIndex > 0 {
 		// if we are not at the first chunk we skip all the metadata to prevent
   	// storing information repeatedly
 		value = TendermintSsyncGoItemValue{
-			Snapshot: abciTypes.Snapshot{},
-			Block: types.Block{},
-			SeenCommit: types.Commit{},
-			State: stateTypes.State{},
-			Chunk: chunk,
+			Snapshot: nil,
+			Block: nil,
+			SeenCommit: nil,
+			State: nil,
+			Chunk: &chunk,
 		}
 	} else {
 		getBlockUrl := fmt.Sprintf("%s/get_block/%d", config.Api, height)
@@ -204,11 +201,11 @@ func (t *TendermintSsyncGoServer) GetDataItem(ctx context.Context, req *pb.GetDa
 		}
 
 		value = TendermintSsyncGoItemValue{
-			Snapshot: snapshot,
-			Block: block,
-			SeenCommit: seenCommit,
-			State: state,
-			Chunk: chunk,
+			Snapshot: &snapshot,
+			Block: &block,
+			SeenCommit: &seenCommit,
+			State: &state,
+			Chunk: &chunk,
 		}
 	}
 
@@ -216,8 +213,6 @@ func (t *TendermintSsyncGoServer) GetDataItem(ctx context.Context, req *pb.GetDa
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Error marshalling value data: %v", err)
 	}
-
-	fmt.Println("parsed json")
 
 	return &pb.GetDataItemResponse{DataItem: &pb.DataItem{Key: key, Value: string(parsedJson)}}, nil
 }
@@ -249,25 +244,25 @@ func (t *TendermintSsyncGoServer) PrevalidateDataItem(ctx context.Context, req *
 		return nil, status.Errorf(codes.Internal, "Error unmarshalling data item: %v", err)
 	}
 
-	if len(itemValue.Chunk) == 0 {
+	if len(*itemValue.Chunk) == 0 {
 		return &pb.PrevalidateDataItemResponse{Valid: false}, status.Errorf(codes.Internal, "Error chunk is empty")
 	}
 
 	if chunkIndex > 0 {
 		// throw error if one of those values is not empty
-		if !reflect.DeepEqual(itemValue.Snapshot, abciTypes.Snapshot{}) {
+		if itemValue.Snapshot != nil {
 			return &pb.PrevalidateDataItemResponse{Valid: false}, status.Errorf(codes.Internal, "Error snapshot is not empty although chunk index is %d", chunkIndex)
 		}
 
-		if !reflect.DeepEqual(itemValue.Block, types.Block{}) {
+		if itemValue.Block != nil {
 			return &pb.PrevalidateDataItemResponse{Valid: false}, status.Errorf(codes.Internal, "Error block is not empty although chunk index is %d", chunkIndex)
 		}
 
-		if !reflect.DeepEqual(itemValue.SeenCommit, types.Commit{}) {
+		if itemValue.SeenCommit != nil {
 			return &pb.PrevalidateDataItemResponse{Valid: false}, status.Errorf(codes.Internal, "Error seen commit is not empty although chunk index is %d", chunkIndex)
 		}
 
-		if !reflect.DeepEqual(itemValue.State, stateTypes.State{}) {
+		if itemValue.State != nil {
 			return &pb.PrevalidateDataItemResponse{Valid: false}, status.Errorf(codes.Internal, "Error state is not empty although chunk index is %d", chunkIndex)
 		}
 
@@ -275,19 +270,19 @@ func (t *TendermintSsyncGoServer) PrevalidateDataItem(ctx context.Context, req *
 	}
 
 	// throw error if one of those values is empty
-	if reflect.DeepEqual(itemValue.Snapshot, abciTypes.Snapshot{}) {
+	if itemValue.Snapshot == nil {
 		return &pb.PrevalidateDataItemResponse{Valid: false}, status.Errorf(codes.Internal, "Error snapshot is empty although chunk index is zero")
 	}
 
-	if reflect.DeepEqual(itemValue.Block, types.Block{}) {
+	if itemValue.Block == nil {
 		return &pb.PrevalidateDataItemResponse{Valid: false}, status.Errorf(codes.Internal, "Error block is empty although chunk index is zero")
 	}
 
-	if reflect.DeepEqual(itemValue.SeenCommit, types.Commit{}) {
+	if itemValue.SeenCommit == nil {
 		return &pb.PrevalidateDataItemResponse{Valid: false}, status.Errorf(codes.Internal, "Error seen commit is empty although chunk index is zero")
 	}
 
-	if reflect.DeepEqual(itemValue.State, stateTypes.State{}) {
+	if itemValue.State == nil {
 		return &pb.PrevalidateDataItemResponse{Valid: false}, status.Errorf(codes.Internal, "Error state is empty although chunk index is zero")
 	}
 
@@ -312,8 +307,10 @@ func (t *TendermintSsyncGoServer) PrevalidateDataItem(ctx context.Context, req *
 	}
 
 	// validate block
-	if err := itemValue.Block.ValidateBasic(); err != nil {
-		return &pb.PrevalidateDataItemResponse{Valid: false}, status.Errorf(codes.Internal, "Error validating block: %s", err)
+	if config.Network != "celestia" {
+		if err := itemValue.Block.ValidateBasic(); err != nil {
+			return &pb.PrevalidateDataItemResponse{Valid: false}, status.Errorf(codes.Internal, "Error validating block: %s", err)
+		}
 	}
 
 	// validate commit
@@ -351,11 +348,9 @@ func (t *TendermintSsyncGoServer) ValidateDataItem(ctx context.Context, req *pb.
 	}
 
 	// Check if the proposedDataItem and validationDataItem are equal
-	if reflect.DeepEqual(proposed, validation) {
+	if reflect.DeepEqual(&proposed, &validation) {
 		return &pb.ValidateDataItemResponse{Vote: bundlestypes.VOTE_TYPE_VALID}, nil
 	}
-
-	// TODO: add custom validation logic here
 
 	// Vote Invalid if proposedDataItem and validationDataItem do not match
 	return &pb.ValidateDataItemResponse{Vote: bundlestypes.VOTE_TYPE_INVALID}, nil

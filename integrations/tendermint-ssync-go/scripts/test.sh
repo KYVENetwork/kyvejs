@@ -4,11 +4,11 @@
 #               Variables               #
 #########################################
 # Key, config, and expected values (CHANGE THESE TO MATCH YOUR INTEGRATION!!!)
-KEY="2705000/0"
-API="http://ovh-protocol-1:26013"
-CONFIG='{"interval":5000,"api":"'$API'"}'
+KEY="720000/0"
+API="http://ovh-protocol-1:26015"
+CONFIG='{"network":"celestia","interval":5000,"api":"'$API'"}'
 EXPECTED_SUMMARY="\"$KEY\""
-EXPECTED_NEXT_KEY="\"$(expr $KEY + 1)\""
+EXPECTED_NEXT_KEY="\"720000/1\""
 
 #########################################
 
