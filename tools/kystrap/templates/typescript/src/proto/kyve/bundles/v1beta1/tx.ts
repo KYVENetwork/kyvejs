@@ -1142,6 +1142,7 @@ export interface MsgClient extends Client {
 export const MsgClient = makeGenericClientConstructor(MsgService, "kyve.bundles.v1beta1.Msg") as unknown as {
   new (address: string, credentials: ChannelCredentials, options?: Partial<ClientOptions>): MsgClient;
   service: typeof MsgService;
+  serviceName: string;
 };
 
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;

@@ -285,6 +285,7 @@ class MsgStub(betterproto.ServiceStub):
 
 
 class MsgBase(ServiceBase):
+
     async def submit_bundle_proposal(
         self, msg_submit_bundle_proposal: "MsgSubmitBundleProposal"
     ) -> "MsgSubmitBundleProposalResponse":

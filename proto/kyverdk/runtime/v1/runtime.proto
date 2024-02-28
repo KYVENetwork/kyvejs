@@ -90,7 +90,7 @@ message DataItem {
   // The key of the data item
   string key = 1;
   // The value of the data item
-  string value = 2;
+  bytes value = 2;
 }
 
 /* Configuration entity containing serialized info about connection to the respective chain */

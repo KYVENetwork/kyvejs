@@ -1,11 +1,11 @@
 package server
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"os"
-	"reflect"
 	"slices"
 	"strconv"
 	"strings"
@@ -208,7 +208,7 @@ func (t *TendermintSsyncGoServer) GetDataItem(ctx context.Context, req *pb.GetDa
 		return nil, status.Errorf(codes.Internal, "Error marshalling value data: %v", err)
 	}
 
-	return &pb.GetDataItemResponse{DataItem: &pb.DataItem{Key: key, Value: string(parsedJson)}}, nil
+	return &pb.GetDataItemResponse{DataItem: &pb.DataItem{Key: key, Value: parsedJson}}, nil
 }
 
 // PrevalidateDataItem prevalidates a data item right after is was retrieved from source.
@@ -233,7 +233,7 @@ func (t *TendermintSsyncGoServer) PrevalidateDataItem(ctx context.Context, req *
 	}
 
 	var itemValue TendermintSsyncGoItemValue
-	err = tmJson.Unmarshal([]byte(req.GetDataItem().GetValue()), &itemValue)
+	err = tmJson.Unmarshal(req.GetDataItem().GetValue(), &itemValue)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Error unmarshalling data item: %v", err)
 	}
@@ -327,26 +327,13 @@ func (t *TendermintSsyncGoServer) TransformDataItem(ctx context.Context, req *pb
 //
 // Deterministic behavior is required
 func (t *TendermintSsyncGoServer) ValidateDataItem(ctx context.Context, req *pb.ValidateDataItemRequest) (*pb.ValidateDataItemResponse, error) {
-	requestProposedDataItem := req.GetProposedDataItem()
-	requestValidationDataItem := req.GetValidationDataItem()
+	proposed := req.GetProposedDataItem().GetValue()
+	validation := req.GetValidationDataItem().GetValue()
 
-	var proposed TendermintSsyncGoTransformedItemValue
-	var validation TendermintSsyncGoTransformedItemValue
-	
-	if err := tmJson.Unmarshal([]byte(requestProposedDataItem.GetValue()), &proposed); err != nil {
-		return nil, status.Errorf(codes.Internal, "Error unmarshalling proposedDataItem: %v", err)
-	}
-	
-	if err := tmJson.Unmarshal([]byte(requestValidationDataItem.GetValue()), &validation); err != nil {
-		return nil, status.Errorf(codes.Internal, "Error unmarshalling validationDataItem: %v", err)
-	}
-
-	// Check if the proposedDataItem and validationDataItem are equal
-	if reflect.DeepEqual(&proposed, &validation) {
+	if bytes.Equal(proposed, validation) {
 		return &pb.ValidateDataItemResponse{Vote: bundlestypes.VOTE_TYPE_VALID}, nil
 	}
-
-	// Vote Invalid if proposedDataItem and validationDataItem do not match
+	
 	return &pb.ValidateDataItemResponse{Vote: bundlestypes.VOTE_TYPE_INVALID}, nil
 }
 
