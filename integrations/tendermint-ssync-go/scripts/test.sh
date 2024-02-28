@@ -4,8 +4,8 @@
 #               Variables               #
 #########################################
 # Key, config, and expected values (CHANGE THESE TO MATCH YOUR INTEGRATION!!!)
-KEY="600000/0"
-API="http://ovh-protocol-1.tail625ca.ts.net:26015"
+KEY="2705000/0"
+API="http://ovh-protocol-1:26013"
 CONFIG='{"interval":5000,"api":"'$API'"}'
 EXPECTED_SUMMARY="\"$KEY\""
 EXPECTED_NEXT_KEY="\"$(expr $KEY + 1)\""

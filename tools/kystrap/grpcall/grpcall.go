@@ -15,6 +15,8 @@ import (
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
+const maxMessageSize int = 2 * 1024 * 1024 * 1024; // 2 GB
+
 type GrpcCaller struct {
 	address        string
 	isSimpleOutput bool
@@ -103,6 +105,7 @@ func (gc *GrpcCaller) dial() (*grpc.ClientConn, error) {
 
 	grpcurlUA := "kystrap"
 	opts = append(opts, grpc.WithUserAgent(grpcurlUA))
+	opts = append(opts, grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(maxMessageSize), grpc.MaxCallSendMsgSize(maxMessageSize)))
 
 	network := "tcp"
 
@@ -135,6 +138,7 @@ func (gc *GrpcCaller) PerformMethodCall(method protoreflect.MethodDescriptor, da
 		EmitJSONDefaultFields: true,
 		AllowUnknownFields:    true,
 		IncludeTextSeparator:  true,
+		
 	}
 
 	rf, formatter, err := grpcurl.RequestParserAndFormatter(grpcurl.FormatJSON, types.Rdk.DescriptorSource, in, options)

@@ -159,7 +159,7 @@ func (t *TendermintSsyncGoServer) GetDataItem(ctx context.Context, req *pb.GetDa
 
 	var value TendermintSsyncGoItemValue
 
-	if chunkIndex == 0 {
+	if chunkIndex > 0 {
 		// if we are not at the first chunk we skip all the metadata to prevent
   	// storing information repeatedly
 		value = TendermintSsyncGoItemValue{
@@ -202,7 +202,6 @@ func (t *TendermintSsyncGoServer) GetDataItem(ctx context.Context, req *pb.GetDa
 		if err := tmJson.Unmarshal(getStateResponse, &state); err != nil {
 			return nil, status.Errorf(codes.Internal, "Error unmarshalling state: %s", err)
 		}
-
 
 		value = TendermintSsyncGoItemValue{
 			Snapshot: snapshot,
