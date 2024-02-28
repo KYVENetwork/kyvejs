@@ -39,13 +39,7 @@ type TendermintSsyncGoItemValue struct {
 	Chunk 					*[]byte															`json:"chunk"`
 }
 
-type TendermintSsyncGoTransformedItemValue struct {
-	Snapshot        abciTypes.Snapshot                  `json:"snapshot"`
-	Block						types.Block 												`json:"block"`
-	SeenCommit 			types.Commit 												`json:"seenCommit"`
-	State 					stateTypes.State 										`json:"state"`
-	Chunk 					[]byte															`json:"chunk"`
-}
+type TendermintSsyncGoTransformedItemValue = TendermintSsyncGoItemValue
 
 func ParseKey(key string) (height uint64, chunkIndex uint64, err error) {
 	parsed := strings.Split(key, "/")
