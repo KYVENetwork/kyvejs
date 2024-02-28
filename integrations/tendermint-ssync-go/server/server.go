@@ -141,7 +141,7 @@ func (t *TendermintSsyncGoServer) GetDataItem(ctx context.Context, req *pb.GetDa
 		return nil, status.Errorf(codes.Internal, "Error snapshot with height %d not found", height)
 	}
 
-	snapshot := listSnapshots[idx]
+	snapshot := &listSnapshots[idx]
 
 	loadSnapshotChunkUrl := fmt.Sprintf("%s/load_snapshot_chunk/%d/%d/%d", config.Api, snapshot.Height, snapshot.Format, chunkIndex)
 	loadSnapshotChunkResponse, err := utils.GetFromUrl(loadSnapshotChunkUrl)
@@ -149,8 +149,8 @@ func (t *TendermintSsyncGoServer) GetDataItem(ctx context.Context, req *pb.GetDa
 		return nil, status.Errorf(codes.Internal, "Error loading snapshot chunk from URL %s: %v", loadSnapshotChunkUrl, err)
 	}
 
-	var chunk []byte
-	if err := tmJson.Unmarshal(loadSnapshotChunkResponse, &chunk); err != nil {
+	chunk := new([]byte)
+	if err := tmJson.Unmarshal(loadSnapshotChunkResponse, chunk); err != nil {
 		return nil, status.Errorf(codes.Internal, "Error unmarshalling chunk: %s", err)
 	}
 
@@ -164,7 +164,7 @@ func (t *TendermintSsyncGoServer) GetDataItem(ctx context.Context, req *pb.GetDa
 			Block: nil,
 			SeenCommit: nil,
 			State: nil,
-			Chunk: &chunk,
+			Chunk: chunk,
 		}
 	} else {
 		getBlockUrl := fmt.Sprintf("%s/get_block/%d", config.Api, height)
@@ -173,8 +173,8 @@ func (t *TendermintSsyncGoServer) GetDataItem(ctx context.Context, req *pb.GetDa
 			return nil, status.Errorf(codes.Internal, "Error getting block from URL %s: %v", getBlockUrl, err)
 		}
 
-		var block types.Block
-		if err := tmJson.Unmarshal(getBlockResponse, &block); err != nil {
+		block := new(types.Block)
+		if err := tmJson.Unmarshal(getBlockResponse, block); err != nil {
 			return nil, status.Errorf(codes.Internal, "Error unmarshalling block: %s", err)
 		}
 
@@ -184,8 +184,8 @@ func (t *TendermintSsyncGoServer) GetDataItem(ctx context.Context, req *pb.GetDa
 			return nil, status.Errorf(codes.Internal, "Error getting seen commit from URL %s: %v", getSeenCommitUrl, err)
 		}
 
-		var seenCommit types.Commit
-		if err := tmJson.Unmarshal(getSeenCommitResponse, &seenCommit); err != nil {
+		seenCommit := new(types.Commit)
+		if err := tmJson.Unmarshal(getSeenCommitResponse, seenCommit); err != nil {
 			return nil, status.Errorf(codes.Internal, "Error unmarshalling seen commit: %s", err)
 		}
 
@@ -195,17 +195,17 @@ func (t *TendermintSsyncGoServer) GetDataItem(ctx context.Context, req *pb.GetDa
 			return nil, status.Errorf(codes.Internal, "Error getting state from URL %s: %v", getStateUrl, err)
 		}
 
-		var state stateTypes.State
-		if err := tmJson.Unmarshal(getStateResponse, &state); err != nil {
+		state := new(stateTypes.State)
+		if err := tmJson.Unmarshal(getStateResponse, state); err != nil {
 			return nil, status.Errorf(codes.Internal, "Error unmarshalling state: %s", err)
 		}
 
 		value = TendermintSsyncGoItemValue{
-			Snapshot: &snapshot,
-			Block: &block,
-			SeenCommit: &seenCommit,
-			State: &state,
-			Chunk: &chunk,
+			Snapshot: snapshot,
+			Block: block,
+			SeenCommit: seenCommit,
+			State: state,
+			Chunk: chunk,
 		}
 	}
 
