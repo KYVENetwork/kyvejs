@@ -1,11 +1,11 @@
 package server
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"os"
-	"reflect"
 	"strconv"
 
 	bundlestypes "github.com/KYVENetwork/chain/x/bundles/types"
@@ -28,20 +28,23 @@ type Config struct {
 }
 
 type Block struct {
-	BlockId types.BlockID `json:"block_id"`
-	Block   types.Block   `json:"block"`
+	BlockId *types.BlockID `json:"block_id"`
+	Block   *types.Block   `json:"block"`
 }
-
-type BlockResults = coreTypes.ResultBlockResults
 
 type TendermintGoItemValue struct {
-	Block        Block                  `json:"block"`
-	BlockResults BlockResults `json:"block_results"`
+	Block        *Block                  `json:"block"`
+	BlockResults *coreTypes.ResultBlockResults `json:"block_results"`
 }
 
-type TendermintGoTransformedItemValue struct {
-	Block        Block       `json:"block"`
-	BlockResults BlockResults `json:"block_results"`
+type TendermintGoTransformedItemValue = TendermintGoItemValue
+
+type BlockResponse struct {
+	Result *Block `json:"result"`
+}
+
+type BlockResultsResponse struct {
+	Result *coreTypes.ResultBlockResults `json:"result"`
 }
 
 // GetRuntimeName returns the name of the runtime. Example "@kyvejs/tendermint"
@@ -99,30 +102,30 @@ func (t *TendermintGoServer) GetDataItem(ctx context.Context, req *pb.GetDataIte
 	key := req.GetKey()
 
 	blockHeightUrl := fmt.Sprintf("%s/block?height=%s", config.Rpc, key)
-	blockResponse, err := utils.GetResultFromUrl(blockHeightUrl)
+	blockResponse, err := utils.GetFromUrl(blockHeightUrl)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Error getting JSON from URL %s: %v", blockHeightUrl, err)
 	}
 
-	var block Block
+	var block BlockResponse
 	if err := tmJson.Unmarshal(blockResponse, &block); err != nil {
 		return nil, status.Errorf(codes.Internal, "Error unmarshalling block: %s", err)
 	}
 
 	blockResultsHeightUrl := fmt.Sprintf("%s/block_results?height=%s", config.Rpc, key)
-	blockResultsResponse, err := utils.GetResultFromUrl(blockResultsHeightUrl)
+	blockResultsResponse, err := utils.GetFromUrl(blockResultsHeightUrl)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Error getting JSON from URL %s: %v", blockResultsHeightUrl, err)
 	}
 
-	var blockResults BlockResults
+	var blockResults BlockResultsResponse
 	if err := tmJson.Unmarshal(blockResultsResponse, &blockResults); err != nil {
 		return nil, status.Errorf(codes.Internal, "Error unmarshalling block results: %s", err)
 	}
 
 	value := TendermintGoItemValue{
-		Block:        block,
-		BlockResults: blockResults,
+		Block:        block.Result,
+		BlockResults: blockResults.Result,
 	}
 
 	parsedJson, err := tmJson.Marshal(value)
@@ -130,7 +133,7 @@ func (t *TendermintGoServer) GetDataItem(ctx context.Context, req *pb.GetDataIte
 		return nil, status.Errorf(codes.Internal, "Error marshalling value data: %v", err)
 	}
 
-	return &pb.GetDataItemResponse{DataItem: &pb.DataItem{Key: key, Value: string(parsedJson)}}, nil
+	return &pb.GetDataItemResponse{DataItem: &pb.DataItem{Key: key, Value: parsedJson}}, nil
 }
 
 // PrevalidateDataItem prevalidates a data item right after is was retrieved from source.
@@ -184,28 +187,10 @@ func (t *TendermintGoServer) TransformDataItem(ctx context.Context, req *pb.Tran
 //
 // Deterministic behavior is required
 func (t *TendermintGoServer) ValidateDataItem(ctx context.Context, req *pb.ValidateDataItemRequest) (*pb.ValidateDataItemResponse, error) {
-	requestProposedDataItem := req.GetProposedDataItem()
-	requestValidationDataItem := req.GetValidationDataItem()
-
-	var proposed TendermintGoTransformedItemValue
-	var validation TendermintGoTransformedItemValue
-	
-	if err := tmJson.Unmarshal([]byte(requestProposedDataItem.GetValue()), &proposed); err != nil {
-		return nil, status.Errorf(codes.Internal, "Error unmarshalling proposedDataItem: %v", err)
-	}
-	
-	if err := tmJson.Unmarshal([]byte(requestValidationDataItem.GetValue()), &validation); err != nil {
-		return nil, status.Errorf(codes.Internal, "Error unmarshalling validationDataItem: %v", err)
-	}
-
-	// Check if the proposedDataItem and validationDataItem are equal
-	if reflect.DeepEqual(proposed, validation) {
+	if bytes.Equal(req.GetProposedDataItem().GetValue(), req.GetValidationDataItem().GetValue()) {
 		return &pb.ValidateDataItemResponse{Vote: bundlestypes.VOTE_TYPE_VALID}, nil
 	}
-
-	// TODO: add custom validation logic here
-
-	// Vote Invalid if proposedDataItem and validationDataItem do not match
+	
 	return &pb.ValidateDataItemResponse{Vote: bundlestypes.VOTE_TYPE_INVALID}, nil
 }
 

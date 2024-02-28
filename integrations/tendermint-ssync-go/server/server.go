@@ -327,10 +327,7 @@ func (t *TendermintSsyncGoServer) TransformDataItem(ctx context.Context, req *pb
 //
 // Deterministic behavior is required
 func (t *TendermintSsyncGoServer) ValidateDataItem(ctx context.Context, req *pb.ValidateDataItemRequest) (*pb.ValidateDataItemResponse, error) {
-	proposed := req.GetProposedDataItem().GetValue()
-	validation := req.GetValidationDataItem().GetValue()
-
-	if bytes.Equal(proposed, validation) {
+	if bytes.Equal(req.GetProposedDataItem().GetValue(), req.GetValidationDataItem().GetValue()) {
 		return &pb.ValidateDataItemResponse{Vote: bundlestypes.VOTE_TYPE_VALID}, nil
 	}
 	
