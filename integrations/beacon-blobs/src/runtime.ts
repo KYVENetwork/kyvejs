@@ -1,11 +1,19 @@
 import { DataItem, IRuntime, Validator, VOTE } from "@kyvejs/protocol";
 import { name, version } from "../package.json";
-import axios from 'axios';
+import axios from "axios";
+import { createVersionedHash, getTransactionByHash } from "../utils/utils";
+import { providers } from "ethers";
+import { hexValue } from "ethers/lib/utils";
+import { SHA256 } from "crypto-js";
 
-// EVM config
+
+// Beacon Blobs config
 interface IConfig {
-  rpc: string;
+  consensusRPC: string;
+  executionRPC: string;
   finality: number;
+  genesisTime: number;
+  sequencer: string;
 }
 
 export default class BeaconBlobs implements IRuntime {
@@ -16,61 +24,110 @@ export default class BeaconBlobs implements IRuntime {
   async validateSetConfig(rawConfig: string): Promise<void> {
     const config: IConfig = JSON.parse(rawConfig);
 
-    if (!config.rpc) {
-      throw new Error(`Config does not have property "rpc" defined`);
-    }
-
-    if (process.env.KYVEJS_EVM_RPC) {
-      config.rpc = process.env.KYVEJS_EVM_RPC;
-
-      console.log("set config RPC to", config.rpc)
-    }
-
     if (!config.finality) {
       throw new Error(`Config does not have finality defined`);
     }
+
+    if (!config.consensusRPC) {
+      throw new Error(`Config does not have property "consensusRPC" defined`);
+    }
+
+    if (!config.executionRPC) {
+      throw new Error(`Config does not have property "executionRPC" defined`);
+    }
+
+    if (!config.genesisTime) {
+      throw new Error(`Config does not have property "genesisTime" defined`);
+    }
+
+    if (!config.sequencer) {
+      throw new Error(`Config does not have property "sequencer" defined`);
+    }
+
+    if (process.env.KYVEJS_BEACON_BLOBS_EXECUTION_RPC) {
+      config.executionRPC = process.env.KYVEJS_BEACON_BLOBS_EXECUTION_RPC;
+
+      console.log("set config executionRPC to", config.executionRPC)
+    }
+
+    if (process.env.KYVEJS_BEACON_BLOBS_CONSENSUS_RPC) {
+      config.consensusRPC = process.env.KYVEJS_BEACON_BLOBS_CONSENSUS_RPC;
+
+      console.log("set config consensusRPC to", config.consensusRPC)
+    }
+
 
     this.config = config;
   }
 
   async  getDataItem(_: Validator, key: string): Promise<any> {
-    const headers = await axios.get(`${this.config.rpc}/eth/v1/beacon/headers`, {
-      headers: {
-        'accept': 'application/json'
-      }
-    });
+    const provider = new providers.StaticJsonRpcProvider(this.config.executionRPC);
 
-    if ((parseInt(headers.data.data[0].header.message.slot)- parseInt(key)) < this.config.finality) {
+    const currentHeight = await provider.getBlockNumber();
+
+    console.log("current height", currentHeight)
+
+    const hexKey = hexValue(+key);
+
+    const block = await provider.getBlockWithTransactions(hexKey);
+
+    // only validate if current height is already 'finalized'
+    if (block.number >= currentHeight - 256) {
       throw new Error(
-        `Finality not reached yet; waiting for next slot`
+        `Finality not reached yet; waiting for next block`
       )
     }
 
-    let dataItem;
+    // Get all type3 transactions that has been sent to the sequencer inbox
+    const filteredTransactions = block.transactions.filter(
+      (tx) => tx.type == 3 && tx.to == this.config.sequencer
+    );
 
-    await axios.get(`${this.config.rpc}/eth/v1/beacon/blob_sidecars/${key}`, {
+    // Calculate corresponding slot number
+    const slotNumber = (block.timestamp - this.config.genesisTime) / 12
+
+    let type3TxsToSequencer: string[] = [];
+    for (const tx of filteredTransactions) {
+      const txDetail = await getTransactionByHash(this.config.executionRPC, tx.hash);
+      type3TxsToSequencer.concat(txDetail["blobVersionedHashes"]);
+    }
+
+    let blobs: any;
+
+    await axios.get(`${this.config.consensusRPC}/eth/v1/beacon/blob_sidecars/${slotNumber}`, {
       headers: {
         'accept': 'application/json'
       }
     }).then((res) => {
-      dataItem = {
-        key,
-        value: res.data.data,
-      }
+      blobs = res.data.data;
     }).catch(err => {
-      if (err.response.status == 404) {
-        dataItem = {
-          key,
-          value: null,
-        }
-      } else {
-        throw new Error(
-          `Failed to query '/eth/v1/beacon/blob_sidecars/${key}'`
-        )
+      throw new Error(
+        `Failed to query '/eth/v1/beacon/blob_sidecars/${slotNumber}'`
+      );
+    });
+
+    let includedBlobs: any[] = [];
+    // For each blob, take KZG commitment and check if it matches with a first versioned hash of type3TxToSequencer.
+    // This means that the blob was actually sent to the sequencer address.
+    // If it matches, include the blob in data item, if not, skip blob.
+    blobs.forEach((b: any) => {
+      const commitment= createVersionedHash(b["kzg_commitment"]);
+
+      if (type3TxsToSequencer.includes(commitment)) {
+        includedBlobs.push(b)
       }
     });
 
-    return dataItem;
+    if (includedBlobs.length != type3TxsToSequencer.length) {
+      throw new Error(
+        `Length of included blobs and txs to sequencer is not equal`
+      )
+    }
+
+    return {
+      key,
+      value: includedBlobs,
+    };
   }
 
 
@@ -99,7 +156,10 @@ export default class BeaconBlobs implements IRuntime {
   }
 
   async summarizeDataBundle(_: Validator, bundle: DataItem[]): Promise<string> {
-    return bundle.at(-1)?.value?.hash ?? '';
+    return JSON.stringify(bundle.map((x: any) => {
+      const str = JSON.stringify(x)
+      return SHA256(str)
+    }));
   }
 
   async nextKey(_: Validator, key: string): Promise<string> {
