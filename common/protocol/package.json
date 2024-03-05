@@ -32,7 +32,6 @@
     "bignumber.js": "^9.1.2",
     "clone": "^2.1.2",
     "commander": "^9.4.1",
-    "diff": "^5.1.0",
     "fs-extra": "^10.0.1",
     "jsonfile": "^6.1.0",
     "jszip": "^3.10.1",
