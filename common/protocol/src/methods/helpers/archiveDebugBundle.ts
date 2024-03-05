@@ -53,15 +53,6 @@ export function archiveDebugBundle(
     );
     zip.file("validation_bundle.json", validation_bundle_str);
 
-    // save the diff of the proposed and local bundle
-    // const diff_str = Diff.createTwoFilesPatch(
-    //   "proposed_bundle.json",
-    //   "validation_bundle.json",
-    //   proposed_bundle_str,
-    //   validation_bundle_str
-    // );
-    // zip.file("diff.txt", diff_str);
-
     // save the logfile of the current session
     const debug_str = readFileSync(path.join(this.home, "logs", this.logFile));
     zip.file("debug.log", debug_str);
