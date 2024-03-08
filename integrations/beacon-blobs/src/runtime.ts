@@ -65,8 +65,6 @@ export default class BeaconBlobs implements IRuntime {
 
     const currentHeight = await provider.getBlockNumber();
 
-    console.log("current height", currentHeight)
-
     const hexKey = hexValue(+key);
 
     const block = await provider.getBlockWithTransactions(hexKey);
@@ -89,7 +87,7 @@ export default class BeaconBlobs implements IRuntime {
     let type3TxsToSequencer: string[] = [];
     for (const tx of filteredTransactions) {
       const txDetail = await getTransactionByHash(this.config.executionRPC, tx.hash);
-      type3TxsToSequencer.concat(txDetail["blobVersionedHashes"]);
+      txDetail["blobVersionedHashes"].forEach((bHash: any) => type3TxsToSequencer.push(bHash))
     }
 
     let blobs: any;
@@ -126,7 +124,10 @@ export default class BeaconBlobs implements IRuntime {
 
     return {
       key,
-      value: includedBlobs,
+      value: {
+        slot: slotNumber,
+        blobs: includedBlobs
+      },
     };
   }
 
@@ -156,10 +157,12 @@ export default class BeaconBlobs implements IRuntime {
   }
 
   async summarizeDataBundle(_: Validator, bundle: DataItem[]): Promise<string> {
-    return JSON.stringify(bundle.map((x: any) => {
-      const str = JSON.stringify(x)
-      return SHA256(str)
-    }));
+    // return JSON.stringify(bundle.map((x: any) => {
+    //   const str = JSON.stringify(x)
+    //   return SHA256(str)
+    // }));
+
+    return bundle.at(0)?.value.slot + "-" + bundle.at(-1)?.value.slot;
   }
 
   async nextKey(_: Validator, key: string): Promise<string> {
