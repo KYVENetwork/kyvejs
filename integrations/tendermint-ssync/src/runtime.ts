@@ -173,11 +173,14 @@ export default class TendermintSSync implements IRuntime {
     validationDataItem: DataItem
   ): Promise<number> {
     // exclude tendermint software version from validation
-    if (proposedDataItem.value.state) {
+    if (proposedDataItem.value.state && proposedDataItem.value.state.Version) {
       delete proposedDataItem.value.state.Version.software;
     }
 
-    if (validationDataItem.value.state) {
+    if (
+      validationDataItem.value.state &&
+      validationDataItem.value.state.Version
+    ) {
       delete validationDataItem.value.state.Version.software;
     }
 
