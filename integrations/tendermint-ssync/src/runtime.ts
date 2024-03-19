@@ -118,7 +118,7 @@ export default class TendermintSSync implements IRuntime {
     // throw error if chunk is missing
     if (!item.value.chunk) {
       throw new Error(`Value in data item has no snapshot chunk`);
-    } 
+    }
 
     if (chunkIndex > 0) {
       // throw error if one of those values is not null
@@ -172,6 +172,18 @@ export default class TendermintSSync implements IRuntime {
     proposedDataItem: DataItem,
     validationDataItem: DataItem
   ): Promise<number> {
+    // exclude tendermint software version from validation
+    if (proposedDataItem.value.state && proposedDataItem.value.state.Version) {
+      delete proposedDataItem.value.state.Version.software;
+    }
+
+    if (
+      validationDataItem.value.state &&
+      validationDataItem.value.state.Version
+    ) {
+      delete validationDataItem.value.state.Version.software;
+    }
+
     // apply equal comparison
     if (
       JSON.stringify(proposedDataItem) === JSON.stringify(validationDataItem)
