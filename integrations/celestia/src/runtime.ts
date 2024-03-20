@@ -28,18 +28,22 @@ export default class Celestia implements IRuntime {
       config.rpc = process.env.KYVEJS_CELESTIA_RPC;
     }
 
+    if (!process.env.CELESTIA_NODE_AUTH_TOKEN) {
+      throw new Error(`Environment variable CELESTIA_NODE_AUTH_TOKEN is not defined`)
+    }
+
     this.config = config;
   }
 
   async getDataItem(_: Validator, key: string): Promise<DataItem> {
+    let header;
     // fetch GetAll from namespace
-    const { data } = await axios.post(this.config.rpc, {
+    const headerResult = await axios.post(this.config.rpc, {
       id: 1,
       jsonrpc: '2.0',
-      method: 'blob.GetAll',
+      method: 'header.GetByHeight',
       params: [
-        +key,
-        this.config.namespaces
+        300,
       ]
     }, {
       headers: {
@@ -48,10 +52,62 @@ export default class Celestia implements IRuntime {
       }
     });
 
-    if (data.result) {
-      return { key, value: data.result };
+    if (headerResult.data.result) {
+      header = headerResult.data.result
+    } else {
+      throw new Error(`Failed to query header`)
     }
-    return { key, value: [] };
+
+    const eds = await axios.post(this.config.rpc, {
+      id: 1,
+      jsonrpc: '2.0',
+      method: 'share.GetEDS',
+      params: [
+        header,
+      ]
+    }, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.CELESTIA_NODE_AUTH_TOKEN}`
+      }
+    });
+
+    if (!eds.data.result) {
+      throw new Error(`Failed to query EDS Header`)
+    }
+
+    const sharesByNamespaces: Map<string, any> = new Map<string, any>()
+
+    for (const namespace of this.config.namespaces) {
+      const sharesByNamespace = await axios.post(this.config.rpc, {
+        id: 1,
+        jsonrpc: '2.0',
+        method: 'share.GetSharesByNamespace',
+        params: [
+          header,
+          namespace
+        ]
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.CELESTIA_NODE_AUTH_TOKEN}`
+        }
+      });
+
+      if (sharesByNamespace.data.result) {
+        sharesByNamespaces.set(namespace, sharesByNamespace.data)
+      } else {
+        sharesByNamespaces.set(namespace, [])
+      }
+    }
+
+    return {
+      key,
+      value: {
+        eds: eds.data.result,
+        sharesByNamespace: sharesByNamespaces
+      }
+    };
   }
 
   async prevalidateDataItem(_: Validator, dataItem: DataItem): Promise<boolean> {
