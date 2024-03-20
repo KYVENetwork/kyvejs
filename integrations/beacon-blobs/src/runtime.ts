@@ -13,7 +13,7 @@ interface IConfig {
   executionRPC: string;
   finality: number;
   genesisTime: number;
-  sequencer: string;
+  sequencer: string[];
 }
 
 export default class BeaconBlobs implements IRuntime {
@@ -40,7 +40,7 @@ export default class BeaconBlobs implements IRuntime {
       throw new Error(`Config does not have property "genesisTime" defined`);
     }
 
-    if (!config.sequencer) {
+    if (!config.sequencer.length) {
       throw new Error(`Config does not have property "sequencer" defined`);
     }
 
@@ -78,7 +78,12 @@ export default class BeaconBlobs implements IRuntime {
 
     // Get all type3 transactions that has been sent to the sequencer inbox
     const filteredTransactions = block.transactions.filter(
-      (tx) => tx.type == 3 && tx.to == this.config.sequencer
+      (tx) => {
+        if (tx.to) {
+          return tx.type == 3 && this.config.sequencer.includes(tx.to)
+        }
+        return false
+      }
     );
 
     // Calculate corresponding slot number
