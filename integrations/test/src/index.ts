@@ -1,6 +1,6 @@
 import { Validator } from '@kyvejs/protocol';
-import BeaconBlobs from "./runtime";
+import Tendermint from './runtime';
 
-const runtime = new BeaconBlobs();
+const runtime = new Tendermint();
 
 new Validator(runtime).bootstrap();

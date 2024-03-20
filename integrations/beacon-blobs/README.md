@@ -1,1 +1,0 @@
-# @kyvejs/beacon-blobs
