@@ -4,7 +4,6 @@ import axios from "axios";
 import { createVersionedHash, getTransactionByHash } from "../utils/utils";
 import { providers } from "ethers";
 import { hexValue } from "ethers/lib/utils";
-import { SHA256 } from "crypto-js";
 
 
 // Beacon Blobs config
