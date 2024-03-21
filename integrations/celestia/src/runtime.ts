@@ -37,13 +37,14 @@ export default class Celestia implements IRuntime {
 
   async getDataItem(_: Validator, key: string): Promise<DataItem> {
     let header;
+
     // fetch GetAll from namespace
     const headerResult = await axios.post(this.config.rpc, {
       id: 1,
       jsonrpc: '2.0',
       method: 'header.GetByHeight',
       params: [
-        300,
+        +key,
       ]
     }, {
       headers: {
@@ -58,28 +59,10 @@ export default class Celestia implements IRuntime {
       throw new Error(`Failed to query header`)
     }
 
-    const eds = await axios.post(this.config.rpc, {
-      id: 1,
-      jsonrpc: '2.0',
-      method: 'share.GetEDS',
-      params: [
-        header,
-      ]
-    }, {
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.CELESTIA_NODE_AUTH_TOKEN}`
-      }
-    });
-
-    if (!eds.data.result) {
-      throw new Error(`Failed to query EDS Header`)
-    }
-
-    const sharesByNamespaces: Map<string, any> = new Map<string, any>()
+    const sharesByNamespaces: any[] = []
 
     for (const namespace of this.config.namespaces) {
-      const sharesByNamespace = await axios.post(this.config.rpc, {
+      const shares = await axios.post(this.config.rpc, {
         id: 1,
         jsonrpc: '2.0',
         method: 'share.GetSharesByNamespace',
@@ -94,17 +77,12 @@ export default class Celestia implements IRuntime {
         }
       });
 
-      if (sharesByNamespace.data.result) {
-        sharesByNamespaces.set(namespace, sharesByNamespace.data)
-      } else {
-        sharesByNamespaces.set(namespace, [])
-      }
+      sharesByNamespaces.push({[namespace]: shares.data.result})
     }
 
     return {
       key,
       value: {
-        eds: eds.data.result,
         sharesByNamespace: sharesByNamespaces
       }
     };
