@@ -99,6 +99,13 @@ export class Validator {
   protected metricsPort!: number;
   protected home!: string;
 
+  // tmp variables
+  protected lastUploadedBundle: {
+    storageId: string;
+    dataSize: number;
+    dataHash: string;
+  } | null = null;
+
   // setups
   protected setupLogger = setupLogger;
   protected setupCacheProvider = setupCacheProvider;
