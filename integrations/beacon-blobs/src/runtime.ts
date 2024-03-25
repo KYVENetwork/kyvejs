@@ -85,9 +85,6 @@ export default class BeaconBlobs implements IRuntime {
       }
     );
 
-    // Calculate corresponding slot number
-    const slotNumber = (block.timestamp - this.config.genesisTime) / 12
-
     let type3TxsToSequencer: string[] = [];
     for (const tx of filteredTransactions) {
       const txDetail = await getTransactionByHash(this.config.executionRPC, tx.hash);
@@ -95,6 +92,9 @@ export default class BeaconBlobs implements IRuntime {
     }
 
     let blobs: any;
+
+    // Calculate corresponding slot number
+    const slotNumber = (block.timestamp - this.config.genesisTime) / 12
 
     await axios.get(`${this.config.consensusRPC}/eth/v1/beacon/blob_sidecars/${slotNumber}`, {
       headers: {
