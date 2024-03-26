@@ -184,6 +184,19 @@ export default class Tendermint implements IRuntime {
                 );
               }
 
+              // set attribute "ibccallbackerror-error" in ibc event "ibccallbackerror-fungible_token_packet" to empty string
+              if (event.type === 'ibccallbackerror-fungible_token_packet') {
+                event.attributes = event.attributes.map(
+                  (attribute: IAttribute) => {
+                    if (attribute.key === 'ibccallbackerror-error') {
+                      attribute.value = '';
+                    }
+
+                    return attribute;
+                  }
+                );
+              }
+
               return event;
             });
           }
