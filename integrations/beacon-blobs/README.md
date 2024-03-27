@@ -31,7 +31,7 @@ config provides a good overview about the requirements:
 
 ```
 {
-  "consensusRPC": <endpoint of local running consensus client (Prysm)>;
+  "consensusRPC": <endpoint of local running consensus client (Lighthouse)>;
   "executionRPC": <endpoint of local running execution client (Geth)>;
   "finality": <number of blocks the pool waits before archiving>;
   "genesisTime": <genesis time of the beacon node>;
@@ -53,7 +53,7 @@ In addition to the configuration, the steps of the `getDataItem` method of the r
 ## Required Setup
 
 This runtime requires the node operator to run an Ethereum node which is used as the source and the KYVE protocol node. The Ethereum node 
-itself consists of the consensus layer (Prysm) and the execution layer (Geth). The minimum hardware requirements are at least the min requirements 
+itself consists of the consensus layer (Lighthouse) and the execution layer (Geth). The minimum hardware requirements are at least the min requirements 
 of that Ethereum node.
 
 ## Binary Installation
