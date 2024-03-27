@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.7](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint@1.1.6...@kyvejs/tendermint@1.1.7) (2024-03-27)
+
+### Bug Fixes
+
+- ignore ibc error which is non-deterministic ([#125](https://github.com/KYVENetwork/kyvejs/issues/125)) ([a34ceeb](https://github.com/KYVENetwork/kyvejs/commit/a34ceebcb6aac134d3372ab8193a99328e892625))
+
 ## [1.1.6](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint@1.1.5...@kyvejs/tendermint@1.1.6) (2024-03-25)
 
 **Note:** Version bump only for package @kyvejs/tendermint
