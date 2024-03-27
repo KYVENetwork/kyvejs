@@ -29,7 +29,7 @@ and KYVE is here to support that.
 This section explains how the blobs of specified sequencer addresses are obtained in order to validate them properly. First, the pool 
 config provides a good overview about the requirements:
 
-```json
+```
 {
   "consensusRPC": <endpoint of local running consensus client (Prysm)>;
   "executionRPC": <endpoint of local running execution client (Geth)>;
