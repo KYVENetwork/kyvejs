@@ -6,7 +6,6 @@ import { providers } from "ethers";
 import { hexValue } from "ethers/lib/utils";
 import { createHashesFromBundle, generateMerkleRoot } from "../utils/merkle";
 
-
 // Ethereum Blobs config
 interface IConfig {
   consensusRPC: string;
@@ -56,8 +55,14 @@ export default class EthereumBlobs implements IRuntime {
       console.log("set config consensusRPC to", config.consensusRPC)
     }
 
+    // Set the sequencer addresses to lower case
+    const sequencerLower: string[] = [];
+    config.sequencer.forEach(s => {
+      sequencerLower.push(s.toLowerCase())
+    })
 
     this.config = config;
+    this.config.sequencer = sequencerLower;
   }
 
   async  getDataItem(_: Validator, key: string): Promise<any> {
@@ -79,7 +84,10 @@ export default class EthereumBlobs implements IRuntime {
     // Get all type3 transactions that has been sent to the sequencer inbox
     const filteredTransactions = block.transactions.filter(
       (tx) => {
-        return tx.to && tx.type == 3 && this.config.sequencer.includes(tx.to)
+        if (tx.to) {
+          return tx.type == 3 && this.config.sequencer.includes(tx.to.toLowerCase())
+        }
+        return false
       }
     );
 
