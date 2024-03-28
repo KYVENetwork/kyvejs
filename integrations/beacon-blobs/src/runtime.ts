@@ -4,6 +4,7 @@ import axios from "axios";
 import { createVersionedHash, getTransactionByHash } from "../utils/utils";
 import { providers } from "ethers";
 import { hexValue } from "ethers/lib/utils";
+import { createHashesFromBundle, generateMerkleRoot } from "../utils/merkle";
 
 
 // Beacon Blobs config
@@ -78,10 +79,7 @@ export default class BeaconBlobs implements IRuntime {
     // Get all type3 transactions that has been sent to the sequencer inbox
     const filteredTransactions = block.transactions.filter(
       (tx) => {
-        if (tx.to) {
-          return tx.type == 3 && this.config.sequencer.includes(tx.to)
-        }
-        return false
+        return tx.to && tx.type == 3 && this.config.sequencer.includes(tx.to)
       }
     );
 
@@ -91,7 +89,7 @@ export default class BeaconBlobs implements IRuntime {
       txDetail["blobVersionedHashes"].forEach((bHash: any) => type3TxsToSequencer.push(bHash))
     }
 
-    let blobs: any;
+    let blobs: any[] = [];
 
     // Calculate corresponding slot number
     const slotNumber = (block.timestamp - this.config.genesisTime) / 12
@@ -104,7 +102,7 @@ export default class BeaconBlobs implements IRuntime {
       blobs = res.data.data;
     }).catch(err => {
       throw new Error(
-        `Failed to query '/eth/v1/beacon/blob_sidecars/${slotNumber}'`
+        `Failed to query '/eth/v1/beacon/blob_sidecars/${slotNumber}': ${err}`
       );
     });
 
@@ -126,6 +124,8 @@ export default class BeaconBlobs implements IRuntime {
       )
     }
 
+    // TODO: Ensure that includedBlobs are JSON
+
     return {
       key,
       value: {
@@ -138,7 +138,7 @@ export default class BeaconBlobs implements IRuntime {
 
   async prevalidateDataItem(_: Validator, item: DataItem): Promise<boolean> {
     // check if item value is not null
-    return true;
+    return item.value && item.value.slot
   }
 
   async transformDataItem(_: Validator, item: DataItem): Promise<DataItem> {
@@ -161,12 +161,15 @@ export default class BeaconBlobs implements IRuntime {
   }
 
   async summarizeDataBundle(_: Validator, bundle: DataItem[]): Promise<string> {
-    // return JSON.stringify(bundle.map((x: any) => {
-    //   const str = JSON.stringify(x)
-    //   return SHA256(str)
-    // }));
+    const hashes = createHashesFromBundle(bundle);
 
-    return bundle.at(0)?.value.slot + "-" + bundle.at(-1)?.value.slot;
+    const merkleRoot = generateMerkleRoot(hashes);
+
+    return JSON.stringify({
+      "from_slot": bundle.at(0)?.value.slot,
+      "to_slot": bundle.at(-1)?.value.slot,
+      "merkle_root": merkleRoot
+    })
   }
 
   async nextKey(_: Validator, key: string): Promise<string> {
