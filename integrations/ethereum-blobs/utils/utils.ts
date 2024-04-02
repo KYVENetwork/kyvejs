@@ -21,6 +21,8 @@ export async function getTransactionByHash(rpc: string, hash: string) {
   }
 }
 
+// Creates the versioned hash for a kzg_commitment to enable
+// the comparison with a tx_hash.
 export function createVersionedHash(hex: string): string {
   if (hex.startsWith('0x')) {
     hex = hex.slice(2);

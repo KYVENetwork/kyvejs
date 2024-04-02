@@ -1,12 +1,7 @@
 import * as crypto from '@cosmjs/crypto';
 
-
-export function createHashesFromBundle(bundle: any[]): Uint8Array[]{
-  const hashes: any[] = []
-  bundle.forEach(dataItem => {
-    hashes.push(dataItemToSha256(dataItem))
-  })
-  return hashes
+export function createHashesFromBundle(bundle: any[]): Uint8Array[] {
+  return bundle.map(dataItem => dataItemToSha256(dataItem))
 }
 
 function dataItemToSha256(data: any): Uint8Array {
@@ -16,7 +11,7 @@ function dataItemToSha256(data: any): Uint8Array {
   return crypto.sha256(encoded_obj)
 }
 
-export function generateMerkleRoot(hashes: any): string {
+export function generateMerkleRoot(hashes: Uint8Array[]): string {
   if (!hashes || hashes.length == 0) {
     return '';
   }
