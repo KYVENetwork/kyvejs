@@ -10,10 +10,8 @@ export function createHashesFromBundle(bundle: any[]): Uint8Array[]{
 }
 
 function dataItemToSha256(data: any): Uint8Array {
-  // Serialize the object to JSON
-  const serialized_obj: string = JSON.stringify(data, Object.keys(data));
   // Encode the serialized object to UTF-8
-  const encoded_obj: Uint8Array = Buffer.from(serialized_obj, 'utf-8');
+  const encoded_obj: Uint8Array = Buffer.from(JSON.stringify(data), 'utf-8');
   // Calculate the SHA-256 hash
   return crypto.sha256(encoded_obj)
 }

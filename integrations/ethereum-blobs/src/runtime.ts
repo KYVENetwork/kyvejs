@@ -84,8 +84,14 @@ export default class EthereumBlobs implements IRuntime {
     // Get all type3 transactions that has been sent to the sequencer inbox
     const filteredTransactions = block.transactions.filter(
       (tx) => {
-        if (tx.to) {
-          return tx.type == 3 && this.config.sequencer.includes(tx.to.toLowerCase())
+        if (tx.type == 3) {
+          if (tx.to && tx.from) {
+            return this.config.sequencer.includes(tx.to.toLowerCase()) || this.config.sequencer.includes(tx.from.toLowerCase())
+          } else if (tx.to && !tx.from) {
+            return this.config.sequencer.includes(tx.to.toLowerCase())
+          } else if (!tx.to && tx.from) {
+            return this.config.sequencer.includes(tx.from.toLowerCase())
+          }
         }
         return false
       }
