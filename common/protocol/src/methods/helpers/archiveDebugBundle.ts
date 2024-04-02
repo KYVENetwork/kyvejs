@@ -31,6 +31,9 @@ export function archiveDebugBundle(
       mkdirSync(path.join(this.home, `debug`), { recursive: true });
     }
 
+    // if size of debug folder exceeds debug max limit we don't store an archive
+    // TODO: how to get size of directory?
+
     const zip = new JSZip();
 
     // save metadata which includes vote reasons and args
