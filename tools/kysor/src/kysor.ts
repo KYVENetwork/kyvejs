@@ -424,6 +424,11 @@ export const run = async (options: any) => {
         args.push(`${valaccount.metricsPort}`);
       }
 
+      if (valaccount.debugMaxSize) {
+        args.push("--debug-max-size");
+        args.push(`${valaccount.debugMaxSize}`);
+      }
+
       logger.info("Starting process ...");
 
       console.log("\n");
