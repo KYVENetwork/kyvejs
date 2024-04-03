@@ -360,4 +360,24 @@ valaccounts
     }
   });
 
+valaccounts
+  .command("list")
+  .description("List all valaccounts")
+  .option(
+    "--home <string>",
+    "The location of the .kysor home directory where binaries and configs are stored."
+  )
+  .action(async (options) => {
+    try {
+      const home = path.join(options.home || USER_HOME, KYSOR_DIR);
+
+      const files = fs.readdirSync(path.join(home, "valaccounts"));
+      for (const file of files) {
+        console.log(file.replace(".toml", ""));
+      }
+    } catch (err) {
+      console.log(`ERROR: Could not list valaccounts: ${err}`);
+    }
+  });
+
 export default valaccounts;
