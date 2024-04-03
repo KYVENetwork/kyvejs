@@ -51,6 +51,11 @@ valaccounts
     "Specify the port of the metrics server. Only considered if '--metrics' is set [default = 8080]",
     "8080"
   )
+  .option(
+    "--debug-max-size <number>",
+    "Specify the max size in bytes for the debug folder. [default = 10737418240 (10GB)]",
+    "10737418240"
+  )
   .option("--recover", "Create a valaccount by importing an existing mnemonic")
   .action(async (options) => {
     try {
@@ -133,6 +138,7 @@ valaccounts
         cache: options.cache,
         metrics: options.metrics,
         metricsPort: options.metricsPort,
+        debugMaxSize: options.debugMaxSize,
       };
 
       fs.writeFileSync(
