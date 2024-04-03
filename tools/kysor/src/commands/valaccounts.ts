@@ -366,7 +366,7 @@ valaccounts
       const home = path.join(options.home || USER_HOME, KYSOR_DIR);
 
       const files = fs.readdirSync(path.join(home, "valaccounts"));
-      for (let file of files) {
+      for (const file of files) {
         console.log(file.replace(".toml", ""));
       }
     } catch (err) {
