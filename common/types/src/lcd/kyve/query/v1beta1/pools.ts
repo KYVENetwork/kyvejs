@@ -84,7 +84,7 @@ export const QueryPoolsRequest = {
     if (message.runtime !== "") {
       writer.uint32(26).string(message.runtime);
     }
-    if (message.disabled === true) {
+    if (message.disabled !== false) {
       writer.uint32(32).bool(message.disabled);
     }
     if (message.storage_provider_id !== 0) {
@@ -165,7 +165,7 @@ export const QueryPoolsRequest = {
     if (message.runtime !== "") {
       obj.runtime = message.runtime;
     }
-    if (message.disabled === true) {
+    if (message.disabled !== false) {
       obj.disabled = message.disabled;
     }
     if (message.storage_provider_id !== 0) {

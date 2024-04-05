@@ -385,7 +385,7 @@ export const DelegationData = {
     if (message.delegator_count !== "0") {
       writer.uint32(40).uint64(message.delegator_count);
     }
-    if (message.latest_index_was_undelegation === true) {
+    if (message.latest_index_was_undelegation !== false) {
       writer.uint32(48).bool(message.latest_index_was_undelegation);
     }
     return writer;
@@ -479,7 +479,7 @@ export const DelegationData = {
     if (message.delegator_count !== "0") {
       obj.delegator_count = message.delegator_count;
     }
-    if (message.latest_index_was_undelegation === true) {
+    if (message.latest_index_was_undelegation !== false) {
       obj.latest_index_was_undelegation = message.latest_index_was_undelegation;
     }
     return obj;

@@ -1220,13 +1220,13 @@ export const Params = {
     if (message.min_initial_deposit_ratio !== "") {
       writer.uint32(58).string(message.min_initial_deposit_ratio);
     }
-    if (message.burn_vote_quorum === true) {
+    if (message.burn_vote_quorum !== false) {
       writer.uint32(104).bool(message.burn_vote_quorum);
     }
-    if (message.burn_proposal_deposit_prevote === true) {
+    if (message.burn_proposal_deposit_prevote !== false) {
       writer.uint32(112).bool(message.burn_proposal_deposit_prevote);
     }
-    if (message.burn_vote_veto === true) {
+    if (message.burn_vote_veto !== false) {
       writer.uint32(120).bool(message.burn_vote_veto);
     }
     return writer;
@@ -1362,13 +1362,13 @@ export const Params = {
     if (message.min_initial_deposit_ratio !== "") {
       obj.min_initial_deposit_ratio = message.min_initial_deposit_ratio;
     }
-    if (message.burn_vote_quorum === true) {
+    if (message.burn_vote_quorum !== false) {
       obj.burn_vote_quorum = message.burn_vote_quorum;
     }
-    if (message.burn_proposal_deposit_prevote === true) {
+    if (message.burn_proposal_deposit_prevote !== false) {
       obj.burn_proposal_deposit_prevote = message.burn_proposal_deposit_prevote;
     }
-    if (message.burn_vote_veto === true) {
+    if (message.burn_vote_veto !== false) {
       obj.burn_vote_veto = message.burn_vote_veto;
     }
     return obj;

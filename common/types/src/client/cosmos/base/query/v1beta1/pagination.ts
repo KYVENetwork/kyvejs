@@ -84,10 +84,10 @@ export const PageRequest = {
     if (message.limit !== "0") {
       writer.uint32(24).uint64(message.limit);
     }
-    if (message.count_total === true) {
+    if (message.count_total !== false) {
       writer.uint32(32).bool(message.count_total);
     }
-    if (message.reverse === true) {
+    if (message.reverse !== false) {
       writer.uint32(40).bool(message.reverse);
     }
     return writer;
@@ -165,10 +165,10 @@ export const PageRequest = {
     if (message.limit !== "0") {
       obj.limit = message.limit;
     }
-    if (message.count_total === true) {
+    if (message.count_total !== false) {
       obj.count_total = message.count_total;
     }
-    if (message.reverse === true) {
+    if (message.reverse !== false) {
       obj.reverse = message.reverse;
     }
     return obj;
@@ -263,7 +263,7 @@ export const PageResponse = {
 };
 
 function bytesFromBase64(b64: string): Uint8Array {
-  if (globalThis.Buffer) {
+  if ((globalThis as any).Buffer) {
     return Uint8Array.from(globalThis.Buffer.from(b64, "base64"));
   } else {
     const bin = globalThis.atob(b64);
@@ -276,7 +276,7 @@ function bytesFromBase64(b64: string): Uint8Array {
 }
 
 function base64FromBytes(arr: Uint8Array): string {
-  if (globalThis.Buffer) {
+  if ((globalThis as any).Buffer) {
     return globalThis.Buffer.from(arr).toString("base64");
   } else {
     const bin: string[] = [];

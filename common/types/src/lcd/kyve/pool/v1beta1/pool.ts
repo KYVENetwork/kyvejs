@@ -467,7 +467,7 @@ export const Pool = {
     if (message.max_bundle_size !== "0") {
       writer.uint32(112).uint64(message.max_bundle_size);
     }
-    if (message.disabled === true) {
+    if (message.disabled !== false) {
       writer.uint32(120).bool(message.disabled);
     }
     if (message.protocol !== undefined) {
@@ -708,7 +708,7 @@ export const Pool = {
     if (message.max_bundle_size !== "0") {
       obj.max_bundle_size = message.max_bundle_size;
     }
-    if (message.disabled === true) {
+    if (message.disabled !== false) {
       obj.disabled = message.disabled;
     }
     if (message.protocol !== undefined) {

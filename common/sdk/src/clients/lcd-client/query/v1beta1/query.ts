@@ -161,6 +161,7 @@ export class KyveRegistryLCDClient extends AbstractKyveLCDClient {
     const endpoint = `/kyve/v1/bundles/${params.pool_id}`;
     return await this.request(endpoint, parameters);
   }
+
   async currentVoteStatus(
     params: kyveQueryBundles.QueryCurrentVoteStatusRequest
   ): Promise<kyveQueryBundlesRes.QueryCurrentVoteStatusResponse> {
