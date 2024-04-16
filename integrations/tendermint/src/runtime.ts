@@ -105,7 +105,9 @@ export default class Tendermint implements IRuntime {
 
     if (!block_validate(item.value.block)) {
       throw new Error(
-        `Block schema validation failed: ${block_validate.errors}`
+        `Block schema validation failed: ${JSON.stringify(
+          block_validate.errors
+        )}`
       );
     }
 
@@ -114,7 +116,9 @@ export default class Tendermint implements IRuntime {
 
     if (!block_results_validate(item.value.block_results)) {
       throw new Error(
-        `Block results schema validation failed: ${block_results_validate.errors}`
+        `Block results schema validation failed: ${JSON.stringify(
+          block_results_validate.errors
+        )}`
       );
     }
 

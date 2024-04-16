@@ -147,6 +147,40 @@
         }
       ]
     },
+    "finalize_block_events": {
+      "type": ["array", "null"],
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string"
+            },
+            "attributes": {
+              "type": "array",
+              "items": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "key": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": ["string", "null"]
+                    },
+                    "index": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": ["key", "value", "index"]
+                }
+              ]
+            }
+          },
+          "required": ["type", "attributes"]
+        }
+      ]
+    },
     "validator_updates": {
       "type": ["array", "null"],
       "items": [
@@ -236,10 +270,8 @@
   "required": [
     "height",
     "txs_results",
-    "begin_block_events",
-    "end_block_events",
     "validator_updates",
     "consensus_param_updates"
   ],
-  "additionalProperties": false
+  "additionalProperties": true
 }
