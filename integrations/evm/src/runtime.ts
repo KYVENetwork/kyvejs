@@ -138,16 +138,6 @@ export default class EVM implements IRuntime {
       return VOTE.VOTE_TYPE_VALID;
     }
 
-    // Remove non-deterministic data
-    //   const modifiedValidationDataItem = removeOutputProperties(validationDataItem.value.traceCalls, ["output", "accessList", "address", "value"]);
-    //   const modifiedProposedDataItem = removeOutputProperties(proposedDataItem.value.traceCalls, ["output", "accessList", "address", "value"])
-    //
-    // if (
-    //     JSON.stringify(modifiedProposedDataItem) === JSON.stringify(modifiedValidationDataItem)
-    //   ) {
-    //     return VOTE.VOTE_TYPE_ABSTAIN;
-    //   }
-
     return VOTE.VOTE_TYPE_INVALID;
   }
 
