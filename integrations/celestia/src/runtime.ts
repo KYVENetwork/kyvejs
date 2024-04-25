@@ -1,6 +1,7 @@
 import { DataItem, IRuntime, Validator, VOTE } from '@kyvejs/protocol';
 import { name, version } from '../package.json';
 import axios from 'axios';
+import { createHashesFromBundle, generateMerkleRoot } from "../utils/merkle";
 
 // Celestia config
 interface IConfig {
@@ -112,8 +113,13 @@ export default class Celestia implements IRuntime {
   }
 
   async summarizeDataBundle(_: Validator, bundle: DataItem[]): Promise<string> {
-    // use latest block height as bundle summary
-    return ""
+    const hashes = createHashesFromBundle(bundle);
+
+    const merkleRoot = generateMerkleRoot(hashes);
+
+    return JSON.stringify({
+      "merkle_root": merkleRoot
+    })
   }
 
   async nextKey(_: Validator, key: string): Promise<string> {
