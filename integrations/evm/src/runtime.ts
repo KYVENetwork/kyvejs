@@ -35,11 +35,11 @@ export default class EVM implements IRuntime {
       throw new Error(`Config does not have finality defined`);
     }
 
-    if (!config.includedData.blockWithTransactions && !config.includedData.blockReceipts && !config.includedData.transactionReceipts) {
+    if (!config.includedData?.blockWithTransactions && !config.includedData?.blockReceipts && !config.includedData?.transactionReceipts) {
       throw new Error(`Config require included data`);
     }
 
-    if (!config.includedData.blockReceipts && !config.includedData.transactionReceipts) {
+    if (!config.includedData?.blockReceipts && !config.includedData?.transactionReceipts) {
       throw new Error(`Config can not include block receipts and transaction receipts at the same time`);
     }
 
@@ -60,7 +60,7 @@ export default class EVM implements IRuntime {
     const block = await provider.getBlockWithTransactions(hexKey);
 
     // only validate if current height is already 'finalized'
-    if (block.number >= currentHeight - 256) {
+    if (block.number >= currentHeight - this.config.finality) {
       throw new Error(
         `Finality not reached yet; waiting for next block`
       )
