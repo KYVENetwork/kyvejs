@@ -2,7 +2,8 @@
 
 # Variables
 KYVE_CHAIN_REPO="git@github.com:KYVENetwork/chain.git"
-KYVE_CHAIN_VERSION="v1.4.0"
+# TODO: change this to v1.5.0 once it's released
+KYVE_CHAIN_VERSION="rapha/pool-endkey"
 
 echo "Cloning chain repo version ${KYVE_CHAIN_VERSION}"
 mkdir -p ./tmp

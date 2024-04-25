@@ -1146,7 +1146,7 @@ function createBaseQueryCanValidateResponse(): QueryCanValidateResponse {
 
 export const QueryCanValidateResponse = {
   encode(message: QueryCanValidateResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.possible === true) {
+    if (message.possible !== false) {
       writer.uint32(8).bool(message.possible);
     }
     if (message.reason !== "") {
@@ -1194,7 +1194,7 @@ export const QueryCanValidateResponse = {
 
   toJSON(message: QueryCanValidateResponse): unknown {
     const obj: any = {};
-    if (message.possible === true) {
+    if (message.possible !== false) {
       obj.possible = message.possible;
     }
     if (message.reason !== "") {
@@ -1324,7 +1324,7 @@ function createBaseQueryCanProposeResponse(): QueryCanProposeResponse {
 
 export const QueryCanProposeResponse = {
   encode(message: QueryCanProposeResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.possible === true) {
+    if (message.possible !== false) {
       writer.uint32(8).bool(message.possible);
     }
     if (message.reason !== "") {
@@ -1372,7 +1372,7 @@ export const QueryCanProposeResponse = {
 
   toJSON(message: QueryCanProposeResponse): unknown {
     const obj: any = {};
-    if (message.possible === true) {
+    if (message.possible !== false) {
       obj.possible = message.possible;
     }
     if (message.reason !== "") {
@@ -1502,7 +1502,7 @@ function createBaseQueryCanVoteResponse(): QueryCanVoteResponse {
 
 export const QueryCanVoteResponse = {
   encode(message: QueryCanVoteResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.possible === true) {
+    if (message.possible !== false) {
       writer.uint32(8).bool(message.possible);
     }
     if (message.reason !== "") {
@@ -1550,7 +1550,7 @@ export const QueryCanVoteResponse = {
 
   toJSON(message: QueryCanVoteResponse): unknown {
     const obj: any = {};
-    if (message.possible === true) {
+    if (message.possible !== false) {
       obj.possible = message.possible;
     }
     if (message.reason !== "") {

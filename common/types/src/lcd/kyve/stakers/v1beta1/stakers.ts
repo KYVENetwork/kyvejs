@@ -310,7 +310,7 @@ export const Valaccount = {
     if (message.points !== "0") {
       writer.uint32(32).uint64(message.points);
     }
-    if (message.is_leaving === true) {
+    if (message.is_leaving !== false) {
       writer.uint32(40).bool(message.is_leaving);
     }
     return writer;
@@ -391,7 +391,7 @@ export const Valaccount = {
     if (message.points !== "0") {
       obj.points = message.points;
     }
-    if (message.is_leaving === true) {
+    if (message.is_leaving !== false) {
       obj.is_leaving = message.is_leaving;
     }
     return obj;
