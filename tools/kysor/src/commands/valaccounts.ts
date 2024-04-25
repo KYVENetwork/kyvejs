@@ -51,6 +51,11 @@ valaccounts
     "Specify the port of the metrics server. Only considered if '--metrics' is set [default = 8080]",
     "8080"
   )
+  .option(
+    "--debug-max-size <number>",
+    "Specify the max size in bytes for the debug folder. [default = 10737418240 (10GB)]",
+    "10737418240"
+  )
   .option("--recover", "Create a valaccount by importing an existing mnemonic")
   .action(async (options) => {
     try {
@@ -133,6 +138,7 @@ valaccounts
         cache: options.cache,
         metrics: options.metrics,
         metricsPort: options.metricsPort,
+        debugMaxSize: options.debugMaxSize,
       };
 
       fs.writeFileSync(
@@ -351,6 +357,26 @@ valaccounts
       console.log(`Successfully deleted valaccount ${options.name}`);
     } catch (err) {
       console.log(`ERROR: Could not delete valaccount: ${err}`);
+    }
+  });
+
+valaccounts
+  .command("list")
+  .description("List all valaccounts")
+  .option(
+    "--home <string>",
+    "The location of the .kysor home directory where binaries and configs are stored."
+  )
+  .action(async (options) => {
+    try {
+      const home = path.join(options.home || USER_HOME, KYSOR_DIR);
+
+      const files = fs.readdirSync(path.join(home, "valaccounts"));
+      for (const file of files) {
+        console.log(file.replace(".toml", ""));
+      }
+    } catch (err) {
+      console.log(`ERROR: Could not list valaccounts: ${err}`);
     }
   });
 

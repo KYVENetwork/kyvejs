@@ -1,6 +1,6 @@
 import { existsSync, mkdirSync, createWriteStream, readFileSync } from "fs";
 import path from "path";
-import { DataItem, standardizeError, Validator } from "../..";
+import { DataItem, dirSize, standardizeError, Validator } from "../..";
 import JSZip from "jszip";
 import { VoteType } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
 
@@ -29,6 +29,18 @@ export function archiveDebugBundle(
     // if "debug" folder under target path does not exist create it
     if (!existsSync(path.join(this.home, `debug`))) {
       mkdirSync(path.join(this.home, `debug`), { recursive: true });
+    }
+
+    // if size of debug folder exceeds debug max limit we don't store an archive
+    if (this.debugMaxSize > 0) {
+      const debugDirSize = dirSize(path.join(this.home, `debug`));
+
+      if (debugDirSize >= this.debugMaxSize) {
+        this.logger.warn(
+          `Skipped saving debug information, debug dir exceeded max size of ${this.debugMaxSize} with ${debugDirSize} bytes`
+        );
+        return;
+      }
     }
 
     const zip = new JSZip();

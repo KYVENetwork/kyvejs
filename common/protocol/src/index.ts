@@ -95,9 +95,17 @@ export class Validator {
   protected requestBackoff!: number;
   protected cache!: string;
   protected debug!: boolean;
+  protected debugMaxSize!: number;
   protected metrics!: boolean;
   protected metricsPort!: number;
   protected home!: string;
+
+  // tmp variables
+  protected lastUploadedBundle: {
+    storageId: string;
+    dataSize: number;
+    dataHash: string;
+  } | null = null;
 
   // setups
   protected setupLogger = setupLogger;
@@ -248,6 +256,11 @@ export class Validator {
       )
       .option("--debug", "Run the validator node in debug mode")
       .option(
+        "--debug-max-size <number>",
+        "The maximum size of the debug folder in bytes. Use zero to disable [default = 10737418240 (10GB)]",
+        "10737418240"
+      )
+      .option(
         "--metrics",
         "Start a prometheus metrics server on http://localhost:8080/metrics"
       )
@@ -294,6 +307,7 @@ export class Validator {
     this.requestBackoff = parseInt(options.requestBackoff);
     this.cache = options.cache;
     this.debug = options.debug;
+    this.debugMaxSize = parseInt(options.debugMaxSize);
     this.metrics = options.metrics;
     this.metricsPort = parseInt(options.metricsPort);
     this.home = options.home;
