@@ -90,6 +90,13 @@ export async function createBundleProposal(this: Validator): Promise<void> {
     // as to_key
     const toKey = bundleProposal.at(-1)?.key ?? "";
 
+    if (await this.isEndkeyReached(toKey)) {
+      this.logger.info(`End key reached. Skipping Uploader Role ...`);
+
+      await this.skipUploaderRole(fromIndex);
+      return;
+    }
+
     // get the last value of the bundle proposal and format
     // it so it can be included in the bundle proposal and
     // saved on chain
