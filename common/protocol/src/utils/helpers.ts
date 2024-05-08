@@ -1,6 +1,13 @@
 import { BigNumber } from "bignumber.js";
 import crypto from "crypto";
+<<<<<<< HEAD
 import { DataItem } from "../proto/kyverdk/runtime/v1/runtime";
+=======
+import { statSync, readdirSync } from "fs";
+import { join } from "path";
+
+import { DataItem } from "..";
+>>>>>>> main
 
 const INFINITY_LOOP = true;
 /**
@@ -171,3 +178,30 @@ export async function callWithBackoffStrategy<T>(
     })().catch((err) => reject(err));
   });
 }
+
+/**
+ * Get recursively the size of a dir including all children
+ *
+ * @method dirSize
+ * @param {onErrorRetryerType} dir path of the dir
+ * @return {number} returns the size in bytes
+ */
+export const dirSize = (dir: string): number => {
+  const files = readdirSync(dir, { withFileTypes: true });
+
+  const paths = files.map((file) => {
+    const path = join(dir, file.name);
+
+    if (file.isDirectory()) return dirSize(path);
+
+    if (file.isFile()) {
+      const { size } = statSync(path);
+
+      return size;
+    }
+
+    return 0;
+  });
+
+  return paths.flat(Infinity).reduce((i, size) => i + size, 0);
+};

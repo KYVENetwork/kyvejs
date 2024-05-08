@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.7](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/protocol@1.1.6...@kyvejs/protocol@1.1.7) (2024-04-03)
+
+**Note:** Version bump only for package @kyvejs/protocol
+
+## [1.1.6](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/protocol@1.1.5...@kyvejs/protocol@1.1.6) (2024-03-25)
+
+**Note:** Version bump only for package @kyvejs/protocol
+
+## [1.1.5](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/protocol@1.1.4...@kyvejs/protocol@1.1.5) (2024-03-05)
+
+### Bug Fixes
+
+- debug bundles ([#121](https://github.com/KYVENetwork/kyvejs/issues/121)) ([00b9ade](https://github.com/KYVENetwork/kyvejs/commit/00b9ade296a3bc81c2ab3f2ebb2896ae27a699ae))
+
 ## [1.1.4](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/protocol@1.1.3...@kyvejs/protocol@1.1.4) (2024-01-26)
 
 **Note:** Version bump only for package @kyvejs/protocol

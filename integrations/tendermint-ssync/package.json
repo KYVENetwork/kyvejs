@@ -1,6 +1,6 @@
 {
   "name": "@kyvejs/tendermint-ssync",
-  "version": "1.1.4",
+  "version": "1.1.8",
   "license": "MIT",
   "scripts": {
     "build": "rimraf dist && tsc",
@@ -28,9 +28,14 @@
     "singleQuote": true
   },
   "dependencies": {
+<<<<<<< HEAD
     "@grpc/grpc-js": "^1.9.2",
     "axios": "^0.27.2",
     "dotenv": "^16.3.1"
+=======
+    "@kyvejs/protocol": "1.1.7",
+    "axios": "^0.27.2"
+>>>>>>> main
   },
   "devDependencies": {
     "pkg": "^5.8.0",
