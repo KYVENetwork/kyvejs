@@ -1,7 +1,7 @@
 import { DataItem, IRuntime, Validator, VOTE } from '@kyvejs/protocol';
 import { name, version } from '../package.json';
 import axios from 'axios';
-import { createHashesFromBundle, generateMerkleRoot } from "../utils/merkle";
+import { createHashesFromBundleByNamespace, generateMerkleRoot } from "../utils/merkle";
 
 // Celestia config
 interface IConfig {
@@ -78,7 +78,7 @@ export default class Celestia implements IRuntime {
         }
       });
 
-      sharesByNamespaces.push({[namespace]: shares.data.result})
+      sharesByNamespaces.push({ namespace_id: namespace, data: shares.data.result })
     }
 
     return {
@@ -113,12 +113,12 @@ export default class Celestia implements IRuntime {
   }
 
   async summarizeDataBundle(_: Validator, bundle: DataItem[]): Promise<string> {
-    const hashes = createHashesFromBundle(bundle);
+    const hashes = createHashesFromBundleByNamespace(bundle);
 
     const merkleRoot = generateMerkleRoot(hashes);
 
     return JSON.stringify({
-      "merkle_root": merkleRoot
+      "merkle_root": Buffer.from(merkleRoot).toString("hex")
     })
   }
 
