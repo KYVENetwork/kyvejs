@@ -7,7 +7,7 @@ export class Coins {
   private coinMap: Map<string, BN> = new Map();
 
   constructor(...coinArgs: CoinArgs) {
-    this.setCoinMap(this.coinArgsToCoins(...coinArgs));
+    this.coinMap = this.coinArgsToMap(...coinArgs);
   }
 
   private get coins(): Coin[] {
@@ -155,50 +155,62 @@ export class Coins {
   }
 
   public isAllLTE(...coinArgs: CoinArgs): boolean {
-    return this.coinArgsToCoins(...coinArgs).every(
-      (coin) =>
-        this.coinMap.has(coin.denom) &&
-        this.coinMap.get(coin.denom)!.lte(new BN(coin.amount))
+    const coins = this.coinArgsToMap(...coinArgs);
+
+    return Array.from(this.coinMap.keys()).every(
+      (denom) =>
+        coins.has(denom) &&
+        this.coinMap.get(denom)!.lte(new BN(coins.get(denom)!))
     );
   }
 
   public isAllLT(...coinArgs: CoinArgs): boolean {
-    return this.coinArgsToCoins(...coinArgs).every(
-      (coin) =>
-        this.coinMap.has(coin.denom) &&
-        this.coinMap.get(coin.denom)!.lt(new BN(coin.amount))
+    const coins = this.coinArgsToMap(...coinArgs);
+
+    return Array.from(this.coinMap.keys()).every(
+      (denom) =>
+        coins.has(denom) &&
+        this.coinMap.get(denom)!.lt(new BN(coins.get(denom)!))
     );
   }
 
   public isAnyGTE(...coinArgs: CoinArgs): boolean {
-    return this.coinArgsToCoins(...coinArgs).some(
-      (coin) =>
-        this.coinMap.has(coin.denom) &&
-        this.coinMap.get(coin.denom)!.gte(new BN(coin.amount))
+    const coins = this.coinArgsToMap(...coinArgs);
+
+    return Array.from(this.coinMap.keys()).some(
+      (denom) =>
+        coins.has(denom) &&
+        this.coinMap.get(denom)!.gte(new BN(coins.get(denom)!))
     );
   }
 
   public isAnyGT(...coinArgs: CoinArgs): boolean {
-    return this.coinArgsToCoins(...coinArgs).some(
-      (coin) =>
-        this.coinMap.has(coin.denom) &&
-        this.coinMap.get(coin.denom)!.gt(new BN(coin.amount))
+    const coins = this.coinArgsToMap(...coinArgs);
+
+    return Array.from(this.coinMap.keys()).some(
+      (denom) =>
+        coins.has(denom) &&
+        this.coinMap.get(denom)!.gt(new BN(coins.get(denom)!))
     );
   }
 
   public isAnyLTE(...coinArgs: CoinArgs): boolean {
-    return this.coinArgsToCoins(...coinArgs).some(
-      (coin) =>
-        this.coinMap.has(coin.denom) &&
-        this.coinMap.get(coin.denom)!.lte(new BN(coin.amount))
+    const coins = this.coinArgsToMap(...coinArgs);
+
+    return Array.from(this.coinMap.keys()).some(
+      (denom) =>
+        coins.has(denom) &&
+        this.coinMap.get(denom)!.lte(new BN(coins.get(denom)!))
     );
   }
 
   public isAnyLT(...coinArgs: CoinArgs): boolean {
-    return this.coinArgsToCoins(...coinArgs).some(
-      (coin) =>
-        this.coinMap.has(coin.denom) &&
-        this.coinMap.get(coin.denom)!.lt(new BN(coin.amount))
+    const coins = this.coinArgsToMap(...coinArgs);
+
+    return Array.from(this.coinMap.keys()).some(
+      (denom) =>
+        coins.has(denom) &&
+        this.coinMap.get(denom)!.lt(new BN(coins.get(denom)!))
     );
   }
 
@@ -223,10 +235,14 @@ export class Coins {
     return coins;
   }
 
-  private setCoinMap(coins: Coin[]) {
-    coins.forEach((coin) => {
-      this.coinMap.set(coin.denom, new BN(coin.amount));
+  private coinArgsToMap(...coinArgs: CoinArgs): Map<string, BN> {
+    const map: Map<string, BN> = new Map();
+
+    this.coinArgsToCoins(...coinArgs).forEach((coin) => {
+      map.set(coin.denom, new BN(coin.amount));
     });
+
+    return map;
   }
 
   private sortCoins(coins: Coin[]): Coin[] {

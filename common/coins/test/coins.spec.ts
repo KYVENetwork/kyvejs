@@ -345,4 +345,268 @@ describe("coins.ts", () => {
       new Coins("10acoin,20bcoin").max("10bcoin,10ccoin").toString()
     ).toEqual("10acoin,20bcoin,10ccoin");
   });
+
+  test("isAllGTE", () => {
+    expect(new Coins().isAllGTE()).toBeTruthy();
+
+    expect(new Coins("10acoin,20bcoin,30ccoin").isAllGTE()).toBeTruthy();
+
+    expect(new Coins().isAllGTE("10acoin,20bcoin,30ccoin")).toBeFalsy();
+
+    expect(
+      new Coins("10acoin,20bcoin").isAllGTE("20acoin,30bcoin,40ccoin")
+    ).toBeFalsy();
+
+    expect(
+      new Coins("10acoin,20bcoin,30ccoin").isAllGTE("20acoin,30bcoin,40ccoin")
+    ).toBeFalsy();
+
+    expect(
+      new Coins("20acoin,30bcoin,40ccoin").isAllGTE("10acoin,20bcoin,30ccoin")
+    ).toBeTruthy();
+
+    expect(
+      new Coins("10acoin,20bcoin,30ccoin").isAllGTE("10acoin,20bcoin,30ccoin")
+    ).toBeTruthy();
+
+    expect(
+      new Coins("20acoin,30bcoin,40ccoin").isAllGTE("10acoin,20bcoin")
+    ).toBeTruthy();
+
+    expect(
+      new Coins("20acoin,10bcoin,40ccoin").isAllGTE("10acoin,20bcoin,30ccoin")
+    ).toBeFalsy();
+  });
+
+  test("isAllGT", () => {
+    expect(new Coins().isAllGT()).toBeTruthy();
+
+    expect(new Coins("10acoin,20bcoin,30ccoin").isAllGT()).toBeTruthy();
+
+    expect(new Coins().isAllGT("10acoin,20bcoin,30ccoin")).toBeFalsy();
+
+    expect(
+      new Coins("10acoin,20bcoin").isAllGT("20acoin,30bcoin,40ccoin")
+    ).toBeFalsy();
+
+    expect(
+      new Coins("10acoin,20bcoin,30ccoin").isAllGT("20acoin,30bcoin,40ccoin")
+    ).toBeFalsy();
+
+    expect(
+      new Coins("20acoin,30bcoin,40ccoin").isAllGT("10acoin,20bcoin,30ccoin")
+    ).toBeTruthy();
+
+    expect(
+      new Coins("10acoin,20bcoin,30ccoin").isAllGT("10acoin,20bcoin,30ccoin")
+    ).toBeFalsy();
+
+    expect(
+      new Coins("20acoin,30bcoin,40ccoin").isAllGT("10acoin,20bcoin")
+    ).toBeTruthy();
+
+    expect(
+      new Coins("20acoin,10bcoin,40ccoin").isAllGT("10acoin,20bcoin,30ccoin")
+    ).toBeFalsy();
+  });
+
+  test("isAllLTE", () => {
+    expect(new Coins().isAllLTE()).toBeTruthy();
+
+    expect(new Coins("10acoin,20bcoin,30ccoin").isAllLTE()).toBeFalsy();
+
+    expect(new Coins().isAllLTE("10acoin,20bcoin,30ccoin")).toBeTruthy();
+
+    expect(
+      new Coins("10acoin,20bcoin").isAllLTE("20acoin,30bcoin,40ccoin")
+    ).toBeTruthy();
+
+    expect(
+      new Coins("10acoin,20bcoin,30ccoin").isAllLTE("20acoin,30bcoin,40ccoin")
+    ).toBeTruthy();
+
+    expect(
+      new Coins("20acoin,30bcoin,40ccoin").isAllLTE("10acoin,20bcoin,30ccoin")
+    ).toBeFalsy();
+
+    expect(
+      new Coins("10acoin,20bcoin,30ccoin").isAllLTE("10acoin,20bcoin,30ccoin")
+    ).toBeTruthy();
+
+    expect(
+      new Coins("20acoin,30bcoin,40ccoin").isAllLTE("10acoin,20bcoin")
+    ).toBeFalsy();
+
+    expect(
+      new Coins("10acoin,40bcoin,30ccoin").isAllLTE("20acoin,30bcoin,40ccoin")
+    ).toBeFalsy();
+  });
+
+  test("isAllLT", () => {
+    expect(new Coins().isAllLT()).toBeTruthy();
+
+    expect(new Coins("10acoin,20bcoin,30ccoin").isAllLT()).toBeFalsy();
+
+    expect(new Coins().isAllLT("10acoin,20bcoin,30ccoin")).toBeTruthy();
+
+    expect(
+      new Coins("10acoin,20bcoin").isAllLT("20acoin,30bcoin,40ccoin")
+    ).toBeTruthy();
+
+    expect(
+      new Coins("10acoin,20bcoin,30ccoin").isAllLT("20acoin,30bcoin,40ccoin")
+    ).toBeTruthy();
+
+    expect(
+      new Coins("20acoin,30bcoin,40ccoin").isAllLT("10acoin,20bcoin,30ccoin")
+    ).toBeFalsy();
+
+    expect(
+      new Coins("10acoin,20bcoin,30ccoin").isAllLT("10acoin,20bcoin,30ccoin")
+    ).toBeFalsy();
+
+    expect(
+      new Coins("20acoin,30bcoin,40ccoin").isAllLT("10acoin,20bcoin")
+    ).toBeFalsy();
+
+    expect(
+      new Coins("10acoin,40bcoin,30ccoin").isAllLT("20acoin,30bcoin,40ccoin")
+    ).toBeFalsy();
+  });
+
+  test("isAnyGTE", () => {
+    expect(new Coins().isAnyGTE()).toBeFalsy();
+
+    expect(new Coins("10acoin,20bcoin,30ccoin").isAnyGTE()).toBeFalsy();
+
+    expect(new Coins().isAnyGTE("10acoin,20bcoin,30ccoin")).toBeFalsy();
+
+    expect(
+      new Coins("10acoin,20bcoin").isAnyGTE("20acoin,30bcoin,40ccoin")
+    ).toBeFalsy();
+
+    expect(
+      new Coins("10acoin,20bcoin,30ccoin").isAnyGTE("20acoin,30bcoin,40ccoin")
+    ).toBeFalsy();
+
+    expect(
+      new Coins("30bcoin").isAnyGTE("10acoin,20bcoin,30ccoin")
+    ).toBeTruthy();
+
+    expect(
+      new Coins("10acoin,20bcoin,30ccoin").isAnyGTE("10acoin,20bcoin,30ccoin")
+    ).toBeTruthy();
+
+    expect(
+      new Coins("20acoin,30bcoin,40ccoin").isAnyGTE("10acoin,20bcoin")
+    ).toBeTruthy();
+
+    expect(
+      new Coins("20acoin,10bcoin,40ccoin").isAnyGTE("10acoin,20bcoin,30ccoin")
+    ).toBeTruthy();
+  });
+
+  test("isAnyGT", () => {
+    expect(new Coins().isAnyGT()).toBeFalsy();
+
+    expect(new Coins("10acoin,20bcoin,30ccoin").isAnyGT()).toBeFalsy();
+
+    expect(new Coins().isAnyGT("10acoin,20bcoin,30ccoin")).toBeFalsy();
+
+    expect(
+      new Coins("10acoin,20bcoin").isAnyGT("20acoin,30bcoin,40ccoin")
+    ).toBeFalsy();
+
+    expect(
+      new Coins("10acoin,20bcoin,30ccoin").isAnyGT("20acoin,30bcoin,40ccoin")
+    ).toBeFalsy();
+
+    expect(
+      new Coins("30bcoin").isAnyGT("10acoin,20bcoin,30ccoin")
+    ).toBeTruthy();
+
+    expect(
+      new Coins("10acoin,20bcoin,30ccoin").isAnyGT("10acoin,20bcoin,30ccoin")
+    ).toBeFalsy();
+
+    expect(
+      new Coins("20acoin,30bcoin,40ccoin").isAnyGT("10acoin,20bcoin")
+    ).toBeTruthy();
+
+    expect(
+      new Coins("20acoin,10bcoin,40ccoin").isAnyGT("10acoin,20bcoin,30ccoin")
+    ).toBeTruthy();
+  });
+
+  test("isAnyLTE", () => {
+    expect(new Coins().isAnyLTE()).toBeFalsy();
+
+    expect(new Coins("10acoin,20bcoin,30ccoin").isAnyLTE()).toBeFalsy();
+
+    expect(new Coins().isAnyLTE("10acoin,20bcoin,30ccoin")).toBeFalsy();
+
+    expect(
+      new Coins("10acoin,20bcoin").isAnyLTE("20acoin,30bcoin,40ccoin")
+    ).toBeTruthy();
+
+    expect(
+      new Coins("10acoin,20bcoin,30ccoin").isAnyLTE("20acoin,30bcoin,40ccoin")
+    ).toBeTruthy();
+
+    expect(
+      new Coins("20acoin,30bcoin,40ccoin").isAnyLTE("10acoin,20bcoin,30ccoin")
+    ).toBeFalsy();
+
+    expect(
+      new Coins("10acoin,20bcoin,30ccoin").isAnyLTE("10acoin,20bcoin,30ccoin")
+    ).toBeTruthy();
+
+    expect(
+      new Coins("20acoin,30bcoin,40ccoin").isAnyLTE("10acoin,20bcoin")
+    ).toBeFalsy();
+
+    expect(
+      new Coins("10acoin,40bcoin,30ccoin").isAnyLTE("20acoin,30bcoin,40ccoin")
+    ).toBeTruthy();
+
+    expect(
+      new Coins("10acoin").isAnyLTE("20acoin,30bcoin,40ccoin")
+    ).toBeTruthy();
+  });
+
+  test("isAnyLT", () => {
+    expect(new Coins().isAnyLT()).toBeFalsy();
+
+    expect(new Coins("10acoin,20bcoin,30ccoin").isAnyLT()).toBeFalsy();
+
+    expect(new Coins().isAnyLT("10acoin,20bcoin,30ccoin")).toBeFalsy();
+
+    expect(
+      new Coins("10acoin,20bcoin").isAnyLT("20acoin,30bcoin,40ccoin")
+    ).toBeTruthy();
+
+    expect(
+      new Coins("10acoin,20bcoin,30ccoin").isAnyLT("20acoin,30bcoin,40ccoin")
+    ).toBeTruthy();
+
+    expect(
+      new Coins("20acoin,30bcoin,40ccoin").isAnyLT("10acoin,20bcoin,30ccoin")
+    ).toBeFalsy();
+
+    expect(
+      new Coins("10acoin,20bcoin,30ccoin").isAnyLT("10acoin,20bcoin,30ccoin")
+    ).toBeFalsy();
+
+    expect(
+      new Coins("20acoin,30bcoin,40ccoin").isAnyLT("10acoin,20bcoin")
+    ).toBeFalsy();
+
+    expect(
+      new Coins("10acoin,40bcoin,30ccoin").isAnyLT("20acoin,30bcoin,40ccoin")
+    ).toBeTruthy();
+
+    expect(
+      new Coins("10acoin").isAnyLT("20acoin,30bcoin,40ccoin")
+    ).toBeTruthy();
+  });
 });
