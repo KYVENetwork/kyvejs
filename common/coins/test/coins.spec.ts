@@ -1,8 +1,7 @@
 import { Coins } from "../src/coins";
 
-// TODO: negative values in constructor?
-// TODO: should sub with negative values fail?
-// TODO: validate denoms
+// TODO: should sub remove zero amount coins?
+// TODO: test constructor zero coins
 
 describe("coins.ts", () => {
   test("constructor", () => {
@@ -24,11 +23,19 @@ describe("coins.ts", () => {
     );
     // duplicate coin string
     expect(() => new Coins("10acoin,20acoin,30bcoin")).toThrow(
-      new Error("Found duplicate coins")
+      new Error("Got duplicate coins")
     );
     // duplicates in multiple coin string
     expect(() => new Coins("10acoin,30bcoin", "20acoin")).toThrow(
-      new Error("Found duplicate coins")
+      new Error("Got duplicate coins")
+    );
+    // negative values
+    expect(() => new Coins("10acoin,-30bcoin")).toThrow(
+      new Error("Got an invalid coin string")
+    );
+    // invalid denom
+    expect(() => new Coins("10acoin,30B")).toThrow(
+      new Error("Got an invalid coin string")
     );
 
     // --- Coin ---
@@ -59,7 +66,23 @@ describe("coins.ts", () => {
           { denom: "acoin", amount: "20" },
           { denom: "bcoin", amount: "30" }
         )
-    ).toThrow(new Error("Found duplicate coins"));
+    ).toThrow(new Error("Got duplicate coins"));
+    // negative values
+    expect(
+      () =>
+        new Coins(
+          { denom: "acoin", amount: "10" },
+          { denom: "bcoin", amount: "-30" }
+        )
+    ).toThrow(new Error("Got an invalid coin string"));
+    // invalid denom
+    expect(
+      () =>
+        new Coins(
+          { denom: "acoin", amount: "10" },
+          { denom: "B", amount: "30" }
+        )
+    ).toThrow(new Error("Got an invalid coin string"));
 
     // --- Coins ---
 
@@ -84,7 +107,7 @@ describe("coins.ts", () => {
     // duplicate coins
     expect(
       () => new Coins(new Coins("10acoin"), new Coins("20acoin", "30bcoin"))
-    ).toThrow(new Error("Found duplicate coins"));
+    ).toThrow(new Error("Got duplicate coins"));
   });
 
   test("toString", () => {
@@ -95,6 +118,14 @@ describe("coins.ts", () => {
         { denom: "acoin", amount: "10000000" }
       ).toString()
     ).toEqual("10000000acoin,20000000bcoin,30000000ccoin");
+
+    expect(
+      new Coins(
+        { denom: "bcoin", amount: "20000000" },
+        { denom: "ccoin", amount: "0" },
+        { denom: "acoin", amount: "10000000" }
+      ).toString()
+    ).toEqual("10000000acoin,20000000bcoin");
   });
 
   test("toArray", () => {
@@ -105,21 +136,30 @@ describe("coins.ts", () => {
       { denom: "bcoin", amount: "20000000" },
       { denom: "ccoin", amount: "30000000" },
     ]);
+
+    expect(new Coins("10000000acoin,0bcoin,30000000ccoin").toArray()).toEqual([
+      { denom: "acoin", amount: "10000000" },
+      { denom: "ccoin", amount: "30000000" },
+    ]);
   });
 
   test("len", () => {
     expect(new Coins().len()).toEqual(0);
+
+    expect(new Coins("10000000acoin,20000000bcoin,0ccoin").len()).toEqual(2);
 
     expect(
       new Coins("10000000acoin,20000000bcoin,30000000ccoin").len()
     ).toEqual(3);
   });
 
-  test("isEmpty", () => {
-    expect(new Coins().isEmpty()).toBeTruthy();
+  test("empty", () => {
+    expect(new Coins().empty()).toBeTruthy();
+
+    expect(new Coins("0acoin,0bcoin").empty()).toBeTruthy();
 
     expect(
-      new Coins("10000000acoin,20000000bcoin,30000000ccoin").isEmpty()
+      new Coins("10000000acoin,20000000bcoin,30000000ccoin").empty()
     ).toBeFalsy();
   });
 
@@ -128,7 +168,7 @@ describe("coins.ts", () => {
 
     expect(new Coins("0acoin,0bcoin,0ccoin").isZero()).toBeTruthy();
 
-    expect(new Coins("0acoin,20000000bcoin,0ccoin").isZero()).toBeFalsy();
+    expect(new Coins("0acoin,20bcoin,0ccoin").isZero()).toBeFalsy();
   });
 
   test("amountOf", () => {
@@ -150,6 +190,8 @@ describe("coins.ts", () => {
       new Coins("10000000acoin,20000000bcoin").find("ccoin")
     ).toBeUndefined();
 
+    expect(new Coins("0acoin,20000000bcoin").find("acoin")).toBeUndefined();
+
     expect(
       new Coins("10000000acoin,20000000bcoin,30000000ccoin").find("bcoin")
     ).toEqual({ denom: "bcoin", amount: "20000000" });
@@ -163,6 +205,15 @@ describe("coins.ts", () => {
         new Coins(
           { denom: "bcoin", amount: "20000000" },
           { denom: "ccoin", amount: "30000000" },
+          { denom: "acoin", amount: "10000000" }
+        )
+      )
+    ).toBeTruthy();
+
+    expect(
+      new Coins("10000000acoin,20000000bcoin,0ccoin").equal(
+        new Coins(
+          { denom: "bcoin", amount: "20000000" },
           { denom: "acoin", amount: "10000000" }
         )
       )
@@ -192,6 +243,11 @@ describe("coins.ts", () => {
   test("denoms", () => {
     expect(new Coins().denoms()).toEqual([]);
 
+    expect(new Coins("20000000bcoin,0acoin,30000000ccoin").denoms()).toEqual([
+      "bcoin",
+      "ccoin",
+    ]);
+
     expect(
       new Coins("20000000bcoin,10000000acoin,30000000ccoin").denoms()
     ).toEqual(["acoin", "bcoin", "ccoin"]);
@@ -205,14 +261,6 @@ describe("coins.ts", () => {
     expect(
       new Coins("20000000bcoin,10000000acoin,30000000ccoin").isAnyNegative()
     ).toBeFalsy();
-
-    expect(
-      new Coins(
-        { denom: "bcoin", amount: "20000000" },
-        { denom: "ccoin", amount: "-30000000" },
-        { denom: "acoin", amount: "10000000" }
-      ).isAnyNegative()
-    ).toBeTruthy();
   });
 
   test("isAllPositive", () => {
@@ -221,16 +269,12 @@ describe("coins.ts", () => {
     expect(new Coins("0acoin,0bcoin,0ccoin").isAllPositive()).toBeFalsy();
 
     expect(
-      new Coins("20000000bcoin,10000000acoin,30000000ccoin").isAllPositive()
-    ).toBeTruthy();
+      new Coins("20000000bcoin,10000000acoin,0ccoin").isAllPositive()
+    ).toBeFalsy();
 
     expect(
-      new Coins(
-        { denom: "bcoin", amount: "20000000" },
-        { denom: "ccoin", amount: "-30000000" },
-        { denom: "acoin", amount: "10000000" }
-      ).isAllPositive()
-    ).toBeFalsy();
+      new Coins("20000000bcoin,10000000acoin,30000000ccoin").isAllPositive()
+    ).toBeTruthy();
   });
 
   test("add", () => {
@@ -239,6 +283,12 @@ describe("coins.ts", () => {
     expect(new Coins().add("10acoin,20bcoin,30ccoin").toString()).toEqual(
       "10acoin,20bcoin,30ccoin"
     );
+
+    expect(new Coins("10acoin").add("10acoin,20bcoin").toString()).toEqual(
+      "20acoin,20bcoin"
+    );
+
+    expect(new Coins("10acoin").add("0bcoin").toString()).toEqual("10acoin");
 
     expect(
       new Coins("10acoin,20bcoin,30ccoin")
@@ -255,59 +305,42 @@ describe("coins.ts", () => {
       "10acoin,20bcoin,30ccoin"
     );
 
+    expect(new Coins("10acoin").sub("0bcoin").toString()).toEqual("10acoin");
+
     expect(
       new Coins("10acoin,20bcoin,30ccoin")
         .sub({ denom: "bcoin", amount: "5" })
         .sub(new Coins("7ccoin"))
-        .sub("15acoin,3dcoin")
         .toString()
-    ).toEqual("-5acoin,15bcoin,23ccoin,-3dcoin");
+    ).toEqual("10acoin,15bcoin,23ccoin");
   });
 
   test("mul", () => {
     expect(new Coins().mul(1).toString()).toEqual("");
 
     expect(new Coins("10acoin,20bcoin,30ccoin").mul("0").toString()).toEqual(
-      "0acoin,0bcoin,0ccoin"
+      ""
     );
 
     expect(new Coins("10acoin,20bcoin,30ccoin").mul("3").toString()).toEqual(
       "30acoin,60bcoin,90ccoin"
     );
-
-    expect(
-      new Coins(
-        { denom: "acoin", amount: "10" },
-        { denom: "bcoin", amount: "-20" },
-        { denom: "ccoin", amount: "30" }
-      )
-        .mul(-2)
-        .toString()
-    ).toEqual("-20acoin,40bcoin,-60ccoin");
   });
 
-  test("div", () => {
-    expect(new Coins().div(1).toString()).toEqual("");
+  test("quo", () => {
+    expect(new Coins().quo(1).toString()).toEqual("");
 
-    expect(new Coins("10acoin,20bcoin,30ccoin").div("10").toString()).toEqual(
+    expect(new Coins("10acoin,20bcoin,30ccoin").quo("10").toString()).toEqual(
       "1acoin,2bcoin,3ccoin"
     );
 
-    expect(new Coins("10acoin,20bcoin,30ccoin").div(3).toString()).toEqual(
+    expect(new Coins("10acoin,20bcoin,30ccoin").quo(3).toString()).toEqual(
       "3acoin,6bcoin,10ccoin"
     );
 
-    expect(
-      new Coins(
-        { denom: "acoin", amount: "10" },
-        { denom: "bcoin", amount: "-20" },
-        { denom: "ccoin", amount: "30" }
-      )
-        .div(-2)
-        .toString()
-    ).toEqual("-5acoin,10bcoin,-15ccoin");
+    expect(new Coins("4acoin").quo(8).toString()).toEqual("");
 
-    expect(() => new Coins("10acoin,20bcoin,30ccoin").div(0)).toThrow(
+    expect(() => new Coins("10acoin,20bcoin,30ccoin").quo(0)).toThrow(
       new Error("Assertion failed")
     );
   });
@@ -322,6 +355,8 @@ describe("coins.ts", () => {
         .min("20acoin,10bcoin,30ccoin")
         .toString()
     ).toEqual("10acoin,10bcoin,30ccoin");
+
+    expect(new Coins("10acoin,20bcoin").min("10ccoin").toString()).toEqual("");
 
     expect(
       new Coins("10acoin,20bcoin").min("10bcoin,10ccoin").toString()
