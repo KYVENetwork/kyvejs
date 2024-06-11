@@ -1,8 +1,5 @@
 import { Coins } from "../src/coins";
 
-// TODO: should sub remove zero amount coins?
-// TODO: test constructor zero coins
-
 describe("coins.ts", () => {
   test("constructor", () => {
     expect(new Coins().toString()).toEqual("");
