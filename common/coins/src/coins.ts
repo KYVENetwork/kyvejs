@@ -186,9 +186,6 @@ export class Coins {
    * isAllPositive returns true if there is at least
    * one coin and all currencies have a positive value.
    *
-   * Add adds two sets of coins.
-   * e.g. {2A} + {A, 2B} = {3A, 2B} {2A} + {0B} = {2A}
-   *
    * @method isAllPositive
    * @return {boolean}
    */
@@ -340,24 +337,72 @@ export class Coins {
     return new Coins(this);
   }
 
-  public isAllGTE(...coinArgs: CoinArgs): boolean {
-    return this.coinArgsToCoins(...coinArgs).every(
+  /**
+   * isAllGTE returns false if for any denom in coinsB,
+   * the denom is present at a smaller amount in coins,
+   * else returns true.
+   *
+   * Examples:
+   *
+   * {2A, 3B}.isAllGTE({2A, 1B}) = true
+   * {1A}.isAllGTE({4A, 2B, 2C} = false
+   * {1A, 2B}.isAllGTE({}) = true
+   * {}.isAllGTE({1A, 2B}) = false
+   *
+   * @method isAllGTE
+   * @param {CoinArgs} coinsB
+   * @return {Coins}
+   */
+  public isAllGTE(...coinsB: CoinArgs): boolean {
+    return this.coinArgsToCoins(...coinsB).every(
       (coin) =>
         this.coinMap.has(coin.denom) &&
         this.coinMap.get(coin.denom)!.gte(new BN(coin.amount))
     );
   }
 
-  public isAllGT(...coinArgs: CoinArgs): boolean {
-    return this.coinArgsToCoins(...coinArgs).every(
+  /**
+   * isAllGT returns false if for any denom in coinsB,
+   * the denom is present at a smaller or equal amount in
+   * coins, else returns true.
+   *
+   * Examples:
+   *
+   * {2A, 3B}.isAllGT({1A, 1B}) = true
+   * {1A}.isAllGT({} = false
+   * {1A, 2B}.isAllGT({}) = true
+   * {}.isAllGT({1A, 2B}) = false
+   *
+   * @method isAllGTE
+   * @param {CoinArgs} coinsB
+   * @return {Coins}
+   */
+  public isAllGT(...coinsB: CoinArgs): boolean {
+    return this.coinArgsToCoins(...coinsB).every(
       (coin) =>
         this.coinMap.has(coin.denom) &&
         this.coinMap.get(coin.denom)!.gt(new BN(coin.amount))
     );
   }
 
-  public isAllLTE(...coinArgs: CoinArgs): boolean {
-    const coins = this.coinArgsToMap(...coinArgs);
+  /**
+   * isAllLTE returns false if for any denom in coinsB,
+   * the denom is present at a greater amount in coins,
+   * else returns true.
+   *
+   * Examples:
+   *
+   * {2A, 1B}.isAllLTE({2A, 3B}) = true
+   * {4A, 2B, 2C}.isAllLTE({1A} = false
+   * {}.isAllLTE({1A, 2B}) = true
+   * {1A, 2B}.isAllLTE({}) = false
+   *
+   * @method isAllLTE
+   * @param {CoinArgs} coinsB
+   * @return {Coins}
+   */
+  public isAllLTE(...coinsB: CoinArgs): boolean {
+    const coins = this.coinArgsToMap(...coinsB);
 
     return Array.from(this.coinMap.keys()).every(
       (denom) =>
@@ -366,8 +411,24 @@ export class Coins {
     );
   }
 
-  public isAllLT(...coinArgs: CoinArgs): boolean {
-    const coins = this.coinArgsToMap(...coinArgs);
+  /**
+   * isAllLT returns false if for any denom in coinsB,
+   * the denom is present at a greater or equal amount
+   * in coins, else returns true.
+   *
+   * Examples:
+   *
+   * {1A, 1B}.isAllLT({2A, 3B}) = true
+   * {4A, 2B, 2C}.isAllLT({1A} = false
+   * {}.isAllLT({1A, 2B}) = true
+   * {1A, 2B}.isAllLT({}) = false
+   *
+   * @method isAllLT
+   * @param {CoinArgs} coinsB
+   * @return {Coins}
+   */
+  public isAllLT(...coinsB: CoinArgs): boolean {
+    const coins = this.coinArgsToMap(...coinsB);
 
     return Array.from(this.coinMap.keys()).every(
       (denom) =>
@@ -376,8 +437,24 @@ export class Coins {
     );
   }
 
-  public isAnyGTE(...coinArgs: CoinArgs): boolean {
-    const coins = this.coinArgsToMap(...coinArgs);
+  /**
+   * isAnyGTE returns true if coins contains at least
+   * one denom that is present at a greater or equal
+   * amount in coinsB, it returns false otherwise.
+   *
+   * Examples:
+   *
+   * {2A, 3B}.isAnyGTE({}) = false
+   * {}.isAnyGTE({2A, 3B}) = false
+   * {2B}.isAnyGTE({4A, 2B, 2C} = true
+   * {2A, 1C}.isAnyGTE({4A, 2B, 2C} = false
+   *
+   * @method isAnyGTE
+   * @param {CoinArgs} coinsB
+   * @return {Coins}
+   */
+  public isAnyGTE(...coinsB: CoinArgs): boolean {
+    const coins = this.coinArgsToMap(...coinsB);
 
     return Array.from(this.coinMap.keys()).some(
       (denom) =>
@@ -386,8 +463,24 @@ export class Coins {
     );
   }
 
-  public isAnyGT(...coinArgs: CoinArgs): boolean {
-    const coins = this.coinArgsToMap(...coinArgs);
+  /**
+   * isAnyGT returns true if coins contains at least
+   * one denom that is present at a greater
+   * amount in coinsB, it returns false otherwise.
+   *
+   * Examples:
+   *
+   * {2A, 3B}.isAnyGT({}) = false
+   * {}.isAnyGT({2A, 3B}) = false
+   * {3B}.isAnyGT({4A, 2B, 2C} = true
+   * {4A, 1C}.isAnyGT({4A, 2B, 2C} = false
+   *
+   * @method isAnyGT
+   * @param {CoinArgs} coinsB
+   * @return {Coins}
+   */
+  public isAnyGT(...coinsB: CoinArgs): boolean {
+    const coins = this.coinArgsToMap(...coinsB);
 
     return Array.from(this.coinMap.keys()).some(
       (denom) =>
@@ -396,8 +489,24 @@ export class Coins {
     );
   }
 
-  public isAnyLTE(...coinArgs: CoinArgs): boolean {
-    const coins = this.coinArgsToMap(...coinArgs);
+  /**
+   * isAnyLTE returns true if coins contains at least
+   * one denom that is present at a smaller or equal
+   * amount in coinsB, it returns false otherwise.
+   *
+   * Examples:
+   *
+   * {2A, 3B}.isAnyLTE({}) = false
+   * {}.isAnyLTE({2A, 3B}) = false
+   * {2B}.isAnyLTE({4A, 2B, 2C} = true
+   * {6A, 3C}.isAnyLTE({4A, 2B, 2C} = false
+   *
+   * @method isAnyLTE
+   * @param {CoinArgs} coinsB
+   * @return {Coins}
+   */
+  public isAnyLTE(...coinsB: CoinArgs): boolean {
+    const coins = this.coinArgsToMap(...coinsB);
 
     return Array.from(this.coinMap.keys()).some(
       (denom) =>
@@ -406,8 +515,24 @@ export class Coins {
     );
   }
 
-  public isAnyLT(...coinArgs: CoinArgs): boolean {
-    const coins = this.coinArgsToMap(...coinArgs);
+  /**
+   * isAnyLT returns true if coins contains at least
+   * one denom that is present at a smaller
+   * amount in coinsB, it returns false otherwise.
+   *
+   * Examples:
+   *
+   * {2A, 3B}.isAnyLT({}) = false
+   * {}.isAnyLT({2A, 3B}) = false
+   * {1B}.isAnyLT({4A, 2B, 2C} = true
+   * {4A, 3C}.isAnyLT({4A, 2B, 2C} = false
+   *
+   * @method isAnyLT
+   * @param {CoinArgs} coinsB
+   * @return {Coins}
+   */
+  public isAnyLT(...coinsB: CoinArgs): boolean {
+    const coins = this.coinArgsToMap(...coinsB);
 
     return Array.from(this.coinMap.keys()).some(
       (denom) =>
