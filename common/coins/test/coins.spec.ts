@@ -1,4 +1,4 @@
-import { Coins } from "../src/coins";
+import { Coins } from "../src";
 
 describe("coins.ts", () => {
   test("constructor", () => {
