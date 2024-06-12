@@ -7,6 +7,7 @@ export const genesis_pool = {
     logo: "ar://9FJDam56yBbmvn8rlamEucATH5UcYqSBw468rlCXn8E",
     config: "ar://bYvlKiVLb1YY0Gx4mjUhpWBkztqmA4uEN97kTaZtBfY",
     start_key: "0",
+    end_key: "",
     current_key: "",
     current_summary: "",
     current_index: "0",
