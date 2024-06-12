@@ -80,7 +80,7 @@
       ]
     },
     "begin_block_events": {
-      "type": ["array", "null"],
+      "type": ["array"],
       "items": [
         {
           "type": "object",
@@ -148,7 +148,7 @@
       ]
     },
     "finalize_block_events": {
-      "type": ["array", "null"],
+      "type": ["array"],
       "items": [
         {
           "type": "object",
