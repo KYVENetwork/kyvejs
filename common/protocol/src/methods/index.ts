@@ -13,7 +13,6 @@ export * from "./checks/isValidVersion";
 export * from "./checks/isStorageBalanceLow";
 export * from "./checks/isStorageBalanceZero";
 export * from "./checks/isDataAvailable";
-export * from "./checks/isEndkeyReached";
 
 // timeouts
 export * from "./timeouts/waitForAuthorization";

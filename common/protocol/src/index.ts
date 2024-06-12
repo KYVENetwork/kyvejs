@@ -39,7 +39,6 @@ import {
   isStorageBalanceZero,
   isValidVersion,
   isDataAvailable,
-  isEndkeyReached,
   voteBundleProposal,
   waitForAuthorization,
   waitForCacheContinuation,
@@ -123,7 +122,6 @@ export class Validator {
   protected isStorageBalanceZero = isStorageBalanceZero;
   protected isStorageBalanceLow = isStorageBalanceLow;
   protected isDataAvailable = isDataAvailable;
-  protected isEndkeyReached = isEndkeyReached;
 
   // timeouts
   protected waitForAuthorization = waitForAuthorization;
