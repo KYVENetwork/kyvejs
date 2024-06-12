@@ -276,7 +276,7 @@ export class Validator {
       )
       .option(
         "--skip-data-availability-check",
-        "Skip data availability check and join pool instantly without waiting for the data source. WARNING: Only use this if you know what you are doing"
+        "Skip data availability check and join pool instantly without waiting for the data source. WARNING: Only use this if you know what you are doing since this can lead to timeout slashes"
       )
       .action((options) => {
         this.start(options);
