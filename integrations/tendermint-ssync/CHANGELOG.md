@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.8](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint-ssync@1.1.7...@kyvejs/tendermint-ssync@1.1.8) (2024-04-03)
+
+**Note:** Version bump only for package @kyvejs/tendermint-ssync
+
+## [1.1.7](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint-ssync@1.1.6...@kyvejs/tendermint-ssync@1.1.7) (2024-03-25)
+
+**Note:** Version bump only for package @kyvejs/tendermint-ssync
+
+## [1.1.6](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint-ssync@1.1.5...@kyvejs/tendermint-ssync@1.1.6) (2024-03-13)
+
+### Bug Fixes
+
+- exclude tendermint software version from validation ([#123](https://github.com/KYVENetwork/kyvejs/issues/123)) ([1a35943](https://github.com/KYVENetwork/kyvejs/commit/1a35943f1165e895b5a704833276d0b21fdea8b9))
+
+## [1.1.5](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint-ssync@1.1.4...@kyvejs/tendermint-ssync@1.1.5) (2024-03-05)
+
+**Note:** Version bump only for package @kyvejs/tendermint-ssync
+
 ## [1.1.4](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint-ssync@1.1.3...@kyvejs/tendermint-ssync@1.1.4) (2024-01-26)
 
 **Note:** Version bump only for package @kyvejs/tendermint-ssync

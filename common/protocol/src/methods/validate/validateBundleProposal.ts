@@ -234,6 +234,19 @@ export async function validateBundleProposal(
       // validate each data item in bundle with custom runtime validation
       for (let i = 0; i < proposedBundle.length; i++) {
         if (valid) {
+          // if the pool has an end key and we find out that a data item
+          // has the end key and it is not the last data item in the bundle
+          // we consider the bundle invalid
+          if (this.pool.data?.end_key) {
+            if (
+              i < proposedBundle.length - 1 &&
+              proposedBundle[i].key === this.pool.data?.end_key
+            ) {
+              valid = false;
+              break;
+            }
+          }
+
           this.logger.debug(
             `this.runtime.validateDataItem($THIS, $PROPOSED_DATA_ITEM, $VALIDATION_DATA_ITEM)`
           );

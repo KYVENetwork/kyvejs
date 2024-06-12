@@ -18,4 +18,5 @@ export interface IValaccountConfig {
   cache: string;
   metrics: boolean;
   metricsPort: string;
+  debugMaxSize: number;
 }
