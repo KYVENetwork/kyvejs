@@ -1,3 +1,4 @@
+import { V1BundlesLCDClient } from "./v1/bundles/query";
 import { BundlesModuleLCDClient } from "./bundles/v1beta1/query";
 import { DelegationModuleLCDClient } from "./delegation/v1beta1/query";
 import { FundersModuleLCDClient } from "./funders/v1beta1/query";
@@ -7,6 +8,9 @@ import { QueryModuleLCDClient } from "./query/v1beta1/query";
 import { StakersModuleLCDClient } from "./stakers/v1beta1/query";
 import { TeamModuleLCDClient } from "./team/v1beta1/query";
 class KyveLCDClient {
+  public v1: {
+    bundles: V1BundlesLCDClient;
+  };
   public bundles: {
     v1beta1: BundlesModuleLCDClient;
   };
@@ -33,6 +37,9 @@ class KyveLCDClient {
   };
 
   constructor(restEndpoint: string) {
+    this.v1 = {
+      bundles: new V1BundlesLCDClient(restEndpoint),
+    };
     this.bundles = {
       v1beta1: new BundlesModuleLCDClient(restEndpoint),
     };
