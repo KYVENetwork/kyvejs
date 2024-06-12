@@ -358,3 +358,8 @@ export * from "./types";
 
 // export utils
 export * from "./utils";
+
+// add this so we can JSON.stringify bignumbers
+(BigInt.prototype as any).toJSON = function () {
+  return this.toString();
+};
