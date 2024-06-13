@@ -41,32 +41,16 @@ export default class TendermintSSync implements IRuntime {
 
   async getDataItem(_: Validator, key: string): Promise<DataItem> {
     // fetch snapshot chunk from given height, format and chunk derived from key
-    const [height, chunkIndex] = key.split('/').map((k) => +k);
-
-    const { data: snapshots } = await axios.get(
-      `${this.config.api}/list_snapshots`
-    );
-
-    if (!snapshots) {
-      throw new Error(`404: Snapshot with height ${height} not found`);
-    }
-
-    const snapshot: ISnapshot = snapshots.find(
-      (s: ISnapshot) => +s.height === height
-    );
-
-    if (!snapshot) {
-      throw new Error(`404: Snapshot with height ${height} not found`);
-    }
+    const [height, format, chunkIndex] = key.split('/').map((k) => +k);
 
     // fetch snapshot chunk
     const { data: chunk } = await axios.get(
-      `${this.config.api}/load_snapshot_chunk/${height}/${snapshot.format}/${chunkIndex}`
+      `${this.config.api}/load_snapshot_chunk/${height}/${format}/${chunkIndex}`
     );
 
     // if we are not at the first chunk we skip all the metadata to prevent
     // storing information repeatedly
-    if (chunkIndex != 0) {
+    if (chunkIndex > 0) {
       return {
         key,
         value: {
@@ -78,6 +62,9 @@ export default class TendermintSSync implements IRuntime {
         },
       };
     }
+
+    // fetch snapshot
+    const snapshot = await this.getSnapshot(height + this.config.interval);
 
     // fetch block
     const { data: block } = await axios.get(
@@ -108,7 +95,9 @@ export default class TendermintSSync implements IRuntime {
 
   async prevalidateDataItem(_: Validator, item: DataItem): Promise<boolean> {
     // parse snapshot key
-    const [height, chunkIndex] = item.key.split('/').map((k) => +k);
+    const [height, format, chunkIndex, chunks] = item.key
+      .split('/')
+      .map((k) => +k);
 
     // throw error if entire value is not defined
     if (!item.value) {
@@ -159,6 +148,20 @@ export default class TendermintSSync implements IRuntime {
       );
     }
 
+    // throw error if snapshot format mismatches
+    if (+item.value.snapshot.format !== format) {
+      throw new Error(
+        `Snapshot format differs in key and value; key:${format} value:${item.value.snapshot.format}`
+      );
+    }
+
+    // throw error if snapshot chunks mismatch
+    if (+item.value.snapshot.chunks !== chunks) {
+      throw new Error(
+        `Snapshot chunks differ in key and value; key:${chunks} value:${item.value.snapshot.chunks}`
+      );
+    }
+
     return true;
   }
 
@@ -198,18 +201,28 @@ export default class TendermintSSync implements IRuntime {
   }
 
   async nextKey(_: Validator, key: string): Promise<string> {
-    // since we only need to fetch if we continue with the next snapshot
-    const [height, chunkIndex] = key.split('/').map((k) => +k);
+    // parse snapshot key
+    const [height, format, chunkIndex, chunks] = key.split('/').map((k) => +k);
 
+    // if we have reached the last chunk of the current snapshot
+    // we fetch the next snapshot in order to construct the next key
+    if (chunks - 1 === chunkIndex) {
+      const snapshot = await this.getSnapshot(height + this.config.interval);
+
+      return `${snapshot.height}/${snapshot.format}/0/${snapshot.chunks}`;
+    }
+
+    // if we have not reached the last chunk yet we simply increment
+    // the chunk index
+    return `${height}/${format}/${chunkIndex + 1}/${chunks}`;
+  }
+
+  private async getSnapshot(height: number): Promise<ISnapshot> {
     const { data: snapshots } = await axios.get(
       `${this.config.api}/list_snapshots`
     );
 
-    if (!snapshots) {
-      throw new Error(`404: Snapshot with height ${height} not found`);
-    }
-
-    const snapshot: ISnapshot = snapshots.find(
+    const snapshot: ISnapshot = (snapshots || []).find(
       (s: ISnapshot) => +s.height === height
     );
 
@@ -217,13 +230,6 @@ export default class TendermintSSync implements IRuntime {
       throw new Error(`404: Snapshot with height ${height} not found`);
     }
 
-    // move on to next snapshot and start at first chunk
-    // if we have already reached all chunks in current snapshot
-    if (snapshot.chunks - 1 === chunkIndex) {
-      return `${height + this.config.interval}/0`;
-    }
-
-    // stay on current snapshot and continue with next snapshot chunk
-    return `${height}/${chunkIndex + 1}`;
+    return snapshot;
   }
 }
