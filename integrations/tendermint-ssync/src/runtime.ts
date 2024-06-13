@@ -194,10 +194,14 @@ export default class TendermintSSync implements IRuntime {
   }
 
   async summarizeDataBundle(_: Validator, bundle: DataItem[]): Promise<string> {
-    // return format "height/chunkIndex/chunks"
-    return !!bundle.at(-1)
-      ? `${bundle.at(-1)?.key}/${bundle.at(-1)?.value?.snapshot?.chunks ?? 0}`
-      : '';
+    // return format "height/format/chunkIndex/chunks"
+    const dataItem = bundle.at(-1);
+    if (!dataItem) {
+      return '';
+    }
+
+    const [height, chunkIndex] = dataItem.key.split('/').map((k) => +k);
+    return `${height}/${dataItem.value.snapshot.format}/${chunkIndex}/${dataItem.value.snapshot.chunks}`;
   }
 
   async nextKey(_: Validator, key: string): Promise<string> {
