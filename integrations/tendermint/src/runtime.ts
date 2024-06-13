@@ -1,10 +1,11 @@
-import { DataItem, IRuntime, Validator, VOTE } from '@kyvejs/protocol';
+import { DataItem, IRuntime, Validator, VOTE } from "@kyvejs/protocol";
 import { name, version } from '../package.json';
 import axios from 'axios';
 import Ajv from 'ajv';
 import block_schema from './schemas/block.json';
 import block_results_schema from './schemas/block_result.json';
-import { createHashesFromTendermintBundle, generateMerkleRoot } from "../utils/merkle";
+import { createHashesFromTendermintBundle } from "../utils/merkle";
+import { generateMerkleRoot } from "@kyvejs/sdk";
 
 const ajv = new Ajv();
 
