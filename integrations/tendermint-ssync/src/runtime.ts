@@ -70,7 +70,7 @@ export default class TendermintSSync implements IRuntime {
       return {
         key,
         value: {
-          snapshot,
+          snapshot: null,
           block: null,
           seenCommit: null,
           state: null,
@@ -201,7 +201,8 @@ export default class TendermintSSync implements IRuntime {
     }
 
     const [height, chunkIndex] = dataItem.key.split('/').map((k) => +k);
-    return `${height}/${dataItem.value.snapshot.format}/${chunkIndex}/${dataItem.value.snapshot.chunks}`;
+    const snapshot = await this.getSnapshot(height);
+    return `${height}/${snapshot.format}/${chunkIndex}/${snapshot.chunks}`;
   }
 
   async nextKey(_: Validator, key: string): Promise<string> {
