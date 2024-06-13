@@ -1,0 +1,35 @@
+{
+  "name": "@kyvejs/coins",
+  "version": "1.0.0",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "*"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KYVENetwork/kyvejs.git"
+  },
+  "author": "Troy Kessler <troy@kyve.network>",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "rimraf dist && tsc",
+    "format": "prettier --write .",
+    "doc": "typedoc",
+    "test": "jest"
+  },
+  "dependencies": {
+    "@cosmjs/amino": "^0.32.3",
+    "bn.js": "^5.2.1"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "@types/jest": "^29.5.12",
+    "rimraf": "^3.0.2",
+    "typescript": "^4.5.5",
+    "@types/bn.js": "^5.1.5"
+  }
+}
