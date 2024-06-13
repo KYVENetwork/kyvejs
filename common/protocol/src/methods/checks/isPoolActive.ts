@@ -37,6 +37,9 @@ export function isPoolActive(this: Validator): boolean {
     case PoolStatus.POOL_STATUS_UNSPECIFIED:
       this.logger.info("Pool status is currently unspecified. Idling ...");
       return false;
+    case PoolStatus.POOL_STATUS_END_KEY_REACHED:
+      this.logger.info("End key reached. Idling ...");
+      return false;
     default:
       this.logger.info("Pool status is currently unknown. Idling ...");
       return false;
