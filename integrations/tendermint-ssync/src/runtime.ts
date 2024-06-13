@@ -64,13 +64,13 @@ export default class TendermintSSync implements IRuntime {
       `${this.config.api}/load_snapshot_chunk/${height}/${snapshot.format}/${chunkIndex}`
     );
 
-    // if we are not at the first chunk we skip all the metadata to prevent
-    // storing information repeatedly
+    // if we are not at the first chunk we skip all the metadata except the snapshot
+    // to prevent storing information repeatedly
     if (chunkIndex != 0) {
       return {
         key,
         value: {
-          snapshot: null,
+          snapshot,
           block: null,
           seenCommit: null,
           state: null,
@@ -194,13 +194,29 @@ export default class TendermintSSync implements IRuntime {
   }
 
   async summarizeDataBundle(_: Validator, bundle: DataItem[]): Promise<string> {
-    return bundle.at(-1)?.key ?? '';
+    // return format "height/chunkIndex/chunks"
+    return !!bundle.at(-1)
+      ? `${bundle.at(-1)?.key}/${bundle.at(-1)?.value?.snapshot?.chunks ?? 0}`
+      : '';
   }
 
   async nextKey(_: Validator, key: string): Promise<string> {
     // since we only need to fetch if we continue with the next snapshot
     const [height, chunkIndex] = key.split('/').map((k) => +k);
 
+    const snapshot = await this.getSnapshot(height);
+
+    // move on to next snapshot and start at first chunk
+    // if we have already reached all chunks in current snapshot
+    if (snapshot.chunks - 1 === chunkIndex) {
+      return `${height + this.config.interval}/0`;
+    }
+
+    // stay on current snapshot and continue with next snapshot chunk
+    return `${height}/${chunkIndex + 1}`;
+  }
+
+  private async getSnapshot(height: number): Promise<ISnapshot> {
     const { data: snapshots } = await axios.get(
       `${this.config.api}/list_snapshots`
     );
@@ -217,13 +233,6 @@ export default class TendermintSSync implements IRuntime {
       throw new Error(`404: Snapshot with height ${height} not found`);
     }
 
-    // move on to next snapshot and start at first chunk
-    // if we have already reached all chunks in current snapshot
-    if (snapshot.chunks - 1 === chunkIndex) {
-      return `${height + this.config.interval}/0`;
-    }
-
-    // stay on current snapshot and continue with next snapshot chunk
-    return `${height}/${chunkIndex + 1}`;
+    return snapshot;
   }
 }
