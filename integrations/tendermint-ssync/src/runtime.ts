@@ -40,8 +40,18 @@ export default class TendermintSSync implements IRuntime {
   }
 
   async getDataItem(_: Validator, key: string): Promise<DataItem> {
-    // fetch snapshot chunk from given height, format and chunk derived from key
-    const [height, format, chunkIndex] = key.split('/').map((k) => +k);
+    // parse snapshot key
+    // TODO: remove legacy key parsing once every legacy state-sync
+    // pool has upgraded to the new key format
+    // "height/chunkIndex" -> "height/format/chunkIndex/chunks"
+    const [height, format, chunkIndex, chunks] =
+      key.split('/').length === 4
+        ? key.split('/').map((k) => +k)
+        : await (async () => {
+            const [height, chunkIndex] = key.split('/').map((k) => +k);
+            const snapshot = await this.getSnapshot(height);
+            return [height, snapshot.format, chunkIndex, snapshot.chunks];
+          })();
 
     // fetch snapshot chunk
     const { data: chunk } = await axios.get(
@@ -95,9 +105,17 @@ export default class TendermintSSync implements IRuntime {
 
   async prevalidateDataItem(_: Validator, item: DataItem): Promise<boolean> {
     // parse snapshot key
-    const [height, format, chunkIndex, chunks] = item.key
-      .split('/')
-      .map((k) => +k);
+    // TODO: remove legacy key parsing once every legacy state-sync
+    // pool has upgraded to the new key format
+    // "height/chunkIndex" -> "height/format/chunkIndex/chunks"
+    const [height, format, chunkIndex, chunks] =
+      item.key.split('/').length === 4
+        ? item.key.split('/').map((k) => +k)
+        : await (async () => {
+            const [height, chunkIndex] = item.key.split('/').map((k) => +k);
+            const snapshot = await this.getSnapshot(height);
+            return [height, snapshot.format, chunkIndex, snapshot.chunks];
+          })();
 
     // throw error if entire value is not defined
     if (!item.value) {
@@ -202,7 +220,17 @@ export default class TendermintSSync implements IRuntime {
 
   async nextKey(_: Validator, key: string): Promise<string> {
     // parse snapshot key
-    const [height, format, chunkIndex, chunks] = key.split('/').map((k) => +k);
+    // TODO: remove legacy key parsing once every legacy state-sync
+    // pool has upgraded to the new key format
+    // "height/chunkIndex" -> "height/format/chunkIndex/chunks"
+    const [height, format, chunkIndex, chunks] =
+      key.split('/').length === 4
+        ? key.split('/').map((k) => +k)
+        : await (async () => {
+            const [height, chunkIndex] = key.split('/').map((k) => +k);
+            const snapshot = await this.getSnapshot(height);
+            return [height, snapshot.format, chunkIndex, snapshot.chunks];
+          })();
 
     // if we have reached the last chunk of the current snapshot
     // we fetch the next snapshot in order to construct the next key
