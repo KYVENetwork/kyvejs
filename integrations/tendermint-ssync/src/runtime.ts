@@ -64,8 +64,8 @@ export default class TendermintSSync implements IRuntime {
       `${this.config.api}/load_snapshot_chunk/${height}/${snapshot.format}/${chunkIndex}`
     );
 
-    // if we are not at the first chunk we skip all the metadata except the snapshot
-    // to prevent storing information repeatedly
+    // if we are not at the first chunk we skip all the metadata to prevent
+    // storing information repeatedly
     if (chunkIndex != 0) {
       return {
         key,
