@@ -9,7 +9,7 @@ import path from "path";
 
 import { IConfig, IValaccountConfig } from "./types/interfaces";
 import { getChecksum, setupLogger, startNodeProcess } from "./utils";
-import { ARCH, USER_HOME, KYSOR_DIR, PLATFORM } from "./utils/constants";
+import { ARCH, KYSOR_DIR, PLATFORM, USER_HOME } from "./utils/constants";
 
 const INFINITY_LOOP = true;
 

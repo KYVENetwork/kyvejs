@@ -1,14 +1,14 @@
-import * as crypto from '@cosmjs/crypto';
+import * as crypto from "@cosmjs/crypto";
 
 export function createHashesFromBundle(bundle: any[]): Uint8Array[] {
-  return bundle.map(dataItem => dataItemToSha256(dataItem))
+  return bundle.map((dataItem) => dataItemToSha256(dataItem));
 }
 
 export function dataItemToSha256(data: any): Uint8Array {
   // Encode the serialized object to UTF-8
-  const encoded_obj: Uint8Array = Buffer.from(JSON.stringify(data), 'utf-8');
+  const encoded_obj: Uint8Array = Buffer.from(JSON.stringify(data), "utf-8");
   // Calculate the SHA-256 hash
-  return crypto.sha256(encoded_obj)
+  return crypto.sha256(encoded_obj);
 }
 
 export function generateMerkleRoot(hashes: Uint8Array[]): Uint8Array {
@@ -23,8 +23,11 @@ export function generateMerkleRoot(hashes: Uint8Array[]): Uint8Array {
   }
 
   const combinedHashes: Uint8Array[] = [];
-  for(let i = 0; i < hashes.length; i += 2) {
-    const hashesConcatenated = new Uint8Array([...Array.from(hashes[i]), ...Array.from(hashes[i + 1])]);
+  for (let i = 0; i < hashes.length; i += 2) {
+    const hashesConcatenated = new Uint8Array([
+      ...Array.from(hashes[i]),
+      ...Array.from(hashes[i + 1]),
+    ]);
     const hash = crypto.sha256(hashesConcatenated);
     combinedHashes.push(hash);
   }
