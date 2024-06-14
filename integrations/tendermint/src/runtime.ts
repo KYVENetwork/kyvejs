@@ -1,11 +1,11 @@
-import { DataItem, IRuntime, Validator, VOTE } from "@kyvejs/protocol";
+import { DataItem, IRuntime, Validator, VOTE } from '@kyvejs/protocol';
 import { name, version } from '../package.json';
 import axios from 'axios';
 import Ajv from 'ajv';
 import block_schema from './schemas/block.json';
 import block_results_schema from './schemas/block_result.json';
-import { createHashesFromTendermintBundle } from "../utils/merkle";
-import { generateMerkleRoot } from "@kyvejs/sdk";
+import { createHashesFromTendermintBundle } from './utils/merkle';
+import { generateMerkleRoot } from '@kyvejs/sdk';
 
 const ajv = new Ajv();
 
@@ -239,12 +239,11 @@ export default class Tendermint implements IRuntime {
 
   async summarizeDataBundle(_: Validator, bundle: DataItem[]): Promise<string> {
     const hashes: Uint8Array[] = createHashesFromTendermintBundle(bundle);
-
     const merkleRoot: Uint8Array = generateMerkleRoot(hashes);
 
     return JSON.stringify({
-      "merkle_root": Buffer.from(merkleRoot).toString("hex")
-    })
+      merkle_root: Buffer.from(merkleRoot).toString('hex'),
+    });
   }
 
   async nextKey(_: Validator, key: string): Promise<string> {
