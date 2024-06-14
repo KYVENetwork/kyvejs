@@ -43,21 +43,8 @@ export default class TendermintSSync implements IRuntime {
     // fetch snapshot chunk from given height, format and chunk derived from key
     const [height, chunkIndex] = key.split('/').map((k) => +k);
 
-    const { data: snapshots } = await axios.get(
-      `${this.config.api}/list_snapshots`
-    );
-
-    if (!snapshots) {
-      throw new Error(`404: Snapshot with height ${height} not found`);
-    }
-
-    const snapshot: ISnapshot = snapshots.find(
-      (s: ISnapshot) => +s.height === height
-    );
-
-    if (!snapshot) {
-      throw new Error(`404: Snapshot with height ${height} not found`);
-    }
+    // fetch snapshot metadata from height
+    const snapshot = await this.getSnapshot(height);
 
     // fetch snapshot chunk
     const { data: chunk } = await axios.get(
