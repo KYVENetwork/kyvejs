@@ -1,4 +1,3 @@
-import { V1BundlesLCDClient } from "./v1/bundles/query";
 import { BundlesModuleLCDClient } from "./bundles/v1beta1/query";
 import { DelegationModuleLCDClient } from "./delegation/v1beta1/query";
 import { FundersModuleLCDClient } from "./funders/v1beta1/query";
@@ -7,6 +6,7 @@ import { PoolModuleLCDClient } from "./pool/v1beta1/query";
 import { QueryModuleLCDClient } from "./query/v1beta1/query";
 import { StakersModuleLCDClient } from "./stakers/v1beta1/query";
 import { TeamModuleLCDClient } from "./team/v1beta1/query";
+import { V1BundlesLCDClient } from "./v1/bundles/query";
 class KyveLCDClient {
   public v1: {
     bundles: V1BundlesLCDClient;

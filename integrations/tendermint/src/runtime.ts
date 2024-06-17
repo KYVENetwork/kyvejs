@@ -4,6 +4,8 @@ import axios from 'axios';
 import Ajv from 'ajv';
 import block_schema from './schemas/block.json';
 import block_results_schema from './schemas/block_result.json';
+import { createHashesFromTendermintBundle } from './utils/merkle';
+import { generateMerkleRoot } from '@kyvejs/sdk';
 
 const ajv = new Ajv();
 
@@ -236,8 +238,12 @@ export default class Tendermint implements IRuntime {
   }
 
   async summarizeDataBundle(_: Validator, bundle: DataItem[]): Promise<string> {
-    // use latest block height as bundle summary
-    return bundle.at(-1)?.value?.block?.block?.header?.height ?? '';
+    const hashes: Uint8Array[] = createHashesFromTendermintBundle(bundle);
+    const merkleRoot: Uint8Array = generateMerkleRoot(hashes);
+
+    return JSON.stringify({
+      merkle_root: Buffer.from(merkleRoot).toString('hex'),
+    });
   }
 
   async nextKey(_: Validator, key: string): Promise<string> {

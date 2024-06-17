@@ -7,7 +7,7 @@ import path from "path";
 import prompts from "prompts";
 
 import { IValaccountConfig } from "../types/interfaces";
-import { FILE_ACCESS, USER_HOME, KYSOR_DIR } from "../utils/constants";
+import { FILE_ACCESS, KYSOR_DIR, USER_HOME } from "../utils/constants";
 
 const valaccounts = new Command("valaccounts").description(
   "Create and delete valaccounts"
