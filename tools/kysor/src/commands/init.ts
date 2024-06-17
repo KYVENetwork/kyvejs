@@ -4,7 +4,7 @@ import { Command } from "commander";
 import fs from "fs";
 import path from "path";
 
-import { USER_HOME, KYSOR_DIR } from "../utils/constants";
+import { KYSOR_DIR, USER_HOME } from "../utils/constants";
 
 const init = new Command("init").description("Init KYSOR");
 
