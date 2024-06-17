@@ -124,6 +124,9 @@ export default class Tendermint implements IRuntime {
       );
     }
 
+    // check if finalize_block_events are present if every event attribute
+    // has a mode and that every mode attribute is either of value
+    // "BeginBlock" or "EndBlock"
     if (item.value.block_results.finalize_block_events) {
       for (const event of item.value.block_results.finalize_block_events) {
         const modeAttribute = event.attributes.find(
