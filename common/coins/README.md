@@ -19,11 +19,11 @@ Here are some examples on how to use the coins sdk:
 Arithmetic methods:
 
 ```ts
-new Coins("1acoin,2bcoin").add("3ccoin").mul(2).toString()
+new Coins("1acoin,2bcoin").add({denom: "ccoin", amount: "3"}).mul(2).toString()
 -> "2acoin,4bcoin,6ccoin"
 
 new Coins("1acoin,2bcoin,4ccoin").sub("1acoin").div(2).toArray()
--> [{"denom": "bcoin", amount: "1"}, {"denom": "ccoin", amount: "2"}]
+-> [{denom: "bcoin", amount: "1"}, {denom: "ccoin", amount: "2"}]
 ```
 
 Checks and info methods:
@@ -53,7 +53,7 @@ myCoins.max("1bcoin,1ccoin").toString()
 Comparison methods:
 
 ```ts
-const myCoins = new Coins({"denom": "bcoin", amount: "1"}, {"denom": "ccoin", amount: "2"})
+const myCoins = new Coins({denom: "bcoin", amount: "1"}, {denom: "ccoin", amount: "2"})
 
 new Coins("1acoin,2bcoin,3ccoin").isAllGT(myCoins)
 -> true
