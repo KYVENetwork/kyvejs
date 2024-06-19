@@ -585,3 +585,5 @@ export class Coins {
       .join(",");
   }
 }
+
+export { parseCoins, Coin } from "@cosmjs/amino";
