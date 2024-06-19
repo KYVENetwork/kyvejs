@@ -16,21 +16,53 @@ npm i @kyvejs/coins
 
 Here are some examples on how to use the coins sdk:
 
+Arithmetic methods:
+
 ```ts
-const coinsA = new Coins({"denom": "acoin", amount: "10"}, {"denom": "bcoin", amount: "20"})
-const coinsB = new Coins("30ccoin")
+new Coins("1acoin,2bcoin").add({denom: "ccoin", amount: "3"}).mul(2).toString()
+-> "2acoin,4bcoin,6ccoin"
 
-coinsA.add(coinsB).quo(10).toString()
--> "1acoin,2bcoin,3ccoin"
-
-coinsA.equal(coinsB)
--> false
-
-coinsA.max(coinsB).toArray()
--> [{"denom": "acoin", amount: "10"}, {"denom": "bcoin", amount: "20"}, {"denom": "ccoin", amount: "30"}]
+new Coins("1acoin,2bcoin,4ccoin").sub("1acoin").div(2).toArray()
+-> [{denom: "bcoin", amount: "1"}, {denom: "ccoin", amount: "2"}]
 ```
 
-## Available methods
+Checks and info methods:
+
+```ts
+const myCoins = new Coins("1acoin,2bcoin")
+
+myCoins.isZero()
+-> false
+
+myCoins.len()
+-> 2
+
+myCoins.equal("1acoin,2bcoin")
+-> true
+
+myCoins.amountOf("bcoin")
+-> "2"
+
+myCoins.min("1bcoin,1ccoin").toString()
+-> "1bcoin"
+
+myCoins.max("1bcoin,1ccoin").toString()
+-> "1acoin,2bcoin,1ccoin"
+```
+
+Comparison methods:
+
+```ts
+const myCoins = new Coins({denom: "bcoin", amount: "1"}, {denom: "ccoin", amount: "2"})
+
+new Coins("1acoin,2bcoin,3ccoin").isAllGT(myCoins)
+-> true
+
+new Coins("2bcoin,1ccoin").isAnyLT(myCoins)
+-> true
+```
+
+## All available methods
 
 The following methods are available on the Coins class:
 
