@@ -20,7 +20,7 @@ Arithmetic methods:
 
 ```ts
 new Coins("1acoin,2bcoin").add("3ccoin").mul(2).toString()
--> "2acoin,2bcoin,3ccoin"
+-> "2acoin,4bcoin,6ccoin"
 
 new Coins("1acoin,2bcoin,4ccoin").sub("1acoin").div(2).toArray()
 -> [{"denom": "bcoin", amount: "1"}, {"denom": "ccoin", amount: "2"}]
@@ -45,6 +45,9 @@ myCoins.amountOf("bcoin")
 
 myCoins.min("1bcoin,1ccoin").toString()
 -> "1bcoin"
+
+myCoins.max("1bcoin,1ccoin").toString()
+-> "1acoin,2bcoin,1ccoin"
 ```
 
 Comparison methods:
