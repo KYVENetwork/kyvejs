@@ -15,16 +15,14 @@ export const createFundersAminoConverters = (): AminoConverters => {
       toAmino: (msg: MsgFundPool) => ({
         creator: msg.creator,
         ...(isNotEmpty(msg.pool_id) && { pool_id: msg.pool_id }),
-        ...(isNotEmpty(msg.amount) && { amount: msg.amount }),
-        ...(isNotEmpty(msg.amount_per_bundle) && {
-          amount_per_bundle: msg.amount_per_bundle,
-        }),
+        amounts: [...msg.amounts],
+        amounts_per_bundle: [...msg.amounts_per_bundle],
       }),
       fromAmino: (msg): MsgFundPool => ({
         creator: msg.creator,
         pool_id: msg.pool_id,
-        amount: msg.amount,
-        amount_per_bundle: msg.amount_per_bundle,
+        amounts: [...msg.amounts],
+        amounts_per_bundle: [...msg.amounts_per_bundle],
       }),
     },
     "/kyve.funders.v1beta1.MsgDefundPool": {
@@ -32,12 +30,12 @@ export const createFundersAminoConverters = (): AminoConverters => {
       toAmino: (msg: MsgDefundPool) => ({
         creator: msg.creator,
         ...(isNotEmpty(msg.pool_id) && { id: msg.pool_id }),
-        ...(isNotEmpty(msg.amount) && { amount: msg.amount }),
+        amounts: [...msg.amounts],
       }),
       fromAmino: (msg): MsgDefundPool => ({
         creator: msg.creator,
         pool_id: msg.pool_id,
-        amount: msg.amount,
+        amounts: [...msg.amounts],
       }),
     },
     "/kyve.funders.v1beta1.MsgCreateFunder": {

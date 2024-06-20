@@ -1,6 +1,6 @@
 import { Logger } from "tslog";
 import { Validator } from "../../src/index";
-import { setupMetrics, isPoolActive } from "../../src/methods";
+import { isPoolActive, setupMetrics } from "../../src/methods";
 import { register } from "prom-client";
 import { TestRuntime } from "../mocks/runtime.mock";
 import { genesis_pool } from "../mocks/constants";
@@ -13,6 +13,7 @@ TEST CASES - isPoolActive
 * assert if pool status is POOL_STATUS_ACTIVE
 * assert if pool status is POOL_STATUS_NO_FUNDS
 * assert if pool status is POOL_STATUS_DISABLED
+* assert if pool status is POOL_STATUS_END_KEY_REACHED
 * assert if pool status is POOL_STATUS_NOT_ENOUGH_DELEGATION
 * assert if pool status is POOL_STATUS_UPGRADING
 * assert if pool status is POOL_STATUS_UNSPECIFIED
@@ -72,6 +73,17 @@ describe("isPoolActive", () => {
   test("assert if pool status is POOL_STATUS_DISABLED", async () => {
     // ARRANGE
     v.pool.status = PoolStatus.POOL_STATUS_DISABLED;
+
+    // ACT
+    const result = isPoolActive.call(v);
+
+    // ASSERT
+    expect(result).toBeFalsy();
+  });
+
+  test("assert if pool status is POOL_STATUS_END_KEY_REACHED", async () => {
+    // ARRANGE
+    v.pool.status = PoolStatus.POOL_STATUS_END_KEY_REACHED;
 
     // ACT
     const result = isPoolActive.call(v);

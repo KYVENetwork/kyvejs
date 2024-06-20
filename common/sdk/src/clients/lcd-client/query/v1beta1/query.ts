@@ -51,7 +51,7 @@ type PaginationResponseTypeUtil<T> = Overwrite<
   { pagination?: { next_key: string; total: string } }
 >;
 
-export class KyveRegistryLCDClient extends AbstractKyveLCDClient {
+export class QueryModuleLCDClient extends AbstractKyveLCDClient {
   constructor(restEndpoint: string) {
     super(restEndpoint);
   }
@@ -126,41 +126,7 @@ export class KyveRegistryLCDClient extends AbstractKyveLCDClient {
     return await this.request(endpoint);
   }
   /** end stakers **/
-
-  // async finalizedBundles(
-  //   params: PaginationPartialRequestUtilType<kyveQueryBundles.QueryFinalizedBundlesRequest>
-  // ): Promise<
-  //   PaginationResponseTypeUtil<kyveQueryRes.QueryFinalizedBundlesResponse>
-  // > {
-  //   const parameters: Record<string, any> = {};
-  //
-  //   if (typeof params?.pagination !== "undefined") {
-  //     parameters.pagination = params.pagination;
-  //   }
-  //   const endpoint = `kyve/query/v1beta1/finalized_bundles/${params.pool_id}`;
-  //   return await this.request(endpoint, parameters);
-  // }
   /** Bundles **/
-  async finalizedBundle(
-    params: kyveQueryBundles.QueryFinalizedBundleRequest
-  ): Promise<kyveQueryBundles.QueryFinalizedBundleResponse> {
-    const endpoint = `/kyve/v1/bundles/${params.pool_id}/${params.id}`;
-    return await this.request(endpoint);
-  }
-
-  async finalizedBundles(
-    params: PaginationPartialRequestUtilType<kyveQueryBundles.QueryFinalizedBundlesRequest>
-  ): Promise<
-    PaginationResponseTypeUtil<kyveQueryBundlesRes.QueryFinalizedBundlesResponse>
-  > {
-    const parameters: Record<string, any> = {};
-
-    if (typeof params?.pagination !== "undefined") {
-      parameters.pagination = params.pagination;
-    }
-    const endpoint = `/kyve/v1/bundles/${params.pool_id}`;
-    return await this.request(endpoint, parameters);
-  }
   async currentVoteStatus(
     params: kyveQueryBundles.QueryCurrentVoteStatusRequest
   ): Promise<kyveQueryBundlesRes.QueryCurrentVoteStatusResponse> {

@@ -1,6 +1,8 @@
 import { DataItem, IRuntime, Validator, VOTE } from '@kyvejs/protocol';
 import { name, version } from '../package.json';
 import axios from 'axios';
+import { createHashesFromTendermintBundle } from './utils/merkle';
+import { generateMerkleRoot } from '@kyvejs/sdk';
 
 // TendermintBSync config
 interface IConfig {
@@ -82,8 +84,12 @@ export default class TendermintBSync implements IRuntime {
   }
 
   async summarizeDataBundle(_: Validator, bundle: DataItem[]): Promise<string> {
-    // use latest block height as bundle summary
-    return bundle.at(-1)?.value?.header?.height ?? '';
+    const hashes: Uint8Array[] = createHashesFromTendermintBundle(bundle);
+    const merkleRoot: Uint8Array = generateMerkleRoot(hashes);
+
+    return JSON.stringify({
+      merkle_root: Buffer.from(merkleRoot).toString('hex'),
+    });
   }
 
   async nextKey(_: Validator, key: string): Promise<string> {

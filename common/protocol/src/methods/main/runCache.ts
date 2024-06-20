@@ -119,6 +119,15 @@ export async function runCache(this: Validator): Promise<void> {
       this.m.cache_index_tail.set(Math.max(0, currentIndex - 1));
 
       for (let i = currentIndex; i < targetIndex; i++) {
+        // if the end key is not empty and we have reached the end key of the pool
+        // we do not sync past this key
+        if (this.pool.data?.end_key && this.pool.data.end_key === key) {
+          this.logger.info(
+            `Reached pool end key "${key}", the node will not continue collecting data past this key.`
+          );
+          break;
+        }
+
         // check if data item was already collected. If it was
         // already collected we don't need to retrieve it again
         this.logger.debug(`this.cacheProvider.exists(${i.toString()})`);
@@ -222,11 +231,6 @@ export async function runCache(this: Validator): Promise<void> {
         // assign the next key for the next round
         key = nextKey;
       }
-
-      // indicate that current caching round is done
-      this.logger.debug(
-        `Finished caching from index ${currentIndex} to ${targetIndex}. Waiting for next round ...`
-      );
 
       // wait until a new bundle proposal is available. We don't need
       // to sync the pool here because the pool state already gets

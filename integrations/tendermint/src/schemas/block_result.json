@@ -80,7 +80,7 @@
       ]
     },
     "begin_block_events": {
-      "type": ["array", "null"],
+      "type": ["array"],
       "items": [
         {
           "type": "object",
@@ -115,6 +115,40 @@
     },
     "end_block_events": {
       "type": ["array", "null"],
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string"
+            },
+            "attributes": {
+              "type": "array",
+              "items": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "key": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": ["string", "null"]
+                    },
+                    "index": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": ["key", "value", "index"]
+                }
+              ]
+            }
+          },
+          "required": ["type", "attributes"]
+        }
+      ]
+    },
+    "finalize_block_events": {
+      "type": ["array"],
       "items": [
         {
           "type": "object",
@@ -231,15 +265,14 @@
         }
       },
       "required": ["block", "evidence", "validator"]
-    }
+    },
+    "event_plaintext": { "type": "boolean" }
   },
   "required": [
     "height",
     "txs_results",
-    "begin_block_events",
-    "end_block_events",
     "validator_updates",
     "consensus_param_updates"
   ],
-  "additionalProperties": false
+  "additionalProperties": true
 }

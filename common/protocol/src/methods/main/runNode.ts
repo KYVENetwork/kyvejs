@@ -1,3 +1,4 @@
+import { PoolStatus } from "@kyvejs/types/lcd/kyve/pool/v1beta1/pool";
 import { Validator } from "../..";
 import { IDLE_TIME, sleep } from "../../utils";
 
@@ -31,6 +32,11 @@ export async function runNode(this: Validator): Promise<void> {
 
     if (!this.isNodeValidator()) {
       process.exit(1);
+    }
+
+    if (this.pool.status === PoolStatus.POOL_STATUS_END_KEY_REACHED) {
+      this.logger.info(`Reached pool end key. Shutting down node ...`);
+      process.exit(0);
     }
 
     // log warnings if storage provider balance is low

@@ -4,6 +4,8 @@ import axios from 'axios';
 import Ajv from 'ajv';
 import block_schema from './schemas/block.json';
 import block_results_schema from './schemas/block_result.json';
+import { createHashesFromTendermintBundle } from './utils/merkle';
+import { generateMerkleRoot } from '@kyvejs/sdk';
 
 const ajv = new Ajv();
 
@@ -105,7 +107,9 @@ export default class Tendermint implements IRuntime {
 
     if (!block_validate(item.value.block)) {
       throw new Error(
-        `Block schema validation failed: ${block_validate.errors}`
+        `Block schema validation failed: ${JSON.stringify(
+          block_validate.errors
+        )}`
       );
     }
 
@@ -114,8 +118,38 @@ export default class Tendermint implements IRuntime {
 
     if (!block_results_validate(item.value.block_results)) {
       throw new Error(
-        `Block results schema validation failed: ${block_results_validate.errors}`
+        `Block results schema validation failed: ${JSON.stringify(
+          block_results_validate.errors
+        )}`
       );
+    }
+
+    // check if finalize_block_events are present if every event attribute
+    // has a mode and that every mode attribute is either of value
+    // "BeginBlock" or "EndBlock"
+    if (item.value.block_results.finalize_block_events) {
+      for (const event of item.value.block_results.finalize_block_events) {
+        const modeAttribute = event.attributes.find(
+          (attribute: any) => attribute.key === 'mode'
+        );
+
+        if (!modeAttribute) {
+          throw new Error(
+            `finalize_block_events contains events with no "mode" in ${event.type}`
+          );
+        }
+
+        if (
+          modeAttribute.value !== 'BeginBlock' &&
+          modeAttribute.value !== 'EndBlock'
+        ) {
+          throw new Error(
+            `finalize_block_events contains invalid mode in ${
+              event.type
+            }: ${JSON.stringify(modeAttribute)}`
+          );
+        }
+      }
     }
 
     return true;
@@ -236,8 +270,12 @@ export default class Tendermint implements IRuntime {
   }
 
   async summarizeDataBundle(_: Validator, bundle: DataItem[]): Promise<string> {
-    // use latest block height as bundle summary
-    return bundle.at(-1)?.value?.block?.block?.header?.height ?? '';
+    const hashes: Uint8Array[] = createHashesFromTendermintBundle(bundle);
+    const merkleRoot: Uint8Array = generateMerkleRoot(hashes);
+
+    return JSON.stringify({
+      merkle_root: Buffer.from(merkleRoot).toString('hex'),
+    });
   }
 
   async nextKey(_: Validator, key: string): Promise<string> {

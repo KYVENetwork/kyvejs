@@ -29,9 +29,7 @@ TEST CASES - cache tests
 * start caching from a pool where transformDataItem fails
 * start caching from a pool where nextKey fails once
 * start caching from a pool where cache methods fail
-* TODO: test with pool config that has no source object
-* TODO: test with pool config that has zero sources
-* TODO: start caching from a pool where node has not cached anything yet
+* start caching from a pool which has an endKey
 
 */
 
@@ -249,8 +247,6 @@ describe("cache tests", () => {
 
     // assert that only one round ran
     expect(v["waitForCacheContinuation"]).toHaveBeenCalledTimes(1);
-
-    // TODO: assert timeouts
   });
 
   test("start caching from a pool which has a bundle proposal ongoing", async () => {
@@ -423,8 +419,6 @@ describe("cache tests", () => {
 
     // assert that only one round ran
     expect(v["waitForCacheContinuation"]).toHaveBeenCalledTimes(1);
-
-    // TODO: assert timeouts
   });
 
   test("continue caching from a pool which has a bundle proposal ongoing", async () => {
@@ -602,8 +596,6 @@ describe("cache tests", () => {
 
     // assert that only one round ran
     expect(v["waitForCacheContinuation"]).toHaveBeenCalledTimes(1);
-
-    // TODO: assert timeouts
   });
 
   test("start caching from a pool where last bundle proposal was dropped", async () => {
@@ -767,8 +759,6 @@ describe("cache tests", () => {
 
     // assert that only one round ran
     expect(v["waitForCacheContinuation"]).toHaveBeenCalledTimes(1);
-
-    // TODO: assert timeouts
   });
 
   test("start caching from a pool where getNextDataItem fails once", async () => {
@@ -931,8 +921,6 @@ describe("cache tests", () => {
 
     // assert that only one round ran
     expect(v["waitForCacheContinuation"]).toHaveBeenCalledTimes(1);
-
-    // TODO: assert timeouts
   });
 
   test("start caching from a pool where getNextDataItem fails multiple times", async () => {
@@ -1175,8 +1163,6 @@ describe("cache tests", () => {
 
     // assert that only one round ran
     expect(v["waitForCacheContinuation"]).toHaveBeenCalledTimes(1);
-
-    // TODO: assert timeouts
   });
 
   test("start caching from a pool where transformDataItem fails", async () => {
@@ -1407,8 +1393,6 @@ describe("cache tests", () => {
 
     // assert that only one round ran
     expect(v["waitForCacheContinuation"]).toHaveBeenCalledTimes(1);
-
-    // TODO: assert timeouts
   });
 
   test.skip("start caching from a pool where nextKey fails once", async () => {
@@ -1527,8 +1511,6 @@ describe("cache tests", () => {
 
     // assert that only one round ran
     expect(v["waitForCacheContinuation"]).toHaveBeenCalledTimes(0);
-
-    // TODO: assert timeouts
   });
 
   test("start caching from a pool where cache methods fail", async () => {
@@ -1665,7 +1647,173 @@ describe("cache tests", () => {
 
     // assert that only one round ran
     expect(v["waitForCacheContinuation"]).toHaveBeenCalledTimes(0);
+  });
 
-    // TODO: assert timeouts
+  test("start caching from a pool which has an endKey", async () => {
+    // ARRANGE
+    v.pool = {
+      ...genesis_pool,
+      data: {
+        ...genesis_pool.data,
+        current_key: "99",
+        current_index: "100",
+        end_key: "152",
+      },
+      bundle_proposal: {
+        ...genesis_pool.bundle_proposal,
+        storage_id: "test_storage_id",
+        uploader: "test_staker",
+        next_uploader: "test_staker",
+        data_size: "123456789",
+        data_hash: "test_bundle_hash",
+        bundle_size: "50",
+        from_key: "100",
+        to_key: "149",
+        bundle_summary: "test_summary",
+        updated_at: "0",
+        voters_valid: ["test_staker"],
+      },
+    } as any;
+
+    // ACT
+    await runCache.call(v);
+
+    // ASSERT
+    const txs = v["client"][0].kyve.bundles.v1beta1;
+    const queries = v["lcd"][0].kyve.query.v1beta1;
+    const cacheProvider = v["cacheProvider"];
+    const runtime = v["runtime"];
+
+    // ========================
+    // ASSERT CLIENT INTERFACES
+    // ========================
+
+    expect(txs.claimUploaderRole).toHaveBeenCalledTimes(0);
+
+    expect(txs.voteBundleProposal).toHaveBeenCalledTimes(0);
+
+    expect(txs.submitBundleProposal).toHaveBeenCalledTimes(0);
+
+    expect(txs.skipUploaderRole).toHaveBeenCalledTimes(0);
+
+    // =====================
+    // ASSERT LCD INTERFACES
+    // =====================
+
+    expect(queries.canVote).toHaveBeenCalledTimes(0);
+
+    expect(queries.canPropose).toHaveBeenCalledTimes(0);
+
+    // =========================
+    // ASSERT STORAGE INTERFACES
+    // =========================
+
+    expect(storageProvider.saveBundle).toHaveBeenCalledTimes(0);
+
+    expect(storageProvider.retrieveBundle).toHaveBeenCalledTimes(0);
+
+    // =======================
+    // ASSERT CACHE INTERFACES
+    // =======================
+
+    // we use 50 + 3 here because the current bundle is 50 items big
+    // and because of the end key we only index the next 3 items and stop
+    // afterwards
+    expect(cacheProvider.put).toHaveBeenCalledTimes(50 + 3);
+
+    for (let n = 0; n < 50 + 3; n++) {
+      const item = {
+        key: (n + parseInt(genesis_pool.data.max_bundle_size)).toString(),
+        value: `${
+          n + parseInt(genesis_pool.data.max_bundle_size)
+        }-value-transform`,
+      };
+      expect(cacheProvider.put).toHaveBeenNthCalledWith(
+        n + 1,
+        (n + parseInt(genesis_pool.data.max_bundle_size)).toString(),
+        item
+      );
+    }
+
+    expect(cacheProvider.get).toHaveBeenCalledTimes(0);
+
+    expect(cacheProvider.exists).toHaveBeenCalledTimes(
+      parseInt(genesis_pool.data.max_bundle_size) + 50 + 3
+    );
+
+    for (let n = 0; n < parseInt(genesis_pool.data.max_bundle_size); n++) {
+      expect(cacheProvider.exists).toHaveBeenNthCalledWith(n + 1, n.toString());
+    }
+
+    for (
+      let n = parseInt(genesis_pool.data.max_bundle_size);
+      n < parseInt(genesis_pool.data.max_bundle_size) + 50 + 3;
+      n++
+    ) {
+      expect(cacheProvider.exists).toHaveBeenNthCalledWith(n + 1, n.toString());
+    }
+
+    expect(cacheProvider.del).toHaveBeenCalledTimes(0);
+
+    expect(cacheProvider.drop).toHaveBeenCalledTimes(0);
+
+    // =============================
+    // ASSERT COMPRESSION INTERFACES
+    // =============================
+
+    expect(compression.compress).toHaveBeenCalledTimes(0);
+
+    expect(compression.decompress).toHaveBeenCalledTimes(0);
+
+    // =========================
+    // ASSERT RUNTIME INTERFACES
+    // =========================
+
+    expect(runtime.getDataItem).toHaveBeenCalledTimes(50 + 3);
+
+    for (let n = 0; n < 50 + 3; n++) {
+      expect(runtime.getDataItem).toHaveBeenNthCalledWith(
+        n + 1,
+        v,
+        (n + parseInt(genesis_pool.data.max_bundle_size)).toString()
+      );
+    }
+
+    expect(runtime.transformDataItem).toHaveBeenCalledTimes(50 + 3);
+
+    for (let n = 0; n < 50 + 3; n++) {
+      const item = {
+        key: (n + parseInt(genesis_pool.data.max_bundle_size)).toString(),
+        value: `${n + parseInt(genesis_pool.data.max_bundle_size)}-value`,
+      };
+      expect(runtime.transformDataItem).toHaveBeenNthCalledWith(
+        n + 1,
+        expect.any(Validator),
+        item
+      );
+    }
+
+    expect(runtime.validateDataItem).toHaveBeenCalledTimes(0);
+
+    expect(runtime.nextKey).toHaveBeenCalledTimes(50 + 3);
+
+    // here we subtract the key - 1 because we start using the
+    // current key
+    for (let n = 0; n < 50 + 3; n++) {
+      expect(runtime.nextKey).toHaveBeenNthCalledWith(
+        n + 1,
+        expect.any(Validator),
+        (n + parseInt(genesis_pool.data.max_bundle_size) - 1).toString()
+      );
+    }
+
+    expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(0);
+
+    // ========================
+    // ASSERT NODEJS INTERFACES
+    // ========================
+
+    // assert that only one round ran
+    expect(v["waitForCacheContinuation"]).toHaveBeenCalledTimes(1);
   });
 });
