@@ -247,7 +247,7 @@
               "type": "string"
             }
           },
-          "required": ["max_age_num_blocks", "max_age_duration", "max_bytes"]
+          "required": ["max_age_num_blocks", "max_age_duration"]
         },
         "validator": {
           "type": "object",
