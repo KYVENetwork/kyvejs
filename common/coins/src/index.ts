@@ -1,18 +1,22 @@
 import { parseCoins, Coin } from "@cosmjs/amino";
-import BN from "bn.js";
+import BigNumber from "bignumber.js";
+
+BigNumber.set({
+  ROUNDING_MODE: 3,
+});
 
 type CoinArgs = String[] | Coin[] | Coins[];
 
 export class Coins {
-  private coinMap: Map<string, BN> = new Map();
+  private coinMap: Map<string, BigNumber> = new Map();
 
   private get coins(): Coin[] {
     return this.sortCoins(
       Array.from(this.coinMap.entries()).map(([denom, amount]) => ({
         denom,
-        amount: amount.toString(),
+        amount: amount.toFixed(0),
       }))
-    ).filter((coin) => !new BN(coin.amount).isZero());
+    ).filter((coin) => !new BigNumber(coin.amount).isZero());
   }
 
   /**
@@ -179,7 +183,9 @@ export class Coins {
    * @return {boolean}
    */
   public isAnyNegative(): boolean {
-    return Array.from(this.coinMap.values()).some((amount) => amount.isNeg());
+    return Array.from(this.coinMap.values()).some((amount) =>
+      amount.isNegative()
+    );
   }
 
   /**
@@ -192,7 +198,7 @@ export class Coins {
   public isAllPositive(): boolean {
     return (
       !this.empty() &&
-      Array.from(this.coinMap.values()).every((amount) => amount.gtn(0))
+      Array.from(this.coinMap.values()).every((amount) => amount.gt(0))
     );
   }
 
@@ -211,7 +217,7 @@ export class Coins {
     this.coinArgsToCoins(...coinsB).forEach((coin) => {
       this.coinMap.set(
         coin.denom,
-        (this.coinMap.get(coin.denom) || new BN(0)).add(new BN(coin.amount))
+        (this.coinMap.get(coin.denom) || new BigNumber(0)).plus(coin.amount)
       );
     });
 
@@ -235,7 +241,7 @@ export class Coins {
     this.coinArgsToCoins(...coinsB).forEach((coin) => {
       this.coinMap.set(
         coin.denom,
-        (this.coinMap.get(coin.denom) || new BN(0)).sub(new BN(coin.amount))
+        (this.coinMap.get(coin.denom) || new BigNumber(0)).minus(coin.amount)
       );
     });
 
@@ -257,7 +263,10 @@ export class Coins {
    */
   public mul(value: number | string): Coins {
     this.coinMap.forEach((amount, denom) => {
-      this.coinMap.set(denom, amount.mul(new BN(value)));
+      this.coinMap.set(
+        denom,
+        new BigNumber(amount.multipliedBy(value).toFixed(0))
+      );
     });
 
     return new Coins(this);
@@ -280,7 +289,7 @@ export class Coins {
    */
   public quo(value: number | string): Coins {
     this.coinMap.forEach((amount, denom) => {
-      this.coinMap.set(denom, new BN(amount.div(new BN(value)).toString()));
+      this.coinMap.set(denom, amount.idiv(value));
     });
 
     return new Coins(this);
@@ -304,9 +313,9 @@ export class Coins {
     return new Coins(
       ...this.coinArgsToCoins(...coinsB).map((coin) => ({
         denom: coin.denom,
-        amount: BN.min(
-          this.coinMap.get(coin.denom) || new BN(0),
-          new BN(coin.amount)
+        amount: BigNumber.min(
+          this.coinMap.get(coin.denom) || new BigNumber(0),
+          coin.amount
         ).toString(),
       }))
     );
@@ -330,7 +339,10 @@ export class Coins {
     this.coinArgsToCoins(...coinsB).forEach((coin) => {
       this.coinMap.set(
         coin.denom,
-        BN.max(this.coinMap.get(coin.denom) || new BN(0), new BN(coin.amount))
+        BigNumber.max(
+          this.coinMap.get(coin.denom) || new BigNumber(0),
+          coin.amount
+        )
       );
     });
 
@@ -357,7 +369,7 @@ export class Coins {
     return this.coinArgsToCoins(...coinsB).every(
       (coin) =>
         this.coinMap.has(coin.denom) &&
-        this.coinMap.get(coin.denom)!.gte(new BN(coin.amount))
+        this.coinMap.get(coin.denom)!.gte(coin.amount)
     );
   }
 
@@ -381,7 +393,7 @@ export class Coins {
     return this.coinArgsToCoins(...coinsB).every(
       (coin) =>
         this.coinMap.has(coin.denom) &&
-        this.coinMap.get(coin.denom)!.gt(new BN(coin.amount))
+        this.coinMap.get(coin.denom)!.gt(coin.amount)
     );
   }
 
@@ -406,8 +418,7 @@ export class Coins {
 
     return Array.from(this.coinMap.keys()).every(
       (denom) =>
-        coins.has(denom) &&
-        this.coinMap.get(denom)!.lte(new BN(coins.get(denom)!))
+        coins.has(denom) && this.coinMap.get(denom)!.lte(coins.get(denom)!)
     );
   }
 
@@ -432,8 +443,7 @@ export class Coins {
 
     return Array.from(this.coinMap.keys()).every(
       (denom) =>
-        coins.has(denom) &&
-        this.coinMap.get(denom)!.lt(new BN(coins.get(denom)!))
+        coins.has(denom) && this.coinMap.get(denom)!.lt(coins.get(denom)!)
     );
   }
 
@@ -458,8 +468,7 @@ export class Coins {
 
     return Array.from(this.coinMap.keys()).some(
       (denom) =>
-        coins.has(denom) &&
-        this.coinMap.get(denom)!.gte(new BN(coins.get(denom)!))
+        coins.has(denom) && this.coinMap.get(denom)!.gte(coins.get(denom)!)
     );
   }
 
@@ -484,8 +493,7 @@ export class Coins {
 
     return Array.from(this.coinMap.keys()).some(
       (denom) =>
-        coins.has(denom) &&
-        this.coinMap.get(denom)!.gt(new BN(coins.get(denom)!))
+        coins.has(denom) && this.coinMap.get(denom)!.gt(coins.get(denom)!)
     );
   }
 
@@ -510,8 +518,7 @@ export class Coins {
 
     return Array.from(this.coinMap.keys()).some(
       (denom) =>
-        coins.has(denom) &&
-        this.coinMap.get(denom)!.lte(new BN(coins.get(denom)!))
+        coins.has(denom) && this.coinMap.get(denom)!.lte(coins.get(denom)!)
     );
   }
 
@@ -536,8 +543,7 @@ export class Coins {
 
     return Array.from(this.coinMap.keys()).some(
       (denom) =>
-        coins.has(denom) &&
-        this.coinMap.get(denom)!.lt(new BN(coins.get(denom)!))
+        coins.has(denom) && this.coinMap.get(denom)!.lt(coins.get(denom)!)
     );
   }
 
@@ -565,11 +571,11 @@ export class Coins {
     return coins;
   }
 
-  private coinArgsToMap(...coinArgs: CoinArgs): Map<string, BN> {
-    const map: Map<string, BN> = new Map();
+  private coinArgsToMap(...coinArgs: CoinArgs): Map<string, BigNumber> {
+    const map: Map<string, BigNumber> = new Map();
 
     this.coinArgsToCoins(...coinArgs).forEach((coin) => {
-      map.set(coin.denom, new BN(coin.amount));
+      map.set(coin.denom, new BigNumber(coin.amount));
     });
 
     return map;
