@@ -213,11 +213,7 @@ export default class TendermintSSync implements IRuntime {
       `${this.config.api}/list_snapshots`
     );
 
-    if (!snapshots) {
-      throw new Error(`404: Snapshot with height ${height} not found`);
-    }
-
-    const snapshot: ISnapshot = snapshots.find(
+    const snapshot: ISnapshot = (snapshots || []).find(
       (s: ISnapshot) => +s.height === height
     );
 
