@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.2.0](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint@1.1.8...@kyvejs/tendermint@1.2.0) (2024-07-03)
+
+### Bug Fixes
+
+- remove max bytes from schema ([#142](https://github.com/KYVENetwork/kyvejs/issues/142)) ([25fa879](https://github.com/KYVENetwork/kyvejs/commit/25fa879296aaeb89c755bad24ad01df260fb4b52))
+
+### Features
+
+- v1.5.x ([#136](https://github.com/KYVENetwork/kyvejs/issues/136)) ([97d8b54](https://github.com/KYVENetwork/kyvejs/commit/97d8b54833d50bee7eb1a6e17d61f71d81887a9d)), closes [#133](https://github.com/KYVENetwork/kyvejs/issues/133)
+
 ## [1.1.8](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint@1.1.7...@kyvejs/tendermint@1.1.8) (2024-04-03)
 
 **Note:** Version bump only for package @kyvejs/tendermint

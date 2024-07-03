@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.2.0](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint-ssync@1.1.8...@kyvejs/tendermint-ssync@1.2.0) (2024-07-03)
+
+### Features
+
+- update tendermint-ssync ([#143](https://github.com/KYVENetwork/kyvejs/issues/143)) ([9be090b](https://github.com/KYVENetwork/kyvejs/commit/9be090be55dc10e4bd50ba00698a34b8a1ef6069))
+
 ## [1.1.8](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint-ssync@1.1.7...@kyvejs/tendermint-ssync@1.1.8) (2024-04-03)
 
 **Note:** Version bump only for package @kyvejs/tendermint-ssync

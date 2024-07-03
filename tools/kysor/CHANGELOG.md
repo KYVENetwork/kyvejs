@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.4.0](https://github.com/KYVENetwork/kyvejs/compare/@kyve/kysor@1.3.2...@kyve/kysor@1.4.0) (2024-07-03)
+
+### Features
+
+- v1.5.x ([#136](https://github.com/KYVENetwork/kyvejs/issues/136)) ([97d8b54](https://github.com/KYVENetwork/kyvejs/commit/97d8b54833d50bee7eb1a6e17d61f71d81887a9d)), closes [#133](https://github.com/KYVENetwork/kyvejs/issues/133)
+
 ## [1.3.2](https://github.com/KYVENetwork/kyvejs/compare/@kyve/kysor@1.3.1...@kyve/kysor@1.3.2) (2024-04-03)
 
 **Note:** Version bump only for package @kyve/kysor
