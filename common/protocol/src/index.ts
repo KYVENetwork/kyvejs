@@ -274,6 +274,10 @@ export class Validator {
         "Specify the home directory of the node where logs and the cache should save their data. [default current directory]",
         "./"
       )
+      .option(
+        "--skip-data-availability-check",
+        "Skip data availability check and join pool instantly without waiting for the data source. WARNING: Only use this if you know what you are doing since this can lead to timeout slashes"
+      )
       .action((options) => {
         this.start(options);
       });
@@ -326,9 +330,13 @@ export class Validator {
       process.exit(1);
     }
 
-    // until data is not available we wait and idle
-    while (!(await this.isDataAvailable())) {
-      await sleep(IDLE_TIME);
+    // by default we check if the first data items are available
+    // to protect the node operator from timeout slashes due to
+    // misconfiguration of the data source
+    if (!options.skipDataAvailabilityCheck) {
+      while (!(await this.isDataAvailable())) {
+        await sleep(IDLE_TIME);
+      }
     }
 
     await this.setupValidator();
@@ -356,3 +364,8 @@ export * from "./types";
 
 // export utils
 export * from "./utils";
+
+// add this so we can JSON.stringify bignumbers
+(BigInt.prototype as any).toJSON = function () {
+  return this.toString();
+};
