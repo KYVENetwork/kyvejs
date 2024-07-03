@@ -73,11 +73,11 @@ export const createStakersAminoConverters = (): AminoConverters => {
       aminoType: "kyve/stakers/MsgClaimCommissionRewards",
       toAmino: (msg: MsgClaimCommissionRewards) => ({
         creator: msg.creator,
-        ...(isNotEmpty(msg.amount) && { amount: msg.amount }),
+        amounts: [...msg.amounts],
       }),
       fromAmino: (msg): MsgClaimCommissionRewards => ({
         creator: msg.creator,
-        amount: msg.amount,
+        amounts: [...msg.amounts],
       }),
     },
     "/kyve.stakers.v1beta1.MsgJoinPool": {

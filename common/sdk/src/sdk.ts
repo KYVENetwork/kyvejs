@@ -178,7 +178,9 @@ export class KyveSDK {
 
     await window.keplr.enable(this.config.chainId);
 
-    const signer = await window.keplr.getOfflineSignerAuto(this.config.chainId);
+    const signer: any = await window.keplr.getOfflineSignerAuto(
+      this.config.chainId
+    );
     const walletName = (await window.keplr.getKey(this.config.chainId)).name;
     const keplr = window.keplr;
     const keplrAminoSigner = new KeplrAminoSigner(keplr, this.config);
