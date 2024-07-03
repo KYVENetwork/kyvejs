@@ -34,6 +34,10 @@ describe("coins.ts", () => {
     expect(() => new Coins("10acoin,30B")).toThrow(
       new Error("Got an invalid coin string")
     );
+    // float values
+    expect(() => new Coins("10acoin,0.2bcoin")).toThrow(
+      new Error("Got an invalid coin string")
+    );
 
     // --- Coin ---
 
@@ -319,8 +323,12 @@ describe("coins.ts", () => {
       ""
     );
 
-    expect(new Coins("10acoin,20bcoin,30ccoin").mul("3").toString()).toEqual(
+    expect(new Coins("10acoin,20bcoin,30ccoin").mul(3).toString()).toEqual(
       "30acoin,60bcoin,90ccoin"
+    );
+
+    expect(new Coins("10acoin,20bcoin,17ccoin").mul("0.1").toString()).toEqual(
+      "1acoin,2bcoin,1ccoin"
     );
   });
 
@@ -337,8 +345,12 @@ describe("coins.ts", () => {
 
     expect(new Coins("4acoin").quo(8).toString()).toEqual("");
 
+    expect(new Coins("10acoin,20bcoin,30ccoin").quo(0.2).toString()).toEqual(
+      "50acoin,100bcoin,150ccoin"
+    );
+
     expect(() => new Coins("10acoin,20bcoin,30ccoin").quo(0)).toThrow(
-      new Error("Assertion failed")
+      new Error("Got an invalid coin string")
     );
   });
 
