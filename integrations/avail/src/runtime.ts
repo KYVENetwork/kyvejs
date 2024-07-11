@@ -1,12 +1,11 @@
 import { DataItem, IRuntime, Validator, VOTE } from "@kyvejs/protocol";
 import { name, version } from "../package.json";
-import axios from "axios";
-import { providers } from "ethers";
-import { hexValue } from "ethers/lib/utils";
 import { createHashesFromBundle, generateMerkleRoot } from "../utils/merkle";
+import { fetchJsonRpc } from "../utils/utils";
 
 // Ethereum Blobs config
 interface IConfig {
+  finality: number;
   rpc: string;
 }
 
@@ -22,64 +21,36 @@ export default class Avail implements IRuntime {
       throw new Error(`Config does not have property "rpc" defined`);
     }
 
+    if (!config.finality) {
+      throw new Error(`Config does not have property "finality" defined`);
+    }
+
     if (process.env.KYVEJS_AVAIL_RPC) {
       config.rpc = process.env.KYVEJS_AVAIL_RPC;
 
-      console.log("set config rpc to", config.rpc)
+      console.log("set `KYVEJS_AVAIL_RPC` rpc to", config.rpc)
     }
 
     this.config = config;
   }
 
-  async  getDataItem(_: Validator, key: string): Promise<any> {
-    let blockHash;
-    let block;
+  async getDataItem(_: Validator, key: string): Promise<any> {
+    const finalizedBlockHash = await fetchJsonRpc(this.config.rpc, 'chain_getFinalizedHead');
+    const finalizedBlock = await fetchJsonRpc(this.config.rpc, 'chain_getBlock', [finalizedBlockHash]);
+    const finalizedHeight = parseInt(finalizedBlock.block.header.number, 16);
 
-    const blockHashResult = await axios.post(this.config.rpc, {
-      id: 1,
-      jsonrpc: '2.0',
-      method: 'chain_getBlockHash',
-      params: [
-        +key,
-      ]
-    }, {
-      headers: {
-        'Content-Type': 'application/json',
-      }
-    });
-
-    if (blockHashResult.data.result) {
-      blockHash = blockHashResult.data.result
-    } else {
-      throw new Error(`Failed to query block hash`)
+    if (parseInt(key) >= finalizedHeight - this.config.finality) {
+      throw new Error('Finality not reached yet; waiting for finality');
     }
 
-    const blockResult = await axios.post(this.config.rpc, {
-      id: 1,
-      jsonrpc: '2.0',
-      method: 'chain_getBlock',
-      params: [
-        blockHash,
-      ]
-    }, {
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.CELESTIA_NODE_AUTH_TOKEN}`
-      }
-    });
-
-    if (blockResult.data.result) {
-      block = blockResult.data.result
-    } else {
-      throw new Error(`Failed to query block`)
-    }
+    const blockHash = await fetchJsonRpc(this.config.rpc, 'chain_getBlockHash', [+key]);
+    const block = await fetchJsonRpc(this.config.rpc, 'chain_getBlock', [blockHash]);
 
     return {
       key,
       value: block,
     };
   }
-
 
   async prevalidateDataItem(_: Validator, item: DataItem): Promise<boolean> {
     // check if item value is not null
