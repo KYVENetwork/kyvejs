@@ -7,10 +7,7 @@ import { dataItemToSha256, generateMerkleRoot } from '@kyvejs/sdk';
 // Trustless API to serve block and block results independently.
 export function createHashesFromTendermintBundle(bundle: any[]): Uint8Array[] {
   return bundle.map((dataItem) => {
-    const blockHashes: Uint8Array[] = [
-      dataItemToSha256(dataItem.value?.block),
-      dataItemToSha256(dataItem.value?.block_results),
-    ];
+    const blockHashes: Uint8Array[] = [dataItemToSha256(dataItem.value)];
 
     const merkleRoot: Uint8Array = generateMerkleRoot(blockHashes);
 
