@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.2.1](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint-bsync@1.2.0...@kyvejs/tendermint-bsync@1.2.1) (2024-07-23)
+
+### Bug Fixes
+
+- bundle summary in bsync runtime ([#145](https://github.com/KYVENetwork/kyvejs/issues/145)) ([424aac0](https://github.com/KYVENetwork/kyvejs/commit/424aac0f0913c6ffa1550bb5ebae6e524af836a7))
+
 # [1.2.0](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint-bsync@1.1.7...@kyvejs/tendermint-bsync@1.2.0) (2024-07-03)
 
 ### Features
