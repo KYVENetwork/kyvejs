@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.2.1](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint@1.2.0...@kyvejs/tendermint@1.2.1) (2024-07-24)
+
+### Bug Fixes
+
+- allow empty begin_block_events ([#146](https://github.com/KYVENetwork/kyvejs/issues/146)) ([842c2eb](https://github.com/KYVENetwork/kyvejs/commit/842c2ebb844be171a1f9fddb7967046b29b0084f))
+
 # [1.2.0](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint@1.1.8...@kyvejs/tendermint@1.2.0) (2024-07-03)
 
 ### Bug Fixes

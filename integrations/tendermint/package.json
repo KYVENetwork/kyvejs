@@ -1,6 +1,6 @@
 {
   "name": "@kyvejs/tendermint",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "license": "MIT",
   "scripts": {
     "build": "rimraf dist && tsc",
