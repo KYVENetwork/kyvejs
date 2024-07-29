@@ -11,7 +11,7 @@ import { isNotEmpty } from "../utils";
 export const createFundersAminoConverters = (): AminoConverters => {
   return {
     "/kyve.funders.v1beta1.MsgFundPool": {
-      aminoType: "kyve/funders/MsgFundPool",
+      aminoType: "/kyve.funders.v1beta1.MsgFundPool",
       toAmino: (msg: MsgFundPool) => ({
         creator: msg.creator,
         ...(isNotEmpty(msg.pool_id) && { pool_id: msg.pool_id }),
@@ -26,7 +26,7 @@ export const createFundersAminoConverters = (): AminoConverters => {
       }),
     },
     "/kyve.funders.v1beta1.MsgDefundPool": {
-      aminoType: "kyve/funders/MsgDefundPool",
+      aminoType: "/kyve.funders.v1beta1.MsgDefundPool",
       toAmino: (msg: MsgDefundPool) => ({
         creator: msg.creator,
         ...(isNotEmpty(msg.pool_id) && { id: msg.pool_id }),
@@ -39,7 +39,7 @@ export const createFundersAminoConverters = (): AminoConverters => {
       }),
     },
     "/kyve.funders.v1beta1.MsgCreateFunder": {
-      aminoType: "kyve/funders/MsgCreateFunder",
+      aminoType: "/kyve.funders.v1beta1.MsgCreateFunder",
       toAmino: (msg: MsgCreateFunder) => ({
         creator: msg.creator,
         ...(isNotEmpty(msg.moniker) && { moniker: msg.moniker }),
@@ -58,7 +58,7 @@ export const createFundersAminoConverters = (): AminoConverters => {
       }),
     },
     "/kyve.funders.v1beta1.MsgUpdateFunder": {
-      aminoType: "kyve/funders/MsgUpdateFunder",
+      aminoType: "/kyve.funders.v1beta1.MsgUpdateFunder",
       toAmino: (msg: MsgUpdateFunder) => ({
         creator: msg.creator,
         ...(isNotEmpty(msg.moniker) && { moniker: msg.moniker }),
