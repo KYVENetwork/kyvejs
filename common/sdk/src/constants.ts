@@ -23,8 +23,8 @@ export const SUPPORTED_CHAIN_CONFIGS = {
   "kyve-1": {
     chainId: "kyve-1",
     chainName: "KYVE",
-    rpc: "https://rpc-eu-1.kyve.network",
-    rest: "https://api-eu-1.kyve.network",
+    rpc: "https://rpc.kyve.network",
+    rest: "https://api.kyve.network",
     coin: "KYVE",
     coinDenom: "ukyve",
     coinDecimals: 6,
@@ -33,8 +33,8 @@ export const SUPPORTED_CHAIN_CONFIGS = {
   "kaon-1": {
     chainId: "kaon-1",
     chainName: "KYVE Kaon",
-    rpc: "https://rpc-eu-1.kaon.kyve.network",
-    rest: "https://api-eu-1.kaon.kyve.network",
+    rpc: "https://rpc.kaon.kyve.network",
+    rest: "https://api.kaon.kyve.network",
     coin: "KYVE",
     coinDenom: "tkyve",
     coinDecimals: 6,
@@ -43,8 +43,8 @@ export const SUPPORTED_CHAIN_CONFIGS = {
   "korellia-2": {
     chainId: "korellia-2",
     chainName: "KYVE Korellia",
-    rpc: "https://rpc-eu-1.korellia.kyve.network",
-    rest: "https://api-eu-1.korellia.kyve.network",
+    rpc: "https://rpc.korellia.kyve.network",
+    rest: "https://api.korellia.kyve.network",
     coin: "KYVE",
     coinDenom: "tkyve",
     coinDecimals: 6,
