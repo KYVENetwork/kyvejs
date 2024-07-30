@@ -25,7 +25,7 @@ function jsonDecimalToProto(decimal: string): string {
 export const createStakersAminoConverters = (): AminoConverters => {
   return {
     "/kyve.stakers.v1beta1.MsgCreateStaker": {
-      aminoType: "kyve/stakers/MsgCreateStaker",
+      aminoType: "/kyve.stakers.v1beta1.MsgCreateStaker",
       toAmino: (msg: MsgCreateStaker) => ({
         creator: msg.creator,
         ...(isNotEmpty(msg.amount) && { amount: msg.amount }),
@@ -38,7 +38,7 @@ export const createStakersAminoConverters = (): AminoConverters => {
       }),
     },
     "/kyve.stakers.v1beta1.MsgUpdateMetadata": {
-      aminoType: "kyve/stakers/MsgUpdateMetadata",
+      aminoType: "/kyve.stakers.v1beta1.MsgUpdateMetadata",
       toAmino: (msg: MsgUpdateMetadata) => ({
         creator: msg.creator,
         ...(isNotEmpty(msg.moniker) && { moniker: msg.moniker }),
@@ -59,7 +59,7 @@ export const createStakersAminoConverters = (): AminoConverters => {
       }),
     },
     "/kyve.stakers.v1beta1.MsgUpdateCommission": {
-      aminoType: "kyve/stakers/MsgUpdateCommission",
+      aminoType: "/kyve.stakers.v1beta1.MsgUpdateCommission",
       toAmino: (msg: MsgUpdateCommission) => ({
         creator: msg.creator,
         commission: protoDecimalToJson(msg.commission),
@@ -70,7 +70,7 @@ export const createStakersAminoConverters = (): AminoConverters => {
       }),
     },
     "/kyve.stakers.v1beta1.MsgClaimCommissionRewards": {
-      aminoType: "kyve/stakers/MsgClaimCommissionRewards",
+      aminoType: "/kyve.stakers.v1beta1.MsgClaimCommissionRewards",
       toAmino: (msg: MsgClaimCommissionRewards) => ({
         creator: msg.creator,
         amounts: [...msg.amounts],
@@ -81,7 +81,7 @@ export const createStakersAminoConverters = (): AminoConverters => {
       }),
     },
     "/kyve.stakers.v1beta1.MsgJoinPool": {
-      aminoType: "kyve/stakers/MsgJoinPool",
+      aminoType: "/kyve.stakers.v1beta1.MsgJoinPool",
       toAmino: (msg: MsgJoinPool) => ({
         creator: msg.creator,
         ...(isNotEmpty(msg.pool_id) && { pool_id: msg.pool_id }),
@@ -96,7 +96,7 @@ export const createStakersAminoConverters = (): AminoConverters => {
       }),
     },
     "/kyve.stakers.v1beta1.MsgLeavePool": {
-      aminoType: "kyve/stakers/MsgLeavePool",
+      aminoType: "/kyve.stakers.v1beta1.MsgLeavePool",
       toAmino: (msg: MsgLeavePool) => ({
         creator: msg.creator,
         ...(isNotEmpty(msg.pool_id) && { pool_id: msg.pool_id }),
