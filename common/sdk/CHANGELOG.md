@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.3.1](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/sdk@1.3.0...@kyvejs/sdk@1.3.1) (2024-07-30)
+
+### Bug Fixes
+
+- amino types ([#147](https://github.com/KYVENetwork/kyvejs/issues/147)) ([7bf5a69](https://github.com/KYVENetwork/kyvejs/commit/7bf5a69455c3b055b0051d811b13672542cdcc8e))
+
 # [1.3.0](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/sdk@1.1.1...@kyvejs/sdk@1.3.0) (2024-07-03)
 
 ### Features
