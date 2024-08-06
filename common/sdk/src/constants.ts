@@ -4,7 +4,7 @@ import { ChainInfo } from "@keplr-wallet/types";
 
 export const PREFIX = "kyve";
 export const GOV_AUTHORITY = "kyve10d07y265gmmuvt4z0w9aw880jnsr700jdv7nah";
-export const GAS_MULTIPLIER = 1.3;
+export const GAS_MULTIPLIER = 1.5;
 export const COIN_TYPE = 118;
 
 export type IConfig = {
