@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.2.2](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/protocol@1.2.1...@kyvejs/protocol@1.2.2) (2024-08-07)
+
+**Note:** Version bump only for package @kyvejs/protocol
+
 ## [1.2.1](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/protocol@1.2.0...@kyvejs/protocol@1.2.1) (2024-07-30)
 
 **Note:** Version bump only for package @kyvejs/protocol
