@@ -71,7 +71,13 @@ export async function voteBundleProposal(
       }
 
       if (receipt.code === 0) {
-        this.logger.info(`Voted ${voteMessage} on bundle "${storageId}"`);
+        if (this.dryRun) {
+          this.logger.warn(
+            `Node would have voted ${voteMessage} on bundle "${storageId}"`
+          );
+        } else {
+          this.logger.info(`Voted ${voteMessage} on bundle "${storageId}"`);
+        }
 
         this.m.tx_vote_bundle_proposal_successful.inc();
         this.m.fees_vote_bundle_proposal.inc(
