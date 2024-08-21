@@ -286,8 +286,8 @@ export class Validator {
       )
       .option(
         "--dry-run-bundles <number>",
-        "Specify the number of bundles that should be tested before the node properly exits [default = 10]",
-        "10"
+        "Specify the number of bundles that should be tested before the node properly exits. If zero the node will run indefinitely [default = 0]",
+        "0"
       )
       .action((options) => {
         this.start(options);

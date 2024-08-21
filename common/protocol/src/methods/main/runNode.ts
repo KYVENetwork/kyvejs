@@ -96,7 +96,8 @@ export async function runNode(this: Validator): Promise<void> {
       }
     }
 
-    if (this.dryRun) {
+    // exit the node properly if the provided bundle rounds have been reached
+    if (this.dryRun && this.dryRunBundles > 0) {
       const rounds = await this.m.bundles_amount.get();
 
       if (rounds.values[0].value === this.dryRunBundles) {
