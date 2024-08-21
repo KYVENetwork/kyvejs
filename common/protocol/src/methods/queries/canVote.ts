@@ -46,6 +46,13 @@ export async function canVote(
               };
             }
 
+            if (this.dryRun) {
+              return {
+                possible: true,
+                reason: "",
+              };
+            }
+
             this.logger.debug(this.rest[l]);
             this.logger.debug(
               `this.lcd.kyve.query.v1beta1.canVote({pool_id: ${this.poolId.toString()},staker: ${

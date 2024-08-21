@@ -17,7 +17,6 @@ export function isPoolActive(this: Validator): boolean {
     case PoolStatus.POOL_STATUS_ACTIVE:
       return true;
     case PoolStatus.POOL_STATUS_NO_FUNDS:
-      this.logger.warn("Pool is out of funds, rewards may be reduced");
       return true;
     case PoolStatus.POOL_STATUS_DISABLED:
       this.logger.info(

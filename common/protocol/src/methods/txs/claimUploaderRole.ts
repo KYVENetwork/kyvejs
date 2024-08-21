@@ -14,6 +14,11 @@ import { Validator, standardizeError } from "../..";
 export async function claimUploaderRole(this: Validator): Promise<boolean> {
   for (let c = 0; c < this.client.length; c++) {
     try {
+      // if the node runs in dry run abort
+      if (this.dryRun) {
+        return false;
+      }
+
       // if next uploader is already defined abort
       if (this.pool.bundle_proposal!.next_uploader) {
         return false;
