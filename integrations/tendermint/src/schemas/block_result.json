@@ -58,7 +58,7 @@
                       ]
                     }
                   },
-                  "required": ["type", "attributes"]
+                  "required": ["type"]
                 }
               ]
             },
@@ -109,7 +109,7 @@
               ]
             }
           },
-          "required": ["type", "attributes"]
+          "required": ["type"]
         }
       ]
     },
@@ -143,7 +143,7 @@
               ]
             }
           },
-          "required": ["type", "attributes"]
+          "required": ["type"]
         }
       ]
     },

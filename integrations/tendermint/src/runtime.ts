@@ -23,7 +23,7 @@ interface IAttribute {
 
 interface IEvent {
   type: string;
-  attributes: IAttribute[];
+  attributes?: IAttribute[];
 }
 
 export default class Tendermint implements IRuntime {
@@ -174,7 +174,7 @@ export default class Tendermint implements IRuntime {
     if (item.value.block_results.begin_block_events) {
       item.value.block_results.begin_block_events =
         item.value.block_results.begin_block_events.map((event: IEvent) => {
-          event.attributes = event.attributes
+          event.attributes = (event.attributes || [])
             .sort(compareEventAttribute)
             .map(({ index, ...attribute }: IAttribute) => attribute);
           return event;
@@ -185,7 +185,7 @@ export default class Tendermint implements IRuntime {
     if (item.value.block_results.end_block_events) {
       item.value.block_results.end_block_events =
         item.value.block_results.end_block_events.map((event: IEvent) => {
-          event.attributes = event.attributes
+          event.attributes = (event.attributes || [])
             .sort(compareEventAttribute)
             .map(({ index, ...attribute }: IAttribute) => attribute);
           return event;
@@ -201,7 +201,7 @@ export default class Tendermint implements IRuntime {
           if (tx_result.events) {
             tx_result.events = tx_result.events.map((event: IEvent) => {
               // sort attributes in txs_results
-              event.attributes = event.attributes
+              event.attributes = (event.attributes || [])
                 .sort(compareEventAttribute)
                 .map(({ index, ...attribute }: IAttribute) => attribute);
 
