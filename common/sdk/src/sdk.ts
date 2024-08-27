@@ -191,7 +191,7 @@ export class KyveSDK {
       walletName
     );
     this.walletSupports.add(SUPPORTED_WALLETS.KEPLR);
-    return client;
+    return client as KyveWebClient;
   }
 
   /**

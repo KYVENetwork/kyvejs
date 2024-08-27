@@ -83,7 +83,7 @@ export class CosmostationSigner implements OfflineDirectSigner {
     ];
   }
 
-  async signDirect(signerAddress: string, signDoc: SignDoc) {
+  async signDirect(_signerAddress: string, signDoc: SignDoc) {
     const signedResult = await cosmostationMethods.signDirect(
       this.config.chainId,
       {
