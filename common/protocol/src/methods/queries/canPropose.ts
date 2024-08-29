@@ -18,6 +18,10 @@ export async function canPropose(
   updatedAt: number
 ): Promise<boolean> {
   try {
+    if (this.dryRun) {
+      return false;
+    }
+
     const canPropose = await callWithBackoffStrategy(
       async () => {
         for (let l = 0; l < this.lcd.length; l++) {
