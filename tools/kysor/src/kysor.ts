@@ -408,6 +408,15 @@ export const run = async (options: any) => {
         args.push("--debug");
       }
 
+      if (options.dryRun) {
+        args.push("--dry-run");
+      }
+
+      if (options.dryRunBundles > 0) {
+        args.push("--dry-run-bundles");
+        args.push(`${options.dryRunBundles}`);
+      }
+
       if (valaccount.requestBackoff) {
         args.push(`--request-backoff`);
         args.push(`${valaccount.requestBackoff}`);
