@@ -28,10 +28,13 @@ export async function runNode(this: Validator): Promise<void> {
 
     // get latest state of the chain to start round
     await this.syncPoolState();
-    await this.getBalancesForMetrics();
 
-    if (!this.isNodeValidator()) {
-      process.exit(1);
+    if (!this.dryRun) {
+      await this.getBalancesForMetrics();
+
+      if (!this.isNodeValidator()) {
+        process.exit(1);
+      }
     }
 
     if (this.pool.status === PoolStatus.POOL_STATUS_END_KEY_REACHED) {
@@ -61,7 +64,13 @@ export async function runNode(this: Validator): Promise<void> {
     }
 
     // log out the role of this node in this particular round
-    if (this.pool.bundle_proposal!.next_uploader === this.staker) {
+    if (this.dryRun) {
+      this.logger.info(
+        `Participating in bundle proposal round ${
+          this.pool.data!.total_bundles
+        } as NON-VALIDATOR`
+      );
+    } else if (this.pool.bundle_proposal!.next_uploader === this.staker) {
       this.logger.info(
         `Participating in bundle proposal round ${
           this.pool.data!.total_bundles
@@ -84,6 +93,34 @@ export async function runNode(this: Validator): Promise<void> {
       if (!success) {
         this.logger.info(`Retrying to validate bundle proposal`);
         continue;
+      }
+    }
+
+    // exit the node properly if the provided bundle rounds have been reached
+    if (this.dryRun && this.dryRunBundles > 0) {
+      const rounds = await this.m.bundles_amount.get();
+
+      if (rounds.values[0].value === this.dryRunBundles) {
+        const valid = await this.m.bundles_voted_valid.get();
+        const invalid = await this.m.bundles_voted_invalid.get();
+        const abstain = await this.m.bundles_voted_abstain.get();
+
+        console.log();
+        this.logger.info(
+          `Participated in ${rounds.values[0].value} bundle rounds and successfully finished dry run`
+        );
+
+        console.log();
+        this.logger.info(`Voted valid: ${valid.values[0].value}`);
+        this.logger.info(`Voted invalid: ${invalid.values[0].value}`);
+        this.logger.info(`Voted abstain: ${abstain.values[0].value}`);
+
+        console.log();
+        this.logger.info(
+          `Note that the total sum of the votes can be greater than the rounds since a node can still vote valid/invalid after initially voting abstain`
+        );
+
+        process.exit(0);
       }
     }
 
