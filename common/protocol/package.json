@@ -37,7 +37,7 @@
     "tslog": "^3.2.2",
     "unique-names-generator": "^4.6.0",
     "uuid": "^9.0.0",
-    "@ardrive/turbo-sdk": "^1.13.0"
+    "@ardrive/turbo-sdk": "^1.14.1"
   },
   "devDependencies": {
     "@types/clone": "^2.1.1",
@@ -56,8 +56,6 @@
     "rimraf": "^3.0.2",
     "ts-jest": "^28.0.8",
     "typedoc": "^0.22.17",
-    "typescript": "^4.4.3",
-    "@types/async-retry": "^1.4.8",
-    "@types/bn.js": "^5.1.5"
+    "typescript": "^4.4.3"
   }
 }
