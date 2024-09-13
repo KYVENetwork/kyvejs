@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.0.0-beta.7](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/ethereum-blobs@1.0.0-beta.6...@kyvejs/ethereum-blobs@1.0.0-beta.7) (2024-09-13)
+
+**Note:** Version bump only for package @kyvejs/ethereum-blobs
+
 # [1.0.0-beta.6](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/ethereum-blobs@1.0.0-beta.5...@kyvejs/ethereum-blobs@1.0.0-beta.6) (2024-08-29)
 
 **Note:** Version bump only for package @kyvejs/ethereum-blobs
