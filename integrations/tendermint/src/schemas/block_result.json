@@ -148,7 +148,7 @@
       ]
     },
     "finalize_block_events": {
-      "type": ["array"],
+      "type": ["array", "null"],
       "items": [
         {
           "type": "object",
