@@ -75,13 +75,16 @@ export default class Avail implements IRuntime {
     }
     // prevent nondeterministic misbehaviour
     v.logger.info('Removing commitments: difference identified');
-    // remove nondeterministic block_results to prevent incorrect invalid vote
-    delete validationDataItem.value.block.header.extension.V1.commitment;
+    // remove nondeterministic data to prevent incorrect invalid vote
+    delete validationDataItem.value.block.header.extension.V3.commitment;
+    delete proposedDataItem.value.block.header.extension.V3.commitment;
+    delete validationDataItem.value.justifications;
+    delete proposedDataItem.value.justifications;
 
     if (
       JSON.stringify(proposedDataItem) === JSON.stringify(validationDataItem)
     ) {
-      v.logger.warn("Voting abstain: value.block.header.extension.V1.commitment don't match");
+      v.logger.warn("Voting abstain: value.block.header.extension.V3.commitment or value.justifications don't match");
       // vote abstain if begin_block_events are not equal
       return VOTE.VOTE_TYPE_ABSTAIN;
     }
