@@ -1,0 +1,72 @@
+{
+  "options": {
+    "syntax": "proto3"
+  },
+  "nested": {
+    "Blob": {
+      "fields": {
+        "namespaceId": {
+          "type": "bytes",
+          "id": 1
+        },
+        "data": {
+          "type": "bytes",
+          "id": 2
+        },
+        "shareVersion": {
+          "type": "uint32",
+          "id": 3
+        },
+        "namespaceVersion": {
+          "type": "uint32",
+          "id": 4
+        }
+      }
+    },
+    "BlobTx": {
+      "fields": {
+        "tx": {
+          "type": "bytes",
+          "id": 1
+        },
+        "blobs": {
+          "rule": "repeated",
+          "type": "Blob",
+          "id": 2
+        },
+        "typeId": {
+          "type": "string",
+          "id": 3
+        }
+      }
+    },
+    "MsgPayForBlobs": {
+      "fields": {
+        "signer": {
+          "type": "string",
+          "id": 1
+        },
+        "namespaces": {
+          "rule": "repeated",
+          "type": "bytes",
+          "id": 2
+        },
+        "blobSizes": {
+          "rule": "repeated",
+          "type": "uint32",
+          "id": 3
+        },
+        "shareCommitments": {
+          "rule": "repeated",
+          "type": "bytes",
+          "id": 4
+        },
+        "shareVersions": {
+          "rule": "repeated",
+          "type": "uint32",
+          "id": 8
+        }
+      }
+    }
+  }
+}
