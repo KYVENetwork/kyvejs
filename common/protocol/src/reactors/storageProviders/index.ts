@@ -3,6 +3,7 @@ import { Arweave } from "./Arweave";
 import { Bundlr } from "./Bundlr";
 import { Kyve } from "./Kyve";
 import { NoStorageProvider } from "./NoStorageProvider";
+import { Turbo } from "./Turbo";
 
 /**
  * storageProviderFactory creates the correct storage provider class
@@ -10,8 +11,9 @@ import { NoStorageProvider } from "./NoStorageProvider";
  *
  * 0 - NoStorageProvider
  * 1 - Arweave
- * 2 - Bundlr
+ * 2 - Bundlr @deprecated
  * 3 - Kyve
+ * 4 - Turbo
  * x - NoStorageProvider (default)
  *
  * @method storageProviderFactory
@@ -25,6 +27,8 @@ export function storageProviderFactory(this: Validator): IStorageProvider {
       return new Bundlr(this.storagePriv);
     case 3:
       return new Kyve(this.chainId, this.poolId, this.staker, this.valaccount);
+    case 4:
+      return new Turbo(this.valaccount);
     default:
       return new NoStorageProvider();
   }
