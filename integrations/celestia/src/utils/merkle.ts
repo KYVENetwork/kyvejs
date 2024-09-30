@@ -75,12 +75,11 @@ function createMerkleRootForBlobs(txs: any): Uint8Array {
 
       decodedCelestiaTx.blobs.forEach((blob: any, index: any) => {
         blobs.push({
-          namespace_id: toHex(blob.namespaceId),
+          namespace: toBase64(blob.namespaceId),
           data: toBase64(blob.data),
-          share_commitment: toBase64(decodedPayForBlobs.shareCommitments[index]),
           share_version: decodedPayForBlobs.shareVersions[index],
-          blob_size: decodedPayForBlobs.blobSizes[index],
-          signer: decodedPayForBlobs.signer,
+          commitment: toBase64(decodedPayForBlobs.shareCommitments[index]),
+          index: -1,
         })
       })
     } catch(e) {
