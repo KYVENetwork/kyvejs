@@ -12,8 +12,12 @@ export function dataItemToSha256(data: any): Uint8Array {
 }
 
 export function generateMerkleRoot(hashes: Uint8Array[]): Uint8Array {
+  // if there are no hashes we return a 32 byte long array filled with zeros
   if (!hashes || hashes.length == 0) {
-    return Buffer.from("");
+    return Buffer.from(
+      "0000000000000000000000000000000000000000000000000000000000000000",
+      "hex"
+    );
   }
 
   // Ensure number of hashes (leafs) are even by copying the
