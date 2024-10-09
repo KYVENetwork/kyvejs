@@ -79,7 +79,7 @@ function createMerkleRootForBlobs(txs: any): Uint8Array {
 
       decodedCelestiaTx.blobs.forEach((blob: any, index: any) => {
         blobs.push({
-          namespace: toBase64(blob.namespaceId),
+          namespace: toBase64(decodedPayForBlobs.namespaces[index]),
           data: toBase64(blob.data),
           share_version: decodedPayForBlobs.shareVersions[index],
           commitment: toBase64(decodedPayForBlobs.shareCommitments[index]),
