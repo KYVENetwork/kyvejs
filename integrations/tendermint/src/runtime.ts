@@ -192,6 +192,17 @@ export default class Tendermint implements IRuntime {
         });
     }
 
+    // sort attributes and remove index in finalize_block_events
+    if (item.value.block_results.finalize_block_events) {
+      item.value.block_results.finalize_block_events =
+        item.value.block_results.finalize_block_events.map((event: IEvent) => {
+          event.attributes = (event.attributes || [])
+            .sort(compareEventAttribute)
+            .map(({ index, ...attribute }: IAttribute) => attribute);
+          return event;
+        });
+    }
+
     if (item.value.block_results.txs_results) {
       item.value.block_results.txs_results =
         item.value.block_results.txs_results.map((tx_result: any) => {
