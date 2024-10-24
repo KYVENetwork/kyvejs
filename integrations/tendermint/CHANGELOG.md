@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.2.7](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint@1.2.6...@kyvejs/tendermint@1.2.7) (2024-10-24)
+
+### Bug Fixes
+
+- remove index in finalize block events ([#157](https://github.com/KYVENetwork/kyvejs/issues/157)) ([2fb33c2](https://github.com/KYVENetwork/kyvejs/commit/2fb33c2a2d36ed83ce39eefb086e5fe1a4a80c68))
+
 ## [1.2.6](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint@1.2.5...@kyvejs/tendermint@1.2.6) (2024-09-23)
 
 ### Bug Fixes
