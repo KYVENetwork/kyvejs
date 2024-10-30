@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.3.0](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/protocol@1.2.4...@kyvejs/protocol@1.3.0) (2024-10-30)
+
+### Features
+
+- add new storage provider ArDrive Turbo ([#158](https://github.com/KYVENetwork/kyvejs/issues/158)) ([35cec1a](https://github.com/KYVENetwork/kyvejs/commit/35cec1a01a76ff6525290619ee311df217bde8d5))
+
 ## [1.2.4](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/protocol@1.2.3...@kyvejs/protocol@1.2.4) (2024-09-13)
 
 **Note:** Version bump only for package @kyvejs/protocol

@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.1.0-beta.7](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/evm@1.1.0-beta.6...@kyvejs/evm@1.1.0-beta.7) (2024-10-30)
+
+**Note:** Version bump only for package @kyvejs/evm
+
 # [1.1.0-beta.6](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/evm@1.1.0-beta.5...@kyvejs/evm@1.1.0-beta.6) (2024-09-13)
 
 **Note:** Version bump only for package @kyvejs/evm
