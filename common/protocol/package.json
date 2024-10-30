@@ -36,7 +36,8 @@
     "semver": "^7.5.3",
     "tslog": "^3.2.2",
     "unique-names-generator": "^4.6.0",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.0",
+    "@ardrive/turbo-sdk": "^1.14.1"
   },
   "devDependencies": {
     "@types/clone": "^2.1.1",

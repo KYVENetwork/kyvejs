@@ -2,6 +2,7 @@ import { IStorageProvider, Validator } from "../..";
 import { Arweave } from "./Arweave";
 import { Bundlr } from "./Bundlr";
 import { Kyve } from "./Kyve";
+import { Turbo } from "./Turbo";
 import { NoStorageProvider } from "./NoStorageProvider";
 
 /**
@@ -12,6 +13,7 @@ import { NoStorageProvider } from "./NoStorageProvider";
  * 1 - Arweave
  * 2 - Bundlr
  * 3 - Kyve
+ * 4 - Turbo
  * x - NoStorageProvider (default)
  *
  * @method storageProviderFactory
@@ -25,6 +27,8 @@ export function storageProviderFactory(this: Validator): IStorageProvider {
       return new Bundlr(this.storagePriv);
     case 3:
       return new Kyve(this.chainId, this.poolId, this.staker, this.valaccount);
+    case 4:
+      return new Turbo(this.storagePriv || this.valaccount);
     default:
       return new NoStorageProvider();
   }
