@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.4.1](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/types@1.4.0...@kyvejs/types@1.4.1) (2024-09-13)
+
+**Note:** Version bump only for package @kyvejs/types
+
 # [1.4.0](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/types@1.2.0...@kyvejs/types@1.4.0) (2024-07-03)
 
 ### Features

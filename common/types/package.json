@@ -1,6 +1,6 @@
 {
   "name": "@kyvejs/types",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "repository": {
@@ -24,5 +24,9 @@
   "devDependencies": {
     "rimraf": "^3.0.2",
     "typescript": "^4.7.3"
+  },
+  "dependencies": {
+    "long": "^5.2.3",
+    "protobufjs": "^7.4.0"
   }
 }

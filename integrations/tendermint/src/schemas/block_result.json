@@ -58,7 +58,7 @@
                       ]
                     }
                   },
-                  "required": ["type", "attributes"]
+                  "required": ["type"]
                 }
               ]
             },
@@ -109,7 +109,7 @@
               ]
             }
           },
-          "required": ["type", "attributes"]
+          "required": ["type"]
         }
       ]
     },
@@ -143,12 +143,12 @@
               ]
             }
           },
-          "required": ["type", "attributes"]
+          "required": ["type"]
         }
       ]
     },
     "finalize_block_events": {
-      "type": ["array"],
+      "type": ["array", "null"],
       "items": [
         {
           "type": "object",
