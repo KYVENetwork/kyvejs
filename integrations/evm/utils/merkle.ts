@@ -1,7 +1,46 @@
 import * as crypto from '@cosmjs/crypto';
 
 export function createHashesFromBundle(bundle: any[]): Uint8Array[] {
-  return bundle.map(dataItem => dataItemToSha256(dataItem))
+  return bundle.map((dataItem) => {
+    const rawDataItemHash: Uint8Array = dataItemToSha256(dataItem.value);
+
+    const blockHash = dataItemToSha256(dataItem.value.block)
+
+    const transactionsHashes = dataItem.value.block.transactions.map((tx: any) => dataItemToSha256(tx))
+    const transactionsMerkleRoot: Uint8Array = generateMerkleRoot(transactionsHashes)
+
+    const receiptsHash = dataItemToSha256(dataItem.value.receipts)
+
+    let allLogs: any[] = [];
+    dataItem.value.receipts.forEach((receipt: any) => {
+        allLogs = allLogs.concat(receipt.logs)
+    })
+    allLogs = allLogs.map(log => dataItemToSha256(log))
+    const logsMerkleRoot: Uint8Array = generateMerkleRoot(allLogs)
+
+    const blockMerkleRoot: Uint8Array = generateMerkleRoot([
+        blockHash,
+        transactionsMerkleRoot
+    ])
+    const receiptsAndLogsMerkleRoot: Uint8Array = generateMerkleRoot([
+        receiptsHash,
+        logsMerkleRoot
+    ])
+    const subMerkleRoot: Uint8Array = generateMerkleRoot([
+        blockMerkleRoot,
+        receiptsAndLogsMerkleRoot
+    ])
+    const merkleRootWithoutKey: Uint8Array = generateMerkleRoot([
+        rawDataItemHash,
+        subMerkleRoot
+    ])
+
+    const keyBytes = crypto.sha256(Buffer.from(dataItem.key, 'utf-8'));
+
+    const combined = Buffer.concat([keyBytes, merkleRootWithoutKey]);
+
+   return crypto.sha256(combined);
+  })
 }
 
 function dataItemToSha256(data: any): Uint8Array {
@@ -11,9 +50,9 @@ function dataItemToSha256(data: any): Uint8Array {
   return crypto.sha256(encoded_obj)
 }
 
-export function generateMerkleRoot(hashes: Uint8Array[]): string {
+export function generateMerkleRoot(hashes: Uint8Array[]): Uint8Array {
   if (!hashes || hashes.length == 0) {
-    return '';
+    return Buffer.from("0000000000000000000000000000000000000000000000000000000000000000", "hex");
   }
 
   // Ensure number of hashes (leafs) are even by copying the
@@ -32,7 +71,13 @@ export function generateMerkleRoot(hashes: Uint8Array[]): string {
   // If the combinedHashes length is 1, it means that we have the merkle root already,
   // and we can return the hex representation
   if (combinedHashes.length === 1) {
-    return Buffer.from(combinedHashes[0]).toString('hex');
+    return combinedHashes[0];
   }
   return generateMerkleRoot(combinedHashes);
 }
+
+
+
+
+
+

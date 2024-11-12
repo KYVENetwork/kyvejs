@@ -146,7 +146,7 @@ export default class EVM implements IRuntime {
     const merkleRoot = generateMerkleRoot(hashes);
 
     return JSON.stringify({
-      "merkle_root": merkleRoot
+      "merkle_root": Buffer.from(merkleRoot).toString('hex')
     })
   }
 
