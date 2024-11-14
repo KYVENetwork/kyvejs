@@ -201,6 +201,15 @@ export default class TendermintSSync implements IRuntime {
     // move on to next snapshot and start at first chunk
     // if we have already reached all chunks in current snapshot
     if (snapshot.chunks - 1 === chunkIndex) {
+      // since the interval can change and the cosmos apps always create
+      // snapshots if the block height is divisible by the interval we
+      // search for the next height which fits this definition
+      for (let h = height + 1; h <= height + this.config.interval; h++) {
+        if (h % this.config.interval === 0) {
+          return `${h}/0`;
+        }
+      }
+
       return `${height + this.config.interval}/0`;
     }
 
