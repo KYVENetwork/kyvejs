@@ -9,7 +9,7 @@ import path from "path";
 
 import { IConfig, IValaccountConfig } from "./types/interfaces";
 import { getChecksum, setupLogger, startNodeProcess } from "./utils";
-import { ARCH, USER_HOME, KYSOR_DIR, PLATFORM } from "./utils/constants";
+import { ARCH, KYSOR_DIR, PLATFORM, USER_HOME } from "./utils/constants";
 
 const INFINITY_LOOP = true;
 
@@ -406,6 +406,15 @@ export const run = async (options: any) => {
 
       if (options.debug) {
         args.push("--debug");
+      }
+
+      if (options.dryRun) {
+        args.push("--dry-run");
+      }
+
+      if (options.dryRunBundles > 0) {
+        args.push("--dry-run-bundles");
+        args.push(`${options.dryRunBundles}`);
       }
 
       if (valaccount.requestBackoff) {

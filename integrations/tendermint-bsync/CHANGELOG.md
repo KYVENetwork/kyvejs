@@ -3,6 +3,38 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.2.6](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint-bsync@1.2.5...@kyvejs/tendermint-bsync@1.2.6) (2024-10-30)
+
+**Note:** Version bump only for package @kyvejs/tendermint-bsync
+
+## [1.2.5](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint-bsync@1.2.4...@kyvejs/tendermint-bsync@1.2.5) (2024-09-13)
+
+**Note:** Version bump only for package @kyvejs/tendermint-bsync
+
+## [1.2.4](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint-bsync@1.2.3...@kyvejs/tendermint-bsync@1.2.4) (2024-08-29)
+
+**Note:** Version bump only for package @kyvejs/tendermint-bsync
+
+## [1.2.3](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint-bsync@1.2.2...@kyvejs/tendermint-bsync@1.2.3) (2024-08-07)
+
+**Note:** Version bump only for package @kyvejs/tendermint-bsync
+
+## [1.2.2](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint-bsync@1.2.1...@kyvejs/tendermint-bsync@1.2.2) (2024-07-30)
+
+**Note:** Version bump only for package @kyvejs/tendermint-bsync
+
+## [1.2.1](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint-bsync@1.2.0...@kyvejs/tendermint-bsync@1.2.1) (2024-07-23)
+
+### Bug Fixes
+
+- bundle summary in bsync runtime ([#145](https://github.com/KYVENetwork/kyvejs/issues/145)) ([424aac0](https://github.com/KYVENetwork/kyvejs/commit/424aac0f0913c6ffa1550bb5ebae6e524af836a7))
+
+# [1.2.0](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint-bsync@1.1.7...@kyvejs/tendermint-bsync@1.2.0) (2024-07-03)
+
+### Features
+
+- v1.5.x ([#136](https://github.com/KYVENetwork/kyvejs/issues/136)) ([97d8b54](https://github.com/KYVENetwork/kyvejs/commit/97d8b54833d50bee7eb1a6e17d61f71d81887a9d)), closes [#133](https://github.com/KYVENetwork/kyvejs/issues/133)
+
 ## [1.1.7](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint-bsync@1.1.6...@kyvejs/tendermint-bsync@1.1.7) (2024-04-03)
 
 **Note:** Version bump only for package @kyvejs/tendermint-bsync

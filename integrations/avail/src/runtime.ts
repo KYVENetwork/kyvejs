@@ -5,7 +5,6 @@ import { fetchJsonRpc } from "../utils/utils";
 
 // Ethereum Blobs config
 interface IConfig {
-  finality: number;
   rpc: string;
 }
 
@@ -19,10 +18,6 @@ export default class Avail implements IRuntime {
 
     if (!config.rpc) {
       throw new Error(`Config does not have property "rpc" defined`);
-    }
-
-    if (!config.finality) {
-      throw new Error(`Config does not have property "finality" defined`);
     }
 
     if (process.env.KYVEJS_AVAIL_RPC) {
@@ -39,7 +34,7 @@ export default class Avail implements IRuntime {
     const finalizedBlock = await fetchJsonRpc(this.config.rpc, 'chain_getBlock', [finalizedBlockHash]);
     const finalizedHeight = parseInt(finalizedBlock.block.header.number, 16);
 
-    if (parseInt(key) >= finalizedHeight - this.config.finality) {
+    if (parseInt(key) > finalizedHeight) {
       throw new Error('Finality not reached yet; waiting for finality');
     }
 

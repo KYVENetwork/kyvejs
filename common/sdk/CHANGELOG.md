@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.3.3](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/sdk@1.3.2...@kyvejs/sdk@1.3.3) (2024-09-13)
+
+**Note:** Version bump only for package @kyvejs/sdk
+
+## [1.3.2](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/sdk@1.3.1...@kyvejs/sdk@1.3.2) (2024-08-07)
+
+**Note:** Version bump only for package @kyvejs/sdk
+
+## [1.3.1](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/sdk@1.3.0...@kyvejs/sdk@1.3.1) (2024-07-30)
+
+### Bug Fixes
+
+- amino types ([#147](https://github.com/KYVENetwork/kyvejs/issues/147)) ([7bf5a69](https://github.com/KYVENetwork/kyvejs/commit/7bf5a69455c3b055b0051d811b13672542cdcc8e))
+
+# [1.3.0](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/sdk@1.1.1...@kyvejs/sdk@1.3.0) (2024-07-03)
+
+### Features
+
+- v1.5.x ([#136](https://github.com/KYVENetwork/kyvejs/issues/136)) ([97d8b54](https://github.com/KYVENetwork/kyvejs/commit/97d8b54833d50bee7eb1a6e17d61f71d81887a9d)), closes [#133](https://github.com/KYVENetwork/kyvejs/issues/133)
+
 ## [1.1.1](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/sdk@1.1.0...@kyvejs/sdk@1.1.1) (2024-01-26)
 
 **Note:** Version bump only for package @kyvejs/sdk

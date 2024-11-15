@@ -279,7 +279,7 @@ export function setupMetrics(this: Validator): void {
 
     this.logger.debug(`Initializing metrics: bundles_amount`);
 
-    this.m.bundles_amount = new prom_client.Gauge({
+    this.m.bundles_amount = new prom_client.Counter({
       name: "bundles_amount",
       help: "The amount of bundles the validator participated in.",
     });

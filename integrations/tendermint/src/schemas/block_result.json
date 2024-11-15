@@ -58,7 +58,7 @@
                       ]
                     }
                   },
-                  "required": ["type", "attributes"]
+                  "required": ["type"]
                 }
               ]
             },
@@ -109,11 +109,45 @@
               ]
             }
           },
-          "required": ["type", "attributes"]
+          "required": ["type"]
         }
       ]
     },
     "end_block_events": {
+      "type": ["array", "null"],
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string"
+            },
+            "attributes": {
+              "type": "array",
+              "items": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "key": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": ["string", "null"]
+                    },
+                    "index": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": ["key", "value", "index"]
+                }
+              ]
+            }
+          },
+          "required": ["type"]
+        }
+      ]
+    },
+    "finalize_block_events": {
       "type": ["array", "null"],
       "items": [
         {
@@ -213,7 +247,7 @@
               "type": "string"
             }
           },
-          "required": ["max_age_num_blocks", "max_age_duration", "max_bytes"]
+          "required": ["max_age_num_blocks", "max_age_duration"]
         },
         "validator": {
           "type": "object",
@@ -231,15 +265,14 @@
         }
       },
       "required": ["block", "evidence", "validator"]
-    }
+    },
+    "event_plaintext": { "type": "boolean" }
   },
   "required": [
     "height",
     "txs_results",
-    "begin_block_events",
-    "end_block_events",
     "validator_updates",
     "consensus_param_updates"
   ],
-  "additionalProperties": false
+  "additionalProperties": true
 }

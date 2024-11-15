@@ -11,37 +11,35 @@ import { isNotEmpty } from "../utils";
 export const createFundersAminoConverters = (): AminoConverters => {
   return {
     "/kyve.funders.v1beta1.MsgFundPool": {
-      aminoType: "kyve/funders/MsgFundPool",
+      aminoType: "/kyve.funders.v1beta1.MsgFundPool",
       toAmino: (msg: MsgFundPool) => ({
         creator: msg.creator,
         ...(isNotEmpty(msg.pool_id) && { pool_id: msg.pool_id }),
-        ...(isNotEmpty(msg.amount) && { amount: msg.amount }),
-        ...(isNotEmpty(msg.amount_per_bundle) && {
-          amount_per_bundle: msg.amount_per_bundle,
-        }),
+        amounts: [...msg.amounts],
+        amounts_per_bundle: [...msg.amounts_per_bundle],
       }),
       fromAmino: (msg): MsgFundPool => ({
         creator: msg.creator,
         pool_id: msg.pool_id,
-        amount: msg.amount,
-        amount_per_bundle: msg.amount_per_bundle,
+        amounts: [...msg.amounts],
+        amounts_per_bundle: [...msg.amounts_per_bundle],
       }),
     },
     "/kyve.funders.v1beta1.MsgDefundPool": {
-      aminoType: "kyve/funders/MsgDefundPool",
+      aminoType: "/kyve.funders.v1beta1.MsgDefundPool",
       toAmino: (msg: MsgDefundPool) => ({
         creator: msg.creator,
         ...(isNotEmpty(msg.pool_id) && { id: msg.pool_id }),
-        ...(isNotEmpty(msg.amount) && { amount: msg.amount }),
+        amounts: [...msg.amounts],
       }),
       fromAmino: (msg): MsgDefundPool => ({
         creator: msg.creator,
         pool_id: msg.pool_id,
-        amount: msg.amount,
+        amounts: [...msg.amounts],
       }),
     },
     "/kyve.funders.v1beta1.MsgCreateFunder": {
-      aminoType: "kyve/funders/MsgCreateFunder",
+      aminoType: "/kyve.funders.v1beta1.MsgCreateFunder",
       toAmino: (msg: MsgCreateFunder) => ({
         creator: msg.creator,
         ...(isNotEmpty(msg.moniker) && { moniker: msg.moniker }),
@@ -60,7 +58,7 @@ export const createFundersAminoConverters = (): AminoConverters => {
       }),
     },
     "/kyve.funders.v1beta1.MsgUpdateFunder": {
-      aminoType: "kyve/funders/MsgUpdateFunder",
+      aminoType: "/kyve.funders.v1beta1.MsgUpdateFunder",
       toAmino: (msg: MsgUpdateFunder) => ({
         creator: msg.creator,
         ...(isNotEmpty(msg.moniker) && { moniker: msg.moniker }),

@@ -99,6 +99,8 @@ export class Validator {
   protected metrics!: boolean;
   protected metricsPort!: number;
   protected home!: string;
+  protected dryRun!: boolean;
+  protected dryRunBundles!: number;
 
   // tmp variables
   protected lastUploadedBundle: {
@@ -274,6 +276,19 @@ export class Validator {
         "Specify the home directory of the node where logs and the cache should save their data. [default current directory]",
         "./"
       )
+      .option(
+        "--skip-data-availability-check",
+        "Skip data availability check and join pool instantly without waiting for the data source. WARNING: Only use this if you know what you are doing since this can lead to timeout slashes"
+      )
+      .option(
+        "--dry-run",
+        "Run the node without uploading or voting on bundles so the operator can test his setup before joining as a validator."
+      )
+      .option(
+        "--dry-run-bundles <number>",
+        "Specify the number of bundles that should be tested before the node properly exits. If zero the node will run indefinitely [default = 0]",
+        "0"
+      )
       .action((options) => {
         this.start(options);
       });
@@ -311,6 +326,8 @@ export class Validator {
     this.metrics = options.metrics;
     this.metricsPort = parseInt(options.metricsPort);
     this.home = options.home;
+    this.dryRun = options.dryRun;
+    this.dryRunBundles = parseInt(options.dryRunBundles);
 
     // name the log file after the time the node got started
     this.logFile = `${new Date().toISOString()}.log`;
@@ -322,16 +339,23 @@ export class Validator {
     await this.setupSDK();
     await this.syncPoolState(true);
 
-    if (await this.isStorageBalanceZero()) {
+    if (!this.dryRun && (await this.isStorageBalanceZero())) {
       process.exit(1);
     }
 
-    // until data is not available we wait and idle
-    while (!(await this.isDataAvailable())) {
-      await sleep(IDLE_TIME);
+    // by default we check if the first data items are available
+    // to protect the node operator from timeout slashes due to
+    // misconfiguration of the data source
+    if (!options.skipDataAvailabilityCheck) {
+      while (!(await this.isDataAvailable())) {
+        await sleep(IDLE_TIME);
+      }
     }
 
-    await this.setupValidator();
+    if (!this.dryRun) {
+      await this.setupValidator();
+    }
+
     await this.setupCacheProvider();
 
     // start the node process. Validator and cache should run at the same time.
@@ -356,3 +380,8 @@ export * from "./types";
 
 // export utils
 export * from "./utils";
+
+// add this so we can JSON.stringify bignumbers
+(BigInt.prototype as any).toJSON = function () {
+  return this.toString();
+};

@@ -3,6 +3,54 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.2.8](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint@1.2.7...@kyvejs/tendermint@1.2.8) (2024-10-30)
+
+**Note:** Version bump only for package @kyvejs/tendermint
+
+## [1.2.7](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint@1.2.6...@kyvejs/tendermint@1.2.7) (2024-10-24)
+
+### Bug Fixes
+
+- remove index in finalize block events ([#157](https://github.com/KYVENetwork/kyvejs/issues/157)) ([2fb33c2](https://github.com/KYVENetwork/kyvejs/commit/2fb33c2a2d36ed83ce39eefb086e5fe1a4a80c68))
+
+## [1.2.6](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint@1.2.5...@kyvejs/tendermint@1.2.6) (2024-09-23)
+
+### Bug Fixes
+
+- allow `null` for `finalize_block_events` ([#156](https://github.com/KYVENetwork/kyvejs/issues/156)) ([0f733c4](https://github.com/KYVENetwork/kyvejs/commit/0f733c422a78d7e8ce9c1d701b2c2c0a413263e5))
+
+## [1.2.5](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint@1.2.4...@kyvejs/tendermint@1.2.5) (2024-09-13)
+
+**Note:** Version bump only for package @kyvejs/tendermint
+
+## [1.2.4](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint@1.2.3...@kyvejs/tendermint@1.2.4) (2024-08-29)
+
+**Note:** Version bump only for package @kyvejs/tendermint
+
+## [1.2.3](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint@1.2.2...@kyvejs/tendermint@1.2.3) (2024-08-07)
+
+**Note:** Version bump only for package @kyvejs/tendermint
+
+## [1.2.2](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint@1.2.1...@kyvejs/tendermint@1.2.2) (2024-07-30)
+
+**Note:** Version bump only for package @kyvejs/tendermint
+
+## [1.2.1](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint@1.2.0...@kyvejs/tendermint@1.2.1) (2024-07-24)
+
+### Bug Fixes
+
+- allow empty begin_block_events ([#146](https://github.com/KYVENetwork/kyvejs/issues/146)) ([842c2eb](https://github.com/KYVENetwork/kyvejs/commit/842c2ebb844be171a1f9fddb7967046b29b0084f))
+
+# [1.2.0](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint@1.1.8...@kyvejs/tendermint@1.2.0) (2024-07-03)
+
+### Bug Fixes
+
+- remove max bytes from schema ([#142](https://github.com/KYVENetwork/kyvejs/issues/142)) ([25fa879](https://github.com/KYVENetwork/kyvejs/commit/25fa879296aaeb89c755bad24ad01df260fb4b52))
+
+### Features
+
+- v1.5.x ([#136](https://github.com/KYVENetwork/kyvejs/issues/136)) ([97d8b54](https://github.com/KYVENetwork/kyvejs/commit/97d8b54833d50bee7eb1a6e17d61f71d81887a9d)), closes [#133](https://github.com/KYVENetwork/kyvejs/issues/133)
+
 ## [1.1.8](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint@1.1.7...@kyvejs/tendermint@1.1.8) (2024-04-03)
 
 **Note:** Version bump only for package @kyvejs/tendermint
