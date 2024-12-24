@@ -23,12 +23,12 @@
     "lint:fix": "eslint --fix . --ignore-path ../../.eslintignore --ext ts --ext tsx --ext js --ext jsx"
   },
   "dependencies": {
-    "@cosmjs/amino": "^0.32.3",
-    "@cosmjs/crypto": "^0.32.3",
-    "@cosmjs/encoding": "^0.32.3",
+    "@cosmjs/amino": "^0.32.4",
+    "@cosmjs/crypto": "^0.32.4",
+    "@cosmjs/encoding": "^0.32.4",
     "@cosmjs/math": "^0.32.4",
-    "@cosmjs/proto-signing": "^0.32.3",
-    "@cosmjs/stargate": "^0.32.3",
+    "@cosmjs/proto-signing": "^0.32.4",
+    "@cosmjs/stargate": "^0.32.4",
     "@cosmostation/extension-client": "^0.1.15",
     "@keplr-wallet/cosmos": "^0.12.96",
     "@kyvejs/types": "1.4.1",

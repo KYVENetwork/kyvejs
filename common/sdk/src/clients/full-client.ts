@@ -5,7 +5,6 @@ import { createDefaultAminoConverters } from "@cosmjs/stargate";
 
 import {
   createBundlesAminoConverters,
-  createDelegationAminoConverters,
   createFundersAminoConverters,
   createGovV1AminoConverters,
   createStakersAminoConverters,
@@ -49,7 +48,6 @@ export async function getSigningKyveClient(
         ...createGovV1AminoConverters(),
         ...createFundersAminoConverters(),
         ...createStakersAminoConverters(),
-        ...createDelegationAminoConverters(),
         ...createBundlesAminoConverters(),
       }),
     });
