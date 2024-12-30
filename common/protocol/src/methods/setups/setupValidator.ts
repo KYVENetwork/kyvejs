@@ -63,7 +63,7 @@ export async function setupValidator(this: Validator): Promise<void> {
 
     this.logger.debug(`Valname "${this.name}" got created`);
 
-    // check if valaccount was already authorized by a validator
+    // check if pool account was already authorized by a validator
     await this.waitForAuthorization();
 
     this.logger.info(`Successfully joined pool: ${this.poolId}`);

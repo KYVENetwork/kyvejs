@@ -10,7 +10,7 @@ export const parsePoolId = (value: string): number => {
   return parsedValue;
 };
 
-export const parseValaccount = (value: string): string => {
+export const parsePoolAccount = (value: string): string => {
   if (!process.env[value]) {
     throw new commander.InvalidArgumentError(
       `Environment variable "${value}" has no value`

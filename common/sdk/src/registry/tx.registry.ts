@@ -29,7 +29,7 @@ import { MsgUpdateFunder } from "@kyvejs/types/lcd/kyve/funders/v1beta1/tx";
 import { MsgFundPool } from "@kyvejs/types/client/kyve/funders/v1beta1/tx";
 import { MsgDefundPool } from "@kyvejs/types/client/kyve/funders/v1beta1/tx";
 
-export const registry: ReadonlyArray<[string, GeneratedType]> = [
+export const registry: ReadonlyArray<[string, any]> = [
   ...defaultRegistryTypes,
   /**pool **/
   ["/kyve.pool.v1beta1.MsgCreatePool", MsgCreatePool],

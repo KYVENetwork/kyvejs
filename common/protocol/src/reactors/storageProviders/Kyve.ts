@@ -12,13 +12,13 @@ export class Kyve implements IStorageProvider {
   private chainId: string;
   private poolId: number;
   private staker: string;
-  private valaccount: string;
+  private poolAccount: string;
 
   constructor(
     chainId: string,
     poolId: number,
     staker: string,
-    valaccount: string
+    poolAccount: string
   ) {
     if (!chainId) {
       throw new Error("ChainId is empty.");
@@ -28,18 +28,18 @@ export class Kyve implements IStorageProvider {
       throw new Error("PoolId is empty.");
     }
 
-    if (!valaccount) {
-      throw new Error("Valaccount mnemonic is empty.");
+    if (!poolAccount) {
+      throw new Error("Pool account mnemonic is empty.");
     }
 
     this.chainId = chainId;
     this.poolId = poolId;
     this.staker = staker;
-    this.valaccount = valaccount;
+    this.poolAccount = poolAccount;
   }
 
   async getAddress() {
-    return (await new KyveSDK().fromMnemonic(this.valaccount)).account.address;
+    return (await new KyveSDK().fromMnemonic(this.poolAccount)).account.address;
   }
 
   async getBalance() {
@@ -52,7 +52,7 @@ export class Kyve implements IStorageProvider {
 
   async saveBundle(bundle: Buffer, _: BundleTag[]) {
     const storageId = uuidv4();
-    const sdk = await new KyveSDK().fromMnemonic(this.valaccount);
+    const sdk = await new KyveSDK().fromMnemonic(this.poolAccount);
     const address = await this.getAddress();
     const timestamp = new Date().valueOf().toString();
 
