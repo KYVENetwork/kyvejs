@@ -29,6 +29,7 @@ import { MsgUpdateFunder } from "@kyvejs/types/lcd/kyve/funders/v1beta1/tx";
 import { MsgFundPool } from "@kyvejs/types/client/kyve/funders/v1beta1/tx";
 import { MsgDefundPool } from "@kyvejs/types/client/kyve/funders/v1beta1/tx";
 
+// TODO: why does <[string, GeneratedType]> does not work anymore?
 export const registry: ReadonlyArray<[string, any]> = [
   ...defaultRegistryTypes,
   /**pool **/
