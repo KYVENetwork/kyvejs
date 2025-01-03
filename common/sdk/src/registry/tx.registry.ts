@@ -28,6 +28,18 @@ import { MsgCreateFunder } from "@kyvejs/types/lcd/kyve/funders/v1beta1/tx";
 import { MsgUpdateFunder } from "@kyvejs/types/lcd/kyve/funders/v1beta1/tx";
 import { MsgFundPool } from "@kyvejs/types/client/kyve/funders/v1beta1/tx";
 import { MsgDefundPool } from "@kyvejs/types/client/kyve/funders/v1beta1/tx";
+import {
+  MsgWithdrawDelegatorReward,
+  MsgWithdrawValidatorCommission,
+} from "cosmjs-types/cosmos/distribution/v1beta1/tx";
+import {
+  MsgBeginRedelegate,
+  MsgCancelUnbondingDelegation,
+  MsgCreateValidator,
+  MsgDelegate,
+  MsgEditValidator,
+  MsgUndelegate,
+} from "cosmjs-types/cosmos/staking/v1beta1/tx";
 
 // TODO: why does <[string, GeneratedType]> does not work anymore?
 export const registry: ReadonlyArray<[string, any]> = [
@@ -203,6 +215,62 @@ export const encodeTxMsg = {
       value: MsgUpdateParamsGlobal.encode(value).finish(),
     };
   },
+
+  delegate(value: MsgDelegate) {
+    return {
+      type_url: "/cosmos.staking.v1beta1.MsgDelegate",
+      value: MsgDelegate.encode(value).finish(),
+    };
+  },
+
+  undelegate(value: MsgUndelegate) {
+    return {
+      type_url: "/cosmos.staking.v1beta1.MsgUndelegate",
+      value: MsgUndelegate.encode(value).finish(),
+    };
+  },
+
+  cancelUnbonding(value: MsgCancelUnbondingDelegation) {
+    return {
+      type_url: "/cosmos.staking.v1beta1.MsgCancelUnbondingDelegation",
+      value: MsgCancelUnbondingDelegation.encode(value).finish(),
+    };
+  },
+
+  redelegate(value: MsgBeginRedelegate) {
+    return {
+      type_url: "/cosmos.staking.v1beta1.MsgBeginRedelegate",
+      value: MsgBeginRedelegate.encode(value).finish(),
+    };
+  },
+
+  createValidator(value: MsgCreateValidator) {
+    return {
+      type_url: "/cosmos.staking.v1beta1.MsgCreateValidator",
+      value: MsgCreateValidator.encode(value).finish(),
+    };
+  },
+
+  editValidator(value: MsgEditValidator) {
+    return {
+      type_url: "/cosmos.staking.v1beta1.MsgEditValidator",
+      value: MsgEditValidator.encode(value).finish(),
+    };
+  },
+
+  withdrawDelegatorReward(value: MsgWithdrawDelegatorReward) {
+    return {
+      type_url: "/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward",
+      value: MsgWithdrawDelegatorReward.encode(value).finish(),
+    };
+  },
+
+  withdrawValidatorCommission(value: MsgWithdrawValidatorCommission) {
+    return {
+      type_url: "/cosmos.distribution.v1beta1.MsgWithdrawValidatorCommission",
+      value: MsgWithdrawValidatorCommission.encode(value).finish(),
+    };
+  },
 };
 
 export const withTypeUrl = {
@@ -349,6 +417,62 @@ export const withTypeUrl = {
   updateParamsGlobal(value: MsgUpdateParamsGlobal) {
     return {
       typeUrl: "/kyve.global.v1beta1.MsgUpdateParams",
+      value,
+    };
+  },
+
+  delegate(value: MsgDelegate) {
+    return {
+      typeUrl: "/cosmos.staking.v1beta1.MsgDelegate",
+      value,
+    };
+  },
+
+  undelegate(value: MsgUndelegate) {
+    return {
+      typeUrl: "/cosmos.staking.v1beta1.MsgUndelegate",
+      value,
+    };
+  },
+
+  cancelUnbonding(value: MsgCancelUnbondingDelegation) {
+    return {
+      typeUrl: "/cosmos.staking.v1beta1.MsgCancelUnbondingDelegation",
+      value,
+    };
+  },
+
+  redelegate(value: MsgBeginRedelegate) {
+    return {
+      typeUrl: "/cosmos.staking.v1beta1.MsgBeginRedelegate",
+      value,
+    };
+  },
+
+  createValidator(value: MsgCreateValidator) {
+    return {
+      typeUrl: "/cosmos.staking.v1beta1.MsgCreateValidator",
+      value,
+    };
+  },
+
+  editValidator(value: MsgEditValidator) {
+    return {
+      typeUrl: "/cosmos.staking.v1beta1.MsgEditValidator",
+      value,
+    };
+  },
+
+  withdrawDelegatorReward(value: MsgWithdrawDelegatorReward) {
+    return {
+      typeUrl: "/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward",
+      value,
+    };
+  },
+
+  withdrawValidatorCommission(value: MsgWithdrawValidatorCommission) {
+    return {
+      typeUrl: "/cosmos.distribution.v1beta1.MsgWithdrawValidatorCommission",
       value,
     };
   },

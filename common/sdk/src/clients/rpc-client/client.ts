@@ -9,11 +9,25 @@ import KyveBundlesMethods from "./kyve/bundles/v1beta1/bundles";
 import KyveFundersMethods from "./kyve/funders/v1beta1/funders";
 import KyveGovMethodsV1 from "./kyve/gov/v1/gov";
 import KyveStakersMethods from "./kyve/stakers/v1beta1/stakers";
+import KyveBankMethods from "./cosmos/bank/v1beta1/bank";
+import KyveStakingMethods from "./cosmos/staking/v1beta1/staking";
+import KyveDistributionMethods from "./cosmos/distribution/v1beta1/distribution";
 
 export default class KyveClient {
   public nativeClient: SigningStargateClient;
   public readonly account: AccountData;
   public readonly config: IConfig;
+  public cosmos: {
+    bank: {
+      v1beta1: KyveBankMethods;
+    };
+    staking: {
+      v1beta1: KyveStakingMethods;
+    };
+    distribution: {
+      v1beta1: KyveDistributionMethods;
+    };
+  };
   public kyve: {
     base: {
       v1beta1: KyveBaseMethods;
@@ -43,6 +57,25 @@ export default class KyveClient {
     this.config = config;
     this.nativeClient = client;
     this.aminoSigner = aminoSigner;
+    this.cosmos = {
+      bank: {
+        v1beta1: new KyveBankMethods(this.nativeClient, this.account, config),
+      },
+      staking: {
+        v1beta1: new KyveStakingMethods(
+          this.nativeClient,
+          this.account,
+          config
+        ),
+      },
+      distribution: {
+        v1beta1: new KyveDistributionMethods(
+          this.nativeClient,
+          this.account,
+          config
+        ),
+      },
+    };
     this.kyve = {
       base: {
         v1beta1: new KyveBaseMethods(this.nativeClient, this.account, config),
