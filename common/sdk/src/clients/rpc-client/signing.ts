@@ -1,6 +1,6 @@
 import { StdFee } from "@cosmjs/amino/build/signdoc";
 import { sha256 } from "@cosmjs/crypto";
-import { toHex } from "@cosmjs/encoding";
+import { fromBech32, toBech32, toHex } from "@cosmjs/encoding";
 import { AccountData, EncodeObject } from "@cosmjs/proto-signing";
 import {
   calculateFee,
@@ -9,7 +9,7 @@ import {
 } from "@cosmjs/stargate";
 import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
 
-import { GAS_MULTIPLIER, IConfig } from "../../constants";
+import { GAS_MULTIPLIER, IConfig, VAL_PREFIX } from "../../constants";
 export interface IBasePendingTx {
   tx: EncodeObject[];
 }
@@ -83,6 +83,14 @@ export class KyveSigning {
     this.nativeClient = client;
     this.account = account;
     this.config = config;
+  }
+
+  get address(): string {
+    return this.account.address;
+  }
+
+  get validatorAddress(): string {
+    return toBech32(VAL_PREFIX, fromBech32(this.account.address).data);
   }
 
   async getPendingSignedTx(

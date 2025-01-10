@@ -3,6 +3,7 @@ import { Bech32Address } from "@keplr-wallet/cosmos";
 import { ChainInfo } from "@keplr-wallet/types";
 
 export const PREFIX = "kyve";
+export const VAL_PREFIX = "kyvevaloper";
 export const GOV_AUTHORITY = "kyve10d07y265gmmuvt4z0w9aw880jnsr700jdv7nah";
 export const GAS_MULTIPLIER = 1.5;
 export const COIN_TYPE = 118;

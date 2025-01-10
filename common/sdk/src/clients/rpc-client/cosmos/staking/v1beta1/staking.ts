@@ -21,7 +21,7 @@ export default class CosmosStakingMethods extends KyveSigning {
   ) {
     const tx = withTypeUrl.delegate({
       ...value,
-      delegatorAddress: this.account.address,
+      delegatorAddress: this.address,
     });
 
     return new PendingTx({ tx: [tx] }, () =>
@@ -38,7 +38,7 @@ export default class CosmosStakingMethods extends KyveSigning {
   ) {
     const tx = withTypeUrl.undelegate({
       ...value,
-      delegatorAddress: this.account.address,
+      delegatorAddress: this.address,
     });
 
     return new PendingTx({ tx: [tx] }, () =>
@@ -55,7 +55,7 @@ export default class CosmosStakingMethods extends KyveSigning {
   ) {
     const tx = withTypeUrl.cancelUnbonding({
       ...value,
-      delegatorAddress: this.account.address,
+      delegatorAddress: this.address,
     });
 
     return new PendingTx({ tx: [tx] }, () =>
@@ -72,7 +72,7 @@ export default class CosmosStakingMethods extends KyveSigning {
   ) {
     const tx = withTypeUrl.redelegate({
       ...value,
-      delegatorAddress: this.account.address,
+      delegatorAddress: this.address,
     });
 
     return new PendingTx({ tx: [tx] }, () =>
@@ -89,7 +89,7 @@ export default class CosmosStakingMethods extends KyveSigning {
   ) {
     const tx = withTypeUrl.createValidator({
       ...value,
-      validatorAddress: this.account.address,
+      validatorAddress: this.validatorAddress,
     });
 
     return new PendingTx({ tx: [tx] }, () =>
@@ -106,7 +106,7 @@ export default class CosmosStakingMethods extends KyveSigning {
   ) {
     const tx = withTypeUrl.editValidator({
       ...value,
-      validatorAddress: this.account.address,
+      validatorAddress: this.validatorAddress,
     });
 
     return new PendingTx({ tx: [tx] }, () =>

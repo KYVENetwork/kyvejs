@@ -15,7 +15,7 @@ export default class CosmosBankMethods extends KyveSigning {
     const tx = {
       typeUrl: "/cosmos.bank.v1beta1.MsgSend",
       value: {
-        fromAddress: this.account.address,
+        fromAddress: this.address,
         toAddress: recipient,
         amount: coins(amount, this.config.coinDenom),
       },
@@ -40,7 +40,7 @@ export default class CosmosBankMethods extends KyveSigning {
       value: {
         inputs: [
           {
-            address: this.account.address,
+            address: this.address,
             coins: coins(allAmount.toString(), this.config.coinDenom),
           },
         ],

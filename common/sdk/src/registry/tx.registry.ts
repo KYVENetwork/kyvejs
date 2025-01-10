@@ -1,4 +1,4 @@
-import { GeneratedType, Registry } from "@cosmjs/proto-signing";
+import { Registry } from "@cosmjs/proto-signing";
 import { defaultRegistryTypes } from "@cosmjs/stargate";
 /** cosmos **/
 import { MsgSubmitProposal } from "@kyvejs/types/client/cosmos/gov/v1/tx";

@@ -14,7 +14,7 @@ export default class CosmosDistributionMethods extends KyveSigning {
   ) {
     const tx = withTypeUrl.withdrawDelegatorReward({
       ...value,
-      delegatorAddress: this.account.address,
+      delegatorAddress: this.address,
     });
 
     return new PendingTx({ tx: [tx] }, () =>
@@ -27,7 +27,7 @@ export default class CosmosDistributionMethods extends KyveSigning {
     memo?: string;
   }) {
     const tx = withTypeUrl.withdrawValidatorCommission({
-      validatorAddress: this.account.address,
+      validatorAddress: this.validatorAddress,
     });
 
     return new PendingTx({ tx: [tx] }, () =>
