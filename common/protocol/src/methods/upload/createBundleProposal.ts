@@ -146,6 +146,8 @@ export async function createBundleProposal(this: Validator): Promise<void> {
       let high = bundleProposal.length - 1;
       let maxIndex = 0;
 
+      // use binary search to minimize the times we have to compress the bundle to
+      // find the biggest bundle which is still below the max byte size
       while (low <= high) {
         const mid = Math.floor((low + high) / 2);
 
