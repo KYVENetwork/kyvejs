@@ -296,7 +296,8 @@ export class Validator {
       )
       .option(
         "--ensure-no-loss",
-        "Ensures that the node only uploads bundles which can be fully rewarded by the protocol."
+        "Ensures that the node only uploads bundles which can be fully rewarded by the protocol.",
+        true
       )
       .action((options) => {
         this.start(options);
