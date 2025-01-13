@@ -18,14 +18,18 @@ import { createKyveLCDClient } from "./clients/lcd-client/client";
 import KyveClient from "./clients/rpc-client/client";
 import KyveWebClient from "./clients/rpc-client/web.client";
 import {
+  DEVNET_CHAIN_ID,
   IConfig,
   KYVE_COSMOSTATION_CONFIG,
   KYVE_KEPLR_CONFIG,
   KYVE_LEAP_CONFIG,
+  LOCAL_CHAIN_ID,
+  MAINNET_CHAIN_ID,
   PREFIX,
   SUPPORTED_CHAIN_CONFIGS,
   SUPPORTED_WALLETS,
   SupportedChains,
+  TESTNET_CHAIN_ID,
 } from "./constants";
 import {
   cosmostationMethods,
@@ -376,5 +380,37 @@ export class KyveSDK {
       fromBase64(pubKey),
       fromBase64(signature)
     );
+  }
+
+  /**
+   * check if sdk is connected to the kyve mainnet
+   * @return boolean
+   */
+  isMainnet(): boolean {
+    return this.config.chainId === MAINNET_CHAIN_ID;
+  }
+
+  /**
+   * check if sdk is connected to the kyve testnet
+   * @return boolean
+   */
+  isTestnet(): boolean {
+    return this.config.chainId === TESTNET_CHAIN_ID;
+  }
+
+  /**
+   * check if sdk is connected to the kyve devnet
+   * @return boolean
+   */
+  isDevnet(): boolean {
+    return this.config.chainId === DEVNET_CHAIN_ID;
+  }
+
+  /**
+   * check if sdk is connected to the kyve local chain
+   * @return boolean
+   */
+  isLocal(): boolean {
+    return this.config.chainId === LOCAL_CHAIN_ID;
   }
 }
