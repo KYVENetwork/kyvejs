@@ -77,12 +77,17 @@ export async function createBundleProposal(this: Validator): Promise<void> {
     this.logger.debug(`this.compressionFactory()`);
     const compression = this.compressionFactory();
 
+    let maxBytes = MAX_BUNDLE_BYTE_SIZE;
+
     if (
       this.ensureNoLoss &&
       (this.sdk[0].isMainnet() || this.sdk[0].isLocal())
     ) {
       await this.syncParams();
 
+      // calculate expected storage rewards to calculate
+      // the maximum amount of bytes we can upload before
+      // running into a loss
       let rewards = new Coins({
         denom: this.sdk[0].config.coinDenom,
         amount: new BigNumber(this.pool.account_balance)
@@ -136,81 +141,85 @@ export async function createBundleProposal(this: Validator): Promise<void> {
             (this.pool.data?.current_storage_provider_id ?? 0)
         )?.cost ?? "0";
 
-      let maxBytes = MAX_BUNDLE_BYTE_SIZE;
-
       if (new BigNumber(storageCost).gt(0)) {
-        maxBytes = +new BigNumber(rewardsUsd).dividedBy(storageCost).toFixed(0);
-      }
+        const maxBytesWithNoLoss = +new BigNumber(rewardsUsd)
+          .dividedBy(storageCost)
+          .toFixed(0);
 
-      let low = 0;
-      let high = bundleProposal.length - 1;
-      let maxIndex = 0;
-
-      // use binary search to minimize the times we have to compress the bundle to
-      // find the biggest bundle which is still below the max byte size
-      while (low <= high) {
-        const mid = Math.floor((low + high) / 2);
-
-        let size = 0;
-
-        if (mid > 0) {
-          this.logger.debug(
-            `this.compression.compress($RAW_BUNDLE_PROPOSAL[0:${mid}])`
-          );
-          const storageProviderData = await compression
-            .compress(bundleToBytes(bundleProposal.slice(0, mid)))
-            .catch((err) => {
-              this.logger.error(
-                `Unexpected error compressing bundle. Skipping Uploader Role ...`
-              );
-              this.logger.error(standardizeError(err));
-
-              return null;
-            });
-
-          // skip uploader role if compression returns null
-          if (storageProviderData === null) {
-            await this.skipUploaderRole(fromIndex);
-            return;
-          }
-
-          size = storageProviderData.byteLength;
-        }
-
-        if (size < maxBytes) {
-          if (mid >= maxIndex) {
-            maxIndex = mid;
-          }
-          low = mid + 1;
-        } else if (size > maxBytes) {
-          high = mid - 1;
-        } else {
-          if (mid >= maxIndex) {
-            maxIndex = mid;
-          }
-          break;
+        if (new BigNumber(maxBytesWithNoLoss).lt(maxBytes)) {
+          maxBytes = maxBytesWithNoLoss;
         }
       }
+    }
 
-      if (maxIndex === 0) {
-        this.logger.info(
-          `Skip uploader role since uploading at least one data item would lead to a loss`
+    let low = 0;
+    let high = bundleProposal.length - 1;
+    let maxIndex = 0;
+
+    // use binary search to minimize the times we have to compress the bundle to
+    // find the biggest bundle which is still below the max byte size
+    while (low <= high) {
+      const mid = Math.floor((low + high) / 2);
+
+      let size = 0;
+
+      if (mid > 0) {
+        this.logger.debug(
+          `this.compression.compress($RAW_BUNDLE_PROPOSAL[0:${mid}])`
         );
+        const storageProviderData = await compression
+          .compress(bundleToBytes(bundleProposal.slice(0, mid)))
+          .catch((err) => {
+            this.logger.error(
+              `Unexpected error compressing bundle. Skipping Uploader Role ...`
+            );
+            this.logger.error(standardizeError(err));
 
-        await this.skipUploaderRole(fromIndex);
-        return;
+            return null;
+          });
+
+        // skip uploader role if compression returns null
+        if (storageProviderData === null) {
+          await this.skipUploaderRole(fromIndex);
+          return;
+        }
+
+        size = storageProviderData.byteLength;
       }
 
+      if (size < maxBytes) {
+        if (mid >= maxIndex) {
+          maxIndex = mid;
+        }
+        low = mid + 1;
+      } else if (size > maxBytes) {
+        high = mid - 1;
+      } else {
+        if (mid >= maxIndex) {
+          maxIndex = mid;
+        }
+        break;
+      }
+    }
+
+    if (maxIndex === 0) {
       this.logger.info(
-        `Dropping ${bundleProposal.length - maxIndex} items from original ${
-          bundleProposal.length
-        } item bundle proposal to prevent uploading with loss`
+        `Skip uploader role since uploading at least one data item would exceed the maximum bytes limit`
       );
 
-      // cutoff any data items which would exceed the maximum data size which
-      // does not lead to a loss
-      bundleProposal = bundleProposal.slice(0, maxIndex);
+      await this.skipUploaderRole(fromIndex);
+      return;
     }
+
+    this.logger.info(
+      `Dropping ${bundleProposal.length - maxIndex} items from original ${
+        bundleProposal.length
+      } item bundle proposal to prevent exceeding the maximum bytes limit`
+    );
+
+    // cutoff any data items which would exceed the maximum data size which
+    // does not lead to a loss
+    bundleProposal = bundleProposal.slice(0, maxIndex);
 
     // get the first key of the bundle proposal which gets
     // included in the bundle proposal and saved on chain
