@@ -243,7 +243,7 @@ describe("propose bundle tests", () => {
     // ASSERT COMPRESSION INTERFACES
     // =============================
 
-    expect(compression.compress).toHaveBeenCalledTimes(1);
+    expect(compression.compress).toHaveBeenCalled();
     expect(compression.compress).toHaveBeenLastCalledWith(
       Buffer.from(JSON.stringify(bundle))
     );
@@ -411,7 +411,7 @@ describe("propose bundle tests", () => {
     // ASSERT COMPRESSION INTERFACES
     // =============================
 
-    expect(compression.compress).toHaveBeenCalledTimes(1);
+    expect(compression.compress).toHaveBeenCalled();
     expect(compression.compress).toHaveBeenLastCalledWith(
       Buffer.from(JSON.stringify(bundle))
     );
@@ -701,7 +701,7 @@ describe("propose bundle tests", () => {
     // ASSERT COMPRESSION INTERFACES
     // =============================
 
-    expect(compression.compress).toHaveBeenCalledTimes(1);
+    expect(compression.compress).toHaveBeenCalled();
     expect(compression.compress).toHaveBeenLastCalledWith(
       Buffer.from(JSON.stringify(bundle))
     );
@@ -860,7 +860,7 @@ describe("propose bundle tests", () => {
     // ASSERT COMPRESSION INTERFACES
     // =============================
 
-    expect(compression.compress).toHaveBeenCalledTimes(1);
+    expect(compression.compress).toHaveBeenCalled();
     expect(compression.compress).toHaveBeenLastCalledWith(
       Buffer.from(JSON.stringify(bundle))
     );
@@ -1015,7 +1015,7 @@ describe("propose bundle tests", () => {
     // ASSERT COMPRESSION INTERFACES
     // =============================
 
-    expect(compression.compress).toHaveBeenCalledTimes(1);
+    expect(compression.compress).toHaveBeenCalled();
     expect(compression.compress).toHaveBeenLastCalledWith(
       Buffer.from(JSON.stringify(bundle))
     );
@@ -1179,7 +1179,7 @@ describe("propose bundle tests", () => {
     // ASSERT COMPRESSION INTERFACES
     // =============================
 
-    expect(compression.compress).toHaveBeenCalledTimes(1);
+    expect(compression.compress).toHaveBeenCalled();
     expect(compression.compress).toHaveBeenLastCalledWith(
       Buffer.from(JSON.stringify(bundle))
     );
@@ -1483,7 +1483,7 @@ describe("propose bundle tests", () => {
     // ASSERT COMPRESSION INTERFACES
     // =============================
 
-    expect(compression.compress).toHaveBeenCalledTimes(1);
+    expect(compression.compress).toHaveBeenCalled();
     expect(compression.compress).toHaveBeenLastCalledWith(
       Buffer.from(JSON.stringify(bundle))
     );
@@ -1634,7 +1634,7 @@ describe("propose bundle tests", () => {
     // ASSERT COMPRESSION INTERFACES
     // =============================
 
-    expect(compression.compress).toHaveBeenCalledTimes(0);
+    expect(compression.compress).toHaveBeenCalled();
 
     expect(compression.decompress).toHaveBeenCalledTimes(0);
 
@@ -1782,10 +1782,7 @@ describe("propose bundle tests", () => {
     // ASSERT COMPRESSION INTERFACES
     // =============================
 
-    expect(compression.compress).toHaveBeenCalledTimes(1);
-    expect(compression.compress).toHaveBeenLastCalledWith(
-      Buffer.from(JSON.stringify(bundle))
-    );
+    expect(compression.compress).toHaveBeenCalled();
 
     expect(compression.decompress).toHaveBeenCalledTimes(0);
 
@@ -1793,11 +1790,7 @@ describe("propose bundle tests", () => {
     // ASSERT RUNTIME INTERFACES
     // =========================
 
-    expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(1);
-    expect(runtime.summarizeDataBundle).toHaveBeenLastCalledWith(
-      expect.any(Validator),
-      bundle
-    );
+    expect(runtime.summarizeDataBundle).toHaveBeenCalledTimes(0);
 
     expect(runtime.validateDataItem).toHaveBeenCalledTimes(0);
 
@@ -1954,7 +1947,7 @@ describe("propose bundle tests", () => {
     // ASSERT COMPRESSION INTERFACES
     // =============================
 
-    expect(compression.compress).toHaveBeenCalledTimes(1);
+    expect(compression.compress).toHaveBeenCalled();
     expect(compression.compress).toHaveBeenLastCalledWith(
       Buffer.from(JSON.stringify(bundle))
     );
