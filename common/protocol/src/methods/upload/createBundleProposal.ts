@@ -1,12 +1,13 @@
 import BigNumber from "bignumber.js";
 import { Validator } from "../..";
-import { BundleTag, DataItem } from "../../types";
+import { DataItem } from "../../types";
 import {
   bundleToBytes,
   MAX_BUNDLE_BYTE_SIZE,
   sha256,
   standardizeError,
 } from "../../utils";
+import { Coin, Coins } from "@kyvejs/coins";
 
 /**
  * createBundleProposal assembles a bundle proposal by loading
@@ -38,7 +39,7 @@ export async function createBundleProposal(this: Validator): Promise<void> {
     const toIndex = fromIndex + parseInt(this.pool.data!.max_bundle_size);
 
     // load bundle proposal from local cache
-    const bundleProposal: DataItem[] = [];
+    let bundleProposal: DataItem[] = [];
 
     // here we try to fetch data items from the current index
     // to the proposal index. If we fail before we simply
@@ -48,20 +49,12 @@ export async function createBundleProposal(this: Validator): Promise<void> {
       `Loading bundle from index ${fromIndex} to index ${toIndex}`
     );
 
-    let bundleSize = 0;
     for (let i = fromIndex; i < toIndex; i++) {
       try {
         // try to get the data item from local cache
         this.logger.debug(`this.cacheProvider.get(${i.toString()})`);
         const item = await this.cacheProvider.get(i.toString());
         bundleProposal.push(item);
-        // calculate the size of the data item and add it to the total bundle size
-        const itemSize = Buffer.from(JSON.stringify(item)).byteLength;
-        bundleSize += itemSize;
-        // break if bundle size exceeds limit
-        if (bundleSize > MAX_BUNDLE_BYTE_SIZE) {
-          break;
-        }
       } catch {
         // if the data item was not found simply abort
         // and submit what we just have now
@@ -79,6 +72,159 @@ export async function createBundleProposal(this: Validator): Promise<void> {
     }
 
     this.logger.info(`Data was found on local cache from required range`);
+
+    // get current compression defined on pool
+    this.logger.debug(`this.compressionFactory()`);
+    const compression = this.compressionFactory();
+
+    let maxBytes = MAX_BUNDLE_BYTE_SIZE;
+
+    if (
+      this.ensureNoLoss &&
+      (this.sdk[0].isMainnet() || this.sdk[0].isLocal())
+    ) {
+      await this.syncParams();
+
+      // calculate expected storage rewards to calculate
+      // the maximum amount of bytes we can upload before
+      // running into a loss
+      let rewards = new Coins({
+        denom: this.sdk[0].config.coinDenom,
+        amount: new BigNumber(this.pool.account_balance)
+          .times(this.params.pool_params?.pool_inflation_payout_rate ?? "0")
+          .toFixed(0),
+      });
+
+      this.pool.fundings.forEach((f) => {
+        rewards = rewards.add(
+          new Coins(...f.amounts_per_bundle).min(...f.amounts)
+        );
+      });
+
+      rewards = new Coins(
+        ...rewards.toArray().map((coin) => ({
+          denom: coin.denom,
+          amount: new BigNumber(coin.amount)
+            .multipliedBy(
+              new BigNumber(1).minus(
+                this.params.bundles_params?.network_fee ?? "0"
+              )
+            )
+            .toFixed(0),
+        }))
+      );
+
+      const rewardsUsd = rewards.toArray().reduce((acc: string, coin: Coin) => {
+        const coin_entry = this.params.funders_params?.coin_whitelist.find(
+          (w) => w.coin_denom === coin.denom
+        );
+
+        if (!coin_entry || coin_entry.coin_weight === "0") {
+          return acc;
+        }
+
+        return new BigNumber(acc)
+          .plus(
+            new BigNumber(coin.amount)
+              .dividedBy(
+                new BigNumber(10).exponentiatedBy(coin_entry.coin_decimals)
+              )
+              .times(coin_entry.coin_weight)
+          )
+          .toString();
+      }, "0");
+
+      const storageCost =
+        this.params.bundles_params?.storage_costs.find(
+          (s) =>
+            s.storage_provider_id ===
+            (this.pool.data?.current_storage_provider_id ?? 0)
+        )?.cost ?? "0";
+
+      if (new BigNumber(storageCost).gt(0)) {
+        const maxBytesWithNoLoss = +new BigNumber(rewardsUsd)
+          .dividedBy(storageCost)
+          .toFixed(0);
+
+        if (new BigNumber(maxBytesWithNoLoss).lt(maxBytes)) {
+          maxBytes = maxBytesWithNoLoss;
+        }
+      }
+    }
+
+    let low = 0;
+    let high = bundleProposal.length - 1;
+    let maxIndex = -1;
+    let size;
+
+    // use binary search to minimize the times we have to compress the bundle to
+    // find the biggest bundle which is still below the max byte size
+    while (low <= high) {
+      const mid = Math.floor((low + high) / 2);
+
+      this.logger.debug(
+        `this.compression.compress($RAW_BUNDLE_PROPOSAL[0:${mid}])`
+      );
+      const storageProviderData = await compression
+        .compress(bundleToBytes(bundleProposal.slice(0, mid + 1)))
+        .catch((err) => {
+          this.logger.error(
+            `Unexpected error compressing bundle. Skipping Uploader Role ...`
+          );
+          this.logger.error(standardizeError(err));
+
+          return null;
+        });
+
+      // skip uploader role if compression returns null
+      if (storageProviderData === null) {
+        await this.skipUploaderRole(fromIndex);
+        return;
+      }
+
+      size = storageProviderData.byteLength;
+
+      this.logger.debug(
+        `Bundle proposal with index range 0,${mid} has byte size ${size} of max allowed ${maxBytes} bytes`
+      );
+
+      if (size < maxBytes) {
+        if (mid >= maxIndex) {
+          maxIndex = mid;
+        }
+        low = mid + 1;
+      } else if (size > maxBytes) {
+        high = mid - 1;
+      } else {
+        if (mid >= maxIndex) {
+          maxIndex = mid;
+        }
+        break;
+      }
+    }
+
+    this.logger.debug(
+      `Choosing bundle proposal with index range 0,${maxIndex} has biggest byte size ${size} still below max allowed ${maxBytes} bytes`
+    );
+
+    if (maxIndex + 1 === 0) {
+      this.logger.info(
+        `Skip uploader role since uploading at least one data item would exceed the maximum bytes limit`
+      );
+
+      await this.skipUploaderRole(fromIndex);
+      return;
+    }
+
+    this.logger.info(
+      `Dropping ${bundleProposal.length - (maxIndex + 1)} items from original ${
+        bundleProposal.length
+      } item bundle proposal to prevent exceeding the maximum bytes limit`
+    );
+
+    // cutoff any data items which would exceed the maximum data size which
+    // does not lead to a loss
+    bundleProposal = bundleProposal.slice(0, maxIndex + 1);
 
     // get the first key of the bundle proposal which gets
     // included in the bundle proposal and saved on chain
@@ -110,10 +256,6 @@ export async function createBundleProposal(this: Validator): Promise<void> {
       await this.skipUploaderRole(fromIndex);
       return;
     }
-
-    // get current compression defined on pool
-    this.logger.debug(`this.compressionFactory()`);
-    const compression = this.compressionFactory();
 
     const uploadBundle = bundleToBytes(bundleProposal);
 

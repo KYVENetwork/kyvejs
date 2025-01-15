@@ -7,6 +7,11 @@ export const GOV_AUTHORITY = "kyve10d07y265gmmuvt4z0w9aw880jnsr700jdv7nah";
 export const GAS_MULTIPLIER = 1.5;
 export const COIN_TYPE = 118;
 
+export const MAINNET_CHAIN_ID = "kyve-1";
+export const TESTNET_CHAIN_ID = "kaon-1";
+export const DEVNET_CHAIN_ID = "korellia-2";
+export const LOCAL_CHAIN_ID = "kyve-local";
+
 export type IConfig = {
   chainId: string;
   chainName: string;
