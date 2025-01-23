@@ -35,6 +35,7 @@ export * from "./queries/canPropose";
 export * from "./queries/canVote";
 export * from "./queries/getBalancesForMetrics";
 export * from "./queries/syncPoolState";
+export * from "./queries/syncParams";
 
 // validate
 export * from "./validate/saveBundleDownload";

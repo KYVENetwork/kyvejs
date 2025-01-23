@@ -14,21 +14,31 @@ export class Turbo implements IStorageProvider {
   public name = "Turbo";
   public coinDecimals = 12;
 
-  private readonly mnemonic: string;
+  private readonly privateKey: string;
 
-  constructor(mnemonic: string) {
-    if (!mnemonic) {
-      throw new Error("Mnemonic is empty.");
+  constructor(privateKey: string) {
+    if (!privateKey) {
+      throw new Error("PrivateKey is empty.");
     }
 
-    this.mnemonic = mnemonic;
+    this.privateKey = privateKey;
   }
 
   private async authenticatedTurbo(): Promise<TurboAuthenticatedClient> {
-    return TurboFactory.authenticated({
-      privateKey: await privateKeyFromKyveMnemonic(this.mnemonic),
-      token: "kyve",
-    });
+    try {
+      return TurboFactory.authenticated({
+        privateKey: await privateKeyFromKyveMnemonic(this.privateKey),
+        token: "kyve",
+      });
+    } catch (err: any) {
+      if (err.message === "Invalid mnemonic format") {
+        return TurboFactory.authenticated({
+          privateKey: JSON.parse(this.privateKey),
+        });
+      }
+
+      throw err;
+    }
   }
 
   private unauthenticatedTurbo(): TurboUnauthenticatedClient {

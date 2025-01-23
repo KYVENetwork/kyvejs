@@ -31,6 +31,7 @@ import {
   skipUploaderRole,
   submitBundleProposal,
   syncPoolState,
+  syncParams,
   parseProposedBundle,
   validateBundleProposal,
   isNodeValidator,
@@ -52,6 +53,7 @@ import { SupportedChains } from "@kyvejs/sdk/dist/constants";
 import { storageProviderFactory } from "./reactors/storageProviders";
 import { compressionFactory } from "./reactors/compression";
 import { cacheProviderFactory } from "./reactors/cacheProvider";
+import { QueryParamsResponse } from "@kyvejs/types/lcd/kyve/query/v1beta1/params";
 
 /**
  * Main class of KYVE protocol nodes representing a validator node.
@@ -101,6 +103,8 @@ export class Validator {
   protected home!: string;
   protected dryRun!: boolean;
   protected dryRunBundles!: number;
+  protected ensureNoLoss!: boolean;
+  protected params!: QueryParamsResponse;
 
   // tmp variables
   protected lastUploadedBundle: {
@@ -143,6 +147,7 @@ export class Validator {
 
   // queries
   protected syncPoolState = syncPoolState;
+  protected syncParams = syncParams;
   protected getBalancesForMetrics = getBalancesForMetrics;
   protected canVote = canVote;
   protected canPropose = canPropose;
@@ -289,6 +294,11 @@ export class Validator {
         "Specify the number of bundles that should be tested before the node properly exits. If zero the node will run indefinitely [default = 0]",
         "0"
       )
+      .option(
+        "--ensure-no-loss",
+        "Ensures that the node only uploads bundles which can be fully rewarded by the protocol.",
+        true
+      )
       .action((options) => {
         this.start(options);
       });
@@ -328,6 +338,7 @@ export class Validator {
     this.home = options.home;
     this.dryRun = options.dryRun;
     this.dryRunBundles = parseInt(options.dryRunBundles);
+    this.ensureNoLoss = options.ensureNoLoss;
 
     // name the log file after the time the node got started
     this.logFile = `${new Date().toISOString()}.log`;

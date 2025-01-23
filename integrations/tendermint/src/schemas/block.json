@@ -262,13 +262,7 @@
                         "type": "string"
                       }
                     },
-                    "required": [
-                      "vote_a",
-                      "vote_b",
-                      "TotalVotingPower",
-                      "ValidatorPower",
-                      "Timestamp"
-                    ]
+                    "required": ["vote_a", "vote_b"]
                   }
                 },
                 "required": ["type", "value"]
