@@ -2,8 +2,12 @@ import { DataItem, IRuntime, Validator, VOTE } from "@kyvejs/protocol";
 import { name, version } from "../package.json";
 import { createHashesFromBundle, generateMerkleRoot } from "../utils/merkle";
 import { fetchJsonRpc } from "../utils/utils";
+import Ajv from 'ajv';
+import block_schema from './schemas/block.json';
 
-// Ethereum Blobs config
+const ajv = new Ajv();
+
+// Avail config
 interface IConfig {
   rpc: string;
 }
@@ -22,8 +26,6 @@ export default class Avail implements IRuntime {
 
     if (process.env.KYVEJS_AVAIL_RPC) {
       config.rpc = process.env.KYVEJS_AVAIL_RPC;
-
-      console.log("set `KYVEJS_AVAIL_RPC` rpc to", config.rpc)
     }
 
     this.config = config;
@@ -43,13 +45,22 @@ export default class Avail implements IRuntime {
 
     return {
       key,
-      value: block,
+      value: block.block,
     };
   }
 
   async prevalidateDataItem(_: Validator, item: DataItem): Promise<boolean> {
-    // check if item value is not null
-    return item.value
+    const block_validate = ajv.compile(block_schema);
+
+    if (!block_validate(item.value.block)) {
+      throw new Error(
+        `Block schema validation failed: ${JSON.stringify(
+          block_validate.errors
+        )}`
+      );
+    }
+
+    return true
   }
 
   async transformDataItem(_: Validator, item: DataItem): Promise<DataItem> {
