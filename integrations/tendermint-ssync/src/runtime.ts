@@ -171,6 +171,23 @@ export default class TendermintSSync implements IRuntime {
       delete validationDataItem.value.state.Version.software;
     }
 
+    // exclude time_iota_ms from validation
+    if (
+      proposedDataItem.value.state &&
+      proposedDataItem.value.state.ConsensusParams &&
+      proposedDataItem.value.state.ConsensusParams.block
+    ) {
+      delete proposedDataItem.value.state.ConsensusParams.block.time_iota_ms;
+    }
+
+    if (
+      validationDataItem.value.state &&
+      validationDataItem.value.state.ConsensusParams &&
+      validationDataItem.value.state.ConsensusParams.block
+    ) {
+      delete validationDataItem.value.state.ConsensusParams.block.time_iota_ms;
+    }
+
     // apply equal comparison
     if (
       JSON.stringify(proposedDataItem) === JSON.stringify(validationDataItem)
