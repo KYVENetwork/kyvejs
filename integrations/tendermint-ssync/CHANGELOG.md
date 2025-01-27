@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.2.7](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint-ssync@1.2.6...@kyvejs/tendermint-ssync@1.2.7) (2025-01-27)
+
+### Bug Fixes
+
+- ignore time_iota_ms during validation ([#163](https://github.com/KYVENetwork/kyvejs/issues/163)) ([1675241](https://github.com/KYVENetwork/kyvejs/commit/16752417f37785f08f00d538ba53d7ef44b932dc))
+
 ## [1.2.6](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint-ssync@1.2.5...@kyvejs/tendermint-ssync@1.2.6) (2025-01-15)
 
 **Note:** Version bump only for package @kyvejs/tendermint-ssync
