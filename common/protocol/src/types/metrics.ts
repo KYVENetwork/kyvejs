@@ -32,6 +32,10 @@ export interface IMetrics {
   query_pool_successful: PromCounter;
   query_pool_failed: PromCounter;
 
+  // QueryParams metrics
+  query_params_successful: PromCounter;
+  query_params_failed: PromCounter;
+
   // QueryCanValidate metrics
   query_can_validate_successful: PromCounter;
   query_can_validate_failed: PromCounter;

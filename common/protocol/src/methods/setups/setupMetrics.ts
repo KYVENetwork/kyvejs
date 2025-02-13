@@ -143,6 +143,21 @@ export function setupMetrics(this: Validator): void {
       help: "The amount of QueryPool /kyve/query/v1beta1/pool/{id} calls that failed.",
     });
 
+    // QueryParams metrics
+    this.logger.debug(`Initializing metrics: query_params_successful`);
+
+    this.m.query_params_successful = new prom_client.Counter({
+      name: "query_params_successful",
+      help: "The amount of QueryParams /kyve/query/v1beta1/params/{id} calls that succeeded.",
+    });
+
+    this.logger.debug(`Initializing metrics: query_params_failed`);
+
+    this.m.query_params_failed = new prom_client.Counter({
+      name: "query_params_failed",
+      help: "The amount of QueryParams /kyve/query/v1beta1/params/{id} calls that failed.",
+    });
+
     // QueryCanValidate metrics
     this.logger.debug(`Initializing metrics: query_can_validate_successful`);
 
