@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.2.10](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint@1.2.9...@kyvejs/tendermint@1.2.10) (2025-02-13)
+
+**Note:** Version bump only for package @kyvejs/tendermint
+
 ## [1.2.9](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint@1.2.8...@kyvejs/tendermint@1.2.9) (2025-01-15)
 
 **Note:** Version bump only for package @kyvejs/tendermint

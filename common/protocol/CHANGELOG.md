@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.3.2](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/protocol@1.3.1...@kyvejs/protocol@1.3.2) (2025-02-13)
+
+### Bug Fixes
+
+- sign signature without rpc requests ([#164](https://github.com/KYVENetwork/kyvejs/issues/164)) ([ec2a972](https://github.com/KYVENetwork/kyvejs/commit/ec2a9725fd0b5fca3026b5f011e9b0f7740cbcac))
+
 ## [1.3.1](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/protocol@1.3.0...@kyvejs/protocol@1.3.1) (2025-01-15)
 
 **Note:** Version bump only for package @kyvejs/protocol
