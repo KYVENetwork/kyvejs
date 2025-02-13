@@ -1,7 +1,9 @@
-import KyveSDK from "@kyvejs/sdk";
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 import { BundleTag, IStorageProvider } from "../../types";
+import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
+import { Secp256k1HdWallet } from "@cosmjs/amino";
+import { makeADR36AminoSignDoc } from "@keplr-wallet/cosmos";
 
 require("dotenv").config();
 
@@ -39,7 +41,11 @@ export class Kyve implements IStorageProvider {
   }
 
   async getAddress() {
-    return (await new KyveSDK().fromMnemonic(this.valaccount)).account.address;
+    const signer = await DirectSecp256k1HdWallet.fromMnemonic(this.valaccount, {
+      prefix: "kyve",
+    });
+    const [account] = await signer.getAccounts();
+    return account.address;
   }
 
   async getBalance() {
@@ -52,19 +58,25 @@ export class Kyve implements IStorageProvider {
 
   async saveBundle(bundle: Buffer, _: BundleTag[]) {
     const storageId = uuidv4();
-    const sdk = await new KyveSDK().fromMnemonic(this.valaccount);
-    const address = await this.getAddress();
     const timestamp = new Date().valueOf().toString();
 
-    const { signature, pub_key } = await sdk.signString(
+    const signer = await Secp256k1HdWallet.fromMnemonic(this.valaccount, {
+      prefix: "kyve",
+    });
+
+    const [account] = await signer.getAccounts();
+
+    const signDoc = makeADR36AminoSignDoc(
+      account.address,
       JSON.stringify({
         chainId: this.chainId,
         poolId: this.poolId.toString(),
         staker: this.staker,
-        valaccount: address,
+        valaccount: account.address,
         timestamp,
       })
     );
+    const { signature } = await signer.signAmino(account.address, signDoc);
 
     await axios.post(
       "https://upload.storage.kyve.network/upload",
@@ -80,9 +92,9 @@ export class Kyve implements IStorageProvider {
           "kyve-chain-id": this.chainId,
           "kyve-pool-id": this.poolId.toString(),
           "kyve-staker": this.staker,
-          "kyve-public-key": pub_key.value,
+          "kyve-public-key": signature.pub_key.value,
           "kyve-timestamp": timestamp,
-          "kyve-signature": signature,
+          "kyve-signature": signature.signature,
         },
       }
     );
