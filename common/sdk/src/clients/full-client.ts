@@ -8,6 +8,7 @@ import {
   createFundersAminoConverters,
   createGovV1AminoConverters,
   createStakersAminoConverters,
+  createMultiCoinRewardsConverters,
 } from "../amino";
 import { IConfig } from "../constants";
 import * as KyveRegistryTx from "../registry/tx.registry";
@@ -49,6 +50,7 @@ export async function getSigningKyveClient(
         ...createFundersAminoConverters(),
         ...createStakersAminoConverters(),
         ...createBundlesAminoConverters(),
+        ...createMultiCoinRewardsConverters(),
       }),
     });
 

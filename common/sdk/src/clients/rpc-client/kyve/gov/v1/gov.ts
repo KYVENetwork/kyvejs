@@ -3,7 +3,6 @@ import { coins } from "@cosmjs/stargate";
 import { VoteOption } from "@kyvejs/types/client/cosmos/gov/v1/gov";
 import { MsgUpdateParams as MsgUpdateParamsBundles } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
 import { MsgUpdateParams as MsgUpdateParamsGlobal } from "@kyvejs/types/client/kyve/global/v1beta1/tx";
-import { MsgUpdateParams as MsgUpdateParamsPool } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
 import { MsgUpdateParams as MsgUpdateParamsMultiCoinRewards } from "@kyvejs/types/client/kyve/multi_coin_rewards/v1beta1/tx";
 import {
   MsgCancelRuntimeUpgrade,
