@@ -9,6 +9,7 @@ import KyveBundlesMethods from "./kyve/bundles/v1beta1/bundles";
 import KyveFundersMethods from "./kyve/funders/v1beta1/funders";
 import KyveGovMethodsV1 from "./kyve/gov/v1/gov";
 import KyveStakersMethods from "./kyve/stakers/v1beta1/stakers";
+import KyveMultiCoinRewardsMethods from "./kyve/multi_coin_rewards/v1beta1/multi_coin_rewards";
 import KyveBankMethods from "./cosmos/bank/v1beta1/bank";
 import KyveStakingMethods from "./cosmos/staking/v1beta1/staking";
 import KyveDistributionMethods from "./cosmos/distribution/v1beta1/distribution";
@@ -43,6 +44,9 @@ export default class KyveClient {
     };
     stakers: {
       v1beta1: KyveStakersMethods;
+    };
+    multi_coin_rewards: {
+      v1beta1: KyveMultiCoinRewardsMethods;
     };
   };
   private aminoSigner: OfflineAminoSigner | null;
@@ -99,6 +103,13 @@ export default class KyveClient {
       },
       stakers: {
         v1beta1: new KyveStakersMethods(
+          this.nativeClient,
+          this.account,
+          config
+        ),
+      },
+      multi_coin_rewards: {
+        v1beta1: new KyveMultiCoinRewardsMethods(
           this.nativeClient,
           this.account,
           config

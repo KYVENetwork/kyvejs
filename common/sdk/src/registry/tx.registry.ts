@@ -40,6 +40,10 @@ import {
   MsgEditValidator,
   MsgUndelegate,
 } from "cosmjs-types/cosmos/staking/v1beta1/tx";
+/** multi_coin_rewards **/
+import { MsgSetMultiCoinRewardsDistributionPolicy } from "@kyvejs/types/client/kyve/multi_coin_rewards/v1beta1/tx";
+import { MsgToggleMultiCoinRewards } from "@kyvejs/types/client/kyve/multi_coin_rewards/v1beta1/tx";
+import { MsgUpdateParams as MsgUpdateParamsMultiCoinRewards } from "@kyvejs/types/client/kyve/multi_coin_rewards/v1beta1/tx";
 
 // TODO: why does <[string, GeneratedType]> does not work anymore?
 export const registry: ReadonlyArray<[string, any]> = [
@@ -66,6 +70,15 @@ export const registry: ReadonlyArray<[string, any]> = [
   ["/kyve.bundles.v1beta1.MsgVoteBundleProposal", MsgVoteBundleProposal],
   ["/kyve.bundles.v1beta1.MsgClaimUploaderRole", MsgClaimUploaderRole],
   ["/kyve.bundles.v1beta1.MsgSkipUploaderRole", MsgSkipUploaderRole],
+  /** multi_coin_rewards **/
+  [
+    "/kyve.multi_coin_rewards.v1beta1.MsgSetMultiCoinRewardsDistributionPolicy",
+    MsgSetMultiCoinRewardsDistributionPolicy,
+  ],
+  [
+    "/kyve.multi_coin_rewards.v1beta1.MsgToggleMultiCoinRewards",
+    MsgToggleMultiCoinRewards,
+  ],
   /** cosmos **/
   ["/cosmos.gov.v1.MsgSubmitProposal", MsgSubmitProposal],
   ["/cosmos.gov.v1.MsgVote", MsgVote],
@@ -216,6 +229,14 @@ export const encodeTxMsg = {
     };
   },
 
+  updateParamsMultiCoinRewards(value: MsgUpdateParamsMultiCoinRewards) {
+    return {
+      type_url:
+        "/kyve.multi_coin_rewards.v1beta1.MsgUpdateParamsMultiCoinRewards",
+      value: MsgUpdateParamsMultiCoinRewards.encode(value).finish(),
+    };
+  },
+
   delegate(value: MsgDelegate) {
     return {
       type_url: "/cosmos.staking.v1beta1.MsgDelegate",
@@ -269,6 +290,23 @@ export const encodeTxMsg = {
     return {
       type_url: "/cosmos.distribution.v1beta1.MsgWithdrawValidatorCommission",
       value: MsgWithdrawValidatorCommission.encode(value).finish(),
+    };
+  },
+
+  setMultiCoinRewardsDistributionPolicy(
+    value: MsgSetMultiCoinRewardsDistributionPolicy
+  ) {
+    return {
+      type_url:
+        "/kyve.multi_coin_rewards.v1beta1.MsgSetMultiCoinRewardsDistributionPolicy",
+      value: MsgSetMultiCoinRewardsDistributionPolicy.encode(value).finish(),
+    };
+  },
+
+  toggleMultiCoinRewards(value: MsgToggleMultiCoinRewards) {
+    return {
+      type_url: "/cosmos.multi_coin_rewards.v1beta1.MsgToggleMultiCoinRewards",
+      value: MsgToggleMultiCoinRewards.encode(value).finish(),
     };
   },
 };
@@ -421,6 +459,14 @@ export const withTypeUrl = {
     };
   },
 
+  updateParamsMultiCoinRewards(value: MsgUpdateParamsMultiCoinRewards) {
+    return {
+      typeUrl:
+        "/kyve.multi_coin_rewards.v1beta1.MsgUpdateParamsMultiCoinRewards",
+      value,
+    };
+  },
+
   delegate(value: MsgDelegate) {
     return {
       typeUrl: "/cosmos.staking.v1beta1.MsgDelegate",
@@ -473,6 +519,23 @@ export const withTypeUrl = {
   withdrawValidatorCommission(value: MsgWithdrawValidatorCommission) {
     return {
       typeUrl: "/cosmos.distribution.v1beta1.MsgWithdrawValidatorCommission",
+      value,
+    };
+  },
+
+  setMultiCoinRewardsDistributionPolicy(
+    value: MsgSetMultiCoinRewardsDistributionPolicy
+  ) {
+    return {
+      typeUrl:
+        "/kyve.multi_coin_rewards.v1beta1.MsgSetMultiCoinRewardsDistributionPolicy",
+      value,
+    };
+  },
+
+  toggleMultiCoinRewards(value: MsgToggleMultiCoinRewards) {
+    return {
+      typeUrl: "/cosmos.multi_coin_rewards.v1beta1.MsgToggleMultiCoinRewards",
       value,
     };
   },
