@@ -6,15 +6,29 @@ import { makeADR36AminoSignDoc } from "@keplr-wallet/cosmos";
 import { IConfig } from "../../constants";
 import KyveBaseMethods from "./kyve/base/v1beta1/base";
 import KyveBundlesMethods from "./kyve/bundles/v1beta1/bundles";
-import KyveDelegationMethods from "./kyve/delegation/v1beta1/delegation";
 import KyveFundersMethods from "./kyve/funders/v1beta1/funders";
 import KyveGovMethodsV1 from "./kyve/gov/v1/gov";
-import KyveStakersMethods from "./kyve/stakers/v1beta1/stakers";
+import KyveStakersMethods from "./kyve/stakers/v1/stakers";
+import KyveMultiCoinRewardsMethods from "./kyve/multi_coin_rewards/v1beta1/multi_coin_rewards";
+import KyveBankMethods from "./cosmos/bank/v1beta1/bank";
+import KyveStakingMethods from "./cosmos/staking/v1beta1/staking";
+import KyveDistributionMethods from "./cosmos/distribution/v1beta1/distribution";
 
 export default class KyveClient {
   public nativeClient: SigningStargateClient;
   public readonly account: AccountData;
   public readonly config: IConfig;
+  public cosmos: {
+    bank: {
+      v1beta1: KyveBankMethods;
+    };
+    staking: {
+      v1beta1: KyveStakingMethods;
+    };
+    distribution: {
+      v1beta1: KyveDistributionMethods;
+    };
+  };
   public kyve: {
     base: {
       v1beta1: KyveBaseMethods;
@@ -25,14 +39,14 @@ export default class KyveClient {
     bundles: {
       v1beta1: KyveBundlesMethods;
     };
-    delegation: {
-      v1beta1: KyveDelegationMethods;
-    };
     funders: {
       v1beta1: KyveFundersMethods;
     };
     stakers: {
       v1beta1: KyveStakersMethods;
+    };
+    multi_coin_rewards: {
+      v1beta1: KyveMultiCoinRewardsMethods;
     };
   };
   private aminoSigner: OfflineAminoSigner | null;
@@ -47,19 +61,31 @@ export default class KyveClient {
     this.config = config;
     this.nativeClient = client;
     this.aminoSigner = aminoSigner;
+    this.cosmos = {
+      bank: {
+        v1beta1: new KyveBankMethods(this.nativeClient, this.account, config),
+      },
+      staking: {
+        v1beta1: new KyveStakingMethods(
+          this.nativeClient,
+          this.account,
+          config
+        ),
+      },
+      distribution: {
+        v1beta1: new KyveDistributionMethods(
+          this.nativeClient,
+          this.account,
+          config
+        ),
+      },
+    };
     this.kyve = {
       base: {
         v1beta1: new KyveBaseMethods(this.nativeClient, this.account, config),
       },
       bundles: {
         v1beta1: new KyveBundlesMethods(
-          this.nativeClient,
-          this.account,
-          config
-        ),
-      },
-      delegation: {
-        v1beta1: new KyveDelegationMethods(
           this.nativeClient,
           this.account,
           config
@@ -77,6 +103,13 @@ export default class KyveClient {
       },
       stakers: {
         v1beta1: new KyveStakersMethods(
+          this.nativeClient,
+          this.account,
+          config
+        ),
+      },
+      multi_coin_rewards: {
+        v1beta1: new KyveMultiCoinRewardsMethods(
           this.nativeClient,
           this.account,
           config

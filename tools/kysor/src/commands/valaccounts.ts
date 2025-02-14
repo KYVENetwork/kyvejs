@@ -283,7 +283,7 @@ valaccounts
         gasPrice: config.gasPrice,
       }).fromMnemonic(valaccount.valaccount);
 
-      const tx = await client.kyve.base.v1beta1.transfer(
+      const tx = await client.cosmos.bank.v1beta1.transfer(
         options.recipient,
         options.amount
       );

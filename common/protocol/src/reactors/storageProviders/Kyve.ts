@@ -14,13 +14,13 @@ export class Kyve implements IStorageProvider {
   private chainId: string;
   private poolId: number;
   private staker: string;
-  private valaccount: string;
+  private poolAccount: string;
 
   constructor(
     chainId: string,
     poolId: number,
     staker: string,
-    valaccount: string
+    poolAccount: string
   ) {
     if (!chainId) {
       throw new Error("ChainId is empty.");
@@ -30,20 +30,23 @@ export class Kyve implements IStorageProvider {
       throw new Error("PoolId is empty.");
     }
 
-    if (!valaccount) {
-      throw new Error("Valaccount mnemonic is empty.");
+    if (!poolAccount) {
+      throw new Error("Pool account mnemonic is empty.");
     }
 
     this.chainId = chainId;
     this.poolId = poolId;
     this.staker = staker;
-    this.valaccount = valaccount;
+    this.poolAccount = poolAccount;
   }
 
   async getAddress() {
-    const signer = await DirectSecp256k1HdWallet.fromMnemonic(this.valaccount, {
-      prefix: "kyve",
-    });
+    const signer = await DirectSecp256k1HdWallet.fromMnemonic(
+      this.poolAccount,
+      {
+        prefix: "kyve",
+      }
+    );
     const [account] = await signer.getAccounts();
     return account.address;
   }
@@ -60,7 +63,7 @@ export class Kyve implements IStorageProvider {
     const storageId = uuidv4();
     const timestamp = new Date().valueOf().toString();
 
-    const signer = await Secp256k1HdWallet.fromMnemonic(this.valaccount, {
+    const signer = await Secp256k1HdWallet.fromMnemonic(this.poolAccount, {
       prefix: "kyve",
     });
 

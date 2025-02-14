@@ -342,7 +342,14 @@ export function setupMetrics(this: Validator): void {
 
     this.m.balance_valaccount = new prom_client.Gauge({
       name: "balance_valaccount",
-      help: "The current $KYVE balance of the valaccount.",
+      help: "The current $KYVE balance of the valaccount (soon deprecated, use balance_pool_account instead).",
+    });
+
+    this.logger.debug(`Initializing metrics: balance_pool_account`);
+
+    this.m.balance_pool_account = new prom_client.Gauge({
+      name: "balance_pool_account",
+      help: "The current $KYVE balance of the pool account.",
     });
 
     this.logger.debug(`Initializing metrics: balance_storage_provider`);

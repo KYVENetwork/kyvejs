@@ -1,17 +1,13 @@
 import paginationQuery from "@kyvejs/types/client/cosmos/base/query/v1beta1/pagination";
 import kyveQueryAccount from "@kyvejs/types/client/kyve/query/v1beta1/account";
 import kyveQueryBundles from "@kyvejs/types/client/kyve/query/v1beta1/bundles";
-import kyveQueryDelegation from "@kyvejs/types/client/kyve/query/v1beta1/delegation";
 import kyveQueryFunders from "@kyvejs/types/client/kyve/query/v1beta1/funders";
 import kyveQueryParamsRes from "@kyvejs/types/client/kyve/query/v1beta1/params";
 import kyveQueryPools from "@kyvejs/types/client/kyve/query/v1beta1/pools";
-import kyveQueryStakers from "@kyvejs/types/client/kyve/query/v1beta1/stakers";
 import kyveQueryAccountRes from "@kyvejs/types/lcd/kyve/query/v1beta1/account";
 import kyveQueryBundlesRes from "@kyvejs/types/lcd/kyve/query/v1beta1/bundles";
-import kyveQueryDelegationRes from "@kyvejs/types/lcd/kyve/query/v1beta1/delegation";
 import kyveQueryFundersRes from "@kyvejs/types/lcd/kyve/query/v1beta1/funders";
 import kyveQueryPoolsRes from "@kyvejs/types/lcd/kyve/query/v1beta1/pools";
-import kyveQueryStakersRes from "@kyvejs/types/lcd/kyve/query/v1beta1/stakers";
 
 import { AbstractKyveLCDClient } from "../../lcd-client.abstract";
 
@@ -97,35 +93,6 @@ export class QueryModuleLCDClient extends AbstractKyveLCDClient {
     return await this.request(endpoint, parameters);
   }
   /** end Pools **/
-  /** Stakers **/
-  async stakers(
-    params: PaginationPartialRequestUtilType<kyveQueryStakers.QueryStakersRequest>
-  ): Promise<
-    PaginationResponseTypeUtil<kyveQueryStakersRes.QueryStakersResponse>
-  > {
-    const parameters: Record<string, any> = {};
-
-    if (typeof params?.pagination !== "undefined") {
-      parameters.pagination = params.pagination;
-    }
-    const endpoint = `/kyve/query/v1beta1/stakers`;
-    return await this.request(endpoint, params);
-  }
-
-  async staker(
-    params: kyveQueryStakers.QueryStakerRequest
-  ): Promise<kyveQueryStakersRes.QueryStakerResponse> {
-    const endpoint = `/kyve/query/v1beta1/staker/${params.address}`;
-    return await this.request(endpoint);
-  }
-
-  async stakersByPool(
-    params: kyveQueryStakers.QueryStakersByPoolRequest
-  ): Promise<kyveQueryStakersRes.QueryStakersByPoolResponse> {
-    const endpoint = `/kyve/query/v1beta1/stakers_by_pool/${params.pool_id}`;
-    return await this.request(endpoint);
-  }
-  /** end stakers **/
   /** Bundles **/
   async currentVoteStatus(
     params: kyveQueryBundles.QueryCurrentVoteStatusRequest
@@ -137,7 +104,7 @@ export class QueryModuleLCDClient extends AbstractKyveLCDClient {
   async canValidate(
     params: kyveQueryBundles.QueryCanValidateRequest
   ): Promise<kyveQueryBundles.QueryCanValidateResponse> {
-    const endpoint = `/kyve/query/v1beta1/can_validate/${params.pool_id}/${params.valaddress}`;
+    const endpoint = `/kyve/query/v1beta1/can_validate/${params.pool_id}/${params.pool_address}`;
     return await this.request(endpoint);
   }
   async canPropose(
@@ -153,40 +120,6 @@ export class QueryModuleLCDClient extends AbstractKyveLCDClient {
     return await this.request(endpoint);
   }
   /** end Bundles **/
-  /** Delegations **/
-  async delegator(
-    params: kyveQueryDelegation.QueryDelegatorRequest
-  ): Promise<kyveQueryDelegationRes.QueryDelegatorResponse> {
-    const endpoint = `/kyve/query/v1beta1/delegator/${params.staker}/${params.delegator}`;
-    return await this.request(endpoint);
-  }
-  async delegatorsByStaker(
-    params: PaginationPartialRequestUtilType<kyveQueryDelegation.QueryDelegatorsByStakerRequest>
-  ): Promise<
-    PaginationResponseTypeUtil<kyveQueryDelegationRes.QueryDelegatorsByStakerResponse>
-  > {
-    const parameters: Record<string, any> = {};
-
-    if (typeof params?.pagination !== "undefined") {
-      parameters.pagination = params.pagination;
-    }
-    const endpoint = `/kyve/query/v1beta1/delegators_by_staker/${params.staker}`;
-    return await this.request(endpoint, parameters);
-  }
-  async stakersByDelegator(
-    params: PaginationPartialRequestUtilType<kyveQueryDelegation.QueryStakersByDelegatorRequest>
-  ): Promise<
-    PaginationResponseTypeUtil<kyveQueryDelegationRes.QueryStakersByDelegatorResponse>
-  > {
-    const parameters: Record<string, any> = {};
-
-    if (typeof params?.pagination !== "undefined") {
-      parameters.pagination = params.pagination;
-    }
-    const endpoint = `/kyve/query/v1beta1/stakers_by_delegator/${params.delegator}`;
-    return await this.request(endpoint, parameters);
-  }
-  /** end Delegations **/
 
   /*** Account **/
   async accountAssets(

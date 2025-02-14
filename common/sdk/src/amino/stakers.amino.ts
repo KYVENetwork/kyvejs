@@ -1,13 +1,11 @@
 import { Decimal } from "@cosmjs/math";
 import { AminoConverters } from "@cosmjs/stargate";
 import {
-  MsgClaimCommissionRewards,
-  MsgCreateStaker,
   MsgJoinPool,
   MsgLeavePool,
   MsgUpdateCommission,
-  MsgUpdateMetadata,
-} from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
+  MsgUpdateStakeFraction,
+} from "@kyvejs/types/client/kyve/stakers/v1/tx";
 
 import { isNotEmpty } from "../utils";
 
@@ -24,79 +22,53 @@ function jsonDecimalToProto(decimal: string): string {
 
 export const createStakersAminoConverters = (): AminoConverters => {
   return {
-    "/kyve.stakers.v1beta1.MsgCreateStaker": {
-      aminoType: "/kyve.stakers.v1beta1.MsgCreateStaker",
-      toAmino: (msg: MsgCreateStaker) => ({
-        creator: msg.creator,
-        ...(isNotEmpty(msg.amount) && { amount: msg.amount }),
-        commission: protoDecimalToJson(msg.commission),
-      }),
-      fromAmino: (msg): MsgCreateStaker => ({
-        creator: msg.creator,
-        amount: msg.amount,
-        commission: jsonDecimalToProto(msg.commission),
-      }),
-    },
-    "/kyve.stakers.v1beta1.MsgUpdateMetadata": {
-      aminoType: "/kyve.stakers.v1beta1.MsgUpdateMetadata",
-      toAmino: (msg: MsgUpdateMetadata) => ({
-        creator: msg.creator,
-        ...(isNotEmpty(msg.moniker) && { moniker: msg.moniker }),
-        ...(isNotEmpty(msg.website) && { website: msg.website }),
-        ...(isNotEmpty(msg.identity) && { identity: msg.identity }),
-        ...(isNotEmpty(msg.security_contact) && {
-          security_contact: msg.security_contact,
-        }),
-        ...(isNotEmpty(msg.details) && { details: msg.details }),
-      }),
-      fromAmino: (msg): MsgUpdateMetadata => ({
-        creator: msg.creator,
-        moniker: msg.moniker,
-        website: msg.website,
-        identity: msg.identity,
-        security_contact: msg.security_contact,
-        details: msg.details,
-      }),
-    },
-    "/kyve.stakers.v1beta1.MsgUpdateCommission": {
-      aminoType: "/kyve.stakers.v1beta1.MsgUpdateCommission",
+    "/kyve.stakers.v1.MsgUpdateCommission": {
+      aminoType: "/kyve.stakers.v1.MsgUpdateCommission",
       toAmino: (msg: MsgUpdateCommission) => ({
         creator: msg.creator,
+        pool_id: msg.pool_id,
         commission: protoDecimalToJson(msg.commission),
       }),
       fromAmino: (msg): MsgUpdateCommission => ({
         creator: msg.creator,
+        pool_id: msg.pool_id,
         commission: jsonDecimalToProto(msg.commission),
       }),
     },
-    "/kyve.stakers.v1beta1.MsgClaimCommissionRewards": {
-      aminoType: "/kyve.stakers.v1beta1.MsgClaimCommissionRewards",
-      toAmino: (msg: MsgClaimCommissionRewards) => ({
+    "/kyve.stakers.v1.MsgUpdateStakeFraction": {
+      aminoType: "/kyve.stakers.v1.MsgUpdateStakeFraction",
+      toAmino: (msg: MsgUpdateStakeFraction) => ({
         creator: msg.creator,
-        amounts: [...msg.amounts],
+        pool_id: msg.pool_id,
+        stake_fraction: protoDecimalToJson(msg.stake_fraction),
       }),
-      fromAmino: (msg): MsgClaimCommissionRewards => ({
+      fromAmino: (msg): MsgUpdateStakeFraction => ({
         creator: msg.creator,
-        amounts: [...msg.amounts],
+        pool_id: msg.pool_id,
+        stake_fraction: jsonDecimalToProto(msg.stake_fraction),
       }),
     },
-    "/kyve.stakers.v1beta1.MsgJoinPool": {
-      aminoType: "/kyve.stakers.v1beta1.MsgJoinPool",
+    "/kyve.stakers.v1.MsgJoinPool": {
+      aminoType: "/kyve.stakers.v1.MsgJoinPool",
       toAmino: (msg: MsgJoinPool) => ({
         creator: msg.creator,
         ...(isNotEmpty(msg.pool_id) && { pool_id: msg.pool_id }),
-        valaddress: msg.valaddress,
+        valaddress: msg.pool_address,
         ...(isNotEmpty(msg.amount) && { amount: msg.amount }),
+        commission: protoDecimalToJson(msg.commission),
+        stake_fraction: protoDecimalToJson(msg.stake_fraction),
       }),
       fromAmino: (msg): MsgJoinPool => ({
         creator: msg.creator,
         pool_id: msg.pool_id,
-        valaddress: msg.valaddress,
+        pool_address: msg.pool_address,
         amount: msg.amount,
+        commission: jsonDecimalToProto(msg.commission),
+        stake_fraction: jsonDecimalToProto(msg.stake_fraction),
       }),
     },
-    "/kyve.stakers.v1beta1.MsgLeavePool": {
-      aminoType: "/kyve.stakers.v1beta1.MsgLeavePool",
+    "/kyve.stakers.v1.MsgLeavePool": {
+      aminoType: "/kyve.stakers.v1.MsgLeavePool",
       toAmino: (msg: MsgLeavePool) => ({
         creator: msg.creator,
         ...(isNotEmpty(msg.pool_id) && { pool_id: msg.pool_id }),

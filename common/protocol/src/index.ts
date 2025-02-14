@@ -8,7 +8,7 @@ import { version as protocolVersion } from "../package.json";
 import {
   parseCache,
   parseEndpoints,
-  parseValaccount,
+  parsePoolAccount,
   parsePoolId,
 } from "./commander";
 import {
@@ -86,7 +86,7 @@ export class Validator {
   // node option attributes
   protected poolId!: number;
   protected staker!: string;
-  protected valaccount!: string;
+  protected poolAccount!: string;
   protected storagePriv!: string;
   protected chainId!: SupportedChains;
   protected rpc!: string[];
@@ -215,13 +215,19 @@ export class Validator {
       .description("Run the protocol node")
       .requiredOption(
         "--pool <string>",
-        "The ID of the pool this valaccount should participate as a validator",
+        "The ID of the pool this pool account should participate as a validator",
         parsePoolId
       )
-      .requiredOption(
+      // TODO: make required in next version and remove --valaccount completely
+      .option(
+        "--pool-account <string>",
+        "The environment variable pointing to the pool account mnemonic",
+        parsePoolAccount
+      )
+      .option(
         "--valaccount <string>",
-        "The environment variable pointing to the valaccount mnemonic",
-        parseValaccount
+        "The environment variable pointing to the valaccount mnemonic (soon deprecated, use --pool-account instead)",
+        parsePoolAccount
       )
       .requiredOption("--chain-id <string>", "The chain ID of the network")
       .requiredOption(
@@ -321,7 +327,7 @@ export class Validator {
   private async start(options: OptionValues): Promise<void> {
     // assign program options to node instance
     this.poolId = options.pool;
-    this.valaccount = options.valaccount;
+    this.poolAccount = options.poolAccount || options.valaccount;
     this.storagePriv = process.env[options.storagePriv] || "";
     this.chainId = options.chainId;
     this.rpc = options.rpc;
@@ -339,6 +345,11 @@ export class Validator {
     this.dryRun = options.dryRun;
     this.dryRunBundles = parseInt(options.dryRunBundles);
     this.ensureNoLoss = options.ensureNoLoss;
+
+    if (!this.poolAccount) {
+      this.logger.fatal(`Pool account not found. Exiting ...`);
+      process.exit(1);
+    }
 
     // name the log file after the time the node got started
     this.logFile = `${new Date().toISOString()}.log`;

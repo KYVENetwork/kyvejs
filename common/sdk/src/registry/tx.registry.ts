@@ -1,4 +1,4 @@
-import { GeneratedType, Registry } from "@cosmjs/proto-signing";
+import { Registry } from "@cosmjs/proto-signing";
 import { defaultRegistryTypes } from "@cosmjs/stargate";
 /** cosmos **/
 import { MsgSubmitProposal } from "@kyvejs/types/client/cosmos/gov/v1/tx";
@@ -9,14 +9,6 @@ import { MsgVoteBundleProposal } from "@kyvejs/types/client/kyve/bundles/v1beta1
 import { MsgClaimUploaderRole } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
 import { MsgSkipUploaderRole } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
 import { MsgUpdateParams as MsgUpdateParamsBundles } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
-/** delegations **/
-import { MsgDelegate } from "@kyvejs/types/client/kyve/delegation/v1beta1/tx";
-import { MsgWithdrawRewards } from "@kyvejs/types/client/kyve/delegation/v1beta1/tx";
-import { MsgRedelegate } from "@kyvejs/types/client/kyve/delegation/v1beta1/tx";
-import { MsgUndelegate } from "@kyvejs/types/client/kyve/delegation/v1beta1/tx";
-import { MsgUpdateParams as MsgUpdateParamsDelegation } from "@kyvejs/types/client/kyve/delegation/v1beta1/tx";
-import { MsgFundPool } from "@kyvejs/types/client/kyve/funders/v1beta1/tx";
-import { MsgDefundPool } from "@kyvejs/types/client/kyve/funders/v1beta1/tx";
 /** fees **/
 import { MsgUpdateParams as MsgUpdateParamsGlobal } from "@kyvejs/types/client/kyve/global/v1beta1/tx";
 import { MsgCreatePool } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
@@ -26,20 +18,35 @@ import { MsgEnablePool } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
 import { MsgScheduleRuntimeUpgrade } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
 import { MsgCancelRuntimeUpgrade } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
 /** stakers **/
-import {
-  MsgClaimCommissionRewards,
-  MsgCreateStaker,
-} from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
-import { MsgUpdateMetadata } from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
-import { MsgJoinPool } from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
-import { MsgUpdateCommission } from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
-import { MsgLeavePool } from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
-import { MsgUpdateParams as MsgUpdateParamsStakers } from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
+import { MsgJoinPool } from "@kyvejs/types/client/kyve/stakers/v1/tx";
+import { MsgUpdateCommission } from "@kyvejs/types/client/kyve/stakers/v1/tx";
+import { MsgUpdateStakeFraction } from "@kyvejs/types/client/kyve/stakers/v1/tx";
+import { MsgLeavePool } from "@kyvejs/types/client/kyve/stakers/v1/tx";
+import { MsgUpdateParams as MsgUpdateParamsStakers } from "@kyvejs/types/client/kyve/stakers/v1/tx";
 /** funders **/
 import { MsgCreateFunder } from "@kyvejs/types/lcd/kyve/funders/v1beta1/tx";
 import { MsgUpdateFunder } from "@kyvejs/types/lcd/kyve/funders/v1beta1/tx";
+import { MsgFundPool } from "@kyvejs/types/client/kyve/funders/v1beta1/tx";
+import { MsgDefundPool } from "@kyvejs/types/client/kyve/funders/v1beta1/tx";
+import {
+  MsgWithdrawDelegatorReward,
+  MsgWithdrawValidatorCommission,
+} from "cosmjs-types/cosmos/distribution/v1beta1/tx";
+import {
+  MsgBeginRedelegate,
+  MsgCancelUnbondingDelegation,
+  MsgCreateValidator,
+  MsgDelegate,
+  MsgEditValidator,
+  MsgUndelegate,
+} from "cosmjs-types/cosmos/staking/v1beta1/tx";
+/** multi_coin_rewards **/
+import { MsgSetMultiCoinRewardsDistributionPolicy } from "@kyvejs/types/client/kyve/multi_coin_rewards/v1beta1/tx";
+import { MsgToggleMultiCoinRewards } from "@kyvejs/types/client/kyve/multi_coin_rewards/v1beta1/tx";
+import { MsgUpdateParams as MsgUpdateParamsMultiCoinRewards } from "@kyvejs/types/client/kyve/multi_coin_rewards/v1beta1/tx";
 
-export const registry: ReadonlyArray<[string, GeneratedType]> = [
+// TODO: why does <[string, GeneratedType]> does not work anymore?
+export const registry: ReadonlyArray<[string, any]> = [
   ...defaultRegistryTypes,
   /**pool **/
   ["/kyve.pool.v1beta1.MsgCreatePool", MsgCreatePool],
@@ -54,25 +61,24 @@ export const registry: ReadonlyArray<[string, GeneratedType]> = [
   ["/kyve.funders.v1beta1.MsgFundPool", MsgFundPool],
   ["/kyve.funders.v1beta1.MsgDefundPool", MsgDefundPool],
   /** stakers **/
-  ["/kyve.stakers.v1beta1.MsgCreateStaker", MsgCreateStaker],
-  ["/kyve.stakers.v1beta1.MsgUpdateMetadata", MsgUpdateMetadata],
-  ["/kyve.stakers.v1beta1.MsgUpdateCommission", MsgUpdateCommission],
-  [
-    "/kyve.stakers.v1beta1.MsgClaimCommissionRewards",
-    MsgClaimCommissionRewards,
-  ],
-  ["/kyve.stakers.v1beta1.MsgJoinPool", MsgJoinPool],
-  ["/kyve.stakers.v1beta1.MsgLeavePool", MsgLeavePool],
-  /** delegations  **/
-  ["/kyve.delegation.v1beta1.MsgDelegate", MsgDelegate],
-  ["/kyve.delegation.v1beta1.MsgWithdrawRewards", MsgWithdrawRewards],
-  ["/kyve.delegation.v1beta1.MsgUndelegate", MsgUndelegate],
-  ["/kyve.delegation.v1beta1.MsgRedelegate", MsgRedelegate],
+  ["/kyve.stakers.v1.MsgUpdateCommission", MsgUpdateCommission],
+  ["/kyve.stakers.v1.MsgUpdateStakeFraction", MsgUpdateStakeFraction],
+  ["/kyve.stakers.v1.MsgJoinPool", MsgJoinPool],
+  ["/kyve.stakers.v1.MsgLeavePool", MsgLeavePool],
   /** bundles **/
   ["/kyve.bundles.v1beta1.MsgSubmitBundleProposal", MsgSubmitBundleProposal],
   ["/kyve.bundles.v1beta1.MsgVoteBundleProposal", MsgVoteBundleProposal],
   ["/kyve.bundles.v1beta1.MsgClaimUploaderRole", MsgClaimUploaderRole],
   ["/kyve.bundles.v1beta1.MsgSkipUploaderRole", MsgSkipUploaderRole],
+  /** multi_coin_rewards **/
+  [
+    "/kyve.multi_coin_rewards.v1beta1.MsgSetMultiCoinRewardsDistributionPolicy",
+    MsgSetMultiCoinRewardsDistributionPolicy,
+  ],
+  [
+    "/kyve.multi_coin_rewards.v1beta1.MsgToggleMultiCoinRewards",
+    MsgToggleMultiCoinRewards,
+  ],
   /** cosmos **/
   ["/cosmos.gov.v1.MsgSubmitProposal", MsgSubmitProposal],
   ["/cosmos.gov.v1.MsgVote", MsgVote],
@@ -153,72 +159,31 @@ export const encodeTxMsg = {
     };
   },
 
-  createStaker(value: MsgCreateStaker) {
-    return {
-      type_url: "/kyve.stakers.v1beta1.MsgCreateStaker",
-      value: MsgCreateStaker.encode(value).finish(),
-    };
-  },
-
-  updateMetadata(value: MsgUpdateMetadata) {
-    return {
-      type_url: "/kyve.stakers.v1beta1.MsgUpdateMetadata",
-      value: MsgUpdateMetadata.encode(value).finish(),
-    };
-  },
-
   updateCommission(value: MsgUpdateCommission) {
     return {
-      type_url: "/kyve.stakers.v1beta1.MsgUpdateCommission",
+      type_url: "/kyve.stakers.v1.MsgUpdateCommission",
       value: MsgUpdateCommission.encode(value).finish(),
     };
   },
 
-  claimCommissionRewards(value: MsgClaimCommissionRewards) {
+  updateStakeFraction(value: MsgUpdateStakeFraction) {
     return {
-      type_url: "/kyve.stakers.v1beta1.MsgClaimCommissionRewards",
-      value: MsgClaimCommissionRewards.encode(value).finish(),
+      type_url: "/kyve.stakers.v1.MsgUpdateStakeFraction",
+      value: MsgUpdateStakeFraction.encode(value).finish(),
     };
   },
 
   joinPool(value: MsgJoinPool) {
     return {
-      type_url: "/kyve.stakers.v1beta1.MsgJoinPool",
+      type_url: "/kyve.stakers.v1.MsgJoinPool",
       value: MsgJoinPool.encode(value).finish(),
     };
   },
 
   leavePool(value: MsgJoinPool) {
     return {
-      type_url: "/kyve.stakers.v1beta1.MsgLeavePool",
+      type_url: "/kyve.stakers.v1.MsgLeavePool",
       value: MsgLeavePool.encode(value).finish(),
-    };
-  },
-
-  delegate(value: MsgDelegate) {
-    return {
-      type_url: "/kyve.delegation.v1beta1.MsgDelegate",
-      value: MsgDelegate.encode(value).finish(),
-    };
-  },
-
-  withdrawRewards(value: MsgWithdrawRewards) {
-    return {
-      type_url: "/kyve.delegation.v1beta1.MsgWithdrawRewards",
-      value: MsgWithdrawRewards.encode(value).finish(),
-    };
-  },
-  undelegate(value: MsgUndelegate) {
-    return {
-      type_url: "/kyve.delegation.v1beta1.MsgUndelegate",
-      value: MsgUndelegate.encode(value).finish(),
-    };
-  },
-
-  redelegate(value: MsgRedelegate) {
-    return {
-      type_url: "/kyve.delegation.v1beta1.MsgRedelegate",
-      value: MsgRedelegate.encode(value).finish(),
     };
   },
 
@@ -245,15 +210,8 @@ export const encodeTxMsg = {
 
   updateParamsStakers(value: MsgUpdateParamsStakers) {
     return {
-      type_url: "/kyve.stakers.v1beta1.MsgUpdateParams",
+      type_url: "/kyve.stakers.v1.MsgUpdateParams",
       value: MsgUpdateParamsStakers.encode(value).finish(),
-    };
-  },
-
-  updateParamsDelegation(value: MsgUpdateParamsDelegation) {
-    return {
-      type_url: "/kyve.delegation.v1beta1.MsgUpdateParams",
-      value: MsgUpdateParamsDelegation.encode(value).finish(),
     };
   },
 
@@ -268,6 +226,87 @@ export const encodeTxMsg = {
     return {
       type_url: "/kyve.global.v1beta1.MsgUpdateParams",
       value: MsgUpdateParamsGlobal.encode(value).finish(),
+    };
+  },
+
+  updateParamsMultiCoinRewards(value: MsgUpdateParamsMultiCoinRewards) {
+    return {
+      type_url:
+        "/kyve.multi_coin_rewards.v1beta1.MsgUpdateParamsMultiCoinRewards",
+      value: MsgUpdateParamsMultiCoinRewards.encode(value).finish(),
+    };
+  },
+
+  delegate(value: MsgDelegate) {
+    return {
+      type_url: "/cosmos.staking.v1beta1.MsgDelegate",
+      value: MsgDelegate.encode(value).finish(),
+    };
+  },
+
+  undelegate(value: MsgUndelegate) {
+    return {
+      type_url: "/cosmos.staking.v1beta1.MsgUndelegate",
+      value: MsgUndelegate.encode(value).finish(),
+    };
+  },
+
+  cancelUnbonding(value: MsgCancelUnbondingDelegation) {
+    return {
+      type_url: "/cosmos.staking.v1beta1.MsgCancelUnbondingDelegation",
+      value: MsgCancelUnbondingDelegation.encode(value).finish(),
+    };
+  },
+
+  redelegate(value: MsgBeginRedelegate) {
+    return {
+      type_url: "/cosmos.staking.v1beta1.MsgBeginRedelegate",
+      value: MsgBeginRedelegate.encode(value).finish(),
+    };
+  },
+
+  createValidator(value: MsgCreateValidator) {
+    return {
+      type_url: "/cosmos.staking.v1beta1.MsgCreateValidator",
+      value: MsgCreateValidator.encode(value).finish(),
+    };
+  },
+
+  editValidator(value: MsgEditValidator) {
+    return {
+      type_url: "/cosmos.staking.v1beta1.MsgEditValidator",
+      value: MsgEditValidator.encode(value).finish(),
+    };
+  },
+
+  withdrawDelegatorReward(value: MsgWithdrawDelegatorReward) {
+    return {
+      type_url: "/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward",
+      value: MsgWithdrawDelegatorReward.encode(value).finish(),
+    };
+  },
+
+  withdrawValidatorCommission(value: MsgWithdrawValidatorCommission) {
+    return {
+      type_url: "/cosmos.distribution.v1beta1.MsgWithdrawValidatorCommission",
+      value: MsgWithdrawValidatorCommission.encode(value).finish(),
+    };
+  },
+
+  setMultiCoinRewardsDistributionPolicy(
+    value: MsgSetMultiCoinRewardsDistributionPolicy
+  ) {
+    return {
+      type_url:
+        "/kyve.multi_coin_rewards.v1beta1.MsgSetMultiCoinRewardsDistributionPolicy",
+      value: MsgSetMultiCoinRewardsDistributionPolicy.encode(value).finish(),
+    };
+  },
+
+  toggleMultiCoinRewards(value: MsgToggleMultiCoinRewards) {
+    return {
+      type_url: "/cosmos.multi_coin_rewards.v1beta1.MsgToggleMultiCoinRewards",
+      value: MsgToggleMultiCoinRewards.encode(value).finish(),
     };
   },
 };
@@ -343,112 +382,160 @@ export const withTypeUrl = {
     };
   },
 
-  createStaker(value: MsgCreateStaker) {
+  updateCommission(value: MsgUpdateCommission) {
     return {
-      typeUrl: "/kyve.stakers.v1beta1.MsgCreateStaker",
+      typeUrl: "/kyve.stakers.v1.MsgUpdateCommission",
       value,
     };
   },
 
-  updateMetadata(value: MsgUpdateMetadata) {
+  updateStakeFraction(value: MsgUpdateStakeFraction) {
     return {
-      typeUrl: "/kyve.stakers.v1beta1.MsgUpdateMetadata",
+      typeUrl: "/kyve.stakers.v1.MsgUpdateStakeFraction",
       value,
     };
   },
-  updateCommission(value: MsgUpdateCommission) {
-    return {
-      typeUrl: "/kyve.stakers.v1beta1.MsgUpdateCommission",
-      value,
-    };
-  },
-  claimCommissionRewards(value: MsgClaimCommissionRewards) {
-    return {
-      typeUrl: "/kyve.stakers.v1beta1.MsgClaimCommissionRewards",
-      value,
-    };
-  },
+
   joinPool(value: MsgJoinPool) {
     return {
-      typeUrl: "/kyve.stakers.v1beta1.MsgJoinPool",
+      typeUrl: "/kyve.stakers.v1.MsgJoinPool",
       value,
     };
   },
+
   leavePool(value: MsgLeavePool) {
     return {
-      typeUrl: "/kyve.stakers.v1beta1.MsgLeavePool",
+      typeUrl: "/kyve.stakers.v1.MsgLeavePool",
       value,
     };
   },
-  delegate(value: MsgDelegate) {
-    return {
-      typeUrl: "/kyve.delegation.v1beta1.MsgDelegate",
-      value,
-    };
-  },
-  withdrawRewards(value: MsgWithdrawRewards) {
-    return {
-      typeUrl: "/kyve.delegation.v1beta1.MsgWithdrawRewards",
-      value,
-    };
-  },
-  undelegate(value: MsgUndelegate) {
-    return {
-      typeUrl: "/kyve.delegation.v1beta1.MsgUndelegate",
-      value,
-    };
-  },
-  redelegate(value: MsgRedelegate) {
-    return {
-      typeUrl: "/kyve.delegation.v1beta1.MsgRedelegate",
-      value,
-    };
-  },
+
   submitBundleProposal(value: MsgSubmitBundleProposal) {
     return {
       typeUrl: "/kyve.bundles.v1beta1.MsgSubmitBundleProposal",
       value,
     };
   },
+
   voteBundleProposal(value: MsgVoteBundleProposal) {
     return {
       typeUrl: "/kyve.bundles.v1beta1.MsgVoteBundleProposal",
       value,
     };
   },
+
   skipUploaderRole(value: MsgSkipUploaderRole) {
     return {
       typeUrl: "/kyve.bundles.v1beta1.MsgSkipUploaderRole",
       value,
     };
   },
+
   claimUploaderRole(value: MsgClaimUploaderRole) {
     return {
       typeUrl: "/kyve.bundles.v1beta1.MsgClaimUploaderRole",
       value,
     };
   },
+
   updateParamsStakers(value: MsgUpdateParamsStakers) {
     return {
-      typeUrl: "/kyve.stakers.v1beta1.MsgUpdateParams",
+      typeUrl: "/kyve.stakers.v1.MsgUpdateParams",
       value,
     };
   },
-  updateParamsDelegation(value: MsgUpdateParamsDelegation) {
-    return {
-      typeUrl: "/kyve.delegation.v1beta1.MsgUpdateParams",
-      value,
-    };
-  },
+
   updateParamsBundles(value: MsgUpdateParamsBundles) {
     return {
       typeUrl: "/kyve.bundles.v1beta1.MsgUpdateParams",
       value,
     };
   },
+
   updateParamsGlobal(value: MsgUpdateParamsGlobal) {
     return {
       typeUrl: "/kyve.global.v1beta1.MsgUpdateParams",
+      value,
+    };
+  },
+
+  updateParamsMultiCoinRewards(value: MsgUpdateParamsMultiCoinRewards) {
+    return {
+      typeUrl:
+        "/kyve.multi_coin_rewards.v1beta1.MsgUpdateParamsMultiCoinRewards",
+      value,
+    };
+  },
+
+  delegate(value: MsgDelegate) {
+    return {
+      typeUrl: "/cosmos.staking.v1beta1.MsgDelegate",
+      value,
+    };
+  },
+
+  undelegate(value: MsgUndelegate) {
+    return {
+      typeUrl: "/cosmos.staking.v1beta1.MsgUndelegate",
+      value,
+    };
+  },
+
+  cancelUnbonding(value: MsgCancelUnbondingDelegation) {
+    return {
+      typeUrl: "/cosmos.staking.v1beta1.MsgCancelUnbondingDelegation",
+      value,
+    };
+  },
+
+  redelegate(value: MsgBeginRedelegate) {
+    return {
+      typeUrl: "/cosmos.staking.v1beta1.MsgBeginRedelegate",
+      value,
+    };
+  },
+
+  createValidator(value: MsgCreateValidator) {
+    return {
+      typeUrl: "/cosmos.staking.v1beta1.MsgCreateValidator",
+      value,
+    };
+  },
+
+  editValidator(value: MsgEditValidator) {
+    return {
+      typeUrl: "/cosmos.staking.v1beta1.MsgEditValidator",
+      value,
+    };
+  },
+
+  withdrawDelegatorReward(value: MsgWithdrawDelegatorReward) {
+    return {
+      typeUrl: "/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward",
+      value,
+    };
+  },
+
+  withdrawValidatorCommission(value: MsgWithdrawValidatorCommission) {
+    return {
+      typeUrl: "/cosmos.distribution.v1beta1.MsgWithdrawValidatorCommission",
+      value,
+    };
+  },
+
+  setMultiCoinRewardsDistributionPolicy(
+    value: MsgSetMultiCoinRewardsDistributionPolicy
+  ) {
+    return {
+      typeUrl:
+        "/kyve.multi_coin_rewards.v1beta1.MsgSetMultiCoinRewardsDistributionPolicy",
+      value,
+    };
+  },
+
+  toggleMultiCoinRewards(value: MsgToggleMultiCoinRewards) {
+    return {
+      typeUrl: "/cosmos.multi_coin_rewards.v1beta1.MsgToggleMultiCoinRewards",
       value,
     };
   },
