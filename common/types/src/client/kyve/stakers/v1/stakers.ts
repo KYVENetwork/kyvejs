@@ -2,25 +2,25 @@
 // versions:
 //   protoc-gen-ts_proto  v2.6.1
 //   protoc               unknown
-// source: kyve/stakers/v1beta1/stakers.proto
+// source: kyve/stakers/v1/stakers.proto
 
 /* eslint-disable */
 import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
 import { Coin } from "../../../cosmos/base/v1beta1/coin";
 
-export const protobufPackage = "kyve.stakers.v1beta1";
+export const protobufPackage = "kyve.stakers.v1";
 
 /** SlashType ... */
 export enum SlashType {
   /** SLASH_TYPE_UNSPECIFIED - SLASH_TYPE_UNSPECIFIED ... */
-  SLASH_TYPE_UNSPECIFIED = "SLASH_TYPE_UNSPECIFIED",
+  SLASH_TYPE_UNSPECIFIED = 0,
   /** SLASH_TYPE_TIMEOUT - SLASH_TYPE_TIMEOUT ... */
-  SLASH_TYPE_TIMEOUT = "SLASH_TYPE_TIMEOUT",
+  SLASH_TYPE_TIMEOUT = 1,
   /** SLASH_TYPE_VOTE - SLASH_TYPE_VOTE ... */
-  SLASH_TYPE_VOTE = "SLASH_TYPE_VOTE",
+  SLASH_TYPE_VOTE = 2,
   /** SLASH_TYPE_UPLOAD - SLASH_TYPE_UPLOAD ... */
-  SLASH_TYPE_UPLOAD = "SLASH_TYPE_UPLOAD",
-  UNRECOGNIZED = "UNRECOGNIZED",
+  SLASH_TYPE_UPLOAD = 3,
+  UNRECOGNIZED = -1,
 }
 
 export function slashTypeFromJSON(object: any): SlashType {
@@ -57,22 +57,6 @@ export function slashTypeToJSON(object: SlashType): string {
     case SlashType.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";
-  }
-}
-
-export function slashTypeToNumber(object: SlashType): number {
-  switch (object) {
-    case SlashType.SLASH_TYPE_UNSPECIFIED:
-      return 0;
-    case SlashType.SLASH_TYPE_TIMEOUT:
-      return 1;
-    case SlashType.SLASH_TYPE_VOTE:
-      return 2;
-    case SlashType.SLASH_TYPE_UPLOAD:
-      return 3;
-    case SlashType.UNRECOGNIZED:
-    default:
-      return -1;
   }
 }
 

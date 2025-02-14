@@ -2,12 +2,12 @@
 // versions:
 //   protoc-gen-ts_proto  v2.6.1
 //   protoc               unknown
-// source: kyve/stakers/v1beta1/params.proto
+// source: kyve/stakers/v1/params.proto
 
 /* eslint-disable */
 import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
 
-export const protobufPackage = "kyve.stakers.v1beta1";
+export const protobufPackage = "kyve.stakers.v1";
 
 /** Params defines the stakers module parameters. */
 export interface Params {

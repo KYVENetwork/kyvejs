@@ -5,7 +5,7 @@ import {
   MsgLeavePool,
   MsgUpdateCommission,
   MsgUpdateStakeFraction,
-} from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
+} from "@kyvejs/types/client/kyve/stakers/v1/tx";
 
 import { isNotEmpty } from "../utils";
 
@@ -22,8 +22,8 @@ function jsonDecimalToProto(decimal: string): string {
 
 export const createStakersAminoConverters = (): AminoConverters => {
   return {
-    "/kyve.stakers.v1beta1.MsgUpdateCommission": {
-      aminoType: "/kyve.stakers.v1beta1.MsgUpdateCommission",
+    "/kyve.stakers.v1.MsgUpdateCommission": {
+      aminoType: "/kyve.stakers.v1.MsgUpdateCommission",
       toAmino: (msg: MsgUpdateCommission) => ({
         creator: msg.creator,
         pool_id: msg.pool_id,
@@ -35,8 +35,8 @@ export const createStakersAminoConverters = (): AminoConverters => {
         commission: jsonDecimalToProto(msg.commission),
       }),
     },
-    "/kyve.stakers.v1beta1.MsgUpdateStakeFraction": {
-      aminoType: "/kyve.stakers.v1beta1.MsgUpdateStakeFraction",
+    "/kyve.stakers.v1.MsgUpdateStakeFraction": {
+      aminoType: "/kyve.stakers.v1.MsgUpdateStakeFraction",
       toAmino: (msg: MsgUpdateStakeFraction) => ({
         creator: msg.creator,
         pool_id: msg.pool_id,
@@ -48,8 +48,8 @@ export const createStakersAminoConverters = (): AminoConverters => {
         stake_fraction: jsonDecimalToProto(msg.stake_fraction),
       }),
     },
-    "/kyve.stakers.v1beta1.MsgJoinPool": {
-      aminoType: "/kyve.stakers.v1beta1.MsgJoinPool",
+    "/kyve.stakers.v1.MsgJoinPool": {
+      aminoType: "/kyve.stakers.v1.MsgJoinPool",
       toAmino: (msg: MsgJoinPool) => ({
         creator: msg.creator,
         ...(isNotEmpty(msg.pool_id) && { pool_id: msg.pool_id }),
@@ -67,8 +67,8 @@ export const createStakersAminoConverters = (): AminoConverters => {
         stake_fraction: jsonDecimalToProto(msg.stake_fraction),
       }),
     },
-    "/kyve.stakers.v1beta1.MsgLeavePool": {
-      aminoType: "/kyve.stakers.v1beta1.MsgLeavePool",
+    "/kyve.stakers.v1.MsgLeavePool": {
+      aminoType: "/kyve.stakers.v1.MsgLeavePool",
       toAmino: (msg: MsgLeavePool) => ({
         creator: msg.creator,
         ...(isNotEmpty(msg.pool_id) && { pool_id: msg.pool_id }),

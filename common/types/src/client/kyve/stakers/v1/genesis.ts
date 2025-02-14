@@ -2,7 +2,7 @@
 // versions:
 //   protoc-gen-ts_proto  v2.6.1
 //   protoc               unknown
-// source: kyve/stakers/v1beta1/genesis.proto
+// source: kyve/stakers/v1/genesis.proto
 
 /* eslint-disable */
 import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
@@ -16,7 +16,7 @@ import {
   Staker,
 } from "./stakers";
 
-export const protobufPackage = "kyve.stakers.v1beta1";
+export const protobufPackage = "kyve.stakers.v1";
 
 /** GenesisState defines the stakers module's genesis state. */
 export interface GenesisState {

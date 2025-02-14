@@ -2,14 +2,14 @@
 // versions:
 //   protoc-gen-ts_proto  v2.6.1
 //   protoc               unknown
-// source: kyve/stakers/v1beta1/events.proto
+// source: kyve/stakers/v1/events.proto
 
 /* eslint-disable */
 import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
 import { Params } from "./params";
-import { SlashType, slashTypeFromJSON, slashTypeToJSON } from "./stakers";
+import { SlashType, slashTypeFromJSON, slashTypeToJSON, slashTypeToNumber } from "./stakers";
 
-export const protobufPackage = "kyve.stakers.v1beta1";
+export const protobufPackage = "kyve.stakers.v1";
 
 /**
  * EventUpdateParams is an event emitted when the module parameters are updated.
@@ -691,7 +691,7 @@ export const EventLeavePool: MessageFns<EventLeavePool> = {
 };
 
 function createBaseEventSlash(): EventSlash {
-  return { pool_id: "0", staker: "", amount: "0", slash_type: 0, stake_fraction: "" };
+  return { pool_id: "0", staker: "", amount: "0", slash_type: SlashType.SLASH_TYPE_UNSPECIFIED, stake_fraction: "" };
 }
 
 export const EventSlash: MessageFns<EventSlash> = {
@@ -705,8 +705,8 @@ export const EventSlash: MessageFns<EventSlash> = {
     if (message.amount !== "0") {
       writer.uint32(24).uint64(message.amount);
     }
-    if (message.slash_type !== 0) {
-      writer.uint32(32).int32(message.slash_type);
+    if (message.slash_type !== SlashType.SLASH_TYPE_UNSPECIFIED) {
+      writer.uint32(32).int32(slashTypeToNumber(message.slash_type));
     }
     if (message.stake_fraction !== "") {
       writer.uint32(42).string(message.stake_fraction);
@@ -750,7 +750,7 @@ export const EventSlash: MessageFns<EventSlash> = {
             break;
           }
 
-          message.slash_type = reader.int32() as any;
+          message.slash_type = slashTypeFromJSON(reader.int32());
           continue;
         }
         case 5: {
@@ -775,7 +775,7 @@ export const EventSlash: MessageFns<EventSlash> = {
       pool_id: isSet(object.pool_id) ? globalThis.String(object.pool_id) : "0",
       staker: isSet(object.staker) ? globalThis.String(object.staker) : "",
       amount: isSet(object.amount) ? globalThis.String(object.amount) : "0",
-      slash_type: isSet(object.slash_type) ? slashTypeFromJSON(object.slash_type) : 0,
+      slash_type: isSet(object.slash_type) ? slashTypeFromJSON(object.slash_type) : SlashType.SLASH_TYPE_UNSPECIFIED,
       stake_fraction: isSet(object.stake_fraction) ? globalThis.String(object.stake_fraction) : "",
     };
   },
@@ -791,7 +791,7 @@ export const EventSlash: MessageFns<EventSlash> = {
     if (message.amount !== "0") {
       obj.amount = message.amount;
     }
-    if (message.slash_type !== 0) {
+    if (message.slash_type !== SlashType.SLASH_TYPE_UNSPECIFIED) {
       obj.slash_type = slashTypeToJSON(message.slash_type);
     }
     if (message.stake_fraction !== "") {
@@ -808,7 +808,7 @@ export const EventSlash: MessageFns<EventSlash> = {
     message.pool_id = object.pool_id ?? "0";
     message.staker = object.staker ?? "";
     message.amount = object.amount ?? "0";
-    message.slash_type = object.slash_type ?? 0;
+    message.slash_type = object.slash_type ?? SlashType.SLASH_TYPE_UNSPECIFIED;
     message.stake_fraction = object.stake_fraction ?? "";
     return message;
   },

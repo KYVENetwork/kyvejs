@@ -2,28 +2,28 @@
 // versions:
 //   protoc-gen-ts_proto  v2.6.1
 //   protoc               unknown
-// source: kyve/query/v1beta1/stakers.proto
+// source: kyve/query/v1/stakers.proto
 
 /* eslint-disable */
 import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
 import { PageRequest, PageResponse } from "../../../cosmos/base/query/v1beta1/pagination";
-import { FullStaker } from "./query";
+import { FullStaker } from "../v1beta1/query";
 
-export const protobufPackage = "kyve.query.v1beta1";
+export const protobufPackage = "kyve.query.v1";
 
 /** StakerStatus ... */
 export enum StakerStatus {
   /** STAKER_STATUS_UNSPECIFIED - STAKER_STATUS_UNSPECIFIED ... */
-  STAKER_STATUS_UNSPECIFIED = "STAKER_STATUS_UNSPECIFIED",
+  STAKER_STATUS_UNSPECIFIED = 0,
   /** STAKER_STATUS_PROTOCOL_ACTIVE - STAKER_STATUS_PROTOCOL_ACTIVE ... */
-  STAKER_STATUS_PROTOCOL_ACTIVE = "STAKER_STATUS_PROTOCOL_ACTIVE",
+  STAKER_STATUS_PROTOCOL_ACTIVE = 1,
   /** STAKER_STATUS_PROTOCOL_INACTIVE - STAKER_STATUS_PROTOCOL_INACTIVE ... */
-  STAKER_STATUS_PROTOCOL_INACTIVE = "STAKER_STATUS_PROTOCOL_INACTIVE",
+  STAKER_STATUS_PROTOCOL_INACTIVE = 2,
   /** STAKER_STATUS_CHAIN_ACTIVE - STAKER_STATUS_CHAIN_ACTIVE ... */
-  STAKER_STATUS_CHAIN_ACTIVE = "STAKER_STATUS_CHAIN_ACTIVE",
+  STAKER_STATUS_CHAIN_ACTIVE = 3,
   /** STAKER_STATUS_CHAIN_INACTIVE - STAKER_STATUS_CHAIN_INACTIVE ... */
-  STAKER_STATUS_CHAIN_INACTIVE = "STAKER_STATUS_CHAIN_INACTIVE",
-  UNRECOGNIZED = "UNRECOGNIZED",
+  STAKER_STATUS_CHAIN_INACTIVE = 4,
+  UNRECOGNIZED = -1,
 }
 
 export function stakerStatusFromJSON(object: any): StakerStatus {
@@ -65,24 +65,6 @@ export function stakerStatusToJSON(object: StakerStatus): string {
     case StakerStatus.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";
-  }
-}
-
-export function stakerStatusToNumber(object: StakerStatus): number {
-  switch (object) {
-    case StakerStatus.STAKER_STATUS_UNSPECIFIED:
-      return 0;
-    case StakerStatus.STAKER_STATUS_PROTOCOL_ACTIVE:
-      return 1;
-    case StakerStatus.STAKER_STATUS_PROTOCOL_INACTIVE:
-      return 2;
-    case StakerStatus.STAKER_STATUS_CHAIN_ACTIVE:
-      return 3;
-    case StakerStatus.STAKER_STATUS_CHAIN_INACTIVE:
-      return 4;
-    case StakerStatus.UNRECOGNIZED:
-    default:
-      return -1;
   }
 }
 
@@ -145,7 +127,7 @@ export interface QueryStakersByPoolCountResponse {
 }
 
 function createBaseQueryStakersRequest(): QueryStakersRequest {
-  return { pagination: undefined, status: StakerStatus.STAKER_STATUS_UNSPECIFIED, search: "" };
+  return { pagination: undefined, status: 0, search: "" };
 }
 
 export const QueryStakersRequest: MessageFns<QueryStakersRequest> = {
@@ -153,8 +135,8 @@ export const QueryStakersRequest: MessageFns<QueryStakersRequest> = {
     if (message.pagination !== undefined) {
       PageRequest.encode(message.pagination, writer.uint32(10).fork()).join();
     }
-    if (message.status !== StakerStatus.STAKER_STATUS_UNSPECIFIED) {
-      writer.uint32(16).int32(stakerStatusToNumber(message.status));
+    if (message.status !== 0) {
+      writer.uint32(16).int32(message.status);
     }
     if (message.search !== "") {
       writer.uint32(26).string(message.search);
@@ -182,7 +164,7 @@ export const QueryStakersRequest: MessageFns<QueryStakersRequest> = {
             break;
           }
 
-          message.status = stakerStatusFromJSON(reader.int32());
+          message.status = reader.int32() as any;
           continue;
         }
         case 3: {
@@ -205,7 +187,7 @@ export const QueryStakersRequest: MessageFns<QueryStakersRequest> = {
   fromJSON(object: any): QueryStakersRequest {
     return {
       pagination: isSet(object.pagination) ? PageRequest.fromJSON(object.pagination) : undefined,
-      status: isSet(object.status) ? stakerStatusFromJSON(object.status) : StakerStatus.STAKER_STATUS_UNSPECIFIED,
+      status: isSet(object.status) ? stakerStatusFromJSON(object.status) : 0,
       search: isSet(object.search) ? globalThis.String(object.search) : "",
     };
   },
@@ -215,7 +197,7 @@ export const QueryStakersRequest: MessageFns<QueryStakersRequest> = {
     if (message.pagination !== undefined) {
       obj.pagination = PageRequest.toJSON(message.pagination);
     }
-    if (message.status !== StakerStatus.STAKER_STATUS_UNSPECIFIED) {
+    if (message.status !== 0) {
       obj.status = stakerStatusToJSON(message.status);
     }
     if (message.search !== "") {
@@ -232,7 +214,7 @@ export const QueryStakersRequest: MessageFns<QueryStakersRequest> = {
     message.pagination = (object.pagination !== undefined && object.pagination !== null)
       ? PageRequest.fromPartial(object.pagination)
       : undefined;
-    message.status = object.status ?? StakerStatus.STAKER_STATUS_UNSPECIFIED;
+    message.status = object.status ?? 0;
     message.search = object.search ?? "";
     return message;
   },
@@ -709,7 +691,7 @@ export interface QueryStakers {
   StakersByPoolCount(request: QueryStakersByPoolCountRequest): Promise<QueryStakersByPoolCountResponse>;
 }
 
-export const QueryStakersServiceName = "kyve.query.v1beta1.QueryStakers";
+export const QueryStakersServiceName = "kyve.query.v1.QueryStakers";
 export class QueryStakersClientImpl implements QueryStakers {
   private readonly rpc: Rpc;
   private readonly service: string;

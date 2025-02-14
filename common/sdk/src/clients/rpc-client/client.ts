@@ -8,7 +8,7 @@ import KyveBaseMethods from "./kyve/base/v1beta1/base";
 import KyveBundlesMethods from "./kyve/bundles/v1beta1/bundles";
 import KyveFundersMethods from "./kyve/funders/v1beta1/funders";
 import KyveGovMethodsV1 from "./kyve/gov/v1/gov";
-import KyveStakersMethods from "./kyve/stakers/v1beta1/stakers";
+import KyveStakersMethods from "./kyve/stakers/v1/stakers";
 import KyveMultiCoinRewardsMethods from "./kyve/multi_coin_rewards/v1beta1/multi_coin_rewards";
 import KyveBankMethods from "./cosmos/bank/v1beta1/bank";
 import KyveStakingMethods from "./cosmos/staking/v1beta1/staking";

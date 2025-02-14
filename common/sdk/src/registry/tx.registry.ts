@@ -18,11 +18,11 @@ import { MsgEnablePool } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
 import { MsgScheduleRuntimeUpgrade } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
 import { MsgCancelRuntimeUpgrade } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
 /** stakers **/
-import { MsgJoinPool } from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
-import { MsgUpdateCommission } from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
-import { MsgUpdateStakeFraction } from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
-import { MsgLeavePool } from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
-import { MsgUpdateParams as MsgUpdateParamsStakers } from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
+import { MsgJoinPool } from "@kyvejs/types/client/kyve/stakers/v1/tx";
+import { MsgUpdateCommission } from "@kyvejs/types/client/kyve/stakers/v1/tx";
+import { MsgUpdateStakeFraction } from "@kyvejs/types/client/kyve/stakers/v1/tx";
+import { MsgLeavePool } from "@kyvejs/types/client/kyve/stakers/v1/tx";
+import { MsgUpdateParams as MsgUpdateParamsStakers } from "@kyvejs/types/client/kyve/stakers/v1/tx";
 /** funders **/
 import { MsgCreateFunder } from "@kyvejs/types/lcd/kyve/funders/v1beta1/tx";
 import { MsgUpdateFunder } from "@kyvejs/types/lcd/kyve/funders/v1beta1/tx";
@@ -61,10 +61,10 @@ export const registry: ReadonlyArray<[string, any]> = [
   ["/kyve.funders.v1beta1.MsgFundPool", MsgFundPool],
   ["/kyve.funders.v1beta1.MsgDefundPool", MsgDefundPool],
   /** stakers **/
-  ["/kyve.stakers.v1beta1.MsgUpdateCommission", MsgUpdateCommission],
-  ["/kyve.stakers.v1beta1.MsgUpdateStakeFraction", MsgUpdateStakeFraction],
-  ["/kyve.stakers.v1beta1.MsgJoinPool", MsgJoinPool],
-  ["/kyve.stakers.v1beta1.MsgLeavePool", MsgLeavePool],
+  ["/kyve.stakers.v1.MsgUpdateCommission", MsgUpdateCommission],
+  ["/kyve.stakers.v1.MsgUpdateStakeFraction", MsgUpdateStakeFraction],
+  ["/kyve.stakers.v1.MsgJoinPool", MsgJoinPool],
+  ["/kyve.stakers.v1.MsgLeavePool", MsgLeavePool],
   /** bundles **/
   ["/kyve.bundles.v1beta1.MsgSubmitBundleProposal", MsgSubmitBundleProposal],
   ["/kyve.bundles.v1beta1.MsgVoteBundleProposal", MsgVoteBundleProposal],
@@ -161,28 +161,28 @@ export const encodeTxMsg = {
 
   updateCommission(value: MsgUpdateCommission) {
     return {
-      type_url: "/kyve.stakers.v1beta1.MsgUpdateCommission",
+      type_url: "/kyve.stakers.v1.MsgUpdateCommission",
       value: MsgUpdateCommission.encode(value).finish(),
     };
   },
 
   updateStakeFraction(value: MsgUpdateStakeFraction) {
     return {
-      type_url: "/kyve.stakers.v1beta1.MsgUpdateStakeFraction",
+      type_url: "/kyve.stakers.v1.MsgUpdateStakeFraction",
       value: MsgUpdateStakeFraction.encode(value).finish(),
     };
   },
 
   joinPool(value: MsgJoinPool) {
     return {
-      type_url: "/kyve.stakers.v1beta1.MsgJoinPool",
+      type_url: "/kyve.stakers.v1.MsgJoinPool",
       value: MsgJoinPool.encode(value).finish(),
     };
   },
 
   leavePool(value: MsgJoinPool) {
     return {
-      type_url: "/kyve.stakers.v1beta1.MsgLeavePool",
+      type_url: "/kyve.stakers.v1.MsgLeavePool",
       value: MsgLeavePool.encode(value).finish(),
     };
   },
@@ -210,7 +210,7 @@ export const encodeTxMsg = {
 
   updateParamsStakers(value: MsgUpdateParamsStakers) {
     return {
-      type_url: "/kyve.stakers.v1beta1.MsgUpdateParams",
+      type_url: "/kyve.stakers.v1.MsgUpdateParams",
       value: MsgUpdateParamsStakers.encode(value).finish(),
     };
   },
@@ -384,28 +384,28 @@ export const withTypeUrl = {
 
   updateCommission(value: MsgUpdateCommission) {
     return {
-      typeUrl: "/kyve.stakers.v1beta1.MsgUpdateCommission",
+      typeUrl: "/kyve.stakers.v1.MsgUpdateCommission",
       value,
     };
   },
 
   updateStakeFraction(value: MsgUpdateStakeFraction) {
     return {
-      typeUrl: "/kyve.stakers.v1beta1.MsgUpdateStakeFraction",
+      typeUrl: "/kyve.stakers.v1.MsgUpdateStakeFraction",
       value,
     };
   },
 
   joinPool(value: MsgJoinPool) {
     return {
-      typeUrl: "/kyve.stakers.v1beta1.MsgJoinPool",
+      typeUrl: "/kyve.stakers.v1.MsgJoinPool",
       value,
     };
   },
 
   leavePool(value: MsgLeavePool) {
     return {
-      typeUrl: "/kyve.stakers.v1beta1.MsgLeavePool",
+      typeUrl: "/kyve.stakers.v1.MsgLeavePool",
       value,
     };
   },
@@ -440,7 +440,7 @@ export const withTypeUrl = {
 
   updateParamsStakers(value: MsgUpdateParamsStakers) {
     return {
-      typeUrl: "/kyve.stakers.v1beta1.MsgUpdateParams",
+      typeUrl: "/kyve.stakers.v1.MsgUpdateParams",
       value,
     };
   },

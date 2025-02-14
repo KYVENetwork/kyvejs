@@ -2,13 +2,13 @@
 // versions:
 //   protoc-gen-ts_proto  v2.6.1
 //   protoc               unknown
-// source: kyve/stakers/v1beta1/query.proto
+// source: kyve/stakers/v1/query.proto
 
 /* eslint-disable */
 import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
 import { Params } from "./params";
 
-export const protobufPackage = "kyve.stakers.v1beta1";
+export const protobufPackage = "kyve.stakers.v1";
 
 /** QueryParamsRequest is request type for the Query/Params RPC method. */
 export interface QueryParamsRequest {
@@ -129,7 +129,7 @@ export interface Query {
   Params(request: QueryParamsRequest): Promise<QueryParamsResponse>;
 }
 
-export const QueryServiceName = "kyve.stakers.v1beta1.Query";
+export const QueryServiceName = "kyve.stakers.v1.Query";
 export class QueryClientImpl implements Query {
   private readonly rpc: Rpc;
   private readonly service: string;

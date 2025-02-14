@@ -1,8 +1,8 @@
 import { StdFee } from "@cosmjs/amino/build/signdoc";
-import { MsgUpdateCommission } from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
-import { MsgUpdateStakeFraction } from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
-import { MsgJoinPool } from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
-import { MsgLeavePool } from "@kyvejs/types/client/kyve/stakers/v1beta1/tx";
+import { MsgUpdateCommission } from "@kyvejs/types/client/kyve/stakers/v1/tx";
+import { MsgUpdateStakeFraction } from "@kyvejs/types/client/kyve/stakers/v1/tx";
+import { MsgJoinPool } from "@kyvejs/types/client/kyve/stakers/v1/tx";
+import { MsgLeavePool } from "@kyvejs/types/client/kyve/stakers/v1/tx";
 
 import { withTypeUrl } from "../../../../../registry/tx.registry";
 import { KyveSigning, PendingTx } from "../../../signing";

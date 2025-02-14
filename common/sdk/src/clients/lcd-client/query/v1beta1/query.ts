@@ -4,12 +4,10 @@ import kyveQueryBundles from "@kyvejs/types/client/kyve/query/v1beta1/bundles";
 import kyveQueryFunders from "@kyvejs/types/client/kyve/query/v1beta1/funders";
 import kyveQueryParamsRes from "@kyvejs/types/client/kyve/query/v1beta1/params";
 import kyveQueryPools from "@kyvejs/types/client/kyve/query/v1beta1/pools";
-import kyveQueryStakers from "@kyvejs/types/client/kyve/query/v1beta1/stakers";
 import kyveQueryAccountRes from "@kyvejs/types/lcd/kyve/query/v1beta1/account";
 import kyveQueryBundlesRes from "@kyvejs/types/lcd/kyve/query/v1beta1/bundles";
 import kyveQueryFundersRes from "@kyvejs/types/lcd/kyve/query/v1beta1/funders";
 import kyveQueryPoolsRes from "@kyvejs/types/lcd/kyve/query/v1beta1/pools";
-import kyveQueryStakersRes from "@kyvejs/types/lcd/kyve/query/v1beta1/stakers";
 
 import { AbstractKyveLCDClient } from "../../lcd-client.abstract";
 
@@ -95,35 +93,6 @@ export class QueryModuleLCDClient extends AbstractKyveLCDClient {
     return await this.request(endpoint, parameters);
   }
   /** end Pools **/
-  /** Stakers **/
-  async stakers(
-    params: PaginationPartialRequestUtilType<kyveQueryStakers.QueryStakersRequest>
-  ): Promise<
-    PaginationResponseTypeUtil<kyveQueryStakersRes.QueryStakersResponse>
-  > {
-    const parameters: Record<string, any> = {};
-
-    if (typeof params?.pagination !== "undefined") {
-      parameters.pagination = params.pagination;
-    }
-    const endpoint = `/kyve/query/v1beta1/stakers`;
-    return await this.request(endpoint, params);
-  }
-
-  async staker(
-    params: kyveQueryStakers.QueryStakerRequest
-  ): Promise<kyveQueryStakersRes.QueryStakerResponse> {
-    const endpoint = `/kyve/query/v1beta1/staker/${params.address}`;
-    return await this.request(endpoint);
-  }
-
-  async stakersByPool(
-    params: kyveQueryStakers.QueryStakersByPoolRequest
-  ): Promise<kyveQueryStakersRes.QueryStakersByPoolResponse> {
-    const endpoint = `/kyve/query/v1beta1/stakers_by_pool/${params.pool_id}`;
-    return await this.request(endpoint);
-  }
-  /** end stakers **/
   /** Bundles **/
   async currentVoteStatus(
     params: kyveQueryBundles.QueryCurrentVoteStatusRequest

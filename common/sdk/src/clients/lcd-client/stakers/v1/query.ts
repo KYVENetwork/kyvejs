@@ -1,4 +1,4 @@
-import paramsRes from "@kyvejs/types/lcd/kyve/stakers/v1beta1/params";
+import paramsRes from "@kyvejs/types/lcd/kyve/stakers/v1/params";
 
 import { AbstractKyveLCDClient } from "../../lcd-client.abstract";
 
@@ -8,7 +8,7 @@ export class StakersModuleLCDClient extends AbstractKyveLCDClient {
   }
 
   async params(): Promise<paramsRes.Params> {
-    const endpoint = `/kyve/stakers/v1beta1/params`;
+    const endpoint = `/kyve/stakers/v1/params`;
     return await this.request(endpoint);
   }
 }

@@ -2,18 +2,18 @@
 // versions:
 //   protoc-gen-ts_proto  v2.6.1
 //   protoc               unknown
-// source: kyve/stakers/v1beta1/tx.proto
+// source: kyve/delegation/v1beta1/tx.proto
 
 /* eslint-disable */
 import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
 
-export const protobufPackage = "kyve.stakers.v1beta1";
+export const protobufPackage = "kyve.delegation.v1beta1";
 
 /** MsgUpdateParams defines a SDK message for updating the module parameters. */
 export interface MsgUpdateParams {
   /** authority is the address of the governance account. */
   authority: string;
-  /** payload defines the x/stakers parameters to update. */
+  /** payload defines the x/delegation parameters to update. */
   payload: string;
 }
 
@@ -143,13 +143,13 @@ export const MsgUpdateParamsResponse: MessageFns<MsgUpdateParamsResponse> = {
 /** Msg defines the Msg service. */
 export interface Msg {
   /**
-   * UpdateParams defines a governance operation for updating the x/stakers module
+   * UpdateParams defines a governance operation for updating the x/delegation module
    * parameters. The authority is hard-coded to the x/gov module account.
    */
   UpdateParams(request: MsgUpdateParams): Promise<MsgUpdateParamsResponse>;
 }
 
-export const MsgServiceName = "kyve.stakers.v1beta1.Msg";
+export const MsgServiceName = "kyve.delegation.v1beta1.Msg";
 export class MsgClientImpl implements Msg {
   private readonly rpc: Rpc;
   private readonly service: string;

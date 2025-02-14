@@ -11,7 +11,7 @@ import { Params } from "../../bundles/v1beta1/params";
 import { Params as Params5 } from "../../funders/v1beta1/params";
 import { Params as Params1 } from "../../global/v1beta1/global";
 import { Params as Params4 } from "../../pool/v1beta1/params";
-import { Params as Params3 } from "../../stakers/v1beta1/params";
+import { Params as Params3 } from "../../stakers/v1/params";
 
 export const protobufPackage = "kyve.query.v1beta1";
 
