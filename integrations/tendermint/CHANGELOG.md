@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.3.0](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint@1.2.10...@kyvejs/tendermint@1.3.0) (2025-02-14)
+
+### Features
+
+- shared staking ([#165](https://github.com/KYVENetwork/kyvejs/issues/165)) ([5fee7f9](https://github.com/KYVENetwork/kyvejs/commit/5fee7f9db9c0aa47b0486ca880643333a7bdcc1a))
+
 ## [1.2.10](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint@1.2.9...@kyvejs/tendermint@1.2.10) (2025-02-13)
 
 **Note:** Version bump only for package @kyvejs/tendermint

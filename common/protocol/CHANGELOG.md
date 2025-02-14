@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.4.0](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/protocol@1.3.2...@kyvejs/protocol@1.4.0) (2025-02-14)
+
+### Features
+
+- shared staking ([#165](https://github.com/KYVENetwork/kyvejs/issues/165)) ([5fee7f9](https://github.com/KYVENetwork/kyvejs/commit/5fee7f9db9c0aa47b0486ca880643333a7bdcc1a))
+
 ## [1.3.2](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/protocol@1.3.1...@kyvejs/protocol@1.3.2) (2025-02-13)
 
 ### Bug Fixes

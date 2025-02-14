@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.4.0](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/sdk@1.3.4...@kyvejs/sdk@1.4.0) (2025-02-14)
+
+### Features
+
+- shared staking ([#165](https://github.com/KYVENetwork/kyvejs/issues/165)) ([5fee7f9](https://github.com/KYVENetwork/kyvejs/commit/5fee7f9db9c0aa47b0486ca880643333a7bdcc1a))
+
 ## [1.3.4](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/sdk@1.3.3...@kyvejs/sdk@1.3.4) (2025-01-15)
 
 **Note:** Version bump only for package @kyvejs/sdk
