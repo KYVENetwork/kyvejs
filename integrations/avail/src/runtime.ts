@@ -2,10 +2,6 @@ import { DataItem, IRuntime, Validator, VOTE } from "@kyvejs/protocol";
 import { name, version } from "../package.json";
 import { createHashesFromBundle, generateMerkleRoot } from "../utils/merkle";
 import { fetchJsonRpc } from "../utils/utils";
-import Ajv from 'ajv';
-import block_schema from './schemas/block.json';
-
-const ajv = new Ajv();
 
 // Avail config
 interface IConfig {
@@ -34,7 +30,7 @@ export default class Avail implements IRuntime {
   async getDataItem(_: Validator, key: string): Promise<any> {
     const finalizedBlockHash = await fetchJsonRpc(this.config.rpc, 'chain_getFinalizedHead');
     const finalizedBlock = await fetchJsonRpc(this.config.rpc, 'chain_getBlock', [finalizedBlockHash]);
-    const finalizedHeight = parseInt(finalizedBlock.block.header.number, 16);
+    const finalizedHeight = parseInt(finalizedBlock.block.header.number);
 
     if (parseInt(key) > finalizedHeight) {
       throw new Error('Finality not reached yet; waiting for finality');
@@ -50,16 +46,6 @@ export default class Avail implements IRuntime {
   }
 
   async prevalidateDataItem(_: Validator, item: DataItem): Promise<boolean> {
-    const block_validate = ajv.compile(block_schema);
-
-    if (!block_validate(item.value.block)) {
-      throw new Error(
-        `Block schema validation failed: ${JSON.stringify(
-          block_validate.errors
-        )}`
-      );
-    }
-
     return true
   }
 
