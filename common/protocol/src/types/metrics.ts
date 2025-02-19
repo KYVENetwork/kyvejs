@@ -80,7 +80,9 @@ export interface IMetrics {
   // BALANCE METRICS
 
   balance_staker: PromGauge;
+  // TODO: remove balance_valaccount in next version
   balance_valaccount: PromGauge;
+  balance_pool_account: PromGauge;
   balance_storage_provider: PromGauge;
 
   // RUNTIME METRICS

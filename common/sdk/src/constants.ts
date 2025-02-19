@@ -3,6 +3,7 @@ import { Bech32Address } from "@keplr-wallet/cosmos";
 import { ChainInfo } from "@keplr-wallet/types";
 
 export const PREFIX = "kyve";
+export const VAL_PREFIX = "kyvevaloper";
 export const GOV_AUTHORITY = "kyve10d07y265gmmuvt4z0w9aw880jnsr700jdv7nah";
 export const GAS_MULTIPLIER = 1.5;
 export const COIN_TYPE = 118;
@@ -33,7 +34,7 @@ export const SUPPORTED_CHAIN_CONFIGS = {
     coin: "KYVE",
     coinDenom: "ukyve",
     coinDecimals: 6,
-    gasPrice: 0.02,
+    gasPrice: 2,
   },
   "kaon-1": {
     chainId: "kaon-1",
@@ -43,7 +44,7 @@ export const SUPPORTED_CHAIN_CONFIGS = {
     coin: "KYVE",
     coinDenom: "tkyve",
     coinDecimals: 6,
-    gasPrice: 0.02,
+    gasPrice: 2,
   },
   "korellia-2": {
     chainId: "korellia-2",
@@ -53,7 +54,7 @@ export const SUPPORTED_CHAIN_CONFIGS = {
     coin: "KYVE",
     coinDenom: "tkyve",
     coinDecimals: 6,
-    gasPrice: 0.02,
+    gasPrice: 2,
   },
   "kyve-beta": {
     chainId: "kyve-beta",
@@ -63,7 +64,7 @@ export const SUPPORTED_CHAIN_CONFIGS = {
     coin: "KYVE",
     coinDenom: "tkyve",
     coinDecimals: 6,
-    gasPrice: 0.02,
+    gasPrice: 2,
   },
   "kyve-alpha": {
     chainId: "kyve-alpha",
@@ -73,7 +74,7 @@ export const SUPPORTED_CHAIN_CONFIGS = {
     coin: "KYVE",
     coinDenom: "tkyve",
     coinDecimals: 6,
-    gasPrice: 0.02,
+    gasPrice: 2,
   },
   "kyve-local": {
     chainId: "kyve-local",
@@ -83,7 +84,7 @@ export const SUPPORTED_CHAIN_CONFIGS = {
     coin: "KYVE",
     coinDenom: "tkyve",
     coinDecimals: 6,
-    gasPrice: 0.02,
+    gasPrice: 2,
   },
 };
 

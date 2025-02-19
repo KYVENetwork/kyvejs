@@ -4,7 +4,7 @@ import { Validator, standardizeError } from "../..";
 
 /**
  * getBalancesForMetrics tries to retrieve the $KYVE balance of the staker account, the $KYVE
- * balance of the valaccount and the balance of the storage provider which
+ * balance of the pool account and the balance of the storage provider which
  * can be of any currency for metrics
  *
  * @method getBalancesForMetrics
@@ -47,23 +47,26 @@ export async function getBalancesForMetrics(this: Validator): Promise<void> {
         `this.client.nativeClient.getBalance(${this.client[0].account.address},${this.sdk[c].config.coinDenom})`
       );
 
-      const valaccountBalanceRaw = await this.client[c].nativeClient.getBalance(
+      const poolAccountBalanceRaw = await this.client[
+        c
+      ].nativeClient.getBalance(
         this.client[0].account.address,
         this.sdk[c].config.coinDenom
       );
 
-      this.logger.debug(JSON.stringify(valaccountBalanceRaw));
+      this.logger.debug(JSON.stringify(poolAccountBalanceRaw));
 
-      const valaccountBalance = new BigNumber(valaccountBalanceRaw.amount)
+      const poolAccountBalance = new BigNumber(poolAccountBalanceRaw.amount)
         .dividedBy(
           new BigNumber(10).exponentiatedBy(this.sdk[c].config.coinDecimals)
         )
         .toNumber();
 
-      this.m.balance_valaccount.set(valaccountBalance);
+      this.m.balance_valaccount.set(poolAccountBalance);
+      this.m.balance_pool_account.set(poolAccountBalance);
       break;
     } catch (err) {
-      this.logger.error(`Failed to get $KYVE balance of valaccount`);
+      this.logger.error(`Failed to get $KYVE balance of pool account`);
       this.logger.error(standardizeError(err));
     }
   }

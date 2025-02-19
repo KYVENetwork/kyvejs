@@ -26,9 +26,9 @@ export function storageProviderFactory(this: Validator): IStorageProvider {
     case 2:
       return new Bundlr(this.storagePriv);
     case 3:
-      return new Kyve(this.chainId, this.poolId, this.staker, this.valaccount);
+      return new Kyve(this.chainId, this.poolId, this.staker, this.poolAccount);
     case 4:
-      return new Turbo(this.storagePriv || this.valaccount);
+      return new Turbo(this.storagePriv || this.poolAccount);
     default:
       return new NoStorageProvider();
   }

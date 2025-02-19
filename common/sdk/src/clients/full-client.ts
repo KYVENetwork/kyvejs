@@ -5,10 +5,10 @@ import { createDefaultAminoConverters } from "@cosmjs/stargate";
 
 import {
   createBundlesAminoConverters,
-  createDelegationAminoConverters,
   createFundersAminoConverters,
   createGovV1AminoConverters,
   createStakersAminoConverters,
+  createMultiCoinRewardsConverters,
 } from "../amino";
 import { IConfig } from "../constants";
 import * as KyveRegistryTx from "../registry/tx.registry";
@@ -49,8 +49,8 @@ export async function getSigningKyveClient(
         ...createGovV1AminoConverters(),
         ...createFundersAminoConverters(),
         ...createStakersAminoConverters(),
-        ...createDelegationAminoConverters(),
         ...createBundlesAminoConverters(),
+        ...createMultiCoinRewardsConverters(),
       }),
     });
 

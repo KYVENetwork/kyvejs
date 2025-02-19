@@ -4,7 +4,8 @@ import { FundersModuleLCDClient } from "./funders/v1beta1/query";
 import { GlobalModuleLCDClient } from "./global/v1beta1/query";
 import { PoolModuleLCDClient } from "./pool/v1beta1/query";
 import { QueryModuleLCDClient } from "./query/v1beta1/query";
-import { StakersModuleLCDClient } from "./stakers/v1beta1/query";
+import { QueryModuleV1LCDClient } from "./query/v1/query";
+import { StakersModuleLCDClient } from "./stakers/v1/query";
 import { TeamModuleLCDClient } from "./team/v1beta1/query";
 import { V1BundlesLCDClient } from "./v1/bundles/query";
 class KyveLCDClient {
@@ -28,9 +29,10 @@ class KyveLCDClient {
   };
   public query: {
     v1beta1: QueryModuleLCDClient;
+    v1: QueryModuleV1LCDClient;
   };
   public stakers: {
-    v1beta1: StakersModuleLCDClient;
+    v1: StakersModuleLCDClient;
   };
   public team: {
     v1beta1: TeamModuleLCDClient;
@@ -57,9 +59,10 @@ class KyveLCDClient {
     };
     this.query = {
       v1beta1: new QueryModuleLCDClient(restEndpoint),
+      v1: new QueryModuleV1LCDClient(restEndpoint),
     };
     this.stakers = {
-      v1beta1: new StakersModuleLCDClient(restEndpoint),
+      v1: new StakersModuleLCDClient(restEndpoint),
     };
     this.team = {
       v1beta1: new TeamModuleLCDClient(restEndpoint),

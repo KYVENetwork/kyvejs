@@ -32,9 +32,9 @@ export async function setupSDK(this: Validator): Promise<void> {
         })
     );
 
-    this.logger.debug(`Initializing KyveClient from valaccount mnemonic`);
+    this.logger.debug(`Initializing KyveClient from pool account mnemonic`);
     this.client = await Promise.all(
-      this.sdk.map(async (sdk) => await sdk.fromMnemonic(this.valaccount))
+      this.sdk.map(async (sdk) => await sdk.fromMnemonic(this.poolAccount))
     );
 
     this.logger.debug(`Initializing KyveLCD from sdk`);

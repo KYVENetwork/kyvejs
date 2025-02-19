@@ -10,7 +10,7 @@ const INFINITY_LOOP = true;
 
 /**
  * waitForAuthorization ensures that the node starts with a valid validator
- * who authorized this valaccount. If the valaccount was not authorized
+ * who authorized this pool account. If the pool account was not authorized
  * by the validator yet it logs out the information to authorize it.
  * After authorization the node can continue running.
  *
@@ -20,9 +20,9 @@ const INFINITY_LOOP = true;
  */
 export async function waitForAuthorization(this: Validator): Promise<void> {
   try {
-    const valaddress = this.client[0].account.address;
+    const poolAddress = this.client[0].account.address;
 
-    // call canValidate query to check if valaccount
+    // call canValidate query to check if pool account
     // was already authorized to run
     const canValidate = await callWithBackoffStrategy(
       async () => {
@@ -30,14 +30,14 @@ export async function waitForAuthorization(this: Validator): Promise<void> {
           try {
             this.logger.debug(this.rest[l]);
             this.logger.debug(
-              `this.lcd.kyve.query.v1beta1.canValidate({pool_id: ${this.poolId.toString()},valaddress: ${
+              `this.lcd.kyve.query.v1beta1.canValidate({pool_id: ${this.poolId.toString()},poolAddress: ${
                 this.client[0].account.address
               }})`
             );
 
             return await this.lcd[l].kyve.query.v1beta1.canValidate({
               pool_id: this.poolId.toString(),
-              valaddress,
+              pool_address: poolAddress,
             });
           } catch (err) {
             this.logger.error(`REST call to "${this.rest[l]}" failed`);
@@ -62,20 +62,20 @@ export async function waitForAuthorization(this: Validator): Promise<void> {
     this.logger.debug(JSON.stringify(canValidate));
     this.m.query_can_validate_successful.inc();
 
-    // assign validator staker address if staker has authorized this valaccount
+    // assign validator staker address if staker has authorized this pool account
     if (canValidate.possible) {
       this.staker = canValidate.reason;
       return;
     } else {
-      // log information so that staker can authorize this valaccount
+      // log information so that staker can authorize this pool account
       this.logger.info(
-        `Valaccount has not joined the pool with id ${this.poolId} yet`
+        `Pool account has not joined the pool with id ${this.poolId} yet`
       );
       this.logger.info(
         `Visit https://app.kyve.network and join the pool from your validator account:\n`
       );
 
-      this.logger.info(`Valaddress:    ${valaddress}`);
+      this.logger.info(`Pool Address:  ${poolAddress}`);
       this.logger.info(`Valname:       ${this.name}\n`);
 
       this.logger.info(
@@ -85,7 +85,7 @@ export async function waitForAuthorization(this: Validator): Promise<void> {
       await sleep(REFRESH_TIME);
     }
 
-    // wait until valaccount got authorized
+    // wait until pool account got authorized
     while (INFINITY_LOOP) {
       const canValidate = await callWithBackoffStrategy(
         async () => {
@@ -93,12 +93,12 @@ export async function waitForAuthorization(this: Validator): Promise<void> {
             try {
               this.logger.debug(this.rest[l]);
               this.logger.debug(
-                `this.lcd.kyve.query.v1beta1.canValidate({pool_id: ${this.poolId.toString()},valaddress: ${valaddress}})`
+                `this.lcd.kyve.query.v1beta1.canValidate({pool_id: ${this.poolId.toString()},pool_address: ${poolAddress}})`
               );
 
               return await this.lcd[l].kyve.query.v1beta1.canValidate({
                 pool_id: this.poolId.toString(),
-                valaddress,
+                pool_address: poolAddress,
               });
             } catch (err) {
               this.logger.error(`REST call to "${this.rest[l]}" failed`);
@@ -131,7 +131,7 @@ export async function waitForAuthorization(this: Validator): Promise<void> {
       }
     }
   } catch (err) {
-    this.logger.fatal(`Failed to authorize valaccount. Exiting ...`);
+    this.logger.fatal(`Failed to authorize pool account. Exiting ...`);
     this.logger.fatal(standardizeError(err));
 
     process.exit(1);
