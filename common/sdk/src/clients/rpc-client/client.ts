@@ -43,7 +43,7 @@ export default class KyveClient {
       v1beta1: KyveFundersMethods;
     };
     stakers: {
-      v1beta1: KyveStakersMethods;
+      v1: KyveStakersMethods;
     };
     multi_coin_rewards: {
       v1beta1: KyveMultiCoinRewardsMethods;
@@ -102,11 +102,7 @@ export default class KyveClient {
         ),
       },
       stakers: {
-        v1beta1: new KyveStakersMethods(
-          this.nativeClient,
-          this.account,
-          config
-        ),
+        v1: new KyveStakersMethods(this.nativeClient, this.account, config),
       },
       multi_coin_rewards: {
         v1beta1: new KyveMultiCoinRewardsMethods(

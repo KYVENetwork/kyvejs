@@ -26,7 +26,7 @@ export const createStakersAminoConverters = (): AminoConverters => {
       aminoType: "/kyve.stakers.v1.MsgUpdateCommission",
       toAmino: (msg: MsgUpdateCommission) => ({
         creator: msg.creator,
-        pool_id: msg.pool_id,
+        ...(isNotEmpty(msg.pool_id) && { pool_id: msg.pool_id }),
         commission: protoDecimalToJson(msg.commission),
       }),
       fromAmino: (msg): MsgUpdateCommission => ({
@@ -39,7 +39,7 @@ export const createStakersAminoConverters = (): AminoConverters => {
       aminoType: "/kyve.stakers.v1.MsgUpdateStakeFraction",
       toAmino: (msg: MsgUpdateStakeFraction) => ({
         creator: msg.creator,
-        pool_id: msg.pool_id,
+        ...(isNotEmpty(msg.pool_id) && { pool_id: msg.pool_id }),
         stake_fraction: protoDecimalToJson(msg.stake_fraction),
       }),
       fromAmino: (msg): MsgUpdateStakeFraction => ({
@@ -53,7 +53,7 @@ export const createStakersAminoConverters = (): AminoConverters => {
       toAmino: (msg: MsgJoinPool) => ({
         creator: msg.creator,
         ...(isNotEmpty(msg.pool_id) && { pool_id: msg.pool_id }),
-        valaddress: msg.pool_address,
+        pool_address: msg.pool_address,
         ...(isNotEmpty(msg.amount) && { amount: msg.amount }),
         commission: protoDecimalToJson(msg.commission),
         stake_fraction: protoDecimalToJson(msg.stake_fraction),
