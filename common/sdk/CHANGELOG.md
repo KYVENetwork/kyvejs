@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.4.2](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/sdk@1.4.1...@kyvejs/sdk@1.4.2) (2025-02-21)
+
+### Bug Fixes
+
+- amino decimals ([4b4977e](https://github.com/KYVENetwork/kyvejs/commit/4b4977ee4477fa63eb55a0355fa30e95ac88ac20))
+
 ## [1.4.1](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/sdk@1.4.0...@kyvejs/sdk@1.4.1) (2025-02-20)
 
 ### Bug Fixes
