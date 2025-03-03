@@ -408,16 +408,17 @@ export async function createBundleProposal(this: Validator): Promise<void> {
           dataHash,
         };
       } catch (err) {
-        this.logger.info(
+        this.logger.error(
           `Saving bundle proposal on StorageProvider was unsuccessful`
         );
-        this.logger.debug(standardizeError(err));
+        this.logger.error(standardizeError(err));
 
         this.m.storage_provider_save_failed.inc();
 
         // if the bundle fails to the uploaded to the storage provider
         // let the node skip the uploader role and continue
         await this.skipUploaderRole(fromIndex);
+        return;
       }
     }
 
