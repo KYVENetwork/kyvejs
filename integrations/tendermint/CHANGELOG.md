@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.3.3](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint@1.3.2...@kyvejs/tendermint@1.3.3) (2025-03-03)
+
+### Bug Fixes
+
+- cometbft schema ([#166](https://github.com/KYVENetwork/kyvejs/issues/166)) ([b432f38](https://github.com/KYVENetwork/kyvejs/commit/b432f380c71798e42d0daa42360bbf950969ca0c))
+
 ## [1.3.2](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint@1.3.1...@kyvejs/tendermint@1.3.2) (2025-02-21)
 
 **Note:** Version bump only for package @kyvejs/tendermint
