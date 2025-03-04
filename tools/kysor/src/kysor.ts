@@ -438,6 +438,11 @@ export const run = async (options: any) => {
         args.push(`${valaccount.debugMaxSize}`);
       }
 
+      if (options.gasPrice) {
+        args.push("--gas-price");
+        args.push(`${options.gasPrice}`);
+      }
+
       logger.info("Starting process ...");
 
       console.log("\n");
