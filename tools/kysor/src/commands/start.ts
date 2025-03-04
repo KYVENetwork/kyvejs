@@ -24,6 +24,10 @@ start
     "Specify the number of bundles that should be tested before the node properly exits. If zero the node will run indefinitely [default = 0]",
     "0"
   )
+  .option(
+    "--gas-price <number>",
+    "The gas price the node should use to calculate transaction fees, this value will be loaded by default based on the chain id"
+  )
   .action(async (options) => {
     await run(options);
   });
