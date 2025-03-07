@@ -11,7 +11,7 @@ import { isNotEmpty } from "../utils";
 export const createBundlesAminoConverters = (): AminoConverters => {
   return {
     "/kyve.bundles.v1beta1.MsgSubmitBundleProposal": {
-      aminoType: "kyve/bundles/MsgSubmitBundleProposal",
+      aminoType: "/kyve.bundles.v1beta1.MsgSubmitBundleProposal",
       toAmino: (msg: MsgSubmitBundleProposal) => ({
         creator: msg.creator,
         staker: msg.staker,
@@ -42,7 +42,7 @@ export const createBundlesAminoConverters = (): AminoConverters => {
       }),
     },
     "/kyve.bundles.v1beta1.MsgVoteBundleProposal": {
-      aminoType: "kyve/bundles/MsgVoteBundleProposal",
+      aminoType: "/kyve.bundles.v1beta1.MsgVoteBundleProposal",
       toAmino: (msg: MsgVoteBundleProposal) => ({
         creator: msg.creator,
         staker: msg.staker,
@@ -59,7 +59,7 @@ export const createBundlesAminoConverters = (): AminoConverters => {
       }),
     },
     "/kyve.bundles.v1beta1.MsgClaimUploaderRole": {
-      aminoType: "kyve/bundles/MsgClaimUploaderRole",
+      aminoType: "/kyve.bundles.v1beta1.MsgClaimUploaderRole",
       toAmino: (msg: MsgClaimUploaderRole) => ({
         creator: msg.creator,
         staker: msg.staker,
@@ -72,7 +72,7 @@ export const createBundlesAminoConverters = (): AminoConverters => {
       }),
     },
     "/kyve.bundles.v1beta1.MsgSkipUploaderRole": {
-      aminoType: "kyve/bundles/MsgSkipUploaderRole",
+      aminoType: "/kyve.bundles.v1beta1.MsgSkipUploaderRole",
       toAmino: (msg: MsgSkipUploaderRole) => ({
         creator: msg.creator,
         staker: msg.staker,
