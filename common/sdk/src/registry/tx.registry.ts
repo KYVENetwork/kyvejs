@@ -305,7 +305,7 @@ export const encodeTxMsg = {
 
   toggleMultiCoinRewards(value: MsgToggleMultiCoinRewards) {
     return {
-      type_url: "/cosmos.multi_coin_rewards.v1beta1.MsgToggleMultiCoinRewards",
+      type_url: "/kyve.multi_coin_rewards.v1beta1.MsgToggleMultiCoinRewards",
       value: MsgToggleMultiCoinRewards.encode(value).finish(),
     };
   },
@@ -535,7 +535,7 @@ export const withTypeUrl = {
 
   toggleMultiCoinRewards(value: MsgToggleMultiCoinRewards) {
     return {
-      typeUrl: "/cosmos.multi_coin_rewards.v1beta1.MsgToggleMultiCoinRewards",
+      typeUrl: "/kyve.multi_coin_rewards.v1beta1.MsgToggleMultiCoinRewards",
       value,
     };
   },
