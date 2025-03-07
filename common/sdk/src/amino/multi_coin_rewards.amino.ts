@@ -10,7 +10,7 @@ export const createMultiCoinRewardsConverters = (): AminoConverters => {
     "/kyve.multi_coin_rewards.v1beta1.MsgSetMultiCoinRewardsDistributionPolicy":
       {
         aminoType:
-          "kyve/multi_coin_rewards/MsgSetMultiCoinRewardsDistributionPolicy",
+          "/kyve.multi_coin_rewards.v1beta1.MsgSetMultiCoinRewardsDistributionPolicy",
         toAmino: (msg: MsgSetMultiCoinRewardsDistributionPolicy) => ({
           creator: msg.creator,
           policy: msg.policy,
@@ -21,10 +21,10 @@ export const createMultiCoinRewardsConverters = (): AminoConverters => {
         }),
       },
     "/kyve.multi_coin_rewards.v1beta1.MsgToggleMultiCoinRewards": {
-      aminoType: "kyve/multi_coin_rewards/MsgToggleMultiCoinRewards",
+      aminoType: "/kyve.multi_coin_rewards.v1beta1.MsgToggleMultiCoinRewards",
       toAmino: (msg: MsgToggleMultiCoinRewards) => ({
         creator: msg.creator,
-        enabled: msg.enabled,
+        ...(msg.enabled && { enabled: msg.enabled }),
       }),
       fromAmino: (msg): MsgToggleMultiCoinRewards => ({
         creator: msg.creator,
@@ -32,7 +32,7 @@ export const createMultiCoinRewardsConverters = (): AminoConverters => {
       }),
     },
     "/kyve.multi_coin_rewards.v1beta1.MsgUpdateParams": {
-      aminoType: "kyve/multi_coin_rewards/MsgUpdateParams",
+      aminoType: "/kyve.multi_coin_rewards.v1beta1.MsgUpdateParams",
       toAmino: (msg: MsgUpdateParams) => ({
         authority: msg.authority,
         payload: msg.payload,
