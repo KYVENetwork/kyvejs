@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.4.4](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/sdk@1.4.3...@kyvejs/sdk@1.4.4) (2025-03-07)
+
+### Bug Fixes
+
+- toggle multi coin rewards ([#170](https://github.com/KYVENetwork/kyvejs/issues/170)) ([4746b0b](https://github.com/KYVENetwork/kyvejs/commit/4746b0b8d2d705df60fcd2365d054adbde7c4d89))
+
 ## [1.4.3](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/sdk@1.4.2...@kyvejs/sdk@1.4.3) (2025-03-07)
 
 **Note:** Version bump only for package @kyvejs/sdk
