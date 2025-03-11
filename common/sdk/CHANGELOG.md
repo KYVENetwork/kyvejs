@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.4.5](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/sdk@1.4.4...@kyvejs/sdk@1.4.5) (2025-03-11)
+
+### Bug Fixes
+
+- amino multi coin rewards ([#171](https://github.com/KYVENetwork/kyvejs/issues/171)) ([65838d9](https://github.com/KYVENetwork/kyvejs/commit/65838d9cecb9265b87c3e51c398c493acf64f8ac))
+
 ## [1.4.4](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/sdk@1.4.3...@kyvejs/sdk@1.4.4) (2025-03-07)
 
 ### Bug Fixes
