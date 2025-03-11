@@ -404,6 +404,15 @@ export const run = async (options: any) => {
         `${versionHome}`,
       ];
 
+      if (options.ensureNoLoss) {
+        args.push("--ensure-no-loss");
+        args.push(`--scale-ensure-no-loss`);
+        args.push(`${options.scaleEnsureNoLoss}`);
+      } else {
+        args.push("--ensure-no-loss");
+        args.push(`${false}`);
+      }
+
       if (options.debug) {
         args.push("--debug");
       }

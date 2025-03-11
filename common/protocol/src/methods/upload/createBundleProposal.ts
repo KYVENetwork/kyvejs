@@ -152,6 +152,10 @@ export async function createBundleProposal(this: Validator): Promise<void> {
       }
     }
 
+    if (this.scaleEnsureNoLoss > 0) {
+      maxBytes *= this.scaleEnsureNoLoss;
+    }
+
     let low = 0;
     let high = bundleProposal.length - 1;
     let maxIndex = -1;
