@@ -104,6 +104,7 @@ export class Validator {
   protected dryRun!: boolean;
   protected dryRunBundles!: number;
   protected ensureNoLoss!: boolean;
+  protected scaleEnsureNoLoss!: number;
   protected params!: QueryParamsResponse;
 
   // tmp variables
@@ -305,6 +306,11 @@ export class Validator {
         "Ensures that the node only uploads bundles which can be fully rewarded by the protocol.",
         true
       )
+      .option(
+        "--scale-ensure-no-loss <number>",
+        "Scales the maximum bytes which ensure no loss with this scale factor. E.g 0.5 would mean that you would only upload 50% of the bundle size that what you could normally upload with no loss, 0 to disable this.",
+        "0"
+      )
       .action((options) => {
         this.start(options);
       });
@@ -345,6 +351,7 @@ export class Validator {
     this.dryRun = options.dryRun;
     this.dryRunBundles = parseInt(options.dryRunBundles);
     this.ensureNoLoss = options.ensureNoLoss;
+    this.scaleEnsureNoLoss = options.scaleEnsureNoLoss;
 
     if (!this.poolAccount) {
       this.logger.fatal(`Pool account not found. Exiting ...`);

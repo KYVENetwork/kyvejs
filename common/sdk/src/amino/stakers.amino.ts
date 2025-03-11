@@ -1,4 +1,3 @@
-import { Decimal } from "@cosmjs/math";
 import { AminoConverters } from "@cosmjs/stargate";
 import {
   MsgJoinPool,
@@ -9,43 +8,32 @@ import {
 
 import { isNotEmpty } from "../utils";
 
-function protoDecimalToJson(decimal: string): string {
-  const parsed = Decimal.fromAtomics(decimal, 18);
-  const [whole, fractional] = parsed.toString().split(".");
-  return `${whole}.${(fractional ?? "").padEnd(18, "0")}`;
-}
-
-function jsonDecimalToProto(decimal: string): string {
-  const parsed = Decimal.fromUserInput(decimal, 18);
-  return parsed.atomics;
-}
-
 export const createStakersAminoConverters = (): AminoConverters => {
   return {
     "/kyve.stakers.v1.MsgUpdateCommission": {
       aminoType: "/kyve.stakers.v1.MsgUpdateCommission",
       toAmino: (msg: MsgUpdateCommission) => ({
         creator: msg.creator,
-        pool_id: msg.pool_id,
-        commission: protoDecimalToJson(msg.commission),
+        ...(isNotEmpty(msg.pool_id) && { pool_id: msg.pool_id }),
+        commission: msg.commission,
       }),
       fromAmino: (msg): MsgUpdateCommission => ({
         creator: msg.creator,
         pool_id: msg.pool_id,
-        commission: jsonDecimalToProto(msg.commission),
+        commission: msg.commission,
       }),
     },
     "/kyve.stakers.v1.MsgUpdateStakeFraction": {
       aminoType: "/kyve.stakers.v1.MsgUpdateStakeFraction",
       toAmino: (msg: MsgUpdateStakeFraction) => ({
         creator: msg.creator,
-        pool_id: msg.pool_id,
-        stake_fraction: protoDecimalToJson(msg.stake_fraction),
+        ...(isNotEmpty(msg.pool_id) && { pool_id: msg.pool_id }),
+        stake_fraction: msg.stake_fraction,
       }),
       fromAmino: (msg): MsgUpdateStakeFraction => ({
         creator: msg.creator,
         pool_id: msg.pool_id,
-        stake_fraction: jsonDecimalToProto(msg.stake_fraction),
+        stake_fraction: msg.stake_fraction,
       }),
     },
     "/kyve.stakers.v1.MsgJoinPool": {
@@ -53,18 +41,18 @@ export const createStakersAminoConverters = (): AminoConverters => {
       toAmino: (msg: MsgJoinPool) => ({
         creator: msg.creator,
         ...(isNotEmpty(msg.pool_id) && { pool_id: msg.pool_id }),
-        valaddress: msg.pool_address,
+        pool_address: msg.pool_address,
         ...(isNotEmpty(msg.amount) && { amount: msg.amount }),
-        commission: protoDecimalToJson(msg.commission),
-        stake_fraction: protoDecimalToJson(msg.stake_fraction),
+        commission: msg.commission,
+        stake_fraction: msg.stake_fraction,
       }),
       fromAmino: (msg): MsgJoinPool => ({
         creator: msg.creator,
         pool_id: msg.pool_id,
         pool_address: msg.pool_address,
         amount: msg.amount,
-        commission: jsonDecimalToProto(msg.commission),
-        stake_fraction: jsonDecimalToProto(msg.stake_fraction),
+        commission: msg.commission,
+        stake_fraction: msg.stake_fraction,
       }),
     },
     "/kyve.stakers.v1.MsgLeavePool": {

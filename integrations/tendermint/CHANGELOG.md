@@ -3,6 +3,32 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.3.6](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint@1.3.5...@kyvejs/tendermint@1.3.6) (2025-03-11)
+
+**Note:** Version bump only for package @kyvejs/tendermint
+
+## [1.3.5](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint@1.3.4...@kyvejs/tendermint@1.3.5) (2025-03-07)
+
+**Note:** Version bump only for package @kyvejs/tendermint
+
+## [1.3.4](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint@1.3.3...@kyvejs/tendermint@1.3.4) (2025-03-07)
+
+**Note:** Version bump only for package @kyvejs/tendermint
+
+## [1.3.3](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint@1.3.2...@kyvejs/tendermint@1.3.3) (2025-03-03)
+
+### Bug Fixes
+
+- cometbft schema ([#166](https://github.com/KYVENetwork/kyvejs/issues/166)) ([b432f38](https://github.com/KYVENetwork/kyvejs/commit/b432f380c71798e42d0daa42360bbf950969ca0c))
+
+## [1.3.2](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint@1.3.1...@kyvejs/tendermint@1.3.2) (2025-02-21)
+
+**Note:** Version bump only for package @kyvejs/tendermint
+
+## [1.3.1](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint@1.3.0...@kyvejs/tendermint@1.3.1) (2025-02-20)
+
+**Note:** Version bump only for package @kyvejs/tendermint
+
 # [1.3.0](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint@1.2.10...@kyvejs/tendermint@1.3.0) (2025-02-14)
 
 ### Features

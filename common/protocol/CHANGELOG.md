@@ -3,6 +3,32 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.4.6](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/protocol@1.4.5...@kyvejs/protocol@1.4.6) (2025-03-11)
+
+**Note:** Version bump only for package @kyvejs/protocol
+
+## [1.4.5](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/protocol@1.4.4...@kyvejs/protocol@1.4.5) (2025-03-07)
+
+**Note:** Version bump only for package @kyvejs/protocol
+
+## [1.4.4](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/protocol@1.4.3...@kyvejs/protocol@1.4.4) (2025-03-07)
+
+**Note:** Version bump only for package @kyvejs/protocol
+
+## [1.4.3](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/protocol@1.4.2...@kyvejs/protocol@1.4.3) (2025-03-03)
+
+### Bug Fixes
+
+- storage provider error handling ([#167](https://github.com/KYVENetwork/kyvejs/issues/167)) ([14cc792](https://github.com/KYVENetwork/kyvejs/commit/14cc792eb0d59cfb3e9cb8c1e2e150cc1d1a4441))
+
+## [1.4.2](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/protocol@1.4.1...@kyvejs/protocol@1.4.2) (2025-02-21)
+
+**Note:** Version bump only for package @kyvejs/protocol
+
+## [1.4.1](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/protocol@1.4.0...@kyvejs/protocol@1.4.1) (2025-02-20)
+
+**Note:** Version bump only for package @kyvejs/protocol
+
 # [1.4.0](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/protocol@1.3.2...@kyvejs/protocol@1.4.0) (2025-02-14)
 
 ### Features

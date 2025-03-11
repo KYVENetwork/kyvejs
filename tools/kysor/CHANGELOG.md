@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.5.6](https://github.com/KYVENetwork/kyvejs/compare/@kyve/kysor@1.5.5...@kyve/kysor@1.5.6) (2025-03-11)
+
+**Note:** Version bump only for package @kyve/kysor
+
+## [1.5.5](https://github.com/KYVENetwork/kyvejs/compare/@kyve/kysor@1.5.4...@kyve/kysor@1.5.5) (2025-03-07)
+
+**Note:** Version bump only for package @kyve/kysor
+
+## [1.5.4](https://github.com/KYVENetwork/kyvejs/compare/@kyve/kysor@1.5.3...@kyve/kysor@1.5.4) (2025-03-07)
+
+**Note:** Version bump only for package @kyve/kysor
+
+## [1.5.3](https://github.com/KYVENetwork/kyvejs/compare/@kyve/kysor@1.5.2...@kyve/kysor@1.5.3) (2025-03-04)
+
+**Note:** Version bump only for package @kyve/kysor
+
+## [1.5.2](https://github.com/KYVENetwork/kyvejs/compare/@kyve/kysor@1.5.1...@kyve/kysor@1.5.2) (2025-02-21)
+
+**Note:** Version bump only for package @kyve/kysor
+
+## [1.5.1](https://github.com/KYVENetwork/kyvejs/compare/@kyve/kysor@1.5.0...@kyve/kysor@1.5.1) (2025-02-20)
+
+**Note:** Version bump only for package @kyve/kysor
+
 # [1.5.0](https://github.com/KYVENetwork/kyvejs/compare/@kyve/kysor@1.4.5...@kyve/kysor@1.5.0) (2025-02-14)
 
 ### Features

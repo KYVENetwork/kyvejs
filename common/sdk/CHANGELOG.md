@@ -3,6 +3,34 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.4.5](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/sdk@1.4.4...@kyvejs/sdk@1.4.5) (2025-03-11)
+
+### Bug Fixes
+
+- amino multi coin rewards ([#171](https://github.com/KYVENetwork/kyvejs/issues/171)) ([65838d9](https://github.com/KYVENetwork/kyvejs/commit/65838d9cecb9265b87c3e51c398c493acf64f8ac))
+
+## [1.4.4](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/sdk@1.4.3...@kyvejs/sdk@1.4.4) (2025-03-07)
+
+### Bug Fixes
+
+- toggle multi coin rewards ([#170](https://github.com/KYVENetwork/kyvejs/issues/170)) ([4746b0b](https://github.com/KYVENetwork/kyvejs/commit/4746b0b8d2d705df60fcd2365d054adbde7c4d89))
+
+## [1.4.3](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/sdk@1.4.2...@kyvejs/sdk@1.4.3) (2025-03-07)
+
+**Note:** Version bump only for package @kyvejs/sdk
+
+## [1.4.2](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/sdk@1.4.1...@kyvejs/sdk@1.4.2) (2025-02-21)
+
+### Bug Fixes
+
+- amino decimals ([4b4977e](https://github.com/KYVENetwork/kyvejs/commit/4b4977ee4477fa63eb55a0355fa30e95ac88ac20))
+
+## [1.4.1](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/sdk@1.4.0...@kyvejs/sdk@1.4.1) (2025-02-20)
+
+### Bug Fixes
+
+- MsgJoinPool valaddress to pool_address ([937ebcb](https://github.com/KYVENetwork/kyvejs/commit/937ebcb28d2cd08efc0a5f04dcf1e5cb8951f0d7))
+
 # [1.4.0](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/sdk@1.3.4...@kyvejs/sdk@1.4.0) (2025-02-14)
 
 ### Features

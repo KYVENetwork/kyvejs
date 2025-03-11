@@ -8,6 +8,8 @@ import { QueryModuleV1LCDClient } from "./query/v1/query";
 import { StakersModuleLCDClient } from "./stakers/v1/query";
 import { TeamModuleLCDClient } from "./team/v1beta1/query";
 import { V1BundlesLCDClient } from "./v1/bundles/query";
+import { MultiCoinRewardsModuleLCDClient } from "./multi_coin_rewards/v1/query";
+
 class KyveLCDClient {
   public v1: {
     bundles: V1BundlesLCDClient;
@@ -36,6 +38,9 @@ class KyveLCDClient {
   };
   public team: {
     v1beta1: TeamModuleLCDClient;
+  };
+  public multi_coin_rewards: {
+    v1: MultiCoinRewardsModuleLCDClient;
   };
 
   constructor(restEndpoint: string) {
@@ -66,6 +71,9 @@ class KyveLCDClient {
     };
     this.team = {
       v1beta1: new TeamModuleLCDClient(restEndpoint),
+    };
+    this.multi_coin_rewards = {
+      v1: new MultiCoinRewardsModuleLCDClient(restEndpoint),
     };
   }
 }
