@@ -1,0 +1,108 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "header": {
+      "type": "object",
+      "properties": {
+        "parentHash": {
+          "type": "string"
+        },
+        "number": {
+          "type": "string"
+        },
+        "stateRoot": {
+          "type": "string"
+        },
+        "extrinsicsRoot": {
+          "type": "string"
+        },
+        "digest": {
+          "type": "object",
+          "properties": {
+            "logs": {
+              "type": "array",
+              "items": {}
+            }
+          },
+          "required": [
+            "logs"
+          ]
+        },
+        "extension": {
+          "type": "object",
+          "properties": {
+            "V3": {
+              "type": "object",
+              "properties": {
+                "appLookup": {
+                  "type": "object",
+                  "properties": {
+                    "size": {
+                      "type": "integer"
+                    },
+                    "index": {
+                      "type": "array",
+                      "items": {}
+                    }
+                  },
+                  "required": [
+                    "size",
+                    "index"
+                  ]
+                },
+                "commitment": {
+                  "type": "object",
+                  "properties": {
+                    "rows": {
+                      "type": "integer"
+                    },
+                    "cols": {
+                      "type": "integer"
+                    },
+                    "commitment": {
+                      "type": "array",
+                      "items": {}
+                    },
+                    "dataRoot": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "rows",
+                    "cols",
+                    "commitment",
+                    "dataRoot"
+                  ]
+                }
+              },
+              "required": [
+                "appLookup",
+                "commitment"
+              ]
+            }
+          },
+          "required": [
+            "V3"
+          ]
+        }
+      },
+      "required": [
+        "parentHash",
+        "number",
+        "stateRoot",
+        "extrinsicsRoot",
+        "digest",
+        "extension"
+      ]
+    },
+    "extrinsics": {
+      "type": "array",
+      "items": {}
+    }
+  },
+  "required": [
+    "header",
+    "extrinsics"
+  ]
+}
