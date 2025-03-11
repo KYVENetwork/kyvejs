@@ -41,7 +41,10 @@ export default class Avail implements IRuntime {
 
     return {
       key,
-      value: block.block,
+      value: {
+        block: block.block,
+        hash: blockHash,
+      },
     };
   }
 
