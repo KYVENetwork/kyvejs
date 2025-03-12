@@ -406,11 +406,14 @@ export const run = async (options: any) => {
 
       if (options.ensureNoLoss) {
         args.push("--ensure-no-loss");
-        args.push(`--scale-ensure-no-loss`);
-        args.push(`${options.scaleEnsureNoLoss}`);
       } else {
         args.push("--ensure-no-loss");
         args.push(`${false}`);
+      }
+
+      if (options.scaleEnsureNoLoss > 0) {
+        args.push(`--scale-ensure-no-loss`);
+        args.push(`${options.scaleEnsureNoLoss}`);
       }
 
       if (options.debug) {
