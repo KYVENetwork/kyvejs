@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.3.8](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint@1.3.7...@kyvejs/tendermint@1.3.8) (2025-06-02)
+
+### Bug Fixes
+
+- schema for story network ([#175](https://github.com/KYVENetwork/kyvejs/issues/175)) ([4b39fd0](https://github.com/KYVENetwork/kyvejs/commit/4b39fd0bdce61383a54262a576f0790ee241880a))
+
 ## [1.3.7](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint@1.3.6...@kyvejs/tendermint@1.3.7) (2025-03-31)
 
 **Note:** Version bump only for package @kyvejs/tendermint
