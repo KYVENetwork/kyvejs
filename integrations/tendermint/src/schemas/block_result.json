@@ -202,8 +202,7 @@
                         "ed25519": {
                           "type": "string"
                         }
-                      },
-                      "required": ["ed25519"]
+                      }
                     }
                   },
                   "required": ["type", "value"]
