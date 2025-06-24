@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.4.7](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/protocol@1.4.6...@kyvejs/protocol@1.4.7) (2025-03-31)
+
+### Bug Fixes
+
+- range error invalid string length ([#174](https://github.com/KYVENetwork/kyvejs/issues/174)) ([69bcf6a](https://github.com/KYVENetwork/kyvejs/commit/69bcf6a21355d60992fd2ef3df7a7eb7c71fc660))
+
 ## [1.4.6](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/protocol@1.4.5...@kyvejs/protocol@1.4.6) (2025-03-11)
 
 **Note:** Version bump only for package @kyvejs/protocol

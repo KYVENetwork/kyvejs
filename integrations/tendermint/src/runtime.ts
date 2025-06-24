@@ -6,6 +6,7 @@ import block_schema from './schemas/block.json';
 import block_results_schema from './schemas/block_result.json';
 import { createHashesFromTendermintBundle } from './utils/merkle';
 import { generateMerkleRoot } from '@kyvejs/sdk';
+import { eventPropertyBlacklist } from './utils/blacklist';
 
 const ajv = new Ajv();
 
@@ -188,30 +189,25 @@ export default class Tendermint implements IRuntime {
                 .sort(compareEventAttribute)
                 .map(({ index, ...attribute }: IAttribute) => attribute);
 
-              // set attribute "acknowledgement" in ibc event "fungible_token_packet" to empty string
-              if (event.type === 'fungible_token_packet') {
-                event.attributes = event.attributes.map(
-                  (attribute: IAttribute) => {
-                    if (attribute.key === 'YWNrbm93bGVkZ2VtZW50') {
-                      attribute.value = '';
+              // remove blacklisted event properties
+              for (const blacklistedEvent of Object.keys(
+                eventPropertyBlacklist
+              )) {
+                if (event.type === blacklistedEvent) {
+                  event.attributes = event.attributes.map(
+                    (attribute: IAttribute) => {
+                      if (
+                        eventPropertyBlacklist[blacklistedEvent].includes(
+                          attribute.key
+                        )
+                      ) {
+                        attribute.value = '';
+                      }
+
+                      return attribute;
                     }
-
-                    return attribute;
-                  }
-                );
-              }
-
-              // set attribute "ibccallbackerror-error" in ibc event "ibccallbackerror-fungible_token_packet" to empty string
-              if (event.type === 'ibccallbackerror-fungible_token_packet') {
-                event.attributes = event.attributes.map(
-                  (attribute: IAttribute) => {
-                    if (attribute.key === 'ibccallbackerror-error') {
-                      attribute.value = '';
-                    }
-
-                    return attribute;
-                  }
-                );
+                  );
+                }
               }
 
               return event;

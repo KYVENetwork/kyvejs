@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.5.7](https://github.com/KYVENetwork/kyvejs/compare/@kyve/kysor@1.5.6...@kyve/kysor@1.5.7) (2025-03-12)
+
+### Bug Fixes
+
+- scale ensure no loss ([e848451](https://github.com/KYVENetwork/kyvejs/commit/e8484517c67e7222c163c55cb7e6e1b75e3fc1a1))
+
 ## [1.5.6](https://github.com/KYVENetwork/kyvejs/compare/@kyve/kysor@1.5.5...@kyve/kysor@1.5.6) (2025-03-11)
 
 **Note:** Version bump only for package @kyve/kysor

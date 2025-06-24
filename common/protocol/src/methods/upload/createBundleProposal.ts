@@ -166,27 +166,37 @@ export async function createBundleProposal(this: Validator): Promise<void> {
     while (low <= high) {
       const mid = Math.floor((low + high) / 2);
 
-      this.logger.debug(
-        `this.compression.compress($RAW_BUNDLE_PROPOSAL[0:${mid}])`
-      );
-      const storageProviderData = await compression
-        .compress(bundleToBytes(bundleProposal.slice(0, mid + 1)))
-        .catch((err) => {
-          this.logger.error(
-            `Unexpected error compressing bundle. Skipping Uploader Role ...`
-          );
-          this.logger.error(standardizeError(err));
+      try {
+        this.logger.debug(
+          `this.compression.compress($RAW_BUNDLE_PROPOSAL[0:${mid}])`
+        );
+        const storageProviderData = await compression
+          .compress(bundleToBytes(bundleProposal.slice(0, mid + 1)))
+          .catch((err) => {
+            this.logger.error(
+              `Unexpected error compressing bundle. Skipping Uploader Role ...`
+            );
+            this.logger.error(standardizeError(err));
 
-          return null;
-        });
+            return null;
+          });
 
-      // skip uploader role if compression returns null
-      if (storageProviderData === null) {
-        await this.skipUploaderRole(fromIndex);
-        return;
+        // skip uploader role if compression returns null
+        if (storageProviderData === null) {
+          await this.skipUploaderRole(fromIndex);
+          return;
+        }
+
+        size = storageProviderData.byteLength;
+      } catch (err) {
+        if (err instanceof RangeError) {
+          // if a RangeError happens it means that the bundle proposal was too big to
+          // convert into bytes. In this case we set the size manually to a high value
+          size = MAX_BUNDLE_BYTE_SIZE + 1;
+        } else {
+          throw err;
+        }
       }
-
-      size = storageProviderData.byteLength;
 
       this.logger.debug(
         `Bundle proposal with index range 0,${mid} has byte size ${size} of max allowed ${maxBytes} bytes`
