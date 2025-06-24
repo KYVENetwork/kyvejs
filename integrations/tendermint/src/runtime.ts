@@ -189,6 +189,7 @@ export default class Tendermint implements IRuntime {
                 .sort(compareEventAttribute)
                 .map(({ index, ...attribute }: IAttribute) => attribute);
 
+              // remove blacklisted event properties
               for (const blacklistedEvent of Object.keys(
                 eventPropertyBlacklist
               )) {
