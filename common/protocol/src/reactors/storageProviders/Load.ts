@@ -19,14 +19,14 @@ export class Load implements IStorageProvider {
     if (!storagePriv) {
       throw new Error("Load storage provider requires a private key");
     }
-    if (!process.env.LOAD_API_KEY) {
+    if (!process.env.LOAD_STORAGE_PROVIDER_API_KEY) {
       throw new Error(
-        "Load storage provider requires LOAD_API_KEY environment variable"
+        "Load storage provider requires LOAD_STORAGE_PROVIDER_API_KEY environment variable"
       );
     }
 
     this.signer = new EthereumSigner(storagePriv);
-    this.apiKey = process.env.LOAD_API_KEY;
+    this.apiKey = process.env.LOAD_STORAGE_PROVIDER_API_KEY;
     this.baseUrl =
       process.env.LOAD_BASE_URL || "https://load-s3-agent.load.network";
   }
@@ -50,12 +50,13 @@ export class Load implements IStorageProvider {
 
   async saveBundle(bundle: Buffer, tags: BundleTag[]): Promise<StorageReceipt> {
     try {
+
       // Convert BundleTag[] to the format expected by @dha-team/arbundles
       const arbundleTags = tags.map((tag) => ({
         name: tag.name,
         value: tag.value,
       }));
-      // Create and sign DataItem
+      // Create and sign DataItem 
       const dataItem = createData(bundle, this.signer, {
         tags: arbundleTags,
         target: undefined,
@@ -65,7 +66,7 @@ export class Load implements IStorageProvider {
       await dataItem.sign(this.signer);
       const signedDataItemBuffer = dataItem.getRaw();
 
-      // Prepare DataItem for the format compatible with
+      // Prepare DataItem for the format compatible with 
       // Load S3 Agent API
       const formData = new FormData();
       formData.append("file", signedDataItemBuffer, {
@@ -103,6 +104,7 @@ export class Load implements IStorageProvider {
     timeout: number
   ): Promise<StorageReceipt> {
     try {
+
       // Load S3 Agent return a redirect to the presigned get_object URL
       // when an object (offchain DataItem) is requested, for performance purposes.
       // So first we get the presigned get_object URL.
@@ -137,6 +139,7 @@ export class Load implements IStorageProvider {
 
       throw new Error(`Unexpected response status: ${redirectResponse.status}`);
     } catch (error) {
+
       if (axios.isAxiosError(error)) {
         if (error.response?.status === 404) {
           throw new Error(`Bundle not found: ${storageId}`);
