@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.3.8](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint-ssync@1.3.7...@kyvejs/tendermint-ssync@1.3.8) (2025-09-26)
+
+**Note:** Version bump only for package @kyvejs/tendermint-ssync
+
 ## [1.3.7](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint-ssync@1.3.6...@kyvejs/tendermint-ssync@1.3.7) (2025-03-31)
 
 **Note:** Version bump only for package @kyvejs/tendermint-ssync

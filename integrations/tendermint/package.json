@@ -1,6 +1,6 @@
 {
   "name": "@kyvejs/tendermint",
-  "version": "1.3.9",
+  "version": "1.3.10",
   "license": "MIT",
   "scripts": {
     "build": "rimraf dist && tsc",
@@ -22,7 +22,7 @@
     "singleQuote": true
   },
   "dependencies": {
-    "@kyvejs/protocol": "1.4.7",
+    "@kyvejs/protocol": "1.5.0",
     "@kyvejs/sdk": "1.4.5",
     "ajv": "^8.12.0",
     "axios": "^0.27.2",

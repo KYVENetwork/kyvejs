@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.5.0](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/protocol@1.4.7...@kyvejs/protocol@1.5.0) (2025-09-26)
+
+### Features
+
+- Load S3 Storage Provider ([#177](https://github.com/KYVENetwork/kyvejs/issues/177)) ([4f25e88](https://github.com/KYVENetwork/kyvejs/commit/4f25e88ded8fa3232199b77e4a3b9537e1118f44))
+
 ## [1.4.7](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/protocol@1.4.6...@kyvejs/protocol@1.4.7) (2025-03-31)
 
 ### Bug Fixes

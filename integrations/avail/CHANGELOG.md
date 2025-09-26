@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.0.0-beta.3](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/avail@1.0.0-beta.2...@kyvejs/avail@1.0.0-beta.3) (2025-09-26)
+
+**Note:** Version bump only for package @kyvejs/avail
+
 # 1.0.0-beta.2 (2025-06-30)
 
 ### Features
