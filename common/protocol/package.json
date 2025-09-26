@@ -21,6 +21,7 @@
   "dependencies": {
     "@ardrive/turbo-sdk": "^1.14.1",
     "@bundlr-network/client": "^0.8.9",
+    "@dha-team/arbundles": "^1.0.3",
     "@kyvejs/coins": "1.0.3",
     "@kyvejs/sdk": "1.4.5",
     "@kyvejs/types": "1.5.0",
@@ -28,6 +29,7 @@
     "axios": "^0.27.2",
     "bignumber.js": "^9.1.2",
     "clone": "^2.1.2",
+    "form-data": "^4.0.4",
     "commander": "^9.4.1",
     "fs-extra": "^10.0.1",
     "jsonfile": "^6.1.0",
