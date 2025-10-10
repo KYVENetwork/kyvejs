@@ -4,6 +4,7 @@ import { Bundlr } from "./Bundlr";
 import { Kyve } from "./Kyve";
 import { Turbo } from "./Turbo";
 import { Load } from "./Load";
+import { Walrus } from "./Walrus";
 import { NoStorageProvider } from "./NoStorageProvider";
 
 /**
@@ -32,6 +33,8 @@ export function storageProviderFactory(this: Validator): IStorageProvider {
       return new Turbo(this.storagePriv || this.poolAccount);
     case 5:
       return new Load(this.storagePriv);
+    case 6:
+      return new Walrus(this.storagePriv);
     default:
       return new NoStorageProvider();
   }

@@ -6,7 +6,8 @@
     "declaration": true,
     "outDir": "dist",
     "esModuleInterop": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "skipLibCheck": true
   },
   "files": ["src/index.ts", "src/scripts/checksum.ts"]
 }

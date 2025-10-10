@@ -21,11 +21,11 @@
   "dependencies": {
     "@ardrive/turbo-sdk": "^1.14.1",
     "@bundlr-network/client": "^0.8.9",
-    "@dha-team/arbundles": "^1.0.3",
+    "@dha-team/arbundles": "^1.0.4",
     "@kyvejs/coins": "1.0.3",
     "@kyvejs/sdk": "1.4.5",
     "@kyvejs/types": "1.5.0",
-    "arweave": "^1.10.17",
+    "arweave": "^1.15.7",
     "axios": "^0.27.2",
     "bignumber.js": "^9.1.2",
     "clone": "^2.1.2",
@@ -40,7 +40,9 @@
     "semver": "^7.5.3",
     "tslog": "^3.2.2",
     "unique-names-generator": "^4.6.0",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.0",
+    "@mysten/walrus": "^0.7.2",
+    "@mysten/sui": "^1.39.1"
   },
   "devDependencies": {
     "@types/clone": "^2.1.1",
@@ -48,8 +50,8 @@
     "@types/fs-extra": "^9.0.13",
     "@types/jest": "^28.1.7",
     "@types/jsonfile": "^6.0.1",
-    "@types/node": "^18.11.9",
-    "@types/node-fetch": "^2.6.2",
+    "@types/node": "^24.7.1",
+    "@types/node-fetch": "^2.6.13",
     "@types/object-hash": "^2.2.1",
     "@types/seedrandom": "^3.0.2",
     "@types/semver": "^7.3.9",
@@ -59,6 +61,6 @@
     "rimraf": "^3.0.2",
     "ts-jest": "^28.0.8",
     "typedoc": "^0.22.17",
-    "typescript": "^4.4.3"
+    "typescript": "^5.9.3"
   }
 }
