@@ -1,8 +1,8 @@
 import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
 
 import { BundleTag, IStorageProvider } from "../../types";
-import { getFullnodeUrl, SuiClient } from "@mysten/sui/dist/cjs/client";
-import { WalrusClient } from "@mysten/walrus/dist/cjs/client";
+import { getFullnodeUrl, SuiClient } from "@mysten/sui/client";
+import { WalrusClient } from "@mysten/walrus";
 
 export class Walrus implements IStorageProvider {
   public name = "Walrus";
@@ -34,7 +34,7 @@ export class Walrus implements IStorageProvider {
   async getBalance() {
     const walBalance = await this.suiClient.getBalance({
       owner: this.keypair.toSuiAddress(),
-      coinType: `0x8270feb7375eee355e64fdb69c50abb6b5f9393a722883c1cf45f8e26048810a::wal::WAL`,
+      coinType: `0x356a26eb9e012a68958082340d4c4116e7f55615cf27affcff209cf0ae544f59::wal::WAL`,
     });
     return walBalance.totalBalance;
   }
