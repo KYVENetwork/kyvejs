@@ -3,14 +3,15 @@
   "version": "1.0.0-beta.19",
   "license": "MIT",
   "scripts": {
-    "build": "rimraf dist && tsc",
-    "build:binaries": "yarn build && rimraf out && pkg --no-bytecode --public-packages '*' --compress GZip --output out/kyve package.json && node ../../common/protocol/dist/scripts/checksum.js",
+    "build": "rimraf dist && tsc && webpack --config webpack.config.js",
+    "transpile": "webpack --config webpack.config.js",
+    "build:binaries": "yarn build && rimraf out && pkg --no-bytecode --public-packages '*' --compress GZip --output out/kyve package.json && node ./dist-cjs/checksum.js",
     "start": "node ./dist/src/index.js",
     "format": "prettier --write ."
   },
-  "bin": "./dist/src/index.js",
+  "bin": "./dist-cjs/bundle.js",
   "pkg": {
-    "scripts": "./dist/src/index.js",
+    "scripts": "./dist-cjs/bundle.js",
     "targets": [
       "latest-linux-x64",
       "latest-linux-arm64",
@@ -31,6 +32,8 @@
     "pkg": "^5.8.0",
     "prettier": "^2.7.1",
     "rimraf": "^3.0.2",
-    "typescript": "^4.7.4"
+    "typescript": "^4.7.4",
+    "webpack": "^5.102.1",
+    "webpack-cli": "^6.0.1"
   }
 }

@@ -120,6 +120,7 @@ out
 
 .nuxt
 dist
+dist-cjs
 
 # Gatsby files
 
