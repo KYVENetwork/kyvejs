@@ -4,7 +4,7 @@
   "license": "MIT",
   "scripts": {
     "build": "rimraf dist && tsc",
-    "transpile": "webpack --config webpack.config.js",
+    "transpile": "rimraf dist-cjs && webpack --config webpack.config.js && cp ../../node_modules/@mysten/walrus-wasm/walrus_wasm_bg.wasm dist-cjs",
     "build:binaries": "yarn build && yarn transpile && rimraf out && pkg --no-bytecode --public-packages '*' --compress GZip --output out/kyve package.json && node ./dist-cjs/checksum.js",
     "start": "node ./dist/src/index.js",
     "format": "prettier --write ."
@@ -12,6 +12,7 @@
   "bin": "./dist-cjs/bundle.js",
   "pkg": {
     "scripts": "./dist-cjs/bundle.js",
+    "assets": "./dist-cjs/walrus_wasm_bg.wasm",
     "targets": [
       "latest-linux-x64",
       "latest-linux-arm64",

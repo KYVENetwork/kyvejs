@@ -38,7 +38,8 @@
     "clean": "lerna run clean",
     "lint": "lerna run lint",
     "lint:fix": "lerna run lint:fix",
-    "custom-version": "yarn lerna version --conventional-commits=false"
+    "custom-version": "yarn lerna version --conventional-commits=false",
+    "test:binaries": "./scripts/testbinaries.sh"
   },
   "version": "0.0.0",
   "packageManager": "yarn@1.22.22+sha1.ac34549e6aa8e7ead463a7407e1c7390f61a6610"
