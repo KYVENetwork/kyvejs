@@ -53,10 +53,7 @@ import { testStorageProvider } from "./reactors/storageProviders/testStorageProv
 import { compressionFactory } from "./reactors/compression/index.js";
 import { cacheProviderFactory } from "./reactors/cacheProvider/index.js";
 import { QueryParamsResponse } from "@kyvejs/types/lcd/kyve/query/v1beta1/params.js";
-
-import { createRequire } from "module";
-const require = createRequire(import.meta.url);
-const packageJson = require("../package.json");
+import { PROTOCOL_VERSION } from "./version.js";
 
 /**
  * Main class of KYVE protocol nodes representing a validator node.
@@ -189,7 +186,7 @@ export class Validator {
     this.runtime = runtime;
 
     // set @kyvejs/protocol version
-    this.protocolVersion = packageJson.version;
+    this.protocolVersion = PROTOCOL_VERSION;
   }
 
   /**

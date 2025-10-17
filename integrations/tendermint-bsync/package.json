@@ -3,9 +3,9 @@
   "version": "1.2.17",
   "license": "MIT",
   "scripts": {
-    "build": "rimraf dist && tsc && webpack --config webpack.config.js",
+    "build": "rimraf dist && tsc",
     "transpile": "webpack --config webpack.config.js",
-    "build:binaries": "yarn build && rimraf out && pkg --no-bytecode --public-packages '*' --compress GZip --output out/kyve package.json && node ./dist-cjs/checksum.js",
+    "build:binaries": "yarn build && yarn transpile && rimraf out && pkg --no-bytecode --public-packages '*' --compress GZip --output out/kyve package.json && node ./dist-cjs/checksum.js",
     "start": "node ./dist/src/index.js",
     "format": "prettier --write ."
   },

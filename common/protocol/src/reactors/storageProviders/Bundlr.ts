@@ -24,7 +24,9 @@ export class Bundlr implements IStorageProvider {
     return JSON.parse(this.storagePriv);
   }
 
+  // @ts-ignore
   private get bundlrClient(): BundlrClient.default {
+    // @ts-ignore
     return new BundlrClient.default(
       "http://node1.bundlr.network",
       "arweave",

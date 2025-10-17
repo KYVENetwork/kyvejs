@@ -1,4 +1,3 @@
-import Prando from "prando";
 import {
   adjectives,
   animals,
@@ -6,6 +5,7 @@ import {
   uniqueNamesGenerator,
 } from "unique-names-generator";
 import { major, minor, patch, prerelease } from "semver";
+import seedrandom from "seedrandom";
 
 import { Validator, standardizeError } from "../../index.js";
 
@@ -49,7 +49,7 @@ export async function setupValidator(this: Validator): Promise<void> {
     this.logger.debug(`Creating seed for valname generation`);
     this.logger.debug(valnameSeed);
 
-    const r = new Prando.default(valnameSeed);
+    const rng = seedrandom(valnameSeed);
 
     this.logger.debug(`Generate valname with seed`);
 
@@ -58,7 +58,7 @@ export async function setupValidator(this: Validator): Promise<void> {
       separator: "-",
       length: 3,
       style: "lowerCase",
-      seed: r.nextInt(0, adjectives.length * colors.length * animals.length),
+      seed: rng(),
     }).replace(" ", "-");
 
     this.logger.debug(`Valname "${this.name}" got created`);
