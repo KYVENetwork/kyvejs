@@ -59,7 +59,7 @@ export class Bundlr implements IStorageProvider {
   }
 
   async retrieveBundle(storageId: string, timeout: number) {
-    const { data: storageData } = await axios.default.get(
+    const { data: storageData } = await axios.get(
       `https://arweave.net/${storageId}`,
       { responseType: "arraybuffer", timeout }
     );

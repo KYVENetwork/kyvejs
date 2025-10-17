@@ -8,8 +8,9 @@ import {
   IStorageProvider,
   StorageReceipt,
 } from "../../types/index.js";
+import dotenv from "dotenv";
 
-require("dotenv").config();
+dotenv.config();
 
 export class Load implements IStorageProvider {
   public name = "Load";
@@ -79,20 +80,16 @@ export class Load implements IStorageProvider {
       });
 
       // Upload signed DataItem to Load S3
-      const response = await axios.default.post(
-        `${this.baseUrl}/upload`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${this.apiKey}`,
-            signed: "true",
-            ...formData.getHeaders(),
-          },
-          timeout: 60000,
-          maxContentLength: Infinity,
-          maxBodyLength: Infinity,
-        }
-      );
+      const response = await axios.post(`${this.baseUrl}/upload`, formData, {
+        headers: {
+          Authorization: `Bearer ${this.apiKey}`,
+          signed: "true",
+          ...formData.getHeaders(),
+        },
+        timeout: 60000,
+        maxContentLength: Infinity,
+        maxBodyLength: Infinity,
+      });
 
       if (response.status !== 200) {
         throw new Error(`Upload failed with status: ${response.status}`);
@@ -115,23 +112,20 @@ export class Load implements IStorageProvider {
       // Load S3 Agent return a redirect to the presigned get_object URL
       // when an object (offchain DataItem) is requested, for performance purposes.
       // So first we get the presigned get_object URL.
-      const redirectResponse = await axios.default.get(
-        `${this.baseUrl}/${storageId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${this.apiKey}`,
-          },
-          maxRedirects: 0,
-          validateStatus: (status) => status === 302 || status === 200,
-          timeout: timeout || 30000,
-        }
-      );
+      const redirectResponse = await axios.get(`${this.baseUrl}/${storageId}`, {
+        headers: {
+          Authorization: `Bearer ${this.apiKey}`,
+        },
+        maxRedirects: 0,
+        validateStatus: (status) => status === 302 || status === 200,
+        timeout: timeout || 30000,
+      });
 
       if (redirectResponse.status === 302) {
         const presignedUrl = redirectResponse.headers.location;
 
         // Download offchain DataItem body's data from the presigned Load S3 URL
-        const dataResponse = await axios.default.get(presignedUrl, {
+        const dataResponse = await axios.get(presignedUrl, {
           responseType: "arraybuffer",
           timeout: timeout || 30000,
         });
@@ -149,7 +143,7 @@ export class Load implements IStorageProvider {
 
       throw new Error(`Unexpected response status: ${redirectResponse.status}`);
     } catch (error) {
-      if (axios.default.isAxiosError(error)) {
+      if (axios.isAxiosError(error)) {
         if (error.response?.status === 404) {
           throw new Error(`Bundle not found: ${storageId}`);
         }

@@ -2,11 +2,12 @@ import { Account, Ed25519PrivateKey, Network } from "@aptos-labs/ts-sdk";
 import { ShelbyNodeClient } from "@shelby-protocol/sdk/node";
 import { v4 as uuidv4 } from "uuid";
 
+import dotenv from "dotenv";
 import { BundleTag, IStorageProvider } from "../../types/index.js";
 
 const TIME_TO_LIVE = 60 * 60 * 1_000_000;
 
-require("dotenv").config();
+dotenv.config();
 
 export class Shelby implements IStorageProvider {
   public name = "Shelby";

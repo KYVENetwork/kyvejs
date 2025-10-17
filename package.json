@@ -23,8 +23,7 @@
     "rimraf": "^3.0.2"
   },
   "resolutions": {
-    "axios": "^0.27.2",
-    "@aptos-labs/ts-sdk": "^5.1.1"
+    "axios": "^1.4.0"
   },
   "scripts": {
     "setup": "lerna clean && yarn install && lerna run build",
