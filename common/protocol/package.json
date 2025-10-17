@@ -40,7 +40,9 @@
     "semver": "^7.5.3",
     "tslog": "^3.2.2",
     "unique-names-generator": "^4.6.0",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.0",
+    "@shelby-protocol/sdk": "^0.0.4",
+    "@aptos-labs/ts-sdk": "^5.1.1"
   },
   "devDependencies": {
     "@types/clone": "^2.1.1",
