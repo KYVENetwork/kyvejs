@@ -4,7 +4,7 @@
   "license": "MIT",
   "scripts": {
     "build": "rimraf dist && tsc",
-    "build:binaries": "yarn build && rimraf out && pkg --no-bytecode --public-packages '*' --compress GZip --output out/kyve package.json && node ../../common/protocol/dist/src/scripts/checksum.js",
+    "build:binaries": "yarn build && rimraf out && pkg --no-bytecode --public-packages '*' --compress GZip --output out/kyve package.json && node ../../common/protocol/dist/scripts/checksum.js",
     "start": "node ./dist/src/index.js",
     "format": "prettier - -write ."
   },
@@ -14,7 +14,8 @@
     "targets": [
       "latest-linux-x64",
       "latest-linux-arm64",
-      "latest-macos-x64"
+      "latest-macos-x64",
+      "latest-macos-arm64"
     ],
     "outputPath": "out"
   },

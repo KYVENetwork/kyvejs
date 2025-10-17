@@ -79,8 +79,8 @@ export function setupLogger(this: Validator): void {
 
     this.logger.info("Starting node ...\n");
   } catch (err) {
-    this.logger.fatal(`Failed to init logger. Exiting ...`);
-    this.logger.fatal(standardizeError(err));
+    console.log(`Failed to init logger. Exiting ...`);
+    console.log(standardizeError(err));
 
     process.exit(1);
   }

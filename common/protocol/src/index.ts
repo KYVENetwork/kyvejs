@@ -366,6 +366,12 @@ export class Validator {
       },
     } as PoolResponse;
 
+    // name the log file after the time the node got started
+    this.logFile = `${new Date().toISOString()}.log`;
+    this.home = "./";
+
+    this.setupLogger();
+
     await this.testStorageProvider(options.data);
   }
 

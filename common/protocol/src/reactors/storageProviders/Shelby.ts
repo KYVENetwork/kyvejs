@@ -56,7 +56,7 @@ export class Shelby implements IStorageProvider {
 
     await this.client.upload({
       blobData: Uint8Array.from(bundle),
-      signer: this.signer as any,
+      signer: this.signer,
       blobName: storageId,
       expirationMicros: Date.now() * 1000 + TIME_TO_LIVE,
     });

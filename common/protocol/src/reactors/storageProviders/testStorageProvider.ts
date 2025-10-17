@@ -37,16 +37,16 @@ export async function testStorageProvider(
     );
 
     this.logger.info(`Comparing byte size with original data`);
-    if (bundle.length !== storageData.length) {
+    if (bundle.byteLength !== storageData.byteLength) {
       throw new Error(
-        `Byte size does not match, uploaded ${bundle.length} bytes, retrieved ${storageData.length}`
+        `Byte size does not match, uploaded ${bundle.byteLength} bytes, retrieved ${storageData.byteLength}`
       );
     }
 
     this.logger.info(`Comparing data content with original data`);
-    if (bundle.equals(storageData)) {
+    if (bundle.toString() !== storageData.toString()) {
       throw new Error(
-        `Data content does not match, uploaded ${bundle.toString()} bytes, retrieved ${storageData.toString()}`
+        `Data content does not match, uploaded \"${bundle.toString()}\", retrieved \"${storageData.toString()}\"`
       );
     }
 
