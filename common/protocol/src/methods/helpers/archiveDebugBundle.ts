@@ -1,8 +1,8 @@
 import { existsSync, mkdirSync, createWriteStream, readFileSync } from "fs";
 import path from "path";
-import { DataItem, dirSize, standardizeError, Validator } from "../..";
+import { DataItem, dirSize, standardizeError, Validator } from "../../index.js";
 import JSZip from "jszip";
-import { VoteType } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
+import { VoteType } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx.js";
 
 /**
  * archiveDebugBundle is used for storing a bundle for debug

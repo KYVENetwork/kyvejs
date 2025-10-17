@@ -3,7 +3,7 @@ import crypto from "crypto";
 import { statSync, readdirSync } from "fs";
 import { join } from "path";
 
-import { DataItem } from "..";
+import { DataItem } from "../index.js";
 
 const INFINITY_LOOP = true;
 /**

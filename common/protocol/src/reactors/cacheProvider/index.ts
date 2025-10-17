@@ -1,6 +1,6 @@
-import { ICacheProvider, Validator } from "../..";
-import { JsonFileCache } from "./JsonFileCache";
-import { MemoryCache } from "./MemoryCache";
+import { ICacheProvider, Validator } from "../../index.js";
+import { JsonFileCache } from "./JsonFileCache.js";
+import { MemoryCache } from "./MemoryCache.js";
 
 /**
  * cacheProviderFactory creates the correct cache class

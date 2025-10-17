@@ -1,4 +1,4 @@
-import { Validator, standardizeError } from "../..";
+import { Validator, standardizeError } from "../../index.js";
 
 /**
  * skipUploaderRole is called by the current next uploader of the

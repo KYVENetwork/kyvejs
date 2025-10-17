@@ -32,17 +32,17 @@ import { MsgUndelegate } from "@kyvejs/types/client/kyve/delegation/v1beta1/tx";
 import {
   MsgSubmitBundleProposal,
   MsgUpdateParams as MsgUpdateParamsBundles,
-} from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
-import { MsgVoteBundleProposal } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
-import { MsgClaimUploaderRole } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
-import { MsgSkipUploaderRole } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
+} from "@kyvejs/types/client/kyve/bundles/v1beta1/tx.js";
+import { MsgVoteBundleProposal } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx.js";
+import { MsgClaimUploaderRole } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx.js";
+import { MsgSkipUploaderRole } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx.js";
 /** funder **/
 import {
   MsgCreateFunder,
   MsgDefundPool,
   MsgFundPool,
-  MsgUpdateFunder
-} from '@kyvejs/types/client/kyve/funders/v1beta1/tx';
+  MsgUpdateFunder,
+} from "@kyvejs/types/client/kyve/funders/v1beta1/tx";
 
 /** gov **/
 import Mock = jest.Mock;

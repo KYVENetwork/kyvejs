@@ -1,5 +1,5 @@
-import KyveSDK from "@kyvejs/sdk";
-import { Validator, standardizeError } from "../..";
+import { KyveSDK } from "@kyvejs/sdk";
+import { Validator, standardizeError } from "../../index.js";
 
 /**
  * setupSDK creates the main KYVE SDK and the client which is used for transactions

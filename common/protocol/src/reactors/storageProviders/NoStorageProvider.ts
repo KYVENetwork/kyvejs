@@ -1,5 +1,5 @@
-import { sha256 } from "../..";
-import { BundleTag, IStorageProvider } from "../../types";
+import { sha256 } from "../../index.js";
+import { BundleTag, IStorageProvider } from "../../types/index.js";
 
 export class NoStorageProvider implements IStorageProvider {
   public name = "NoStorageProvider";

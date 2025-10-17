@@ -1,16 +1,14 @@
-import { PoolResponse } from "@kyvejs/types/lcd/kyve/query/v1beta1/pools";
-import KyveSDK, { KyveClient, KyveLCDClientType } from "@kyvejs/sdk";
+import { PoolResponse } from "@kyvejs/types/lcd/kyve/query/v1beta1/pools.js";
+import { KyveClient, KyveLCDClientType, KyveSDK } from "@kyvejs/sdk";
 import { Command, OptionValues } from "commander";
 import os from "os";
 import { Logger } from "tslog";
-
-import { version as protocolVersion } from "../package.json";
 import {
   parseCache,
   parseEndpoints,
   parsePoolAccount,
   parsePoolId,
-} from "./commander";
+} from "./commander/index.js";
 import {
   archiveDebugBundle,
   canPropose,
@@ -46,15 +44,19 @@ import {
   waitForNextBundleProposal,
   waitForUploadInterval,
   isStorageBalanceLow,
-} from "./methods";
-import { ICacheProvider, IMetrics, IRuntime } from "./types";
-import { IDLE_TIME, sleep, standardizeError } from "./utils";
-import { SupportedChains } from "@kyvejs/sdk/dist/constants";
-import { storageProviderFactory } from "./reactors/storageProviders";
-import { testStorageProvider } from "./reactors/storageProviders/testStorageProvider";
-import { compressionFactory } from "./reactors/compression";
-import { cacheProviderFactory } from "./reactors/cacheProvider";
-import { QueryParamsResponse } from "@kyvejs/types/lcd/kyve/query/v1beta1/params";
+} from "./methods/index.js";
+import { ICacheProvider, IMetrics, IRuntime } from "./types/index.js";
+import { IDLE_TIME, sleep, standardizeError } from "./utils/index.js";
+import { constants } from "@kyvejs/sdk";
+import { storageProviderFactory } from "./reactors/storageProviders/index.js";
+import { testStorageProvider } from "./reactors/storageProviders/testStorageProvider.js";
+import { compressionFactory } from "./reactors/compression/index.js";
+import { cacheProviderFactory } from "./reactors/cacheProvider/index.js";
+import { QueryParamsResponse } from "@kyvejs/types/lcd/kyve/query/v1beta1/params.js";
+
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+const packageJson = require("../package.json");
 
 /**
  * Main class of KYVE protocol nodes representing a validator node.
@@ -89,7 +91,7 @@ export class Validator {
   protected staker!: string;
   protected poolAccount!: string;
   protected storagePriv!: string;
-  protected chainId!: SupportedChains;
+  protected chainId!: constants.SupportedChains;
   protected rpc!: string[];
   protected rest!: string[];
   protected coinDenom!: string;
@@ -187,7 +189,7 @@ export class Validator {
     this.runtime = runtime;
 
     // set @kyvejs/protocol version
-    this.protocolVersion = protocolVersion;
+    this.protocolVersion = packageJson.version;
   }
 
   /**
@@ -450,13 +452,13 @@ export class Validator {
 }
 
 // export commander
-export * from "./commander";
+export * from "./commander/index.js";
 
 // export types
-export * from "./types";
+export * from "./types/index.js";
 
 // export utils
-export * from "./utils";
+export * from "./utils/index.js";
 
 // add this so we can JSON.stringify bignumbers
 (BigInt.prototype as any).toJSON = function () {

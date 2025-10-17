@@ -1,5 +1,9 @@
-import { DataItem, Validator } from "../..";
-import { callWithBackoffStrategy, sleep, standardizeError } from "../../utils";
+import { DataItem, Validator } from "../../index.js";
+import {
+  callWithBackoffStrategy,
+  sleep,
+  standardizeError,
+} from "../../utils/index.js";
 import clone from "clone";
 
 /**

@@ -1,5 +1,8 @@
-import { Validator } from "../..";
-import { callWithBackoffStrategy, standardizeError } from "../../utils";
+import { Validator } from "../../index.js";
+import {
+  callWithBackoffStrategy,
+  standardizeError,
+} from "../../utils/index.js";
 
 /**
  * canVote checks if the node is able to vote on the current
@@ -77,7 +80,7 @@ export async function canVote(
         throw new Error();
       },
       { limitTimeoutMs: 5 * 60 * 1000, increaseByMs: 10 * 1000 },
-      async (err: any, ctx) => {
+      async (err: any, ctx: any) => {
         this.logger.info(
           `Requesting query canVote was unsuccessful. Retrying in ${(
             ctx.nextTimeoutInMs / 1000

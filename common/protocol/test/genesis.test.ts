@@ -18,7 +18,7 @@ import { TestNormalCompression } from "./mocks/compression.mock";
 import { setupMetrics } from "../src/methods";
 import { register } from "prom-client";
 import { TestRuntime } from "./mocks/runtime.mock";
-import { VoteType } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
+import { VoteType } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx.js";
 
 /*
 

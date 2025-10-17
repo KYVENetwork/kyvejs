@@ -2,7 +2,7 @@ import { appendFileSync, existsSync, mkdirSync } from "fs";
 import path from "path";
 import { ILogObject, Logger } from "tslog";
 
-import { Validator, standardizeError } from "../..";
+import { Validator, standardizeError } from "../../index.js";
 
 /**
  * setupLogger creates the logger instance and defines the home and file

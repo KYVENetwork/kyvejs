@@ -4,7 +4,7 @@ import {
   MsgSkipUploaderRole,
   MsgSubmitBundleProposal,
   MsgVoteBundleProposal,
-} from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
+} from "@kyvejs/types/client/kyve/bundles/v1beta1/tx.js";
 
 import { isNotEmpty } from "../utils";
 

@@ -1,5 +1,8 @@
-import { Validator } from "../..";
-import { callWithBackoffStrategy, standardizeError } from "../../utils";
+import { Validator } from "../../index.js";
+import {
+  callWithBackoffStrategy,
+  standardizeError,
+} from "../../utils/index.js";
 
 /**
  * syncParams fetches the all protocol params from chain

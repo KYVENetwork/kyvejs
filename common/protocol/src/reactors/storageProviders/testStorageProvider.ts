@@ -1,4 +1,4 @@
-import { Validator, standardizeError } from "../..";
+import { Validator, standardizeError } from "../../index.js";
 
 /**
  * testStorageProvider uploads one data item and retrieves it

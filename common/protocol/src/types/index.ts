@@ -1,3 +1,3 @@
-export * from "./dto";
-export * from "./interfaces";
-export * from "./metrics";
+export * from "./dto.js";
+export * from "./interfaces/index.js";
+export * from "./metrics.js";

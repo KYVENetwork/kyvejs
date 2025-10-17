@@ -1,6 +1,6 @@
 import path from "path";
 
-import { Validator, standardizeError } from "../..";
+import { Validator, standardizeError } from "../../index.js";
 import fse from "fs-extra";
 
 /**

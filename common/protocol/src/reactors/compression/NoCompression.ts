@@ -1,4 +1,4 @@
-import { ICompression } from "../../types";
+import { ICompression } from "../../types/index.js";
 
 export class NoCompression implements ICompression {
   public name = "NoCompression";

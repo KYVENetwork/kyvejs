@@ -1,5 +1,5 @@
-import BigNumber from "bignumber.js";
-import { Validator, standardizeJSON } from "../..";
+import { BigNumber } from "bignumber.js";
+import { Validator, standardizeJSON } from "../../index.js";
 
 /**
  * isStorageBalanceLow checks if the account of the storage provider

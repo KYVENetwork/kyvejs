@@ -1,8 +1,11 @@
-import BigNumber from "bignumber.js";
+import { BigNumber } from "bignumber.js";
 
-import { VoteType } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
-import { Validator } from "../..";
-import { callWithBackoffStrategy, standardizeError } from "../../utils";
+import { VoteType } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx.js";
+import { Validator } from "../../index.js";
+import {
+  callWithBackoffStrategy,
+  standardizeError,
+} from "../../utils/index.js";
 
 /**
  * saveBundleDownload downloads a bundle from the storage provider.

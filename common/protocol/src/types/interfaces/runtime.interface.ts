@@ -1,5 +1,5 @@
-import { Validator } from "../..";
-import { DataItem } from "..";
+import { Validator } from "../../index.js";
+import { DataItem } from "../index.js";
 
 /**
  * Interface of Runtime.

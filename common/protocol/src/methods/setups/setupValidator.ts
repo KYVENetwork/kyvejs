@@ -7,7 +7,7 @@ import {
 } from "unique-names-generator";
 import { major, minor, patch, prerelease } from "semver";
 
-import { Validator, standardizeError } from "../..";
+import { Validator, standardizeError } from "../../index.js";
 
 /**
  * setupValidator ensures the node starts as a valid validator
@@ -49,7 +49,7 @@ export async function setupValidator(this: Validator): Promise<void> {
     this.logger.debug(`Creating seed for valname generation`);
     this.logger.debug(valnameSeed);
 
-    const r = new Prando(valnameSeed);
+    const r = new Prando.default(valnameSeed);
 
     this.logger.debug(`Generate valname with seed`);
 

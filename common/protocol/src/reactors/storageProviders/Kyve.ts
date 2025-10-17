@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
-import { BundleTag, IStorageProvider } from "../../types";
+import { BundleTag, IStorageProvider } from "../../types/index.js";
 import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
 import { Secp256k1HdWallet } from "@cosmjs/amino";
 import { makeADR36AminoSignDoc } from "@keplr-wallet/cosmos";
@@ -81,7 +81,7 @@ export class Kyve implements IStorageProvider {
     );
     const { signature } = await signer.signAmino(account.address, signDoc);
 
-    await axios.post(
+    await axios.default.post(
       "https://upload.storage.kyve.network/upload",
       {
         name: storageId,
@@ -109,7 +109,7 @@ export class Kyve implements IStorageProvider {
   }
 
   async retrieveBundle(storageId: string, timeout: number) {
-    const { data: storageData } = await axios.get(
+    const { data: storageData } = await axios.default.get(
       `https://storage.kyve.network/${storageId}`,
       { responseType: "arraybuffer", timeout }
     );

@@ -1,7 +1,7 @@
-import { VoteType } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
+import { VoteType } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx.js";
 
-import { Validator } from "../..";
-import { sha256, standardizeError } from "../../utils";
+import { Validator } from "../../index.js";
+import { sha256, standardizeError } from "../../utils/index.js";
 
 /**
  * validateBundleProposal validates a proposed bundle proposal

@@ -1,6 +1,6 @@
-import BigNumber from "bignumber.js";
+import { BigNumber } from "bignumber.js";
 
-import { Validator, standardizeError } from "../..";
+import { Validator, standardizeError } from "../../index.js";
 
 /**
  * getBalancesForMetrics tries to retrieve the $KYVE balance of the staker account, the $KYVE

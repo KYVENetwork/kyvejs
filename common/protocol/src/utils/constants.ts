@@ -1,4 +1,4 @@
-import { VoteType } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
+import { VoteType } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx.js";
 
 // the time a node should halt if the node decides to idle
 export const IDLE_TIME = 60 * 1000;

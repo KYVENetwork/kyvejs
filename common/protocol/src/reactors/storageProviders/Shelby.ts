@@ -2,7 +2,7 @@ import { Account, Ed25519PrivateKey, Network } from "@aptos-labs/ts-sdk";
 import { ShelbyNodeClient } from "@shelby-protocol/sdk/node";
 import { v4 as uuidv4 } from "uuid";
 
-import { BundleTag, IStorageProvider } from "../../types";
+import { BundleTag, IStorageProvider } from "../../types/index.js";
 
 const TIME_TO_LIVE = 60 * 60 * 1_000_000;
 
@@ -54,7 +54,7 @@ export class Shelby implements IStorageProvider {
     const storageId = `${this.signer.accountAddress.toString()}/${uuidv4()}`;
 
     await this.client.upload({
-      blobData: bundle,
+      blobData: Uint8Array.from(bundle),
       signer: this.signer as any,
       blobName: storageId,
       expirationMicros: Date.now() * 1000 + TIME_TO_LIVE,

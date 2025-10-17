@@ -1,12 +1,12 @@
-import BigNumber from "bignumber.js";
-import { Validator } from "../..";
-import { DataItem } from "../../types";
+import { BigNumber } from "bignumber.js";
+import { Validator } from "../../index.js";
+import { DataItem } from "../../types/index.js";
 import {
   bundleToBytes,
   MAX_BUNDLE_BYTE_SIZE,
   sha256,
   standardizeError,
-} from "../../utils";
+} from "../../utils/index.js";
 import { Coin, Coins } from "@kyvejs/coins";
 
 /**

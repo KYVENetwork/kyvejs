@@ -1,4 +1,4 @@
-import { Validator, standardizeError } from "../..";
+import { Validator, standardizeError } from "../../index.js";
 
 /**
  * submitBundleProposal submits a bundle proposal to the

@@ -2,7 +2,7 @@ import http from "http";
 import prom_client, { register } from "prom-client";
 import url from "url";
 
-import { IMetrics, Validator, standardizeError } from "../..";
+import { IMetrics, Validator, standardizeError } from "../../index.js";
 
 /**
  * setupMetrics initiates all metrics and starts if enabled a local prometheus

@@ -1,8 +1,8 @@
 import ArweaveClient from "arweave";
-import { JWKInterface } from "arweave/node/lib/wallet";
+import { JWKInterface } from "arweave/node/lib/wallet.js";
 import axios from "axios";
 
-import { BundleTag, IStorageProvider } from "../../types";
+import { BundleTag, IStorageProvider } from "../../types/index.js";
 
 export class Arweave implements IStorageProvider {
   public name = "Arweave";
@@ -41,7 +41,7 @@ export class Arweave implements IStorageProvider {
   }
 
   async getPrice(bytes: number) {
-    const { data: price } = await axios.get(
+    const { data: price } = await axios.default.get(
       `${this.arweaveClient.getConfig().api.protocol}://${
         this.arweaveClient.getConfig().api.host
       }/price/${bytes}`
@@ -80,7 +80,7 @@ export class Arweave implements IStorageProvider {
   }
 
   async retrieveBundle(storageId: string, timeout: number) {
-    const { data: storageData } = await axios.get(
+    const { data: storageData } = await axios.default.get(
       `https://arweave.net/${storageId}`,
       { responseType: "arraybuffer", timeout }
     );

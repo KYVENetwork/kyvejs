@@ -8,7 +8,7 @@ import {
 } from "@ardrive/turbo-sdk";
 import axios from "axios";
 
-import { BundleTag, IStorageProvider } from "../../types";
+import { BundleTag, IStorageProvider } from "../../types/index.js";
 
 export class Turbo implements IStorageProvider {
   public name = "Turbo";
@@ -79,7 +79,7 @@ export class Turbo implements IStorageProvider {
   }
 
   async retrieveBundle(storageId: string, timeout: number) {
-    const { data: storageData } = await axios.get(
+    const { data: storageData } = await axios.default.get(
       `https://arweave.net/${storageId}`,
       { responseType: "arraybuffer", timeout }
     );

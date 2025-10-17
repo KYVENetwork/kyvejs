@@ -1,5 +1,5 @@
-import { Validator } from "../..";
-import { REFRESH_TIME, sleep, standardizeError } from "../../utils";
+import { Validator } from "../../index.js";
+import { REFRESH_TIME, sleep, standardizeError } from "../../utils/index.js";
 
 /**
  * waitForNextBundleProposal waits until the the next bundle proposal has

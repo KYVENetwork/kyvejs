@@ -1,6 +1,6 @@
-import { Validator } from "../..";
-import { DataItem } from "../../types";
-import { bytesToBundle } from "../../utils";
+import { Validator } from "../../index.js";
+import { DataItem } from "../../types/index.js";
+import { bytesToBundle } from "../../utils/index.js";
 
 /**
  * parseProposedBundle takes the raw data from the storage

@@ -1,4 +1,4 @@
-import { Validator, standardizeError } from "../..";
+import { Validator, standardizeError } from "../../index.js";
 
 /**
  * isDataAvailable checks if the current next data item

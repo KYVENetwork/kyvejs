@@ -4,11 +4,11 @@ import { defaultRegistryTypes } from "@cosmjs/stargate";
 import { MsgSubmitProposal } from "@kyvejs/types/client/cosmos/gov/v1/tx";
 import { MsgVote } from "@kyvejs/types/client/cosmos/gov/v1/tx";
 /** bundles **/
-import { MsgSubmitBundleProposal } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
-import { MsgVoteBundleProposal } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
-import { MsgClaimUploaderRole } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
-import { MsgSkipUploaderRole } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
-import { MsgUpdateParams as MsgUpdateParamsBundles } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
+import { MsgSubmitBundleProposal } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx.js";
+import { MsgVoteBundleProposal } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx.js";
+import { MsgClaimUploaderRole } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx.js";
+import { MsgSkipUploaderRole } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx.js";
+import { MsgUpdateParams as MsgUpdateParamsBundles } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx.js";
 /** fees **/
 import { MsgUpdateParams as MsgUpdateParamsGlobal } from "@kyvejs/types/client/kyve/global/v1beta1/tx";
 import { MsgCreatePool } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";

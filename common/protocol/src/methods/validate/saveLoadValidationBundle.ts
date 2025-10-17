@@ -1,9 +1,9 @@
-import BigNumber from "bignumber.js";
+import { BigNumber } from "bignumber.js";
 
-import { VoteType } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
-import { Validator } from "../..";
-import { DataItem } from "../../types";
-import { callWithBackoffStrategy, standardizeJSON } from "../../utils";
+import { VoteType } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx.js";
+import { Validator } from "../../index.js";
+import { DataItem } from "../../types/index.js";
+import { callWithBackoffStrategy, standardizeJSON } from "../../utils/index.js";
 
 /**
  * saveLoadValidationBundle loads the bundle from the local

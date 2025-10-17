@@ -1,10 +1,10 @@
-import { Validator } from "../..";
+import { Validator } from "../../index.js";
 import {
   callWithBackoffStrategy,
   REFRESH_TIME,
   sleep,
   standardizeError,
-} from "../../utils";
+} from "../../utils/index.js";
 
 const INFINITY_LOOP = true;
 
