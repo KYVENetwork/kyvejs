@@ -1,4 +1,4 @@
-import { DataItem, ICacheProvider } from "../../types";
+import { DataItem, ICacheProvider } from "../../types/index.js";
 
 export class MemoryCache implements ICacheProvider {
   public name = "MemoryCache";

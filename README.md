@@ -84,7 +84,10 @@ cd integrations/<integration>
 yarn build:binaries
 ```
 
-The binaries can then be found in the `/out` folder
+The binaries can then be found in the `/out` folder. Note that the binaries are compiled with `pkg`
+which can only handle CommonJs code while the `protocol` package has the new ESM code, to account
+for this we first transpile the output of the typescript build to a single commonjs file which we
+then compile into a final binary.
 
 ## How to contribute
 

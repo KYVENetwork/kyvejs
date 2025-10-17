@@ -1,4 +1,4 @@
-import { DataItem } from "..";
+import { DataItem } from "../index.js";
 
 /**
  * Interface of Cache.

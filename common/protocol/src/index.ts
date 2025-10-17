@@ -1,16 +1,14 @@
-import { PoolResponse } from "@kyvejs/types/lcd/kyve/query/v1beta1/pools";
-import KyveSDK, { KyveClient, KyveLCDClientType } from "@kyvejs/sdk";
+import { PoolResponse } from "@kyvejs/types/lcd/kyve/query/v1beta1/pools.js";
+import { KyveClient, KyveLCDClientType, KyveSDK } from "@kyvejs/sdk";
 import { Command, OptionValues } from "commander";
 import os from "os";
 import { Logger } from "tslog";
-
-import { version as protocolVersion } from "../package.json";
 import {
   parseCache,
   parseEndpoints,
   parsePoolAccount,
   parsePoolId,
-} from "./commander";
+} from "./commander/index.js";
 import {
   archiveDebugBundle,
   canPropose,
@@ -46,14 +44,16 @@ import {
   waitForNextBundleProposal,
   waitForUploadInterval,
   isStorageBalanceLow,
-} from "./methods";
-import { ICacheProvider, IMetrics, IRuntime } from "./types";
-import { IDLE_TIME, sleep, standardizeError } from "./utils";
-import { SupportedChains } from "@kyvejs/sdk/dist/constants";
-import { storageProviderFactory } from "./reactors/storageProviders";
-import { compressionFactory } from "./reactors/compression";
-import { cacheProviderFactory } from "./reactors/cacheProvider";
-import { QueryParamsResponse } from "@kyvejs/types/lcd/kyve/query/v1beta1/params";
+} from "./methods/index.js";
+import { ICacheProvider, IMetrics, IRuntime } from "./types/index.js";
+import { IDLE_TIME, sleep, standardizeError } from "./utils/index.js";
+import { constants } from "@kyvejs/sdk";
+import { storageProviderFactory } from "./reactors/storageProviders/index.js";
+import { testStorageProvider } from "./reactors/storageProviders/testStorageProvider.js";
+import { compressionFactory } from "./reactors/compression/index.js";
+import { cacheProviderFactory } from "./reactors/cacheProvider/index.js";
+import { QueryParamsResponse } from "@kyvejs/types/lcd/kyve/query/v1beta1/params.js";
+import { PROTOCOL_VERSION } from "./version.js";
 
 /**
  * Main class of KYVE protocol nodes representing a validator node.
@@ -88,7 +88,7 @@ export class Validator {
   protected staker!: string;
   protected poolAccount!: string;
   protected storagePriv!: string;
-  protected chainId!: SupportedChains;
+  protected chainId!: constants.SupportedChains;
   protected rpc!: string[];
   protected rest!: string[];
   protected coinDenom!: string;
@@ -171,6 +171,9 @@ export class Validator {
   protected storageProviderFactory = storageProviderFactory;
   protected compressionFactory = compressionFactory;
 
+  // tests
+  protected testStorageProvider = testStorageProvider;
+
   /**
    * Constructor for the validator class. It is required to provide the
    * runtime class here in order to run the
@@ -183,7 +186,7 @@ export class Validator {
     this.runtime = runtime;
 
     // set @kyvejs/protocol version
-    this.protocolVersion = protocolVersion;
+    this.protocolVersion = PROTOCOL_VERSION;
   }
 
   /**
@@ -208,6 +211,31 @@ export class Validator {
         console.log();
         console.log(`Platform: ${os.platform()}`);
         console.log(`Arch: ${os.arch()}`);
+      });
+
+    // define test command
+    const test = program
+      .command("test")
+      .description("Test reactors independently");
+
+    test
+      .command("storage-provider")
+      .description("Test a storage provider")
+      .requiredOption(
+        "--storage-provider-id <number>",
+        "The ID storage provider"
+      )
+      .option(
+        "--storage-priv <string>",
+        "The environment variable pointing to the private key of the storage provider. Only required when using storage providers that require secrets"
+      )
+      .option(
+        "--data <string>",
+        'Test data to upload and retrieve (default "Hello World!")',
+        "Hello World!"
+      )
+      .action((options) => {
+        this.startTestStorageProvider(options);
       });
 
     // define start command
@@ -243,7 +271,7 @@ export class Validator {
       )
       .option(
         "--storage-priv <string>",
-        "The environment variable pointing to the private key of the storage provider. Only required when using storage providers Arweave or Bundlr."
+        "The environment variable pointing to the private key of the storage provider. Only required when using storage providers that require secrets"
       )
       .option(
         "--coin-denom <string>",
@@ -317,6 +345,31 @@ export class Validator {
 
     // bootstrap program
     program.parse();
+  }
+
+  /**
+   * This method will upload a small data item to the selected storage provider
+   * and try to read it again. This command will exit after one round
+   *
+   * @method startTestStorageProvider
+   * @param {OptionValues} options contains all node options defined in bootstrap
+   * @return {Promise<void>}
+   */
+  private async startTestStorageProvider(options: OptionValues): Promise<void> {
+    this.storagePriv = process.env[options.storagePriv] || "";
+    this.pool = {
+      data: {
+        current_storage_provider_id: parseInt(options.storageProviderId),
+      },
+    } as PoolResponse;
+
+    // name the log file after the time the node got started
+    this.logFile = `${new Date().toISOString()}.log`;
+    this.home = "./";
+
+    this.setupLogger();
+
+    await this.testStorageProvider(options.data);
   }
 
   /**
@@ -402,13 +455,13 @@ export class Validator {
 }
 
 // export commander
-export * from "./commander";
+export * from "./commander/index.js";
 
 // export types
-export * from "./types";
+export * from "./types/index.js";
 
 // export utils
-export * from "./utils";
+export * from "./utils/index.js";
 
 // add this so we can JSON.stringify bignumbers
 (BigInt.prototype as any).toJSON = function () {

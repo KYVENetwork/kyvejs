@@ -1,5 +1,5 @@
 import TOML from "@iarna/toml";
-import KyveSDK from "@kyvejs/sdk";
+import { KyveSDK } from "@kyvejs/sdk";
 import { Command } from "commander";
 import fs from "fs";
 import path from "path";

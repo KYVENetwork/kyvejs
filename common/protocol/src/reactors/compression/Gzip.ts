@@ -1,7 +1,7 @@
 import { gunzipSync, gzipSync } from "zlib";
-import { MAX_COMPRESSION_BYTE_SIZE } from "../..";
+import { MAX_COMPRESSION_BYTE_SIZE } from "../../index.js";
 
-import { ICompression } from "../../types";
+import { ICompression } from "../../types/index.js";
 
 export class Gzip implements ICompression {
   public name = "Gzip";

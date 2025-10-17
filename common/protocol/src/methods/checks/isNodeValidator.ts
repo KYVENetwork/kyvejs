@@ -1,4 +1,4 @@
-import { Validator, standardizeError } from "../..";
+import { Validator, standardizeError } from "../../index.js";
 
 /**
  * isNodeValidator checks if the staker of the node is in the

@@ -1,6 +1,6 @@
-import { PoolStatus } from "@kyvejs/types/lcd/kyve/pool/v1beta1/pool";
-import { Validator } from "../..";
-import { IDLE_TIME, sleep } from "../../utils";
+import { PoolStatus } from "@kyvejs/types/lcd/kyve/pool/v1beta1/pool.js";
+import { Validator } from "../../index.js";
+import { IDLE_TIME, sleep } from "../../utils/index.js";
 
 /**
  * runNode is the main execution thread for validating and proposing bundles.

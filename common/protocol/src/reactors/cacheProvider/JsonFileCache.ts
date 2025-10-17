@@ -1,8 +1,8 @@
 import { existsSync, mkdirSync, promises as fs } from "fs";
 import fse from "fs-extra";
-import { readFile, writeFile } from "jsonfile";
+import jsonfile from "jsonfile";
 
-import { DataItem, ICacheProvider } from "../../types";
+import { DataItem, ICacheProvider } from "../../types/index.js";
 
 export class JsonFileCache implements ICacheProvider {
   public name = "JsonFileCache";
@@ -19,11 +19,11 @@ export class JsonFileCache implements ICacheProvider {
   }
 
   public async put(key: string, value: DataItem): Promise<void> {
-    await writeFile(`${this.path}/${key}.json`, value);
+    await jsonfile.writeFile(`${this.path}/${key}.json`, value);
   }
 
   public async get(key: string): Promise<DataItem> {
-    return await readFile(`${this.path}/${key}.json`);
+    return await jsonfile.readFile(`${this.path}/${key}.json`);
   }
 
   public async exists(key: string): Promise<boolean> {

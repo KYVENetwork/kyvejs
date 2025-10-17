@@ -1,10 +1,10 @@
-import { IStorageProvider, Validator } from "../..";
-import { Arweave } from "./Arweave";
-import { Bundlr } from "./Bundlr";
-import { Kyve } from "./Kyve";
-import { Turbo } from "./Turbo";
-import { Load } from "./Load";
-import { NoStorageProvider } from "./NoStorageProvider";
+import { IStorageProvider, Validator } from "../../index.js";
+import { Arweave } from "./Arweave.js";
+import { Bundlr } from "./Bundlr.js";
+import { Kyve } from "./Kyve.js";
+import { Turbo } from "./Turbo.js";
+import { Load } from "./Load.js";
+import { NoStorageProvider } from "./NoStorageProvider.js";
 
 /**
  * storageProviderFactory creates the correct storage provider class

@@ -1,11 +1,12 @@
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
-import { BundleTag, IStorageProvider } from "../../types";
+import { BundleTag, IStorageProvider } from "../../types/index.js";
 import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
 import { Secp256k1HdWallet } from "@cosmjs/amino";
 import { makeADR36AminoSignDoc } from "@keplr-wallet/cosmos";
+import dotenv from "dotenv";
 
-require("dotenv").config();
+dotenv.config();
 
 export class Kyve implements IStorageProvider {
   public name = "Kyve";

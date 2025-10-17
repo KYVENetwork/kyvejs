@@ -1,6 +1,6 @@
-import { ICompression, Validator } from "../..";
-import { Gzip } from "./Gzip";
-import { NoCompression } from "./NoCompression";
+import { ICompression, Validator } from "../../index.js";
+import { Gzip } from "./Gzip.js";
+import { NoCompression } from "./NoCompression.js";
 
 /**
  * compressionFactory creates the correct compression class

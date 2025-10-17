@@ -1,4 +1,4 @@
-import { Validator, standardizeJSON } from "../..";
+import { Validator, standardizeJSON } from "../../index.js";
 import { valid, major, minor, patch, prerelease } from "semver";
 
 /**

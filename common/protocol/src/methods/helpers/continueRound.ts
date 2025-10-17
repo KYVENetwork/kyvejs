@@ -1,4 +1,4 @@
-import { Validator } from "../..";
+import { Validator } from "../../index.js";
 
 /**
  * continueRound is only used for test purposes to allow easier unit testing.

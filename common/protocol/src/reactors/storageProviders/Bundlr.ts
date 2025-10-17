@@ -1,8 +1,8 @@
 import BundlrClient from "@bundlr-network/client";
-import { JWKInterface } from "arweave/node/lib/wallet";
+import { JWKInterface } from "arweave/node/lib/wallet.js";
 import axios from "axios";
 
-import { BundleTag, IStorageProvider } from "../../types";
+import { BundleTag, IStorageProvider } from "../../types/index.js";
 
 export class Bundlr implements IStorageProvider {
   public name = "Bundlr";
@@ -24,8 +24,10 @@ export class Bundlr implements IStorageProvider {
     return JSON.parse(this.storagePriv);
   }
 
-  private get bundlrClient(): BundlrClient {
-    return new BundlrClient(
+  // @ts-ignore
+  private get bundlrClient(): BundlrClient.default {
+    // @ts-ignore
+    return new BundlrClient.default(
       "http://node1.bundlr.network",
       "arweave",
       this.bundlrKeyfile

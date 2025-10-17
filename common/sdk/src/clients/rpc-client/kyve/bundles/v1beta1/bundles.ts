@@ -1,8 +1,8 @@
 import { StdFee } from "@cosmjs/amino/build/signdoc";
-import { MsgSubmitBundleProposal } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
-import { MsgVoteBundleProposal } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
-import { MsgClaimUploaderRole } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
-import { MsgSkipUploaderRole } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
+import { MsgSubmitBundleProposal } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx.js";
+import { MsgVoteBundleProposal } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx.js";
+import { MsgClaimUploaderRole } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx.js";
+import { MsgSkipUploaderRole } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx.js";
 
 import { withTypeUrl } from "../../../../../registry/tx.registry";
 import { KyveSigning, PendingTx } from "../../../signing";

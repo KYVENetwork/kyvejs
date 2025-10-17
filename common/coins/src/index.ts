@@ -1,5 +1,5 @@
 import { parseCoins, Coin } from "@cosmjs/amino";
-import BigNumber from "bignumber.js";
+import { BigNumber } from "bignumber.js";
 
 BigNumber.set({
   ROUNDING_MODE: 3,

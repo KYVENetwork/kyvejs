@@ -1,6 +1,6 @@
-import { PoolStatus } from "@kyvejs/types/lcd/kyve/pool/v1beta1/pool";
+import { PoolStatus } from "@kyvejs/types/lcd/kyve/pool/v1beta1/pool.js";
 
-import { Validator } from "../..";
+import { Validator } from "../../index.js";
 
 /**
  * isPoolActive checks if the pool is active or not.

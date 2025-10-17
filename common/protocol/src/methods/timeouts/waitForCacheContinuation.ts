@@ -1,5 +1,5 @@
-import { Validator } from "../..";
-import { sleep } from "../../utils";
+import { Validator } from "../../index.js";
+import { sleep } from "../../utils/index.js";
 
 /**
  * waitForCacheContinuation waits until a new bundle proposal is

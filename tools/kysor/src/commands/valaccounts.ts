@@ -1,6 +1,6 @@
 import TOML from "@iarna/toml";
-import KyveSDK from "@kyvejs/sdk";
-import BigNumber from "bignumber.js";
+import { KyveSDK } from "@kyvejs/sdk";
+import { BigNumber } from "bignumber.js";
 import { Command } from "commander";
 import fs from "fs";
 import path from "path";

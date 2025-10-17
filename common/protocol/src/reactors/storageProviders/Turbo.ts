@@ -8,7 +8,7 @@ import {
 } from "@ardrive/turbo-sdk";
 import axios from "axios";
 
-import { BundleTag, IStorageProvider } from "../../types";
+import { BundleTag, IStorageProvider } from "../../types/index.js";
 
 export class Turbo implements IStorageProvider {
   public name = "Turbo";

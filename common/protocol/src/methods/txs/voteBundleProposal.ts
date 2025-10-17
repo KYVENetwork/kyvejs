@@ -1,5 +1,5 @@
-import { Validator, standardizeError } from "../..";
-import { VoteType } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx";
+import { Validator, standardizeError } from "../../index.js";
+import { VoteType } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx.js";
 
 /**
  * voteBundleProposal submits a vote on the current bundle proposal.

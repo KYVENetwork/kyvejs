@@ -1,7 +1,7 @@
-import BigNumber from "bignumber.js";
+import { BigNumber } from "bignumber.js";
 
-import { Validator } from "../..";
-import { sleep, standardizeError } from "../../utils";
+import { Validator } from "../../index.js";
+import { sleep, standardizeError } from "../../utils/index.js";
 
 /**
  * waitForUploadInterval waits until the upload interval of the current
