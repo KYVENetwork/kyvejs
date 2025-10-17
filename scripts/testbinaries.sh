@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e  # Exit immediately if a command exits with a non-zero status
 
 # Detect OS
 OS="$(uname | tr '[:upper:]' '[:lower:]')"
@@ -40,8 +41,4 @@ find "$BASE_DIR" -type d -name out | while read -r out_dir; do
 
   echo "Executing $BINARY_PATH"
   "$BINARY_PATH" version
-  exit_code=$?
-  if [ $exit_code -ne 0 ]; then
-    echo "Warning: $BINARY_PATH exited with code $exit_code"
-  fi
 done
