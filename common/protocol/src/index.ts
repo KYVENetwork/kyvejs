@@ -51,6 +51,7 @@ import { ICacheProvider, IMetrics, IRuntime } from "./types";
 import { IDLE_TIME, sleep, standardizeError } from "./utils";
 import { SupportedChains } from "@kyvejs/sdk/dist/constants";
 import { storageProviderFactory } from "./reactors/storageProviders";
+import { testStorageProvider } from "./reactors/storageProviders/testStorageProvider";
 import { compressionFactory } from "./reactors/compression";
 import { cacheProviderFactory } from "./reactors/cacheProvider";
 import { QueryParamsResponse } from "@kyvejs/types/lcd/kyve/query/v1beta1/params";
@@ -171,6 +172,9 @@ export class Validator {
   protected storageProviderFactory = storageProviderFactory;
   protected compressionFactory = compressionFactory;
 
+  // tests
+  protected testStorageProvider = testStorageProvider;
+
   /**
    * Constructor for the validator class. It is required to provide the
    * runtime class here in order to run the
@@ -210,6 +214,31 @@ export class Validator {
         console.log(`Arch: ${os.arch()}`);
       });
 
+    // define test command
+    const test = program
+      .command("test")
+      .description("Test reactors independently");
+
+    test
+      .command("storage-provider")
+      .description("Test a storage provider")
+      .requiredOption(
+        "--storage-provider-id <number>",
+        "The ID storage provider"
+      )
+      .option(
+        "--storage-priv <string>",
+        "The environment variable pointing to the private key of the storage provider. Only required when using storage providers that require secrets"
+      )
+      .option(
+        "--data <string>",
+        'Test data to upload and retrieve (default "Hello World!")',
+        "Hello World!"
+      )
+      .action((options) => {
+        this.startTestStorageProvider(options);
+      });
+
     // define start command
     program
       .command("start")
@@ -243,7 +272,7 @@ export class Validator {
       )
       .option(
         "--storage-priv <string>",
-        "The environment variable pointing to the private key of the storage provider. Only required when using storage providers Arweave or Bundlr."
+        "The environment variable pointing to the private key of the storage provider. Only required when using storage providers that require secrets"
       )
       .option(
         "--coin-denom <string>",
@@ -317,6 +346,25 @@ export class Validator {
 
     // bootstrap program
     program.parse();
+  }
+
+  /**
+   * This method will upload a small data item to the selected storage provider
+   * and try to read it again. This command will exit after one round
+   *
+   * @method startTestStorageProvider
+   * @param {OptionValues} options contains all node options defined in bootstrap
+   * @return {Promise<void>}
+   */
+  private async startTestStorageProvider(options: OptionValues): Promise<void> {
+    this.storagePriv = process.env[options.storagePriv] || "";
+    this.pool = {
+      data: {
+        current_storage_provider_id: parseInt(options.storageProviderId),
+      },
+    } as PoolResponse;
+
+    await this.testStorageProvider(options.data);
   }
 
   /**

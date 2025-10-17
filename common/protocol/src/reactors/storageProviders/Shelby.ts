@@ -55,7 +55,7 @@ export class Shelby implements IStorageProvider {
 
     await this.client.upload({
       blobData: bundle,
-      signer: this.signer,
+      signer: this.signer as any,
       blobName: storageId,
       expirationMicros: Date.now() * 1000 + TIME_TO_LIVE,
     });
@@ -67,12 +67,23 @@ export class Shelby implements IStorageProvider {
   }
 
   async retrieveBundle(storageId: string, _timeout: number) {
-    // TODO: how to read this stream into a buffer?
     const { readable } = await this.client.download({
       account: this.signer.accountAddress.toString(),
       blobName: storageId,
     });
 
-    return { storageId, storageData: Buffer.from(`${readable}`) };
+    // Convert ReadableStream to Buffer
+    const reader = readable.getReader();
+    const chunks: Uint8Array[] = [];
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      chunks.push(value);
+    }
+
+    const storageData = Buffer.concat(chunks);
+
+    return { storageId, storageData };
   }
 }
