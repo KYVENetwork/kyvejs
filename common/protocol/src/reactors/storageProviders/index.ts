@@ -4,6 +4,7 @@ import { Bundlr } from "./Bundlr";
 import { Kyve } from "./Kyve";
 import { Turbo } from "./Turbo";
 import { Load } from "./Load";
+import { Shelby } from "./Shelby";
 import { NoStorageProvider } from "./NoStorageProvider";
 
 /**
@@ -15,6 +16,7 @@ import { NoStorageProvider } from "./NoStorageProvider";
  * 3 - Kyve
  * 4 - Turbo
  * 5 - Load
+ * 7 - Shelby
  * x - NoStorageProvider (default)
  *
  * @method storageProviderFactory
@@ -32,6 +34,8 @@ export function storageProviderFactory(this: Validator): IStorageProvider {
       return new Turbo(this.storagePriv || this.poolAccount);
     case 5:
       return new Load(this.storagePriv);
+    case 7:
+      return new Shelby(this.storagePriv);
     default:
       return new NoStorageProvider();
   }

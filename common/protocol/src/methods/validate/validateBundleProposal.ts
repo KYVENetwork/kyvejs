@@ -163,9 +163,9 @@ export async function validateBundleProposal(
     // vote invalid if bundle key does not match with proposed from key
     this.logger.debug(`Validating bundle proposal by bundle from_key`);
     this.logger.debug(`Proposed = ${this.pool.bundle_proposal!.from_key}`);
-    this.logger.debug(`Actual   = ${validationBundle.at(0)?.key}`);
+    this.logger.debug(`Actual   = ${validationBundle[0]?.key}`);
 
-    if (this.pool.bundle_proposal!.from_key !== validationBundle.at(0)?.key) {
+    if (this.pool.bundle_proposal!.from_key !== validationBundle[0]?.key) {
       this.logger.info(`Found different value on proposed bundle from_key`);
 
       this.archiveDebugBundle(
@@ -176,7 +176,7 @@ export async function validateBundleProposal(
           reason:
             "found different from_key on bundle downloaded from storage provider",
           proposed: this.pool.bundle_proposal!.from_key,
-          validation: validationBundle.at(0)?.key,
+          validation: validationBundle[0]?.key,
         }
       );
 
@@ -194,9 +194,14 @@ export async function validateBundleProposal(
     // vote invalid if bundle key does not match with proposed to key
     this.logger.debug(`Validating bundle proposal by bundle to_key`);
     this.logger.debug(`Proposed = ${this.pool.bundle_proposal!.to_key}`);
-    this.logger.debug(`Actual   = ${validationBundle.at(-1)?.key}`);
+    this.logger.debug(
+      `Actual   = ${validationBundle[validationBundle.length - 1]?.key}`
+    );
 
-    if (this.pool.bundle_proposal!.to_key !== validationBundle.at(-1)?.key) {
+    if (
+      this.pool.bundle_proposal!.to_key !==
+      validationBundle[validationBundle.length - 1]?.key
+    ) {
       this.logger.info(`Found different value on proposed bundle to_key`);
 
       this.archiveDebugBundle(
@@ -207,7 +212,7 @@ export async function validateBundleProposal(
           reason:
             "found different to_key on bundle downloaded from storage provider",
           proposed: this.pool.bundle_proposal!.to_key,
-          validation: validationBundle.at(-1)?.key,
+          validation: validationBundle[validationBundle.length - 1]?.key,
         }
       );
 

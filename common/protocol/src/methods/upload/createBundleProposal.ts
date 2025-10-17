@@ -243,12 +243,12 @@ export async function createBundleProposal(this: Validator): Promise<void> {
     // get the first key of the bundle proposal which gets
     // included in the bundle proposal and saved on chain
     // as from_key
-    const fromKey = bundleProposal.at(0)?.key ?? "";
+    const fromKey = bundleProposal[0]?.key ?? "";
 
     // get the last key of the bundle proposal which gets
     // included in the bundle proposal and saved on chain
     // as to_key
-    const toKey = bundleProposal.at(-1)?.key ?? "";
+    const toKey = bundleProposal[bundleProposal.length - 1]?.key ?? "";
 
     // get the last value of the bundle proposal and format
     // it so it can be included in the bundle proposal and

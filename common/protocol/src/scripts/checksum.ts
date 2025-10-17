@@ -9,7 +9,7 @@ export const getChecksum = (path: string): Promise<string> => {
 
     input.on("error", reject);
 
-    input.on("data", (chunk: Buffer) => {
+    input.on("data", (chunk: string | Buffer<ArrayBufferLike>) => {
       hash.update(chunk);
     });
 
