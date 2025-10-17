@@ -5,7 +5,6 @@ import {
   uniqueNamesGenerator,
 } from "unique-names-generator";
 import { major, minor, patch, prerelease } from "semver";
-import seedrandom from "seedrandom";
 
 import { Validator, standardizeError } from "../../index.js";
 
@@ -37,9 +36,9 @@ export async function setupValidator(this: Validator): Promise<void> {
     // the min patch version, the valname should only differ, if the local patch
     // version is smaller, therefore we take the min out of remote and local
     // patch version
-    const valnameSeed = `${this.chainId}-${this.poolId}-${
-      this.runtime.name
-    }-${major(this.runtime.version)}-${minor(this.runtime.version)}-${Math.min(
+    const seed = `${this.chainId}-${this.poolId}-${this.runtime.name}-${major(
+      this.runtime.version
+    )}-${minor(this.runtime.version)}-${Math.min(
       patch(this.runtime.version),
       patch(this.pool.data!.protocol!.version)
     )}-${JSON.stringify(prerelease(this.runtime.version))}-${
@@ -47,9 +46,7 @@ export async function setupValidator(this: Validator): Promise<void> {
     }`;
 
     this.logger.debug(`Creating seed for valname generation`);
-    this.logger.debug(valnameSeed);
-
-    const rng = seedrandom(valnameSeed);
+    this.logger.debug(seed);
 
     this.logger.debug(`Generate valname with seed`);
 
@@ -58,7 +55,7 @@ export async function setupValidator(this: Validator): Promise<void> {
       separator: "-",
       length: 3,
       style: "lowerCase",
-      seed: rng(),
+      seed,
     }).replace(" ", "-");
 
     this.logger.debug(`Valname "${this.name}" got created`);
