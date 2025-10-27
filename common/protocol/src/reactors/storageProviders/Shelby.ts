@@ -40,7 +40,7 @@ export class Shelby implements IStorageProvider {
   }
 
   async getAddress() {
-    return "";
+    return this.signer.accountAddress.toString();
   }
 
   async getBalance() {
@@ -52,7 +52,7 @@ export class Shelby implements IStorageProvider {
   }
 
   async saveBundle(bundle: Buffer, _tags: BundleTag[]) {
-    const storageId = `${this.signer.accountAddress.toString()}/${uuidv4()}`;
+    const storageId = uuidv4();
 
     await this.client.upload({
       blobData: Uint8Array.from(bundle),
