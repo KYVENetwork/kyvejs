@@ -1,5 +1,5 @@
 import { spawn, SpawnOptionsWithoutStdio } from "child_process";
-import crypto from "crypto";
+import * as crypto from "crypto";
 import fs from "fs";
 import path from "path";
 import { ILogObject, Logger } from "tslog";

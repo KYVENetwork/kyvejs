@@ -1,5 +1,5 @@
 import { BigNumber } from "bignumber.js";
-import crypto from "crypto";
+import * as crypto from "crypto";
 import { statSync, readdirSync } from "fs";
 import { join } from "path";
 

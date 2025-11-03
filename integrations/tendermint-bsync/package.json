@@ -29,7 +29,7 @@
     "axios": "^0.27.2"
   },
   "devDependencies": {
-    "pkg": "^5.8.0",
+    "@yao-pkg/pkg": "^6.10.1",
     "prettier": "^2.7.1",
     "rimraf": "^3.0.2",
     "typescript": "^4.7.4",
