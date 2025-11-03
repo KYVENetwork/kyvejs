@@ -1,4 +1,4 @@
-import crypto from "crypto";
+import * as crypto from "crypto";
 import JSZip from "jszip";
 import { createReadStream, readdirSync, readFileSync, writeFileSync } from "fs";
 

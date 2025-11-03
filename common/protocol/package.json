@@ -41,6 +41,10 @@
     "tslog": "^3.2.2",
     "unique-names-generator": "^4.6.0",
     "uuid": "^9.0.0",
+    "@shelby-protocol/sdk": "^0.0.4",
+    "@aptos-labs/ts-sdk": "^5.1.1",
+    "electron": "^38.3.0",
+    "got": "^14.6.1",
     "@mysten/walrus": "^0.7.2",
     "@mysten/sui": "^1.39.1"
   },
@@ -51,7 +55,6 @@
     "@types/jest": "^28.1.7",
     "@types/jsonfile": "^6.0.1",
     "@types/node": "^24.7.1",
-    "@types/node-fetch": "^2.6.13",
     "@types/object-hash": "^2.2.1",
     "@types/seedrandom": "^3.0.2",
     "@types/semver": "^7.3.9",

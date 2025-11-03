@@ -15,6 +15,13 @@ export async function testStorageProvider(
 ): Promise<void> {
   try {
     const storageProvider = this.storageProviderFactory();
+
+    if (storageProvider.name === "NoStorageProvider") {
+      throw new Error(
+        `Storage provider id ${this.pool.data?.current_storage_provider_id} not found`
+      );
+    }
+
     const bundle = Buffer.from(data);
 
     this.logger.info(
