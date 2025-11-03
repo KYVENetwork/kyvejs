@@ -5,6 +5,7 @@ import { Kyve } from "./Kyve.js";
 import { Turbo } from "./Turbo.js";
 import { Load } from "./Load.js";
 import { Shelby } from "./Shelby.js";
+import { Walrus } from "./Walrus.js";
 import { NoStorageProvider } from "./NoStorageProvider.js";
 
 /**
@@ -16,6 +17,7 @@ import { NoStorageProvider } from "./NoStorageProvider.js";
  * 3 - Kyve
  * 4 - Turbo
  * 5 - Load
+ * 6 - Walrus
  * 7 - Shelby
  * x - NoStorageProvider (default)
  *
@@ -34,6 +36,8 @@ export function storageProviderFactory(this: Validator): IStorageProvider {
       return new Turbo(this.storagePriv || this.poolAccount);
     case 5:
       return new Load(this.storagePriv);
+    case 6:
+      return new Walrus(this.storagePriv);
     case 7:
       return new Shelby(this.storagePriv);
     default:

@@ -15,3 +15,6 @@ jobs:
       - name: "build:binaries"
         working-directory: .
         run: yarn build:binaries
+      - name: "test:binaries"
+        working-directory: .
+        run: yarn test:binaries
