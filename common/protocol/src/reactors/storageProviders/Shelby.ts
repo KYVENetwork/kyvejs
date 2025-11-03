@@ -1,5 +1,9 @@
 import { Account, Ed25519PrivateKey, Network } from "@aptos-labs/ts-sdk";
-import { ShelbyNodeClient } from "@shelby-protocol/sdk/node";
+import {
+  buildRequestUrl,
+  NetworkToShelbyRPCBaseUrl,
+  ShelbyNodeClient,
+} from "@shelby-protocol/sdk/node";
 import { v4 as uuidv4 } from "uuid";
 
 import dotenv from "dotenv";
@@ -15,6 +19,9 @@ export class Shelby implements IStorageProvider {
 
   private readonly client: ShelbyNodeClient;
   private readonly signer: Account;
+
+  private readonly baseUrl: string;
+  private readonly apiKey: string;
 
   constructor(storagePriv: string) {
     if (!storagePriv) {
@@ -33,10 +40,15 @@ export class Shelby implements IStorageProvider {
       privateKey: new Ed25519PrivateKey(storagePriv),
     });
 
+    const network = Network.SHELBYNET;
+
     this.client = new ShelbyNodeClient({
-      network: Network.SHELBYNET,
+      network,
       apiKey: process.env.SHELBY_API_KEY,
     });
+
+    this.baseUrl = NetworkToShelbyRPCBaseUrl[network];
+    this.apiKey = process.env.SHELBY_API_KEY;
   }
 
   async getAddress() {
@@ -68,21 +80,47 @@ export class Shelby implements IStorageProvider {
   }
 
   async retrieveBundle(storageId: string, _timeout: number) {
-    const { readable } = await this.client.download({
-      account: this.signer.accountAddress.toString(),
-      blobName: storageId,
+    const url = buildRequestUrl(
+      `/v1/blobs/${this.signer.accountAddress.toString()}/${storageId}`,
+      this.baseUrl
+    );
+
+    const headers = new Headers();
+    headers.set("Range", `bytes=0-`);
+
+    const response = await fetch(url, {
+      headers: {
+        ...headers,
+        ...(this.apiKey ? { Authorization: `Bearer ${this.apiKey}` } : {}),
+      },
     });
 
-    // Convert ReadableStream to Buffer
-    const reader = readable.getReader();
-    const chunks: Uint8Array[] = [];
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      chunks.push(value);
+    if (!response.ok) {
+      throw new Error(
+        `Failed to download blob: ${response.status} ${response.statusText}`
+      );
+    }
+    if (!response.body) {
+      throw new Error("Response body is null");
+    }
+    const contentLengthHeader = response.headers.get("content-length");
+    if (contentLengthHeader === null) {
+      throw new Error(
+        "Response did not have content-length header, which is required"
+      );
+    }
+    const expectedContentLength = Number.parseInt(contentLengthHeader, 10);
+    if (Number.isNaN(expectedContentLength)) {
+      throw new Error(
+        `Invalid content-length header received: ${contentLengthHeader}`
+      );
     }
 
+    const stream = response.body;
+    const chunks = [];
+    for await (const chunk of stream) {
+      chunks.push(chunk);
+    }
     const storageData = Buffer.concat(chunks);
 
     return { storageId, storageData };
