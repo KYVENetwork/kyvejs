@@ -3,8 +3,9 @@ import { Arweave } from "./Arweave.js";
 import { Bundlr } from "./Bundlr.js";
 import { Kyve } from "./Kyve.js";
 import { Turbo } from "./Turbo.js";
-import { Load } from "./Load.js";
+// import { Load } from "./Load.js";
 import { Walrus } from "./Walrus.js";
+import { FilecoinOnchainCloud } from "./FilecoinOnchainCloud.js";
 import { NoStorageProvider } from "./NoStorageProvider.js";
 
 /**
@@ -32,10 +33,12 @@ export function storageProviderFactory(this: Validator): IStorageProvider {
       return new Kyve(this.chainId, this.poolId, this.staker, this.poolAccount);
     case 4:
       return new Turbo(this.storagePriv || this.poolAccount);
-    case 5:
-      return new Load(this.storagePriv);
+    // case 5:
+    //   return new Load(this.storagePriv);
     case 6:
       return new Walrus(this.storagePriv);
+    case 8:
+      return new FilecoinOnchainCloud(this.storagePriv);
     default:
       return new NoStorageProvider();
   }

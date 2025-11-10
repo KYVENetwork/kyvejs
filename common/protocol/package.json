@@ -42,7 +42,9 @@
     "unique-names-generator": "^4.6.0",
     "uuid": "^9.0.0",
     "@mysten/walrus": "^0.7.2",
-    "@mysten/sui": "^1.39.1"
+    "@mysten/sui": "^1.39.1",
+    "@filoz/synapse-sdk": "^0.35.3",
+    "ethers": "^6.15.0"
   },
   "devDependencies": {
     "@types/clone": "^2.1.1",
