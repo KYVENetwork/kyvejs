@@ -1,51 +1,55 @@
 import { BundleTag, IStorageProvider } from "../../types/index.js";
-import { Synapse, RPC_URLS } from "@filoz/synapse-sdk";
+import { Synapse, RPC_URLS, TOKENS } from "@filoz/synapse-sdk";
 
 export class FilecoinOnchainCloud implements IStorageProvider {
   public name = "FilecoinOnchainCloud";
   public coinDecimals = 18;
 
-  private readonly synapse: Promise<Synapse>;
+  private readonly storagePriv: string;
 
   constructor(storagePriv: string) {
     if (!storagePriv) {
       throw new Error("Filecoin key is empty. Please provide a valid key!");
     }
 
-    this.synapse = Synapse.create({
-      privateKey: storagePriv,
+    this.storagePriv = storagePriv;
+  }
+
+  private async createSynapse(): Promise<Synapse> {
+    return Synapse.create({
+      privateKey: this.storagePriv,
       rpcURL: RPC_URLS.calibration.websocket,
     });
   }
 
   async getAddress() {
-    return (await this.synapse).getPaymentsAddress();
+    const synapse = await this.createSynapse();
+    return synapse.getPaymentsAddress();
   }
 
   async getBalance() {
-    const paymentsAddress = await this.getAddress();
-    const currentAllowance = await (
-      await this.synapse
-    ).payments.allowance(paymentsAddress);
-    return currentAllowance.toString();
+    const synapse = await this.createSynapse();
+
+    const { funds } = await synapse.payments.accountInfo(TOKENS.USDFC);
+    return funds.toString();
   }
 
   async getPrice(bytes: number) {
-    const preflight = await (await this.synapse).storage.preflightUpload(bytes);
+    const synapse = await this.createSynapse();
+    const preflight = await synapse.storage.preflightUpload(bytes);
     return preflight.estimatedCost.perMonth.toString();
   }
 
-  async saveBundle(bundle: Buffer, tags: BundleTag[]) {
-    console.log(await this.getPrice(bundle.length));
+  async saveBundle(bundle: Buffer, _tags: BundleTag[]) {
+    const synapse = await this.createSynapse();
 
-    const { pieceCid } = await (
-      await this.synapse
-    ).storage.upload(Uint8Array.from(bundle), {
-      metadata: tags.reduce(
-        (acc, { name, value }) => ({ ...acc, [name]: value }),
-        {}
-      ),
-    });
+    const netInfo = await synapse.storage.getStorageInfo();
+    console.log("netInfo", netInfo);
+
+    const preflight = await synapse.storage.preflightUpload(bundle.length);
+    console.log(`funds sufficient: ${preflight.allowanceCheck.sufficient}`);
+
+    const { pieceCid } = await synapse.storage.upload(Uint8Array.from(bundle));
 
     return {
       storageId: pieceCid.toString(),
@@ -54,7 +58,8 @@ export class FilecoinOnchainCloud implements IStorageProvider {
   }
 
   async retrieveBundle(storageId: string, _timeout: number) {
-    const data = await (await this.synapse).storage.download(storageId);
+    const synapse = await this.createSynapse();
+    const data = await synapse.storage.download(storageId);
 
     return { storageId, storageData: Buffer.from(data) };
   }
