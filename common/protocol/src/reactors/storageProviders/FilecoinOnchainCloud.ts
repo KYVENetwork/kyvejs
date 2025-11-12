@@ -23,7 +23,9 @@ export class FilecoinOnchainCloud implements IStorageProvider {
 
   async isBalanceSufficient(size: number) {
     const synapse = await this.createSynapse();
-    const { allowanceCheck } = await synapse.storage.preflightUpload(size);
+    const { allowanceCheck } = await synapse.storage.preflightUpload(
+      size < 128 ? 128 : size
+    );
 
     return {
       sufficient: allowanceCheck.sufficient,
@@ -31,16 +33,10 @@ export class FilecoinOnchainCloud implements IStorageProvider {
     };
   }
 
-  async saveBundle(bundle: Buffer, tags: BundleTag[]) {
+  async saveBundle(bundle: Buffer, _tags: BundleTag[]) {
     const synapse = await this.createSynapse();
-    const metadata = tags.reduce(
-      (acc, { name, value }) => ({ ...acc, [name]: value }),
-      {}
-    );
 
-    const { pieceCid } = await synapse.storage.upload(Uint8Array.from(bundle), {
-      metadata,
-    });
+    const { pieceCid } = await synapse.storage.upload(Uint8Array.from(bundle));
 
     return {
       storageId: pieceCid.toString(),
