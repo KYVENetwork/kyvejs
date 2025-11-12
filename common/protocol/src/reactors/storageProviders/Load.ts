@@ -19,6 +19,7 @@ export class Load implements IStorageProvider {
   private signer: EthereumSigner;
   private apiKey: string;
   private baseUrl: string;
+  private gatewayUrl: string;
 
   constructor(storagePriv: string) {
     if (!storagePriv) {
@@ -34,6 +35,8 @@ export class Load implements IStorageProvider {
     this.apiKey = process.env.LOAD_STORAGE_PROVIDER_API_KEY;
     this.baseUrl =
       process.env.LOAD_BASE_URL || "https://load-s3-agent.load.network";
+    this.gatewayUrl =
+      process.env.LOAD_GATEWAY_URL || "https://gateway.s3-node-1.load.network";
   }
 
   async getAddress(): Promise<string> {
@@ -109,39 +112,19 @@ export class Load implements IStorageProvider {
     timeout: number
   ): Promise<StorageReceipt> {
     try {
-      // Load S3 Agent return a redirect to the presigned get_object URL
-      // when an object (offchain DataItem) is requested, for performance purposes.
-      // So first we get the presigned get_object URL.
-      const redirectResponse = await axios.get(`${this.baseUrl}/${storageId}`, {
-        headers: {
-          Authorization: `Bearer ${this.apiKey}`,
-        },
-        maxRedirects: 0,
-        validateStatus: (status) => status === 302 || status === 200,
-        timeout: timeout || 30000,
-      });
-
-      if (redirectResponse.status === 302) {
-        const presignedUrl = redirectResponse.headers.location;
-
-        // Download offchain DataItem body's data from the presigned Load S3 URL
-        const dataResponse = await axios.get(presignedUrl, {
+      // uses the Load S3 HyperBEAM ANS-104 gateway to access the stored dataitems
+      const dataResponse = await axios.get(
+        `${this.gatewayUrl}/resolve/${storageId}`,
+        {
           responseType: "arraybuffer",
           timeout: timeout || 30000,
-        });
+        }
+      );
 
-        return {
-          storageId,
-          storageData: Buffer.from(dataResponse.data),
-        };
-      } else if (redirectResponse.status === 200) {
-        return {
-          storageId,
-          storageData: Buffer.from(redirectResponse.data),
-        };
-      }
-
-      throw new Error(`Unexpected response status: ${redirectResponse.status}`);
+      return {
+        storageId,
+        storageData: Buffer.from(dataResponse.data),
+      };
     } catch (error) {
       if (axios.isAxiosError(error)) {
         if (error.response?.status === 404) {
