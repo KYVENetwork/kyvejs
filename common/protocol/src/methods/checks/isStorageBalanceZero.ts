@@ -1,4 +1,3 @@
-import { BigNumber } from "bignumber.js";
 import { Validator, standardizeError } from "../../index.js";
 
 /**
@@ -18,27 +17,17 @@ export async function isStorageBalanceZero(this: Validator): Promise<boolean> {
       `Checking account balance on StorageProvider:${storageProvider.name}`
     );
 
-    const address = await storageProvider.getAddress();
-    const balance = await storageProvider.getBalance();
+    const { sufficient, message } = await storageProvider.isBalanceSufficient(
+      1
+    );
 
-    // if storage provider has no balance we don't need to validate it
-    if (!balance) {
-      this.logger.info(
-        `StorageProvider:${storageProvider.name} has no balance. Continuing...\n`
-      );
-      return false;
-    }
-
-    this.logger.debug(`Account "${address}" has "${balance}" balance`);
-
-    if (new BigNumber(balance).isZero()) {
+    if (!sufficient) {
       this.logger.fatal(
-        `Account on StorageProvider:${storageProvider.name} has zero funds! Exiting ...`
+        `Account on StorageProvider:${storageProvider.name} has not enough funds to upload at least 1 byte! Exiting ...`
       );
       this.logger.fatal(
-        `Provide some funds to the following account: ${address}`
+        `Provide some funds to the storage provider account: ${message}`
       );
-
       return true;
     }
 

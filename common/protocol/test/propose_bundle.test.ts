@@ -290,7 +290,10 @@ describe("propose bundle tests", () => {
     });
 
     storageProvider = new TestNormalStorageProvider();
-    storageProvider.getBalance = jest.fn().mockResolvedValue("0");
+    storageProvider.isBalanceSufficient = jest.fn().mockResolvedValue({
+      sufficient: false,
+      message: "",
+    });
     v["storageProviderFactory"] = jest.fn().mockReturnValue(storageProvider);
 
     v["syncPoolState"] = jest.fn().mockImplementation(() => {

@@ -1,9 +1,8 @@
 import { BundleTag, IStorageProvider } from "../../types/index.js";
-import { Synapse, RPC_URLS, TOKENS } from "@filoz/synapse-sdk";
+import { Synapse, RPC_URLS } from "@filoz/synapse-sdk";
 
 export class FilecoinOnchainCloud implements IStorageProvider {
   public name = "FilecoinOnchainCloud";
-  public coinDecimals = 18;
 
   private readonly storagePriv: string;
 
@@ -18,38 +17,30 @@ export class FilecoinOnchainCloud implements IStorageProvider {
   private async createSynapse(): Promise<Synapse> {
     return Synapse.create({
       privateKey: this.storagePriv,
-      rpcURL: RPC_URLS.calibration.websocket,
+      rpcURL: RPC_URLS.calibration.http,
     });
   }
 
-  async getAddress() {
+  async isBalanceSufficient(size: number) {
     const synapse = await this.createSynapse();
-    return synapse.getPaymentsAddress();
+    const { allowanceCheck } = await synapse.storage.preflightUpload(size);
+
+    return {
+      sufficient: allowanceCheck.sufficient,
+      message: allowanceCheck.message || "",
+    };
   }
 
-  async getBalance() {
+  async saveBundle(bundle: Buffer, tags: BundleTag[]) {
     const synapse = await this.createSynapse();
+    const metadata = tags.reduce(
+      (acc, { name, value }) => ({ ...acc, [name]: value }),
+      {}
+    );
 
-    const { funds } = await synapse.payments.accountInfo(TOKENS.USDFC);
-    return funds.toString();
-  }
-
-  async getPrice(bytes: number) {
-    const synapse = await this.createSynapse();
-    const preflight = await synapse.storage.preflightUpload(bytes);
-    return preflight.estimatedCost.perMonth.toString();
-  }
-
-  async saveBundle(bundle: Buffer, _tags: BundleTag[]) {
-    const synapse = await this.createSynapse();
-
-    const netInfo = await synapse.storage.getStorageInfo();
-    console.log("netInfo", netInfo);
-
-    const preflight = await synapse.storage.preflightUpload(bundle.length);
-    console.log(`funds sufficient: ${preflight.allowanceCheck.sufficient}`);
-
-    const { pieceCid } = await synapse.storage.upload(Uint8Array.from(bundle));
+    const { pieceCid } = await synapse.storage.upload(Uint8Array.from(bundle), {
+      metadata,
+    });
 
     return {
       storageId: pieceCid.toString(),

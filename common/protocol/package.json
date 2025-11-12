@@ -22,7 +22,6 @@
   },
   "dependencies": {
     "@ardrive/turbo-sdk": "^1.14.1",
-    "@bundlr-network/client": "^0.8.9",
     "@dha-team/arbundles": "^1.0.4",
     "@kyvejs/coins": "1.0.3",
     "@kyvejs/sdk": "1.4.5",
