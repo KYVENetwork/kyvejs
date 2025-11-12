@@ -15,29 +15,22 @@ export async function isStorageBalanceLow(this: Validator): Promise<void> {
     const storageProvider = this.storageProviderFactory();
 
     this.logger.info(
-      `Checking account balance on StorageProvider:${storageProvider.name}`
+      `Checking if uploader has sufficient funds to upload the bundle to the StorageProvider:${storageProvider.name}`
     );
 
-    const address = await storageProvider.getAddress();
-    const balance = await storageProvider.getBalance();
-
-    // get upload cost of current data size
-    const cost = await storageProvider.getPrice(
+    const { sufficient, message } = await storageProvider.isBalanceSufficient(
       parseInt(this.pool.bundle_proposal?.data_size ?? "0")
     );
 
-    // if account can not pay for 10x the current bundle the balance is not sufficient
-    if (new BigNumber(balance).lte(new BigNumber(cost).multipliedBy(10))) {
+    if (!sufficient) {
       this.logger.warn(
-        `Low account balance on StorageProvider:${storageProvider.name}`
-      );
-    } else {
-      this.logger.info(
-        `Account has sufficient balance on StorageProvider:${storageProvider.name}`
+        `Upload can not upload to StorageProvider:${storageProvider.name}: ${message}`
       );
     }
 
-    this.logger.debug(`Account "${address}" has balance of "${balance}"`);
+    this.logger.info(
+      `Account has sufficient balance on StorageProvider:${storageProvider.name}`
+    );
   } catch (err) {
     this.logger.error(`Checking storage provider balance failed`);
     this.logger.error(standardizeJSON(err));

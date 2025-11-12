@@ -331,12 +331,12 @@ export async function createBundleProposal(this: Validator): Promise<void> {
 
         // if balance is less than the upload cost we skip the uploader
         // role with a warning
-        const balance = await storageProvider.getBalance();
-        const cost = await storageProvider.getPrice(storageProviderData.length);
+        const { sufficient, message } =
+          await storageProvider.isBalanceSufficient(storageProviderData.length);
 
-        if (new BigNumber(balance).lt(cost)) {
+        if (!sufficient) {
           this.logger.warn(
-            `Not enough balance on StorageProvider:${storageProvider.name}; balance = ${balance} required = ${cost}`
+            `Not enough balance on StorageProvider:${storageProvider.name}: ${message}`
           );
           await this.skipUploaderRole(fromIndex);
           return;

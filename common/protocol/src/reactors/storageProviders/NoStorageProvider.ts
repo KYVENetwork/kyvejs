@@ -3,18 +3,12 @@ import { BundleTag, IStorageProvider } from "../../types/index.js";
 
 export class NoStorageProvider implements IStorageProvider {
   public name = "NoStorageProvider";
-  public coinDecimals = 0;
 
-  async getAddress() {
-    return "";
-  }
-
-  async getBalance() {
-    return "0";
-  }
-
-  async getPrice(bytes: number) {
-    return "0";
+  async isBalanceSufficient(_size: number) {
+    return {
+      sufficient: true,
+      message: "",
+    };
   }
 
   async saveBundle(bundle: Buffer, _tags: BundleTag[]) {

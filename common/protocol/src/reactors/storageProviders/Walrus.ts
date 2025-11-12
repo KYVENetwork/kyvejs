@@ -6,7 +6,6 @@ import { WalrusClient } from "@mysten/walrus";
 
 export class Walrus implements IStorageProvider {
   public name = "Walrus";
-  public coinDecimals = 18;
 
   private readonly keypair: Ed25519Keypair;
   private readonly suiClient: SuiClient;
@@ -27,23 +26,38 @@ export class Walrus implements IStorageProvider {
     });
   }
 
-  async getAddress() {
-    return this.keypair.toSuiAddress();
-  }
-
-  async getBalance() {
+  async isBalanceSufficient(size: number) {
+    const suiBalance = await this.suiClient.getBalance({
+      owner: this.keypair.toSuiAddress(),
+    });
     const walBalance = await this.suiClient.getBalance({
       owner: this.keypair.toSuiAddress(),
       coinType: `0x356a26eb9e012a68958082340d4c4116e7f55615cf27affcff209cf0ae544f59::wal::WAL`,
     });
-    return walBalance.totalBalance;
-  }
 
-  async getPrice(bytes: number) {
-    const tip = await this.walrusClient.calculateUploadRelayTip({
-      size: bytes,
+    const suiCost = 6000000;
+    const walCost = await this.walrusClient.calculateUploadRelayTip({
+      size,
     });
-    return tip.toString();
+
+    if (BigInt(suiCost) > BigInt(suiBalance.totalBalance)) {
+      return {
+        sufficient: false,
+        message: `Not enough SUI funds in SUI wallet. Current Balance = ${suiBalance.totalBalance} required = ${suiCost}`,
+      };
+    }
+
+    if (BigInt(walCost) > BigInt(walBalance.totalBalance)) {
+      return {
+        sufficient: false,
+        message: `Not enough WAL funds in SUI wallet. Current Balance = ${suiBalance.totalBalance} required = ${suiCost}`,
+      };
+    }
+
+    return {
+      sufficient: false,
+      message: "",
+    };
   }
 
   async saveBundle(bundle: Buffer, _tags: BundleTag[]) {

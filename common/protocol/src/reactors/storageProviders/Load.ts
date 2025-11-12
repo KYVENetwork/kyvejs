@@ -1,6 +1,5 @@
 import { EthereumSigner } from "@ardrive/turbo-sdk";
 import { createData } from "@dha-team/arbundles";
-import { computeAddress } from "ethers/lib/utils.js";
 import axios from "axios";
 import FormData from "form-data";
 import {
@@ -14,12 +13,11 @@ dotenv.config();
 
 export class Load implements IStorageProvider {
   public name = "Load";
-  public coinDecimals = 0;
 
-  private signer: EthereumSigner;
-  private apiKey: string;
-  private baseUrl: string;
-  private gatewayUrl: string;
+  private readonly signer: EthereumSigner;
+  private readonly apiKey: string;
+  private readonly baseUrl: string;
+  private readonly gatewayUrl: string;
 
   constructor(storagePriv: string) {
     if (!storagePriv) {
@@ -39,21 +37,11 @@ export class Load implements IStorageProvider {
       process.env.LOAD_GATEWAY_URL || "https://gateway.s3-node-1.load.network";
   }
 
-  async getAddress(): Promise<string> {
-    try {
-      const publicKey = await this.signer.publicKey;
-      return computeAddress(publicKey);
-    } catch (error) {
-      throw new Error(`Failed to get address: ${error}`);
-    }
-  }
-  // Load S3 has no Balance functionality
-  async getBalance() {
-    return "";
-  }
-  // No price metric for Load S3
-  async getPrice(_: number) {
-    return "0";
+  async isBalanceSufficient(_size: number) {
+    return {
+      sufficient: true,
+      message: "",
+    };
   }
 
   async saveBundle(bundle: Buffer, tags: BundleTag[]): Promise<StorageReceipt> {

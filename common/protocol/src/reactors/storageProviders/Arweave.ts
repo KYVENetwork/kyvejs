@@ -6,9 +6,9 @@ import { BundleTag, IStorageProvider } from "../../types/index.js";
 
 export class Arweave implements IStorageProvider {
   public name = "Arweave";
-  public coinDecimals = 12;
 
-  private readonly storagePriv: string;
+  private readonly arweaveKeyfile: JWKInterface;
+  private readonly arweaveClient: ArweaveClient;
 
   constructor(storagePriv: string) {
     if (!storagePriv) {
@@ -17,36 +17,36 @@ export class Arweave implements IStorageProvider {
       );
     }
 
-    this.storagePriv = storagePriv;
-  }
-
-  private get arweaveKeyfile(): JWKInterface {
-    return JSON.parse(this.storagePriv);
-  }
-
-  private get arweaveClient(): ArweaveClient {
-    return new ArweaveClient({
+    this.arweaveKeyfile = JSON.parse(storagePriv);
+    this.arweaveClient = new ArweaveClient({
       host: "arweave.net",
       protocol: "https",
     });
   }
 
-  async getAddress() {
-    return await this.arweaveClient.wallets.getAddress(this.arweaveKeyfile);
-  }
+  async isBalanceSufficient(size: number) {
+    const address = await this.arweaveClient.wallets.getAddress(
+      this.arweaveKeyfile
+    );
+    const balance = await this.arweaveClient.wallets.getBalance(address);
 
-  async getBalance() {
-    const account = await this.getAddress();
-    return await this.arweaveClient.wallets.getBalance(account);
-  }
-
-  async getPrice(bytes: number) {
-    const { data: price } = await axios.get(
+    const { data: cost } = await axios.get(
       `${this.arweaveClient.getConfig().api.protocol}://${
         this.arweaveClient.getConfig().api.host
-      }/price/${bytes}`
+      }/price/${size}`
     );
-    return price;
+
+    if (BigInt(cost) > BigInt(balance)) {
+      return {
+        sufficient: false,
+        message: `Not enough funds in Arweave wallet. Current Balance = ${balance} required = ${cost}`,
+      };
+    }
+
+    return {
+      sufficient: true,
+      message: "",
+    };
   }
 
   async saveBundle(bundle: Buffer, tags: BundleTag[]) {
@@ -62,14 +62,6 @@ export class Arweave implements IStorageProvider {
       transaction,
       this.arweaveKeyfile
     );
-
-    const balance = await this.getBalance();
-
-    if (parseInt(transaction.reward) > parseInt(balance)) {
-      throw Error(
-        `Not enough funds in Arweave wallet. Found = ${balance} required = ${transaction.reward}`
-      );
-    }
 
     await this.arweaveClient.transactions.post(transaction);
 
