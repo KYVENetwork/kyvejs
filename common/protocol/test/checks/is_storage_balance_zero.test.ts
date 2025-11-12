@@ -65,7 +65,7 @@ describe("isStorageBalanceZero", () => {
     // ARRANGE
     storageProvider = new TestNormalStorageProvider();
     storageProvider.isBalanceSufficient = jest.fn().mockResolvedValue({
-      sufficient: false,
+      sufficient: true,
       message: "",
     });
     v["storageProviderFactory"] = jest.fn().mockReturnValue(storageProvider);
