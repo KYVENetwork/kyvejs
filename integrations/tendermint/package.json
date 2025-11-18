@@ -4,7 +4,7 @@
   "license": "MIT",
   "scripts": {
     "build": "rimraf dist && tsc",
-    "transpile": "rimraf dist-cjs && webpack --config webpack.config.js && cp ../../node_modules/@mysten/walrus-wasm/walrus_wasm_bg.wasm dist-cjs",
+    "transpile": "rimraf dist-cjs && webpack --config webpack.config.js && cp ../../node_modules/@mysten/walrus-wasm/walrus_wasm_bg.wasm dist-cjs && cp ../../node_modules/@shelby-protocol/clay-codes/dist/clay.wasm dist-cjs",
     "build:binaries": "yarn build && yarn transpile && rimraf out && pkg --no-bytecode --public-packages '*' --compress GZip --output out/kyve package.json && node ./dist-cjs/checksum.js",
     "start": "node ./dist/src/index.js",
     "format": "prettier --write ."
@@ -12,7 +12,10 @@
   "bin": "./dist-cjs/bundle.js",
   "pkg": {
     "scripts": "./dist-cjs/bundle.js",
-    "assets": "./dist-cjs/walrus_wasm_bg.wasm",
+    "assets": [
+      "./dist-cjs/walrus_wasm_bg.wasm",
+      "./dist-cjs/clay.wasm"
+    ],
     "targets": [
       "latest-linux-x64",
       "latest-linux-arm64",
@@ -32,7 +35,7 @@
     "dotenv": "^16.3.1"
   },
   "devDependencies": {
-    "pkg": "^5.8.0",
+    "@yao-pkg/pkg": "^6.10.1",
     "prettier": "^2.7.1",
     "rimraf": "^3.0.2",
     "typescript": "^4.7.4",

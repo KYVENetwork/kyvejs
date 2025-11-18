@@ -1,19 +1,19 @@
-import crypto from "crypto";
-import axios from "axios";
+import * as crypto from 'crypto';
+import axios from 'axios';
 
 export async function getTransactionByHash(rpc: string, hash: string) {
   const data = {
     method: 'eth_getTransactionByHash',
     params: [hash],
     id: 1,
-    jsonrpc: '2.0'
+    jsonrpc: '2.0',
   };
 
   try {
     const response = await axios.post(rpc, data, {
       headers: {
-        'Content-Type': 'application/json'
-      }
+        'Content-Type': 'application/json',
+      },
     });
     return response.data.result;
   } catch (error) {
@@ -34,5 +34,5 @@ export function createVersionedHash(hex: string): string {
 
   const formattedHash = '01' + hash.substring(2);
 
-  return "0x" + formattedHash;
+  return '0x' + formattedHash;
 }
