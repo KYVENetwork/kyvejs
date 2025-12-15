@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.0.0-beta.20](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/ethereum-blobs@1.0.0-beta.19...@kyvejs/ethereum-blobs@1.0.0-beta.20) (2025-12-15)
+
+### Features
+
+- esm ([#179](https://github.com/KYVENetwork/kyvejs/issues/179)) ([21d0bb1](https://github.com/KYVENetwork/kyvejs/commit/21d0bb1fd5633a385121d3833957a9f962c95041))
+- walrus ([#181](https://github.com/KYVENetwork/kyvejs/issues/181)) ([62b6200](https://github.com/KYVENetwork/kyvejs/commit/62b62005795a9b184df7711d2c53fd1f4ef6d366))
+
 # [1.0.0-beta.19](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/ethereum-blobs@1.0.0-beta.18...@kyvejs/ethereum-blobs@1.0.0-beta.19) (2025-09-26)
 
 **Note:** Version bump only for package @kyvejs/ethereum-blobs

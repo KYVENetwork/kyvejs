@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.5.0](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/sdk@1.4.5...@kyvejs/sdk@1.5.0) (2025-12-15)
+
+### Bug Fixes
+
+- update gas price ([de70501](https://github.com/KYVENetwork/kyvejs/commit/de705018374d98ae6aa9b607b41cf4dc2fa4d482))
+
+### Features
+
+- esm ([#179](https://github.com/KYVENetwork/kyvejs/issues/179)) ([21d0bb1](https://github.com/KYVENetwork/kyvejs/commit/21d0bb1fd5633a385121d3833957a9f962c95041))
+
 ## [1.4.5](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/sdk@1.4.4...@kyvejs/sdk@1.4.5) (2025-03-11)
 
 ### Bug Fixes

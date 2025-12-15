@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.6.0](https://github.com/KYVENetwork/kyvejs/compare/@kyve/kysor@1.5.7...@kyve/kysor@1.6.0) (2025-12-15)
+
+### Features
+
+- esm ([#179](https://github.com/KYVENetwork/kyvejs/issues/179)) ([21d0bb1](https://github.com/KYVENetwork/kyvejs/commit/21d0bb1fd5633a385121d3833957a9f962c95041))
+
 ## [1.5.7](https://github.com/KYVENetwork/kyvejs/compare/@kyve/kysor@1.5.6...@kyve/kysor@1.5.7) (2025-03-12)
 
 ### Bug Fixes

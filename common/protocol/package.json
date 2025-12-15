@@ -1,6 +1,6 @@
 {
   "name": "@kyvejs/protocol",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "type": "module",
@@ -24,9 +24,11 @@
     "@ardrive/turbo-sdk": "^1.14.1",
     "@bundlr-network/client": "^0.8.9",
     "@dha-team/arbundles": "^1.0.4",
-    "@kyvejs/coins": "1.0.3",
-    "@kyvejs/sdk": "1.4.5",
+    "@kyvejs/coins": "1.1.0",
+    "@kyvejs/sdk": "1.5.0",
     "@kyvejs/types": "1.5.0",
+    "@mysten/sui": "^1.39.1",
+    "@mysten/walrus": "^0.7.2",
     "arweave": "^1.15.7",
     "axios": "^0.27.2",
     "bignumber.js": "^9.1.2",
@@ -40,9 +42,7 @@
     "semver": "^7.5.3",
     "tslog": "^3.2.2",
     "unique-names-generator": "^4.6.0",
-    "uuid": "^9.0.0",
-    "@mysten/walrus": "^0.7.2",
-    "@mysten/sui": "^1.39.1"
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@types/clone": "^2.1.1",
