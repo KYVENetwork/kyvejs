@@ -4,7 +4,6 @@ import {
   privateKeyFromKyveMnemonic,
   TurboAuthenticatedClient,
   TurboFactory,
-  TurboUnauthenticatedClient,
 } from "@ardrive/turbo-sdk";
 import axios from "axios";
 
@@ -12,28 +11,27 @@ import { BundleTag, IStorageProvider } from "../../types/index.js";
 
 export class Turbo implements IStorageProvider {
   public name = "Turbo";
-  public coinDecimals = 12;
 
-  private readonly privateKey: string;
+  private readonly storagePriv: string;
 
-  constructor(privateKey: string) {
-    if (!privateKey) {
-      throw new Error("PrivateKey is empty.");
+  constructor(storagePriv: string) {
+    if (!storagePriv) {
+      throw new Error("storagePriv is empty.");
     }
 
-    this.privateKey = privateKey;
+    this.storagePriv = storagePriv;
   }
 
   private async authenticatedTurbo(): Promise<TurboAuthenticatedClient> {
     try {
       return TurboFactory.authenticated({
-        privateKey: await privateKeyFromKyveMnemonic(this.privateKey),
+        privateKey: await privateKeyFromKyveMnemonic(this.storagePriv),
         token: "kyve",
       });
     } catch (err: any) {
       if (err.message === "Invalid mnemonic format") {
         return TurboFactory.authenticated({
-          privateKey: JSON.parse(this.privateKey),
+          privateKey: JSON.parse(this.storagePriv),
         });
       }
 
@@ -41,32 +39,30 @@ export class Turbo implements IStorageProvider {
     }
   }
 
-  private unauthenticatedTurbo(): TurboUnauthenticatedClient {
-    return TurboFactory.unauthenticated({
-      token: "kyve",
+  async isBalanceSufficient(size: number) {
+    const turbo = await this.authenticatedTurbo();
+    const { winc: balance } = await turbo.getBalance();
+    const [{ winc: cost }] = await turbo.getUploadCosts({
+      bytes: [size],
     });
-  }
 
-  async getAddress() {
-    return (await this.authenticatedTurbo()).signer.getNativeAddress();
-  }
+    if (BigInt(cost) > BigInt(balance)) {
+      return {
+        sufficient: false,
+        message: `Not enough funds in Turbo wallet. Current Balance = ${balance} required = ${cost}`,
+      };
+    }
 
-  async getBalance() {
-    const { winc } = await (await this.authenticatedTurbo()).getBalance();
-    return winc;
-  }
-
-  async getPrice(bytes: number) {
-    const [{ winc }] = await this.unauthenticatedTurbo().getUploadCosts({
-      bytes: [bytes],
-    });
-    return winc;
+    return {
+      sufficient: true,
+      message: "",
+    };
   }
 
   public async saveBundle(dataBuffer: Buffer, tags: BundleTag[]) {
-    const { id } = await (
-      await this.authenticatedTurbo()
-    ).uploadFile({
+    const turbo = await this.authenticatedTurbo();
+
+    const { id } = await turbo.uploadFile({
       fileStreamFactory: () => Readable.from(dataBuffer),
       fileSizeFactory: () => dataBuffer.byteLength,
       dataItemOpts: { tags },

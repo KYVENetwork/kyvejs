@@ -8,6 +8,11 @@ export type StorageReceipt = {
   storageData: Buffer;
 };
 
+export type ISufficient = {
+  sufficient: boolean;
+  message: string;
+};
+
 /**
  * Interface of Storage Provider.
  *
@@ -26,37 +31,13 @@ export interface IStorageProvider {
   name: string;
 
   /**
-   * How many decimals the native coin of the storage provider has
+   * Checks if the uploader has sufficient funds to upload to the storage provider
    *
-   * @property coinDecimals
-   * @type {number}
+   * @method isBalanceSufficient
+   * @param {number} size the size of the data which will be uploaded
+   * @return {Promise<ISufficient>}
    */
-  coinDecimals: number;
-
-  /**
-   * Gets the public account address of storage provider wallet
-   *
-   * @method getAddress
-   * @return {Promise<string>}
-   */
-  getAddress(): Promise<string>;
-
-  /**
-   * Gets the balance of the storage provider wallet
-   *
-   * @method getBalance
-   * @return {Promise<string>}
-   */
-  getBalance(): Promise<string>;
-
-  /**
-   * Gets the cost to uploader the specified number of bytes
-   *
-   * @method getPrice
-   * @param {number} bytes
-   * @return {Promise<string>}
-   */
-  getPrice(bytes: number): Promise<string>;
+  isBalanceSufficient(size: number): Promise<ISufficient>;
 
   /**
    * Saves a bundle on the storage provider and returns a Storage Id

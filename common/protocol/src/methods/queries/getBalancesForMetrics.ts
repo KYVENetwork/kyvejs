@@ -70,27 +70,4 @@ export async function getBalancesForMetrics(this: Validator): Promise<void> {
       this.logger.error(standardizeError(err));
     }
   }
-
-  try {
-    // get current storage provider defined on pool
-    this.logger.debug(`this.storageProviderFactory()`);
-    const storageProvider = this.storageProviderFactory();
-
-    this.logger.debug(`this.storageProvider.getBalance()`);
-
-    const storageProviderBalanceRaw = await storageProvider.getBalance();
-
-    this.logger.debug(JSON.stringify(storageProviderBalanceRaw));
-
-    const storageProviderBalance = new BigNumber(storageProviderBalanceRaw)
-      .dividedBy(
-        new BigNumber(10).exponentiatedBy(storageProvider.coinDecimals)
-      )
-      .toNumber();
-
-    this.m.balance_storage_provider.set(storageProviderBalance);
-  } catch (err) {
-    this.logger.error(`Failed to get balance of storage provider`);
-    this.logger.error(standardizeError(err));
-  }
 }

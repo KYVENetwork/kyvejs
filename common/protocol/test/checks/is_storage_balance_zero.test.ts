@@ -10,10 +10,9 @@ import { TestNormalStorageProvider } from "../mocks/storageProvider.mock";
 
 TEST CASES - isStorageBalanceZero
 
-* assert zero balance on storage provider
-* assert non-zero balance on storage provider
-* assert getAddress fails
-* assert getBalance fails
+* assert insufficient balance on storage provider
+* assert sufficient balance on storage provider
+* assert isBalanceSufficient fails
 
 */
 
@@ -46,10 +45,13 @@ describe("isStorageBalanceZero", () => {
     register.clear();
   });
 
-  test("assert zero balance on storage provider", async () => {
+  test("assert insufficient balance on storage provider", async () => {
     // ARRANGE
     storageProvider = new TestNormalStorageProvider();
-    storageProvider.getBalance = jest.fn().mockResolvedValue("0");
+    storageProvider.isBalanceSufficient = jest.fn().mockResolvedValue({
+      sufficient: false,
+      message: "",
+    });
     v["storageProviderFactory"] = jest.fn().mockReturnValue(storageProvider);
 
     // ACT
@@ -59,10 +61,13 @@ describe("isStorageBalanceZero", () => {
     expect(result).toBeTruthy();
   });
 
-  test("assert non-zero balance on storage provider", async () => {
+  test("assert sufficient balance on storage provider", async () => {
     // ARRANGE
     storageProvider = new TestNormalStorageProvider();
-    storageProvider.getBalance = jest.fn().mockResolvedValue("100");
+    storageProvider.isBalanceSufficient = jest.fn().mockResolvedValue({
+      sufficient: true,
+      message: "",
+    });
     v["storageProviderFactory"] = jest.fn().mockReturnValue(storageProvider);
 
     // ACT
@@ -72,24 +77,12 @@ describe("isStorageBalanceZero", () => {
     expect(result).toBeFalsy();
   });
 
-  test("assert getAddress fails", async () => {
+  test("assert isBalanceSufficient fails", async () => {
     // ARRANGE
     storageProvider = new TestNormalStorageProvider();
-    storageProvider.getAddress = jest.fn().mockRejectedValue(new Error());
-    storageProvider.getBalance = jest.fn().mockResolvedValue("100");
-    v["storageProviderFactory"] = jest.fn().mockReturnValue(storageProvider);
-
-    // ACT
-    const result = await isStorageBalanceZero.call(v);
-
-    // ASSERT
-    expect(result).toBeTruthy();
-  });
-
-  test("assert getBalance fails", async () => {
-    // ARRANGE
-    storageProvider = new TestNormalStorageProvider();
-    storageProvider.getBalance = jest.fn().mockRejectedValue(new Error());
+    storageProvider.isBalanceSufficient = jest
+      .fn()
+      .mockRejectedValue(new Error());
     v["storageProviderFactory"] = jest.fn().mockReturnValue(storageProvider);
 
     // ACT

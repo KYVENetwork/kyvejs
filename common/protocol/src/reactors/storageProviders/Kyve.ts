@@ -1,7 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 import { BundleTag, IStorageProvider } from "../../types/index.js";
-import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
 import { Secp256k1HdWallet } from "@cosmjs/amino";
 import { makeADR36AminoSignDoc } from "@keplr-wallet/cosmos";
 import dotenv from "dotenv";
@@ -10,7 +9,6 @@ dotenv.config();
 
 export class Kyve implements IStorageProvider {
   public name = "Kyve";
-  public coinDecimals = 0;
 
   private chainId: string;
   private poolId: number;
@@ -41,23 +39,11 @@ export class Kyve implements IStorageProvider {
     this.poolAccount = poolAccount;
   }
 
-  async getAddress() {
-    const signer = await DirectSecp256k1HdWallet.fromMnemonic(
-      this.poolAccount,
-      {
-        prefix: "kyve",
-      }
-    );
-    const [account] = await signer.getAccounts();
-    return account.address;
-  }
-
-  async getBalance() {
-    return "";
-  }
-
-  async getPrice(_: number) {
-    return "0";
+  async isBalanceSufficient(_size: number) {
+    return {
+      sufficient: true,
+      message: "",
+    };
   }
 
   async saveBundle(bundle: Buffer, _: BundleTag[]) {

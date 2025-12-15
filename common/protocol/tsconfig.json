@@ -11,5 +11,9 @@
     "resolveJsonModule": true,
     "skipLibCheck": true
   },
-  "files": ["src/index.ts", "src/scripts/checksum.ts"]
+  "files": [
+    "src/index.ts",
+    "src/scripts/checksum.ts",
+    "src/scripts/depositFilecoin.ts"
+  ]
 }
