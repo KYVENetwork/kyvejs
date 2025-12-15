@@ -92,6 +92,13 @@ export class KyveSDK {
     if (options?.gasPrice) {
       this.config = { ...this.config, gasPrice: options.gasPrice };
     }
+
+    if (process.env["KYVE_GAS_PRICE"]) {
+      this.config = {
+        ...this.config,
+        gasPrice: parseInt(process.env["KYVE_GAS_PRICE"]),
+      };
+    }
   }
 
   /**
