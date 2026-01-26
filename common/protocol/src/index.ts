@@ -403,7 +403,7 @@ export class Validator {
     this.home = options.home;
     this.dryRun = options.dryRun;
     this.dryRunBundles = parseInt(options.dryRunBundles);
-    this.ensureNoLoss = options.ensureNoLoss;
+    this.ensureNoLoss = JSON.parse(options.ensureNoLoss);
     this.scaleEnsureNoLoss = options.scaleEnsureNoLoss;
 
     if (!this.poolAccount) {
