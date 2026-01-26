@@ -404,7 +404,7 @@ export const run = async (options: any) => {
         `${versionHome}`,
       ];
 
-      if (options.ensureNoLoss) {
+      if (JSON.parse(options.ensureNoLoss)) {
         args.push("--ensure-no-loss");
       } else {
         args.push("--ensure-no-loss");
