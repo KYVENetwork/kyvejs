@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.3.1](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint-bsync@1.3.0...@kyvejs/tendermint-bsync@1.3.1) (2026-01-26)
+
+**Note:** Version bump only for package @kyvejs/tendermint-bsync
+
 # [1.3.0](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint-bsync@1.2.17...@kyvejs/tendermint-bsync@1.3.0) (2025-12-15)
 
 ### Features
