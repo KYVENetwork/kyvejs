@@ -330,9 +330,9 @@ export class Validator {
         "0"
       )
       .option(
-        "--ensure-no-loss",
-        "Ensures that the node only uploads bundles which can be fully rewarded by the protocol.",
-        true
+        "--ensure-no-loss [value]",
+        "Ensures that the node only uploads bundles which can be fully rewarded by the protocol. Set to 'false' to disable [default = true]",
+        "true"
       )
       .option(
         "--scale-ensure-no-loss <number>",

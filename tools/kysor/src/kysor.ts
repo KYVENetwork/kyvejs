@@ -404,11 +404,23 @@ export const run = async (options: any) => {
         `${versionHome}`,
       ];
 
-      if (JSON.parse(options.ensureNoLoss)) {
-        args.push("--ensure-no-loss");
+      // Handle ensure-no-loss option: support --ensure-no-loss false to disable
+      // Normalize the value to handle both string and boolean types
+      let ensureNoLossValue: string;
+      if (options.ensureNoLoss === undefined) {
+        ensureNoLossValue = "true";
+      } else if (typeof options.ensureNoLoss === "boolean") {
+        ensureNoLossValue = options.ensureNoLoss ? "true" : "false";
       } else {
+        ensureNoLossValue = String(options.ensureNoLoss).toLowerCase();
+      }
+      
+      if (ensureNoLossValue === "false") {
         args.push("--ensure-no-loss");
-        args.push(`${false}`);
+        args.push("false");
+      } else {
+        // For true or default case, just pass the flag (defaults to true)
+        args.push("--ensure-no-loss");
       }
 
       if (options.scaleEnsureNoLoss > 0) {

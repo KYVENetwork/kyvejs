@@ -25,9 +25,10 @@
   },
   "bin": "./dist/src/index.js",
   "pkg": {
-    "scripts": "./dist/index.js",
+    "scripts": "./dist/src/index.js",
     "assets": [
-      "../../node_modules/classic-level/**/*"
+      "../../node_modules/classic-level/**/*",
+      "../../node_modules/axios/**/*"
     ],
     "targets": [
       "latest-linux-x64",
