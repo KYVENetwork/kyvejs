@@ -38,6 +38,11 @@ start
     "Scales the maximum bytes which ensure no loss with this scale factor. E.g 0.5 would mean that you would only upload 50% of the bundle size that what you could normally upload with no loss, 0 to disable this.",
     "0"
   )
+  .option(
+    "--max-upload-size <number>",
+    "Maximum bundle upload size in MB [default = 200]",
+    "200"
+  )
   .action(async (options) => {
     await run(options);
   });

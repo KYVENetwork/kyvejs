@@ -77,7 +77,7 @@ export async function createBundleProposal(this: Validator): Promise<void> {
     this.logger.debug(`this.compressionFactory()`);
     const compression = this.compressionFactory();
 
-    let maxBytes = MAX_BUNDLE_BYTE_SIZE;
+    let maxBytes = this.maxUploadSize;
 
     if (
       this.ensureNoLoss &&

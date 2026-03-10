@@ -467,6 +467,11 @@ export const run = async (options: any) => {
         args.push(`${options.gasPrice}`);
       }
 
+      if (options.maxUploadSize) {
+        args.push("--max-upload-size");
+        args.push(`${options.maxUploadSize}`);
+      }
+
       logger.info("Starting process ...");
 
       console.log("\n");
