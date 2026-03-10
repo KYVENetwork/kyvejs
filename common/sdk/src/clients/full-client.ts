@@ -7,8 +7,8 @@ import {
   createBundlesAminoConverters,
   createFundersAminoConverters,
   createGovV1AminoConverters,
-  createStakersAminoConverters,
   createMultiCoinRewardsConverters,
+  createStakersAminoConverters,
 } from "../amino";
 import { IConfig } from "../constants";
 import * as KyveRegistryTx from "../registry/tx.registry";

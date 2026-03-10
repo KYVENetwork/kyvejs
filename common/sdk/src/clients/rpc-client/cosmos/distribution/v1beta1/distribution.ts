@@ -1,8 +1,8 @@
 import { StdFee } from "@cosmjs/amino/build/signdoc";
+import { MsgWithdrawDelegatorReward } from "cosmjs-types/cosmos/distribution/v1beta1/tx";
 
 import { withTypeUrl } from "../../../../../registry/tx.registry";
 import { KyveSigning, PendingTx } from "../../../signing";
-import { MsgWithdrawDelegatorReward } from "cosmjs-types/cosmos/distribution/v1beta1/tx";
 
 export default class CosmosDistributionMethods extends KyveSigning {
   public withdrawDelegatorReward(

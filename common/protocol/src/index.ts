@@ -105,6 +105,7 @@ export class Validator {
   protected dryRunBundles!: number;
   protected ensureNoLoss!: boolean;
   protected scaleEnsureNoLoss!: number;
+  protected maxUploadSize: number = 200 * 1024 * 1024;
   protected params!: QueryParamsResponse;
 
   // tmp variables
@@ -339,6 +340,11 @@ export class Validator {
         "Scales the maximum bytes which ensure no loss with this scale factor. E.g 0.5 would mean that you would only upload 50% of the bundle size that what you could normally upload with no loss, 0 to disable this.",
         "0"
       )
+      .option(
+        "--max-upload-size <number>",
+        "Maximum bundle upload size in MB [default = 200]",
+        "200"
+      )
       .action((options) => {
         this.start(options);
       });
@@ -405,6 +411,7 @@ export class Validator {
     this.dryRunBundles = parseInt(options.dryRunBundles);
     this.ensureNoLoss = JSON.parse(options.ensureNoLoss);
     this.scaleEnsureNoLoss = options.scaleEnsureNoLoss;
+    this.maxUploadSize = parseInt(options.maxUploadSize || "200") * 1024 * 1024;
 
     if (!this.poolAccount) {
       this.logger.fatal(`Pool account not found. Exiting ...`);

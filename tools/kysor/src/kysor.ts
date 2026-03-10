@@ -414,7 +414,7 @@ export const run = async (options: any) => {
       } else {
         ensureNoLossValue = String(options.ensureNoLoss).toLowerCase();
       }
-      
+
       if (ensureNoLossValue === "false") {
         args.push("--ensure-no-loss");
         args.push("false");
@@ -465,6 +465,14 @@ export const run = async (options: any) => {
       if (options.gasPrice) {
         args.push("--gas-price");
         args.push(`${options.gasPrice}`);
+      }
+
+      if (
+        options.maxUploadSize !== undefined &&
+        options.maxUploadSize !== null
+      ) {
+        args.push("--max-upload-size");
+        args.push(`${options.maxUploadSize}`);
       }
 
       logger.info("Starting process ...");
