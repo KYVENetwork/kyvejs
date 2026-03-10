@@ -9,8 +9,14 @@ import { MsgVoteBundleProposal } from "@kyvejs/types/client/kyve/bundles/v1beta1
 import { MsgClaimUploaderRole } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx.js";
 import { MsgSkipUploaderRole } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx.js";
 import { MsgUpdateParams as MsgUpdateParamsBundles } from "@kyvejs/types/client/kyve/bundles/v1beta1/tx.js";
+import { MsgFundPool } from "@kyvejs/types/client/kyve/funders/v1beta1/tx";
+import { MsgDefundPool } from "@kyvejs/types/client/kyve/funders/v1beta1/tx";
 /** fees **/
 import { MsgUpdateParams as MsgUpdateParamsGlobal } from "@kyvejs/types/client/kyve/global/v1beta1/tx";
+/** multi_coin_rewards **/
+import { MsgSetMultiCoinRewardsDistributionPolicy } from "@kyvejs/types/client/kyve/multi_coin_rewards/v1beta1/tx";
+import { MsgToggleMultiCoinRewards } from "@kyvejs/types/client/kyve/multi_coin_rewards/v1beta1/tx";
+import { MsgUpdateParams as MsgUpdateParamsMultiCoinRewards } from "@kyvejs/types/client/kyve/multi_coin_rewards/v1beta1/tx";
 import { MsgCreatePool } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
 import { MsgUpdatePool } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
 import { MsgDisablePool } from "@kyvejs/types/client/kyve/pool/v1beta1/tx";
@@ -26,8 +32,6 @@ import { MsgUpdateParams as MsgUpdateParamsStakers } from "@kyvejs/types/client/
 /** funders **/
 import { MsgCreateFunder } from "@kyvejs/types/lcd/kyve/funders/v1beta1/tx";
 import { MsgUpdateFunder } from "@kyvejs/types/lcd/kyve/funders/v1beta1/tx";
-import { MsgFundPool } from "@kyvejs/types/client/kyve/funders/v1beta1/tx";
-import { MsgDefundPool } from "@kyvejs/types/client/kyve/funders/v1beta1/tx";
 import {
   MsgWithdrawDelegatorReward,
   MsgWithdrawValidatorCommission,
@@ -40,10 +44,6 @@ import {
   MsgEditValidator,
   MsgUndelegate,
 } from "cosmjs-types/cosmos/staking/v1beta1/tx";
-/** multi_coin_rewards **/
-import { MsgSetMultiCoinRewardsDistributionPolicy } from "@kyvejs/types/client/kyve/multi_coin_rewards/v1beta1/tx";
-import { MsgToggleMultiCoinRewards } from "@kyvejs/types/client/kyve/multi_coin_rewards/v1beta1/tx";
-import { MsgUpdateParams as MsgUpdateParamsMultiCoinRewards } from "@kyvejs/types/client/kyve/multi_coin_rewards/v1beta1/tx";
 
 // TODO: why does <[string, GeneratedType]> does not work anymore?
 export const registry: ReadonlyArray<[string, any]> = [

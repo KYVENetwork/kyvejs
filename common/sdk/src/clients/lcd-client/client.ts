@@ -2,13 +2,13 @@ import { BundlesModuleLCDClient } from "./bundles/v1beta1/query";
 import { DelegationModuleLCDClient } from "./delegation/v1beta1/query";
 import { FundersModuleLCDClient } from "./funders/v1beta1/query";
 import { GlobalModuleLCDClient } from "./global/v1beta1/query";
+import { MultiCoinRewardsModuleLCDClient } from "./multi_coin_rewards/v1/query";
 import { PoolModuleLCDClient } from "./pool/v1beta1/query";
-import { QueryModuleLCDClient } from "./query/v1beta1/query";
 import { QueryModuleV1LCDClient } from "./query/v1/query";
+import { QueryModuleLCDClient } from "./query/v1beta1/query";
 import { StakersModuleLCDClient } from "./stakers/v1/query";
 import { TeamModuleLCDClient } from "./team/v1beta1/query";
 import { V1BundlesLCDClient } from "./v1/bundles/query";
-import { MultiCoinRewardsModuleLCDClient } from "./multi_coin_rewards/v1/query";
 
 class KyveLCDClient {
   public v1: {

@@ -1,7 +1,4 @@
 import { StdFee } from "@cosmjs/amino/build/signdoc";
-
-import { withTypeUrl } from "../../../../../registry/tx.registry";
-import { KyveSigning, PendingTx } from "../../../signing";
 import {
   MsgBeginRedelegate,
   MsgCancelUnbondingDelegation,
@@ -10,6 +7,9 @@ import {
   MsgEditValidator,
   MsgUndelegate,
 } from "cosmjs-types/cosmos/staking/v1beta1/tx";
+
+import { withTypeUrl } from "../../../../../registry/tx.registry";
+import { KyveSigning, PendingTx } from "../../../signing";
 
 export default class CosmosStakingMethods extends KyveSigning {
   public delegate(
