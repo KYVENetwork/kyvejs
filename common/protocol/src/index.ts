@@ -105,7 +105,7 @@ export class Validator {
   protected dryRunBundles!: number;
   protected ensureNoLoss!: boolean;
   protected scaleEnsureNoLoss!: number;
-  protected maxUploadSize!: number;
+  protected maxUploadSize: number = 200 * 1024 * 1024;
   protected params!: QueryParamsResponse;
 
   // tmp variables
@@ -411,7 +411,7 @@ export class Validator {
     this.dryRunBundles = parseInt(options.dryRunBundles);
     this.ensureNoLoss = JSON.parse(options.ensureNoLoss);
     this.scaleEnsureNoLoss = options.scaleEnsureNoLoss;
-    this.maxUploadSize = parseInt(options.maxUploadSize) * 1024 * 1024;
+    this.maxUploadSize = parseInt(options.maxUploadSize || "200") * 1024 * 1024;
 
     if (!this.poolAccount) {
       this.logger.fatal(`Pool account not found. Exiting ...`);
