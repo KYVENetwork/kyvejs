@@ -467,7 +467,7 @@ export const run = async (options: any) => {
         args.push(`${options.gasPrice}`);
       }
 
-      if (options.maxUploadSize) {
+      if (options.maxUploadSize !== undefined && options.maxUploadSize !== null) {
         args.push("--max-upload-size");
         args.push(`${options.maxUploadSize}`);
       }
