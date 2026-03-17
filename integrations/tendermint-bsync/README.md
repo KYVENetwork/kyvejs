@@ -4,6 +4,10 @@
 
 - [Introduction](#introduction)
 - [Use cases](#use-cases)
+- [Architecture](#architecture)
+  - [Data Collection Flow](#data-collection-flow)
+  - [Runtime Implementation](#runtime-implementation)
+- [Required Setup](#required-setup)
 - [Integrations currently live](#integrations-currently-live)
   - [Mainnet](#mainnet)
   - [Testnet](#testnet)
@@ -18,6 +22,7 @@
     - [Step 2: Start kyve node](#step-2-start-kyve-node)
 - [Creating a pool with the runtime](#creating-a-pool-with-the-runtime)
   - [Config](#config)
+  - [Environment Variable Override](#environment-variable-override)
   - [Create Pool governance proposal](#create-pool-governance-proposal)
 
 ## Introduction
@@ -32,6 +37,156 @@ Since storage pools which use this runtime archive validated and historical bloc
 to bootstrap themselves and sync to the current network height. This may make expensive archival nodes obsolete since those blocks are
 already permanently and immutably archived. Additionally, block data can be retrieved over an ELT pipeline, further analyzing and using
 it for different applications like block explorers.
+
+## Architecture
+
+This section explains how Tendermint blocks are collected for block-sync (fast sync) and archived.
+
+### Data Collection Flow
+
+```mermaid
+graph TB
+    subgraph "Data Source"
+        TM[Tendermint Node<br/>Cosmos SDK Chain]
+    end
+
+    subgraph "KYVE Protocol Node"
+        Runtime[Tendermint BSync Runtime]
+        Cache[Local Cache]
+        Protocol[Protocol Core]
+    end
+
+    subgraph "Storage & Chain"
+        Storage[Storage Provider<br/>Arweave]
+        Chain[KYVE Chain]
+    end
+
+    TM -->|1. /block?height=N<br/>fetch block only| Runtime
+    Runtime -->|2. Prevalidate<br/>height & chain_id| Runtime
+    Runtime -->|3. No transform<br/>pass through| Runtime
+    Runtime -->|4. Cache| Cache
+    Cache -->|5. Bundle 100 blocks| Protocol
+    Protocol -->|6. Compress| Protocol
+    Protocol -->|7. Upload| Storage
+    Storage -->|8. Propose| Chain
+    Chain -->|9. Validators download| Storage
+    Storage -->|10. Validate| Runtime
+    Runtime -->|11. Vote VALID/INVALID| Chain
+
+    style Runtime fill:#e1f5ff
+    style Protocol fill:#fff4e1
+    style Chain fill:#ffe1e1
+```
+
+![Tendermint Block-Sync Architecture](./assets/tendermint-bsync.png)
+
+**Key Differences from Standard Tendermint Runtime:**
+
+1. **Block Data Only**: Fetches only block data, **not** `block_results`
+   - Significantly faster data collection
+   - Smaller bundle sizes (~50% reduction)
+   - Ideal for fast sync use cases where events aren't needed
+
+2. **No Transformation**: Block data is already deterministic
+   - No event sorting required
+   - No attribute manipulation needed
+   - Simpler and faster validation
+
+3. **Exact Validation**: Simple JSON comparison
+   - No ABSTAIN votes needed
+   - No non-determinism handling required
+   - Either VALID or INVALID
+
+4. **Optimized for Speed**: Designed for rapid blockchain synchronization
+   - Nodes can quickly download validated blocks
+   - Fast sync from genesis to current height
+   - Minimal overhead compared to running full archival node
+
+### Runtime Implementation
+
+The runtime implements a streamlined version of the `IRuntime` interface:
+
+#### 1. getDataItem
+Fetches block at a given height:
+- Calls `/block?height={key}` to get block data
+- Returns only the `block` object (not block_results)
+- Significantly faster than full block + block_results fetch
+
+**Data Structure:**
+```typescript
+{
+  key: "block_height",
+  value: {
+    header: {
+      height: "block_height",
+      chain_id: "cosmoshub-4",
+      time: "2021-01-01T00:00:00Z",
+      // ... other header fields
+    },
+    data: {
+      txs: [/* base64 encoded transactions */]
+    },
+    evidence: { /* evidence of misbehavior */ },
+    last_commit: { /* commit signatures */ }
+  }
+}
+```
+
+#### 2. prevalidateDataItem
+Validates basic block properties:
+- **Block exists**: Ensures value is defined
+- **Height matches**: Verifies block height matches key
+- **Chain ID matches**: Confirms block belongs to configured network
+
+No schema validation is performed (unlike standard Tendermint runtime) - relying on Tendermint node to provide valid blocks.
+
+#### 3. transformDataItem
+No transformation applied:
+- Block data from Tendermint is already deterministic
+- No event sorting needed (no events included)
+- Data passed through as-is
+
+#### 4. validateDataItem
+Simple exact JSON comparison:
+- Compares proposed and validation items with `JSON.stringify`
+- Returns **VALID** if exact match
+- Returns **INVALID** if any difference
+
+**No ABSTAIN votes** - block data is fully deterministic, so validators always agree or disagree.
+
+#### 5. summarizeDataBundle
+Creates merkle root from bundle:
+- Hashes all block data in the bundle
+- Generates merkle tree from hashes
+- Returns merkle root as hex string
+- Used for compact on-chain verification
+
+#### 6. nextKey
+Increments block height by 1 to get next block.
+
+**Comparison with Standard Tendermint Runtime:**
+
+| Feature | tendermint-bsync | tendermint |
+|---------|-----------------|------------|
+| Data Fetched | Block only | Block + block_results |
+| Transform | None | Sort events, remove logs |
+| Validation | Exact match | Exact match → ABSTAIN if events differ |
+| Vote Types | VALID, INVALID | VALID, INVALID, ABSTAIN |
+| Use Case | Fast sync | Full data archive + event indexing |
+| Bundle Size | ~50% smaller | Larger (includes events) |
+| Speed | Faster | Slower (more data to process) |
+
+**When to Use tendermint-bsync:**
+- Fast blockchain synchronization
+- Block Explorer data feeds (without events)
+- Historical block archival for sync purposes
+- When event data is not required
+
+**When to Use standard tendermint:**
+- Need transaction events for indexing
+- Building analytics on blockchain events
+- Full blockchain data archival
+- When complete block execution results are required
 
 ## Required Setup
 
@@ -267,11 +422,18 @@ This config should then be stringified on the pool and should look like this:
 }
 ```
 
-With this setup the runtime is able to run. Furthermore an optional environment variable can be set to override the default rpc endpoint (`rpc`).
+### Environment Variable Override
+
+You can override the pool's RPC endpoint using the `KYVEJS_TENDERMINT_BSYNC_RPC` environment variable. This is useful for:
+- Using a local node instead of a remote endpoint
+- Testing with different RPC providers
+- Running multiple pools with different endpoints
 
 ```bash
 export KYVEJS_TENDERMINT_BSYNC_RPC="https://my-custom-rpc-endpoint:26657"
 ```
+
+When set, this environment variable takes precedence over the `rpc` value in the pool config.
 
 ### Create Pool governance proposal
 

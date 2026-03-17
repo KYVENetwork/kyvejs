@@ -4,6 +4,12 @@
 
 - [Introduction](#introduction)
 - [Use cases](#use-cases)
+- [Architecture](#architecture)
+  - [Data Collection Flow](#data-collection-flow)
+  - [Determinism and Data Transformation](#determinism-and-data-transformation)
+  - [Non-deterministic Data Handling](#non-deterministic-data-handling)
+  - [Runtime Implementation](#runtime-implementation)
+- [Required Setup](#required-setup)
 - [Integrations currently live](#integrations-currently-live)
   - [Mainnet](#mainnet)
   - [Testnet](#testnet)
@@ -14,6 +20,7 @@
 - [Run a node](#run-a-node)
 - [Creating a pool with the runtime](#creating-a-pool-with-the-runtime)
   - [Config](#config)
+  - [Environment Variable Override](#environment-variable-override)
   - [Create Pool governance proposal](#create-pool-governance-proposal)
 
 ## Introduction
@@ -28,6 +35,158 @@ Since storage pools which use this runtime archive validated and historical bloc
 to bootstrap themselves and sync to the current network height. This may make expensive archival nodes obsolete since those blocks are
 already permanently and immutably archived. Additionally, block data can be retrieved over an ELT pipeline, further analyzing and using
 it for different applications like block explorers.
+
+## Architecture
+
+This section explains how Tendermint block data is collected, validated, and archived.
+
+### Data Collection Flow
+
+```mermaid
+graph TB
+    subgraph "Data Source"
+        TM[Tendermint Node<br/>Cosmos SDK Chain]
+    end
+
+    subgraph "KYVE Protocol Node"
+        Runtime[Tendermint Runtime]
+        Cache[Local Cache]
+        Protocol[Protocol Core]
+    end
+
+    subgraph "Storage & Chain"
+        Storage[Storage Provider<br/>Arweave/Walrus]
+        Chain[KYVE Chain]
+    end
+
+    TM -->|1. /block?height=N| Runtime
+    TM -->|2. /block_results?height=N| Runtime
+    Runtime -->|3. Prevalidate<br/>schema & chain_id| Runtime
+    Runtime -->|4. Transform<br/>sort attributes| Runtime
+    Runtime -->|5. Cache| Cache
+    Cache -->|6. Bundle| Protocol
+    Protocol -->|7. Compress| Protocol
+    Protocol -->|8. Upload| Storage
+    Storage -->|9. Propose| Chain
+    Chain -->|10. Validators download| Storage
+    Storage -->|11. Validate| Runtime
+    Runtime -->|12. Vote<br/>VALID/ABSTAIN/INVALID| Chain
+
+    style Runtime fill:#e1f5ff
+    style Protocol fill:#fff4e1
+    style Chain fill:#ffe1e1
+```
+
+![Tendermint Runtime Architecture](./assets/tendermint.png)
+
+### Determinism and Data Transformation
+
+Tendermint block data contains events that can have non-deterministic ordering. The runtime ensures determinism through sophisticated data transformation:
+
+**Key Transformations:**
+
+1. **Sort Event Attributes Alphabetically**
+   - All event attributes in `begin_block_events`, `end_block_events`, `finalize_block_events`, and transaction events are sorted by key
+   - This ensures consistent ordering across all validators
+   - Example: `[{key: "amount"}, {key: "recipient"}, {key: "sender"}]` becomes sorted alphabetically
+
+2. **Remove Index Fields**
+   - The `index` field is removed from all attributes as it's not deterministic
+   - Only the key-value pairs are preserved
+
+3. **Delete Duplicate Data**
+   - The `log` property is deleted from transaction results as it contains duplicate information
+   - This reduces bundle size and ensures consistency
+
+4. **Blacklist Non-deterministic Event Properties**
+   - Certain event properties are known to be non-deterministic (e.g., IBC acknowledgments)
+   - These are cleared (set to empty string) to prevent false INVALID votes
+   - Example: `fungible_token_packet.Acknowledgement` is blacklisted
+
+**Blacklisted Fields:**
+- `fungible_token_packet.Acknowledgement` - IBC acknowledgment data (non-deterministic)
+
+### Non-deterministic Data Handling
+
+Even with transformation, `block_results` can still differ between nodes due to non-deterministic events. The runtime implements a two-stage validation strategy:
+
+```mermaid
+graph TD
+    Start[Start Validation] --> Exact[Try Exact JSON Match<br/>block + block_results]
+    Exact -->|Match| Valid[Vote VALID]
+    Exact -->|No Match| Remove[Remove block_results<br/>from both items]
+    Remove --> CompareBlock[Compare block only]
+    CompareBlock -->|Match| Abstain[Vote ABSTAIN<br/>Only block_results differ]
+    CompareBlock -->|No Match| Invalid[Vote INVALID<br/>Block data differs]
+
+    style Valid fill:#90ee90
+    style Abstain fill:#ffeb3b
+    style Invalid fill:#ff6b6b
+```
+
+**Validation Strategy:**
+
+**Stage 1 - Exact Match:**
+- Compares complete data items (block + block_results)
+- If exact match: Returns VALID (ideal case)
+
+**Stage 2 - Block-Only Match:**
+- Removes `block_results` from both proposed and validation items
+- Compares only the `block` data
+- If block matches: Returns ABSTAIN (only events differed - safe to abstain)
+- If block differs: Returns INVALID (genuine data mismatch)
+
+**Why ABSTAIN for block_results differences?**
+- Tendermint events can be non-deterministic across nodes
+- Different nodes may emit events in different orders or with slight variations
+- The block itself (transactions, headers, signatures) is deterministic
+- ABSTAIN prevents false INVALID votes that would incorrectly slash honest uploaders
+- Allows consensus to proceed based on validators who can fully verify
+
+### Runtime Implementation
+
+The runtime implements the `IRuntime` interface with the following flow:
+
+#### 1. getDataItem
+Fetches block and block results at a given height:
+- Calls `/block?height={key}` to get full block data with transactions
+- Calls `/block_results?height={key}` to get block execution results (events, transaction results)
+- Returns both as a combined data item
+
+#### 2. prevalidateDataItem
+Validates data before caching with comprehensive checks:
+- **Block and block_results existence**: Ensures both are defined
+- **Height matching**: Verifies block height matches the key
+- **Chain ID validation**: Confirms block belongs to the configured network
+- **Schema validation**: Uses JSON schemas (Ajv) to validate structure
+  - Validates against `block.json` schema (block structure)
+  - Validates against `block_result.json` schema (events structure)
+
+These checks catch malformed data early before it enters the cache.
+
+#### 3. transformDataItem
+Transforms data to ensure deterministic validation:
+- **Sorts all event attributes** alphabetically by key
+- **Removes index fields** from all attributes
+- **Deletes log property** from transaction results (duplicate data)
+- **Clears blacklisted properties** (e.g., IBC acknowledgments)
+- Applies to: `begin_block_events`, `end_block_events`, `finalize_block_events`, and `txs_results`
+
+#### 4. validateDataItem
+Implements two-stage validation strategy:
+- **Stage 1**: Exact JSON comparison of complete data items
+- **Stage 2**: If mismatch, removes `block_results` and compares blocks only
+- Returns: VALID (exact match), ABSTAIN (only events differ), or INVALID (blocks differ)
+
+#### 5. summarizeDataBundle
+Creates merkle root from bundle:
+- Hashes all data items in the bundle
+- Generates merkle tree from hashes
+- Returns merkle root as hex string
+- Used for compact on-chain verification
+
+#### 6. nextKey
+Increments block height by 1 to get next block.
 
 ## Required Setup
 
@@ -161,11 +320,18 @@ This config should then be stringified on the pool and should look like this:
 }
 ```
 
-With this setup the runtime is able to run. Furthermore an optional environment variable can be set to override the default rpc endpoint (`rpc`).
+### Environment Variable Override
+
+You can override the pool's RPC endpoint using the `KYVEJS_TENDERMINT_RPC` environment variable. This is useful for:
+- Using a local node instead of a remote endpoint
+- Testing with different RPC providers
+- Running multiple pools with different endpoints
 
 ```bash
 export KYVEJS_TENDERMINT_RPC="https://my-custom-rpc-endpoint:26657"
 ```
+
+When set, this environment variable takes precedence over the `rpc` value in the pool config.
 
 ### Create Pool governance proposal
 
