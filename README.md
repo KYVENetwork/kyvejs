@@ -13,11 +13,11 @@
 <div align="center">
   <img alt="License: Apache-2.0" src="https://badgen.net/github/license/KYVENetwork/kyvejs?color=green" />
 
-  <img alt="License: Apache-2.0" src="https://badgen.net/github/stars/KYVENetwork/kyvejs?color=green" />
+  <img alt="GitHub stars" src="https://badgen.net/github/stars/KYVENetwork/kyvejs?color=green" />
 
-  <img alt="License: Apache-2.0" src="https://badgen.net/github/contributors/KYVENetwork/kyvejs?color=green" />
+  <img alt="GitHub contributors" src="https://badgen.net/github/contributors/KYVENetwork/kyvejs?color=green" />
 
-  <img alt="License: Apache-2.0" src="https://badgen.net/github/releases/KYVENetwork/kyvejs?color=green" />
+  <img alt="GitHub releases" src="https://badgen.net/github/releases/KYVENetwork/kyvejs?color=green" />
 </div>
 
 <div align="center">
